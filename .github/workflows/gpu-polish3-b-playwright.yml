@@ -4,6 +4,7 @@ on:
     branches: [gpu-polish3/b-cinematography]
     paths:
       - '.github/workflows/gpu-polish3-b-playwright.yml'
+      - 'gpu-decompose/polish3/cinematography/playwright_studio.py'
   workflow_dispatch:
 permissions:
   contents: read
