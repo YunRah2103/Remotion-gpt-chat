@@ -117,8 +117,8 @@ def blade_mesh(parent,cx,cz,idx,material):
  faces=[]
  for j in range(len(sections)-1):
   k=2*j;t=k+2
-  faces.append((k,k+1,t+1,t))
-  faces.append((face_count+t,face_count+t+1,face_count+k+1,face_count+k))
+  faces.append((k,t,t+1,k+1))
+  faces.append((face_count+k,face_count+k+1,face_count+t+1,face_count+t))
  for j in range(face_count-1):
   if j%2==0:
    faces.append((j,j+2,face_count+j+2,face_count+j))
@@ -169,11 +169,11 @@ cad=HERE/"fan_hub.stl"
 if not cad.exists():raise RuntimeError("Real OpenSCAD STL required before modelling: "+str(cad))
 # Accurate-looking solid black nine-blade fan rotors with dark recessed wells.
 # The OpenSCAD hub remains truly embedded, mounted behind each visible cap.
-well_mat=mat("M_DARK_RECESSED_FAN_WELL",(.006,.008,.010),.08,.82)
+well_mat=mat("M_DARK_RECESSED_FAN_WELL",(.008,.010,.014),.08,.82)
 fan_tip_mat=mat("M_FAN_BLADE_WARM_BLACK",(.016,.019,.023),.07,.39)
 fan_decal=mat("M_FAN_LOGOMARK_SILVER",(.47,.51,.55),.33,.38)
 for i,(x,node) in enumerate(zip([-.94,0,.94],fan_nodes)):
- cylinder("Recessed_black_cooler_well_%d"%i,(x,-.157,.025),.445,.009,well_mat,node,72)
+ cylinder("Recessed_black_cooler_well_%d"%i,(x,-.185,.025),.445,.009,well_mat,node,72)
  torus("Fan_anti_vibration_gasket_%d"%i,(x,-.211,.025),.456,.011,rim,node)
  torus("Fan_precision_outer_bezel_%d"%i,(x,-.225,.025),.463,.007,frame_mat,node)
  for j in range(9):blade_mesh(node,x,.025,j,blade)
