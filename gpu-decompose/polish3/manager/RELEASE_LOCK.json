@@ -15,5 +15,5 @@
   "approvedProofRunId": null,
   "approvedProofArtifactId": null,
   "independentVisualQa": "PENDING",
-  "sourceNotes": "Final A run 37833031666 SHA e5e274; pinned new model and B source. Manager CI must publish PROOF_RUN_POINTER.json after successful native artifact upload. Independent 1080x1920 moving QA required."
+  "sourceNotes": "Native final A+B integrated manager proof pass requested; CI now records an ACTIVE_RUN_POINTER.json immediately at checkout for diagnostics. The exact A/B hashes remain unchanged."
 }
