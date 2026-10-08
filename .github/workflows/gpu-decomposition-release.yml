@@ -66,6 +66,12 @@ jobs:
             if [ -z "$FILE" ]; then echo "::error::Agent A missing $name";exit 1; fi
             cp "$FILE" "public/gpu-decompose/$name"
           done
+          mkdir -p out/blender-source
+          for still in assembled.png exploded.png; do
+            FILE=$(find model-checkout/gpu-decompose/assets model-artifact -type f -name "$still" 2>/dev/null | head -n1 || true)
+            test -s "$FILE" || { echo "::error::Genuine Blender proof missing: $still"; exit 1; }
+            cp "$FILE" "out/blender-source/$still"
+          done
           python3 gpu-decompose/director/validate_assets.py public/gpu-decompose --lock gpu-decompose/director/AGENT_A_LOCK.json | tee out/asset-preflight.json
           python3 - <<'PY'
           import json
@@ -151,6 +157,7 @@ jobs:
             out/asset-preflight.json
             out/compositions.txt
             out/native-proof/
+            out/blender-source/
             out/technical-guides.mp4
             out/manim.log
             out/studio.log
