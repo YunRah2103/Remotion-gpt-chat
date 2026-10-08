@@ -1,0 +1,284 @@
+name: GPU Decomposition - gated genuine-GLB final master
+on:
+  push:
+    branches: [gpu-decompose/b-director]
+    paths:
+      - 'gpu-decompose/director/AGENT_A_LOCK.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  verify-native-assets-and-previews:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Checkout director source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify exact approved Agent A source lock
+        id: lock
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s gpu-decompose/director/AGENT_A_LOCK.json
+          python3 - <<'PY'
+          import json, re
+          x=json.load(open('gpu-decompose/director/AGENT_A_LOCK.json'))
+          assert re.fullmatch('[a-f0-9]{40}',x['agentASha']),x
+          assert re.fullmatch('[a-f0-9]{64}',x['glbSha256']),x
+          assert re.fullmatch('[a-f0-9]{64}',x['animationSha256']),x
+          assert isinstance(x.get('artifactRunId',0),int) and x.get('artifactRunId',0)>=0,x
+          if x.get('artifactRunId',0):
+            assert isinstance(x.get('artifactName'),str) and x['artifactName'],x
+          print('Locked Agent A SHA:',x['agentASha'])
+          PY
+          echo "sha=$(jq -r .agentASha gpu-decompose/director/AGENT_A_LOCK.json)" >> "$GITHUB_OUTPUT"
+          echo "run_id=$(jq -r '.artifactRunId // 0' gpu-decompose/director/AGENT_A_LOCK.json)" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=$(jq -r '.artifactName // "none"' gpu-decompose/director/AGENT_A_LOCK.json)" >> "$GITHUB_OUTPUT"
+      - name: Checkout Agent A exact verified commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.lock.outputs.sha }}
+          path: model-checkout
+          persist-credentials: false
+      - name: Download only specified Agent A asset artifact, when required
+        if: steps.lock.outputs.run_id != '0'
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ steps.lock.outputs.artifact_name }}
+          run-id: ${{ steps.lock.outputs.run_id }}
+          github-token: ${{ github.token }}
+          path: model-artifact
+      - name: Stage genuine 3D geometry, manifest and locked trajectories
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s model-checkout/gpu-decompose/agent-a/HANDOFF.md
+          test -s model-checkout/gpu-decompose/agent-a/blender_generate.py
+          find model-checkout/gpu-decompose/agent-a -name '*.scad' -type f | grep -q .
+          find model-checkout/gpu-decompose/agent-a -name '*.py' -type f | grep -q .
+          mkdir -p public/gpu-decompose out
+          for name in xfx_swift_rx9060xt_triple16.glb decomposition.json asset-manifest.json; do
+            FILE=$(find model-checkout/gpu-decompose/assets model-artifact -type f -name "$name" 2>/dev/null | head -n1 || true)
+            if [ -z "$FILE" ]; then echo "::error::Agent A missing $name";exit 1; fi
+            cp "$FILE" "public/gpu-decompose/$name"
+          done
+          python3 gpu-decompose/director/validate_assets.py public/gpu-decompose --lock gpu-decompose/director/AGENT_A_LOCK.json | tee out/asset-preflight.json
+      - name: Setup Remotion & ffmpeg & actual Manim/Playwright
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install CI dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg pkg-config build-essential libcairo2-dev libpango1.0-dev python3-dev
+          npm install --no-audit --no-fund
+          python3 -m venv /tmp/gpu-film-tools
+          /tmp/gpu-film-tools/bin/pip install --disable-pip-version-check 'manim==0.21.0' 'playwright==1.56.0'
+          /tmp/gpu-film-tools/bin/python -m playwright install --with-deps chromium
+      - name: TypeScript, composition registration and genuine 3D native moving proofs
+        run: |
+          set -euo pipefail
+          npm run check
+          npx remotion compositions src/index.ts --gl=swangle | tee out/compositions.txt
+          grep -q XfxSwiftDecomposition out/compositions.txt
+          mkdir -p out/native-proof
+          for frame in 0 5 89 90 175 180 220 290 329 330 385 449; do
+            npx remotion still src/index.ts XfxSwiftDecomposition "out/native-proof/frame-$frame.png" --frame="$frame" --gl=swangle
+            test -s "out/native-proof/frame-$frame.png"
+          done
+          npx remotion render src/index.ts XfxSwiftDecomposition out/native-proof/moving-120-123.mp4 --frames=120-123 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
+          ffmpeg -v error -xerror -i out/native-proof/moving-120-123.mp4 -f null -
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=noprint_wrappers=1:nokey=1 out/native-proof/moving-120-123.mp4)" = 4
+      - name: Real Playwright browser loading, not a screenshot fabrication
+        run: |
+          set -euo pipefail
+          npx remotion studio src/index.ts --port=3177 > out/studio.log 2>&1 &
+          STUDIO_PID=$!
+          trap 'kill "$STUDIO_PID" || true' EXIT
+          for i in $(seq 1 30); do
+            if curl -fsS -o /dev/null http://127.0.0.1:3177; then break; fi
+            sleep 2
+          done
+          /tmp/gpu-film-tools/bin/python - <<'PY'
+          from playwright.sync_api import sync_playwright
+          with sync_playwright() as p:
+              browser=p.chromium.launch(headless=True,args=['--no-sandbox'])
+              page=browser.new_page(viewport={'width':1280,'height':800})
+              response=page.goto('http://127.0.0.1:3177',wait_until='domcontentloaded',timeout=90000)
+              assert response is not None and response.status==200
+              page.wait_for_timeout(2500)
+              page.screenshot(path='out/native-proof/playwright-studio.png',full_page=True)
+              browser.close()
+          print('PASS Playwright real Chromium rendered Studio web app')
+          PY
+      - name: Render genuine 450-frame Manim calibration overlay
+        run: |
+          set -euo pipefail
+          mkdir -p out/manim
+          /tmp/gpu-film-tools/bin/manim -ql --disable_caching -r 540,960 --fps 30 --media_dir out/manim gpu-decompose/overlays/technical_guides.py TechnicalGuides | tee out/manim.log
+          MOVIE=$(find out/manim -type f -name 'TechnicalGuides.mp4' | head -n1)
+          test -s "$MOVIE"
+          ffmpeg -v error -y -i "$MOVIE" -vf 'fps=30,scale=540:960,tpad=stop_mode=clone:stop_duration=1,trim=duration=15,setpts=PTS-STARTPTS' -an -c:v libx264 -pix_fmt yuv420p out/technical-guides.mp4
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=noprint_wrappers=1:nokey=1 out/technical-guides.mp4)" = 450
+          ffmpeg -v error -xerror -i out/technical-guides.mp4 -f null -
+      - name: Upload hash-validated 3D model for independent render jobs
+        uses: actions/upload-artifact@v4
+        with:
+          name: GPU-VERIFIED-ASSET-INPUTS
+          path: public/gpu-decompose/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Upload native proofs, Playwright browser evidence and Manim clip
+        uses: actions/upload-artifact@v4
+        with:
+          name: GPU-NATIVE-PROOFS-AND-MANIM
+          path: |
+            out/asset-preflight.json
+            out/compositions.txt
+            out/native-proof/
+            out/technical-guides.mp4
+            out/manim.log
+            out/studio.log
+          retention-days: 30
+          if-no-files-found: error
+
+  native-chunks:
+    needs: verify-native-assets-and-previews
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [0, 1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: GPU-VERIFIED-ASSET-INPUTS
+          path: public/gpu-decompose
+      - name: Render 90 real 3D model frames on software-backed WebGL
+        shell: bash
+        env:
+          PART: ${{ matrix.part }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          npm install --no-audit --no-fund
+          mkdir -p out/chunks
+          START=$(( PART * 90 ))
+          END=$(( START + 89 ))
+          npx remotion render src/index.ts XfxSwiftDecomposition "out/chunks/xfx-$PART.mp4" --frames="$START-$END" --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          ffmpeg -hide_banner -loglevel error -xerror -i "out/chunks/xfx-$PART.mp4" -f null -
+          ffprobe -v error -show_entries stream=nb_frames,width,height,r_frame_rate,pix_fmt -select_streams v:0 -of json "out/chunks/xfx-$PART.mp4" > "out/chunks/part-$PART.json"
+          python3 - "$PART" <<'PY'
+          import sys,json
+          v=json.load(open('out/chunks/part-'+sys.argv[1]+'.json'))['streams'][0]
+          assert (v['nb_frames'],v['width'],v['height'],v['r_frame_rate'],v['pix_fmt'])==('90',1080,1920,'30/1','yuv420p'),v
+          print('PASS 90 genuine native frames chunk',sys.argv[1])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gpu-native-chunk-${{ matrix.part }}
+          path: out/chunks/
+          retention-days: 30
+          if-no-files-found: error
+
+  assemble-validate-candidate:
+    needs: native-chunks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install FFmpeg for exact master encode
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: gpu-native-chunk-*
+          merge-multiple: true
+          path: out/chunks
+      - uses: actions/download-artifact@v4
+        with:
+          name: GPU-NATIVE-PROOFS-AND-MANIM
+          path: out/proofs
+      - name: Join all 450 real model frames, generate mechanical sound and overlay genuine Manim
+        run: |
+          set -euo pipefail
+          mkdir -p out/release
+          for i in 0 1 2 3 4; do
+            test -s "out/chunks/xfx-$i.mp4"
+            COUNT=$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=noprint_wrappers=1:nokey=1 "out/chunks/xfx-$i.mp4")
+            test "$COUNT" = 90
+            echo "file 'chunks/xfx-$i.mp4'" >> out/concat.txt
+          done
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i out/concat.txt -c copy out/visual-450.mp4
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=noprint_wrappers=1:nokey=1 out/visual-450.mp4)" = 450
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i "sine=frequency=64:duration=15:sample_rate=48000" \
+            -f lavfi -i "anoisesrc=color=pink:amplitude=0.11:duration=15:sample_rate=48000" \
+            -f lavfi -i "sine=frequency=470:duration=15:sample_rate=48000" \
+            -filter_complex "[0:a]volume=0.055,lowpass=f=145,afade=t=in:st=0:d=1.2,afade=t=out:st=14:d=1[hum];[1:a]highpass=f=220,lowpass=f=3000,volume=0.035,afade=t=in:st=1:d=0.9,afade=t=out:st=14:d=1[air];[2:a]volume='if(between(t,3,11),0.012,0.002)':eval=frame,afade=t=in:st=0:d=0.5[mech];[hum][air][mech]amix=inputs=3:duration=first:normalize=0,alimiter=limit=0.85[a]" \
+            -map "[a]" -ar 48000 -ac 2 -c:a aac -b:a 192k out/sound.m4a
+          test -s out/proofs/technical-guides.mp4
+          ffmpeg -hide_banner -loglevel error -y -i out/visual-450.mp4 -i out/proofs/technical-guides.mp4 -i out/sound.m4a \
+            -filter_complex "[1:v]scale=1080:1920:flags=bicubic[guide];[0:v][guide]blend=all_mode=screen:shortest=1,format=yuv420p[v]" \
+            -map "[v]" -map 2:a:0 -c:v libx264 -preset fast -crf 18 -pix_fmt yuv420p -color_range tv \
+            -r 30 -c:a aac -b:a 192k -ar 48000 -ac 2 -t 15 -movflags +faststart \
+            out/release/XFX-SWIFT-RX9060XT-DECONSTRUCTED-15S.mp4
+      - name: FFprobe assertions, decode every frame, screenshots and checksum
+        run: |
+          set -euo pipefail
+          F=out/release/XFX-SWIFT-RX9060XT-DECONSTRUCTED-15S.mp4
+          ffmpeg -hide_banner -loglevel error -xerror -i "$F" -f null -
+          ffprobe -v error -show_streams -show_format -of json "$F" > out/release/ffprobe.json
+          python3 - <<'PY'
+          import json
+          p=json.load(open('out/release/ffprobe.json'))
+          v=next(x for x in p['streams'] if x['codec_type']=='video')
+          a=next(x for x in p['streams'] if x['codec_type']=='audio')
+          assert (v['codec_name'],v['pix_fmt'],v['width'],v['height'],v['r_frame_rate'],v['nb_frames'])==('h264','yuv420p',1080,1920,'30/1','450'),v
+          assert (a['codec_name'],a['sample_rate'],a['channels'])==('aac','48000',2),a
+          assert abs(float(p['format']['duration'])-15.0)<.075,p['format']
+          print('PASS full file: 450/450 frames 15s 1080x1920 30fps H264 yuv420p + 48kHz stereo AAC')
+          PY
+          ffmpeg -hide_banner -loglevel warning -i "$F" -vf 'blackdetect=d=0.5:pix_th=0.03:pic_th=0.98' -an -f null - 2> out/release/blackdetect.log
+          ffmpeg -hide_banner -loglevel warning -i "$F" -vf 'freezedetect=n=-62dB:d=2' -an -f null - 2> out/release/freezedetect.log
+          ffmpeg -hide_banner -loglevel error -y -ss 2.0 -i "$F" -frames:v 1 -update 1 out/release/hero.png
+          ffmpeg -hide_banner -loglevel error -y -ss 13.7 -i "$F" -frames:v 1 -update 1 out/release/exploded.png
+          for s in 0 3 6 9 11 14; do
+            ffmpeg -hide_banner -loglevel error -y -ss "$s" -i "$F" -frames:v 1 -update 1 "out/release/review-$s.png"
+          done
+          (cd out/release && sha256sum XFX-SWIFT-RX9060XT-DECONSTRUCTED-15S.mp4) > out/release/SHA256SUMS.txt
+          cp gpu-decompose/director/AGENT_A_LOCK.json out/release/source-manifest.json
+          cat > out/release/QA.md <<'EOF'
+          # XFX Swift GPU Decomposition — automated final technical validation
+          - Entire finished MP4 fully decoded without FFmpeg errors.
+          - 450 unique frame positions in 15 seconds, encoded H.264/yuv420p, 1080x1920, 30fps.
+          - 48kHz AAC stereo mechanical soundtrack, original procedural sound.
+          - Genuine Blender-exported 3D GLB source and exact Agent A commit/hashes locked before render.
+          - Genuine native Manim technical animation blended at final encode.
+          - Playwright Chromium Studio smoke test and Remotion native proof stills generated earlier in this same workflow run.
+          - Blender, OpenSCAD, PyBullet, Godot implementation/proof source is required from Agent A.
+          - Manufacturer external appearance targeted; unverified PCB/internal layouts are artistic approximation.
+          - This is an **automatically validated release candidate**. A human/agent visual review of actual video is STILL REQUIRED before claiming final creative QA approval.
+          EOF
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GPU-DECOMPOSITION-FINAL-450F
+          path: out/release/
+          retention-days: 30
+          if-no-files-found: error
