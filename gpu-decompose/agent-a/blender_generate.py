@@ -451,13 +451,25 @@ bpy.ops.render.render(write_still=True)
 # Restore all root groups after each proof; export was already completed above.
 def proof_view(fname,cam_pos,scale,frame=0,hide=(),target=(0,0,0)):
  scene.frame_set(frame)
- for ob in (fans,shroud,sink,board,back): ob.hide_render=ob.name in hide
+ # Blender's hide_render on an EMPTY does not reliably hide the child meshes.
+ # Hide actual descendant objects and restore them after each proof.
+ hidden=[]
+ for obj in coll.objects:
+  p=obj
+  while p is not None:
+   if p.name in hide:
+    if obj.type != "EMPTY":
+     assert not obj.hide_render
+     obj.hide_render=True
+     hidden.append(obj)
+    break
+   p=p.parent
  camera.location=cam_pos
  camera.rotation_euler=(Vector(target)-camera.location).to_track_quat("-Z","Y").to_euler()
  camera.data.ortho_scale=scale
  scene.render.filepath=str(ASSETS/fname)
  bpy.ops.render.render(write_still=True)
- for ob in (fans,shroud,sink,board,back):ob.hide_render=False
+ for obj in hidden:obj.hide_render=False
 
 scene.render.resolution_x=960;scene.render.resolution_y=640
 scene.cycles.samples=32
@@ -476,7 +488,7 @@ proof_view("rear_backplate_polish3.png",(2.1,5.1,2.30),3.75,0,
 # Agent C's unpublished polish3 camera contract remains authoritative.
 scene.render.resolution_x=720;scene.render.resolution_y=1280
 scene.cycles.samples=24
-proof_view("exploded_film_camera.png",(8.2,-5.55,2.8),6.25,449)
+proof_view("exploded_film_camera.png",(8.2,-5.55,2.8),7.45,449)
 scene.render.resolution_x=960;scene.render.resolution_y=640
 
 # Moving proof frames vary both the *real* part offsets and camera orbit,
