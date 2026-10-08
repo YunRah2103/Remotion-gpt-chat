@@ -4,7 +4,6 @@ on:
     branches: [gpu-polish3/c-master]
     paths:
       - 'gpu-decompose/polish3/manager/RELEASE_LOCK.json'
-      - '.github/workflows/gpu-polish3-c-production.yml'
   workflow_dispatch:
 
 permissions:
