@@ -18,7 +18,10 @@ assert len(j.get("meshes",[]))>=40
 materials=[x.get("name") for x in j.get("materials",[])]
 assert "M_PCB_DARK_GREEN" in materials
 assert "M_FAN_BLADE" in materials
-assert "M_POLYMER_GRAPHITE" in materials
+assert "M_DARK_RECESSED_FAN_WELL" in materials
+assert sum(1 for n in nodes if n.startswith("OpenSCAD_FanHub_"))==3
+assert sum(1 for n in nodes if n.startswith("BroadRotorBlade_"))==27
+assert "M_MONOLITHIC_XFX_FASCIA" in materials
 motion=json.loads((root/"decomposition.json").read_text())
 assert motion["durationInFrames"]==450 and motion["fps"]==30
 assert set(motion["nodes"])<=nodes

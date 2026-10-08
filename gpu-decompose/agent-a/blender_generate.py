@@ -194,27 +194,24 @@ for i,(x,node) in enumerate(zip([-.94,0,.94],fan_nodes)):
 fascia=mat("M_MONOLITHIC_XFX_FASCIA",(.025,.028,.033),.14,.61)
 fascia_highlight=mat("M_ANGULAR_FASCIA_HIGHLIGHT",(.047,.051,.058),.25,.48)
 edgeblack=mat("M_TRIPLE_FAN_BEZEL_BLACK",(.016,.019,.024),.28,.43)
-def aperture_fascia(parent,cx):
- verts=[];faces=[]
- segments=128;inner=.453
- for i in range(segments):
-  a0=i*math.tau/segments;a1=(i+1)*math.tau/segments
-  def point(a,r):
-   return (cx+r*math.cos(a),-.217,.025+r*math.sin(a))
-  def outer(a):
-   ca=math.cos(a);sa=math.sin(a)
-   upper=.570
-   lower=.600
-   edge=upper if sa>=0 else lower
-   return min(.475/max(1e-6,abs(ca)),edge/max(1e-6,abs(sa)))
-  start=len(verts)
-  verts.extend([point(a0,inner),point(a0,outer(a0)),point(a1,outer(a1)),point(a1,inner)])
-  faces.extend([(start,start+1,start+2),(start,start+2,start+3)])
- mesh=bpy.data.meshes.new("Solid_Apertured_Shroud_Tris")
- mesh.from_pydata(verts,[],faces);mesh.update()
- ob=bpy.data.objects.new("One_piece_black_front_fascia",mesh)
- coll.objects.link(ob);ob.parent=parent;mesh.materials.append(fascia)
-for fan_x in [-.94,0,.94]:aperture_fascia(shroud,fan_x)
+# One physically continuous polymer front fascia, three Boolean-drilled circular fan apertures.
+# Removes the visible vertical panel seams of the first two prototypes.
+frontpanel=box("Swift_unified_one_piece_fan_fascia",(0,-.215,0),
+               (2.874,.022,1.176),fascia,shroud)
+for idx,fan_x in enumerate([-.94,0,.94]):
+ bpy.ops.mesh.primitive_cylinder_add(vertices=128,radius=.454,depth=.24,
+   location=(fan_x,-.215,.025),rotation=(math.pi/2,0,0))
+ cutter=bpy.context.object
+ cutter.name="CUTTER_%d"%idx
+ mod=frontpanel.modifiers.new("Real_fan_aperture_%d"%idx,"BOOLEAN")
+ mod.operation="DIFFERENCE";mod.solver="EXACT";mod.object=cutter
+ bpy.ops.object.select_all(action="DESELECT")
+ frontpanel.select_set(True);bpy.context.view_layer.objects.active=frontpanel
+ bpy.ops.object.modifier_apply(modifier=mod.name)
+ bpy.data.objects.remove(cutter,do_unlink=True)
+assert len(frontpanel.data.polygons)>100, "Boolean circular apertures failed"
+bevel=frontpanel.modifiers.new("Continuous_moulded_face_edges","BEVEL")
+bevel.width=.005;bevel.segments=2
 # Seamless edge body: no raised square separators between individual fans.
 box("Monolithic_shroud_top",(0,-.143,.593),(2.89,.147,.046),fascia,shroud,.015)
 box("Monolithic_shroud_bottom",(0,-.143,-.596),(2.89,.146,.046),fascia,shroud,.015)
