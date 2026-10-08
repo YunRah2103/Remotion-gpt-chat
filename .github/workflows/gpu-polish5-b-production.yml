@@ -32,7 +32,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          npm ci --no-audit --no-fund
+          npm install --no-audit --no-fund
           npm run check
           python3 gpu-decompose/polish5/manager/verify_polish5.py lock gpu-decompose/polish5/manager/RELEASE_LOCK.json
           L=gpu-decompose/polish5/manager/RELEASE_LOCK.json
@@ -122,7 +122,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
-          npm ci --no-audit --no-fund
+          npm install --no-audit --no-fund
           npm run check
           python3 gpu-decompose/polish5/manager/verify_polish5.py assets \
             public/gpu-decompose/polish5 out/provenance/RELEASE_LOCK.json
@@ -174,7 +174,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
-          npm ci --no-audit --no-fund
+          npm install --no-audit --no-fund
           npm run check
           python3 gpu-decompose/polish5/manager/verify_polish5.py assets \
             public/gpu-decompose/polish5 out/provenance/RELEASE_LOCK.json
