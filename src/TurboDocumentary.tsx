@@ -28,7 +28,7 @@ const Direction:React.FC<{frame:number;stage:number}>=({frame,stage})=>{
  useLayoutEffect(()=>{
   const t=frame-sceneStart[stage];
   if(stage===0){
-   camera.position.set(pos(t,[0,65,149],[5.3,4.8,3.2]),pos(t,[0,149],[2.35,2.3]),pos(t,[0,149],[8.7,7.5,4.9]));
+   camera.position.set(pos(t,[0,65,149],[5.3,4.8,3.2]),pos(t,[0,149],[2.35,2.3]),pos(t,[0,75,149],[8.7,7.5,4.9]));
    camera.lookAt(0,.67,-.1);
   }else if(stage===1){
    camera.position.set(pos(t,[0,149],[3.2,2.2]),pos(t,[0,149],[2.2,1.4]),pos(t,[0,149],[7.7,5.8]));
