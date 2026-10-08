@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/gpu-polish4-d-*.yml'
       - 'gpu-decompose/polish4/manager/verify_polish4.py'
+      - 'gpu-decompose/polish4/manager/synthesize_mechanical_audio.py'
   workflow_dispatch:
 permissions:
   contents: read
@@ -41,3 +42,12 @@ jobs:
           npm install --no-audit --no-fund
           npm run check
           printf 'POLISH04 D CONFIGURATION SMOKE PASS\n'
+      - name: Validate deterministic 15-second AAC-ready mechanical score
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 gpu-decompose/polish4/manager/synthesize_mechanical_audio.py /tmp/polish04-mechanical.wav
+          ffprobe -v error -show_entries stream=codec_name,channels,sample_rate -show_entries format=duration -of json /tmp/polish04-mechanical.wav
+          ffmpeg -v error -y -i /tmp/polish04-mechanical.wav -c:a aac -b:a 192k /tmp/polish04-mechanical.m4a
+          ffmpeg -v error -xerror -i /tmp/polish04-mechanical.m4a -f null -
+          ffmpeg -hide_banner -i /tmp/polish04-mechanical.m4a -af volumedetect -f null - 2>&1 | tail -12
