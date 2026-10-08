@@ -1,0 +1,15 @@
+{
+  "contractVersion": "POLISH03-AUDIO-FINAL-v1",
+  "baseRunId": 37836701382,
+  "baseArtifactId": 11575164881,
+  "baseArtifactName": "GPU-POLISH3-FINAL-450F",
+  "baseMp4Sha256": "ab2c54921f222d37e332748a76dc095656d3d9fd11dc79cda61c1b52fb405b35",
+  "gainDb": 30,
+  "durationFrames": 450,
+  "managerVisualReview": "PASS",
+  "sourceASha": "e5e274437a47b554af7940911e5a825397dc64f3",
+  "sourceBSha": "0eed29a86067bccd74c5d6e44eb116d2bcd4d95c",
+  "approvedNativeProofRunId": 37836009799,
+  "approvedNativeProofArtifactId": 11575916990,
+  "notes": "+30dB final audible mechanical bed, H264 video bitstream copy mandatory, SHA256 compare of decoded pixels, independent final QA by C."
+}
