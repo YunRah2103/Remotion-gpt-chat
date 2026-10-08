@@ -1,0 +1,54 @@
+name: Render VECTOR film
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Check TypeScript
+        run: npm run check
+      - name: Render full 1080x1920 MP4
+        run: |
+          mkdir -p out
+          npx remotion render src/index.ts VectorFilm out/VectorFilm-silent.mp4 --codec=h264 --pixel-format=yuv420p --concurrency=2
+      - name: Cinematic procedural audio
+        run: |
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i "sine=frequency=67:duration=9:sample_rate=48000" \
+            -f lavfi -i "anoisesrc=color=pink:amplitude=0.20:duration=9:sample_rate=48000" \
+            -filter_complex "[0:a]volume=0.22,afade=t=in:st=0:d=0.15,afade=t=out:st=8.5:d=0.5[bass];[1:a]highpass=f=340,lowpass=f=2000,volume=0.10,afade=t=in:st=0:d=0.25,afade=t=out:st=8.4:d=0.6[air];[bass][air]amix=inputs=2:duration=shortest:normalize=0[a]" \
+            -map "[a]" -c:a aac -b:a 192k out/sound.m4a
+          ffmpeg -hide_banner -loglevel error -y -i out/VectorFilm-silent.mp4 -i out/sound.m4a \
+            -map 0:v:0 -map 1:a:0 -c:v copy -c:a copy -t 9 -movflags +faststart out/VECTOR-001.mp4
+      - name: Validate final media
+        run: |
+          ffmpeg -hide_banner -loglevel error -xerror -i out/VECTOR-001.mp4 -f null -
+          ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,pix_fmt,width,height,nb_frames,r_frame_rate -of json out/VECTOR-001.mp4 > out/validation.json
+          ffprobe -v error -select_streams a:0 -show_entries stream=codec_name,sample_rate,channels -of json out/VECTOR-001.mp4 > out/audio-validation.json
+          cat out/validation.json
+          cat out/audio-validation.json
+          sha256sum out/VECTOR-001.mp4 > out/SHA256SUMS.txt
+      - name: Upload final video
+        uses: actions/upload-artifact@v4
+        with:
+          name: VECTOR-001-1080x1920
+          path: |
+            out/VECTOR-001.mp4
+            out/validation.json
+            out/audio-validation.json
+            out/SHA256SUMS.txt
+          retention-days: 30
+          if-no-files-found: error
