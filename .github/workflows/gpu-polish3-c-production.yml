@@ -1,0 +1,327 @@
+name: GPU POLISH 03 - manager proof and guarded full render
+on:
+  push:
+    branches: [gpu-polish3/c-master]
+    paths:
+      - 'gpu-decompose/polish3/manager/RELEASE_LOCK.json'
+      - '.github/workflows/gpu-polish3-c-production.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  verified-input:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    outputs:
+      phase: ${{ steps.lock.outputs.phase }}
+      model_run: ${{ steps.lock.outputs.model_run }}
+      model_name: ${{ steps.lock.outputs.model_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Require independent A/B commit locks and explicit manager stage
+        id: lock
+        shell: bash
+        run: |
+          set -euo pipefail
+          L=gpu-decompose/polish3/manager/RELEASE_LOCK.json
+          python3 gpu-decompose/polish3/manager/verify_polish3.py lock "$L"
+          echo "phase=$(jq -r .status "$L")" >> "$GITHUB_OUTPUT"
+          echo "model_run=$(jq -r .modelArtifactRunId "$L")" >> "$GITHUB_OUTPUT"
+          echo "model_name=$(jq -r .modelArtifactName "$L")" >> "$GITHUB_OUTPUT"
+      - name: Verify exact numeric model artifact from source run (no latest fallback)
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          L=gpu-decompose/polish3/manager/RELEASE_LOCK.json
+          AID=$(jq -r .modelArtifactId "$L")
+          RID=$(jq -r .modelArtifactRunId "$L")
+          ANAME=$(jq -r .modelArtifactName "$L")
+          curl -fLsS -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/$RID/artifacts?per_page=100" > /tmp/artifacts.json
+          jq -e --argjson id "$AID" --arg name "$ANAME" \
+            '.artifacts[] | select(.id==$id and .name==$name and .expired==false)' \
+            /tmp/artifacts.json >/dev/null
+          echo "Verified exact model artifact $AID from run $RID"
+      - name: Download new A model ONLY from locked run
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ steps.lock.outputs.model_name }}
+          run-id: ${{ steps.lock.outputs.model_run }}
+          github-token: ${{ github.token }}
+          path: out/model-artifact
+      - name: Stage ONLY new model and JSON under existing runtime name
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p public/gpu-decompose out/preflight
+          python3 - <<'PY'
+          from pathlib import Path
+          from shutil import copyfile
+          source = Path('out/model-artifact')
+          for filename,target in (
+              ('xfx_swift_rx9060xt_polish3.glb','xfx_swift_rx9060xt_triple16.glb'),
+              ('decomposition.json','decomposition.json'),
+          ):
+              matches=[f for f in source.rglob(filename) if f.is_file()]
+              assert len(matches)==1, f"expected one new Agent A {filename}; got {matches}"
+              copyfile(matches[0],Path('public/gpu-decompose')/target)
+              print('STAGED',matches[0],'=>',target)
+          matches=[p for p in source.rglob('asset-manifest.json') if p.is_file()]
+          assert len(matches)==1, 'new source manifest absent or ambiguous'
+          copyfile(matches[0],Path('out/preflight/model-asset-manifest.json'))
+          PY
+          python3 gpu-decompose/polish3/manager/verify_polish3.py assets \
+            public/gpu-decompose gpu-decompose/polish3/manager/RELEASE_LOCK.json \
+            | tee out/preflight/asset-validation.json
+          cp gpu-decompose/polish3/manager/RELEASE_LOCK.json out/preflight/RELEASE_LOCK.json
+          (cd public/gpu-decompose && sha256sum xfx_swift_rx9060xt_triple16.glb decomposition.json) \
+            > out/preflight/STAGED_SHA256SUMS.txt
+      - name: Publish immutable validated native inputs for downstream jobs
+        uses: actions/upload-artifact@v4
+        with:
+          name: GPU-POLISH3-C-HASHED-ASSETS
+          path: |
+            public/gpu-decompose/
+            out/preflight/
+          retention-days: 30
+          if-no-files-found: error
+
+  native-proofs:
+    if: needs.verified-input.outputs.phase == 'proofs'
+    needs: verified-input
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: GPU-POLISH3-C-HASHED-ASSETS
+          path: .
+      - name: Install and revalidate exact source before video
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          npm install --no-audit --no-fund
+          npm run check
+          python3 gpu-decompose/polish3/manager/verify_polish3.py assets \
+            public/gpu-decompose gpu-decompose/polish3/manager/RELEASE_LOCK.json
+      - name: Genuine 1080x1920 stills at all POLISH 03 review frames
+        run: |
+          set -euo pipefail
+          mkdir -p out/polish3-proof
+          for f in 0 45 89 120 179 240 329 385 449; do
+            npx remotion still src/index.ts XfxSwiftDecomposition \
+              "out/polish3-proof/frame-$f.png" --frame="$f" --gl=swangle
+            test -s "out/polish3-proof/frame-$f.png"
+          done
+      - name: Real moving native 3D preview over release and exploded stages
+        run: |
+          set -euo pipefail
+          for spec in '105-115' '138-148' '240-252' '385-396'; do
+            npx remotion render src/index.ts XfxSwiftDecomposition \
+              "out/polish3-proof/moving-$spec.mp4" --frames="$spec" \
+              --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
+            ffmpeg -v error -xerror -i "out/polish3-proof/moving-$spec.mp4" -f null -
+            ffprobe -v error -show_entries stream=nb_frames,width,height,pix_fmt -of json \
+              "out/polish3-proof/moving-$spec.mp4" > "out/polish3-proof/moving-$spec.ffprobe.json"
+          done
+      - name: Explicit human/agent review remains mandatory
+        run: |
+          cat > out/polish3-proof/PROOF_README.txt <<'EOF'
+          This is an actual rendered native proof artifact, not final approval.
+          C MUST download, view and compare it against baseline original and
+          check fans/shroud, PCB, fins, empty space, colours and exploded parallax.
+          Do NOT set RELEASE_LOCK status=release before independent QA.
+          Proof source identity is pinned in out/preflight/RELEASE_LOCK.json.
+          EOF
+          cp out/preflight/RELEASE_LOCK.json out/polish3-proof/PROOF_RELEASE_LOCK.json
+          cp out/preflight/STAGED_SHA256SUMS.txt out/polish3-proof/INPUT_SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GPU-POLISH3-C-NATIVE-PROOFS
+          path: out/polish3-proof/
+          retention-days: 30
+          if-no-files-found: error
+
+  final-native-chunks:
+    if: needs.verified-input.outputs.phase == 'release'
+    needs: verified-input
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [0, 1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: GPU-POLISH3-C-HASHED-ASSETS
+          path: .
+      - name: Render independent verified full-resolution 90-frame part
+        shell: bash
+        env:
+          PART: ${{ matrix.part }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          npm install --no-audit --no-fund
+          npm run check
+          python3 gpu-decompose/polish3/manager/verify_polish3.py assets \
+            public/gpu-decompose gpu-decompose/polish3/manager/RELEASE_LOCK.json
+          mkdir -p out/chunks
+          START=$((PART*90))
+          END=$((START+89))
+          npx remotion render src/index.ts XfxSwiftDecomposition \
+            "out/chunks/xfx-$PART.mp4" --frames="$START-$END" \
+            --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          ffmpeg -v error -xerror -i "out/chunks/xfx-$PART.mp4" -f null -
+          COUNT=$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames \
+            -of default=noprint_wrappers=1:nokey=1 "out/chunks/xfx-$PART.mp4")
+          test "$COUNT" = 90
+          ffprobe -v error -show_entries stream=nb_frames,width,height,r_frame_rate,pix_fmt \
+            -of json "out/chunks/xfx-$PART.mp4" > "out/chunks/part-$PART.json"
+          python3 - "$PART" <<'PY'
+          import json,sys
+          v=json.load(open('out/chunks/part-'+sys.argv[1]+'.json'))['streams'][0]
+          assert (v['nb_frames'],v['width'],v['height'],v['r_frame_rate']) == ('90',1080,1920,'30/1'),v
+          assert v['pix_fmt'] in ('yuv420p','yuvj420p'),v
+          print('PASS native 90-frame render',sys.argv[1])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gpu-polish3-native-chunk-${{ matrix.part }}
+          path: out/chunks/
+          retention-days: 30
+          if-no-files-found: error
+
+  build-full-master:
+    needs: [verified-input, final-native-chunks]
+    if: needs.verified-input.outputs.phase == 'release'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: GPU-POLISH3-C-HASHED-ASSETS
+          path: .
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: gpu-polish3-native-chunk-*
+          merge-multiple: true
+          path: out/chunks
+      - name: Install ffmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Assemble 450 actual frames and original clean mechanical audio
+        run: |
+          set -euo pipefail
+          mkdir -p out/release
+          : > out/concat.txt
+          for part in 0 1 2 3 4; do
+            F="out/chunks/xfx-$part.mp4"
+            test -s "$F"
+            test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames \
+              -of default=noprint_wrappers=1:nokey=1 "$F")" = 90
+            echo "file 'chunks/xfx-$part.mp4'" >> out/concat.txt
+          done
+          ffmpeg -v error -y -f concat -safe 0 -i out/concat.txt \
+            -c copy out/visual-450.mp4
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames \
+            -of default=noprint_wrappers=1:nokey=1 out/visual-450.mp4)" = 450
+
+          ffmpeg -v error -y \
+            -f lavfi -i 'sine=frequency=65:duration=15:sample_rate=48000' \
+            -f lavfi -i 'anoisesrc=color=pink:amplitude=0.08:duration=15:sample_rate=48000' \
+            -filter_complex '[0:a]volume=0.050,lowpass=f=145,afade=t=in:st=0:d=0.5,afade=t=out:st=14:d=1[hum];[1:a]highpass=f=200,lowpass=f=2200,volume=0.025,afade=t=in:st=1:d=.6,afade=t=out:st=14:d=.8[air];[hum][air]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.85[a]' \
+            -map '[a]' -ar 48000 -ac 2 -c:a aac -b:a 192k out/sound.m4a
+
+          # CRITICAL POLISH 03 FIX: NEVER reapply old RGB/gbrp Manim screen-blend
+          # chain. It corrupted charcoal native frames into magenta at old release.
+          # Keep native video colour values, mux only the original mechanical audio.
+          ffmpeg -v error -y -i out/visual-450.mp4 -i out/sound.m4a \
+            -map 0:v:0 -map 1:a:0 -c:v libx264 -preset fast -crf 18 \
+            -pix_fmt yuv420p -color_range tv -r 30 \
+            -c:a aac -b:a 192k -ar 48000 -ac 2 -t 15 -movflags +faststart \
+            out/release/XFX-SWIFT-RX9060XT-POLISH03-15S.mp4
+      - name: Assert codecs, full 450-frame decode and **no magenta colour regression**
+        shell: bash
+        run: |
+          set -euo pipefail
+          F=out/release/XFX-SWIFT-RX9060XT-POLISH03-15S.mp4
+          ffmpeg -v error -xerror -i "$F" -f null -
+          ffprobe -v error -show_streams -show_format -of json "$F" > out/release/ffprobe.json
+          python3 - <<'PY'
+          import json,subprocess
+          p=json.load(open('out/release/ffprobe.json'))
+          v=[s for s in p['streams'] if s['codec_type']=='video']
+          a=[s for s in p['streams'] if s['codec_type']=='audio']
+          assert len(v)==1 and len(a)==1,p['streams']
+          assert (v[0]['codec_name'],v[0]['pix_fmt'],v[0]['width'],v[0]['height'],v[0]['r_frame_rate'],v[0]['nb_frames']) == ('h264','yuv420p',1080,1920,'30/1','450'),v
+          assert (a[0]['codec_name'],a[0]['sample_rate'],a[0]['channels']) == ('aac','48000',2),a
+          assert abs(float(p['format']['duration'])-15.0) < 0.075,p['format']
+          def corner_rgb(path):
+              out=subprocess.check_output([
+                'ffmpeg','-v','error','-i',path,'-vf',
+                'crop=2:2:10:10,format=rgb24','-frames:v','1',
+                '-f','rawvideo','-pix_fmt','rgb24','-'
+              ])
+              assert len(out)==12,(path,len(out))
+              return tuple(out[:3])
+          raw=corner_rgb('out/chunks/xfx-0.mp4')
+          final=corner_rgb('out/release/XFX-SWIFT-RX9060XT-POLISH03-15S.mp4')
+          print('corner original native RGB',raw,'final RGB',final)
+          assert max(abs(raw[i]-final[i]) for i in range(3))<=24,(raw,final)
+          assert not (final[0]-final[1]>45 and final[2]-final[1]>45), 'old magenta cast returned'
+          print('PASS video codec, audio, framecount, duration, decoded native colour integrity')
+          PY
+          ffmpeg -v error -y -i "$F" -vf "select=eq(n\,45)" -vsync vfr \
+            -frames:v 1 out/release/hero.png
+          ffmpeg -v error -y -i "$F" -vf "select=eq(n\,240)" -vsync vfr \
+            -frames:v 1 out/release/mid-decomposition.png
+          ffmpeg -v error -y -i "$F" -vf "select=eq(n\,449)" -vsync vfr \
+            -frames:v 1 out/release/exploded.png
+          for frame in 0 45 89 120 179 240 329 385 449; do
+            ffmpeg -v error -y -i "$F" -vf "select=eq(n\,$frame)" -vsync vfr \
+              -frames:v 1 "out/release/review-$frame.png"
+          done
+          (cd out/release && sha256sum XFX-SWIFT-RX9060XT-POLISH03-15S.mp4 \
+             hero.png mid-decomposition.png exploded.png) > out/release/SHA256SUMS.txt
+          cp out/preflight/RELEASE_LOCK.json out/release/source-manifest.json
+          cat > out/release/VISUAL_REVIEW.md <<'EOF'
+          # POLISH 03 pending post-render visual sign-off
+          Automated technical checks and explicit native-to-mux colour regression
+          comparison have passed within this workflow. THE FINAL MP4 MUST STILL
+          BE DOWNLOADED AND INSPECTED by Agent C before claiming creative approval.
+          Required compared frames: 0,45,89,120,179,240,329,385,449.
+          Required moving review: fans/shroud release, cooler/PCB, final explosion.
+          Compare with baseline artifact 11570565750 and raw native chunk 11569408516.
+          Internal engineering details are artistically approximate, not XFX CAD.
+          EOF
+          echo "Automated technical candidate generated; final creative review PENDING" > out/release/FINAL_RELEASE.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GPU-POLISH3-FINAL-450F
+          path: out/release/
+          retention-days: 30
+          if-no-files-found: error
