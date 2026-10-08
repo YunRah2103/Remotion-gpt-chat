@@ -1,0 +1,10 @@
+{
+  "runId": 37837671314,
+  "headSha": "4cfe99fa0332304368cffee4c07aea6335e7d7fd",
+  "artifactId": 11576047638,
+  "artifactName": "GPU-POLISH3-FINAL-450F-AUDIOPOLISHED",
+  "baseRunId": 37836701382,
+  "baseArtifactId": 11575164881,
+  "status": "COMPLETE",
+  "note": "Manager must still independently download exact final ZIP and validate SHA256"
+}
