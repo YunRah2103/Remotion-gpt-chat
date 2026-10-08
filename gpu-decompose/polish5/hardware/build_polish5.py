@@ -426,12 +426,15 @@ view("05_heatpipe_coldplate_macro.png",(-.15,-2.2,1.18),(-.25,-.018,0),1.35,grou
 view("06_populated_pcb.png",(-.05,-2.6,1.4),(-.32,.05,0),2.55,groups=("PCB_ASSEMBLY",))
 view("07_gpu_vram_macro.png",(-.36,-1.7,.68),(-.30,.046,0),1.04,groups=("PCB_ASSEMBLY",))
 view("08_vrm_macro.png",(.57,-1.65,.63),(.37,.05,0),1.04,groups=("PCB_ASSEMBLY",))
-view("09_backplate_macro.png",(.3,2.2,1.1),(.10,.23,0),2.2,groups=("BACKPLATE",))
+# The outlet is actually open. Include genuine cooler fins visible through it;
+# hiding them would misleadingly depict an empty black aperture.
+view("09_backplate_macro.png",(.3,2.2,1.1),(.10,.23,0),2.2,groups=("BACKPLATE","HEATSINK_FINS"))
 # Exploded proof poses must only translate canonical anchors; do not bake those poses into GLB.
 explode=[("FAN_LEFT",(-.18,-.93,0)),("FAN_CENTER",(0,-1.00,0)),
          ("FAN_RIGHT",(.18,-.93,0)),("FRONT_SHROUD",(0,-.33,0)),
-         ("HEATSINK",(.04,.19,.10)),("PCB_ASSEMBLY",(0,.65,-.14)),
-         ("BACKPLATE",(0,1.14,-.03))]
+         ("HEATSINK",(.04,.19,.10)),("PCB_ASSEMBLY",(0,.80,-.62)),
+         ("GPU_DIE",(.10,-.34,-.05)),("VRAM_CHIPS",(0,-.22,.04)),
+         ("BACKPLATE",(0,1.35,.37))]
 saved={k:N[k].location.copy() for k,_ in explode}
 for k,d in explode:N[k].location= saved[k]+Vector(d)
 view("10_exploded.png",(3.7,-6.0,3.0),(.02,.05,0),5.1)
