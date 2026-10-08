@@ -22,7 +22,8 @@ jobs:
       - name: Install Blender, FFmpeg, and Remotion
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq blender ffmpeg
+          sudo apt-get install -y -qq blender ffmpeg python3-numpy
+          blender -b --python-expr "import sys; print('BLENDER PYTHON',sys.version); import numpy; print('NUMPY',numpy.__version__)"
           npm install --no-audit --no-fund
           blender --version | head -2
           ffmpeg -version | head -1
