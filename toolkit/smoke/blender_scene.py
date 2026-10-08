@@ -15,6 +15,7 @@ scene.render.resolution_y = 192
 scene.render.resolution_percentage = 100
 scene.render.image_settings.file_format = "PNG"
 scene.render.filepath = os.path.abspath("toolkit/out/blender-wheel.png")
+scene.world = bpy.data.worlds.new("Studio World")
 scene.world.color = (0.05, 0.05, 0.05)
 
 mat = bpy.data.materials.new("Emerald metallic")
