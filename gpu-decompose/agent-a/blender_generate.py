@@ -128,6 +128,7 @@ def blade_mesh(parent,cx,cz,idx,material):
  faces.append((0,1,face_count+1,face_count))
  last=face_count-2
  faces.append((last,face_count+last,face_count+last+1,last+1))
+ assert all(0<=idx<len(verts) for face in faces for idx in face), "Invalid rotor polygon index"
  me=bpy.data.meshes.new("MouldedSweptFanBlade")
  me.from_pydata(verts,[],faces);me.update()
  ob=bpy.data.objects.new("BroadRotorBlade_%02d"%idx,me)
