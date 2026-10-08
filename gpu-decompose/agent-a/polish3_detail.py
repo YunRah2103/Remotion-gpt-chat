@@ -55,9 +55,9 @@ def augment(g):
     # Replace the monolithic straight-edged bars with three staggered dense
     # banks of physically separated, 3-D extruded, variable-profile fins.
     for obj in list(coll.objects):
-        if obj.name.startswith("HeatsinkFin_") or obj.name=="HeatsinkFrame":
-            bpy.data.objects.remove(obj,do_unlink=True)
-        if obj.name.startswith("HeatPipe6mm_"):
+        name = obj.name  # cache before deleting Blender's StructRNA pointer
+        if (name.startswith("HeatsinkFin_") or name=="HeatsinkFrame"
+                or name.startswith("HeatPipe6mm_")):
             bpy.data.objects.remove(obj,do_unlink=True)
     bright_fin=mat("M_P3_FIN_FOLDED_ALUMINIUM",(.43,.48,.52),.86,.25)
     edge_fin=mat("M_P3_FIN_BRIGHT_EDGE",(.66,.70,.73),.89,.20)
@@ -198,9 +198,10 @@ def augment(g):
         xx=-1.34+idx*.066
         if -.58<xx<-.03:continue
         st=.40 if idx%2 else -.39
-        linebar("P3_SignalRoute_%02d"%idx,
-                (xx,st),(xx+.060,st+(.050 if idx%2 else -.050)),
-                .004,pcb,mask)
+        zz=st+(.025 if idx%2 else -.025)
+        ob=box("P3_SignalRoute_%02d"%idx,
+               (xx+.030,.071,zz),(.078,.002,.004),mask,pcb,.001)
+        ob.rotation_euler[1]=(-.55 if idx%2 else .55)
     for i in range(22):
         xx=-1.28+(i%11)*.166
         zz=(-.47,.47)[i//11]

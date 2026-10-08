@@ -22,7 +22,7 @@ assert "M_BACKPLATE_THERMAL_PAD" in materials
 assert "Backplate_machined_one_piece" in nodes
 assert "Rear_vent_rib" not in nodes
 assert sum(n.startswith("VRM_inductor_L") for n in nodes)==8
-assert "M_DARK_RECESSED_FAN_WELL" in materials
+assert "M_P3_STATOR_CAST_GRAPHITE" in materials
 assert sum(1 for n in nodes if n.startswith("OpenSCAD_FanHub_"))==3
 assert sum(1 for n in nodes if n.startswith("BroadRotorBlade_"))==27
 assert "M_MONOLITHIC_XFX_FASCIA" in materials
