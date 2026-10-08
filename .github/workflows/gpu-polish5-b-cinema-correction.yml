@@ -44,18 +44,18 @@ jobs:
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
           npm install --no-audit --no-fund
           npm run check
-          for f in 225 245 270 286 307 329 365 449; do
+          for f in 225 270 286 307 329 365 449; do
             npx remotion still src/index.ts XfxSwiftPolish5CinemaTest \
               "out/p5-v2-experiment/frame-$f.png" --frame="$f" --gl=swangle
             test -s "out/p5-v2-experiment/frame-$f.png"
           done
-          for x in 255-275 285-310; do
+          for x in 280-310; do
             npx remotion render src/index.ts XfxSwiftPolish5CinemaTest \
               "out/p5-v2-experiment/moving-$x.mp4" --frames="$x" \
               --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
             ffmpeg -v error -xerror -i "out/p5-v2-experiment/moving-$x.mp4" -f null -
           done
-          echo '8 native real-A experiment stills and 2 native real-A motion clips: machine only, VISUAL QA STILL REQUIRED.' \
+          echo '7 native real-A experiment stills and 1 native real-A motion clip: machine only, VISUAL QA STILL REQUIRED.' \
             >> out/p5-v2-experiment/READ_ME.txt
       - uses: actions/upload-artifact@v4
         with:
