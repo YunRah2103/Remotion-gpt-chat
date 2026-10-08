@@ -10,7 +10,7 @@ import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
  * "Car Concept", ©2024 Darmstadt Graphics Group GmbH, CC BY 4.0.
  * Model and textures by Eric Chadwick, source: KhronosGroup/glTF-Sample-Assets
  * GLB is checked in at public/assets/carconcept.glb, upstream exact sha1 blob:
- * 391795d5e3f7daa5519ec2e077e8def16bcecdd7
+ * c0f38c989a78cc4ba63253b5338705e0afb0142f
  *
  * wheel group names are part of the authored asset, not guessed transforms.
  */
