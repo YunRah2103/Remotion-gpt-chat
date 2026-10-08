@@ -36,7 +36,7 @@ hubmat=mat("M_FAN_HUB",(.037,.043,.052),.15,.42)
 black_gloss=mat("M_GLOSS_ACCENT",(.012,.017,.02),.6,.20)
 steel=mat("M_BRUSHED_ALUMINIUM",(.56,.60,.63),.82,.27)
 finmat=mat("M_HEATSINK_ANODISED_SILVER",(.27,.30,.34),.72,.47)
-copper=mat("M_NICKEL_COPPER",(.48,.36,.25),.81,.27)
+copper=mat("M_NICKEL_COPPER",(.40,.44,.49),.88,.28)
 coldmat=mat("M_COLDPLATE_NICKEL",(.53,.57,.60),.9,.20)
 pcbmat=mat("M_PCB_DARK_GREEN",(.018,.053,.047),.1,.51)
 chipmat=mat("M_CHIP_CERAMIC_DARK",(.021,.025,.032),.08,.42)
@@ -272,8 +272,8 @@ for i in range(5):
   (.42,-.002,z*.6),(1.25,-.023,z)],copper,pipes,r=.028)
 box("Nickel_cold_plate",(-.21,-.010,.010),(.56,.040,.55),coldmat,cold,.018)
 # Dark green multilayer board, PCB model shorter than open-ended shroud.
-box("PCB_Core",(-.20,.088,.012),(2.30,.023,1.060),pcbmat,pcb,.007)
-for x in [-1.18,-.81,-.44,.0,.40,.78]:
+box("PCB_Core",(-.39,.088,.012),(2.055,.023,1.060),pcbmat,pcb,.007)
+for x in [-1.18,-.81,-.44,.0,.35,.53]:
  for z in [-.43,.43]:
   cylinder("Screw_post",(x,.069,z),.012,.025,steel,pcb,16)
 # Processor silicon package and copper substrate
@@ -303,7 +303,7 @@ for i in range(28):
 trace=mat("M_CIRCUIT_TRACE_DULL_COPPER",(.29,.23,.12),.67,.47)
 for i in range(11):
  zz=-.40+i*.078
- box("PCB_trace_front_%02d"%i,(.57,.072,zz),(.35,.002,.004),trace,pcb)
+ box("PCB_trace_front_%02d"%i,(.36,.072,zz),(.30,.002,.004),trace,pcb)
 for i in range(8):
  zz=-.40+i*.108
  box("PCB_trace_left_%02d"%i,(-1.06,.072,zz),(.10,.002,.003),trace,pcb)
@@ -365,11 +365,14 @@ def linebar(name,a,b,width,parent,ma):
  mid=((a[0]+b[0])/2,.244,(a[1]+b[1])/2)
  ob=box(name,mid,(math.hypot(dx,dz),.003,width),ma,parent)
  ob.rotation_euler[1]=-math.atan2(dz,dx)
-for i in range(9):
- x0=-1.29+i*.035;ztop=.47-i*.042;zend=-.42+i*.038
- xvee=-.22+i*.02
- linebar("V_wave_left_%02d"%i,(x0,ztop),(xvee,.03),.012,back,groovemat)
- linebar("V_wave_right_%02d"%i,(xvee,.03),(.45,zend),.012,back,groovemat)
+# Parallel, non-crossing stepped chevrons inspired by XFX's machined backplate.
+# Prior crossed X engraving looked like a decal instead of milled channels.
+for i in range(8):
+ dz=-.073*i
+ points=[(-1.27,.49+dz),(-.82,.31+dz),(-.36,.14+dz),(.38,.12+dz)]
+ for j in range(3):
+  linebar("Backplate_milled_routing_%02d_%d"%(i,j),
+          points[j],points[j+1],.013,back,groovemat)
 for x in [-1.25,-.64,.48,1.30]:
  for z in [-.50,.50]:
   cylinder("Backplate_screw",(x,.245,z),.012,.007,steel,back,16)
