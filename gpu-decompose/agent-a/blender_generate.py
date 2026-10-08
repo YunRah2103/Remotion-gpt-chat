@@ -35,7 +35,7 @@ blade=mat("M_FAN_BLADE",(.025,.031,.039),.16,.46)
 hubmat=mat("M_FAN_HUB",(.037,.043,.052),.15,.42)
 black_gloss=mat("M_GLOSS_ACCENT",(.012,.017,.02),.6,.20)
 steel=mat("M_BRUSHED_ALUMINIUM",(.56,.60,.63),.82,.27)
-finmat=mat("M_HEATSINK_ANODISED_SILVER",(.39,.43,.49),.85,.35)
+finmat=mat("M_HEATSINK_ANODISED_SILVER",(.27,.30,.34),.72,.47)
 copper=mat("M_NICKEL_COPPER",(.48,.36,.25),.81,.27)
 coldmat=mat("M_COLDPLATE_NICKEL",(.53,.57,.60),.9,.20)
 pcbmat=mat("M_PCB_DARK_GREEN",(.018,.053,.047),.1,.51)
@@ -158,6 +158,25 @@ for i,(x,node) in enumerate(zip([-.94,0,.94],fan_nodes)):
   ob=box("FAN_X_badge_%d_%d"%(i,sign),(x+sign*.017,-.235,.025),(.042,.003,.006),accent,node)
   ob.rotation_euler[1]=sign*.61
 # Shroud has open fan holes. No front-covering opaque solid panel.
+# Real dark polygon fascia surrounding circular fan cut-outs, rather than exposed silver cooling fins.
+def aperture_fascia(parent,cx):
+ verts=[];faces=[]
+ segments=96;inner=.454
+ for i in range(segments):
+  a0=i*math.tau/segments;a1=(i+1)*math.tau/segments
+  def point(a,r):
+   return (cx+r*math.cos(a),-.223,.025+r*math.sin(a))
+  def outer(a):
+   ca=math.cos(a);sa=math.sin(a)
+   edge_z=.525 if sa>=0 else .570
+   return min(.474/max(1e-6,abs(ca)),edge_z/max(1e-6,abs(sa)))
+  start=len(verts)
+  verts.extend([point(a0,inner),point(a0,outer(a0)),point(a1,outer(a1)),point(a1,inner)])
+  faces.extend([(start,start+1,start+2),(start,start+2,start+3)])
+ me=bpy.data.meshes.new("ApertureFascia");me.from_pydata(verts,[],faces);me.update()
+ ob=bpy.data.objects.new("Solid_Fan_Aperture_Fascia",me);coll.objects.link(ob)
+ ob.parent=parent;me.materials.append(plastic)
+for fan_x in [-.94,0,.94]:aperture_fascia(shroud,fan_x)
 box("Shroud_top_rail",(0,-.177,.584),(2.90,.108,.072),plastic,shroud,.010)
 box("Shroud_bottom_rail",(0,-.177,-.583),(2.90,.106,.074),plastic,shroud,.009)
 for x in [-1.419,1.419]:
@@ -269,7 +288,7 @@ def studio():
  dire=Vector((0,0,0))-cam.location;cam.rotation_euler=dire.to_track_quat("-Z","Y").to_euler()
  camdata.type="ORTHO";camdata.ortho_scale=4.25;bpy.context.scene.camera=cam
  scene=bpy.context.scene
- scene.render.engine='CYCLES';scene.cycles.samples=16
+ scene.render.engine='CYCLES';scene.cycles.samples=124
  for layer in scene.view_layers:
   if hasattr(layer,'cycles'):layer.cycles.use_denoising=False
  scene.render.resolution_x=680;scene.render.resolution_y=480
@@ -302,7 +321,13 @@ def export_glb(path):
 export_glb(ASSETS/"xfx_swift_rx9060xt_triple16.glb")
 # Blender native QA previews
 scene.frame_set(0);scene.render.filepath=str(ASSETS/"assembled.png");bpy.ops.render.render(write_still=True)
-scene.frame_set(449);scene.render.filepath=str(ASSETS/"exploded.png");bpy.ops.render.render(write_still=True)
+scene.frame_set(449)
+# Stronger three-quarter viewing angle makes front-to-back exploded offsets readable.
+camera=scene.camera
+camera.location=(6.2,-5.6,2.65)
+camera.rotation_euler=(Vector((0,0,0))-camera.location).to_track_quat("-Z","Y").to_euler()
+camera.data.ortho_scale=5.1
+scene.render.filepath=str(ASSETS/"exploded.png");bpy.ops.render.render(write_still=True)
 # Render REAL sampled moving frames for short evidence video, no screenshot animation fakes.
 preview=ASSETS/"moving_frames";preview.mkdir(exist_ok=True)
 scene.render.resolution_x=448;scene.render.resolution_y=316
