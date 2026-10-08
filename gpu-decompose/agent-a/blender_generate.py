@@ -376,6 +376,11 @@ for i in range(8):
 for x in [-1.25,-.64,.48,1.30]:
  for z in [-.50,.50]:
   cylinder("Backplate_screw",(x,.245,z),.012,.007,steel,back,16)
+# POLISH 03: retain the approved, non-destructive v2.4 base and add
+# physically recognizable detail with the SAME anchor names and coordinates.
+from polish3_detail import augment
+augment(globals())
+
 # Studio preview only (excluded from GLB export).
 def studio():
  world=bpy.context.scene.world;world.use_nodes=True
@@ -442,6 +447,38 @@ scene.frame_set(0)
 aim_camera((2.6,7.2,2.1),4.15)
 scene.render.filepath=str(ASSETS/"backplate_detail.png")
 bpy.ops.render.render(write_still=True)
+# POLISH 03: extra authentic Cycles evidence views, NOT rendered textures.
+# Restore all root groups after each proof; export was already completed above.
+def proof_view(fname,cam_pos,scale,frame=0,hide=(),target=(0,0,0)):
+ scene.frame_set(frame)
+ for ob in (fans,shroud,sink,board,back): ob.hide_render=ob.name in hide
+ camera.location=cam_pos
+ camera.rotation_euler=(Vector(target)-camera.location).to_track_quat("-Z","Y").to_euler()
+ camera.data.ortho_scale=scale
+ scene.render.filepath=str(ASSETS/fname)
+ bpy.ops.render.render(write_still=True)
+ for ob in (fans,shroud,sink,board,back):ob.hide_render=False
+
+scene.render.resolution_x=960;scene.render.resolution_y=640
+scene.cycles.samples=32
+proof_view("fans_shroud_detail.png",(1.32,-4.05,1.36),2.20,0,
+           target=(.89,-.12,.04))
+proof_view("heatsink_heatpipe_detail.png",(2.80,-4.50,2.10),3.15,0,
+           hide=("FAN_ASSEMBLY","FRONT_SHROUD","PCB_ASSEMBLY","BACKPLATE"),
+           target=(0,-.04,0))
+proof_view("pcb_silicon_detail.png",(1.9,-4.80,1.85),2.80,0,
+           hide=("FAN_ASSEMBLY","FRONT_SHROUD","HEATSINK","BACKPLATE"),
+           target=(-.37,.07,0))
+proof_view("rear_backplate_polish3.png",(2.1,5.1,2.30),3.75,0,
+           hide=("FAN_ASSEMBLY","FRONT_SHROUD","HEATSINK","PCB_ASSEMBLY"),
+           target=(0,.22,0))
+# A portrait frame at the previously published approximate director film angle.
+# Agent C's unpublished polish3 camera contract remains authoritative.
+scene.render.resolution_x=720;scene.render.resolution_y=1280
+scene.cycles.samples=24
+proof_view("exploded_film_camera.png",(8.2,-5.55,2.8),6.25,449)
+scene.render.resolution_x=960;scene.render.resolution_y=640
+
 # Moving proof frames vary both the *real* part offsets and camera orbit,
 # following Agent B v1.1 camera-only correction.
 preview=ASSETS/"moving_frames";preview.mkdir(exist_ok=True)
