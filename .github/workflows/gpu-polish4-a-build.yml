@@ -24,7 +24,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo env DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get update -qq
-          sudo env DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get install -y -qq blender openscad ffmpeg
+          sudo env DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get install -y -qq blender openscad ffmpeg python3-numpy
           python -m venv /tmp/gpu-p4-venv
           /tmp/gpu-p4-venv/bin/python -m pip -q install --disable-pip-version-check numpy==1.26.4 trimesh==4.11.1 Pillow==11.1.0
           blender --version | head -n 2
