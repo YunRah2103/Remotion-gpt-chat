@@ -326,7 +326,7 @@ for i,z in enumerate([-.30,0,.30]):
 # Inspired by physical OC3D back photograph: cut-out reveals the REAL metal fins below.
 # Unlike old v2.1, there are NO thick horizontal fake window bars.
 backplate_shell=box("Backplate_machined_one_piece", (0,.231,0),
-                    (2.882,.020,1.194),ventmat,back,.009)
+                    (2.882,.020,1.194),ventmat,back,0)
 def cut_metal_slot(target,name,center,dimensions):
  bpy.ops.mesh.primitive_cube_add(size=1,location=center)
  cutter=bpy.context.object;cutter.name=name+"_cutter"
@@ -342,7 +342,14 @@ cut_metal_slot(backplate_shell,"Full_depth_cooling_fin_window",
                (1.01,.232,0),(.750,.120,.954))
 cut_metal_slot(backplate_shell,"Lower_standoff_relief_notch",
                (.05,.232,-.570),(.320,.120,.180))
-assert len(backplate_shell.data.polygons)>20, "Machined rear-plate Boolean failed"
+# Ray-based *actual geometry* validation, not brittle polygon counting.
+# Blender object-space rays along the rear-face normal.
+bpy.context.view_layer.update()
+window_hit=backplate_shell.ray_cast((1.01,.50,0),(0,-1,0),distance=1.0)[0]
+solid_hit=backplate_shell.ray_cast((-1.0,.50,0),(0,-1,0),distance=1.0)[0]
+assert not window_hit and solid_hit, "Vent opening must be open while the backplate body remains solid"
+rim_mod=backplate_shell.modifiers.new("Machined_plate_edge_round","BEVEL")
+rim_mod.width=.006;rim_mod.segments=2
 # Subtle dark anodized edge around the open exhaust window, no covering geometry.
 for z in [-.483,.483]:
  box("Backplate_air_outlet_lip",(1.01,.239,z),(.756,.009,.012),groovemat,back,.004)
