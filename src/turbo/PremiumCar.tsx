@@ -47,6 +47,26 @@ export const PremiumCar:React.FC<{frame:number;hero?:boolean}>=({frame,hero=fals
      if(!(obj instanceof THREE.Mesh))return;
      obj.castShadow=true;
      obj.receiveShadow=true;
+     // Keep the authored metallic-flake maps and clearcoat, but prevent the
+     // default near-black side panels under night roadway exposure.
+     const enhance=(original:THREE.Material):THREE.Material=>{
+       const m=original.clone();
+       if(m instanceof THREE.MeshStandardMaterial){
+         if(m.name.includes('Paint 1 Carmine')){
+           m.color.set('#dc5552');
+           m.metalness=.38;
+           m.roughness=.24;
+           m.envMapIntensity=1.35;
+         }else if(m.name.includes('Paint 2 Carmine')){
+           m.color.set('#784852');
+           m.metalness=.32;
+           m.roughness=.28;
+           m.envMapIntensity=1.15;
+         }
+       }
+       return m;
+     };
+     obj.material=Array.isArray(obj.material)?obj.material.map(enhance):enhance(obj.material);
    });
    // Khronos native model faces +Z after its glTF Z-up -> Y-up conversion.
    // Our original documentary uses -Z as the forward road axis.
