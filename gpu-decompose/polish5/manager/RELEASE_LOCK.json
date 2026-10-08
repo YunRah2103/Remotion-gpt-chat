@@ -1,0 +1,23 @@
+{
+  "contractVersion": "POLISH05-v1",
+  "contractCommitSha": "5f512efbacaa0446df37fc5c4c07bd3f031fe84a",
+  "status": "await-model",
+  "startingPolish04Sha": "e9a14f5d8e1b3bf805bb4916f9ce8bdc0155ff6a",
+  "polish04ArtifactId": 11579249363,
+  "polish04RunId": 37846669872,
+  "hardwareSourceSha": null,
+  "hardwareArtifactRunId": null,
+  "hardwareArtifactId": null,
+  "hardwareArtifactName": null,
+  "glbSha256": null,
+  "motionSha256": null,
+  "managerSceneSha256": null,
+  "managerCameraSha256": null,
+  "motionCompatibilityAudit": null,
+  "nativeProofRunId": null,
+  "nativeProofArtifactId": null,
+  "nativeReviewSha256": null,
+  "renderApproved": false,
+  "releaseApproved": false,
+  "note": "Await independently verified A final binary model and proof. Never render POLISH04 hardware as POLISH05."
+}
