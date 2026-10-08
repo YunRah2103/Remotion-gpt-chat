@@ -67,7 +67,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: npm install --no-audit --no-fund
+      - name: Install dependencies and FFmpeg for native chunk validation
+        run: |
+          npm install --no-audit --no-fund
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
       - name: Render genuine 1080 x 1920 WebGL frames on software renderer
         env:
           PART: '${{ matrix.part }}'
