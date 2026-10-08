@@ -42,6 +42,24 @@ jobs:
           AID=$(jq -r .modelArtifactId "$L")
           RID=$(jq -r .modelArtifactRunId "$L")
           ANAME=$(jq -r .modelArtifactName "$L")
+          ASHA=$(jq -r .agentASha "$L")
+          curl -fLsS -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/$RID" > /tmp/model-run.json
+          jq -e --arg sha "$ASHA" '.status=="completed" and .conclusion=="success" and .head_sha==$sha' /tmp/model-run.json > /dev/null
+          if [ "$(jq -r .status "$L")" = release ]; then
+            PRID=$(jq -r .approvedProofRunId "$L")
+            PAID=$(jq -r .approvedProofArtifactId "$L")
+            curl -fLsS -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/$PRID" > /tmp/proof-run.json
+            jq -e '.status=="completed" and .conclusion=="success"' /tmp/proof-run.json > /dev/null
+            curl -fLsS -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/$PRID/artifacts?per_page=100" > /tmp/proof-artifacts.json
+            jq -e --argjson id "$PAID" '.artifacts[] | select(.id==$id and .name=="GPU-POLISH3-C-NATIVE-PROOFS" and .expired==false)' /tmp/proof-artifacts.json > /dev/null
+            echo "Verified approved native moving proof run $PRID / artifact $PAID"
+          fi
           curl -fLsS -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/$RID/artifacts?per_page=100" > /tmp/artifacts.json
