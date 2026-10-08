@@ -6,7 +6,7 @@ import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
 import * as THREE from 'three';
 import {fitCamera} from '../../../src/gpu-polish3/cinema';
 
-// PROOF ONLY: locked POLISH03 GLB and prior camera. D must revalidate
+// PROOF ONLY: locked POLISH04 GLB and prior camera. D must revalidate
 // against final POLISH04 A geometry and B cinematography before production.
 type V=[number,number,number];
 type Pose={position:V;rotation:V};
@@ -76,7 +76,7 @@ export const GpuPolish4MotionProof:React.FC=()=>{
  useEffect(()=>{
   let live=true;
   Promise.all([
-   new GLTFLoader().loadAsync(staticFile('gpu-decompose/xfx_swift_rx9060xt_polish3.glb')),
+   new GLTFLoader().loadAsync(staticFile('gpu-decompose/xfx_swift_rx9060xt_polish4.glb')),
    fetch(staticFile('gpu-decompose/decomposition.json')).then(async r=>{
     if(!r.ok)throw Error('no motion JSON '+r.status);
     return await r.json() as Motion;
