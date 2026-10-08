@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Validate true GLB world bounds against 290 x 124 x 49 mm manufacturer envelope."""
 import json,pathlib,trimesh
-base=pathlib.Path(__file__).resolve().parent.parent/"assets"
-scene=trimesh.load(str(base/"xfx_swift_rx9060xt_triple16.glb"),force="scene")
+base=pathlib.Path(__file__).resolve().parent.parent/"polish3"/"assets"
+scene=trimesh.load(str(base/"xfx_swift_rx9060xt_polish3.glb"),force="scene")
 actual=scene.bounds.tolist()
 target=[[-1.45,-.62,-.245],[1.45,.62,.245]]
 tol=[.0435,.0186,.00735] # ±3% of each nominal HALF axis extent

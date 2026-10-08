@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import json,pathlib
 from generate_motion import FRAMES,PARTS,offset,make
-root=pathlib.Path(__file__).resolve().parent.parent/"assets"
+root=pathlib.Path(__file__).resolve().parent.parent/"polish3"/"assets"
 assert FRAMES==450
 assert len(PARTS)==9
 obj=make()

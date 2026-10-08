@@ -59,9 +59,10 @@ func _initialize() -> void:
    anchors[n].position=Vector3(delta[0],delta[1],delta[2])*t
   if f==89:assert(anchors["FAN_LEFT"].position==Vector3.ZERO)
   if f==449:
-   assert(anchors["BACKPLATE"].position.z< -0.61)
-   assert(anchors["FRONT_SHROUD"].position.z>0.65)
-   assert(anchors["HEATSINK"].position.z>0.2)
+   assert(anchors["BACKPLATE"].position.z< -0.75)
+   assert(anchors["FAN_CENTER"].position.z>1.0)
+   assert(anchors["FRONT_SHROUD"].position.z>0.30)
+   assert(anchors["HEATSINK"].position.z>0.09)
    assert(anchors["GPU_DIE"].get_parent().name=="PCB_ASSEMBLY")
    assert(anchors["VRAM_CHIPS"].get_parent().name=="PCB_ASSEMBLY")
   checks+=1

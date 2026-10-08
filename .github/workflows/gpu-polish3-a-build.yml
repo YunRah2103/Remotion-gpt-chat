@@ -1,10 +1,11 @@
-name: GPU Agent A - native 3D asset build
+name: GPU POLISH03 Agent A - native hardware build
 on:
   push:
-    branches: ['gpu-decompose/a-model']
+    branches: ['gpu-polish3/a-hardware']
     paths:
       - 'gpu-decompose/agent-a/**'
-      - '.github/workflows/agent-a-build.yml'
+      - 'gpu-decompose/polish3/**'
+      - '.github/workflows/gpu-polish3-a-build.yml'
   workflow_dispatch:
 permissions:
   contents: read
@@ -36,44 +37,49 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p gpu-decompose/assets
-          openscad -o gpu-decompose/agent-a/fan_hub.stl gpu-decompose/agent-a/mechanical.scad |& tee gpu-decompose/assets/openscad.log
+          openscad -o gpu-decompose/agent-a/fan_hub.stl gpu-decompose/agent-a/mechanical.scad |& tee gpu-decompose/polish3/assets/openscad.log
           test -s gpu-decompose/agent-a/fan_hub.stl
           python gpu-decompose/agent-a/generate_motion.py
           python gpu-decompose/agent-a/test_motion.py
       - name: Real PyBullet collision proxy validation
         run: |
           set -euo pipefail
-          /tmp/gpu-venv/bin/python gpu-decompose/agent-a/clearance.py |& tee gpu-decompose/assets/pybullet.log
-          test -s gpu-decompose/assets/clearance.json
+          /tmp/gpu-venv/bin/python gpu-decompose/agent-a/clearance.py |& tee gpu-decompose/polish3/assets/pybullet.log
+          test -s gpu-decompose/polish3/assets/clearance.json
       - name: Headless Godot native 3D hierarchy playback
         run: |
           set -euo pipefail
-          cp gpu-decompose/assets/decomposition.json gpu-decompose/agent-a/godot/decomposition.json
-          /tmp/godot-bin/Godot_v4.4.1-stable_linux.x86_64 --headless --path gpu-decompose/agent-a/godot --script res://previs.gd |& tee gpu-decompose/assets/godot.log
+          cp gpu-decompose/polish3/assets/decomposition.json gpu-decompose/agent-a/godot/decomposition.json
+          /tmp/godot-bin/Godot_v4.4.1-stable_linux.x86_64 --headless --path gpu-decompose/agent-a/godot --script res://previs.gd |& tee gpu-decompose/polish3/assets/godot.log
           test -s gpu-decompose/agent-a/godot/godot-proof.json
-          cp gpu-decompose/agent-a/godot/godot-proof.json gpu-decompose/assets/godot-proof.json
+          cp gpu-decompose/agent-a/godot/godot-proof.json gpu-decompose/polish3/assets/godot-proof.json
       - name: Real Blender 3D modelling, GLB export, two stills and moving frames
         run: |
           set -euo pipefail
-          blender -b -t 3 --python gpu-decompose/agent-a/blender_generate.py |& tee gpu-decompose/assets/blender.log
-          test -s gpu-decompose/assets/xfx_swift_rx9060xt_triple16.glb
-          test -s gpu-decompose/assets/assembled.png
-          test -s gpu-decompose/assets/exploded.png
+          blender -b -t 3 --python gpu-decompose/agent-a/blender_generate.py |& tee gpu-decompose/polish3/assets/blender.log
+          test -s gpu-decompose/polish3/assets/xfx_swift_rx9060xt_polish3.glb
+          test -s gpu-decompose/polish3/assets/assembled.png
+          test -s gpu-decompose/polish3/assets/exploded.png
+          test -s gpu-decompose/polish3/assets/fans_shroud_detail.png
+          test -s gpu-decompose/polish3/assets/heatsink_heatpipe_detail.png
+          test -s gpu-decompose/polish3/assets/pcb_silicon_detail.png
+          test -s gpu-decompose/polish3/assets/rear_backplate_polish3.png
+          test -s gpu-decompose/polish3/assets/exploded_film_camera.png
       - name: Encode real motion proof and assert GLB structure
         run: |
           set -euo pipefail
-          ffmpeg -y -hide_banner -loglevel error -framerate 10 -pattern_type glob -i 'gpu-decompose/assets/moving_frames/*.png' -c:v libx264 -pix_fmt yuv420p -crf 20 gpu-decompose/assets/decomposition-proof.mp4
-          ffmpeg -v error -xerror -i gpu-decompose/assets/decomposition-proof.mp4 -f null -
-          python gpu-decompose/agent-a/validate_assets.py | tee gpu-decompose/assets/glb-audit.log
-          /tmp/gpu-venv/bin/python gpu-decompose/agent-a/validate_dimensions.py | tee gpu-decompose/assets/dimensions-audit.log
+          ffmpeg -y -hide_banner -loglevel error -framerate 10 -pattern_type glob -i 'gpu-decompose/polish3/assets/moving_frames/*.png' -c:v libx264 -pix_fmt yuv420p -crf 20 gpu-decompose/polish3/assets/decomposition-proof.mp4
+          ffmpeg -v error -xerror -i gpu-decompose/polish3/assets/decomposition-proof.mp4 -f null -
+          python gpu-decompose/agent-a/validate_assets.py | tee gpu-decompose/polish3/assets/glb-audit.log
+          /tmp/gpu-venv/bin/python gpu-decompose/agent-a/validate_dimensions.py | tee gpu-decompose/polish3/assets/dimensions-audit.log
           (cd gpu-decompose/assets && sha256sum *.glb *.json > SHA256SUMS.txt)
       - name: Publish model, native proof media and exact manifests
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: GPU-AGENT-A-XFX-SWIFT-3D
+          name: GPU-POLISH3-A-XFX-HARDWARE
           path: |
-            gpu-decompose/assets/
+            gpu-decompose/polish3/assets/
             gpu-decompose/agent-a/fan_hub.stl
           retention-days: 30
           if-no-files-found: warn

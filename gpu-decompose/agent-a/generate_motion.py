@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
-"""Exact Agent B v1 contract: Y-UP +Z FRONT offsets, 450 pure frame functions.
+"""Polish3 Manager contract: clear fans ahead of fascia, 450 pure frame functions.
 Scene scaling 0.01 units/mm. Data is RELATIVE to each named GLB anchor.
 """
 import json, pathlib
 ROOT=pathlib.Path(__file__).resolve().parent
-OUT=ROOT.parent/"assets"
+OUT=ROOT.parent/"polish3"/"assets"
 FRAMES=450
 PARTS={
- "FAN_LEFT":     {"startFrame":90, "endFrame":162, "delta":[-.120,.025,.430]},
- "FAN_CENTER":   {"startFrame":94, "endFrame":164, "delta":[0,.045,.460]},
- "FAN_RIGHT":    {"startFrame":98, "endFrame":166, "delta":[.120,.025,.430]},
- "FRONT_SHROUD": {"startFrame":125,"endFrame":179,"delta":[0,.020,.660]},
- "HEATSINK":     {"startFrame":184,"endFrame":250,"delta":[0,.050,.220]},
- "GPU_DIE":      {"startFrame":216,"endFrame":282,"delta":[0,.005,.130]},
- "VRAM_CHIPS":   {"startFrame":236,"endFrame":298,"delta":[0,0,.160]},
- "PCB_ASSEMBLY": {"startFrame":260,"endFrame":322,"delta":[0,-.020,-.100]},
- "BACKPLATE":    {"startFrame":284,"endFrame":329,"delta":[0,0,-.620]}
+ "FAN_LEFT":     {"startFrame":90, "endFrame":155, "delta":[-.180,-.035,.930]},
+ "FAN_CENTER":   {"startFrame":94, "endFrame":157, "delta":[0,.060,1.030]},
+ "FAN_RIGHT":    {"startFrame":98, "endFrame":159, "delta":[.180,-.035,.930]},
+ "FRONT_SHROUD": {"startFrame":127,"endFrame":179,"delta":[0,-.015,.310]},
+ "HEATSINK":     {"startFrame":183,"endFrame":250,"delta":[.025,.090,.100]},
+ "GPU_DIE":      {"startFrame":216,"endFrame":282,"delta":[0,.020,.280]},
+ "VRAM_CHIPS":   {"startFrame":236,"endFrame":298,"delta":[0,-.025,.230]},
+ "PCB_ASSEMBLY": {"startFrame":260,"endFrame":322,"delta":[0,-.060,-.250]},
+ "BACKPLATE":    {"startFrame":284,"endFrame":329,"delta":[0,-.020,-.760]}
 }
 def smooth(t):
  t=max(0,min(1,float(t)))

@@ -7,7 +7,7 @@ Scene units: 1 Blender unit = 100 physical mm. Required GLB node names are locke
 import bpy, math, json, os, pathlib, struct, sys, hashlib
 from mathutils import Vector
 HERE=pathlib.Path(__file__).resolve().parent
-ASSETS=HERE.parent/"assets"; ASSETS.mkdir(parents=True,exist_ok=True)
+ASSETS=HERE.parent/"polish3"/"assets"; ASSETS.mkdir(parents=True,exist_ok=True)
 sys.path.insert(0,str(HERE))
 from generate_motion import PARTS,offset,FRAMES
 bpy.ops.object.select_all(action='SELECT'); bpy.ops.object.delete(use_global=False)
@@ -417,7 +417,7 @@ for name,ob in groups.items():
  for fc in ob.animation_data.action.fcurves:
   for kp in fc.keyframe_points:kp.interpolation="LINEAR"
 # named group transform frames are authored at every frame; no cumulative state.
-blend=str(ASSETS/"xfx_swift_rx9060xt_triple16.blend")
+blend=str(ASSETS/"xfx_swift_rx9060xt_polish3.blend")
 bpy.ops.wm.save_as_mainfile(filepath=blend)
 def export_glb(path):
  bpy.ops.object.select_all(action="DESELECT")
@@ -426,7 +426,7 @@ def export_glb(path):
  bpy.ops.export_scene.gltf(filepath=str(path),export_format="GLB",
   use_selection=True,export_yup=True,export_animations=False,
   export_apply=False,export_materials="EXPORT")
-export_glb(ASSETS/"xfx_swift_rx9060xt_triple16.glb")
+export_glb(ASSETS/"xfx_swift_rx9060xt_polish3.glb")
 # Blender native QA previews
 scene.frame_set(0);scene.render.filepath=str(ASSETS/"assembled.png");bpy.ops.render.render(write_still=True)
 # Side-tilted final proof matches Agent B's director-only ~55-degree camera amendment.
