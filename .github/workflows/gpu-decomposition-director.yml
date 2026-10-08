@@ -1,0 +1,41 @@
+name: GPU Decomposition - director static preflight
+on:
+  push:
+    branches: [gpu-decompose/b-director]
+    paths:
+      - 'src/GpuDecomposition.tsx'
+      - 'src/Root.tsx'
+      - 'gpu-decompose/director/**'
+      - '.github/workflows/gpu-decomposition-director.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  director-preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify standalone director composition without substituting missing GLB
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npm run check
+          npx remotion compositions src/index.ts --gl=swangle | tee director-compositions.txt
+          grep -q 'XfxSwiftDecomposition' director-compositions.txt
+          grep -q 'GpuDriveFilm' director-compositions.txt
+          grep -q 'TurboDocumentary' director-compositions.txt
+          echo "PASS: all three independent composition IDs registered, no stand-in GPU used" | tee DIRECTOR-STATIC-QA.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GPU-DECOMPOSITION-DIRECTOR-STATIC-PREFLIGHT
+          path: |
+            director-compositions.txt
+            DIRECTOR-STATIC-QA.txt
+          retention-days: 30
+          if-no-files-found: error
