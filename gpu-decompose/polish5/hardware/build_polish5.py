@@ -343,7 +343,10 @@ bpy.context.scene.collection.objects.link(camera)
 bpy.context.scene.camera=camera;cam_d.type="ORTHO"
 scene=bpy.context.scene
 scene.render.engine="CYCLES";scene.cycles.samples=14
-scene.cycles.use_denoising=True
+scene.cycles.use_denoising=False
+# Ubuntu Blender 4.0 native CPU build excludes OpenImageDenoise; fail-safe no denoising.
+for layer in scene.view_layers:
+    if hasattr(layer.cycles,'use_denoising'): layer.cycles.use_denoising=False
 scene.render.image_settings.file_format="PNG"
 scene.render.resolution_percentage=100
 scene.render.film_transparent=False
