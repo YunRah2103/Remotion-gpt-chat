@@ -1,0 +1,43 @@
+name: GPU POLISH04 - manager pipeline smoke validation
+on:
+  push:
+    branches: [gpu-polish4/d-master]
+    paths:
+      - '.github/workflows/gpu-polish4-d-*.yml'
+      - 'gpu-decompose/polish4/manager/verify_polish4.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  manager-ci:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Parse active production workflow and compile validator
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet --break-system-packages PyYAML
+          python3 -m py_compile gpu-decompose/polish4/manager/verify_polish4.py
+          python3 - <<'PY'
+          import yaml
+          from pathlib import Path
+          p=Path('.github/workflows/gpu-polish4-d-production.yml')
+          x=yaml.safe_load(p.read_text())
+          j=x.get('jobs',{})
+          names={'stage-verified-input','actual-native-proofs','native-450-chunks','release-candidate'}
+          assert set(j)==names,(set(j),names)
+          w=x.get('on',x.get(True))
+          assert w is not None,'production workflow event trigger missing'
+          print('Manager production workflow syntax / job set PASS')
+          PY
+      - name: Confirm inherited Remotion baseline still type-checks
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npm run check
+          printf 'POLISH04 D CONFIGURATION SMOKE PASS\n'
