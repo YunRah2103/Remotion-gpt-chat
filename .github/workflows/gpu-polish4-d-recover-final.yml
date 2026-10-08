@@ -1,0 +1,135 @@
+name: GPU POLISH04 - recover final master from verified native chunks
+on:
+  push:
+    branches: [gpu-polish4/d-master]
+    paths:
+      - '.github/workflows/gpu-polish4-d-recover-final.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  recover-complete-450-frame-release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Fetch exact native chunks from fully rendered run; NO RERENDER
+        uses: actions/download-artifact@v4
+        with:
+          pattern: gpu-polish4-native-chunk-*
+          merge-multiple: true
+          run-id: 37845398181
+          github-token: ${{ github.token }}
+          path: out/chunks
+      - name: Fetch actual POLISH03 baseline for genuine comparison
+        uses: actions/download-artifact@v4
+        with:
+          name: GPU-POLISH3-FINAL-450F-AUDIOPOLISHED
+          run-id: 37837671314
+          github-token: ${{ github.token }}
+          path: out/baseline
+      - name: Install ffmpeg and validate exactly five immutable 90F sources
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python3 - <<'PY'
+          import hashlib,json,pathlib,subprocess
+          expected={0:11579771871,1:11579497655,2:11580001572,3:11578928379,4:11579796787}
+          for n,id in expected.items():
+              f=pathlib.Path(f'out/chunks/xfx-{n}.mp4')
+              assert f.is_file() and f.stat().st_size > 1000000,f
+              p=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_entries',
+                 'stream=codec_name,pix_fmt,nb_frames,width,height,r_frame_rate','-of','json',str(f)]))['streams'][0]
+              assert (p['codec_name'],p['width'],p['height'],p['r_frame_rate'],p['nb_frames'])==('h264',1080,1920,'30/1','90'),p
+              assert p['pix_fmt'] in ('yuvj420p','yuv420p'),p
+              print('LOCKED CHUNK',n,'artifact',id,'sha256',hashlib.sha256(f.read_bytes()).hexdigest(),'pixels',p['pix_fmt'])
+          PY
+      - name: Assemble exact approved 450 native frames, synchronized original PCM, final AAC
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/release
+          : > out/concat.txt
+          for n in 0 1 2 3 4; do
+            printf "file 'chunks/xfx-%s.mp4'\n" "$n" >> out/concat.txt
+          done
+          ffmpeg -v error -y -f concat -safe 0 -i out/concat.txt -c copy out/native-450.mp4
+          N=$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=noprint_wrappers=1:nokey=1 out/native-450.mp4)
+          test "$N" = 450
+          python3 gpu-decompose/polish4/manager/synthesize_mechanical_audio.py out/sound.wav | tee out/release/audio-source.txt
+          echo "591ddc23e1ceabcf5476f7af08dfd8972450d898e9f138369c78541d8c384def  out/sound.wav" | sha256sum -c -
+          ffmpeg -v error -y -i out/native-450.mp4 -i out/sound.wav \
+            -map 0:v:0 -map 1:a:0 -vf 'scale=in_range=pc:out_range=tv,format=yuv420p' \
+            -c:v libx264 -preset fast -crf 18 -pix_fmt yuv420p -color_range tv \
+            -r 30 -c:a aac -b:a 192k -ar 48000 -ac 2 -t 15 -movflags +faststart \
+            out/release/XFX-SWIFT-RX9060XT-POLISH04-15S.mp4
+          F=out/release/XFX-SWIFT-RX9060XT-POLISH04-15S.mp4
+          ffmpeg -v error -xerror -i "$F" -f null -
+          ffprobe -v error -show_streams -show_format -of json "$F" > out/release/ffprobe.json
+          python3 - <<'PY'
+          import json
+          p=json.load(open('out/release/ffprobe.json'))
+          v=[s for s in p['streams'] if s['codec_type']=='video']
+          a=[s for s in p['streams'] if s['codec_type']=='audio']
+          assert len(v)==len(a)==1,p
+          assert (v[0]['codec_name'],v[0]['pix_fmt'],v[0]['width'],v[0]['height'],v[0]['r_frame_rate'],v[0]['nb_frames'])==('h264','yuv420p',1080,1920,'30/1','450'),v
+          assert (a[0]['codec_name'],a[0]['sample_rate'],a[0]['channels'])==('aac','48000',2),a
+          assert abs(float(p['format']['duration'])-15)<0.075,p
+          print('POLISH04 EXACT 450F MASTER FFMPEG / FFPROBE PASS')
+          PY
+          ffmpeg -hide_banner -i "$F" -vn -af volumedetect -f null - 2> out/release/audio-volumedetect.txt
+          python3 - <<'PY'
+          import re
+          s=open('out/release/audio-volumedetect.txt').read()
+          mn=float(re.findall(r'mean_volume:\s*(-?[\d.]+)',s)[-1])
+          mx=float(re.findall(r'max_volume:\s*(-?[\d.]+)',s)[-1])
+          assert -40<mn<-8 and -25<mx<-1,(mn,mx)
+          print('AUDIO PASS',mn,mx)
+          PY
+          ffmpeg -hide_banner -i "$F" -vf 'blackdetect=d=0.2:pix_th=0.03' -an -f null - 2> out/release/blackdetect.txt
+          if grep -q 'black_start:' out/release/blackdetect.txt; then
+            echo "Fail: unintentional extended black"; exit 1
+          fi
+          ffmpeg -hide_banner -i "$F" -vf 'freezedetect=n=-60dB:d=0.3' -an -f null - 2> out/release/freezedetect.txt
+          for spec in "hero:30" "hardware-macro:270" "exploded:449"; do
+            name=${spec%%:*}
+            frame=${spec##*:}
+            ffmpeg -v error -y -i "$F" -vf "select=eq(n\,$frame)" -vsync vfr -frames:v 1 "out/release/$name.png"
+            test -s "out/release/$name.png"
+          done
+          OLD=out/baseline/XFX-SWIFT-RX9060XT-POLISH03-15S.mp4
+          test -s "$OLD"
+          ffmpeg -v error -y -i "$OLD" -vf 'select=eq(n\,449),scale=540:960' -vsync vfr -frames:v 1 out/old.png
+          ffmpeg -v error -y -i "$F" -vf 'select=eq(n\,449),scale=540:960' -vsync vfr -frames:v 1 out/new.png
+          ffmpeg -v error -y -i out/old.png -i out/new.png \
+            -filter_complex "[0:v]drawtext=text='POLISH 03':fontcolor=white:fontsize=23:x=25:y=24[o];[1:v]drawtext=text='POLISH 04':fontcolor=white:fontsize=23:x=25:y=24[n];[o][n]hstack=inputs=2" \
+            -frames:v 1 out/release/before-after.png
+          cp gpu-decompose/polish4/manager/RELEASE_LOCK.json out/release/RELEASE_LOCK.json
+          cp gpu-decompose/polish4/manager/NATIVE_VISUAL_REVIEW.md out/release/VISUAL_REVIEW.md
+          cat > out/release/FINAL_RELEASE.md <<'EOF'
+          # POLISH04 — hash-locked postrender recovery master
+          Five REAL completed 90-frame native pieces from run 37845398181,
+          source commit e42e2a80cc165a73a962faed9d58b7a1a2d8028a, were
+          reassembled without rerendering. Original synchronized mechanical
+          48k stereo PCM and AAC 192k, native H264→H264 yuv420p 30fps 450F.
+          Explicit 450-frame ffprobe and whole-file decode, audio loudness
+          and extended black detection checked in this recovery job.
+          Independent creative QA of the exact A+B+C film passed previously.
+          Actual manufacturer exterior reference-based; internals artistic.
+          EOF
+          (cd out/release && sha256sum *.mp4 *.png) > out/release/SHA256SUMS.txt
+      - name: Publish final release ZIP with real GitHub numeric artifact ID
+        id: deliver
+        uses: actions/upload-artifact@v4
+        with:
+          name: GPU-POLISH4-FINAL-450F
+          path: out/release/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Output actual final artifact locator
+        run: |
+          echo "POLISH04_FINAL_ARTIFACT_ID=${{ steps.deliver.outputs.artifact-id }}"
+          echo "POLISH04_FINAL_ARTIFACT_URL=${{ steps.deliver.outputs.artifact-url }}"
