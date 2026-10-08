@@ -1,0 +1,105 @@
+name: GPU POLISH04 C - Real GLB Motion Proof
+on:
+  push:
+    branches: [gpu-polish4/c-motion]
+    paths:
+      - 'gpu-decompose/polish4/motion/**'
+      - '.github/workflows/gpu-polish4-c-motion-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  native-motion-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install native dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check pybullet
+          npm install --no-audit --no-fund
+          npm run check
+      - name: Download approved POLISH03 A GLB for temporary C proof
+        uses: actions/download-artifact@v4
+        with:
+          name: GPU-POLISH3-A-XFX-HARDWARE
+          run-id: 37833031666
+          github-token: ${{ github.token }}
+          path: out/polish03-source
+      - name: Verify exact GLB SHA, stage owned motion and run mechanical checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p public/gpu-decompose out/proof
+          python3 - <<'PY'
+          from pathlib import Path
+          from shutil import copyfile
+          import hashlib
+          files=list(Path("out/polish03-source").rglob("xfx_swift_rx9060xt_polish3.glb"))
+          assert len(files)==1,files
+          f=files[0]
+          assert hashlib.sha256(f.read_bytes()).hexdigest()=="21f529ccbe7f4bb69f2df602f7f28b15ef06ba915151bba4468b44ef652097e5"
+          copyfile(f,"public/gpu-decompose/xfx_swift_rx9060xt_polish3.glb")
+          copyfile("gpu-decompose/polish4/motion/decomposition.json","public/gpu-decompose/decomposition.json")
+          print("PROOF_INPUT_MATCH POLISH03_LOCKED",f.stat().st_size)
+          PY
+          python3 gpu-decompose/polish4/motion/validate_motion.py | tee out/proof/motion-audit.txt
+          python3 gpu-decompose/polish4/motion/inspect_glb.py public/gpu-decompose/xfx_swift_rx9060xt_polish3.glb | tee out/proof/hierarchy-audit.txt
+          cp gpu-decompose/polish4/motion/hierarchy_report.json out/proof/
+          python3 gpu-decompose/polish4/motion/clearance_pybullet.py | tee out/proof/proxy-audit.txt
+          cp gpu-decompose/polish4/motion/clearance_report.json out/proof/
+          (cd public/gpu-decompose && sha256sum xfx_swift_rx9060xt_polish3.glb decomposition.json) > out/proof/SHA256SUMS.txt
+      - name: Actual motion using Remotion and loaded GLB (four MP4s)
+        shell: bash
+        run: |
+          set -euo pipefail
+          for spec in '90-179' '160-239' '240-329' '329-395'; do
+            npx remotion render gpu-decompose/polish4/motion/entry.tsx \
+              GpuPolish4MotionProof "out/proof/c-motion-$spec.mp4" \
+              --frames="$spec" --scale=0.5 --gl=swangle --concurrency=1 \
+              --codec=h264 --pixel-format=yuv420p
+            ffmpeg -v error -xerror -i "out/proof/c-motion-$spec.mp4" -f null -
+            ffprobe -v error -show_entries stream=width,height,r_frame_rate,nb_frames \
+              -of json "out/proof/c-motion-$spec.mp4" > "out/proof/c-motion-$spec.ffprobe.json"
+          done
+      - name: Actual 3D motion sample images
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in 0 30 60 89 90 100 115 135 150 180 210 225 250 270 280 310 329 365 415 449; do
+            npx remotion still gpu-decompose/polish4/motion/entry.tsx \
+              GpuPolish4MotionProof "out/proof/frame-$f.png" \
+              --frame="$f" --scale=0.5 --gl=swangle
+            test -s "out/proof/frame-$f.png"
+          done
+      - name: Publish independent-review provenance
+        run: |
+          set -euo pipefail
+          cat > out/proof/PROOF_STATUS.md <<'EOF'
+          POLISH04 Agent C mechanical previsualization, NOT the final master.
+          Geometry: real POLISH03 approved GLB, hash 21f529ccbe7f4bb69f2df602f7f28b15ef06ba915151bba4468b44ef652097e5.
+          Cinematography: POLISH03 camera used for temporary motion context, not B's new work.
+          Motion: exclusive POLISH04 C JSON from this exact branch.
+          PyBullet: approximate major-part box proxies; NOT exact mesh collision proof.
+          Agent A's final POLISH04 GLB and B's POLISH04 camera MUST be checked again.
+          Human visual review required: workflow success alone cannot approve motion.
+          EOF
+          sha256sum out/proof/c-motion-*.mp4 > out/proof/CLIP_SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GPU-POLISH4-C-MOVING-MECHANICS
+          path: out/proof/
+          retention-days: 30
+          if-no-files-found: error
