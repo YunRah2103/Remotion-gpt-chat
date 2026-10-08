@@ -1,0 +1,89 @@
+name: GPU POLISH3 B - real native cinema QA
+on:
+  push:
+    branches: [gpu-polish3/b-cinematography]
+    paths:
+      - 'src/gpu-polish3/**'
+      - 'src/GpuDecomposition.tsx'
+      - '.github/workflows/gpu-polish3-b-native-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  gpu-b-native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 145
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download precisely pinned old A model - TEMPORARY TEST ONLY
+        uses: actions/download-artifact@v4
+        with:
+          name: GPU-AGENT-A-XFX-SWIFT-3D
+          run-id: 37819645913
+          github-token: ${{ github.token }}
+          path: locked-old-model
+      - name: Download old release for before-and-after proof
+        uses: actions/download-artifact@v4
+        with:
+          name: GPU-DECOMPOSITION-FINAL-450F
+          run-id: 37821956618
+          github-token: ${{ github.token }}
+          path: old-release
+      - name: Lock baseline assets with SHA - NOT AGENT A POLISH03
+        run: |
+          set -euo pipefail
+          mkdir -p public/gpu-decompose out/polish3-b
+          cp locked-old-model/assets/xfx_swift_rx9060xt_triple16.glb public/gpu-decompose/xfx_swift_rx9060xt_polish3.glb
+          cp locked-old-model/assets/decomposition.json public/gpu-decompose/decomposition.json
+          echo 'e0b86390180ecb6724bcfe029bc77c9a116ff9b004e1ae14fa81b0bff8e0599e  public/gpu-decompose/xfx_swift_rx9060xt_polish3.glb' | sha256sum -c -
+          echo '1790dfa60d0ea10641498901d2e9bf838eb024d9d8c6c4eb1e0aec7914e74510  public/gpu-decompose/decomposition.json' | sha256sum -c -
+          echo "PROOF ONLY - BASELINE A SOURCE 322f77046b15402b55042e86822389bec1e70818; RUN 37819645913; NOT FINAL" > out/polish3-b/PROVENANCE.txt
+          echo "B_SOURCE_SHA=$GITHUB_SHA" >> out/polish3-b/PROVENANCE.txt
+      - name: Install native tools and TypeScript check
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          npm install --no-audit --no-fund
+          npm run check
+      - name: Render real full-resolution 1080 by 1920 stills
+        run: |
+          set -euo pipefail
+          for n in 0 45 89 120 179 240 329 385 449; do
+            npx remotion still src/index.ts XfxSwiftDecomposition "out/polish3-b/frame-$n.png" --frame="$n" --gl=swangle
+            test -s "out/polish3-b/frame-$n.png"
+          done
+      - name: Render true moving Remotion GLB proof clips
+        run: |
+          set -euo pipefail
+          for segment in 108-139 232-247 368-399; do
+            npx remotion render src/index.ts XfxSwiftDecomposition "out/polish3-b/moving-$segment.mp4" --frames="$segment" --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+            ffmpeg -hide_banner -loglevel error -xerror -i "out/polish3-b/moving-$segment.mp4" -f null -
+            expected=32
+            if [ "$segment" = "232-247" ]; then expected=16; fi
+            count=$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=nw=1:nk=1 "out/polish3-b/moving-$segment.mp4")
+            test "$count" = "$expected"
+          done
+          echo '80/80 native moving frames fully decodable' > out/polish3-b/DECODER.txt
+      - name: Extract real original and produce side-by-side review pixels
+        run: |
+          set -euo pipefail
+          old='old-release/XFX-SWIFT-RX9060XT-DECONSTRUCTED-15S.mp4'
+          test -s "$old"
+          for n in 0 120 240 385 449; do
+            ffmpeg -hide_banner -loglevel error -y -i "$old" -vf "select=eq(n\\,$n)" -vsync vfr -frames:v 1 "out/polish3-b/old-$n.png"
+            ffmpeg -hide_banner -loglevel error -y -i "out/polish3-b/old-$n.png" -i "out/polish3-b/frame-$n.png" -filter_complex '[0:v]scale=540:960[a];[1:v]scale=540:960[b];[a][b]hstack=inputs=2' -frames:v 1 "out/polish3-b/before-after-$n.png"
+          done
+          (cd out/polish3-b && sha256sum frame-*.png moving-*.mp4 before-after-*.png) > out/polish3-b/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: GPU-POLISH3-B-BASELINE-NATIVE-PROOFS
+          path: out/polish3-b/
+          retention-days: 30
+          if-no-files-found: warn
