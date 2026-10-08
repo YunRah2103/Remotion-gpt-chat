@@ -3,11 +3,11 @@
 **Status:** Native Blender generation / structural GLB / proof pixels / moving MP4 / matched baseline tests PASS; final Three.js visual approval belongs to Agent B.
 **Repository:** YunRah2103/Remotion-gpt-chat. **Branch:** gpu-polish5/a-hardware.
 **Locked approved starting commit:** e9a14f5d8e1b3bf805bb4916f9ce8bdc0155ff6a.
-**Exact native source commit SHA:** 01e569b9d1fbeb4b5651df81fc1c8c13c0fd1ad6.
-**Verified workflow ID:** 37850869852.
-**Genuine GitHub Actions artifact ID:** 11581523750.
+**Exact native source commit SHA:** 10b2d0bfeebb543323b44a29e96ad3343d8be940.
+**Verified workflow ID:** 37851406769.
+**Genuine GitHub Actions artifact ID:** 11582945244.
 **Artifact name:** GPU-POLISH5-A-LOCKED-HARDWARE.
-**Artifact URL:** https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37850869852/artifacts/11581523750.
+**Artifact URL:** https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37851406769/artifacts/11582945244.
 **POLISH04 accepted GLB SHA256:** edeeca54f6e9bf26127ed91b3debe16bae47f9c58cd9db0bf760927a0869882e.
 **NEW POLISH05 GLB SHA256:** 128b8d8d935a984e9d8172d8c7daba4a3468336520af48d973d157a95dd3b1ea.
 **GLB filename:** xfx_swift_rx9060xt_polish5.glb.
@@ -27,7 +27,7 @@ Enhanced stepped Swift shoulder fascia, open vents, rotor bearing/gasket/retenti
 New PBR metallic/roughness materials: satin graphite polymer, restrained rotor shading, machined nickel ferrules, anodized fin hems, matte solder mask, copper and Ni terminals. All 19 canonical GLB motion anchors remain uniquely named.
 
 ## Integration for Agent B
-1. Download the EXACT artifact ID 11581523750 from run 37850869852. Never guess a latest artifact.
+1. Download the EXACT artifact ID 11582945244 from run 37851406769. Never guess a latest artifact.
 2. Verify SHA256(xfx_swift_rx9060xt_polish5.glb) == 128b8d8d935a984e9d8172d8c7daba4a3468336520af48d973d157a95dd3b1ea.
 3. Stage it to a NEW POLISH05 runtime path; do not overwrite POLISH04 official release asset.
 4. Use glTF Y-up +X horizontal, +Y up, +Z fan-facing, 1 unit=100mm. The 19 original anchors are preserved exactly; new geometry is owned by existing moving parents.
