@@ -386,7 +386,8 @@
       "easing": "smoothstep"
     }
   },
-  "compatibilityStatus": "PROVISIONAL_NOT_APPROVED_FOR_POLISH05",
-  "sourceModel": "POLISH04: reproduce exactly for temporary B engineering preflight only",
-  "revision": "polish5-motion-v1-provisional"
+  "compatibilityStatus": "CANDIDATE_POLISH05_A_ANCHORS_VERIFIED",
+  "sourceModel": "POLISH05 verified Agent A GLB sha256 254b6c0579f294c44598f4623a3b04a108d5bc728c44420dd43194f445f3a296",
+  "revision": "polish5-motion-v1-anchor-compatible-native-proof-pending",
+  "compatibilityAuditPath": "gpu-decompose/polish5/manager/MOTION_A_COMPATIBILITY_DRAFT.md"
 }
