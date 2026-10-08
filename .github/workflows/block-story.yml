@@ -22,6 +22,10 @@ jobs:
           node-version: '22'
       - name: Install Remotion
         run: npm install --no-audit --no-fund
+      - name: Install FFmpeg for video verification
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
       - name: Type check and composition
         run: |
           npm run check
@@ -62,6 +66,10 @@ jobs:
           node-version: '22'
       - name: Install dependencies
         run: npm install --no-audit --no-fund
+      - name: Install FFmpeg for chunk verification
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
       - name: Produce and decode exactly 120 real 3D frames
         env:
           PART: ${{ matrix.part }}
