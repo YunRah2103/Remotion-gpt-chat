@@ -25,6 +25,8 @@ required={
  "COLD_PLATE","PCB_ASSEMBLY","PCB","GPU_DIE","VRAM_CHIPS",
  "VRM_COMPONENTS","PCIE_FINGERS","POWER_8PIN","IO_BRACKET","BACKPLATE"}
 assert required.issubset(nodes),(required-nodes)
+for anchor in required:
+    assert sum(obj.get("name")==anchor for obj in scene["nodes"])==1,("Duplicate anchor",anchor)
 assert sum(s.startswith("BroadRotorBlade_") for s in nodes)==27
 assert sum(s.startswith(("P3_L_fin_","P3_C_fin_","P3_R_fin_")) for s in nodes)==81
 assert sum(s.startswith("P3_Heatpipe_") for s in nodes)==6
@@ -70,7 +72,7 @@ bounds=np.array(geometry.bounds)
 dimensions=bounds[1]-bounds[0]
 expected=np.array([2.90,1.24,.49])
 # Axis order GLB: X card length, Y card height, Z card depth.
-assert np.all(abs(dimensions-expected)/expected<.035),(dimensions,expected)
+assert np.all(abs(dimensions-expected)/expected<.030),(dimensions,expected)
 assert len(geometry.graph.nodes_geometry)>=779,len(geometry.graph.nodes_geometry)
 
 from PIL import Image, ImageStat
