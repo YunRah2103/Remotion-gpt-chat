@@ -154,4 +154,4 @@ export const GpuDecompositionBaseline:React.FC=()=>{
 };
 
 // POLISH 03: source implementation lives in isolated module, baseline preserved above.
-export {GpuDecompositionPolish3 as GpuDecomposition} from './gpu-polish3/GpuDecompositionPolish3';
+export {GpuDecompositionPolish4 as GpuDecomposition} from './gpu-polish4/GpuDecompositionPolish4';
