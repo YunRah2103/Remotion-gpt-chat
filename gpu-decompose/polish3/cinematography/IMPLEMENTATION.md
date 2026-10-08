@@ -5,9 +5,9 @@
 
 ## Source and camera
 - `src/gpu-polish3/GpuDecompositionPolish3.tsx` is the actual isolated three.js/R3F composition. The baseline code in `src/GpuDecomposition.tsx` remains available under `GpuDecompositionBaseline`; the existing `GpuDecomposition` export routes to the new scene. Root.tsx and other films are unchanged.
-- `src/gpu-polish3/cinema.ts` uses pure frame functions, with yaw 9° at frame 0; 15° at hero frame 89; ~48° by frame 322; ~50.3° at 449. Pitch 8° to ~16.8°. No cuts or accumulated transforms.
-- Orthographic camera framing calculates world mesh bounds *after* applying Agent A's hierarchical additive anchor motion, and projects 8 bounding corners into camera space. It targets ~75–81% horizontal footprint while reserving headline/phase typography safety. Bounds are computed from actual current GLB, not fixed assumed model geometry.
-- Gradually enlarges in opening, then reframes the actual exploded geometry without an arbitrary zoom jump.
+- `src/gpu-polish3/cinema.ts` uses pure frame functions, with yaw 15° at frame 0; 24° at hero frame 89; ~53° by frame 322; ~55° at 449. Pitch 10° to ~19°. No cuts or accumulated transforms.
+- Orthographic camera framing calculates world mesh bounds *after* applying Agent A's hierarchical additive anchor motion, and projects 8 bounding corners into camera space. It targets ~79–87.5% target camera-fit width (actual mesh silhouette may be lower due to bounding envelope) while reserving headline/phase typography safety. Bounds are computed from actual current GLB, not fixed assumed model geometry.
+- Gradually enlarges in opening with a more assertive 9° orbit, then reframes the actual exploded geometry without an arbitrary zoom jump.
 
 ## Lighting & appearance
 Graphite `#242a31` 3D studio background, neutral-white overhead key, cool side fill, back rim and wide indirect hemisphere. Cloned materials (source assets unmodified) have conservative max metalness, minimum roughness and very subtle tinted emissive lift only for crushed dark materials, retaining source colour texture.
@@ -28,3 +28,6 @@ Original full released MP4 has severe magenta/purple cast not present in the nat
 
 ## Remaining handoff
 Full B SHA, workflow/artifact IDs and frame-by-frame visual assessment are recorded in `gpu-decompose/polish3/AGENT_B_HANDOFF.md` after native proof. C is sole master release authority.
+
+## Corrected Agent A cross-asset cinematography proof
+Agent A new model build succeeded at immutable source `56b2960ee9aa6b5dbbbc6e326a8d211beb1d63be`, workflow `37831378986`, artifact `11573477646` (`GPU-POLISH3-A-XFX-HARDWARE`). GLB `7208cb73bdd70149ac6bf686b03ac166a9c1af0987bf372feec7b2bd4c01bf4a`; motion JSON `d70aae4a6f6d637ef93d6fbb9eee6a94be5b9a4e9a65c5c78ff9401fd086187b`. A manifest contains exactly one of each 19 required anchor labels. B real new-asset native workflow `.github/workflows/gpu-polish3-b-corrected-model-proof.yml` run `37832082195`, producing 9 required full-native stills, 80 1080×1920 moving proof frames and comparisons to old released MP4. Its results require actual image review before final B approval. A's Blender preview at exploded film-camera angle cuts off outer fan, so a true browser/Remotion bounds-fit view is important.
