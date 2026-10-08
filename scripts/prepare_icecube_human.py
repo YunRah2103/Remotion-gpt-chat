@@ -19,6 +19,29 @@ meshes=[o for o in bpy.context.scene.objects if o.type=='MESH']
 if not meshes:
     raise RuntimeError('Import had no meshes')
 
+# Put the actual human rig into the relaxed reference-video pose,
+# instead of exporting the manufacturer's spread-arm A-pose.
+# Rotation occurs on the upper-arm bones; the forearms/hands follow naturally.
+for rig in (o for o in bpy.context.scene.objects if o.type=='ARMATURE'):
+    names=[pb.name for pb in rig.pose.bones]
+    print('HUMAN RIG BONES',names)
+    lowered=0
+    for pb in rig.pose.bones:
+        n=pb.name.lower().replace('-', '').replace('_', '').replace(' ', '')
+        if 'upperarm' not in n:
+            continue
+        rest=(pb.bone.tail_local-pb.bone.head_local).normalized()
+        sign=1 if pb.bone.head_local.x >= 0 else -1
+        direction=Vector((0.12*sign, 0, -0.993)).normalized()
+        delta=rest.rotation_difference(direction)
+        basis=pb.bone.matrix_local.to_quaternion()
+        pb.rotation_mode='QUATERNION'
+        pb.rotation_quaternion=basis.inverted() @ delta @ basis
+        lowered+=1
+        print('LOWERED ARM', pb.name, 'from',tuple(round(v,3) for v in rest),'to',tuple(round(v,3) for v in direction))
+    print('RELAXED A-POSE ARMS MODIFIED',lowered)
+    bpy.context.view_layer.update()
+
 # High-quality shade; smooth anatomical shape while preserving facial topology.
 for o in meshes:
     for poly in o.data.polygons:
