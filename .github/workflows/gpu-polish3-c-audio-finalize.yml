@@ -1,0 +1,161 @@
+name: GPU POLISH03 - audio polished final master (lossless video copy)
+on:
+  push:
+    branches: [gpu-polish3/c-master]
+    paths:
+      - 'gpu-decompose/polish3/manager/AUDIO_RELEASE_LOCK.json'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  final-audio-master:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Register accessible Actions run pointer
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const path='gpu-decompose/polish3/manager/AUDIO_ACTIVE_RUN_POINTER.json';
+            const payload=JSON.stringify({runId:context.runId,headSha:context.sha,
+              kind:'GPU POLISH03 AUDIO FINAL',status:'STARTED',
+              url:'https://github.com/'+context.repo.owner+'/'+context.repo.repo+'/actions/runs/'+context.runId},null,2)+'\n';
+            let sha;
+            try {
+              const v=await github.rest.repos.getContent({owner:context.repo.owner,repo:context.repo.repo,path,ref:'gpu-polish3/c-master'});
+              sha=v.data.sha;
+            } catch(e) { if(e.status!==404) throw e; }
+            await github.rest.repos.createOrUpdateFileContents({
+              owner:context.repo.owner,repo:context.repo.repo,path,branch:'gpu-polish3/c-master',sha,
+              message:'POLISH03 C: publish actual final audio run ID',
+              content:Buffer.from(payload).toString('base64')
+            });
+      - name: Assert exact successful model/film source and audio contract
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          L=gpu-decompose/polish3/manager/AUDIO_RELEASE_LOCK.json
+          test -s "$L"
+          python3 - <<'PY'
+          import json,re
+          x=json.load(open('gpu-decompose/polish3/manager/AUDIO_RELEASE_LOCK.json'))
+          assert x['baseRunId']==37836701382 and x['baseArtifactId']==11575164881,x
+          assert x['baseArtifactName']=='GPU-POLISH3-FINAL-450F',x
+          assert x['baseMp4Sha256']=='ab2c54921f222d37e332748a76dc095656d3d9fd11dc79cda61c1b52fb405b35',x
+          assert x['gainDb']==30 and x['durationFrames']==450,x
+          assert x['managerVisualReview']=='PASS',x
+          print('SOURCE LOCK PASS final post-production parent 37836701382 artifact 11575164881')
+          PY
+          curl -fsSL -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/37836701382" > /tmp/base.json
+          jq -e '.status=="completed" and .conclusion=="success"' /tmp/base.json >/dev/null
+          curl -fsSL -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/37836701382/artifacts?per_page=100" > /tmp/base-artifacts.json
+          jq -e '.artifacts[] | select(.id==11575164881 and .name=="GPU-POLISH3-FINAL-450F" and .expired==false)' /tmp/base-artifacts.json >/dev/null
+      - uses: actions/download-artifact@v4
+        with:
+          name: GPU-POLISH3-FINAL-450F
+          run-id: 37836701382
+          github-token: ${{ github.token }}
+          path: out/base
+      - name: Correct genuinely too quiet mix without altering 450 video frames
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          F=out/base/XFX-SWIFT-RX9060XT-POLISH03-15S.mp4
+          test -s "$F"
+          echo "ab2c54921f222d37e332748a76dc095656d3d9fd11dc79cda61c1b52fb405b35  $F" | sha256sum -c -
+          mkdir -p out/release
+          O=out/release/XFX-SWIFT-RX9060XT-POLISH03-15S.mp4
+          ffmpeg -v error -y -i "$F" \
+            -map 0:v:0 -map 0:a:0 -c:v copy -af 'volume=30dB' \
+            -c:a aac -b:a 192k -ar 48000 -ac 2 -t 15 \
+            -movflags +faststart "$O"
+          ffmpeg -v error -xerror -i "$O" -f null -
+          ffprobe -v error -show_streams -show_format -of json "$O" > out/release/ffprobe.json
+          python3 - <<'PY'
+          import json
+          p=json.load(open('out/release/ffprobe.json'))
+          v=[s for s in p['streams'] if s['codec_type']=='video']
+          a=[s for s in p['streams'] if s['codec_type']=='audio']
+          assert len(v)==len(a)==1,p
+          assert (v[0]['codec_name'],v[0]['width'],v[0]['height'],v[0]['r_frame_rate'],v[0]['nb_frames'],v[0]['pix_fmt'])==('h264',1080,1920,'30/1','450','yuv420p'),v
+          assert (a[0]['codec_name'],a[0]['sample_rate'],a[0]['channels'])==('aac','48000',2),a
+          assert abs(float(p['format']['duration'])-15.0)<.075,p['format']
+          print('AUDIO-POLISHED FULL DELIVERY FORMAT PASS')
+          PY
+          # Ensure absolutely no video pixel changed during the postmaster.
+          ffmpeg -v error -i "$F" -map 0:v:0 -f hash -hash SHA256 - > out/original-video.sha256
+          ffmpeg -v error -i "$O" -map 0:v:0 -f hash -hash SHA256 - > out/final-video.sha256
+          diff -u out/original-video.sha256 out/final-video.sha256
+          ffmpeg -v info -i "$O" -vn -af volumedetect -f null - 2> out/release/audio-loudness.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('out/release/audio-loudness.txt').read_text()
+          m=float(re.findall(r'mean_volume:\s*(-?[\d.]+)\s*dB',p)[-1])
+          mx=float(re.findall(r'max_volume:\s*(-?[\d.]+)\s*dB',p)[-1])
+          print('Verified final soundtrack mean',m,'dB peak',mx,'dB')
+          assert -24<m<-16 and -20<mx<-10,(m,mx)
+          print('AUDIO LOUDNESS GATE PASS, no clipping')
+          PY
+          for name in hero.png mid-decomposition.png exploded.png; do
+            test -s "out/base/$name"
+            cp "out/base/$name" "out/release/$name"
+          done
+          cp out/base/source-manifest.json out/release/source-manifest.json
+          cp gpu-decompose/polish3/manager/AUDIO_RELEASE_LOCK.json out/release/audio-release-lock.json
+          cp gpu-decompose/polish3/manager/FINAL_VISUAL_REVIEW.md out/release/VISUAL_REVIEW.md
+          cat > out/release/FINAL_RELEASE.md <<'EOF'
+          # GPU POLISH 03 — audio-polished master
+          Base source: run 37836701382 artifact 11575164881; only AAC mechanical
+          audio gain was corrected by +30dB. Exact decoded 450-frame video pixels
+          verified unchanged by full-stream SHA256. FFprobe/decoding/loudness PASS.
+          External XFX silhouette reference-grounded; internal components are
+          approximate artistic reconstruction. Full independent manager film
+          review: see VISUAL_REVIEW.md. This is the publishable final master.
+          EOF
+          (cd out/release && sha256sum XFX-SWIFT-RX9060XT-POLISH03-15S.mp4 \
+            hero.png mid-decomposition.png exploded.png) > out/release/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GPU-POLISH3-FINAL-450F-AUDIOPOLISHED
+          path: out/release/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Publish final run AND numeric artifact ID for downloadable release
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const path='gpu-decompose/polish3/manager/AUDIO_FINAL_RUN_POINTER.json';
+            const artifacts=await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{
+              owner:context.repo.owner,repo:context.repo.repo,run_id:context.runId,per_page:100
+            });
+            const a=artifacts.find(a=>a.name==='GPU-POLISH3-FINAL-450F-AUDIOPOLISHED'&&!a.expired);
+            if(!a)throw Error('publish failed: final AUDIOPOLISHED artifact not found');
+            const payload=JSON.stringify({runId:context.runId,headSha:context.sha,artifactId:a.id,
+              artifactName:a.name,baseRunId:37836701382,baseArtifactId:11575164881,
+              status:'COMPLETE',note:'Manager must still independently download exact final ZIP and validate SHA256'},null,2)+'\n';
+            let sha;
+            try{
+              const v=await github.rest.repos.getContent({owner:context.repo.owner,repo:context.repo.repo,path,ref:'gpu-polish3/c-master'});
+              sha=v.data.sha;
+            }catch(e){if(e.status!==404)throw e;}
+            await github.rest.repos.createOrUpdateFileContents({
+              owner:context.repo.owner,repo:context.repo.repo,path,branch:'gpu-polish3/c-master',sha,
+              message:'POLISH03 C: publish exact audio-final Actions run and final artifact ID',
+              content:Buffer.from(payload).toString('base64')
+            });
