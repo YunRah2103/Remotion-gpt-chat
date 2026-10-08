@@ -15,13 +15,13 @@ export const CAMERA_KEYS:readonly CameraKey[] = [
   {frame:109, focus:'fan',     yaw:19,pitch:11,roll:-10,fov:29,widthFill:.95,heightFill:.78,biasY:.04},
   {frame:141, focus:'front',   yaw:37,pitch:14,roll:-25,fov:34,widthFill:.94,heightFill:.82,biasY:.06},
   {frame:159, focus:'front',   yaw:45,pitch:18,roll:-28,fov:34,widthFill:.92,heightFill:.78,biasY:.05},
-  {frame:181, focus:'cooler',  yaw:51,pitch:22,roll:-20,fov:31,widthFill:.91,heightFill:.78,biasY:.09},
-  {frame:209, focus:'cooler',  yaw:57,pitch:23,roll:-15,fov:30,widthFill:.95,heightFill:.81,biasY:.10},
-  {frame:239, focus:'thermal', yaw:65,pitch:25,roll:-17,fov:29,widthFill:.94,heightFill:.78,biasY:.10},
-  {frame:265, focus:'thermal', yaw:59,pitch:26,roll:-15,fov:29,widthFill:.91,heightFill:.78,biasY:.08},
-  {frame:286, focus:'silicon', yaw:55,pitch:27,roll:-11,fov:29,widthFill:.89,heightFill:.74,biasY:.06},
-  {frame:307, focus:'silicon', yaw:52,pitch:30,roll:-12,fov:28,widthFill:.96,heightFill:.74,biasY:.06},
-  {frame:329, focus:'expand',  yaw:56,pitch:21,roll:-29,fov:33,widthFill:.87,heightFill:.77,biasY:.19},
+  {frame:181, focus:'cooler',  yaw:59,pitch:30,roll:-19,fov:31,widthFill:.91,heightFill:.78,biasY:.09},
+  {frame:209, focus:'cooler',  yaw:67,pitch:41,roll:-12,fov:30,widthFill:.95,heightFill:.81,biasY:.10},
+  {frame:239, focus:'thermal', yaw:69,pitch:44,roll:-10,fov:29,widthFill:.94,heightFill:.78,biasY:.10},
+  {frame:265, focus:'thermal', yaw:67,pitch:44,roll:-9,fov:29,widthFill:.91,heightFill:.78,biasY:.08},
+  {frame:286, focus:'silicon', yaw:65,pitch:42,roll:-8,fov:29,widthFill:.89,heightFill:.74,biasY:.06},
+  {frame:307, focus:'silicon', yaw:62,pitch:40,roll:-10,fov:28,widthFill:.96,heightFill:.74,biasY:.06},
+  {frame:329, focus:'expand',  yaw:56,pitch:27,roll:-29,fov:33,widthFill:.87,heightFill:.77,biasY:.19},
   {frame:364, focus:'all',     yaw:48,pitch:21,roll:-45,fov:32,widthFill:.92,heightFill:.80,biasY:.13},
   {frame:405, focus:'all',     yaw:42,pitch:19,roll:-57,fov:32,widthFill:.92,heightFill:.80,biasY:-.10},
   {frame:449, focus:'all',     yaw:38,pitch:17,roll:-61,fov:32,widthFill:.92,heightFill:.80,biasY:-.20},
@@ -62,9 +62,9 @@ export const subjectBox=(scene:THREE.Object3D,focus:Focus):THREE.Box3=>{
   const names:Record<Exclude<Focus,'all'|'expand'>,string[]>={
     front:['FRONT_SHROUD','FAN_LEFT','FAN_CENTER','FAN_RIGHT'],
     fan:['FAN_CENTER'],
-    cooler:['FRONT_SHROUD','HEATSINK','HEATPIPE_BUNDLE','COLD_PLATE'],
-    thermal:['HEATPIPE_BUNDLE','COLD_PLATE','GPU_DIE','PCB'],
-    silicon:['GPU_DIE','VRAM_CHIPS','VRM_COMPONENTS'],
+    cooler:['HEATSINK_FINS','HEATPIPE_BUNDLE','COLD_PLATE'],
+    thermal:['HEATPIPE_BUNDLE','COLD_PLATE','GPU_DIE','VRAM_CHIPS'],
+    silicon:['GPU_DIE','VRAM_CHIPS','VRM_COMPONENTS','PCB'],
   };
   const box=rangeBox(scene,names[focus]);
   if(box.isEmpty())throw Error('POLISH05 camera focus anchors missing: '+focus);
@@ -73,9 +73,9 @@ export const subjectBox=(scene:THREE.Object3D,focus:Focus):THREE.Box3=>{
 const FOCUS_NAMES:Record<Exclude<Focus,'all'|'expand'>,string[]>={
   front:['FRONT_SHROUD','FAN_LEFT','FAN_CENTER','FAN_RIGHT'],
   fan:['FAN_CENTER'],
-  cooler:['FRONT_SHROUD','HEATSINK','HEATPIPE_BUNDLE','COLD_PLATE'],
-  thermal:['HEATPIPE_BUNDLE','COLD_PLATE','GPU_DIE','PCB'],
-  silicon:['GPU_DIE','VRAM_CHIPS','VRM_COMPONENTS'],
+  cooler:['HEATSINK_FINS','HEATPIPE_BUNDLE','COLD_PLATE'],
+  thermal:['HEATPIPE_BUNDLE','COLD_PLATE','GPU_DIE','VRAM_CHIPS'],
+  silicon:['GPU_DIE','VRAM_CHIPS','VRM_COMPONENTS','PCB'],
 };
 const corners=(b:THREE.Box3)=>{
   const {min:m,max:M}=b;
