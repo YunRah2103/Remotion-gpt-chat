@@ -139,10 +139,12 @@ const StreakField=({frame}:{frame:number})=>{
   const offset=(frame*speed+hash(i+53)*12)%14-7;
   const coords=[p.x+offset,p.y-offset*.21,p.z];
   const dx=p.len*Math.cos(p.a),dy=-p.len*Math.sin(p.a);
-  return <line key={i} position={coords as [number,number,number]}>
-   <bufferGeometry><bufferAttribute attach="attributes-position" args={[new Float32Array([0,0,0,dx,dy,p.b]),3]}/></bufferGeometry>
-   <lineBasicMaterial color={i%6===0?'#64899b':'#66727a'} transparent opacity={p.alpha} depthWrite={false}/>
-  </line>;
+  return <group key={i} position={coords as [number,number,number]}>
+   <mesh position={[dx/2,dy/2,p.b/2]} rotation={[0,0,-p.a]}>
+     <boxGeometry args={[p.len,.005,.005]}/>
+     <meshBasicMaterial color={i%6===0?'#64899b':'#66727a'} transparent opacity={p.alpha} depthWrite={false}/>
+   </mesh>
+  </group>;
  })}</group>;
 };
 const earthShader=()=>new THREE.ShaderMaterial({
@@ -197,7 +199,7 @@ const TextOver=({frame}:{frame:number})=>{
   <div style={{position:'absolute',bottom:361,left:105,right:105,textAlign:'center',fontSize:30,fontWeight:600,lineHeight:1.38,letterSpacing:-.6,opacity:earth,...style}}>
     They are tiny particles that go straight<br/>through you, and straight through the Earth.
   </div>
-  <div style={{position:'absolute',top:1700,left:100,right:100,color:'#525b60',lineHeight:1.35,fontSize:15,opacity:human*.75,...style}}>
+  <div style={{position:'absolute',top:1700,...style,left:100,right:100,color:'#525b60',lineHeight:1.35,fontSize:15,opacity:human*.75}}>
     An original, procedural recreation of the visual presentation.<br/>Scientific figures are diagrammatic, not exact engineering CAD.
   </div>
   {earth>.05&&<div style={{position:'absolute',top:935,right:244,color:'#bbde76',fontSize:21,opacity:earth}}>● <span style={{fontSize:17}}>YOU</span></div>}
