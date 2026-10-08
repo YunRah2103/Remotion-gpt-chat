@@ -1,0 +1,52 @@
+name: IceCube V2 - First 15s Fidelity Proof
+on:
+  push:
+    branches: [recreate/icecube-quality-v2]
+    paths:
+      - 'src/IceCubeOpeningProof.tsx'
+      - 'src/Root.tsx'
+      - '.github/workflows/icecube-proof-v2.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies and FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          npm install --no-audit --no-fund
+      - name: TypeScript strict compile
+        run: npm run check
+      - name: Native three-dimensional Remotion proof
+        run: |
+          mkdir -p out
+          npx remotion render src/index.ts IceCubeOpeningProof out/ICECUBE-V2-OPENING-PROOF-15SEC.mp4 \
+            --gl=swangle --concurrency=2 --codec=h264 --pixel-format=yuv420p --crf=20 --log=error
+      - name: Decoder QA and contact sheet
+        run: |
+          ffprobe -v error -show_entries stream=nb_frames,width,height -of json out/ICECUBE-V2-OPENING-PROOF-15SEC.mp4 > out/ffprobe.json
+          ffmpeg -hide_banner -loglevel error -xerror -i out/ICECUBE-V2-OPENING-PROOF-15SEC.mp4 -f null -
+          python3 - <<'PY'
+          import json
+          x=json.load(open('out/ffprobe.json'))['streams'][0]
+          assert (int(x['nb_frames']),int(x['width']),int(x['height']))==(450,1080,1920),x
+          PY
+          for s in 1 3 5 8 10 12 14; do
+            ffmpeg -hide_banner -loglevel error -y -ss $s -i out/ICECUBE-V2-OPENING-PROOF-15SEC.mp4 -frames:v 1 -update 1 out/scene-$s.png
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ICECUBE-V2-OPENING-3D-15SEC-PROOF
+          path: |
+            out/ICECUBE-V2-OPENING-PROOF-15SEC.mp4
+            out/ffprobe.json
+            out/scene-*.png
+          retention-days: 30
