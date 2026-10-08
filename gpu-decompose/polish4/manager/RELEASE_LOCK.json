@@ -5,11 +5,11 @@
   "agentASourceSha": "a3113bb0a4b450696010c6496cfcb62d2a56e2c3",
   "agentBSourceSha": "c7a4f2ac1c4cb1c3fb85237089a7a3853a3da682",
   "agentCSourceSha": "7090180c54405d6c82b8dc8873f4676c180cba10",
-  "integratedSourceSha": "96dc608ea2f376a987c27559bbd222a8c0fef6ac",
+  "integratedSourceSha": "b8bc5be3ed05149abfcca423a984045025e166ac",
   "glbSha256": "edeeca54f6e9bf26127ed91b3debe16bae47f9c58cd9db0bf760927a0869882e",
   "motionSha256": "d4790dc9dcc6572a0d6ee5478d70431194128055fdaf6d56c171d68ae1f06fed",
   "sceneSourceSha256": "0a54a94073e8ac21e2a8bc6aca41c23403aeb5dd93616d96ecfa3967e1763766",
-  "cameraSourceSha256": "cc5b6af18e24defd23904b343bb7071105b82f187a0d6f010e528e7b3494c0f8",
+  "cameraSourceSha256": "c4fb742bbb4943d5e13534830899894ca3721d6024b4ccb5a8ec83f1297a2044",
   "sceneSourcePath": "src/gpu-polish4/GpuDecompositionPolish4.tsx",
   "cameraSourcePath": "src/gpu-polish4/camera.ts",
   "hardwareRunId": 37840656656,
@@ -25,5 +25,6 @@
   "independentVisualQa": "PENDING",
   "renderApproved": false,
   "releaseApproved": false,
-  "integrationFix": "D 96dc608e scene includes all 13 C motion nodes; original A model exact byte lock and B second native cinema source proof. Full 12-frame native final-combination proof must PASS independently before full render."
+  "integrationFix": "D-approved camera and editorial correction after independent integrated native 12-frame proof run 37842472406 artifact 11578661945 rejected tiny finale. Final yaw38/roll-61; 13 C tracks preserved; source 3d47 rejection document. Re-render full native proofs before release.",
+  "editorialSourceSha256": "ba9d72b5639e86c0b97e4526b53cdcb35e3c750532ec7653a5d0be1133064246"
 }
