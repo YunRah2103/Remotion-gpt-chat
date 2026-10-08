@@ -1,0 +1,59 @@
+name: GPU Decomposition - post-QA orbit native proof
+on:
+  push:
+    branches: [gpu-decompose/b-director]
+    paths:
+      - 'src/GpuDecomposition.tsx'
+      - '.github/workflows/gpu-decomposition-camera-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  orbit-visual-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download exact successful 3D Blender model (not another composition)
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 37811876775
+          name: GPU-AGENT-A-XFX-SWIFT-3D
+          github-token: ${{ github.token }}
+          path: locked-model
+      - name: Verify original GLB/JSON SHA lock and mechanical proofs
+        run: |
+          set -euo pipefail
+          mkdir -p public/gpu-decompose out/camera-proof
+          cp locked-model/assets/xfx_swift_rx9060xt_triple16.glb public/gpu-decompose/
+          cp locked-model/assets/decomposition.json public/gpu-decompose/
+          cp locked-model/assets/asset-manifest.json public/gpu-decompose/
+          python3 gpu-decompose/director/validate_assets.py public/gpu-decompose --lock gpu-decompose/director/AGENT_A_LOCK.json | tee out/camera-proof/source-validation.json
+      - name: Render r2 native 3D 1080x1920 camera frames
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          npm install --no-audit --no-fund
+          npm run check
+          for frame in 0 180 270 330 385 449; do
+            npx remotion still src/index.ts XfxSwiftDecomposition "out/camera-proof/frame-$frame.png" --frame="$frame" --gl=swangle
+            test -s "out/camera-proof/frame-$frame.png"
+          done
+          npx remotion render src/index.ts XfxSwiftDecomposition out/camera-proof/native-320-325.mp4 --frames=320-325 --scale=.5 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
+          ffmpeg -hide_banner -loglevel error -xerror -i out/camera-proof/native-320-325.mp4 -f null -
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=nw=1:nokey=1 out/camera-proof/native-320-325.mp4)" = 6
+          echo NATIVE_R2_ORBIT_PROOF_PASS > out/camera-proof/check.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: GPU-CAMERA-R2-NATIVE-PROOF
+          path: out/camera-proof
+          retention-days: 30
+          if-no-files-found: warn
