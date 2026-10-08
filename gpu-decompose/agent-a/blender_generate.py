@@ -286,6 +286,27 @@ for i,(x,z) in enumerate([(-.78,-.31),(-.78,.29),(.18,-.31),(.18,.29)]):
 for x in [-1.13,-.99,-.85]:
  for z in [-.30,-.15,.0,.15,.30]:
   box("VRM_MOSFET",(x,.051,z),(.085,.030,.052),chipmat,vrm,.005)
+# Real-looking, separately modelled regulator coils and ceramic SMDs.
+# Generic illustrative electrical placement, not a manufacturer PCB tracing.
+coilmat=mat("M_VRM_INDUCTOR_GRAPHITE",(.070,.077,.078),.25,.49)
+for i,x in enumerate([-.99,-.83,-.67,-.51]):
+ for z in [-.35,.34]:
+  box("VRM_inductor_L%02d_%d"%(i,int(z>0)),(x,.047,z),
+      (.113,.052,.098),coilmat,vrm,.012)
+for i in range(28):
+ x=-1.12+(i%7)*.10
+ z=-.10+int(i/7)*.070
+ if abs(x+.30)<.28:continue
+ box("PCB_low_profile_SMD_%02d"%i,(x,.066,z),
+     (.033,.014,.017),steel if i%5==0 else chipmat,vrm,.002)
+# Low-relief traces on exposed board sections, tied to PCB anchor.
+trace=mat("M_CIRCUIT_TRACE_DULL_COPPER",(.29,.23,.12),.67,.47)
+for i in range(11):
+ zz=-.40+i*.078
+ box("PCB_trace_front_%02d"%i,(.57,.072,zz),(.35,.002,.004),trace,pcb)
+for i in range(8):
+ zz=-.40+i*.108
+ box("PCB_trace_left_%02d"%i,(-1.06,.072,zz),(.10,.002,.003),trace,pcb)
 # PCIe contact tongue at bottom and individual plated fingers
 box("PCIE_edge_substrate",(-.24,.085,-.547),(.88,.017,.118),pcbmat,fingers,.002)
 for i in range(32):
@@ -301,12 +322,36 @@ box("GPU_IO_bracket",(-1.416,.0,0),(.026,.405,1.17),steel,bracket,.008)
 for i,z in enumerate([-.30,0,.30]):
  box("Display_socket_housing_%d"%i,(-1.432,-.015,z),(.014,.18,.128),chipmat,bracket,.005)
  box("Display_socket_trim_%d"%i,(-1.446,-.015,z),(.003,.144,.091),accent,bracket,.002)
-# Backplate, distinctive left labyrinth and large right vent cutout visible.
-box("Backplate_left_solid",(-.49,.231,.0),(1.90,.022,1.206),ventmat,back,.016)
-box("Backplate_top_beam",(1.02,.231,.554),(.90,.024,.098),ventmat,back,.010)
-box("Backplate_bottom_beam",(1.02,.231,-.554),(.90,.024,.100),ventmat,back,.010)
-box("Backplate_end_beam",(1.407,.231,0),(.074,.024,1.12),ventmat,back,.008)
-box("Backplate_vent_border",(.578,.231,0),(.065,.024,1.12),ventmat,back,.007)
+# Reference-guided rear: one continuous backplate with an open rectangular fin outlet.
+# Inspired by physical OC3D back photograph: cut-out reveals the REAL metal fins below.
+# Unlike old v2.1, there are NO thick horizontal fake window bars.
+backplate_shell=box("Backplate_machined_one_piece", (0,.231,0),
+                    (2.882,.020,1.194),ventmat,back,.009)
+def cut_metal_slot(target,name,center,dimensions):
+ bpy.ops.mesh.primitive_cube_add(size=1,location=center)
+ cutter=bpy.context.object;cutter.name=name+"_cutter"
+ cutter.dimensions=dimensions
+ bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
+ cut=target.modifiers.new(name,"BOOLEAN")
+ cut.operation="DIFFERENCE";cut.solver="EXACT";cut.object=cutter
+ bpy.ops.object.select_all(action="DESELECT")
+ target.select_set(True);bpy.context.view_layer.objects.active=target
+ bpy.ops.object.modifier_apply(modifier=cut.name)
+ bpy.data.objects.remove(cutter,do_unlink=True)
+cut_metal_slot(backplate_shell,"Full_depth_cooling_fin_window",
+               (1.01,.232,0),(.750,.120,.954))
+cut_metal_slot(backplate_shell,"Lower_standoff_relief_notch",
+               (.05,.232,-.570),(.320,.120,.180))
+assert len(backplate_shell.data.polygons)>20, "Machined rear-plate Boolean failed"
+# Subtle dark anodized edge around the open exhaust window, no covering geometry.
+for z in [-.483,.483]:
+ box("Backplate_air_outlet_lip",(1.01,.239,z),(.756,.009,.012),groovemat,back,.004)
+for x in [.617,1.398]:
+ box("Backplate_outlet_endwall",(x,.239,0),(.010,.009,.966),groovemat,back,.003)
+# Thermal pad patches on INNER face of the plate, visible only as layers part.
+thermal=mat("M_BACKPLATE_THERMAL_PAD",(.117,.124,.129),.03,.80)
+for x,z in [(-.95,-.29),(-.95,.29),(-.32,-.32),(-.32,.32),(.27,-.25)]:
+ box("Backplate_silicone_thermal_pad",(x,.213,z),(.235,.011,.165),thermal,back,.010)
 # Nested V/wave routing motif on solid section (inspired by official exterior).
 def linebar(name,a,b,width,parent,ma):
  dx=b[0]-a[0]; dz=b[1]-a[1]
@@ -318,9 +363,6 @@ for i in range(9):
  xvee=-.22+i*.02
  linebar("V_wave_left_%02d"%i,(x0,ztop),(xvee,.03),.012,back,groovemat)
  linebar("V_wave_right_%02d"%i,(xvee,.03),(.45,zend),.012,back,groovemat)
-# Backplate end vent is reinforced with subtle longitudinal ribs.
-for z in [-.35,-.21,-.07,.07,.21,.35]:
- box("Rear_vent_rib",(1.01,.236,z),(.80,.022,.018),ventmat,back,.005)
 for x in [-1.25,-.64,.48,1.30]:
  for z in [-.50,.50]:
   cylinder("Backplate_screw",(x,.245,z),.012,.007,steel,back,16)
@@ -372,21 +414,45 @@ def export_glb(path):
 export_glb(ASSETS/"xfx_swift_rx9060xt_triple16.glb")
 # Blender native QA previews
 scene.frame_set(0);scene.render.filepath=str(ASSETS/"assembled.png");bpy.ops.render.render(write_still=True)
-scene.frame_set(449)
-# Stronger three-quarter viewing angle makes front-to-back exploded offsets readable.
+# Side-tilted final proof matches Agent B's director-only ~55-degree camera amendment.
 camera=scene.camera
-camera.location=(6.5,-6.0,2.65)
-camera.rotation_euler=(Vector((0,0,0))-camera.location).to_track_quat("-Z","Y").to_euler()
-camera.data.ortho_scale=4.9
-scene.render.filepath=str(ASSETS/"exploded.png");bpy.ops.render.render(write_still=True)
-# Render REAL sampled moving frames for short evidence video, no screenshot animation fakes.
+def aim_camera(position,ortho):
+ camera.location=position
+ camera.rotation_euler=(Vector((0,0,0))-camera.location).to_track_quat("-Z","Y").to_euler()
+ camera.data.ortho_scale=ortho
+scene.frame_set(449)
+aim_camera((8.2,-5.55,2.8),5.1)
+scene.render.filepath=str(ASSETS/"exploded.png")
+bpy.ops.render.render(write_still=True)
+# Distinct QA views. The actual canonical GLB and locked JSON remain unchanged.
+aim_camera((9.2,-3.6,3.0),5.5)
+scene.render.filepath=str(ASSETS/"exploded_side.png")
+bpy.ops.render.render(write_still=True)
+scene.frame_set(0)
+aim_camera((2.6,7.2,2.1),4.15)
+scene.render.filepath=str(ASSETS/"backplate_detail.png")
+bpy.ops.render.render(write_still=True)
+# Moving proof frames vary both the *real* part offsets and camera orbit,
+# following Agent B v1.1 camera-only correction.
 preview=ASSETS/"moving_frames";preview.mkdir(exist_ok=True)
-scene.render.resolution_x=448;scene.render.resolution_y=316
+scene.render.resolution_x=552;scene.render.resolution_y=368
 scene.cycles.samples=10
 for f in list(range(89,330,12))+[380,449]:
  scene.frame_set(f)
+ t=min(1.,max(0.,(f-160.)/(332.-160.)))
+ t=t*t*(3.-2.*t)
+ origin=Vector((2.0,-7.2,2.05));end=Vector((8.2,-5.55,2.8))
+ aim_camera(origin.lerp(end,t),3.65+(5.1-3.65)*t)
  scene.render.filepath=str(preview/("f_%03d.png"%f))
  bpy.ops.render.render(write_still=True)
+# Persist camera documentation for the director, not a replacement animation contract.
+(ASSETS/"camera-proof.json").write_text(json.dumps({
+ "scope":"Blender native QA preview only",
+ "heroBlenderPosition":[2.0,-7.2,2.05],
+ "explodedBlenderPosition":[8.2,-5.55,2.8],
+ "azimuthDegreesApprox":55.9,
+ "orbitFrames":[160,332],
+ "doesNotChange":"decomposition.json, exported GLB frame transforms or director-owned final timeline"},indent=2))
 names=sorted([ob.name for ob in coll.objects])
 (ASSETS/"model_nodes.json").write_text(json.dumps({"nodes":names,"required":list(groups),
  "part_groups":{k:len([o for o in coll.objects if o.parent==v]) for k,v in groups.items()}},indent=2))
