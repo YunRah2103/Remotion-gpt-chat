@@ -1,0 +1,107 @@
+name: GPU POLISH3 B - REAL corrected A hardware integrated camera proof
+on:
+  push:
+    branches: [gpu-polish3/b-cinematography]
+    paths:
+      - '.github/workflows/gpu-polish3-b-corrected-model-proof.yml'
+      - 'src/gpu-polish3/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  corrected-A-native-camera-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download exact new Agent A corrected model (NOT old baseline)
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 37831378986
+          name: GPU-POLISH3-A-XFX-HARDWARE
+          github-token: ${{ github.token }}
+          path: new-A
+      - name: Download original released video for real pixel comparison
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 37821956618
+          name: GPU-DECOMPOSITION-FINAL-450F
+          github-token: ${{ github.token }}
+          path: old-master
+      - name: Validate new A GLB, motion and manifest immutable SHA provenance
+        run: |
+          set -euo pipefail
+          mkdir -p public/gpu-decompose out/polish3-new-A
+          cp new-A/polish3/assets/xfx_swift_rx9060xt_polish3.glb public/gpu-decompose/
+          cp new-A/polish3/assets/decomposition.json public/gpu-decompose/
+          cp new-A/polish3/assets/asset-manifest.json public/gpu-decompose/
+          echo '7208cb73bdd70149ac6bf686b03ac166a9c1af0987bf372feec7b2bd4c01bf4a  public/gpu-decompose/xfx_swift_rx9060xt_polish3.glb' | sha256sum -c -
+          echo 'd70aae4a6f6d637ef93d6fbb9eee6a94be5b9a4e9a65c5c78ff9401fd086187b  public/gpu-decompose/decomposition.json' | sha256sum -c -
+          python3 - <<'PY'
+          import json
+          m=json.load(open('public/gpu-decompose/asset-manifest.json'))
+          a=json.load(open('public/gpu-decompose/decomposition.json'))
+          assert m['modelerCommitSha']=='56b2960ee9aa6b5dbbbc6e326a8d211beb1d63be'
+          assert m['glbSha256']=='7208cb73bdd70149ac6bf686b03ac166a9c1af0987bf372feec7b2bd4c01bf4a'
+          assert m['decompositionSha256']=='d70aae4a6f6d637ef93d6fbb9eee6a94be5b9a4e9a65c5c78ff9401fd086187b'
+          assert (a['fps'],a['durationInFrames'],a['schemaVersion'])==(30,450,1)
+          names=['GPU_ROOT','FAN_ASSEMBLY','FAN_LEFT','FAN_CENTER','FAN_RIGHT','FRONT_SHROUD','HEATSINK','HEATSINK_FINS','HEATPIPE_BUNDLE','COLD_PLATE','PCB_ASSEMBLY','PCB','GPU_DIE','VRAM_CHIPS','VRM_COMPONENTS','PCIE_FINGERS','POWER_8PIN','IO_BRACKET','BACKPLATE']
+          for name in names:
+              assert m['nodeNames'].count(name)==1,(name,m['nodeNames'].count(name))
+          print('A REAL corrected model authentic manifest + 19 unique required anchors validated')
+          PY
+          {
+            echo "AGENT A NEW SOURCE SHA 56b2960ee9aa6b5dbbbc6e326a8d211beb1d63be"
+            echo "A NEW RUN 37831378986 / ARTIFACT 11573477646"
+            echo "GLB SHA256 7208cb73bdd70149ac6bf686b03ac166a9c1af0987bf372feec7b2bd4c01bf4a"
+            echo "MOTION SHA256 d70aae4a6f6d637ef93d6fbb9eee6a94be5b9a4e9a65c5c78ff9401fd086187b"
+            echo "B SOURCE $GITHUB_SHA"
+          } > out/polish3-new-A/PROVENANCE.txt
+      - name: Install FFmpeg, Remotion and TypeScript check
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          npm install --no-audit --no-fund
+          npm run check
+      - name: True new-model Remotion 1080x1920 stills all required frames
+        run: |
+          set -euo pipefail
+          for f in 0 45 89 120 179 240 329 385 449; do
+            npx remotion still src/index.ts XfxSwiftDecomposition "out/polish3-new-A/new-$f.png" --frame="$f" --gl=swangle
+            test -s "out/polish3-new-A/new-$f.png"
+          done
+      - name: True new-model native 3D motion - fan, component and exploded windows
+        run: |
+          set -euo pipefail
+          for sample in 108-139 231-246 367-398; do
+            npx remotion render src/index.ts XfxSwiftDecomposition "out/polish3-new-A/new-$sample.mp4" --frames="$sample" --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=2
+            ffmpeg -hide_banner -loglevel error -xerror -i "out/polish3-new-A/new-$sample.mp4" -f null -
+            need=32
+            if [ "$sample" = "231-246" ]; then need=16; fi
+            count=$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=nw=1:nk=1 "out/polish3-new-A/new-$sample.mp4")
+            test "$count" = "$need"
+          done
+          echo 'NEW A / B INTEGRATION - 80/80 native moving frames decoded PASS' > out/polish3-new-A/DECODER_REPORT.txt
+      - name: Real before and after image comparison at representative frames
+        run: |
+          set -euo pipefail
+          master=old-master/XFX-SWIFT-RX9060XT-DECONSTRUCTED-15S.mp4
+          test -s "$master"
+          for f in 0 120 240 385 449; do
+            ffmpeg -hide_banner -loglevel error -y -i "$master" -vf "select=eq(n\\,$f)" -vsync vfr -frames:v 1 "out/polish3-new-A/before-$f.png"
+            ffmpeg -hide_banner -loglevel error -y -i "out/polish3-new-A/before-$f.png" -i "out/polish3-new-A/new-$f.png" -filter_complex '[0:v]scale=540:960[a];[1:v]scale=540:960[b];[a][b]hstack=inputs=2' -frames:v 1 "out/polish3-new-A/compare-$f.png"
+          done
+          (cd out/polish3-new-A && sha256sum *.png *.mp4) > out/polish3-new-A/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: GPU-POLISH3-B-NEW-A-NATIVE-PROOFS
+          path: out/polish3-new-A/
+          retention-days: 30
+          if-no-files-found: warn
