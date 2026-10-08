@@ -7,5 +7,9 @@
   "artifactId": 11565138533,
   "sourceManifestPath": "gpu-decompose/assets/asset-manifest.json",
   "verifiedBy": "Agent B independent GLB/manifest/geometry and frame inspection",
-  "contractVersion": "1.0"
+  "contractVersion": "1.0",
+  "directorCameraVersion": "r2-56deg-orbit",
+  "directorNativeCameraProofRunId": 37813149635,
+  "directorNativeCameraProofArtifactId": 11566705380,
+  "visualReview": "PASS: inspected 1080x1920 frames 330,385,449; layers visibly separated and on-screen; camera and typography stable"
 }
