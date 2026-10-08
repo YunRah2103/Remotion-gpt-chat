@@ -449,21 +449,21 @@ scene.render.filepath=str(ASSETS/"backplate_detail.png")
 bpy.ops.render.render(write_still=True)
 # POLISH 03: extra authentic Cycles evidence views, NOT rendered textures.
 # Restore all root groups after each proof; export was already completed above.
-def proof_view(fname,cam_pos,scale,frame=0,hide=(),target=(0,0,0)):
+def proof_view(fname,cam_pos,scale,frame=0,hide=(),target=(0,0,0),hide_prefixes=()):
  scene.frame_set(frame)
  # Blender's hide_render on an EMPTY does not reliably hide the child meshes.
  # Hide actual descendant objects and restore them after each proof.
  hidden=[]
  for obj in coll.objects:
   p=obj
+  omit=bool(hide_prefixes and obj.name.startswith(hide_prefixes))
   while p is not None:
-   if p.name in hide:
-    if obj.type != "EMPTY":
-     assert not obj.hide_render
-     obj.hide_render=True
-     hidden.append(obj)
-    break
+   if p.name in hide:omit=True;break
    p=p.parent
+  if omit and obj.type != "EMPTY":
+   assert not obj.hide_render
+   obj.hide_render=True
+   hidden.append(obj)
  camera.location=cam_pos
  camera.rotation_euler=(Vector(target)-camera.location).to_track_quat("-Z","Y").to_euler()
  camera.data.ortho_scale=scale
@@ -475,9 +475,16 @@ scene.render.resolution_x=960;scene.render.resolution_y=640
 scene.cycles.samples=32
 proof_view("fans_shroud_detail.png",(1.32,-4.05,1.36),2.20,0,
            target=(.89,-.12,.04))
+# A labelled sectional cooler proof hides only center-bank fins in the
+# camera pass. The actual exported GLB retains all fin and tube meshes.
 proof_view("heatsink_heatpipe_detail.png",(2.80,-4.50,2.10),3.15,0,
            hide=("FAN_ASSEMBLY","FRONT_SHROUD","PCB_ASSEMBLY","BACKPLATE"),
-           target=(0,-.04,0))
+           target=(0,-.04,0),
+           hide_prefixes=("P3_C_fin_","P3_FinLeadingFold_1",
+                          "P3_FinBank_rail_1","P3_Endplate_1"))
+proof_view("heatpipe_bundle_detail.png",(2.8,-4.1,2.0),3.15,0,
+           hide=("FAN_ASSEMBLY","FRONT_SHROUD","PCB_ASSEMBLY",
+                 "BACKPLATE","HEATSINK_FINS"),target=(0,-.02,0))
 proof_view("pcb_silicon_detail.png",(1.9,-4.80,1.85),2.80,0,
            hide=("FAN_ASSEMBLY","FRONT_SHROUD","HEATSINK","BACKPLATE"),
            target=(-.37,.07,0))
