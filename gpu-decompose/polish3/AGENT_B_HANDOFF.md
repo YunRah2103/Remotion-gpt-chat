@@ -1,6 +1,6 @@
 # GPU DECOMPOSITION POLISH 03 — AGENT B FINAL SOURCE & NATIVE VISUAL HANDOFF
 
-Status: CAMERA/LIGHTING IMPLEMENTATION PUSHED; CORRECTED AGENT A REAL NATIVE RENDER PROOF **PASS**. Browser selected-composition rerun remains tracked separately and is NOT used as a substitute for native WebGL proofs.
+Status: CAMERA/LIGHTING IMPLEMENTATION PUSHED; CORRECTED AGENT A REAL NATIVE RENDER PROOF **PASS**. Playwright Chromium selected-composition proof also SUCCESS; this complements, but never replaces, native Remotion moving-frame QA.
 Repository: YunRah2103/Remotion-gpt-chat ONLY.
 My B branch: gpu-polish3/b-cinematography.
 C correction contract: gpu-decompose/polish3/PRODUCTION_CONTRACT.md, C immutable full commit **8d4748af2d239177a9a6f44f07e9472b95f33d9f**.
@@ -36,7 +36,7 @@ All baseline previews explicitly staged A's OLD GLB under temporary test filenam
 - gpu-decompose/polish3/cinematography/playwright_studio.py — real Chromium opens Remotion Studio and *selects corrected XfxSwiftDecomposition* in improved version; takes screenshot.
 - .github/workflows/gpu-polish3-b-native-proof.yml — old-model isolated test-only baseline and original video comparisons.
 - .github/workflows/gpu-polish3-b-corrected-model-proof.yml — proper pinned NEW A actual GLB, A animation + integrity validation, nine native stills, 80 full-native moving frames, real before/after.
-- .github/workflows/gpu-polish3-b-playwright.yml — real Playwright Chromium with pinned NEW A GLB and Studio screenshot (first run SUCCESS 37832373466 artifact 11573812820; stronger selected-composition rerun 37832851463 awaits independent status).
+- .github/workflows/gpu-polish3-b-playwright.yml — real Playwright Chromium with pinned NEW A GLB and Studio screenshot (first run SUCCESS 37832373466 artifact 11573812820; stronger selected-composition Chromium run **37832851463 SUCCESS**, artifact **11574406894**, actual screenshot selected XfxSwiftDecomposition and rendered GPU at frame 0).
 - gpu-decompose/polish3/AGENT_B_HANDOFF.md — this file.
 
 ## Visual review of decoded pixels
@@ -60,4 +60,4 @@ Frame-specific caveats, to C and A:
 3. From A run 37831378986, stage polish3/assets/xfx_swift_rx9060xt_polish3.glb into public/gpu-decompose/xfx_swift_rx9060xt_polish3.glb; stage polish3/assets/decomposition.json to public/gpu-decompose/decomposition.json. Validate sha256, new asset manifest and required unique nodes. **Never stage the test-only old model from B baseline workflow for master**.
 4. Verify manager's RELEASE_LOCK including immutable A/B source and proof IDs. Repeat final native visual QA after selective C integration (real stills and moving clips, not TypeScript-only). C owns the complete 450 frames, procedural audio/mux H.264 yuv420p + AAC stereo 48 kHz, full decode, strict ffprobe validation, corrected colour processing, release and final creative signoff.
 
-**B QA conclusion:** corrected-A native cinematography SOURCE/PREVIEW PASS, with clearly documented hardware artistic approximation and C's final release/purple-cast postprocessing still NOT YET AUTHORIZED.
+**B QA conclusion:** corrected-A native cinematography SOURCE/PREVIEW PASS and real selected-GPU Chromium Studio browser QA PASS, with clearly documented hardware artistic approximation and C's final release/purple-cast postprocessing still NOT YET AUTHORIZED.
