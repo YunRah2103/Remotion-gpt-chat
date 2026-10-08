@@ -46,6 +46,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
           python3 gpu-decompose/polish4/manager/synthesize_mechanical_audio.py /tmp/polish04-mechanical.wav
           ffprobe -v error -show_entries stream=codec_name,channels,sample_rate -show_entries format=duration -of json /tmp/polish04-mechanical.wav
           ffmpeg -v error -y -i /tmp/polish04-mechanical.wav -c:a aac -b:a 192k /tmp/polish04-mechanical.m4a
