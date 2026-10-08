@@ -1,38 +1,41 @@
-# GPU Decomposition — Agent A v2.1 VISUAL REBUILD HANDOFF
+# GPU Decomposition — Agent A FINAL v2.4 Rebuild and Mechanical QA Handoff
 
-**Status: ASSET RELEASED — Blender/CAD/PyBullet/Godot/GLB validation passed.**
-Repository only: `YunRah2103/Remotion-gpt-chat`
-Agent A branch: `gpu-decompose/a-model`
-This handoff **supersedes** the original 2026-10-08 model, run 37812363063 and artifact 11565343211. **Agent B must not integrate the original model.**
+**Status: VERIFIED 3D ASSET / RELEASED FOR AGENT B INTEGRATION.**
+Repository: `YunRah2103/Remotion-gpt-chat` ONLY.
+Branch: `gpu-decompose/a-model`.
+**This release supersedes all Agent A v1, v2.1, v2.2 and v2.3 render assets and ZIPs. DO NOT silently use an older artifact.**
 
-## Immutable verified source and artifact
+## 1. Immutable source + successful native build
 
-- **Immutable model source SHA:** `46891efdd9bca9da1f26fe7f260a2cae25bcb882`
-- **Successful GitHub Actions workflow run:** [37816437723](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37816437723)
-- Workflow: `.github/workflows/agent-a-build.yml`; workflow ID 378723009.
-- **Artifact ID:** `11567252428`; artifact name: `GPU-AGENT-A-XFX-SWIFT-3D`.
-- [Download the exact artifact in GitHub Actions](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37816437723/artifacts/11567252428).
-- Artifact contents: `assets/xfx_swift_rx9060xt_triple16.glb`, `assets/xfx_swift_rx9060xt_triple16.blend`, `assets/decomposition.json`, `assets/asset-manifest.json`, `assets/clearance.json`, `assets/godot-proof.json`, `assets/assembled.png`, `assets/exploded.png`, `assets/decomposition-proof.mp4`, `assets/SHA256SUMS.txt`, logs, 23 native moving proof frames, `agent-a/fan_hub.stl`.
-- **GLB SHA256:** `c234a0aafe9c80c3c96c2e41fe8d9de965e8d8e6e4ffd9dda60b0307ee530254`, **1,682,752 bytes**.
-- **Decomposition JSON SHA256:** `1790dfa60d0ea10641498901d2e9bf838eb024d9d8c6c4eb1e0aec7914e74510`.
-- Audited glTF contains **277 real meshes, 296 named nodes, 20 materials**. The required 19 hierarchy anchors exist, as do 27 swept rotor blades and all 3 imported OpenSCAD fan hubs.
-- Model source commit is locked above; this handoff-only commit is newer, but does not change any model bytes.
+- **Model source SHA:** `322f77046b15402b55042e86822389bec1e70818`
+- **Successful GitHub Actions run:** [37819645913](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37819645913)
+- Workflow ID: `378723009`; source: `.github/workflows/agent-a-build.yml`
+- **Artifact name:** `GPU-AGENT-A-XFX-SWIFT-3D`
+- **Artifact ID:** `11567849898`
+- [Exact downloadable GitHub Actions artifact](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37819645913/artifacts/11567849898)
+- **GLB file:** `assets/xfx_swift_rx9060xt_triple16.glb`; **1,774,560 bytes**; **SHA256 `e0b86390180ecb6724bcfe029bc77c9a116ff9b004e1ae14fa81b0bff8e0599e`**
+- **Motion JSON:** `assets/decomposition.json`; SHA256 `1790dfa60d0ea10641498901d2e9bf838eb024d9d8c6c4eb1e0aec7914e74510`.
+- Export contains **333 real glTF meshes, 352 named nodes, 23 PBR material entries**. Self-contained GLB. All 19 contract-required anchors pass structural QA. Contains 27 swept fans blades and 3 actual OpenSCAD STL mesh imports.
+- GLB evaluated world bounds: `X [-1.447500,1.447500]`, `Y [-0.619000,0.625200]`, `Z [-0.248500,0.251000]` in Y-up display units. Real mesh bounding test **GLB_BOUNDS_PASS** within director's ±3% envelope against published **290×124×49 mm**.
 
-## Why visual rebuild was necessary
+**This report-only commit is after the model SHA; download the immutable run above.**
 
-The original model had thin fan spokes, exposed silver heatsink behind the fans, a three-section cage-like façade, and generic grey panels.
+## 2. Visual v2.4 changes and engineering credibility
 
-The v2.1 asset replaces this with:
-1. Wide, curved, volumetric nine-blade rotors on each of three fans, real blade thickness, separate named fan anchors, dark recessed wells and central X badges.
-2. **A single, physically modelled, Boolean-cut shroud with THREE real circular apertures**, eliminating the previous vertical panel seams.
-3. Darker graphite-black materials, accurate-looking long rectangular Swift silhouette, slim black bezels, diagonal endcap/corner cut-outs and better top spine branding.
-4. Structured rear ventilation ribbing, metal bracket and visible internals retained.
-5. Real assembled/exploded Cycles CPU previews and a decoded moving decomposition proof.
-No reference photograph is embedded in the geometry or video. The model is an **original stylized mechanical reconstruction**, not a photoreal or manufacturer-CAD asset.
+After the original version was rejected visually, Agent A rebuilt the exterior and further corrected the rear:
+- Real 3D broad swept axial blades on all three independent rotors, not thin spokes; recessed intake wells and machined central caps.
+- One unified graphite-black polymer front shroud with three Boolean-cut circular apertures, slimmer bezels and XFX-style angular corners. No flat photo panels, no previous three-section fascia seams.
+- Rebuilt **one-piece Boolean-cut backplate** with a real exhaust aperture, structural border and inner thermal pad blocks. The open vent genuinely reveals a dense metal fin stack, rather than the earlier fake horizontal bars.
+- Shortened the realistic-looking illustrative PCB so its far edge ends before the rear airflow window, matching the physical cooler-overhang construction more plausibly.
+- Regulator inductor blocks, low-profile SMDs and board circuit traces, separately controlled silicon die/VRAM and authentic gold connector/contact groups.
+- Heatpipe finish shifted toward nickel-plated metallic rather than bright brown copper. Non-crossing, parallel backplate machining lines replace the poor crossing engraving.
+- Adjusted fan caps to keep the **real exported geometry** inside the specified depth, not merely edit claimed manifest dimensions.
 
-## Exact Blender GLB anchor contract
+**Accuracy constraint:** real manufacturer's SKU, three-fan silhouette, dimensions, 8-pin, 2xDP + 1xHDMI established. All inside geometry, blade shape, traces, screw positions, grooves, vent-cut details and number of VRAM chip packages are visual approximations, **NOT manufacturer CAD**.
 
-```
+## 3. EXACT 3D HIERARCHY — case sensitive
+
+```text
 GPU_ROOT
   FAN_ASSEMBLY
     FAN_LEFT
@@ -54,41 +57,59 @@ GPU_ROOT
   BACKPLATE
 ```
 
-Material name samples: `M_MONOLITHIC_XFX_FASCIA`, `M_FAN_BLADE`, `M_FAN_HUB`, `M_DARK_RECESSED_FAN_WELL`, `M_ANGULAR_FASCIA_HIGHLIGHT`, `M_BRUSHED_ALUMINIUM`, `M_NICKEL_COPPER`, `M_PCB_DARK_GREEN`, `M_BACKPLATE_GRAPHITE`, `M_CONTACT_GOLD`. See `asset-manifest.json` for every material.
+**Materials examples:** `M_MONOLITHIC_XFX_FASCIA`, `M_FAN_BLADE`, `M_FAN_HUB`, `M_DARK_RECESSED_FAN_WELL`, `M_NICKEL_COPPER`, `M_PCB_DARK_GREEN`, `M_VRM_INDUCTOR_GRAPHITE`, `M_CIRCUIT_TRACE_DULL_COPPER`, `M_BACKPLATE_GRAPHITE`, `M_BACKPLATE_THERMAL_PAD`, `M_HEATSINK_ANODISED_SILVER`, `M_CONTACT_GOLD`. `asset-manifest.json` enumerates every material.
 
-## Axes, scale, animation and integration
+## 4. Coordinates, motion and absolute rule for Agent B
 
-- GLB coordinate system is **Y-up**, +X long edge pointing to the right, +Z toward viewer/fan front; root at envelope center.
-- `sceneUnitsPerMillimetre=0.01`, i.e. 1 rendered scene unit = 100 real mm. External size based on manufacturer **290 × 124 × 49 mm**.
-- `decomposition.json` is **450 frames at 30 fps**, absolute frame-driven smoothstep applied to each anchor's *initial local pose*. No accumulated transforms; no random simulation.
-- Mandatory animated roots: `FAN_LEFT/CENTER/RIGHT`, `FRONT_SHROUD`, `HEATSINK`, `GPU_DIE`, `VRAM_CHIPS`, `PCB_ASSEMBLY`, `BACKPLATE`. PCB die and VRAM offsets are additive to their parent PCB assembly.
-- The GLB is static at its assembled pose, **no baked animation**. The JSON is authoritative; do not add Blender axis remapping a second time.
-- Stages 0–89 assembled, 90–179 fan and shroud release, 180–329 internals separation, 330–449 completed exploded layout.
+- GLB Y-up, +X along long edge to right, +Y toward top, +Z emerging from fan face; origin at envelope centre. `sceneUnitsPerMillimetre: 0.01`; model represents 290 × 124 × 49 mm.
+- **UNCHANGED** director-locked `decomposition.json`, 450 exact frames @30 fps, smoothstep on anchors' relative LOCAL positions (no baked glTF animation).
+- Required animated names: `FAN_LEFT`, `FAN_CENTER`, `FAN_RIGHT`, `FRONT_SHROUD`, `HEATSINK`, `GPU_DIE`, `VRAM_CHIPS`, `PCB_ASSEMBLY`, `BACKPLATE`.
+- Apply offset per frame independently and add it to the imported anchor's starting local position. PCB die and VRAM animations compound under their parent PCB_ASSEMBLY. Never multiply frame deltas cumulatively.
+- Stages: fully assembled 0–89, fans/shroud 90–179, internals 180–329, final exploded 330–449. No disappearing meshes.
+- **Camera-only quality requirement:** Agent B's v1.1 director amendment already calls for an orbit toward +X, settling at ~55–56 degrees during frames 160–332. Agent A produced matching *preview-only* extra Blender views and a moving camera proof; `camera-proof.json` records settings. Do not treat the preview as Agent B's final native camera approval.
 
-### Agent B exact download/import commands
+**Outstanding visual risk:** At a shallow angle fans and fascia still overlap, and the cooler can read as a stack of flat rectangular planes. Agent B MUST run actual 1080×1920 Remotion native screenshot QA at 330/385/449 and assess rotor separation, layer depth, framing and readability on phone. If the locked offsets are not visually readable, only the director may revise `PRODUCTION_CONTRACT.md` and authorize revised animation. Agent A has NOT silently increased offsets.
+
+## 5. Exact artifact import — do not use latest by guess
 
 ```bash
-gh run download 37816437723 -R YunRah2103/Remotion-gpt-chat \
-  -n GPU-AGENT-A-XFX-SWIFT-3D -D /tmp/xfx-agent-a-v21
-sha256sum /tmp/xfx-agent-a-v21/assets/xfx_swift_rx9060xt_triple16.glb
-sha256sum /tmp/xfx-agent-a-v21/assets/decomposition.json
+gh run download 37819645913 -R YunRah2103/Remotion-gpt-chat \
+  -n GPU-AGENT-A-XFX-SWIFT-3D -D /tmp/xfx-agent-a-v24
+sha256sum /tmp/xfx-agent-a-v24/assets/xfx_swift_rx9060xt_triple16.glb
+sha256sum /tmp/xfx-agent-a-v24/assets/decomposition.json
 mkdir -p public/gpu-decompose/assets
-cp /tmp/xfx-agent-a-v21/assets/xfx_swift_rx9060xt_triple16.glb public/gpu-decompose/assets/
-cp /tmp/xfx-agent-a-v21/assets/decomposition.json public/gpu-decompose/assets/
+cp /tmp/xfx-agent-a-v24/assets/xfx_swift_rx9060xt_triple16.glb public/gpu-decompose/assets/
+cp /tmp/xfx-agent-a-v24/assets/decomposition.json public/gpu-decompose/assets/
 ```
 
-Load via Three.js `GLTFLoader(staticFile('gpu-decompose/assets/xfx_swift_rx9060xt_triple16.glb'))`; verify exact hashes before release. Apply JSON positions as additive local offsets from cached initial GLB node positions and compute each frame independently.
+Load GLB through Three.js `GLTFLoader(staticFile('gpu-decompose/assets/xfx_swift_rx9060xt_triple16.glb'))` and import `decomposition.json` from the same pinned artifact. Fail closed if any named anchor, hash or file is missing. Never copy preview PNGs in place of geometry.
 
-**Visual QA warning for director:** Agent A's proof confirms genuine 3D and render success, but the locked separation distances leave rotor/shroud layers visually close at shallow camera angles. Native Remotion previews must use meaningful oblique camera parallax and show clear fan/shroud release before finalizing. If a stronger displacement is needed, update the director's production contract explicitly; do not silently mutate this model's locked JSON.
+## 6. Reproducible sources and artifact contents
 
-## Sources, QA and known limits
+Canonical scripts: `gpu-decompose/agent-a/blender_generate.py`, `mechanical.scad`, `generate_motion.py`, `test_motion.py`, `clearance.py`, `godot/previs.gd`, `validate_assets.py`, **`validate_dimensions.py`** and workflow `.github/workflows/agent-a-build.yml`.
 
-Canonical sources: `gpu-decompose/agent-a/blender_generate.py`, `mechanical.scad`, `generate_motion.py`, `clearance.py`, `godot/previs.gd`, `validate_assets.py`, `test_motion.py`; workflow `.github/workflows/agent-a-build.yml`.
+The validated artifact contains:
+`assets/xfx_swift_rx9060xt_triple16.glb`,
+`assets/xfx_swift_rx9060xt_triple16.blend`,
+`assets/decomposition.json`,
+`assets/asset-manifest.json`,
+`assets/bounds-validation.json`,
+`assets/clearance.json`,
+`assets/godot-proof.json`,
+`assets/assembled.png`,
+`assets/exploded.png`,
+`assets/exploded_side.png`,
+`assets/backplate_detail.png`,
+`assets/decomposition-proof.mp4`,
+`assets/camera-proof.json`,
+`assets/moving_frames/*.png`, logs, `assets/SHA256SUMS.txt`, and `agent-a/fan_hub.stl`.
 
-**Executed checks:** OpenSCAD STL export plus Blender import of hub into all three rotors; PyBullet DIRECT proxy collision checks; real Godot 450-frame hierarchy playback; Blender scene generation, self-contained glTF export, two 960×640 native preview stills, actual sampled animation frames, ffmpeg H264 moving proof decode, GLB node/material audit and matching SHA256. All steps PASS in run 37816437723.
+**Executed pass gates (run 37819645913):** real OpenSCAD STL export and Blender mesh import, 450-frame deterministic timeline test, actual PyBullet DIRECT major-layer collision-envelope sample check, Godot 450-frame hierarchy checks, native Blender GLB export + four CPU Cycles QA PNGs + 23 native sampled moving frames, ffmpeg H.264 MP4 encoding & full decode, GLB anchor/material schema validation, and actual evaluated-world-bound geometry check. **All passed**. These proofs are not an actual full 450-frame 15-second final MP4; that's Agent B's work.
 
-**Reference:** https://uk.xfxforce.com/shop/xfx-swift-amd-radeon-rx-9060xt-oc-triple-fan-gaming-edition-16gb . Manufacturer-confirmed identity: XFX Swift RX 9060 XT Triple Fan 16GB black model RX-96TS316B7, one 8-pin, 2×DP + HDMI, 290×124×49 mm.
+## 7. Reference, ownership and no interference
 
-**Approximate, not verified CAD:** fan moulding profiles/blade aerodynamics, screw placement, precise silicon packaging, PCB layout/traces, VRAM topology, heatpipe bend counts, fin positions, side notch details, rear plate design, and artwork. Final 450-frame Remotion master MP4 belongs to Agent B; do not treat this 2.3-second modeller proof as that film.
+Manufacturer: https://uk.xfxforce.com/shop/xfx-swift-amd-radeon-rx-9060xt-oc-triple-fan-gaming-edition-16gb
+Backplate teardown reference: https://overclock3d.net/reviews/gpu_displays/xfx-rx-9060-xt-swift-review/2/
+Hardware SKU: `RX-96TS316B7`.
 
-Do not merge directly into Agent B's branch; use immutable source SHA and artifact above. No other repository was read, copied or modified.
+Agent A did not alter Agent B's Remotion files, manager contract or any other repository. No new agents. Source and binary assets ready for Agent B to review and integrate, subject to final phone-native Remotion visual QA.
