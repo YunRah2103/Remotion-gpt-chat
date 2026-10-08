@@ -64,7 +64,7 @@ export const subjectBox=(scene:THREE.Object3D,focus:Focus):THREE.Box3=>{
     fan:['FAN_CENTER'],
     cooler:['HEATSINK_FINS','HEATPIPE_BUNDLE','COLD_PLATE'],
     thermal:['HEATPIPE_BUNDLE','COLD_PLATE','GPU_DIE','VRAM_CHIPS'],
-    silicon:['GPU_DIE','VRAM_CHIPS'],
+    silicon:['GPU_DIE','VRAM_CHIPS','VRM_COMPONENTS','PCB'],
   };
   const box=rangeBox(scene,names[focus]);
   if(box.isEmpty())throw Error('POLISH05 camera focus anchors missing: '+focus);
@@ -75,7 +75,7 @@ const FOCUS_NAMES:Record<Exclude<Focus,'all'|'expand'>,string[]>={
   fan:['FAN_CENTER'],
   cooler:['HEATSINK_FINS','HEATPIPE_BUNDLE','COLD_PLATE'],
   thermal:['HEATPIPE_BUNDLE','COLD_PLATE','GPU_DIE','VRAM_CHIPS'],
-  silicon:['GPU_DIE','VRAM_CHIPS'],
+  silicon:['GPU_DIE','VRAM_CHIPS','VRM_COMPONENTS','PCB'],
 };
 const corners=(b:THREE.Box3)=>{
   const {min:m,max:M}=b;
