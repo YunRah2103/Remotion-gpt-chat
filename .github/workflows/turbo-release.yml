@@ -1,0 +1,95 @@
+name: Turbo Documentary - release validated master
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/turbo-release.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  assemble-final-master:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Download the seven completed original native 3D render chunks
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 37776329123
+          pattern: turbo-chunk-*
+          merge-multiple: true
+          path: out/chunks
+          github-token: ${{ github.token }}
+      - name: Validate chunks and stitch 840 genuine native frames
+        run: |
+          mkdir -p out
+          for i in 0 1 2 3 4 5 6; do
+            test -s "out/chunks/turbo-$i.mp4"
+            count=$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=noprint_wrappers=1:nokey=1 "out/chunks/turbo-$i.mp4")
+            test "$count" = 120
+            echo "file 'chunks/turbo-$i.mp4'" >> out/concat.txt
+          done
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i out/concat.txt -c copy out/visual-840.mp4
+      - name: Mix engine, induction airflow and turbo whine
+        run: |
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i "sine=frequency=59:duration=28:sample_rate=48000" \
+            -f lavfi -i "anoisesrc=color=pink:amplitude=0.13:duration=28:sample_rate=48000" \
+            -f lavfi -i "sine=frequency=860:duration=28:sample_rate=48000" \
+            -filter_complex "[0:a]volume=0.22,lowpass=f=180,afade=t=in:st=0:d=1,afade=t=out:st=26.9:d=1[engine];[1:a]highpass=f=180,lowpass=f=3200,volume=0.08,afade=t=in:st=0:d=0.9,afade=t=out:st=26.8:d=1[air];[2:a]volume='if(between(t,5,21),0.016,0.003)':eval=frame,afade=t=in:st=0:d=0.8[spool];[engine][air][spool]amix=inputs=3:duration=first:normalize=0,alimiter=limit=0.8[a]" \
+            -map "[a]" -ac 2 -ar 48000 -c:a aac -b:a 192k out/sound.m4a
+      - name: Produce limited-range yuv420p H264 1080x1920 master
+        run: |
+          ffmpeg -hide_banner -loglevel error -y -i out/visual-840.mp4 -i out/sound.m4a \
+            -filter:v "scale=in_range=pc:out_range=tv,format=yuv420p" \
+            -map 0:v:0 -map 1:a:0 -c:v libx264 -preset veryfast -crf 18 -pix_fmt yuv420p -color_range tv \
+            -c:a copy -t 28 -movflags +faststart out/THE-HIDDEN-POWER-OF-A-TURBOCHARGER-FINAL.mp4
+      - name: Full MP4 decode and exact technical validation
+        run: |
+          ffmpeg -hide_banner -loglevel error -xerror -i out/THE-HIDDEN-POWER-OF-A-TURBOCHARGER-FINAL.mp4 -f null -
+          ffprobe -v error -show_streams -show_format -of json out/THE-HIDDEN-POWER-OF-A-TURBOCHARGER-FINAL.mp4 > out/ffprobe.json
+          python3 - <<'PY'
+          import json
+          p=json.load(open('out/ffprobe.json'))
+          v=next(s for s in p['streams'] if s['codec_type']=='video')
+          a=next(s for s in p['streams'] if s['codec_type']=='audio')
+          assert (v['codec_name'],v['width'],v['height'],v['pix_fmt'],v['nb_frames'],v['r_frame_rate'])==('h264',1080,1920,'yuv420p','840','30/1'),v
+          assert (a['codec_name'],a['sample_rate'],a['channels'])==('aac','48000',2),a
+          assert abs(float(p['format']['duration'])-28)<.07,p['format']
+          print('PASS 840 frames, 1080x1920, H264 yuv420p 30fps, 28 sec AAC stereo 48kHz')
+          PY
+          ffmpeg -hide_banner -loglevel warning -i out/THE-HIDDEN-POWER-OF-A-TURBOCHARGER-FINAL.mp4 -vf 'blackdetect=d=0.9:pix_th=0.03:pic_th=0.98' -an -f null - 2> out/blackdetect.log
+          for sec in 2 7 12 17 20 24 27; do
+            ffmpeg -hide_banner -loglevel error -y -ss "$sec" -i out/THE-HIDDEN-POWER-OF-A-TURBOCHARGER-FINAL.mp4 -frames:v 1 -update 1 "out/scene-$sec.png"
+          done
+          sha256sum out/THE-HIDDEN-POWER-OF-A-TURBOCHARGER-FINAL.mp4 > out/SHA256SUMS.txt
+          cat > out/RELEASE-QA.txt <<'EOF'
+          THE HIDDEN POWER OF A TURBOCHARGER
+          Composition: TurboDocumentary
+          Render source: YunRah2103/Remotion-gpt-chat, 7x120 original native 3D frames
+          Release input run: 37776329123
+          Frames: 840. Duration: 28 seconds. Canvas: 1080 x 1920, 30 fps.
+          Renderer: Remotion 4 / Three.js / software-backed WebGL (--gl=swangle).
+          Audio: Procedural mechanical soundtrack; original narration subtitled, NO synthetic speech.
+          Masters: H264 yuv420p limited range; AAC stereo at 48000 Hz.
+          Independent QA: TypeScript, moving WebGL previews, chunk decode, final full MP4 decode and stream assertions.
+          Original procedural 3D assets, no YUNEX dependencies.
+          EOF
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TURBOCHARGER-FINAL-840F-YUV420P
+          path: |
+            out/THE-HIDDEN-POWER-OF-A-TURBOCHARGER-FINAL.mp4
+            out/ffprobe.json
+            out/SHA256SUMS.txt
+            out/RELEASE-QA.txt
+            out/blackdetect.log
+            out/scene-*.png
+          retention-days: 30
+          if-no-files-found: error
