@@ -29,8 +29,8 @@ def mat(name,col,metal=0,rough=.45):
  bs.inputs["Roughness"].default_value=rough
  return m
 plastic=mat("M_POLYMER_GRAPHITE",(.032,.037,.046),.10,.58)
-frame_mat=mat("M_SHROUD_DARK",(.055,.063,.076),.2,.36)
-rim=mat("M_FAN_RING",(.018,.022,.027),.32,.3)
+frame_mat=mat("M_SHROUD_DARK",(.028,.032,.039),.18,.40)
+rim=mat("M_FAN_RING",(.013,.016,.020),.25,.37)
 blade=mat("M_FAN_BLADE",(.016,.019,.023),.08,.39)
 hubmat=mat("M_FAN_HUB",(.037,.043,.052),.15,.42)
 black_gloss=mat("M_GLOSS_ACCENT",(.012,.017,.02),.6,.20)
@@ -191,8 +191,8 @@ for i,(x,node) in enumerate(zip([-.94,0,.94],fan_nodes)):
 
 # Entire dark seamless sculpted fascia, constructed as three annular cut-out panels.
 # Topology is real triangles with true open holes, not an image pasted on a box.
-fascia=mat("M_MONOLITHIC_XFX_FASCIA",(.025,.028,.033),.14,.61)
-fascia_highlight=mat("M_ANGULAR_FASCIA_HIGHLIGHT",(.047,.051,.058),.25,.48)
+fascia=mat("M_MONOLITHIC_XFX_FASCIA",(.012,.014,.017),.12,.56)
+fascia_highlight=mat("M_ANGULAR_FASCIA_HIGHLIGHT",(.034,.038,.044),.20,.46)
 edgeblack=mat("M_TRIPLE_FAN_BEZEL_BLACK",(.016,.019,.024),.28,.43)
 # One physically continuous polymer front fascia, three Boolean-drilled circular fan apertures.
 # Removes the visible vertical panel seams of the first two prototypes.
@@ -222,7 +222,7 @@ for x in [-.94,0,.94]:
 # Actual Swift-style diagonal notches at both outside endcaps.
 def accent_polygon(name,points,ma=fascia_highlight):
  mesh=bpy.data.meshes.new(name+"_Geo")
- mesh.from_pydata([(x,-.222,z) for x,z in points],[],[tuple(range(len(points)))])
+ mesh.from_pydata([(x,-.231,z) for x,z in points],[],[tuple(range(len(points)))])
  mesh.update();ob=bpy.data.objects.new(name,mesh)
  coll.objects.link(ob);ob.parent=shroud;mesh.materials.append(ma)
  return ob
