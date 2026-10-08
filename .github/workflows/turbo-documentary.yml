@@ -38,10 +38,10 @@ jobs:
       - name: Render four actual moving native 3D WebGL previews
         run: |
           mkdir -p previews
-          npx remotion render src/index.ts TurboDocumentary previews/opening.mp4 --frames=30-59 --scale=0.36 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=2
-          npx remotion render src/index.ts TurboDocumentary previews/turbine.mp4 --frames=190-219 --scale=0.36 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=2
-          npx remotion render src/index.ts TurboDocumentary previews/compressor.mp4 --frames=500-529 --scale=0.36 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=2
-          npx remotion render src/index.ts TurboDocumentary previews/payoff.mp4 --frames=745-774 --scale=0.36 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=2
+          npx remotion render src/index.ts TurboDocumentary previews/opening.mp4 --frames=30-59 --scale=0.5 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=2
+          npx remotion render src/index.ts TurboDocumentary previews/turbine.mp4 --frames=190-219 --scale=0.5 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=2
+          npx remotion render src/index.ts TurboDocumentary previews/compressor.mp4 --frames=500-529 --scale=0.5 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=2
+          npx remotion render src/index.ts TurboDocumentary previews/payoff.mp4 --frames=745-774 --scale=0.5 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=2
           for name in opening turbine compressor payoff; do
             ffmpeg -hide_banner -loglevel error -xerror -i "previews/$name.mp4" -f null -
             ffmpeg -hide_banner -loglevel error -y -ss 0.5 -i "previews/$name.mp4" -frames:v 1 -update 1 "previews/$name.png"
