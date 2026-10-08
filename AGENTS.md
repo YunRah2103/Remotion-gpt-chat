@@ -1,5 +1,14 @@
-# Normal ChatGPT agent guide
+# Repository agent guide
 
-Work ONLY in `YunRah2103/Remotion-gpt-chat`. Never read, import, copy, write to or modify `YunRah2103/yunus-video-lab` or any YUNEX assets.
+Work ONLY in `YunRah2103/Remotion-gpt-chat`. Never read, import, copy, or modify `YunRah2103/yunus-video-lab` or any YUNEX assets.
 
-This is an independent public Remotion workspace. Use distinct `agent/...` branches for experiments. Read `src/Root.tsx`, `src/VectorFilm.tsx` and `.github/workflows/render.yml` before editing. Derive animation solely from `useCurrentFrame` for deterministic renders. Registered composition is `VectorFilm` (1080 x 1920, 30 fps, 270 frames). Keep changes self-contained. Validate with `npm run check`, commit, verify the full source SHA and inspect actual GitHub Actions MP4 artifacts before claiming video QA approval. Never store secrets in this public repository.
+Independent compositions currently registered in `src/Root.tsx`:
+
+- `GpuDriveFilm`: legacy 6-second, 1080x1920, 30fps / 180 frames.
+- `TurboDocumentary`: THE HIDDEN POWER OF A TURBOCHARGER, 28-second, 1080x1920, 30fps / 840 frames.
+
+Turbo source: `src/TurboDocumentary.tsx` and `src/turbo/Mechanical.tsx`. All animation must be deterministic and based on `useCurrentFrame`, using real R3F/Three.js geometry and WebGL (`--gl=swangle` for CI software rendering). 2D typography is for subtitles and explanations only.
+
+Render workflow: `.github/workflows/turbo-documentary.yml`. Verified master-only release: `.github/workflows/turbo-release.yml`, successful run 37777361493. The MP4 contains an AAC mechanical soundtrack and on-screen narration subtitles, but no synthesized speech. Never describe the original stylized 3D meshes as photoreal CAD.
+
+Maintain exact 840 frames and 28s at 1080x1920/30fps, H264 yuv420p limited range and AAC 48kHz stereo. Use `npm run check`, moving native preview MP4s, FFprobe and full decoding before claiming QA PASS. Verify complete remote SHAs, actions run IDs and artifact IDs. Do not store secrets or use paid render services without permission.
