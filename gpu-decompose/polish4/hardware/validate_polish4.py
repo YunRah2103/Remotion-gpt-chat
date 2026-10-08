@@ -53,7 +53,7 @@ assert pbr("M_P4_HUB_MACHINED_GUNMETAL")["metallicFactor"]>=.65
 
 # Required canonical GLB axes and hierarchy are stable, no new animation
 # primitives or invented motion anchors.
-motion=json.loads((ROOT/"decomposition.json").read_text())
+motion=json.loads((ROOT/"PROOF_ONLY_POLISH03_MOTION.json").read_text())
 assert motion["durationInFrames"]==450 and motion["fps"]==30
 assert set(motion["nodes"]) == {
   "FAN_LEFT","FAN_CENTER","FAN_RIGHT","FRONT_SHROUD","HEATSINK",
@@ -109,7 +109,7 @@ asset={
     "model":"xfx_swift_rx9060xt_polish4.glb",
     "glbSha256":digest,
     "glbBytes":len(data),
-    "motionSha256":hashlib.sha256((ROOT/"decomposition.json").read_bytes()).hexdigest(),
+    "proofOnlyPolish03MotionSha256":hashlib.sha256((ROOT/"PROOF_ONLY_POLISH03_MOTION.json").read_bytes()).hexdigest(),
     "canonicalAnchors":sorted(required),
     "meshCount":len(scene["meshes"]),
     "graphGeometryInstances":len(geometry.graph.nodes_geometry),
