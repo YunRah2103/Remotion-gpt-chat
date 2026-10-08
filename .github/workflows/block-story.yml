@@ -1,0 +1,140 @@
+name: Block Story - original 3D remake and MP4
+on:
+  push:
+    branches:
+      - chatgpt/block-story-recreation
+    paths:
+      - 'src/BlockStory.tsx'
+      - 'src/Root.tsx'
+      - 'scripts/build-block-audio.py'
+      - '.github/workflows/block-story.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Remotion
+        run: npm install --no-audit --no-fund
+      - name: Type check and composition
+        run: |
+          npm run check
+          npx remotion compositions src/index.ts --gl=swangle | tee compositions.txt
+          grep -q BlockStory compositions.txt
+      - name: Native animated 3D motion previews
+        run: |
+          mkdir -p previews
+          npx remotion render src/index.ts BlockStory previews/church.mp4 --frames=65-88 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          npx remotion render src/index.ts BlockStory previews/fire.mp4 --frames=410-433 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          npx remotion render src/index.ts BlockStory previews/church-exterior.mp4 --frames=535-558 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          npx remotion render src/index.ts BlockStory previews/bread-and-wine.mp4 --frames=808-831 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          npx remotion render src/index.ts BlockStory previews/book.mp4 --frames=1230-1253 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          for clip in previews/*.mp4; do
+            ffmpeg -hide_banner -loglevel error -xerror -i "$clip" -f null -
+            ffmpeg -hide_banner -loglevel error -y -ss 0.3 -i "$clip" -frames:v 1 -update 1 "${clip%.mp4}.png"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BLOCK-STORY-NATIVE-PROOFS
+          path: |
+            previews/
+            compositions.txt
+          retention-days: 30
+          if-no-files-found: error
+  chunks:
+    needs: preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [0,1,2,3,4,5,6,7,8,9,10]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Produce and decode exactly 120 real 3D frames
+        env:
+          PART: ${{ matrix.part }}
+        run: |
+          mkdir -p out
+          START=$((PART * 120))
+          END=$((START + 119))
+          npx remotion render src/index.ts BlockStory "out/block-$PART.mp4" --frames="$START-$END" --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          ffmpeg -hide_banner -loglevel error -xerror -i "out/block-$PART.mp4" -f null -
+          count=$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=nk=1:nw=1 "out/block-$PART.mp4")
+          test "$count" = 120
+      - uses: actions/upload-artifact@v4
+        with:
+          name: block-story-chunk-${{ matrix.part }}
+          path: out/block-*.mp4
+          retention-days: 30
+          if-no-files-found: error
+  master:
+    needs: chunks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: block-story-chunk-*
+          merge-multiple: true
+          path: out/chunks
+      - name: Install audio and media tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg espeak-ng
+          python3 -m venv /tmp/blockstory-venv
+          /tmp/blockstory-venv/bin/pip install -q edge-tts
+      - name: Assemble independent new animation with new audio
+        run: |
+          mkdir -p out
+          for i in 0 1 2 3 4 5 6 7 8 9 10; do
+            test -s "out/chunks/block-$i.mp4"
+            count=$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=nk=1:nw=1 "out/chunks/block-$i.mp4")
+            test "$count" = 120
+            echo "file 'chunks/block-$i.mp4'" >> out/concat.txt
+          done
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i out/concat.txt -c copy out/visual-1320.mp4
+          /tmp/blockstory-venv/bin/python scripts/build-block-audio.py
+          ffmpeg -hide_banner -loglevel error -y -i out/visual-1320.mp4 -i out/BLOCK-STORY-44s.m4a -filter:v "scale=in_range=pc:out_range=tv,format=yuv420p" -map 0:v:0 -map 1:a:0 -c:v libx264 -crf 18 -preset veryfast -pix_fmt yuv420p -color_range tv -c:a aac -b:a 192k -ar 48000 -ac 2 -t 44 -movflags +faststart out/BLOCK-STORY-REMOTION-44S.mp4
+      - name: Validate full file and record footage samples
+        run: |
+          ffmpeg -hide_banner -loglevel error -xerror -i out/BLOCK-STORY-REMOTION-44S.mp4 -f null -
+          ffprobe -v error -show_streams -show_format -of json out/BLOCK-STORY-REMOTION-44S.mp4 > out/ffprobe.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('out/ffprobe.json'))
+          v=next(x for x in d['streams'] if x['codec_type']=='video')
+          a=next(x for x in d['streams'] if x['codec_type']=='audio')
+          assert (v['codec_name'],v['width'],v['height'],v['pix_fmt'],v['r_frame_rate'],v['nb_frames']) == ('h264',1080,1920,'yuv420p','30/1','1320'),v
+          assert (a['codec_name'],a['sample_rate'],a['channels']) == ('aac','48000',2),a
+          assert abs(float(d['format']['duration'])-44)<0.1,d['format']
+          print('PASS — 1320 original Remotion 3D frames, 1080x1920, 30 fps, AAC narration')
+          PY
+          ffmpeg -hide_banner -loglevel warning -i out/BLOCK-STORY-REMOTION-44S.mp4 -vf 'blackdetect=d=1:pix_th=0.025:pic_th=0.96' -an -f null - 2>out/blackdetect.txt
+          for s in 2 7 13 19 26 31 36 41; do
+            ffmpeg -hide_banner -loglevel error -y -ss "$s" -i out/BLOCK-STORY-REMOTION-44S.mp4 -frames:v 1 -update 1 "out/scene-$s.png"
+          done
+          sha256sum out/BLOCK-STORY-REMOTION-44S.mp4 >out/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BLOCK-STORY-REMOTION-FINAL-MP4
+          path: |
+            out/BLOCK-STORY-REMOTION-44S.mp4
+            out/ffprobe.json
+            out/SHA256SUMS.txt
+            out/blackdetect.txt
+            out/scene-*.png
+          retention-days: 30
+          if-no-files-found: error
