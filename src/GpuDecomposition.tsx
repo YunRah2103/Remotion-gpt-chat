@@ -105,7 +105,7 @@ const Studio:React.FC<{frame:number; original:THREE.Object3D; animation:Animatio
  <AnimatedHardware frame={frame} original={original} animation={animation}/>
 </>;
 
-export const GpuDecomposition:React.FC=()=>{
+export const GpuDecompositionBaseline:React.FC=()=>{
  const frame=useCurrentFrame();
  const {width,height}=useVideoConfig();
  const [renderHandle]=useState(()=>delayRender('Load actual XFX Swift Blender GLB and locked separation JSON'));
@@ -152,3 +152,6 @@ export const GpuDecomposition:React.FC=()=>{
   </div>
  </AbsoluteFill>;
 };
+
+// POLISH 03: source implementation lives in isolated module, baseline preserved above.
+export {GpuDecompositionPolish3 as GpuDecomposition} from './gpu-polish3/GpuDecompositionPolish3';
