@@ -76,7 +76,7 @@ def box(name,loc,dims,ma,parent,bev=0):
  mesh_parent(ob,parent,ma)
  if bev:
   mod=ob.modifiers.new("soft machined edges","BEVEL");mod.width=bev;mod.segments=2
-  mod.affect="EDGES" if hasattr(mod,"affect") else None
+  if hasattr(mod,"affect"):mod.affect="EDGES"
   ob.modifiers.new("weighted normals","WEIGHTED_NORMAL")
  return ob
 def cylinder(name,loc,r,dep,ma,parent,verts=48):
@@ -274,7 +274,7 @@ def studio():
  scene.render.resolution_percentage=100
  scene.render.image_settings.file_format="PNG"
  scene.render.film_transparent=False
- scene.view_settings.view_transform='AgX' if 'AgX' in [x.identifier for x in bpy.types.ColorManagedViewSettings.bl_rna.properties["view_transform"].enum_items] else 'Standard'
+ scene.view_settings.view_transform='Standard'
  return cam
 studio()
 scene=bpy.context.scene

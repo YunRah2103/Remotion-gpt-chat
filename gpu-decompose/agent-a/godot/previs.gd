@@ -25,10 +25,15 @@ func _initialize() -> void:
  scene.add_child(heat)
  var anchors={}
  for name in dat["nodes"].keys():
+  if name=="PCB_ASSEMBLY":
+   anchors[name]=ba
+   continue
+  if name=="HEATSINK":
+   anchors[name]=heat
+   continue
   var pa=scene
   if name.begins_with("FAN_"):pa=asm
   if name=="GPU_DIE" or name=="VRAM_CHIPS":pa=ba
-  if name=="PCB_ASSEMBLY":pa=scene
   var part=Node3D.new()
   part.name=name
   pa.add_child(part)
