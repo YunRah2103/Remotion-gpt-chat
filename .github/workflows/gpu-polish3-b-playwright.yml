@@ -1,0 +1,65 @@
+name: GPU POLISH3 B - real Chromium Remotion studio proof
+on:
+  push:
+    branches: [gpu-polish3/b-cinematography]
+    paths:
+      - '.github/workflows/gpu-polish3-b-playwright.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  browser-visual:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download exact corrected A model for browser scene
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 37831378986
+          name: GPU-POLISH3-A-XFX-HARDWARE
+          github-token: ${{ github.token }}
+          path: corrected-a
+      - name: Stage verified A model, npm and Chromium
+        run: |
+          set -euo pipefail
+          mkdir -p public/gpu-decompose out/polish3-b-playwright
+          cp corrected-a/polish3/assets/xfx_swift_rx9060xt_polish3.glb public/gpu-decompose/
+          cp corrected-a/polish3/assets/decomposition.json public/gpu-decompose/
+          echo '7208cb73bdd70149ac6bf686b03ac166a9c1af0987bf372feec7b2bd4c01bf4a  public/gpu-decompose/xfx_swift_rx9060xt_polish3.glb' | sha256sum -c -
+          echo 'd70aae4a6f6d637ef93d6fbb9eee6a94be5b9a4e9a65c5c78ff9401fd086187b  public/gpu-decompose/decomposition.json' | sha256sum -c -
+          npm install --no-audit --no-fund
+          npm run check
+          python3 -m venv /tmp/b-playwright
+          /tmp/b-playwright/bin/pip install --disable-pip-version-check playwright==1.56.0
+          /tmp/b-playwright/bin/python -m playwright install --with-deps chromium
+      - name: Launch Remotion Studio and inspect in real Playwright Chromium
+        run: |
+          set -euo pipefail
+          npx remotion studio src/index.ts --port=3178 > out/polish3-b-playwright/studio.log 2>&1 &
+          STUDIO_PID=$!
+          trap 'kill "$STUDIO_PID" || true' EXIT
+          for attempt in $(seq 1 50); do
+            if curl -fsS -o /dev/null http://127.0.0.1:3178; then break; fi
+            sleep 2
+          done
+          /tmp/b-playwright/bin/python gpu-decompose/polish3/cinematography/playwright_studio.py
+          test -s out/polish3-b-playwright/remotion-studio-real-browser.png
+          {
+            echo "Real Chromium and Remotion Studio loaded and screenshot inspected by Playwright"
+            echo "Corrected A SHA: 56b2960ee9aa6b5dbbbc6e326a8d211beb1d63be"
+            echo "B SHA: $GITHUB_SHA"
+          } >> out/polish3-b-playwright/PLAYWRIGHT_RESULT.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: GPU-POLISH3-B-CHROMIUM-PROOF
+          path: out/polish3-b-playwright/
+          retention-days: 30
+          if-no-files-found: warn
