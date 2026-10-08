@@ -1,7 +1,7 @@
 {
-  "runId": 37835252881,
-  "headSha": "542d5eb64f84c45ac3fc66450379e0b52f9bb034",
-  "artifactId": 11575871182,
+  "runId": 37836009799,
+  "headSha": "93fedcbcf82e751a9dbead642603c461dae7647d",
+  "artifactId": 11575916990,
   "artifactName": "GPU-POLISH3-C-NATIVE-PROOFS",
   "branch": "refs/heads/gpu-polish3/c-master",
   "kind": "proof",
