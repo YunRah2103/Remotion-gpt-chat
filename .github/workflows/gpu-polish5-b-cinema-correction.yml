@@ -1,0 +1,65 @@
+name: GPU POLISH05 B - creative correction experimental native shots
+on:
+  push:
+    branches: [gpu-polish5/b-master]
+    paths:
+      - .github/workflows/gpu-polish5-b-cinema-correction.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  experimental-native-real-glb:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: GPU-POLISH5-B-LOCKED-INPUTS
+          run-id: 37850695898
+          github-token: ${{ github.token }}
+          path: .
+      - name: Mount EXACT verified A binary and experimental B v2 animation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s public/gpu-decompose/polish5/xfx_swift_rx9060xt_polish5.glb
+          echo "254b6c0579f294c44598f4623a3b04a108d5bc728c44420dd43194f445f3a296  public/gpu-decompose/polish5/xfx_swift_rx9060xt_polish5.glb" | sha256sum -c -
+          cp gpu-decompose/polish5/motion/decomposition.v2.json public/gpu-decompose/polish5/decomposition.v2.json
+          mkdir -p out/p5-v2-experiment
+          sha256sum public/gpu-decompose/polish5/*.glb public/gpu-decompose/polish5/decomposition.v2.json \
+            > out/p5-v2-experiment/INPUT_SHA256SUMS.txt
+          printf '%s\n' 'EXPERIMENT ONLY: Native A model, v2 B motion/camera; not final release.' \
+            > out/p5-v2-experiment/READ_ME.txt
+      - name: Actual native 1080x1920 camera V2 full-resolution frames and clips
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          npm install --no-audit --no-fund
+          npm run check
+          for f in 180 209 225 245 270 286 310 329 365 449; do
+            npx remotion still src/index.ts XfxSwiftPolish5CinemaTest \
+              "out/p5-v2-experiment/frame-$f.png" --frame="$f" --gl=swangle
+            test -s "out/p5-v2-experiment/frame-$f.png"
+          done
+          for x in 215-235 280-310; do
+            npx remotion render src/index.ts XfxSwiftPolish5CinemaTest \
+              "out/p5-v2-experiment/moving-$x.mp4" --frames="$x" \
+              --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
+            ffmpeg -v error -xerror -i "out/p5-v2-experiment/moving-$x.mp4" -f null -
+          done
+          echo '10 native real-A experiment stills and 2 native real-A motion clips: machine only, VISUAL QA STILL REQUIRED.' \
+            >> out/p5-v2-experiment/READ_ME.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GPU-POLISH5-B-CINEMA-REVEAL-V2-EXPERIMENT
+          path: out/p5-v2-experiment/
+          retention-days: 30
+          if-no-files-found: error

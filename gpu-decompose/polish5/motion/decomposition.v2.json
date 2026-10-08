@@ -1,0 +1,393 @@
+{
+  "schemaVersion": 1,
+  "fps": 30,
+  "durationInFrames": 450,
+  "model": "XFX SWIFT RX-96TS316B7 (artistically reconstructed interiors)",
+  "sceneUnitsPerMillimetre": 0.01,
+  "axes": "glTF Y up; +Z front/fans; +X card length",
+  "positionsAreRelativeDeltas": true,
+  "rotationUnits": "radians",
+  "nodes": {
+    "FAN_LEFT": {
+      "startFrame": 90,
+      "endFrame": 151,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          -0.19,
+          -0.035,
+          1.2
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    },
+    "FAN_CENTER": {
+      "startFrame": 99,
+      "endFrame": 159,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          0,
+          0.085,
+          1.32
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    },
+    "FAN_RIGHT": {
+      "startFrame": 108,
+      "endFrame": 167,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          0.19,
+          -0.035,
+          1.2
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    },
+    "FRONT_SHROUD": {
+      "startFrame": 143,
+      "endFrame": 179,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          0,
+          -0.025,
+          0.64
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    },
+    "HEATSINK": {
+      "startFrame": 183,
+      "endFrame": 238,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          0.035,
+          0.11,
+          0.32
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    },
+    "HEATSINK_FINS": {
+      "startFrame": 202,
+      "endFrame": 252,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          -0.045,
+          0.018,
+          0.07
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    },
+    "HEATPIPE_BUNDLE": {
+      "startFrame": 216,
+      "endFrame": 267,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          0.032,
+          -0.018,
+          0.22
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    },
+    "COLD_PLATE": {
+      "startFrame": 238,
+      "endFrame": 281,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          0.025,
+          -0.018,
+          0.16
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    },
+    "GPU_DIE": {
+      "startFrame": 249,
+      "endFrame": 306,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          -0.015,
+          0.045,
+          0.27
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    },
+    "VRAM_CHIPS": {
+      "startFrame": 266,
+      "endFrame": 316,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          0,
+          -0.035,
+          0.23
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    },
+    "VRM_COMPONENTS": {
+      "startFrame": 281,
+      "endFrame": 322,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          0.014,
+          -0.02,
+          0.08
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    },
+    "PCB_ASSEMBLY": {
+      "startFrame": 283,
+      "endFrame": 320,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          0,
+          -0.055,
+          -0.1
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    },
+    "BACKPLATE": {
+      "startFrame": 304,
+      "endFrame": 329,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          0,
+          -0.025,
+          -0.86
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    }
+  },
+  "compatibilityStatus": "CANDIDATE_POLISH05_A_ANCHORS_VERIFIED",
+  "sourceModel": "POLISH05 A GLB sha256 254b6c0579f294c44598f4623a3b04a108d5bc728c44420dd43194f445f3a296",
+  "revision": "POLISH05-B-reveal-v2-candidate-native-testing",
+  "compatibilityAuditPath": "gpu-decompose/polish5/manager/MOTION_A_COMPATIBILITY_DRAFT.md"
+}
