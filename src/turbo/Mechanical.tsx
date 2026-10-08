@@ -27,12 +27,12 @@ export const RoadWorld:React.FC<{frame:number;hero?:boolean}>=({frame,hero=false
     {[-1,1].map(s=><group key={s}>
       <mesh position={[s*4.3,.27,z]}><boxGeometry args={[.18,.38,2.9]}/><M color="#536a70" roughness={.52}/></mesh>
       <mesh position={[s*4.3,.58,z]}><boxGeometry args={[.12,.1,4.2]}/><M color="#97c1c7" roughness={.4}/></mesh>
-      <mesh position={[s*6.7,1.5,z]}><coneGeometry args={[1.6,3.5,7]}/><meshStandardMaterial color={i%3?'#172f31':'#254044'} roughness={1}/></mesh>
-      <mesh position={[s*6.7,.45,z]}><cylinderGeometry args={[.13,.15,1,8]}/><M color="#162622" roughness={1}/></mesh>
+      <mesh position={[s*10.6,1.5,z]}><coneGeometry args={[1.4,3.4,8]}/><meshStandardMaterial color={i%3?'#172f31':'#254044'} roughness={1}/></mesh>
+      <mesh position={[s*10.6,.45,z]}><cylinderGeometry args={[.13,.15,1,8]}/><M color="#162622" roughness={1}/></mesh>
     </group>)}
    </group>;
   })}
-  {Array.from({length:14},(_,i)=><mesh key={i} position={[i%2?15:-15,2.7,(i*16+scroll*.43)%230-130]} castShadow><dodecahedronGeometry args={[3.7+(i%3),1]}/><meshStandardMaterial color="#152930" roughness={1}/></mesh>)}
+  {Array.from({length:14},(_,i)=><mesh key={i} position={[i%2?24:-24,2.7,(i*16+scroll*.43)%230-130]} castShadow><dodecahedronGeometry args={[3.7+(i%3),1]}/><meshStandardMaterial color="#152930" roughness={1}/></mesh>)}
   <PremiumCar frame={frame} hero={hero}/>
  </group>;
 };
