@@ -146,11 +146,11 @@ const Camera:React.FC<{frame:number;stage:number}>=({frame,stage})=>{
    if(stage===0){camera.position.set(4.1+drift,3.8,7.4-t*.055);camera.lookAt(.0,1.55,-1.4);}
    else if(stage===1){camera.position.set(3.0+drift,2.9,5.6);camera.lookAt(.2,1.25,-1.1);}
    else if(stage===2){camera.position.set(3.5,2.9,6.3);camera.lookAt(0,.9,-1.1);}
-   else if(stage===3){camera.position.set(3.1+drift,3.6,6.9);camera.lookAt(.0,2.7,-.4);}
+   else if(stage===3){camera.position.set(3.4+drift,3.35,10.2);camera.lookAt(0,.8,-.4);}
    else if(stage===4){camera.position.set(2.25+drift,2.0,7.8);camera.lookAt(.0,.6,0);}
-   else if(stage===5){camera.position.set(3.0+drift,2.25,7.4);camera.lookAt(.0,.52,0);}
+   else if(stage===5){camera.position.set(3.5+drift,2.6,13.4);camera.lookAt(0,.45,0);}
    else if(stage===6){camera.position.set(3.4+drift,3.1,7.6);camera.lookAt(0,1.15,0);}
-   else {camera.position.set(2.1+drift,1.3,6.6);camera.lookAt(0,.12,0);}
+   else {camera.position.set(2.7+drift,1.55,12.5);camera.lookAt(0,.15,0);}
    camera.updateProjectionMatrix();
  },[camera,frame,stage]);return null;
 };
