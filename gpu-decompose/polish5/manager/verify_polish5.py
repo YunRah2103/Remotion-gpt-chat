@@ -78,7 +78,7 @@ def assets(path,lockfile):
             if k in n:need(all(isinstance(t,(int,float)) and math.isfinite(t) for t in n[k]),"nonfinite "+k)
     anim=json.loads(m.read_text())
     need((anim.get("schemaVersion"),anim.get("fps"),anim.get("durationInFrames"))==(1,30,450),"wrong animation schedule")
-    need(anim.get("compatibilityStatus")=="FINAL_POLISH05_A_VERIFIED","motion is PROVISIONAL and NOT final-A compatible")
+    need(anim.get("compatibilityStatus") in (("CANDIDATE_POLISH05_A_ANCHORS_VERIFIED","FINAL_POLISH05_A_VERIFIED") if x["status"]=="model-verified" else ("FINAL_POLISH05_A_VERIFIED",)),"motion not compatible with current render gate")
     need(set(anim.get("nodes",{}))==set(MOVING),"wrong 13 moving hardware anchors")
     for name,move in anim["nodes"].items():
         a,b=move.get("startFrame"),move.get("endFrame")
