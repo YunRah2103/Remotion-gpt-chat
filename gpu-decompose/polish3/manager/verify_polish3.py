@@ -42,7 +42,7 @@ def lock_check(file: pathlib.Path) -> dict:
     x = json.loads(file.read_text())
     for key in ("agentASha", "agentBSha"):
         assert isinstance(x.get(key), str) and SHA40.fullmatch(x[key]), f"bad {key}"
-    for key in ("glbSha256", "animationSha256", "sceneSourceSha256"):
+    for key in ("glbSha256", "animationSha256", "sceneSourceSha256", "cameraSourceSha256", "exportSourceSha256"):
         assert isinstance(x.get(key), str) and SHA64.fullmatch(x[key]), f"bad {key}"
     for key in ("modelArtifactRunId", "modelArtifactId"):
         assert type(x.get(key)) is int and x[key] > 0, f"missing real {key}"
@@ -89,7 +89,7 @@ def descendants(graph: dict, idx: int, seen=None) -> set[int]:
 
 
 def asset_check(base: pathlib.Path, lock: dict) -> None:
-    glb = base / "xfx_swift_rx9060xt_triple16.glb"
+    glb = base / "xfx_swift_rx9060xt_polish3.glb"
     motion = base / "decomposition.json"
     assert glb.is_file() and glb.stat().st_size > 10000, "missing new real GLB in runtime staging"
     assert motion.is_file(), "missing new movement JSON in runtime staging"
@@ -97,8 +97,11 @@ def asset_check(base: pathlib.Path, lock: dict) -> None:
     actual_motion = sha256(motion)
     assert actual_glb == lock["glbSha256"], "runtime GLB differs from lock (or old artifact substituted)"
     assert actual_motion == lock["animationSha256"], "runtime motion differs from lock"
-    src = pathlib.Path("src/GpuDecomposition.tsx")
+    src = pathlib.Path("src/gpu-polish3/GpuDecompositionPolish3.tsx")
     assert src.is_file() and sha256(src) == lock["sceneSourceSha256"], "scene source changed after preview approval"
+    for path, key in (("src/gpu-polish3/cinema.ts","cameraSourceSha256"), ("src/GpuDecomposition.tsx","exportSourceSha256")):
+        file = pathlib.Path(path)
+        assert file.is_file() and sha256(file) == lock[key], f"source changed after preview: {path}"
     graph = glb_json(glb)
     names = [n.get("name", "") for n in graph["nodes"]]
     counts = Counter(names)
