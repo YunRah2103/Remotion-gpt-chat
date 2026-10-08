@@ -72,6 +72,7 @@ pairs=[
  ("COLD_PLATE","GPU_DIE"),
  ("GPU_DIE","PCB_ASSEMBLY"),
  ("VRAM_CHIPS","PCB_ASSEMBLY"),
+ ("VRM_COMPONENTS","PCB_ASSEMBLY"),
  ("PCB_ASSEMBLY","BACKPLATE"),
 ]
 records=[]
@@ -86,7 +87,11 @@ for frame in samples:
 end=records[-1]["axialSeparation"]
 keypairs=[
  "FAN_LEFT->FRONT_SHROUD","FAN_CENTER->FRONT_SHROUD",
- "FAN_RIGHT->FRONT_SHROUD","PCB_ASSEMBLY->BACKPLATE"
+ "FAN_RIGHT->FRONT_SHROUD",
+ "FRONT_SHROUD->HEATPIPE_BUNDLE","FRONT_SHROUD->HEATSINK_FINS",
+ "FRONT_SHROUD->COLD_PLATE","COLD_PLATE->GPU_DIE",
+ "GPU_DIE->PCB_ASSEMBLY","VRAM_CHIPS->PCB_ASSEMBLY",
+ "VRM_COMPONENTS->PCB_ASSEMBLY","PCB_ASSEMBLY->BACKPLATE"
 ]
 flags=[{"pair":p,"gap":end.get(p)} for p in keypairs if end.get(p,0)<=.015]
 model={"glb":str(PATH),"method":"real GLB mesh vertices, trimesh world transforms + inherited additive offsets",
@@ -104,3 +109,10 @@ for a,b in pairs:print("FINAL_Z_MARGIN",a,b,end.get(a+"->"+b,"NO_MESH"))
 print("AABB_REVIEW_FLAGS",json.dumps(flags))
 # All final critical separate bounds need human review; do not conceal a warning
 # but don't claim failures of approximate boxes are exact mesh collisions.
+
+# Fail closed on final conservative AABB projection crossings. These are not
+# continuous-triangle collision tests; they certify an actual mesh envelope
+# ordering in +Z and can trigger safer mechanical adjustments.
+assert len(end)>=len(keypairs),("missing tracked real mesh bounds",end)
+assert not flags,("final projected layer clearance insufficient",flags)
+print("POLISH04_CRITICAL_AABB_POSITIVE",len(keypairs),"real-GLB projected pairs")
