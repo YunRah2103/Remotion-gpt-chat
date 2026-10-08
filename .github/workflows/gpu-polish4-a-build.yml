@@ -1,0 +1,65 @@
+name: GPU POLISH04 Agent A - native hardware and PBR QA
+on:
+  push:
+    branches:
+      - gpu-polish4/a-hardware
+    paths:
+      - 'gpu-decompose/polish4/hardware/**'
+      - '.github/workflows/gpu-polish4-a-build.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  build-hardware:
+    name: Native Blender GLB, PBR, real close-ups, validators
+    runs-on: ubuntu-24.04
+    timeout-minutes: 95
+    steps:
+      - name: Checkout assigned hardware branch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install actual GPU model and validation tools
+        run: |
+          set -euo pipefail
+          sudo env DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get update -qq
+          sudo env DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get install -y -qq blender openscad ffmpeg
+          python -m venv /tmp/gpu-p4-venv
+          /tmp/gpu-p4-venv/bin/python -m pip -q install --disable-pip-version-check numpy==1.26.4 trimesh==4.11.1 Pillow==11.1.0
+          blender --version | head -n 2
+          openscad --version
+      - name: Preserve POLISH03 OpenSCAD CAD and 450-frame motion
+        run: |
+          set -euo pipefail
+          mkdir -p gpu-decompose/polish4/hardware/assets
+          openscad -o gpu-decompose/agent-a/fan_hub.stl gpu-decompose/agent-a/mechanical.scad
+          test -s gpu-decompose/agent-a/fan_hub.stl
+          python gpu-decompose/agent-a/generate_motion.py
+          python gpu-decompose/agent-a/test_motion.py
+          cp gpu-decompose/polish3/assets/decomposition.json gpu-decompose/polish4/hardware/assets/decomposition.json
+          sha256sum gpu-decompose/polish4/hardware/assets/decomposition.json
+      - name: Native Blender model, full GPU and seven macro/sectional views
+        run: |
+          set -euo pipefail
+          blender -b -t 3 --python gpu-decompose/polish4/hardware/build_polish4.py |& tee gpu-decompose/polish4/hardware/assets/blender.log
+          test -s gpu-decompose/polish4/hardware/assets/xfx_swift_rx9060xt_polish4.glb
+          test -s gpu-decompose/polish4/hardware/assets/xfx_swift_rx9060xt_polish4.blend
+      - name: Validate actual exported GLB, native images and motion proof
+        run: |
+          set -euo pipefail
+          ffmpeg -y -hide_banner -loglevel error -framerate 10 -pattern_type glob -i 'gpu-decompose/polish4/hardware/assets/moving_frames/*.png' -c:v libx264 -pix_fmt yuv420p -crf 19 gpu-decompose/polish4/hardware/assets/decomposition-proof-p4.mp4
+          ffmpeg -v error -xerror -i gpu-decompose/polish4/hardware/assets/decomposition-proof-p4.mp4 -f null -
+          /tmp/gpu-p4-venv/bin/python gpu-decompose/polish4/hardware/validate_polish4.py |& tee gpu-decompose/polish4/hardware/assets/polish4-audit.log
+          test -s gpu-decompose/polish4/hardware/assets/asset-manifest.json
+          (cd gpu-decompose/polish4/hardware/assets && sha256sum -c SHA256SUMS.txt)
+      - name: Upload native model, Blender source scene, proof shots and exact hashes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GPU-POLISH4-A-XFX-HARDWARE
+          path: |
+            gpu-decompose/polish4/hardware/assets/
+            gpu-decompose/agent-a/fan_hub.stl
+          retention-days: 30
+          if-no-files-found: warn
