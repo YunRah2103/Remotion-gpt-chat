@@ -40,7 +40,7 @@ const Direction:React.FC<{frame:number;stage:number}>=({frame,stage})=>{
    camera.position.set(pos(t,[0,90,179],[5.1,6.5,6.4]),pos(t,[0,179],[1.9,2.9]),pos(t,[0,179],[8.3,7.5]));
    camera.lookAt(pos(t,[0,179],[1.1,3]),0,0);
   }else{
-   camera.position.set(pos(t,[0,110,209],[10.8,10.2,8.5]),pos(t,[0,110,209],[4.1,3.8,3.25]),pos(t,[0,110,209],[21.0,20.5,17.8]));
+   camera.position.set(pos(t,[0,110,209],[9.8,9.1,7.4]),pos(t,[0,110,209],[3.8,3.45,3.0]),pos(t,[0,110,209],[18.7,18.2,15.6]));
    camera.lookAt(0,.77,0);
   }
   camera.updateProjectionMatrix();
