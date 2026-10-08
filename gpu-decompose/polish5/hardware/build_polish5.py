@@ -416,13 +416,10 @@ for j in range(18):
     scene.render.filepath=str(mov/("frame-%03d.png"%j))
     bpy.ops.render.render(write_still=True)
 for k,d in explode:N[k].location=saved[k]
-from PIL import Image,ImageStat
-imagedata={}
-for f in sorted(OUT.glob("*.png")):
-    with Image.open(f) as pic:
-        stat=ImageStat.Stat(pic.convert("L"))
-        assert stat.stddev[0]>5,(f.name,stat.stddev)
-        imagedata[f.name]={"size":pic.size,"stdev":round(stat.stddev[0],2),"bytes":f.stat().st_size}
+# Native image pixel variance will be inspected independently by validate_polish5.py.
+# Blender's embedded Python does not necessarily have third-party Pillow.
+imagedata={f.name:{"bytes":f.stat().st_size} for f in sorted(OUT.glob("*.png"))}
+assert len(imagedata)==10,("Expected ten true native image renders",list(imagedata))
 meta={
  "stage":"AGENT_A_HARDWARE_ONLY","baselinePolish04GlbSha256":BASE_SHA,
  "model":"xfx_swift_rx9060xt_polish5.glb","glbSha256":modelsha,
