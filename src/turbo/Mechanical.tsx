@@ -1,5 +1,4 @@
 import React, {useEffect,useMemo} from 'react';
-import {useThree} from '@react-three/fiber';
 import * as THREE from 'three';
 import {PremiumCar} from './PremiumCar';
 
@@ -15,7 +14,6 @@ const M:React.FC<{color:string;emissive?:string;roughness?:number;metalness?:num
  * Reflective car paint needs environment energy as well as direct light.
  */
 const RoadReflections:React.FC=()=>{
- const {scene}=useThree();
  const texture=useMemo(()=>{
    const w=512,h=256;
    const pixels=new Uint8Array(w*h*4);
@@ -43,13 +41,11 @@ const RoadReflections:React.FC=()=>{
    t.needsUpdate=true;
    return t;
  },[]);
- useEffect(()=>{
-   const prior=scene.environment;
-   scene.environment=texture;
-   scene.environmentIntensity=1.25;
-   return ()=>{scene.environment=prior;texture.dispose();};
- },[scene,texture]);
- return null;
+ // Declarative attachment occurs before the actual WebGL draw in every
+ // independently rendered Remotion frame. useEffect() was too late and caused
+ // alternating dark/bright bodywork in adjacent moving video frames.
+ useEffect(()=>()=>texture.dispose(),[texture]);
+ return <primitive attach="environment" object={texture}/>;
 };
 export const RoadWorld:React.FC<{frame:number;hero?:boolean}>=({frame,hero=false})=>{
  const scroll=frame*(hero?.63:.43);
