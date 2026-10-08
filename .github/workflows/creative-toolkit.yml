@@ -38,20 +38,20 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p toolkit/out
-          blender -b -t 2 --python toolkit/smoke/blender_scene.py 2>&1 | tee toolkit/out/blender.log
-          test -s toolkit/out/blender-wheel.png
           openscad -o toolkit/out/wheel-ring.stl toolkit/smoke/wheel_ring.scad 2>&1 | tee toolkit/out/openscad.log
           test -s toolkit/out/wheel-ring.stl
           /tmp/creative-venv/bin/python toolkit/smoke/pybullet_sim.py
           GODOT=$(find /tmp/godot-bin -maxdepth 1 -type f -name 'Godot*' | head -n 1)
           "$GODOT" --headless --path toolkit/smoke/godot --script res://smoke.gd 2>&1 | tee toolkit/out/godot.log
           grep -q GODOT_SMOKE_PASS toolkit/out/godot.log
+          blender -b -t 2 --python toolkit/smoke/blender_scene.py 2>&1 | tee toolkit/out/blender.log
+          test -s toolkit/out/blender-wheel.png
           ffmpeg -hide_banner -loglevel error -y -loop 1 -framerate 12 -i toolkit/out/blender-wheel.png -t 1.25 -c:v libx264 -pix_fmt yuv420p toolkit/out/blender-preview.mp4
           ffmpeg -v error -xerror -i toolkit/out/blender-preview.mp4 -f null -
-          blender --version | head -n 2 > toolkit/out/versions.txt
+          blender --version > toolkit/out/versions.txt
           openscad --version >> toolkit/out/versions.txt 2>&1
           "$GODOT" --version >> toolkit/out/versions.txt 2>&1
-          /tmp/creative-venv/bin/python -m pip show pybullet | head -n 3 >> toolkit/out/versions.txt
+          /tmp/creative-venv/bin/python -m pip show pybullet >> toolkit/out/versions.txt
       - name: Upload mechanical test proofs even on failure
         if: always()
         uses: actions/upload-artifact@v4
