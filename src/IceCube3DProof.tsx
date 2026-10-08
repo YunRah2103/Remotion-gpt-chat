@@ -28,11 +28,11 @@ const Body=({frame}:{frame:number})=>{
     m.onBeforeCompile=(shader)=>{
       shader.fragmentShader=shader.fragmentShader.replace(
         '#include <opaque_fragment>',
-        \`float eyeAngle = clamp(abs(dot(normalize(normal), normalize(vViewPosition))),0.0,1.0);
+        `float eyeAngle = clamp(abs(dot(normalize(normal), normalize(vViewPosition))),0.0,1.0);
         float edgeFresnel = pow(1.0-eyeAngle,3.45);
         float coolSide = pow(1.0-eyeAngle,1.3)*.08;
         outgoingLight += vec3(0.12,0.45,0.66)*edgeFresnel*1.23 + vec3(0.05,0.13,0.17)*coolSide;
-        #include <opaque_fragment>\`
+        #include <opaque_fragment>`
       );
     };
     return m;
@@ -69,15 +69,15 @@ const Earth=({frame}:{frame:number})=>{
       <sphereGeometry args={[1.03,64,48]}/>
       <shaderMaterial
         transparent depthWrite={false} blending={THREE.AdditiveBlending}
-        vertexShader={\`varying vec3 vn;varying vec3 ve; void main(){
+        vertexShader={`varying vec3 vn;varying vec3 ve; void main(){
           vec4 p=modelViewMatrix*vec4(position,1.);
           vn=normalize(normalMatrix*normal);ve=normalize(-p.xyz);
           gl_Position=projectionMatrix*p;
-        }\`}
-        fragmentShader={\`varying vec3 vn;varying vec3 ve;void main(){
+        }`}
+        fragmentShader={`varying vec3 vn;varying vec3 ve;void main(){
           float f=pow(1.-abs(dot(normalize(vn),normalize(ve))),4.2);
           gl_FragColor=vec4(vec3(.09,.43,.67)*f,f*.50);
-        }\`}
+        }`}
       />
     </mesh>
   </group>;
