@@ -1,4 +1,5 @@
 name: Turbo V3 polish - car and track visual proofs
+# Recheck lighting consistency after synchronous scene.environment attachment.
 on:
   push:
     branches: [fix/turbo-car-road-wheel-v3]
