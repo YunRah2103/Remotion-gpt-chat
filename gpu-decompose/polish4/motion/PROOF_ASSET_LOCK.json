@@ -1,5 +1,5 @@
 {
-  "status": "awaiting_C_real_GLb_native_and_AABB_proof",
+  "status": "real_A04_model_initial_real_clips_passed__clearance_corrected_final_proof_pending",
   "contractSourceCommit": "102064938a9a45540434c93d9ff03cdcd72f9cba",
   "agentASourceCommit": "a3113bb0a4b450696010c6496cfcb62d2a56e2c3",
   "agentABuildRunId": 37840656656,
@@ -7,8 +7,14 @@
   "agentAArtifactName": "GPU-POLISH4-A-XFX-HARDWARE",
   "glbSha256": "edeeca54f6e9bf26127ed91b3debe16bae47f9c58cd9db0bf760927a0869882e",
   "motionRelativePath": "gpu-decompose/polish4/motion/decomposition.json",
-  "motionSha256": "d4790dc9dcc6572a0d6ee5478d70431194128055fdaf6d56c171d68ae1f06fed",
+  "motionSha256": "c311748fa64c31eea43f595d2cf04b0a39cd548a49b5a8b0adaed4e273daf5cc",
   "requiredMovingAnchors": 13,
   "cameraForCurrentProof": "POLISH03 (provisional), B POLISH04 pending integration",
-  "verifiedByC": "Pending exact A GLB and real moving proof; do not promote this to release"
+  "verifiedByC": "Pending exact A GLB and real moving proof; do not promote this to release",
+  "agentCStrictClearanceSourceCommit": "b15034e19c99e1ea0a0dd515506909c70e0df731",
+  "agentCExactAOriginalRunId": 37841310468,
+  "agentCExactAOriginalArtifactId": 11578196861,
+  "agentCCorrectedStrictProofRunId": 37842128210,
+  "correctedStrictProofArtifactId": null,
+  "criticalAabbMinimumSceneUnits": 0.015
 }
