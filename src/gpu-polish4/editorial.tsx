@@ -45,7 +45,7 @@ export const Editorial:React.FC<{frame:number;stages?:typeof SHOT_MAP}>=({frame,
       <div style={{height:'100%',width:((frame+1)/450*100)+'%',
         background:'#e9eaeb'}}/>
     </div>
-    <div style={{position:'absolute',top:273,left:64,right:64,
+    <div style={{position:'absolute',top:120,left:64,right:64,
       opacity:endIn,pointerEvents:'none',
       transform:'translateY('+(16*(1-endIn))+'px)'}}>
       <div style={{fontSize:72,fontWeight:800,letterSpacing:1.1,lineHeight:1}}>
