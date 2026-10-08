@@ -22,6 +22,17 @@ export const PremiumCar:React.FC<{frame:number;hero?:boolean}>=({frame,hero=fals
    const model=gltf.scene.clone(true);
    model.updateMatrixWorld(true);
    const spins:THREE.Group[]=[];
+   // The shipped CarConcept is posed with its front wheels visibly turned.
+   // For a straight road tracking shot use the corresponding rear-wheel axle
+   // orientation while keeping each front wheel's original suspension location.
+   // This removes the exaggerated steering appearance without reshaping meshes.
+   for(const side of ['L','R']){
+     const front=model.getObjectByName('WheelFront'+side);
+     const rear=model.getObjectByName('WheelRear'+side);
+     if(!front||!rear)throw new Error('Unmatched authored wheel axle for '+side);
+     front.quaternion.copy(rear.quaternion);
+   }
+   model.updateMatrixWorld(true);
    for(const name of wheels){
      const wheel=model.getObjectByName(name);
      if(!wheel)throw new Error('Missing complete authored wheel group '+name);
