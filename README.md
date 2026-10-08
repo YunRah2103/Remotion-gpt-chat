@@ -1,14 +1,17 @@
 # Remotion GPT Chat — Independent 3D automotive documentaries
 
-## Vehicle-quality correction (V2, independent CC0 asset)
+## Vehicle-quality correction — high-fidelity concept car
 
-The original procedural lofted/body-box car was rejected as unsuitable for a premium automotive film. The corrective branch replaces it, without modifying YUNEX or the turbo internals, with an actually modelled performance vehicle.
+The original procedural block-like car and a subsequent CC0 prototype were **rejected by visual QA**. The corrective implementation uses a professionally surfaced, textured, riggable glTF model, with a separate four-wheel animation and corrected road-camera occlusion.
 
-- **Car:** [Spectral GT RS](https://github.com/JaronKBragg7337/spectral-gt-rs) by Jaron K Bragg, **CC0 1.0**, Blender-built source and game-ready GLB (263 mesh objects including mechanical detail).
-- **Pinned source:** `34499c501908818a2b08e589a7aecf963343cee7`; binary Git blob SHA `f5b814848453a6c75a48f5047fdadaa7bdc78969`.
-- **Local model:** `public/assets/spectral_gt_rs_game_ready.glb`; versioned directly in this repository.
-- **Implementation:** `src/turbo/PremiumCar.tsx`; grouped independent spinning wheel components and stationary brake calipers, chassis correctly grounded and normalized to 4.98 metres, refined pearl-silver car paint and larger driving compositions.
-- **Proof workflow:** `.github/workflows/turbo-car-preview.yml`, moving WebGL footage, TypeScript, genuine 1080×1920 stills. Approval depends on inspecting actual clips, not compilation alone.
+- **Vehicle model:** [Khronos Car Concept](https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept), model and textures by **Eric Chadwick**, ©2024 Darmstadt Graphics Group GmbH, licensed **Creative Commons Attribution 4.0 International**. Credit and licence are preserved in this source and documentation.
+- **Pinned source commit:** `edc7c9e67c639d230715049ee31f9a96a6babbbe`.
+- **Exact GLB SHA1 Git blob:** `391795d5e3f7daa5519ec2e077e8def16bcecdd7`; 10,267,996 bytes.
+- **In-repository model:** `public/assets/carconcept.glb`.
+- **Real geometry and wheel components:** `src/turbo/PremiumCar.tsx`, with fixed-position brake pads and rotating tires/rims/discs.
+- **Visual preflight:** `.github/workflows/turbo-car-preview.yml`, including moving native Three.js WebGL footage and full-resolution screenshots.
+
+The concept vehicle is licensed third-party work used within this independently built documentary, and is **not** any YUNEX vehicle or reused YUNEX geometry.
 
 ## THE HIDDEN POWER OF A TURBOCHARGER
 
