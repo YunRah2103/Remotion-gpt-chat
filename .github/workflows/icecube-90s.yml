@@ -26,6 +26,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Install system FFmpeg and FFprobe for frame QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
       - name: Install exact existing Remotion toolchain
         run: npm install --no-audit --no-fund
       - name: Compile all TypeScript compositions
@@ -65,6 +69,10 @@ jobs:
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
+      - name: Install system FFmpeg and FFprobe for master assembly
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
       - uses: actions/download-artifact@v4
         with:
           pattern: icecube-native-*
