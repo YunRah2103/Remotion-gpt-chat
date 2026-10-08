@@ -106,3 +106,13 @@ Black triple axial XFX Swift matching 290×124×49 mm envelope; correct 16GB var
 
 ## 10. Ownership / coordination
 Agent A owns `gpu-decompose/agent-a/**`, `gpu-decompose/assets/**` and their production asset workflows. Agent B owns `gpu-decompose/contracts/**`, `gpu-decompose/director/**`, `gpu-decompose/overlays/**`, `src/GpuDecomposition.tsx`, `src/Root.tsx` and `.github/workflows/gpu-decomposition*.yml`. Agent B may update this contract by new committed version with change log, but MUST announce breaking changes to A. No third agent. A should begin modelling against this v1.0 immediately.
+
+## Director-only v1.1 amendment — native camera proof correction (2026-10-08)
+The locked v1.0 **GLB hierarchy, coordinate axes, scale, component offsets, easing, frame boundaries, Agent A's successful asset SHA and 450-frame deliverable are unchanged**.
+The initial B Remotion native render proof (run [37812360533](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37812360533)) showed that the v1.0 camera at ~10° front yaw causes true Z-separation to look almost assembled on a portrait phone, particularly at frame 449. That is a blocking film **readability** problem, not a model failure. Accordingly the director-owned camera presentation is revised only for the integration:
+- During internal decomposition frames 160–332, deterministic smoothstep camera orbit from almost head-on toward the +X/right side, settling at approximately **55–56°** on final exploded view.
+- Final frames 332–449 use only a small orbit settle (~1–2°) so titles remain stable.
+- Slight elevated camera shows front-to-back layers in both screen X and Y, with orthographic view height 7.2 scene units at conclusion (portrait width ~4.05), keeping all physical components within frame.
+- No model geometry or transforms are altered to conceal missing work. Agent A remains on the exact locked A GLB and JSON.
+- The modified camera requires a **new native still QA** at frames 330/385/449 before final-frame render approval. A prior approved TypeScript or Blender render alone is insufficient.
+This is a non-breaking change for Agent A modelling/animation and supersedes only the v1.0 suggested **camera** coordinates at the final exploded stage.
