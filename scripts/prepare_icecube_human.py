@@ -15,7 +15,7 @@ source,output=argv[:2]
 bpy.ops.object.select_all(action='SELECT')
 bpy.ops.object.delete(use_global=False)
 bpy.ops.import_scene.gltf(filepath=str(Path(source).resolve()))
-meshes=[o for o in bpy.context.scene.objects if o.type=='MESH']
+meshes=[o for o in bpy.context.scene.objects if o.type=='MESH' and 'icosphere' not in o.name.lower()]
 if not meshes:
     raise RuntimeError('Import had no meshes')
 
