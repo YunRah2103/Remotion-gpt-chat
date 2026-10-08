@@ -62,6 +62,7 @@ jobs:
           test -s gpu-decompose/polish3/assets/exploded.png
           test -s gpu-decompose/polish3/assets/fans_shroud_detail.png
           test -s gpu-decompose/polish3/assets/heatsink_heatpipe_detail.png
+          test -s gpu-decompose/polish3/assets/heatpipe_bundle_detail.png
           test -s gpu-decompose/polish3/assets/pcb_silicon_detail.png
           test -s gpu-decompose/polish3/assets/rear_backplate_polish3.png
           test -s gpu-decompose/polish3/assets/exploded_film_camera.png
