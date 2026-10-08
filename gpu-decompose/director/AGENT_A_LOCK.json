@@ -1,0 +1,11 @@
+{
+  "agentASha": "0cf16dc85b5ba82d0076238ddba2fbdc46dab39c",
+  "glbSha256": "e78e824c06ffcf6cff641b68929cb74a7f3c2720023aab384b07c9c4224a4d82",
+  "animationSha256": "1790dfa60d0ea10641498901d2e9bf838eb024d9d8c6c4eb1e0aec7914e74510",
+  "artifactRunId": 37811876775,
+  "artifactName": "GPU-AGENT-A-XFX-SWIFT-3D",
+  "artifactId": 11565138533,
+  "sourceManifestPath": "gpu-decompose/assets/asset-manifest.json",
+  "verifiedBy": "Agent B independent GLB/manifest/geometry and frame inspection",
+  "contractVersion": "1.0"
+}
