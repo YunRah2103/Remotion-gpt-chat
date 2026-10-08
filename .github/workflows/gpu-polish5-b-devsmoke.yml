@@ -1,0 +1,72 @@
+name: GPU POLISH05 B - PROVISIONAL baseline native smoke (NOT release)
+on:
+  push:
+    branches: [gpu-polish5/b-master]
+    paths: [.github/workflows/gpu-polish5-b-devsmoke.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  approved-polish04-provisional-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: GPU-POLISH4-A-XFX-HARDWARE
+          run-id: 37840656656
+          github-token: ${{ github.token }}
+          path: out/baseline-hardware
+      - name: Stage explicitly labeled OLD approved model for B-only plumbing smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p public/gpu-decompose/polish5 out/dev-only
+          python3 - <<'PY'
+          from pathlib import Path
+          from shutil import copyfile
+          fs=list(Path('out/baseline-hardware').rglob('xfx_swift_rx9060xt_polish4.glb'))
+          assert len(fs)==1,fs
+          copyfile(fs[0],'public/gpu-decompose/polish5/xfx_swift_rx9060xt_polish5.glb')
+          copyfile('gpu-decompose/polish5/motion/decomposition.v1.json',
+                   'public/gpu-decompose/polish5/decomposition.v1.json')
+          print('PROVISIONAL ONLY / OLD HARDWARE',fs[0])
+          PY
+          echo "edeeca54f6e9bf26127ed91b3debe16bae47f9c58cd9db0bf760927a0869882e  public/gpu-decompose/polish5/xfx_swift_rx9060xt_polish5.glb" | sha256sum -c -
+          echo 'DEVELOPMENT STAGING ONLY: POLISH04 A GLB, NOT Agent A POLISH05 MODEL' \
+            > out/dev-only/PROVISIONAL_WARNING.txt
+          (cd public/gpu-decompose/polish5 && sha256sum *.glb *.json) > out/dev-only/INPUT_SHA256SUMS.txt
+      - name: Real Remotion/Three browser renderer checks and actual moving native clip
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          npm install --no-audit --no-fund
+          npm run check
+          for frame in 0 135 225 449; do
+            npx remotion still src/index.ts XfxSwiftDecompositionPolish5 \
+              "out/dev-only/PROVISIONAL-frame-$frame.png" --frame="$frame" --gl=swangle
+          done
+          npx remotion render src/index.ts XfxSwiftDecompositionPolish5 \
+            out/dev-only/PROVISIONAL-moving-120-145.mp4 \
+            --frames=120-145 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
+          ffmpeg -v error -xerror -i out/dev-only/PROVISIONAL-moving-120-145.mp4 -f null -
+          ffprobe -v error -show_streams -of json out/dev-only/PROVISIONAL-moving-120-145.mp4 \
+            > out/dev-only/DEV_FFPROBE.json
+          printf '%s\n' 'This is a tooling smoke using approved POLISH04 model at a POLISH05 dev-only path.' \
+            'It is NEVER an actual POLISH05 render; do not confuse with Agent A final upgrade.' \
+            'Final A unique new GLB and 12 stills / 6 clips are independently required.' \
+            > out/dev-only/READ_ME.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GPU-POLISH5-B-PROVISIONAL-CI-SMOKE
+          path: out/dev-only/
+          retention-days: 14
+          if-no-files-found: error
