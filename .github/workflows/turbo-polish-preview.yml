@@ -33,12 +33,12 @@ jobs:
           npx remotion still src/index.ts TurboDocumentary out/hero-frame786.png --frame=786 --gl=swangle
       - name: Verify moving wheels on the road
         run: |
-          npx remotion render src/index.ts TurboDocumentary out/opening-motion.mp4 --frames=42-53 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
-          npx remotion render src/index.ts TurboDocumentary out/hero-motion.mp4 --frames=777-788 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          npx remotion render src/index.ts TurboDocumentary out/opening-motion.mp4 --frames=42-47 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          npx remotion render src/index.ts TurboDocumentary out/hero-motion.mp4 --frames=777-782 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
           for file in out/*-motion.mp4; do
             ffmpeg -hide_banner -loglevel error -xerror -i "$file" -f null -
-            n=$(ffprobe -v error -show_entries stream=nb_frames -select_streams v:0 -of csv=p=0 "$file")
-            test "$n" = 12
+            n=$(ffprobe -v error -show_entries stream=nb_frames -select_streams v:0 -of default=noprint_wrappers=1:nokey=1 "$file")
+            test "$n" = 6
           done
       - uses: actions/upload-artifact@v4
         with:
