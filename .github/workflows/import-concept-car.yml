@@ -17,9 +17,9 @@ jobs:
       - name: Download and hash-verify pinned Khronos GLB
         run: |
           mkdir -p public/assets
-          curl -fLSs --retry 3 -o public/assets/carconcept.glb 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/CarConcept/GLB/CarConcept.glb'
-          test "$(wc -c < public/assets/carconcept.glb | tr -d ' ')" = 10267996
-          test "$(git hash-object public/assets/carconcept.glb)" = 391795d5e3f7daa5519ec2e077e8def16bcecdd7
+          curl -fLSs --retry 3 -o public/assets/carconcept.glb 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/CarConcept/glTF-Binary/CarConcept.glb'
+          test "$(wc -c < public/assets/carconcept.glb | tr -d ' ')" = 11778688
+          test "$(git hash-object public/assets/carconcept.glb)" = c0f38c989a78cc4ba63253b5338705e0afb0142f
           python3 - <<'PY'
           import struct,json
           data=open('public/assets/carconcept.glb','rb').read()
