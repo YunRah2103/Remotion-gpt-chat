@@ -270,6 +270,8 @@ def studio():
  camdata.type="ORTHO";camdata.ortho_scale=4.25;bpy.context.scene.camera=cam
  scene=bpy.context.scene
  scene.render.engine='CYCLES';scene.cycles.samples=16
+ for layer in scene.view_layers:
+  if hasattr(layer,'cycles'):layer.cycles.use_denoising=False
  scene.render.resolution_x=680;scene.render.resolution_y=480
  scene.render.resolution_percentage=100
  scene.render.image_settings.file_format="PNG"
