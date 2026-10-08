@@ -17,11 +17,11 @@ export const CAMERA_KEYS:readonly CameraKey[] = [
   {frame:159, focus:'front',   yaw:45,pitch:18,roll:-28,fov:34,widthFill:.92,heightFill:.78,biasY:.05},
   {frame:181, focus:'cooler',  yaw:59,pitch:30,roll:-19,fov:31,widthFill:.91,heightFill:.78,biasY:.09},
   {frame:209, focus:'cooler',  yaw:67,pitch:41,roll:-12,fov:30,widthFill:.95,heightFill:.81,biasY:.10},
-  {frame:239, focus:'thermal', yaw:75,pitch:51,roll:-9,fov:29,widthFill:.94,heightFill:.78,biasY:.10},
-  {frame:265, focus:'thermal', yaw:80,pitch:59,roll:-8,fov:29,widthFill:.91,heightFill:.78,biasY:.08},
-  {frame:286, focus:'silicon', yaw:83,pitch:61,roll:-7,fov:29,widthFill:.89,heightFill:.74,biasY:.06},
-  {frame:307, focus:'silicon', yaw:84,pitch:55,roll:-10,fov:28,widthFill:.96,heightFill:.74,biasY:.06},
-  {frame:329, focus:'expand',  yaw:65,pitch:30,roll:-24,fov:33,widthFill:.87,heightFill:.77,biasY:.19},
+  {frame:239, focus:'thermal', yaw:69,pitch:44,roll:-10,fov:29,widthFill:.94,heightFill:.78,biasY:.10},
+  {frame:265, focus:'thermal', yaw:67,pitch:44,roll:-9,fov:29,widthFill:.91,heightFill:.78,biasY:.08},
+  {frame:286, focus:'silicon', yaw:65,pitch:42,roll:-8,fov:29,widthFill:.89,heightFill:.74,biasY:.06},
+  {frame:307, focus:'silicon', yaw:62,pitch:40,roll:-10,fov:28,widthFill:.96,heightFill:.74,biasY:.06},
+  {frame:329, focus:'expand',  yaw:56,pitch:27,roll:-29,fov:33,widthFill:.87,heightFill:.77,biasY:.19},
   {frame:364, focus:'all',     yaw:48,pitch:21,roll:-45,fov:32,widthFill:.92,heightFill:.80,biasY:.13},
   {frame:405, focus:'all',     yaw:42,pitch:19,roll:-57,fov:32,widthFill:.92,heightFill:.80,biasY:-.10},
   {frame:449, focus:'all',     yaw:38,pitch:17,roll:-61,fov:32,widthFill:.92,heightFill:.80,biasY:-.20},
@@ -64,7 +64,7 @@ export const subjectBox=(scene:THREE.Object3D,focus:Focus):THREE.Box3=>{
     fan:['FAN_CENTER'],
     cooler:['HEATSINK_FINS','HEATPIPE_BUNDLE','COLD_PLATE'],
     thermal:['HEATPIPE_BUNDLE','COLD_PLATE','GPU_DIE','VRAM_CHIPS'],
-    silicon:['GPU_DIE','VRAM_CHIPS','VRM_COMPONENTS'],
+    silicon:['GPU_DIE','VRAM_CHIPS'],
   };
   const box=rangeBox(scene,names[focus]);
   if(box.isEmpty())throw Error('POLISH05 camera focus anchors missing: '+focus);
@@ -75,7 +75,7 @@ const FOCUS_NAMES:Record<Exclude<Focus,'all'|'expand'>,string[]>={
   fan:['FAN_CENTER'],
   cooler:['HEATSINK_FINS','HEATPIPE_BUNDLE','COLD_PLATE'],
   thermal:['HEATPIPE_BUNDLE','COLD_PLATE','GPU_DIE','VRAM_CHIPS'],
-  silicon:['GPU_DIE','VRAM_CHIPS','VRM_COMPONENTS'],
+  silicon:['GPU_DIE','VRAM_CHIPS'],
 };
 const corners=(b:THREE.Box3)=>{
   const {min:m,max:M}=b;
