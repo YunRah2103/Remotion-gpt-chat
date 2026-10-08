@@ -1,15 +1,15 @@
 {
-  "agentASha": "0cf16dc85b5ba82d0076238ddba2fbdc46dab39c",
-  "glbSha256": "e78e824c06ffcf6cff641b68929cb74a7f3c2720023aab384b07c9c4224a4d82",
+  "agentASha": "322f77046b15402b55042e86822389bec1e70818",
+  "glbSha256": "e0b86390180ecb6724bcfe029bc77c9a116ff9b004e1ae14fa81b0bff8e0599e",
   "animationSha256": "1790dfa60d0ea10641498901d2e9bf838eb024d9d8c6c4eb1e0aec7914e74510",
-  "artifactRunId": 37811876775,
+  "artifactRunId": 37819645913,
   "artifactName": "GPU-AGENT-A-XFX-SWIFT-3D",
-  "artifactId": 11565138533,
+  "artifactId": 11567849898,
   "sourceManifestPath": "gpu-decompose/assets/asset-manifest.json",
-  "verifiedBy": "Agent B independent GLB/manifest/geometry and frame inspection",
+  "verifiedBy": "Agent B independent v2.4 source GLB SHA, geometry, bounds, hierarchy, Blender previews and motion checks",
   "contractVersion": "1.0",
   "directorCameraVersion": "r2-56deg-orbit",
   "directorNativeCameraProofRunId": 37813149635,
   "directorNativeCameraProofArtifactId": 11566705380,
-  "visualReview": "PASS: inspected 1080x1920 frames 330,385,449; layers visibly separated and on-screen; camera and typography stable"
+  "visualReview": "Blender v2.4 previews accepted for candidate render; 1080x1920 Remotion portrait camera proof and final native visual QA pending"
 }
