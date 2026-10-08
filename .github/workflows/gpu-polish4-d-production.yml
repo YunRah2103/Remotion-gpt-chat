@@ -270,12 +270,9 @@ jobs:
           done
           ffmpeg -v error -y -f concat -safe 0 -i out/concat.txt -c copy out/visual450.mp4
           test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of csv=p=0 out/visual450.mp4)" = 450
-          ffmpeg -v error -y \
-            -f lavfi -i 'sine=frequency=75:duration=15:sample_rate=48000' \
-            -f lavfi -i 'anoisesrc=color=pink:amplitude=0.045:duration=15:sample_rate=48000' \
-            -filter_complex '[0:a]volume=0.25,lowpass=f=150[r];[1:a]highpass=f=240,lowpass=f=2600,volume=0.06[s];[r][s]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-16:TP=-9:LRA=5,volume=-5dB,alimiter=limit=0.85,afade=t=in:st=0:d=0.2,afade=t=out:st=14.6:d=0.4[a]' \
-            -map '[a]' -ar 48000 -ac 2 -c:a aac -b:a 192k out/audio.m4a
-          ffmpeg -v error -y -i out/visual450.mp4 -i out/audio.m4a \
+          python3 gpu-decompose/polish4/manager/synthesize_mechanical_audio.py \
+            out/mechanical.wav | tee out/release/audio-provenance.txt
+          ffmpeg -v error -y -i out/visual450.mp4 -i out/mechanical.wav \
             -map 0:v:0 -map 1:a:0 -c:v libx264 -preset fast -crf 18 -pix_fmt yuv420p \
             -color_range tv -r 30 -c:a aac -b:a 192k -ar 48000 -ac 2 \
             -t 15 -movflags +faststart \
