@@ -83,7 +83,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import shutil
-          matches=list(Path('out/hardware').rglob('*.glb'))
+          matches=list(Path('out/hardware').rglob('xfx_swift_rx9060xt_polish5.glb'))
           assert len(matches)==1,f'Expected exactly ONE real final-A GLB, found: {matches}'
           dst=Path('public/gpu-decompose/polish5')
           shutil.copyfile(matches[0],dst/'xfx_swift_rx9060xt_polish5.glb')
