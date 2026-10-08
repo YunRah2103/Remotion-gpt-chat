@@ -6,7 +6,6 @@ on:
       - 'src/turbo/**'
       - 'src/TurboDocumentary.tsx'
       - 'src/Root.tsx'
-      - '.github/workflows/turbo-documentary.yml'
       - 'package.json'
   workflow_dispatch:
 permissions:
@@ -119,7 +118,7 @@ jobs:
             -f lavfi -i "sine=frequency=860:duration=28:sample_rate=48000" \
             -filter_complex "[0:a]volume=0.22,lowpass=f=180,afade=t=in:st=0:d=1,afade=t=out:st=26.9:d=1[engine];[1:a]highpass=f=180,lowpass=f=3200,volume=0.08,afade=t=in:st=0:d=0.9,afade=t=out:st=26.8:d=1[air];[2:a]volume='if(between(t,5,21),0.016,0.003)':eval=frame,afade=t=in:st=0:d=0.8[spool];[engine][air][spool]amix=inputs=3:duration=first:normalize=0,alimiter=limit=0.8[a]" \
             -map "[a]" -ac 2 -ar 48000 -c:a aac -b:a 192k out/sound.m4a
-          ffmpeg -hide_banner -loglevel error -y -i out/visual-840.mp4 -i out/sound.m4a -map 0:v:0 -map 1:a:0 -c:v copy -c:a copy -t 28 -movflags +faststart out/THE-HIDDEN-POWER-OF-A-TURBOCHARGER.mp4
+          ffmpeg -hide_banner -loglevel error -y -i out/visual-840.mp4 -i out/sound.m4a -filter:v "scale=in_range=pc:out_range=tv,format=yuv420p" -map 0:v:0 -map 1:a:0 -c:v libx264 -preset veryfast -crf 18 -pix_fmt yuv420p -color_range tv -c:a copy -t 28 -movflags +faststart out/THE-HIDDEN-POWER-OF-A-TURBOCHARGER.mp4
       - name: Full decode, strict FFprobe, scene stills and black-frame check
         run: |
           ffmpeg -hide_banner -loglevel error -xerror -i out/THE-HIDDEN-POWER-OF-A-TURBOCHARGER.mp4 -f null -
