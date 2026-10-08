@@ -1,0 +1,19 @@
+{
+  "contractVersion": "POLISH03-v1",
+  "status": "proofs",
+  "agentASha": "e5e274437a47b554af7940911e5a825397dc64f3",
+  "agentBSha": "0eed29a86067bccd74c5d6e44eb116d2bcd4d95c",
+  "modelArtifactRunId": 37833031666,
+  "modelArtifactId": 11574168580,
+  "modelArtifactName": "GPU-POLISH3-A-XFX-HARDWARE",
+  "glbSha256": "21f529ccbe7f4bb69f2df602f7f28b15ef06ba915151bba4468b44ef652097e5",
+  "animationSha256": "d70aae4a6f6d637ef93d6fbb9eee6a94be5b9a4e9a65c5c78ff9401fd086187b",
+  "sceneSourceSha256": "30c33c9bb1d22e16d616b38afca8b181e5825fb66273cb4ea5f969b9f0c78879",
+  "cameraSourceSha256": "4abe9c566d93df88d93a07a9d9b1ffca9117af82c5844e8382c9b61ee07931fa",
+  "exportSourceSha256": "546205e5b950fcb42f1d820408cceefa2107e053ed271d86103fd3364614bd69",
+  "renderApproved": false,
+  "approvedProofRunId": null,
+  "approvedProofArtifactId": null,
+  "independentVisualQa": "PENDING",
+  "sourceNotes": "Actual final A hardware run 37833031666 newer than B proof 37832082195. Must visually inspect integrated C native proofs before full release."
+}
