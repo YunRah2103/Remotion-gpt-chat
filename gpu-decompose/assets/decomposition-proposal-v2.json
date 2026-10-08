@@ -1,0 +1,280 @@
+{
+  "schemaVersion": 1,
+  "fps": 30,
+  "durationInFrames": 450,
+  "model": "XFX SWIFT RX-96TS316B7 Black Triple Fan 16GB",
+  "sceneUnitsPerMillimetre": 0.01,
+  "axes": "GLB and JSON: +X fan length right, +Y up, +Z out toward viewer",
+  "positionsAreRelativeDeltas": true,
+  "rotationUnits": "radians",
+  "nodes": {
+    "FAN_LEFT": {
+      "startFrame": 90,
+      "endFrame": 162,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          -0.12,
+          0.025,
+          0.72
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    },
+    "FAN_CENTER": {
+      "startFrame": 94,
+      "endFrame": 164,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          0,
+          0.045,
+          0.74
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    },
+    "FAN_RIGHT": {
+      "startFrame": 98,
+      "endFrame": 166,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          0.12,
+          0.025,
+          0.72
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    },
+    "FRONT_SHROUD": {
+      "startFrame": 125,
+      "endFrame": 179,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          0,
+          0.02,
+          0.39
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    },
+    "HEATSINK": {
+      "startFrame": 184,
+      "endFrame": 250,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          0,
+          0.05,
+          0.15
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    },
+    "GPU_DIE": {
+      "startFrame": 216,
+      "endFrame": 282,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          0,
+          0.005,
+          0.21
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    },
+    "VRAM_CHIPS": {
+      "startFrame": 236,
+      "endFrame": 298,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          0,
+          0,
+          0.23
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    },
+    "PCB_ASSEMBLY": {
+      "startFrame": 260,
+      "endFrame": 322,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          0,
+          -0.02,
+          -0.2
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    },
+    "BACKPLATE": {
+      "startFrame": 284,
+      "endFrame": 329,
+      "from": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "to": {
+        "position": [
+          0,
+          0,
+          -0.75
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "easing": "smoothstep"
+    }
+  },
+  "proposalMetadata": {
+    "status": "NOT APPROVED - director review only",
+    "mustNotAutoIntegrate": true,
+    "appliesTo": "Agent A v2.3 GLB SHA256 c78c4162681642c45e641bbd10bf4707f5d30ef7e41249826b820ab313a78891",
+    "directorCamera": "B contract camera v1.1: 56-degree final view, 7.2 scene unit orthographic height",
+    "explicitApprovalRequired": true
+  }
+}
