@@ -29,9 +29,9 @@ const Body=({frame}:{frame:number})=>{
       shader.fragmentShader=shader.fragmentShader.replace(
         '#include <opaque_fragment>',
         `float eyeAngle = clamp(abs(dot(normalize(normal), normalize(vViewPosition))),0.0,1.0);
-        float edgeFresnel = pow(1.0-eyeAngle,3.45);
+        float edgeFresnel = pow(1.0-eyeAngle,3.65);
         float coolSide = pow(1.0-eyeAngle,1.3)*.08;
-        outgoingLight += vec3(0.12,0.45,0.66)*edgeFresnel*1.23 + vec3(0.05,0.13,0.17)*coolSide;
+        outgoingLight += vec3(0.12,0.45,0.66)*edgeFresnel*.82 + vec3(0.05,0.13,0.17)*coolSide;
         #include <opaque_fragment>`
       );
     };
@@ -58,12 +58,8 @@ const Earth=({frame}:{frame:number})=>{
   useMemo(()=>{map.colorSpace=THREE.SRGBColorSpace;return map;},[map]);
   return <group rotation={[.11,.44+frame*.004,-.10]}>
     <mesh>
-      <sphereGeometry args={[1.03,96,64]}/>
-      <meshStandardMaterial map={map} color="#19506a" roughness={1} metalness={0} emissive="#102d3c" emissiveIntensity={.12}/>
-    </mesh>
-    <mesh scale={[1.01,1.01,1.01]}>
-      <sphereGeometry args={[1.03,64,48]}/>
-      <meshBasicMaterial color="#76c8ec" wireframe transparent opacity={.035} depthWrite={false}/>
+      <sphereGeometry args={[.53,96,64]}/>
+      <meshStandardMaterial map={map} color="#4b7892" roughness={1} metalness={0} emissive="#102936" emissiveIntensity={.30}/>
     </mesh>
     <mesh scale={[1.025,1.025,1.025]}>
       <sphereGeometry args={[1.03,64,48]}/>
@@ -116,24 +112,22 @@ const NeutrinoTrails=({frame}:{frame:number})=>{
 };
 const Overlay=({frame}:{frame:number})=>{
   const t=frame/30;
-  const human=fade(t,-1,12.6,1.45);
-  const earth=fade(t,11.3,16,1.05);
+  const human=1;
+  const earth=fade(t,12.55,16,1.0);
   return <>
-    <div style={{position:'absolute',left:84,top:292,right:60,color:'#e5eef1',opacity:human,fontFamily:'Arial,Helvetica,sans-serif'}}>
+    <div style={{position:'absolute',left:84,top:292,right:60,color:'#e5eef1',fontFamily:'Arial,Helvetica,sans-serif'}}>
       <div style={{fontSize:26,fontWeight:650,letterSpacing:-.45}}>Through your body, every second</div>
       <div style={{fontSize:22,color:'#b9c5ca',fontFamily:'Consolas,monospace',marginTop:18,letterSpacing:1.45}}>≈ 100,000,000,000,000 neutrinos</div>
+      <div style={{fontSize:20,color:'#7b8b94',fontFamily:'Consolas,monospace',marginTop:15,letterSpacing:1.1,opacity:earth}}>Earth · 12,742 km across</div>
     </div>
-    <div style={{position:'absolute',left:84,top:292,right:60,color:'#e5eef1',opacity:earth,fontFamily:'Arial,Helvetica,sans-serif'}}>
-      <div style={{fontSize:26,fontWeight:650,letterSpacing:-.45}}>Through your body, every second</div>
-      <div style={{fontSize:22,color:'#a1b3bc',marginTop:18,fontFamily:'Consolas,monospace',letterSpacing:1.5}}>Earth · 12,742 km across</div>
-    </div>
-    {t<12.2&&<div style={{
+    {t<12.5&&<div style={{
       position:'absolute',left:622,top:600,fontSize:19,fontFamily:'Consolas,monospace',
       color:'#7d9098',opacity:human*.70,letterSpacing:2
     }}>1.75 m</div>}
     <div style={{
       position:'absolute',left:82,right:82,top:1480,textAlign:'center',fontFamily:'Arial,Helvetica,sans-serif',
-      color:'#f4f7f8',fontSize:33,fontWeight:600,letterSpacing:-.45,lineHeight:1.32
+      color:'#f4f7f8',fontSize:33,fontWeight:600,letterSpacing:-.45,lineHeight:1.32,
+      opacity:Math.min(1,Math.max(0,(13.3-t)*1.4))
     }}>
       {t<5.1?
         <>About 100 trillion neutrinos pass<br/>through your body every second.</>:
@@ -146,7 +140,7 @@ const Overlay=({frame}:{frame:number})=>{
       This visual recreation uses an original animation and a public-domain<br/>
       scientific-scale human model rather than footage from the reference.
     </div>}
-    {earth>.1&&<div style={{position:'absolute',left:618,top:682,
+    {earth>.1&&<div style={{position:'absolute',left:522,top:780,
       fontFamily:'Consolas,monospace',fontSize:20,color:'#c5e87c',opacity:earth}}>
       ● YOU
     </div>}
@@ -156,7 +150,7 @@ export const IceCube3DProof:React.FC=()=>{
   const frame=useCurrentFrame();
   const t=frame/30;
   const {width,height}=useVideoConfig();
-  const human=fade(t,-2,12.6,1.45),earth=fade(t,11.25,16,1.05);
+  const human=t<12.65,earth=t>=12.65;
   return <AbsoluteFill style={{backgroundColor:'#000',overflow:'hidden'}}>
     <NeutrinoTrails frame={frame}/>
     <ThreeCanvas width={width} height={height}
@@ -166,10 +160,10 @@ export const IceCube3DProof:React.FC=()=>{
       <ambientLight intensity={.48} color="#6c9db6"/>
       <pointLight position={[-3,2,5]} color="#70c9fb" intensity={5}/>
       <directionalLight position={[3,1,-5]} color="#38769f" intensity={7}/>
-      {human>.005&&<group visible={human>.005} scale={1}>
+      {human&&<group position={[0,-.39,0]} scale={1.50}>
         <Body frame={frame}/>
       </group>}
-      {earth>.005&&<Earth frame={frame}/>}
+      {earth&&<group position={[0,-.13,0]}><Earth frame={frame}/></group>}
     </ThreeCanvas>
     {/* Fade on black over model only; keep background streaks throughout. */}
     <AbsoluteFill style={{backgroundColor:'#000000',opacity:0,pointerEvents:'none'}}/>
