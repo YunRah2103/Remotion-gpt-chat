@@ -116,7 +116,7 @@ jobs:
           npx remotion studio src/index.ts --port=3177 > out/studio.log 2>&1 &
           STUDIO_PID=$!
           trap 'kill "$STUDIO_PID" || true' EXIT
-          for i in $(seq 1 30); do
+          for _ in $(seq 1 30); do
             if curl -fsS -o /dev/null http://127.0.0.1:3177; then break; fi
             sleep 2
           done
