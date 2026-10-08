@@ -1,0 +1,149 @@
+name: Turbo Documentary - native 3D previews and master
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/turbo/**'
+      - 'src/TurboDocumentary.tsx'
+      - 'src/Root.tsx'
+      - '.github/workflows/turbo-documentary.yml'
+      - 'package.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Dependencies
+        run: |
+          npm install --no-audit --no-fund
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: GPU availability disclosure
+        run: |
+          ls -la /dev/dri || true
+          command -v nvidia-smi && nvidia-smi || true
+          echo 'WebGL uses --gl=swangle (software renderer)'
+      - name: TypeScript and registered composition
+        run: |
+          npm run check
+          npx remotion compositions src/index.ts --gl=swangle | tee compositions.txt
+          grep -q TurboDocumentary compositions.txt
+      - name: Render four actual moving native 3D WebGL previews
+        run: |
+          mkdir -p previews
+          npx remotion render src/index.ts TurboDocumentary previews/opening.mp4 --frames=30-59 --scale=0.36 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=2
+          npx remotion render src/index.ts TurboDocumentary previews/turbine.mp4 --frames=190-219 --scale=0.36 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=2
+          npx remotion render src/index.ts TurboDocumentary previews/compressor.mp4 --frames=500-529 --scale=0.36 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=2
+          npx remotion render src/index.ts TurboDocumentary previews/payoff.mp4 --frames=745-774 --scale=0.36 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=2
+          for name in opening turbine compressor payoff; do
+            ffmpeg -hide_banner -loglevel error -xerror -i "previews/$name.mp4" -f null -
+            ffmpeg -hide_banner -loglevel error -y -ss 0.5 -i "previews/$name.mp4" -frames:v 1 -update 1 "previews/$name.png"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TURBO-native-moving-previews
+          path: |
+            previews/
+            compositions.txt
+          retention-days: 30
+          if-no-files-found: error
+  chunks:
+    needs: preflight
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [0, 1, 2, 3, 4, 5, 6]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - name: Render genuine 1080 x 1920 WebGL frames on software renderer
+        env:
+          PART: '${{ matrix.part }}'
+        run: |
+          mkdir -p out
+          START=$(( PART * 120 ))
+          END=$(( START + 119 ))
+          echo "Render global frames $START - $END"
+          npx remotion render src/index.ts TurboDocumentary "out/turbo-$PART.mp4" --frames="$START-$END" --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=2
+          ffmpeg -hide_banner -loglevel error -xerror -i "out/turbo-$PART.mp4" -f null -
+          COUNT=$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=noprint_wrappers=1:nokey=1 "out/turbo-$PART.mp4")
+          test "$COUNT" = 120
+      - uses: actions/upload-artifact@v4
+        with:
+          name: turbo-chunk-${{ matrix.part }}
+          path: out/turbo-*.mp4
+          retention-days: 30
+          if-no-files-found: error
+  master:
+    needs: chunks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: turbo-chunk-*
+          path: out/chunks
+          merge-multiple: true
+      - name: Stitch all 840 native frames and mix original mechanical soundtrack
+        run: |
+          mkdir -p out
+          for i in 0 1 2 3 4 5 6; do
+            test -s "out/chunks/turbo-$i.mp4"
+            echo "file 'chunks/turbo-$i.mp4'" >> out/concat.txt
+          done
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i out/concat.txt -c copy out/visual-840.mp4
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i "sine=frequency=59:duration=28:sample_rate=48000" \
+            -f lavfi -i "anoisesrc=color=pink:amplitude=0.13:duration=28:sample_rate=48000" \
+            -f lavfi -i "sine=frequency=860:duration=28:sample_rate=48000" \
+            -filter_complex "[0:a]volume=0.22,lowpass=f=180,afade=t=in:st=0:d=1,afade=t=out:st=26.9:d=1[engine];[1:a]highpass=f=180,lowpass=f=3200,volume=0.08,afade=t=in:st=0:d=.9,afade=t=out:st=26.8:d=1[air];[2:a]volume='if(between(t,5,21),0.016,0.003)':eval=frame,afade=t=in:st=0:d=.8[spool];[engine][air][spool]amix=inputs=3:duration=first:normalize=0,alimiter=limit=0.8[a]" \
+            -map "[a]" -ac 2 -ar 48000 -c:a aac -b:a 192k out/sound.m4a
+          ffmpeg -hide_banner -loglevel error -y -i out/visual-840.mp4 -i out/sound.m4a -map 0:v:0 -map 1:a:0 -c:v copy -c:a copy -t 28 -movflags +faststart out/THE-HIDDEN-POWER-OF-A-TURBOCHARGER.mp4
+      - name: Full decode, strict FFprobe, scene stills and black-frame check
+        run: |
+          ffmpeg -hide_banner -loglevel error -xerror -i out/THE-HIDDEN-POWER-OF-A-TURBOCHARGER.mp4 -f null -
+          ffprobe -v error -show_streams -show_format -of json out/THE-HIDDEN-POWER-OF-A-TURBOCHARGER.mp4 > out/ffprobe.json
+          python3 - <<'PY'
+          import json
+          p=json.load(open('out/ffprobe.json'))
+          v=next(s for s in p['streams'] if s['codec_type']=='video')
+          a=next(s for s in p['streams'] if s['codec_type']=='audio')
+          assert v['codec_name']=='h264' and v['width']==1080 and v['height']==1920,v
+          assert v['pix_fmt']=='yuv420p' and v['nb_frames']=='840' and v['r_frame_rate']=='30/1',v
+          assert a['codec_name']=='aac' and a['sample_rate']=='48000' and a['channels']==2,a
+          assert abs(float(p['format']['duration'])-28.0)<.07,p['format']
+          print('PASS: 840 frames, 1080x1920, 30fps, 28 seconds, H264 yuv420p, AAC 48k stereo')
+          PY
+          ffmpeg -hide_banner -loglevel warning -i out/THE-HIDDEN-POWER-OF-A-TURBOCHARGER.mp4 -vf 'blackdetect=d=0.9:pix_th=0.03:pic_th=0.98' -an -f null - 2> out/blackdetect.log
+          for sec in 3 7 12 17 20 25 27; do
+            ffmpeg -hide_banner -loglevel error -y -ss "$sec" -i out/THE-HIDDEN-POWER-OF-A-TURBOCHARGER.mp4 -frames:v 1 -update 1 "out/frame-$sec.png"
+          done
+          sha256sum out/THE-HIDDEN-POWER-OF-A-TURBOCHARGER.mp4 > out/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: THE-HIDDEN-POWER-OF-A-TURBOCHARGER-MASTER
+          path: |
+            out/THE-HIDDEN-POWER-OF-A-TURBOCHARGER.mp4
+            out/ffprobe.json
+            out/blackdetect.log
+            out/frame-*.png
+            out/SHA256SUMS.txt
+          retention-days: 30
+          if-no-files-found: error
