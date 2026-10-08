@@ -1,4 +1,4 @@
 import React from 'react';
 import {Composition} from 'remotion';
-import {VectorFilm} from './VectorFilm';
-export const VideoRoot=()=> <Composition id="VectorFilm" component={VectorFilm} width={1080} height={1920} fps={30} durationInFrames={270}/>;
+import {GpuDriveFilm} from './GpuDriveFilm';
+export const VideoRoot=()=> <Composition id="GpuDriveFilm" component={GpuDriveFilm} width={1080} height={1920} fps={30} durationInFrames={180}/>;

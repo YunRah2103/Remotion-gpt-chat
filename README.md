@@ -1,15 +1,11 @@
-# Remotion GPT Chat — independent video lab
+# Remotion GPT Chat · GPU DRIVE 001
 
-A public, standalone Remotion + React video project. **This is NOT YUNEX** and never imports from `yunus-video-lab`.
+An **independent** Remotion 4 / Three.js / React Three Fiber true-3D automotive motion film, 6 seconds, 1080×1920, 30 fps. No code or assets from YUNEX or yunus-video-lab.
 
-## First film
+Real 3D geometry includes a conceptual car, wheels, road, environment, lighting and animated 3D camera. 2D typography is overlaid for legibility.
 
-**VECTOR / 001** — a nine-second original motion-design test featuring a fictional sports-car silhouette, animated tyres, camera movement, kinetic typography and moving ground elements. Vertical 1080 × 1920 at 30 fps (270 frames). There are no reused Porsche meshes, stock car photos, or YUNEX branding.
+On push to main, GitHub Actions renders MP4 using software-backed WebGL (`--gl=swangle`), adds synthesised audio and uploads a fully validated file as an artifact.
 
-## Run
+Optional `render-gpu-self-hosted.yml` runs **only when manually triggered** on a Linux self-hosted runner with hardware GPU and labels `self-hosted, linux, x64, gpu`; registering one is separate and not automatically provisioned. Only trigger trusted code; public repositories and self-hosted runners have security implications.
 
-`npm install` then `npm run studio` to preview. `npm run render` creates `out/VectorFilm.mp4`. On every push to `main`, GitHub Actions runs TypeScript checks, renders the film and uploads an MP4 artifact on the Actions run page. [Actions runs](https://github.com/YunRah2103/Remotion-gpt-chat/actions). A manual workflow dispatch is also supported.
-
-## Separate agent workflow
-
-Each ordinary ChatGPT agent can open this repository through GitHub, edit its own `agent/...` branch, open a pull request, and hand off the full remote SHA. Merge into `main` to trigger a new render. See `AGENTS.md`.
+Run `npm install && npm run studio` locally. `npm run check` for TS.

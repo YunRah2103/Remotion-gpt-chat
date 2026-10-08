@@ -1,0 +1,28 @@
+name: Experimental self-hosted GPU render
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  gpu:
+    runs-on: [self-hosted, linux, x64, gpu]
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          npm install --no-audit --no-fund
+          command -v ffmpeg
+          npx remotion gpu
+      - name: Render on hardware-backed GPU
+        run: |
+          mkdir -p out
+          npx remotion render src/index.ts GpuDriveFilm out/GPU-DRIVE-001.mp4 --codec=h264 --pixel-format=yuv420p --gl=angle-egl --concurrency=2
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GPU-DRIVE-001-hardware-GPU
+          path: out/GPU-DRIVE-001.mp4
