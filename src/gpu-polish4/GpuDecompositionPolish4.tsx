@@ -12,9 +12,10 @@ type MotionPose={position:Triple;rotation:Triple};
 type Move={startFrame:number;endFrame:number;easing:'smoothstep';from:MotionPose;to:MotionPose};
 export type PolishedMotion={schemaVersion:1;fps:30;durationInFrames:450;nodes:Record<string,Move>};
 const MOVING=['FAN_LEFT','FAN_CENTER','FAN_RIGHT','FRONT_SHROUD',
-             'HEATSINK','GPU_DIE','VRAM_CHIPS','PCB_ASSEMBLY','BACKPLATE'] as const;
-const REQUIRED=['GPU_ROOT','FAN_ASSEMBLY',...MOVING,'HEATSINK_FINS','HEATPIPE_BUNDLE',
-  'COLD_PLATE','PCB','VRM_COMPONENTS','PCIE_FINGERS','POWER_8PIN','IO_BRACKET'];
+  'HEATSINK','HEATSINK_FINS','HEATPIPE_BUNDLE','COLD_PLATE',
+  'GPU_DIE','VRAM_CHIPS','VRM_COMPONENTS','PCB_ASSEMBLY','BACKPLATE'] as const;
+const REQUIRED=['GPU_ROOT','FAN_ASSEMBLY',...MOVING,
+  'PCB','PCIE_FINGERS','POWER_8PIN','IO_BRACKET'];
 const mix=(a:number,b:number,t:number)=>a+(b-a)*t;
 export function validateAssets(model:THREE.Object3D,motion:PolishedMotion){
   if(motion.schemaVersion!==1||motion.fps!==30||motion.durationInFrames!==450)
