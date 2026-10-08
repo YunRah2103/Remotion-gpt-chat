@@ -1,0 +1,46 @@
+name: GPU Decomposition - native Manim overlay proof
+on:
+  push:
+    branches: [gpu-decompose/b-director]
+    paths:
+      - 'gpu-decompose/overlays/**'
+      - '.github/workflows/gpu-decomposition-overlays.yml'
+permissions:
+  contents: read
+jobs:
+  validate-native-manim:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install genuine Manim native rendering dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg pkg-config build-essential python3-dev libcairo2-dev libpango1.0-dev
+          python -m venv /tmp/manim
+          /tmp/manim/bin/pip install --disable-pip-version-check 'manim==0.21.0'
+      - name: Render all 450 moving vector-overlay frames
+        run: |
+          set -euo pipefail
+          mkdir -p out/manim
+          /tmp/manim/bin/manim -ql --disable_caching -r 540,960 --fps 30 --media_dir out/manim gpu-decompose/overlays/technical_guides.py TechnicalGuides | tee out/manim.log
+          MOVIE=$(find out/manim -type f -name 'TechnicalGuides.mp4' | head -n1)
+          test -s "$MOVIE"
+          ffmpeg -hide_banner -loglevel error -y -i "$MOVIE" -vf 'fps=30,scale=540:960,tpad=stop_mode=clone:stop_duration=1,trim=duration=15,setpts=PTS-STARTPTS' -an -c:v libx264 -pix_fmt yuv420p out/technical-guides.mp4
+          ffmpeg -hide_banner -loglevel error -xerror -i out/technical-guides.mp4 -f null -
+          ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,nb_frames,width,height,r_frame_rate -of json out/technical-guides.mp4 | tee out/manim-probe.json
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=noprint_wrappers=1:nokey=1 out/technical-guides.mp4)" = 450
+          ffmpeg -hide_banner -loglevel error -y -ss 3 -i out/technical-guides.mp4 -frames:v 1 -update 1 out/manim-proof.png
+          echo "MANIM_NATIVE_OVERLAY_PASS" > out/status.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: GPU-MANIM-NATIVE-450F-PROOF
+          path: out/
+          retention-days: 30
+          if-no-files-found: warn
