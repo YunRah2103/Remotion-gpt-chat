@@ -1,91 +1,22 @@
 import React, {useMemo} from 'react';
 import * as THREE from 'three';
+import {PremiumCar} from './PremiumCar';
 
-// Every shape in this film is original, deterministic geometry. No YUNEX models or assets.
-const paint = '#ccd8d4';
+// Original turbocharger mechanics remain independent from the CC0 car exterior.
 const blue = '#5cddff';
 const amber = '#ffb25f';
 const steel = '#bcc8c7';
-const shellMat = {metalness: 0.72, roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.12};
-
-type Station={z:number; w:number; low:number; high:number};
-const makeLoft=(stations:Station[])=>{
-  const verts:number[]=[]; const faces:number[]=[];
-  // Rounded-shoulder 12-point cross sections: a real 3D body surface.
-  const profile=[[-.91,.17],[-.99,.38],[-.94,.75],[-.71,.98],[0,1],[.71,.98],[.94,.75],[.99,.38],[.91,.17],[.67,0],[0,-.05],[-.67,0]];
-  for(const s of stations) for(const [x,y] of profile) verts.push(x*s.w,s.low+y*(s.high-s.low),s.z);
-  for(let k=0;k<stations.length-1;k++) for(let j=0;j<profile.length;j++){
-    const a=k*profile.length+j, b=k*profile.length+(j+1)%profile.length;
-    const c=(k+1)*profile.length+j, d=(k+1)*profile.length+(j+1)%profile.length;
-    faces.push(a,b,c,b,d,c);
-  }
-  for(let j=1;j<profile.length-1;j++){faces.push(0,j+1,j); const end=(stations.length-1)*profile.length;faces.push(end,end+j,end+j+1);}
-  const g=new THREE.BufferGeometry();
-  g.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));g.setIndex(faces);g.computeVertexNormals();return g;
-};
-const bodySections:Station[]=[
-  {z:-2.5,w:.69,low:.43,high:.59},{z:-2.38,w:.89,low:.43,high:.78},
-  {z:-1.67,w:1.01,low:.45,high:.88},{z:-.86,w:1.08,low:.48,high:.78},
-  {z:.72,w:1.08,low:.46,high:.8},{z:1.68,w:1.02,low:.44,high:.84},
-  {z:2.38,w:.92,low:.43,high:.76},{z:2.48,w:.7,low:.46,high:.62}
-];
-const roofSections:Station[]=[
- {z:-1.04,w:.71,low:.82,high:.88},{z:-.47,w:.72,low:.89,high:1.42},
- {z:.17,w:.77,low:.93,high:1.48},{z:.78,w:.72,low:.89,high:1.35},
- {z:1.13,w:.70,low:.81,high:.84}
-];
 const M:React.FC<{color:string;emissive?:string;roughness?:number;metalness?:number;opacity?:number}>=({color,emissive,roughness=.32,metalness=.72,opacity=1})=><meshPhysicalMaterial color={color} emissive={emissive} emissiveIntensity={emissive?1.3:0} metalness={metalness} roughness={roughness} clearcoat={.65} transparent={opacity<1} opacity={opacity} side={THREE.DoubleSide}/>;
 
-const Wheel:React.FC<{side:number;z:number;frame:number}>=({side,z,frame})=>{
-  const spin=frame*.16; // Rotation around the physically correct transverse axle (X).
-  return <group position={[side*1.005,.43,z]}>
-    <group rotation={[spin,0,0]}>
-      <mesh rotation={[0,0,Math.PI/2]} castShadow><cylinderGeometry args={[.425,.425,.26,48]}/><M color="#0a0d12" metalness={.1} roughness={.88}/></mesh>
-      <mesh rotation={[0,Math.PI/2,0]}><torusGeometry args={[.355,.071,10,48]}/><M color="#11171c" metalness={.2} roughness={.78}/></mesh>
-      <mesh position={[side*.145,0,0]} rotation={[0,Math.PI/2,0]}><torusGeometry args={[.275,.023,9,64]}/><M color="#98a6a7" roughness={.16}/></mesh>
-      {Array.from({length:10},(_,i)=>{const a=i*Math.PI*2/10;return <mesh key={i} position={[side*.148,Math.cos(a)*.16,Math.sin(a)*.16]} rotation={[a,0,0]} castShadow><boxGeometry args={[.037,.29,.046]}/><M color="#8c989a" roughness={.2}/></mesh>;})}
-      <mesh position={[side*.17,0,0]} rotation={[0,0,Math.PI/2]}><cylinderGeometry args={[.10,.10,.045,32]}/><M color="#1b2225" roughness={.2}/></mesh>
-    </group>
-    <mesh position={[side*.095,0,0]} rotation={[0,0,Math.PI/2]}><cylinderGeometry args={[.29,.29,.028,36]}/><M color="#647070" roughness={.28}/></mesh>
-    <mesh position={[side*.132,.18,-.14]}><boxGeometry args={[.09,.2,.12]}/><M color="#bf7552" roughness={.34}/></mesh>
-  </group>;
-};
-
-export const PerformanceCar:React.FC<{frame:number;hero?:boolean}>=({frame,hero=false})=>{
- const body=useMemo(()=>makeLoft(bodySections),[]);
- const roof=useMemo(()=>makeLoft(roofSections),[]);
- const bounce=.008*Math.sin(frame/14);
- return <group position={[0,bounce,0]} rotation={[0,hero?.025*Math.sin(frame/120):0,0]}>
-  <mesh castShadow receiveShadow geometry={body}><meshPhysicalMaterial color={paint} metalness={shellMat.metalness} roughness={shellMat.roughness} clearcoat={1} clearcoatRoughness={.09} side={THREE.DoubleSide}/></mesh>
-  <mesh geometry={roof} castShadow><M color="#142832" roughness={.105} metalness={.49}/></mesh>
-  <mesh position={[0,1.49,.19]}><boxGeometry args={[1.15,.032,.85]}/><M color={paint} roughness={.15}/></mesh>
-  {[-1,1].map(s=><React.Fragment key={s}>
-   <mesh position={[s*.77,.84,-1.92]} rotation={[0,0,s*.13]}><boxGeometry args={[.20,.018,.87]}/><M color="#273b3c" roughness={.12}/></mesh>
-   <mesh position={[s*.78,.91,-2.38]} rotation={[0,s*.17,0]}><boxGeometry args={[.37,.10,.04]}/><meshStandardMaterial color="#defff5" emissive="#b1eaff" emissiveIntensity={2}/></mesh>
-   <mesh position={[s*.78,.78,2.42]}><boxGeometry args={[.37,.075,.055]}/><meshStandardMaterial color="#ff4141" emissive="#ff2030" emissiveIntensity={1.7}/></mesh>
-   <mesh position={[s*.96,.83,-.63]}><sphereGeometry args={[.11,14,9]}/><M color={paint} roughness={.24}/></mesh>
-   <mesh position={[s*.8,.87,.18]} rotation={[0,s*.06,0]}><boxGeometry args={[.028,.08,1.32]}/><M color={paint}/></mesh>
-   <mesh position={[s*.92,.61,0]}><boxGeometry args={[.045,.065,1.3]}/><M color="#2e353a" roughness={.45}/></mesh>
-   <mesh position={[s*.38,.51,-2.485]}><boxGeometry args={[.29,.09,.027]}/><M color="#12181c" roughness={.48}/></mesh>
-   <Wheel side={s} z={-1.57} frame={frame}/><Wheel side={s} z={1.58} frame={frame}/>
-  </React.Fragment>)}
-  <mesh castShadow position={[0,1.06,2.28]}><boxGeometry args={[1.85,.065,.38]}/><M color="#151b21" roughness={.23}/></mesh>
-  {[-.71,.71].map(x=><mesh key={x} position={[x,.86,2.19]}><boxGeometry args={[.065,.31,.055]}/><M color="#252f36"/></mesh>)}
-  <mesh position={[0,.57,2.44]}><boxGeometry args={[.5,.1,.055]}/><M color="#191e22"/></mesh>
-  <mesh position={[0,.37,-2.35]}><boxGeometry args={[1.43,.06,.33]}/><M color="#151b21"/></mesh>
-  <mesh position={[0,.36,2.36]}><boxGeometry args={[1.55,.07,.28]}/><M color="#151b21"/></mesh>
- </group>;
-};
-const strip=(x:number,z:number,w:number,h:number,c:string)=><mesh position={[x,h/2,z]}><boxGeometry args={[w,h,3.2]}/><M color={c} roughness={.55} metalness={.2}/></mesh>;
 export const RoadWorld:React.FC<{frame:number;hero?:boolean}>=({frame,hero=false})=>{
  const scroll=frame*(hero?.63:.43);
  return <group>
   <color attach="background" args={['#09141d']}/>
   <fog attach="fog" args={['#09141d',17,89]}/>
-  <hemisphereLight args={['#bcd8e3','#101b20',2.4]}/>
+  <hemisphereLight args={['#d6edf4','#213b42',3.1]}/>
   <ambientLight intensity={.32}/>
-  <directionalLight position={[-8,13,-6]} intensity={3.7} castShadow shadow-mapSize-width={2048} shadow-mapSize-height={2048} shadow-camera-left={-14} shadow-camera-right={14} shadow-camera-top={15} shadow-camera-bottom={-15}/>
-  <spotLight color="#67bdce" position={[4,9,12]} intensity={38} angle={.65} penumbra={.65}/>
+  <directionalLight position={[-8,13,-6]} intensity={4.8} castShadow shadow-mapSize-width={2048} shadow-mapSize-height={2048} shadow-camera-left={-14} shadow-camera-right={14} shadow-camera-top={15} shadow-camera-bottom={-15}/>
+  <spotLight color="#78d9e5" position={[4,9,12]} intensity={65} angle={.65} penumbra={.65}/><spotLight color="#eef5ff" position={[-5,8,2]} intensity={45} angle={.68} penumbra={.65}/>
   <mesh rotation={[-Math.PI/2,0,0]} receiveShadow position={[0,-.045,0]}><planeGeometry args={[180,180]}/><meshStandardMaterial color="#101b20" roughness={.9}/></mesh>
   <mesh rotation={[-Math.PI/2,0,0]} receiveShadow position={[0,-.034,0]}><planeGeometry args={[7.4,180]}/><meshStandardMaterial color="#263238" metalness={.08} roughness={.9}/></mesh>
   {[-3.59,3.59].map(x=><mesh key={x} position={[x,-.006,0]}><boxGeometry args={[.082,.014,180]}/><meshStandardMaterial color="#a7b9b9"/></mesh>)}
@@ -102,7 +33,7 @@ export const RoadWorld:React.FC<{frame:number;hero?:boolean}>=({frame,hero=false
    </group>;
   })}
   {Array.from({length:14},(_,i)=><mesh key={i} position={[i%2?15:-15,2.7,(i*16+scroll*.43)%230-130]} castShadow><dodecahedronGeometry args={[3.7+(i%3),1]}/><meshStandardMaterial color="#152930" roughness={1}/></mesh>)}
-  <PerformanceCar frame={frame} hero={hero}/>
+  <PremiumCar frame={frame} hero={hero}/>
  </group>;
 };
 
