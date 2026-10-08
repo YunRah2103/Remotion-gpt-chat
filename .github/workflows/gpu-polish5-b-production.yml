@@ -5,6 +5,7 @@ on:
     paths:
       - .github/workflows/gpu-polish5-b-production.yml
       - gpu-decompose/polish5/manager/RELEASE_LOCK.json
+      - gpu-decompose/polish5/motion/decomposition.v1.json
       - gpu-decompose/polish5/manager/NATIVE_VISUAL_REVIEW.md
   workflow_dispatch:
 
