@@ -1,7 +1,7 @@
 {
   "contractVersion": "POLISH05-v1",
   "contractCommitSha": "5f512efbacaa0446df37fc5c4c07bd3f031fe84a",
-  "status": "model-verified",
+  "status": "render-approved",
   "startingPolish04Sha": "e9a14f5d8e1b3bf805bb4916f9ce8bdc0155ff6a",
   "polish04ArtifactId": 11579249363,
   "polish04RunId": 37846669872,
@@ -14,10 +14,10 @@
   "managerSceneSha256": "17f2e32691b7588569c697686e723fcaef8b9b40228ad17bb79bac6027ad53c7",
   "managerCameraSha256": "e428a8aca90e31f66fae45d0bdd2049835c812e7796f02cf286f4c198b9de9d8",
   "motionCompatibilityAudit": "gpu-decompose/polish5/manager/MOTION_COMPATIBILITY_FINAL.md",
-  "nativeProofRunId": null,
-  "nativeProofArtifactId": null,
-  "nativeReviewSha256": null,
-  "renderApproved": false,
+  "nativeProofRunId": 37856480805,
+  "nativeProofArtifactId": 11583824211,
+  "nativeReviewSha256": "074eca621a3f251bdac01e67bf154871d1db9ce2919041801e14d81c834ab750",
+  "renderApproved": true,
   "releaseApproved": false,
-  "note": "Promoted v3 readably framed camera and v2 13-track offsets against exact verified A GLB. Standalone native creative correction reviewed (37856088544 artifact 11583982227). Full integrated 12 stills+6 clips required before authorizing 450F."
+  "note": "INDEPENDENT NATIVE VISUAL REVIEW RENDER_APPROVED at full 12 frames / 6 moving clips with final A GLB, final v3 camera and v2 motion. Final 450F MP4 postrender review still required."
 }
