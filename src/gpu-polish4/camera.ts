@@ -22,9 +22,9 @@ export const CAMERA_KEYS:readonly CameraKey[] = [
   {frame:286, focus:'silicon', yaw:55,pitch:27,roll:-11,fov:29,widthFill:.89,heightFill:.74,biasY:.06},
   {frame:307, focus:'silicon', yaw:52,pitch:30,roll:-12,fov:28,widthFill:.96,heightFill:.74,biasY:.06},
   {frame:329, focus:'expand',  yaw:56,pitch:21,roll:-29,fov:33,widthFill:.87,heightFill:.77,biasY:.19},
-  {frame:364, focus:'all',     yaw:53,pitch:20,roll:-35,fov:32,widthFill:.92,heightFill:.79,biasY:.27},
-  {frame:405, focus:'all',     yaw:57,pitch:19,roll:-36,fov:32,widthFill:.92,heightFill:.80,biasY:.29},
-  {frame:449, focus:'all',     yaw:59,pitch:17,roll:-35,fov:32,widthFill:.92,heightFill:.80,biasY:.30},
+  {frame:364, focus:'all',     yaw:48,pitch:21,roll:-45,fov:32,widthFill:.92,heightFill:.80,biasY:.13},
+  {frame:405, focus:'all',     yaw:42,pitch:19,roll:-57,fov:32,widthFill:.92,heightFill:.80,biasY:-.10},
+  {frame:449, focus:'all',     yaw:38,pitch:17,roll:-61,fov:32,widthFill:.92,heightFill:.80,biasY:-.20},
 ] as const;
 
 export const SHOT_MAP = [
