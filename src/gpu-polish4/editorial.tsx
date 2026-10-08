@@ -22,7 +22,8 @@ export const Editorial:React.FC<{frame:number;stages?:typeof SHOT_MAP}>=({frame,
       <div style={{fontSize:35,fontWeight:700,letterSpacing:3.9,
         marginTop:13,color:'#b8c0c4'}}>TO COME APART.</div>
     </div>
-    <div style={{position:'absolute',left:64,right:64,\n      ...(frame>=280&&frame<=329?{top:293}:{bottom:frame>=330?340:229}),
+    <div style={{position:'absolute',left:64,right:64,
+      ...(frame>=280&&frame<=329?{top:293}:{bottom:frame>=330?340:229}),
       display:'flex',alignItems:'flex-end',justifyContent:'space-between',
       gap:22,opacity:Math.max(.66,techAlpha),pointerEvents:'none'}}>
       <div>
