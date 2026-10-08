@@ -1,0 +1,144 @@
+name: IceCube - 90 Second Original Remotion Recreation
+on:
+  push:
+    branches: [recreate/icecube-90s]
+    paths:
+      - 'src/IceCubeNeutrinos90.tsx'
+      - 'src/Root.tsx'
+      - 'scripts/make_icecube_audio.py'
+      - '.github/workflows/icecube-90s.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  render:
+    name: Native Remotion frames ${{ matrix.chunk }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        chunk: [0, 1, 2, 3, 4, 5]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install exact existing Remotion toolchain
+        run: npm install --no-audit --no-fund
+      - name: Compile all TypeScript compositions
+        run: npm run check
+      - name: Render 450 native frames without reference video
+        shell: bash
+        run: |
+          mkdir -p out
+          begin=$(( ${{ matrix.chunk }} * 450 ))
+          end=$(( begin + 449 ))
+          echo "Rendering frames $begin-$end"
+          npx remotion render src/index.ts IceCubeNeutrinos90 \
+            "out/chunk-${{ matrix.chunk }}.mp4" \
+            "--frames=$begin-$end" \
+            --gl=swangle \
+            --concurrency=2 \
+            --codec=h264 \
+            --pixel-format=yuv420p \
+            --crf=20 \
+            --log=error
+          test -s "out/chunk-${{ matrix.chunk }}.mp4"
+          frames=$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=nokey=1:noprint_wrappers=1 "out/chunk-${{ matrix.chunk }}.mp4")
+          test "$frames" = 450
+          ffmpeg -hide_banner -loglevel error -xerror -i "out/chunk-${{ matrix.chunk }}.mp4" -f null -
+      - uses: actions/upload-artifact@v4
+        with:
+          name: icecube-native-${{ matrix.chunk }}
+          path: out/chunk-${{ matrix.chunk }}.mp4
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: error
+
+  release:
+    name: Assemble, narrate, audit 2700-frame master
+    needs: [render]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: icecube-native-*
+          merge-multiple: true
+          path: out/chunks
+      - name: Stitch 2700 original Remotion-rendered frames
+        shell: bash
+        run: |
+          mkdir -p out
+          : > out/chunks.txt
+          for i in 0 1 2 3 4 5; do
+            test -s "out/chunks/chunk-$i.mp4"
+            frames=$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=nokey=1:noprint_wrappers=1 "out/chunks/chunk-$i.mp4")
+            test "$frames" = 450
+            echo "file 'chunks/chunk-$i.mp4'" >> out/chunks.txt
+          done
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i out/chunks.txt -c copy out/icecube-visual.mp4
+          frames=$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=nokey=1:noprint_wrappers=1 out/icecube-visual.mp4)
+          test "$frames" = 2700
+      - name: Build original narrated audio with fallback
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq espeak-ng
+          python3 -m pip install --break-system-packages --quiet edge-tts || true
+          python3 scripts/make_icecube_audio.py
+          test -s out/icecube-sound.m4a
+      - name: Mux and optimise 90-second portrait documentary
+        run: |
+          ffmpeg -hide_banner -loglevel error -y -i out/icecube-visual.mp4 -i out/icecube-sound.m4a \
+            -map 0:v:0 -map 1:a:0 \
+            -c:v copy -c:a copy -t 90 -movflags +faststart \
+            out/ICECUBE-NEUTRINOS-90SEC-RECREATION.mp4
+      - name: Full decoder and stream validation, stills and SHA256
+        shell: bash
+        run: |
+          ffmpeg -hide_banner -loglevel error -xerror -i out/ICECUBE-NEUTRINOS-90SEC-RECREATION.mp4 -f null -
+          ffprobe -v error -show_streams -show_format -of json out/ICECUBE-NEUTRINOS-90SEC-RECREATION.mp4 > out/ffprobe.json
+          python3 - <<'PY'
+          import json
+          p=json.load(open('out/ffprobe.json'))
+          v=next(s for s in p['streams'] if s['codec_type']=='video')
+          a=next(s for s in p['streams'] if s['codec_type']=='audio')
+          assert (v['codec_name'],int(v['width']),int(v['height']),v['pix_fmt'],int(v['nb_frames']),v['r_frame_rate'])==('h264',1080,1920,'yuv420p',2700,'30/1'),v
+          assert a['codec_name']=='aac' and int(a['sample_rate'])==48000 and int(a['channels'])==2,a
+          assert abs(float(p['format']['duration'])-90)<.15,p['format']
+          print('PASS: native Remotion 2700 frames, 90s, 1080x1920 30fps H264 yuv420p AAC 48kHz stereo')
+          PY
+          for sec in 3 12 19 27 34 41 49 62 73 80 87; do
+            ffmpeg -hide_banner -loglevel error -y -ss "$sec" -i out/ICECUBE-NEUTRINOS-90SEC-RECREATION.mp4 -frames:v 1 -update 1 "out/scene-$sec.png"
+          done
+          sha256sum out/ICECUBE-NEUTRINOS-90SEC-RECREATION.mp4 > out/SHA256SUMS.txt
+          cat > out/QA.txt <<'EOF'
+          ICECUBE NEUTRINOS - FIRST 90 SECONDS RECREATION
+          New original graphics: parametric human, globe, space particles,
+          timescale, South Pole ice, Cherenkov flash, boreholes, detector strings,
+          IceCube cylinder and atmospheric event schematic.
+          No copied video frames or still images.
+          Remotion 4 / deterministic React SVG / six native 450-frame renders.
+          Portrait 1080x1920; 2700 frames; 30fps; 90sec; H264 yuv420p.
+          Narration: newly synthesised speech (Edge if available; offline fallback).
+          Ambient audio: procedural tones/noise; AAC 48kHz stereo.
+          Each native chunk decoded and checked, then full master decoded/checked.
+          Source: recreate/icecube-90s. Independent of YUNEX projects.
+          EOF
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ICECUBE-90S-FINAL-MP4-2700F
+          path: |
+            out/ICECUBE-NEUTRINOS-90SEC-RECREATION.mp4
+            out/ffprobe.json
+            out/QA.txt
+            out/SHA256SUMS.txt
+            out/scene-*.png
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
