@@ -182,11 +182,11 @@ for i,(x,node) in enumerate(zip([-.94,0,.94],fan_nodes)):
  for j in range(9):blade_mesh(node,x,.025,j,blade)
  import_cad_hub("OpenSCAD_FanHub_%d"%i,cad,node,x,.025)
  # Circular cap (OEM design has smooth caps carrying small X marks).
- cylinder("Fan_smooth_center_cap_%d"%i,(x,-.251,.025),.141,.026,hubmat,node)
- torus("Fan_hub_chamfer_%d"%i,(x,-.266,.025),.138,.006,black_gloss,node)
+ cylinder("Fan_smooth_center_cap_%d"%i,(x,-.231,.025),.141,.026,hubmat,node)
+ torus("Fan_hub_chamfer_%d"%i,(x,-.244,.025),.138,.006,black_gloss,node)
  for sign in [-1,1]:
   ob=box("Fan_X_silver_insignia_%d_%d"%(i,sign),
-         (x,-.267,.025),(.076,.002,.012),fan_decal,node)
+         (x,-.250,.025),(.076,.002,.012),fan_decal,node)
   ob.rotation_euler[1]=sign*.71
 
 # Entire dark seamless sculpted fascia, constructed as three annular cut-out panels.
