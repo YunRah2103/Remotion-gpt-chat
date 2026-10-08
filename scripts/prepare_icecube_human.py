@@ -51,6 +51,28 @@ for o in meshes:
         mod.levels=1
         mod.render_levels=1
 
+# Bake the adjusted pose and all skin/subdivision deformers into an
+# independent static mesh. A non-animated glTF exports bind poses otherwise,
+# causing the arms to pop back to A-pose in the Remotion render.
+bpy.context.view_layer.update()
+depsgraph=bpy.context.evaluated_depsgraph_get()
+baked=[]
+for old in meshes:
+    ev=old.evaluated_get(depsgraph)
+    baked_mesh=bpy.data.meshes.new_from_object(ev, preserve_all_data_layers=True, depsgraph=depsgraph)
+    baked_obj=bpy.data.objects.new(old.name+'_POSE_BAKED',baked_mesh)
+    bpy.context.scene.collection.objects.link(baked_obj)
+    baked_obj.matrix_world=old.matrix_world.copy()
+    for polygon in baked_obj.data.polygons:
+        polygon.use_smooth=True
+    baked.append(baked_obj)
+    print('POSE BAKED',old.name,len(baked_obj.data.vertices),'vertices')
+for old in list(bpy.context.scene.objects):
+    if old not in baked:
+        bpy.data.objects.remove(old,do_unlink=True)
+meshes=baked
+bpy.context.view_layer.update()
+
 def bounds():
     points=[]
     for obj in meshes:
