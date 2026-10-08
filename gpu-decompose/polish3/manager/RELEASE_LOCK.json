@@ -15,5 +15,5 @@
   "approvedProofRunId": null,
   "approvedProofArtifactId": null,
   "independentVisualQa": "PENDING",
-  "sourceNotes": "Actual final A hardware run 37833031666 newer than B proof 37832082195. Must visually inspect integrated C native proofs before full release."
+  "sourceNotes": "Final A run 37833031666 SHA e5e274; pinned new model and B source. Manager CI must publish PROOF_RUN_POINTER.json after successful native artifact upload. Independent 1080x1920 moving QA required."
 }
