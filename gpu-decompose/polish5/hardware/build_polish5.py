@@ -40,12 +40,12 @@ def material(name,rgba,metal=0.0,rough=.5):
     m.diffuse_color=(*rgba,1.0)
     return m
 # GLB-transferable Metallic/Roughness; only compatible BSDF values, no unsupported procedural tricks.
-mold=material("P5_black_moulded_polymer",(.023,.027,.034),.0,.61)
+mold=material("P5_black_moulded_polymer",(.007,.010,.013),.0,.70)
 shadow=material("P5_recessed_shadow",(.008,.010,.012),.03,.77)
-edge=material("P5_edge_satin_anodized",(.063,.071,.081),.49,.42)
+edge=material("P5_edge_satin_anodized",(.027,.034,.041),.33,.55)
 carbon=material("P5_rotor_polymer",(.023,.030,.036),.05,.42)
 matt=material("P5_rotor_core_black",(.018,.021,.025),.16,.50)
-bearing=material("P5_bearing_dark_nickel",(.18,.20,.22),.85,.27)
+bearing=material("P5_bearing_dark_nickel",(.095,.11,.125),.79,.38)
 alu=material("P5_finetip_anodized_aluminium",(.25,.28,.32),.84,.40)
 nickel=material("P5_precision_nickel",(.39,.41,.43),.94,.26)
 bronze=material("P5_copper_contact_matte",(.29,.17,.078),.82,.36)
@@ -59,12 +59,16 @@ ink=material("P5_laser_print_tone",(.21,.26,.25),.02,.76)
 gold=material("P5_edge_gold_contact",(.51,.33,.115),.87,.33)
 tpad=material("P5_graphite_thermal_interface",(.11,.12,.14),0,.82)
 for name,colour,mt,rg in (
-  ("M_FAN_BLADE",(.026,.030,.038),.07,.45),
+  ("M_FAN_BLADE",(.008,.011,.016),.025,.57),
+  ("M_FAN_HUB",(.013,.016,.020),.075,.52),
+  ("M_FAN_RING",(.011,.013,.018),.10,.59),
+  ("M_SHROUD_DARK",(.009,.011,.016),.02,.67),
+  ("M_TRIPLE_FAN_BEZEL_BLACK",(.009,.012,.016),.08,.56),
   ("M_PCB_DARK_GREEN",(.012,.030,.027),.015,.70),
-  ("M_MONOLITHIC_XFX_FASCIA",(.016,.019,.023),.04,.60),
+  ("M_MONOLITHIC_XFX_FASCIA",(.005,.007,.011),.01,.74),
   ("M_P3_FIN_FOLDED_ALUMINIUM",(.28,.31,.35),.86,.41),
   ("M_NICKEL_COPPER",(.36,.38,.40),.91,.28),
-  ("M_BACKPLATE_GRAPHITE",(.040,.046,.053),.52,.51)):
+  ("M_BACKPLATE_GRAPHITE",(.022,.028,.033),.49,.57)):
     m=bpy.data.materials.get(name)
     if m and m.use_nodes:
         sh=m.node_tree.nodes.get("Principled BSDF")
@@ -163,6 +167,32 @@ for ix in range(11):
     box("upper_fascia_vent_%02d"%ix,(x,-.067,.613),(.043,.041,.0035),
         shadow,sh,.001,"fascia")
     box("vent_lip_%02d"%ix,(x,-.087,.615),(.039,.003,.004),edge,sh,.001,"fascia")
+
+# Readable front-surface black-on-black tooling, rather than three featureless circular holes.
+# These are actual annular section solids with a stepped inner gasket and outer chamfer.
+for i,cx in enumerate((-.94,0,.94)):
+    ring("moulded_aperture_counterbevel_%d"%i,(cx,-.237,.025),
+         .473,.007,edge,sh,"fascia")
+    ring("recessed_blade_rim_shadow_%d"%i,(cx,-.240,.025),
+         .459,.004,shadow,sh,"fascia")
+    for j in range(8):
+        angle=j*math.tau/8
+        x=cx+.478*math.cos(angle);z=.025+.478*math.sin(angle)
+        cyl("perimeter_inset_fastener_%d_%d"%(i,j),(x,-.239,z),
+            .004,.002,bearing,sh,10,"fascia")
+# The angular lower and upper stampings are restrained to the unoccupied border.
+for zsign in (-1,1):
+    zz=zsign*.565
+    for k in range(3):
+        x=-1.225+k*.16
+        bar=box("Swift_stepped_shearline_%d_%d"%(zsign,k),
+            (x,-.233,zz),(.122,.005,.009),edge,sh,.002,"fascia")
+        bar.rotation_euler[1]=zsign*.16
+    for k in range(3):
+        x=.96+k*.10
+        bar=box("Swift_endcap_cant_%d_%d"%(zsign,k),
+            (x,-.234,zz),(.068,.004,.008),shadow,sh,.001,"fascia")
+        bar.rotation_euler[1]=-zsign*.21
 # Fans: modify existing 27 blades: non-uniform aerofoil camber thickness, no animation anchor changes.
 for fan_i,(cx,fan_name) in enumerate(zip((-.94,0,.94),("FAN_LEFT","FAN_CENTER","FAN_RIGHT"))):
     node=N[fan_name]
@@ -283,7 +313,7 @@ for x in (-1.24,.55):
 # Build physically separated substrate layers in package; sit inside inherited GPU_DIE anchor.
 box("GPU_substrate_lip",(-.30,.041,0),(.39,.004,.392),bronze,die,.003,"silicon")
 box("GPU_die_edge_land",(-.30,.019,0),(.323,.002,.323),bearing,die,.002,"silicon")
-printed("die_package_identifier","NAVI44",(-.427,.015,-.045),.032,die)
+printed("die_package_identifier","AMD",(-.427,.015,-.080),.028,die)
 for k,(mx,mz) in enumerate(((-.78,-.31),(-.78,.29),(.18,-.31),(.18,.29))):
     printed("memory_laser_%d"%k,"GDDR6",(mx-.086,.029,mz-.02),.025,vram)
 # IO and power socket exterior should have structural mouth rather than black decals.
@@ -334,15 +364,15 @@ def softbox(name,loc,power,size):
     ob.location=loc;aim(ob,(0,0,0))
 for x in list(bpy.context.scene.objects):
     if x.type=="LIGHT":bpy.data.objects.remove(x,do_unlink=True)
-softbox("P5_Key",(-1.8,-3.1,2.3),1100,3.8)
-softbox("P5_Fill",(2.8,-1.7,1.5),650,3)
-softbox("P5_Rim",(1.5,2.4,2.6),1400,2.8)
+softbox("P5_Key",(-1.8,-3.1,2.3),470,3.8)
+softbox("P5_Fill",(2.8,-1.7,1.5),235,3)
+softbox("P5_Rim",(1.5,2.4,2.6),620,2.8)
 cam_d=bpy.data.cameras.new("P5_Camera")
 camera=bpy.data.objects.new("P5_Camera",cam_d)
 bpy.context.scene.collection.objects.link(camera)
 bpy.context.scene.camera=camera;cam_d.type="ORTHO"
 scene=bpy.context.scene
-scene.render.engine="CYCLES";scene.cycles.samples=14
+scene.render.engine="CYCLES";scene.cycles.samples=24
 scene.cycles.use_denoising=False
 # Ubuntu Blender 4.0 native CPU build excludes OpenImageDenoise; fail-safe no denoising.
 for layer in scene.view_layers:
@@ -355,7 +385,7 @@ try:
     scene.view_settings.view_transform="AgX"
     scene.view_settings.look="Medium High Contrast"
 except Exception:pass
-scene.view_settings.exposure=-.06
+scene.view_settings.exposure=-.20
 # Export MODEL ONLY; exclude proof cameras/lights and no visibility/hidden cutaway.
 for o in bpy.context.scene.objects:o.select_set(False)
 export_objs=[o for o in bpy.context.scene.objects if o.name!="P5_Camera" and o.type not in ("CAMERA","LIGHT")]
@@ -369,34 +399,34 @@ assert out_glb.is_file() and out_glb.stat().st_size>100000
 modelsha=hashlib.sha256(out_glb.read_bytes()).hexdigest()
 # Render native stills. Proof-only hidden geometry is restored for every image.
 all_mesh=[o for o in bpy.context.scene.objects if o.type=="MESH"]
-def view(name,eye,target=(0,0,0),ortho=3.65,hide=(),resolution=(960,640),samples=14):
-    for ob in all_mesh:ob.hide_render=False
+def belongs_to(ob,anchor_name):
+    """Visibility cuts use the actual motion hierarchy, not unreliable name substrings."""
+    parent=N[anchor_name]
+    cur=ob
+    while cur is not None:
+        if cur==parent:return True
+        cur=cur.parent
+    return False
+def view(name,eye,target=(0,0,0),ortho=3.65,groups=(),resolution=(960,640),samples=24):
+    # A group-only view exposes *actual exported geometry*, without the common
+    # mistake of leaving shroud stators floating in PCB/thermal product photographs.
     for ob in all_mesh:
-        if any(ob.name.startswith(s) for s in hide):ob.hide_render=True
+        ob.hide_render=bool(groups) and not any(belongs_to(ob,g) for g in groups)
     camera.location=eye;aim(camera,target);cam_d.ortho_scale=ortho
     scene.render.resolution_x,scene.render.resolution_y=resolution
     scene.cycles.samples=samples
     scene.render.filepath=str(OUT/name)
     bpy.ops.render.render(write_still=True)
     assert (OUT/name).stat().st_size>7000,name
-# Objects start assembled; hide only selected exterior meshes when revealing internal parts.
-hide_front=("Swift_", "Monolithic_", "P4_Shroud_", "P5_shoulder_", "P5_upper_fascia_", "P5_vent_",
-            "P5_perimeter_", "P5_fan_well_", "P5_stator_", "Integrated_","Fan_", "BroadRotorBlade_", "OpenSCAD_FanHub_",
-            "P3_Stator_", "P4_Hub_", "P4_Center_", "P5_fan_","P5_rotor_", "RADEON_", "XFX_")
-hide_cooler=hide_front+("P3_L_fin_","P3_C_fin_","P3_R_fin_","P3_FinLeadingFold_","P5_genuine_",
-                       "P5_cooler_","P5_fin_stack_","P3_FinBank_","P3_Endplate_", "P4_Shroud_")
-hide_pcb=hide_cooler+("P3_Heatpipe_", "P3_Pipe_", "P4_Nickel_heatpipe_","P5_pipe_",
-                      "P3_Heatspreader_","P3_Copper_contact_","Nickel_cold_",
-                      "P5_coldplate_", "Backplate_", "P3_Exhaust_", "P5_rear_outlet_")
 view("01_assembled.png",(3.2,-5.0,2.1))
 view("02_fans_and_shroud_macro.png",(.95,-3.0,.70),(.89,-.20,.04),1.38)
 view("03_rear_three_quarter.png",(2.8,4.9,2.5),(.0,0,0),3.7)
-view("04_heatsink_macro.png",(.35,-2.8,1.25),(.12,-.07,0),1.82,hide=hide_front)
-view("05_heatpipe_coldplate_macro.png",(-.15,-2.2,1.18),(-.25,-.018,0),1.35,hide=hide_cooler)
-view("06_populated_pcb.png",(-.05,-2.6,1.4),(-.32,.05,0),2.55,hide=hide_pcb)
-view("07_gpu_vram_macro.png",(-.36,-1.7,.68),(-.30,.046,0),1.04,hide=hide_pcb)
-view("08_vrm_macro.png",(.57,-1.65,.63),(.37,.05,0),1.04,hide=hide_pcb)
-view("09_backplate_macro.png",(.3,2.2,1.1),(.10,.23,0),2.2)
+view("04_heatsink_macro.png",(.35,-2.8,1.25),(.12,-.07,0),1.82,groups=("HEATSINK",))
+view("05_heatpipe_coldplate_macro.png",(-.15,-2.2,1.18),(-.25,-.018,0),1.35,groups=("HEATPIPE_BUNDLE","COLD_PLATE"))
+view("06_populated_pcb.png",(-.05,-2.6,1.4),(-.32,.05,0),2.55,groups=("PCB_ASSEMBLY",))
+view("07_gpu_vram_macro.png",(-.36,-1.7,.68),(-.30,.046,0),1.04,groups=("PCB_ASSEMBLY",))
+view("08_vrm_macro.png",(.57,-1.65,.63),(.37,.05,0),1.04,groups=("PCB_ASSEMBLY",))
+view("09_backplate_macro.png",(.3,2.2,1.1),(.10,.23,0),2.2,groups=("BACKPLATE",))
 # Exploded proof poses must only translate canonical anchors; do not bake those poses into GLB.
 explode=[("FAN_LEFT",(-.18,-.93,0)),("FAN_CENTER",(0,-1.00,0)),
          ("FAN_RIGHT",(.18,-.93,0)),("FRONT_SHROUD",(0,-.33,0)),
