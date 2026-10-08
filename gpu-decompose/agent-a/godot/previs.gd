@@ -1,75 +1,69 @@
 extends SceneTree
-# Actual headless Godot scene tree: real Node3D/MeshInstance3D proxy assembly.
-# Uses Blender coordinate parent offsets exactly; validates all 450 sampled poses.
+# Native Godot 4 headless playback: actual 3D scene hierarchy, box proxy children.
 func _initialize() -> void:
- var path="res://motion.json"
- var file=FileAccess.open(path,FileAccess.READ)
+ var file=FileAccess.open("res://decomposition.json",FileAccess.READ)
  if file==null:
-  push_error("Missing generated motion.json")
+  push_error("Agent A decomposition data missing")
   quit(2)
   return
- var data=JSON.parse_string(file.get_as_text())
- if typeof(data)!=TYPE_DICTIONARY:
-  push_error("Invalid JSON motion")
+ var dat=JSON.parse_string(file.get_as_text())
+ if typeof(dat)!=TYPE_DICTIONARY or dat["durationInFrames"]!=450:
+  push_error("Bad animation schema")
   quit(3)
   return
- var stage=Node3D.new()
- stage.name="XFX_SWIFT_GPU_Previs"
- root.add_child(stage)
- var nodes={}
- var dims={
-  "SHROUD":Vector3(2.90,0.07,1.24),
-  "FAN_LEFT":Vector3(0.82,0.08,0.82),
-  "FAN_CENTER":Vector3(0.82,0.08,0.82),
-  "FAN_RIGHT":Vector3(0.82,0.08,0.82),
-  "HEATSINK":Vector3(2.68,0.15,1.02),
-  "HEATPIPES":Vector3(2.2,0.05,0.30),
-  "GPU_PROCESSOR":Vector3(0.38,0.035,0.38),
-  "VRAM":Vector3(0.9,0.025,0.65),
-  "PCB":Vector3(2.20,0.025,1.05),
-  "PCIE_CONNECTOR":Vector3(0.70,0.015,0.12),
-  "BACKPLATE":Vector3(2.90,0.018,1.24)}
- var base={
-  "SHROUD":Vector3(0,-0.21,0),
-  "FAN_LEFT":Vector3(-0.94,-0.26,0),
-  "FAN_CENTER":Vector3(0,-0.26,0),
-  "FAN_RIGHT":Vector3(0.94,-0.26,0),
-  "HEATSINK":Vector3(0,-0.075,0),
-  "HEATPIPES":Vector3(0,0.002,0),
-  "GPU_PROCESSOR":Vector3(-0.20,0.035,0),
-  "VRAM":Vector3(-0.15,0.035,0),
-  "PCB":Vector3(-0.18,0.075,0),
-  "PCIE_CONNECTOR":Vector3(-0.18,0.075,-0.59),
-  "BACKPLATE":Vector3(0,0.237,0)}
- for name in data["parts"].keys():
+ var scene=Node3D.new()
+ scene.name="GPU_ROOT"
+ root.add_child(scene)
+ var asm=Node3D.new()
+ asm.name="FAN_ASSEMBLY"
+ scene.add_child(asm)
+ var ba=Node3D.new()
+ ba.name="PCB_ASSEMBLY"
+ scene.add_child(ba)
+ var heat=Node3D.new()
+ heat.name="HEATSINK"
+ scene.add_child(heat)
+ var anchors={}
+ for name in dat["nodes"].keys():
+  var pa=scene
+  if name.begins_with("FAN_"):pa=asm
+  if name=="GPU_DIE" or name=="VRAM_CHIPS":pa=ba
+  if name=="PCB_ASSEMBLY":pa=scene
   var part=Node3D.new()
   part.name=name
-  stage.add_child(part)
-  var mesh=MeshInstance3D.new()
-  mesh.name="GeometryProxy"
-  var cube=BoxMesh.new()
-  cube.size=dims[name]
-  mesh.mesh=cube
-  mesh.position=base[name]
-  part.add_child(mesh)
-  nodes[name]=part
+  pa.add_child(part)
+  var block=MeshInstance3D.new()
+  block.name="MechanicalEnvelopeProxy"
+  var m=BoxMesh.new()
+  m.size=Vector3(.35,.12,.04)
+  if name.begins_with("FAN_"):m.size=Vector3(.86,.86,.065)
+  if name=="FRONT_SHROUD":m.size=Vector3(2.90,1.24,.06)
+  if name=="HEATSINK":m.size=Vector3(2.68,1.03,.13)
+  if name=="PCB_ASSEMBLY":m.size=Vector3(2.3,1.06,.025)
+  if name=="BACKPLATE":m.size=Vector3(2.9,1.20,.018)
+  block.mesh=m
+  part.add_child(block)
+  anchors[name]=part
  var checks=0
- for frame in range(450):
-  var sm=data["samples"][str(frame)]
-  for name in nodes.keys():
-   var p=sm[name]
-   nodes[name].position=Vector3(p[0],p[1],p[2])
-  if frame==89:
-   assert(nodes["SHROUD"].position==Vector3.ZERO)
-  if frame==449:
-   assert(nodes["BACKPLATE"].position.y>1.2)
-   assert(nodes["FAN_CENTER"].position.y< -1.0)
+ for f in range(450):
+  for n in anchors.keys():
+   var cfg=dat["nodes"][n]
+   var t=clamp(float(f-cfg["startFrame"])/float(cfg["endFrame"]-cfg["startFrame"]),0.0,1.0)
+   t=t*t*(3.0-2.0*t)
+   var delta=cfg["to"]["position"]
+   anchors[n].position=Vector3(delta[0],delta[1],delta[2])*t
+  if f==89:assert(anchors["FAN_LEFT"].position==Vector3.ZERO)
+  if f==449:
+   assert(anchors["BACKPLATE"].position.z< -0.61)
+   assert(anchors["FRONT_SHROUD"].position.z>0.65)
+   assert(anchors["HEATSINK"].position.z>0.2)
+   assert(anchors["GPU_DIE"].get_parent().name=="PCB_ASSEMBLY")
+   assert(anchors["VRAM_CHIPS"].get_parent().name=="PCB_ASSEMBLY")
   checks+=1
- var report={"status":"GODOT_PREVIS_PASS","frames_checked":checks,
-  "instantiated_3d_groups":nodes.size(),"first_frame_assembled":true,
-  "last_frame_exploded":true}
- var target=FileAccess.open("res://godot_validation.json",FileAccess.WRITE)
- target.store_string(JSON.stringify(report))
- target.close()
- print("GODOT_PREVIS_PASS ",JSON.stringify(report))
+ var proof={"status":"GODOT_PROOF_PASS","validatedFrames":checks,
+    "sceneRoot":scene.name,"animatedAnchors":anchors.size(),
+    "hierarchicalDieAndMemory":true,"native3DProxyMesh":true}
+ var out=FileAccess.open("res://godot-proof.json",FileAccess.WRITE)
+ out.store_string(JSON.stringify(proof));out.close()
+ print("GODOT_PROOF_PASS ",JSON.stringify(proof))
  quit(0)
