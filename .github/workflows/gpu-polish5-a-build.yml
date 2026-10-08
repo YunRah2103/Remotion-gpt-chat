@@ -65,11 +65,11 @@ jobs:
         run: |
           set -euo pipefail
           sudo env DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get update -qq
-          sudo env DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get install -y -qq blender ffmpeg python3-venv
+          sudo env DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get install -y -qq blender ffmpeg python3-venv python3-numpy
           python3 -m venv /tmp/p5-venv
           /tmp/p5-venv/bin/python -m pip -q install --disable-pip-version-check \
             numpy==1.26.4 trimesh==4.11.1 Pillow==11.1.0
-          blender -b -noaudio -t 3 --python-expr 'import bpy; print("BLENDER_NATIVE", bpy.app.version_string)'
+          blender -b -noaudio -t 3 --python-expr 'import bpy,numpy; print("BLENDER_NATIVE", bpy.app.version_string, "numpy", numpy.__version__)'
       - name: True 3D hardware upgrade, 10 Cycles macro images, 18 animated frames, GLB and blend
         shell: bash
         run: |
