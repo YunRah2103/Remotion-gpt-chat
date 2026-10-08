@@ -37,8 +37,8 @@ jobs:
           test -s gpu-decompose/agent-a/fan_hub.stl
           python gpu-decompose/agent-a/generate_motion.py
           python gpu-decompose/agent-a/test_motion.py
-          cp gpu-decompose/polish3/assets/decomposition.json gpu-decompose/polish4/hardware/assets/decomposition.json
-          sha256sum gpu-decompose/polish4/hardware/assets/decomposition.json
+          cp gpu-decompose/polish3/assets/decomposition.json gpu-decompose/polish4/hardware/assets/PROOF_ONLY_POLISH03_MOTION.json
+          sha256sum gpu-decompose/polish4/hardware/assets/PROOF_ONLY_POLISH03_MOTION.json
       - name: Native Blender model, full GPU and seven macro/sectional views
         run: |
           set -euo pipefail
