@@ -1,0 +1,25 @@
+name: GPU Decomposition - GitHub Action workflow lint
+on:
+  push:
+    branches: [gpu-decompose/b-director]
+    paths:
+      - '.github/workflows/gpu-decomposition*.yml'
+permissions:
+  contents: read
+jobs:
+  actionlint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+      - name: Validate production workflows without touching finished videos
+        run: |
+          set -euo pipefail
+          go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
+          "$(go env GOPATH)/bin/actionlint" -color .github/workflows/gpu-decomposition-director.yml .github/workflows/gpu-decomposition-release.yml .github/workflows/gpu-decomposition-approved-release.yml .github/workflows/gpu-decomposition-overlays.yml .github/workflows/gpu-decomposition-lint.yml
+          echo ACTIONLINT_GPU_WORKFLOWS_PASS
