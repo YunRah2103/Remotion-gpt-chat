@@ -128,7 +128,7 @@ export const GpuDecompositionPolish3:React.FC=()=>{
   <div style={{position:'absolute',bottom:319,left:70,right:70,opacity:stageAlpha,display:'flex',alignItems:'flex-end',justifyContent:'space-between',gap:20,pointerEvents:'none'}}>
    <div>
     <div style={{fontSize:19,fontWeight:700,letterSpacing:3.3,color:'#bccbd7',marginBottom:13}}>{stage.id}</div>
-    <div style={{fontSize:33,fontWeight:800,letterSpacing:1.1,lineHeight:1.1}}>{stage.name}</div>
+    <div style={{fontSize:f>=330?68:33,fontWeight:800,letterSpacing:f>=330?1.8:1.1,lineHeight:1.1}}>{stage.name}</div>
     <div style={{fontSize:18,fontWeight:600,letterSpacing:2,color:'#c0cbd5',marginTop:11}}>{stage.detail}</div>
    </div>
    <div style={{fontSize:20,fontWeight:700,letterSpacing:2,color:'#cbd7e0',whiteSpace:'nowrap'}}>{String(Math.floor(f/30)).padStart(2,'0')} / 15</div>
