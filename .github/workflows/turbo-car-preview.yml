@@ -34,12 +34,12 @@ jobs:
       - name: Three separate genuine moving WebGL car preview sequences
         run: |
           mkdir -p out
-          npx remotion render src/index.ts TurboDocumentary out/opening-v2.mp4 --frames=30-74 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
-          npx remotion render src/index.ts TurboDocumentary out/return-v2.mp4 --frames=652-696 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
-          npx remotion render src/index.ts TurboDocumentary out/hero-v2.mp4 --frames=770-814 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          npx remotion render src/index.ts TurboDocumentary out/opening-v2.mp4 --frames=30-53 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          npx remotion render src/index.ts TurboDocumentary out/return-v2.mp4 --frames=652-675 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          npx remotion render src/index.ts TurboDocumentary out/hero-v2.mp4 --frames=770-793 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
           for name in opening return hero; do
             ffmpeg -hide_banner -loglevel error -xerror -i out/$name-v2.mp4 -f null -
-            ffmpeg -hide_banner -loglevel error -y -ss .7 -i out/$name-v2.mp4 -frames:v 1 -update 1 out/$name-middle.png
+            ffmpeg -hide_banner -loglevel error -y -ss 0.4 -i out/$name-v2.mp4 -frames:v 1 -update 1 out/$name-middle.png
           done
       - name: True full-resolution proof stills
         run: |
