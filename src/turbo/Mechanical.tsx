@@ -1,4 +1,5 @@
-import React, {useMemo} from 'react';
+import React, {useEffect,useMemo} from 'react';
+import {useThree} from '@react-three/fiber';
 import * as THREE from 'three';
 import {PremiumCar} from './PremiumCar';
 
@@ -8,15 +9,58 @@ const amber = '#ffb25f';
 const steel = '#bcc8c7';
 const M:React.FC<{color:string;emissive?:string;roughness?:number;metalness?:number;opacity?:number}>=({color,emissive,roughness=.32,metalness=.72,opacity=1})=><meshPhysicalMaterial color={color} emissive={emissive} emissiveIntensity={emissive?1.3:0} metalness={metalness} roughness={roughness} clearcoat={.65} transparent={opacity<1} opacity={opacity} side={THREE.DoubleSide}/>;
 
+/**
+ * Studio-style original reflection map, generated from pixels locally.
+ * No external HDRI, paid files, or YUNEX dependencies.
+ * Reflective car paint needs environment energy as well as direct light.
+ */
+const RoadReflections:React.FC=()=>{
+ const {scene}=useThree();
+ const texture=useMemo(()=>{
+   const w=512,h=256;
+   const pixels=new Uint8Array(w*h*4);
+   for(let y=0;y<h;y++){
+     const lat=y/(h-1);
+     for(let x=0;x<w;x++){
+       const lon=x/(w-1);
+       const above=lat<.51;
+       const horizon=Math.max(0,1-Math.abs(lat-.49)*2.3);
+       let r=above?148+Math.round(72*horizon):24+Math.round(47*horizon);
+       let g=above?180+Math.round(56*horizon):38+Math.round(51*horizon);
+       let b=above?210+Math.round(36*horizon):52+Math.round(55*horizon);
+       // Large architectural softboxes reflected in body panels.
+       const boxA=(lon>.08&&lon<.23&&lat>.23&&lat<.57);
+       const boxB=(lon>.54&&lon<.77&&lat>.16&&lat<.44);
+       const strip=(lon>.32&&lon<.51&&lat>.43&&lat<.46);
+       if(boxA||boxB||strip){r=247;g=248;b=247;}
+       const idx=(y*w+x)*4;
+       pixels[idx]=r;pixels[idx+1]=g;pixels[idx+2]=b;pixels[idx+3]=255;
+     }
+   }
+   const t=new THREE.DataTexture(pixels,w,h,THREE.RGBAFormat);
+   t.colorSpace=THREE.SRGBColorSpace;
+   t.mapping=THREE.EquirectangularReflectionMapping;
+   t.needsUpdate=true;
+   return t;
+ },[]);
+ useEffect(()=>{
+   const prior=scene.environment;
+   scene.environment=texture;
+   scene.environmentIntensity=1.25;
+   return ()=>{scene.environment=prior;texture.dispose();};
+ },[scene,texture]);
+ return null;
+};
 export const RoadWorld:React.FC<{frame:number;hero?:boolean}>=({frame,hero=false})=>{
  const scroll=frame*(hero?.63:.43);
  return <group>
+  <RoadReflections/>
   <color attach="background" args={['#09141d']}/>
   <fog attach="fog" args={['#09141d',17,89]}/>
   <hemisphereLight args={['#d6edf4','#213b42',3.1]}/>
-  <ambientLight intensity={.32}/>
+  <ambientLight intensity={.98}/>
   <directionalLight position={[-8,13,-6]} intensity={4.8} castShadow shadow-mapSize-width={2048} shadow-mapSize-height={2048} shadow-camera-left={-14} shadow-camera-right={14} shadow-camera-top={15} shadow-camera-bottom={-15}/>
-  <spotLight color="#78d9e5" position={[4,9,12]} intensity={65} angle={.65} penumbra={.65}/><spotLight color="#eef5ff" position={[-5,8,2]} intensity={45} angle={.68} penumbra={.65}/>
+  <spotLight color="#78d9e5" position={[4,9,12]} intensity={65} angle={.65} penumbra={.65}/><spotLight color="#e1f7ff" position={[-4,9,-9]} intensity={125} angle={.85} penumbra={.8}/><spotLight color="#eef5ff" position={[-5,8,2]} intensity={45} angle={.68} penumbra={.65}/>
   <mesh rotation={[-Math.PI/2,0,0]} receiveShadow position={[0,-.045,0]}><planeGeometry args={[180,180]}/><meshStandardMaterial color="#101b20" roughness={.9}/></mesh>
   <mesh rotation={[-Math.PI/2,0,0]} receiveShadow position={[0,-.034,0]}><planeGeometry args={[7.4,180]}/><meshStandardMaterial color="#263238" metalness={.08} roughness={.9}/></mesh>
   {[-3.59,3.59].map(x=><mesh key={x} position={[x,-.006,0]}><boxGeometry args={[.082,.014,180]}/><meshStandardMaterial color="#a7b9b9"/></mesh>)}
