@@ -67,6 +67,12 @@ def asset_check(directory,lock):
     for kind in ("scene","camera"):
         path=pathlib.Path(lock[kind+"SourcePath"])
         require(path.is_file() and digest(path)==lock[kind+"SourceSha256"],kind+" source mismatch")
+    # Prevent an apparently valid C JSON from being ignored by the B renderer.
+    # This integration intentionally enumerates all thirteen required anchors.
+    src=pathlib.Path(lock["sceneSourcePath"]).read_text()
+    missing_runtime=[name for name in MOVING if not re.search(r"['\\\"]"+re.escape(name)+r"['\\\"]",src)]
+    require(not missing_runtime,"runtime missing C mechanical tracks: "+str(missing_runtime))
+    require("polish03.glb" not in src.lower(),"final renderer contains forbidden old GLB fallback")
     doc=glb_document(glb)
     names=[n.get("name","") for n in doc.get("nodes",[])]
     counts=Counter(names)
