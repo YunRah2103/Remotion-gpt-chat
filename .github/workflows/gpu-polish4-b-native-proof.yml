@@ -1,0 +1,105 @@
+name: GPU POLISH04 B - native cinematic shot proof
+on:
+  push:
+    branches: [gpu-polish4/b-cinema]
+    paths:
+      - 'src/gpu-polish4/**'
+      - 'gpu-decompose/polish4/cinema/**'
+      - '.github/workflows/gpu-polish4-b-native-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  shots:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 130
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download POLISH03 only as temporary, provenance-locked B test fixture
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 37833031666
+          name: GPU-POLISH3-A-XFX-HARDWARE
+          github-token: ${{ github.token }}
+          path: out/provisional-a
+      - name: Check hashes and stage temporary B-only assets
+        run: |
+          set -euo pipefail
+          mkdir -p public/gpu-decompose/polish4 out/polish4-b-native
+          A=out/provisional-a/polish3/assets
+          echo '21f529ccbe7f4bb69f2df602f7f28b15ef06ba915151bba4468b44ef652097e5  '${A}'/xfx_swift_rx9060xt_polish3.glb' | sha256sum -c -
+          echo 'd70aae4a6f6d637ef93d6fbb9eee6a94be5b9a4e9a65c5c78ff9401fd086187b  '${A}'/decomposition.json' | sha256sum -c -
+          cp "$A/xfx_swift_rx9060xt_polish3.glb" public/gpu-decompose/polish4/xfx_swift_rx9060xt_polish4.glb
+          cp "$A/decomposition.json" public/gpu-decompose/polish4/decomposition.json
+          printf 'B-ONLY PROOF: This workflow uses SHA-locked POLISH03 GLB and motion temporarily.\\nDo not reuse these bytes for POLISH04 final release.\\n' > out/polish4-b-native/PROVISIONAL_SOURCE_WARNING.txt
+          sha256sum public/gpu-decompose/polish4/* > out/polish4-b-native/TEST_FIXTURE_SHA256SUMS.txt
+      - name: Install Remotion and perform real typecheck
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npm run check
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Native 1080x1920 Three.js stills for all contract shots
+        run: |
+          set -euo pipefail
+          for f in 0 30 60 100 135 180 225 270 310 365 415 449; do
+            npx remotion still src/gpu-polish4/proof-index.tsx GpuPolish4BProof \
+              "out/polish4-b-native/frame-$f.png" --frame="$f" --gl=swangle
+            test -s "out/polish4-b-native/frame-$f.png"
+          done
+      - name: Genuine moving 3D clips - every major optical phase
+        run: |
+          set -euo pipefail
+          for range in 20-27 61-68 101-108 167-174 228-235 285-292 351-358 423-430; do
+            npx remotion render src/gpu-polish4/proof-index.tsx GpuPolish4BProof \
+              "out/polish4-b-native/moving-$range.mp4" --frames="$range" \
+              --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
+            ffmpeg -v error -xerror -i "out/polish4-b-native/moving-$range.mp4" -f null -
+            test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames \
+              -of default=noprint_wrappers=1:nokey=1 "out/polish4-b-native/moving-$range.mp4")" = 8
+          done
+      - name: Download actual audio-polished POLISH03 baseline for frame-match comparison
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 37837671314
+          name: GPU-POLISH3-FINAL-450F-AUDIOPOLISHED
+          github-token: ${{ github.token }}
+          path: out/polish3-baseline
+      - name: Compare matched old/new native output and create review package
+        run: |
+          set -euo pipefail
+          BASE=out/polish3-baseline/XFX-SWIFT-RX9060XT-POLISH03-15S.mp4
+          echo '5a35ed33825395370bd4fe9c3b6092ed13b8ec6bdaa465d9977d1b80a2548e5d  '${BASE} | sha256sum -c -
+          for f in 30 100 225 310 415 449; do
+            ffmpeg -v error -y -i "$BASE" -vf "select=eq(n\\,$f)" -vsync vfr \
+              -frames:v 1 "out/polish4-b-native/previous-$f.png"
+            ffmpeg -v error -y -i "out/polish4-b-native/frame-$f.png" \
+              -i "out/polish4-b-native/previous-$f.png" \
+              -filter_complex "[0:v][1:v]hstack=inputs=2" \
+              -frames:v 1 "out/polish4-b-native/compare-$f.png"
+          done
+          (cd out/polish4-b-native && sha256sum frame-*.png moving-*.mp4 compare-*.png) \
+            > out/polish4-b-native/SHA256SUMS.txt
+          cat > out/polish4-b-native/READ_ME_FIRST.md <<EOF
+          # Agent B native proof; manager approval is still required
+          Source: $GITHUB_SHA
+          Pipeline: $GITHUB_RUN_ID
+          Assets: POLISH03 final A model, POLISH03 motion only.
+          View frame-{0,30,60,100,135,180,225,270,310,365,415,449}.png.
+          View all 8 native moving-*.mp4 and matched compare-*.png.
+          This is NOT the final POLISH04 hardware or mechanical motion.
+          EOF
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: GPU-POLISH4-B-CINEMA-NATIVE-PROOFS
+          path: out/polish4-b-native/
+          retention-days: 30
+          if-no-files-found: warn
