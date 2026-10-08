@@ -1,6 +1,6 @@
 {
   "contractVersion": "POLISH03-v1",
-  "status": "proofs",
+  "status": "release",
   "agentASha": "e5e274437a47b554af7940911e5a825397dc64f3",
   "agentBSha": "0eed29a86067bccd74c5d6e44eb116d2bcd4d95c",
   "modelArtifactRunId": 37833031666,
@@ -11,9 +11,9 @@
   "sceneSourceSha256": "30c33c9bb1d22e16d616b38afca8b181e5825fb66273cb4ea5f969b9f0c78879",
   "cameraSourceSha256": "ca69e6387932e4446117612e4ac133b92ecb14b7546f1e8e4d6eb5c13b367202",
   "exportSourceSha256": "546205e5b950fcb42f1d820408cceefa2107e053ed271d86103fd3364614bd69",
-  "renderApproved": false,
-  "approvedProofRunId": null,
-  "approvedProofArtifactId": null,
-  "independentVisualQa": "PENDING",
-  "sourceNotes": "C targeted post-integration visual correction: deterministic negative camera roll for more portrait use; first integrated old-C camera proof 37835252881 artifact 11575871182 inspected; more visual fill required before approval."
+  "renderApproved": true,
+  "approvedProofRunId": 37836009799,
+  "approvedProofArtifactId": 11575916990,
+  "independentVisualQa": "PASS",
+  "sourceNotes": "Manager independently viewed all nine native proof frames and moving clips from successful final-A rolled proof run 37836009799 artifact 11575916990, visually signed off at gpu-decompose/polish3/manager/C_NATIVE_VISUAL_SIGNOFF.md. Final release candidate still requires 450-frame whole-MP4 independent review."
 }
