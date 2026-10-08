@@ -1,12 +1,14 @@
 name: Turbo Documentary - native 3D previews and master
 on:
   push:
-    branches: [main]
+    branches: [main, fix/turbo-car-quality-v2]
     paths:
+      - '.github/workflows/turbo-documentary.yml'
       - 'src/turbo/**'
       - 'src/TurboDocumentary.tsx'
       - 'src/Root.tsx'
       - 'package.json'
+      - 'public/assets/**'
   workflow_dispatch:
 permissions:
   contents: read
