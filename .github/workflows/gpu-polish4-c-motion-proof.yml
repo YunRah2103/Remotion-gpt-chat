@@ -28,16 +28,16 @@ jobs:
           set -euo pipefail
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
-          python -m pip install --disable-pip-version-check numpy pybullet
+          python -m pip install --disable-pip-version-check numpy pybullet trimesh
           npm install --no-audit --no-fund
           npm run check
-      - name: Download approved POLISH03 A GLB for temporary C proof
+      - name: Download final POLISH04 A GLB for exact-model C proof
         uses: actions/download-artifact@v4
         with:
-          name: GPU-POLISH3-A-XFX-HARDWARE
-          run-id: 37833031666
+          name: GPU-POLISH4-A-XFX-HARDWARE
+          run-id: 37840656656
           github-token: ${{ github.token }}
-          path: out/polish03-source
+          path: out/polish04-source
       - name: Verify exact GLB SHA, stage owned motion and run mechanical checks
         shell: bash
         run: |
@@ -47,20 +47,22 @@ jobs:
           from pathlib import Path
           from shutil import copyfile
           import hashlib
-          files=list(Path("out/polish03-source").rglob("xfx_swift_rx9060xt_polish3.glb"))
+          files=list(Path("out/polish04-source").rglob("xfx_swift_rx9060xt_polish4.glb"))
           assert len(files)==1,files
           f=files[0]
-          assert hashlib.sha256(f.read_bytes()).hexdigest()=="21f529ccbe7f4bb69f2df602f7f28b15ef06ba915151bba4468b44ef652097e5"
-          copyfile(f,"public/gpu-decompose/xfx_swift_rx9060xt_polish3.glb")
+          assert hashlib.sha256(f.read_bytes()).hexdigest()=="edeeca54f6e9bf26127ed91b3debe16bae47f9c58cd9db0bf760927a0869882e"
+          copyfile(f,"public/gpu-decompose/xfx_swift_rx9060xt_polish4.glb")
           copyfile("gpu-decompose/polish4/motion/decomposition.json","public/gpu-decompose/decomposition.json")
-          print("PROOF_INPUT_MATCH POLISH03_LOCKED",f.stat().st_size)
+          print("PROOF_INPUT_MATCH POLISH04_A",f.stat().st_size)
           PY
           python3 gpu-decompose/polish4/motion/validate_motion.py | tee out/proof/motion-audit.txt
-          python3 gpu-decompose/polish4/motion/inspect_glb.py public/gpu-decompose/xfx_swift_rx9060xt_polish3.glb | tee out/proof/hierarchy-audit.txt
+          python3 gpu-decompose/polish4/motion/inspect_glb.py public/gpu-decompose/xfx_swift_rx9060xt_polish4.glb | tee out/proof/hierarchy-audit.txt
           cp gpu-decompose/polish4/motion/hierarchy_report.json out/proof/
+          python3 gpu-decompose/polish4/motion/mesh_aabb_audit.py public/gpu-decompose/xfx_swift_rx9060xt_polish4.glb | tee out/proof/mesh-aabb-audit.txt
+          cp gpu-decompose/polish4/motion/glb_mesh_aabb_report.json out/proof/
           python3 gpu-decompose/polish4/motion/clearance_pybullet.py | tee out/proof/proxy-audit.txt
           cp gpu-decompose/polish4/motion/clearance_report.json out/proof/
-          (cd public/gpu-decompose && sha256sum xfx_swift_rx9060xt_polish3.glb decomposition.json) > out/proof/SHA256SUMS.txt
+          (cd public/gpu-decompose && sha256sum xfx_swift_rx9060xt_polish4.glb decomposition.json) > out/proof/SHA256SUMS.txt
       - name: Actual motion using Remotion and loaded GLB (four MP4s)
         shell: bash
         run: |
@@ -89,11 +91,11 @@ jobs:
           set -euo pipefail
           cat > out/proof/PROOF_STATUS.md <<'EOF'
           POLISH04 Agent C mechanical previsualization, NOT the final master.
-          Geometry: real POLISH03 approved GLB, hash 21f529ccbe7f4bb69f2df602f7f28b15ef06ba915151bba4468b44ef652097e5.
+          Geometry: real Agent A POLISH04 GLB, hash edeeca54f6e9bf26127ed91b3debe16bae47f9c58cd9db0bf760927a0869882e.
           Cinematography: POLISH03 camera used for temporary motion context, not B's new work.
           Motion: exclusive POLISH04 C JSON from this exact branch.
           PyBullet: approximate major-part box proxies; NOT exact mesh collision proof.
-          Agent A's final POLISH04 GLB and B's POLISH04 camera MUST be checked again.
+          Agent A POLISH04 model checked here; B camera and D integrated real-render MUST be checked again.
           Human visual review required: workflow success alone cannot approve motion.
           EOF
           sha256sum out/proof/c-motion-*.mp4 > out/proof/CLIP_SHA256SUMS.txt
