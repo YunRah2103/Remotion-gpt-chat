@@ -1,0 +1,171 @@
+name: Creative Toolkit - real headless smoke tests
+
+on:
+  push:
+    branches:
+      - toolkit/creative-suite-20261008
+    paths:
+      - '.github/workflows/creative-toolkit.yml'
+      - 'toolkit/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  geometry-physics:
+    name: Blender + OpenSCAD + Godot + PyBullet
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install headless 3D tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq blender openscad ffmpeg unzip
+          python -m venv /tmp/creative-venv
+          /tmp/creative-venv/bin/python -m pip install --disable-pip-version-check 'numpy==1.26.4' 'pybullet==3.2.7'
+          curl -fLsS --retry 3 --retry-delay 4 'https://downloads.godotengine.org/?flavor=stable&platform=linux.64&slug=linux.x86_64.zip&version=4.7.2' -o /tmp/godot.zip
+          mkdir -p /tmp/godot-bin
+          unzip -q /tmp/godot.zip -d /tmp/godot-bin
+          find /tmp/godot-bin -maxdepth 1 -type f -name 'Godot*' -exec chmod +x {} \;
+      - name: OpenSCAD - export real CAD STL
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          mkdir -p toolkit/out
+          openscad -o toolkit/out/wheel-ring.stl toolkit/smoke/wheel_ring.scad 2>&1 | tee toolkit/out/openscad.log
+          test -s toolkit/out/wheel-ring.stl
+          openscad --version > toolkit/out/openscad-version.txt 2>&1
+          echo 'OPENSCAD_PASS' > toolkit/out/openscad.pass
+      - name: Godot - instantiate real 3D and physics nodes
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          GODOT=$(find /tmp/godot-bin -maxdepth 1 -type f -name 'Godot*' | head -n 1)
+          test -n "$GODOT"
+          "$GODOT" --headless --path toolkit/smoke/godot --script res://smoke.gd 2>&1 | tee toolkit/out/godot.log
+          grep -q GODOT_SMOKE_PASS toolkit/out/godot.log
+          "$GODOT" --version > toolkit/out/godot-version.txt
+          echo 'GODOT_PASS' > toolkit/out/godot.pass
+      - name: Blender - actual Cycles CPU render, encode and decode
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          blender -b -t 2 --python toolkit/smoke/blender_scene.py 2>&1 | tee toolkit/out/blender.log
+          test -s toolkit/out/blender-wheel.png
+          ffmpeg -hide_banner -loglevel error -y -loop 1 -framerate 12 -i toolkit/out/blender-wheel.png -t 1.25 -c:v libx264 -pix_fmt yuv420p toolkit/out/blender-preview.mp4
+          ffmpeg -v error -xerror -i toolkit/out/blender-preview.mp4 -f null -
+          blender --version > toolkit/out/blender-version.txt
+          echo 'BLENDER_PASS' > toolkit/out/blender.pass
+      - name: PyBullet - rigid body gravity and ground collision
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          /tmp/creative-venv/bin/python toolkit/smoke/pybullet_sim.py
+          test -s toolkit/out/physics.json
+          /tmp/creative-venv/bin/python -m pip show numpy pybullet > toolkit/out/pybullet-versions.txt
+          echo 'PYBULLET_PASS' > toolkit/out/pybullet.pass
+      - name: Confirm all four mechanical tools passed
+        if: always()
+        run: |
+          set -euo pipefail
+          for name in openscad godot blender pybullet; do
+            if [ ! -s "toolkit/out/$name.pass" ]; then
+              echo "::error::$name did not pass its real execution test"
+              exit 1
+            fi
+            cat "toolkit/out/$name.pass"
+          done
+      - name: Upload mechanical test proofs even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: creative-toolkit-mechanical
+          path: toolkit/out/
+          retention-days: 14
+          if-no-files-found: warn
+
+  manim:
+    name: Manim technical animation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Manim native libraries and Python
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg pkg-config build-essential python3-dev libcairo2-dev libpango1.0-dev
+          python -m venv /tmp/manim-venv
+          /tmp/manim-venv/bin/python -m pip install --disable-pip-version-check 'manim==0.21.0'
+      - name: Render and fully decode real animated MP4
+        run: |
+          set -euo pipefail
+          mkdir -p toolkit/out/manim
+          /tmp/manim-venv/bin/manim -ql --disable_caching --media_dir toolkit/out/manim toolkit/smoke/manim_scene.py SteeringSmoke
+          MOVIE=$(find toolkit/out/manim -type f -name '*.mp4' | head -n 1)
+          test -n "$MOVIE"
+          cp "$MOVIE" toolkit/out/manim-demo.mp4
+          ffmpeg -v error -xerror -i toolkit/out/manim-demo.mp4 -f null -
+          ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,nb_frames,width,height -of json toolkit/out/manim-demo.mp4 | tee toolkit/out/manim-probe.json
+          /tmp/manim-venv/bin/manim --version > toolkit/out/manim-version.txt
+      - name: Upload Manim movie
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: creative-toolkit-manim
+          path: toolkit/out/
+          retention-days: 14
+          if-no-files-found: warn
+
+  remotion-browser:
+    name: Remotion + Three.js + Playwright + FFmpeg
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install browser and pipeline tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          npm install --no-audit --no-fund
+          python -m venv /tmp/browser-venv
+          /tmp/browser-venv/bin/python -m pip install --disable-pip-version-check 'playwright==1.56.0'
+          /tmp/browser-venv/bin/python -m playwright install --with-deps chromium
+      - name: Test TypeScript + browser + two original WebGL frames
+        run: |
+          set -euo pipefail
+          mkdir -p toolkit/out
+          npm run check
+          /tmp/browser-venv/bin/python toolkit/smoke/playwright_ui.py
+          npx remotion compositions src/index.ts --gl=swangle > toolkit/out/compositions.txt
+          grep -q 'TurboDocumentary' toolkit/out/compositions.txt
+          npx remotion render src/index.ts GpuDriveFilm toolkit/out/remotion-smoke.mp4 --frames=0-1 --scale=0.25 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
+          ffmpeg -v error -xerror -i toolkit/out/remotion-smoke.mp4 -f null -
+          ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,nb_frames,width,height -of json toolkit/out/remotion-smoke.mp4 | tee toolkit/out/remotion-probe.json
+      - name: Upload existing stack proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: creative-toolkit-remotion-browser
+          path: toolkit/out/
+          retention-days: 14
+          if-no-files-found: warn
