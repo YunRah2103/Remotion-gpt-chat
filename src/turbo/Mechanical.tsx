@@ -53,30 +53,72 @@ const RoadReflections:React.FC=()=>{
 };
 export const RoadWorld:React.FC<{frame:number;hero?:boolean}>=({frame,hero=false})=>{
  const scroll=frame*(hero?.63:.43);
+ const asphalt=useMemo(()=>{
+   const w=128,h=128,bytes=new Uint8Array(w*h*4);
+   let seed=0x2d081a9;
+   for(let i=0;i<w*h;i++){
+     seed=(1664525*seed+1013904223)>>>0;
+     const noise=((seed>>>24)&255)/255;
+     const c=37+Math.round(noise*24);
+     bytes[i*4]=c;bytes[i*4+1]=c+3;bytes[i*4+2]=c+5;bytes[i*4+3]=255;
+   }
+   const tex=new THREE.DataTexture(bytes,w,h,THREE.RGBAFormat);
+   tex.colorSpace=THREE.SRGBColorSpace;
+   tex.wrapS=THREE.RepeatWrapping;tex.wrapT=THREE.RepeatWrapping;
+   tex.repeat.set(3,45);
+   tex.minFilter=THREE.LinearFilter;tex.magFilter=THREE.LinearFilter;
+   tex.needsUpdate=true;
+   return tex;
+ },[]);
+ useEffect(()=>()=>asphalt.dispose(),[asphalt]);
  return <group>
   <RoadReflections/>
-  <color attach="background" args={['#09141d']}/>
-  <fog attach="fog" args={['#09141d',17,89]}/>
-  <hemisphereLight args={['#d6edf4','#213b42',3.1]}/>
-  <ambientLight intensity={.98}/>
-  <directionalLight position={[-8,13,-6]} intensity={4.8} castShadow shadow-mapSize-width={2048} shadow-mapSize-height={2048} shadow-camera-left={-14} shadow-camera-right={14} shadow-camera-top={15} shadow-camera-bottom={-15}/>
-  <spotLight color="#78d9e5" position={[4,9,12]} intensity={65} angle={.65} penumbra={.65}/><spotLight color="#e1f7ff" position={[-4,9,-9]} intensity={125} angle={.85} penumbra={.8}/><spotLight color="#eef5ff" position={[-5,8,2]} intensity={45} angle={.68} penumbra={.65}/>
-  <mesh rotation={[-Math.PI/2,0,0]} receiveShadow position={[0,-.045,0]}><planeGeometry args={[180,180]}/><meshStandardMaterial color="#101b20" roughness={.9}/></mesh>
-  <mesh rotation={[-Math.PI/2,0,0]} receiveShadow position={[0,-.034,0]}><planeGeometry args={[7.4,180]}/><meshStandardMaterial color="#263238" metalness={.08} roughness={.9}/></mesh>
-  {[-3.59,3.59].map(x=><mesh key={x} position={[x,-.006,0]}><boxGeometry args={[.082,.014,180]}/><meshStandardMaterial color="#a7b9b9"/></mesh>)}
+  <color attach="background" args={['#0c1820']}/>
+  <fog attach="fog" args={['#0c1820',20,110]}/>
+  <hemisphereLight args={['#e0f0f9','#1d3137',3.2]}/>
+  <ambientLight intensity={.93}/>
+  <directionalLight position={[-8,13,-6]} intensity={4.4} castShadow shadow-mapSize-width={2048} shadow-mapSize-height={2048} shadow-camera-left={-16} shadow-camera-right={16} shadow-camera-top={17} shadow-camera-bottom={-17}/>
+  <spotLight color="#85e4f8" position={[5,10,12]} intensity={58} angle={.65} penumbra={.75}/>
+  <spotLight color="#f4f9ff" position={[-5,8,-5]} intensity={94} angle={.78} penumbra={.75}/>
+  <mesh rotation={[-Math.PI/2,0,0]} receiveShadow position={[0,-.046,0]}>
+    <planeGeometry args={[180,180]}/>
+    <meshStandardMaterial color="#15252b" roughness={1}/>
+  </mesh>
+  <mesh rotation={[-Math.PI/2,0,0]} receiveShadow position={[0,-.033,0]}>
+    <planeGeometry args={[7.6,180]}/>
+    <meshStandardMaterial map={asphalt} roughness={.92} metalness={.06}/>
+  </mesh>
+  {[-3.61,3.61].map(x=><mesh key={x} position={[x,-.007,0]}>
+   <boxGeometry args={[.105,.015,180]}/><meshStandardMaterial color="#b5c7c9" roughness={.73}/>
+  </mesh>)}
   {Array.from({length:26},(_,i)=>{
    const z=((i*6.6+scroll+77)%171)-88;
    return <group key={i}>
-    <mesh position={[0,-.004,z]}><boxGeometry args={[.10,.017,2.3]}/><meshStandardMaterial color="#ced7cf" roughness={.85}/></mesh>
-    {[-1,1].map(s=><group key={s}>
-      <mesh position={[s*4.3,.27,z]}><boxGeometry args={[.18,.38,2.9]}/><M color="#536a70" roughness={.52}/></mesh>
-      <mesh position={[s*4.3,.58,z]}><boxGeometry args={[.12,.1,4.2]}/><M color="#97c1c7" roughness={.4}/></mesh>
-      <mesh position={[s*10.6,1.5,z]}><coneGeometry args={[1.4,3.4,8]}/><meshStandardMaterial color={i%3?'#172f31':'#254044'} roughness={1}/></mesh>
-      <mesh position={[s*10.6,.45,z]}><cylinderGeometry args={[.13,.15,1,8]}/><M color="#162622" roughness={1}/></mesh>
+    <mesh position={[0,-.003,z]}><boxGeometry args={[.10,.018,2.55]}/><meshStandardMaterial color="#c6d1d0" roughness={.85}/></mesh>
+    {[-1,1].map(side=><group key={side}>
+      {/* Layered highway barrier with continuous-length rails and support uprights */}
+      <mesh position={[side*4.34,.36,z]} castShadow><boxGeometry args={[.13,.095,6.55]}/><M color="#788c95" roughness={.43}/></mesh>
+      <mesh position={[side*4.34,.70,z]} castShadow><boxGeometry args={[.11,.10,6.55]}/><M color="#9bb3ba" roughness={.34}/></mesh>
+      <mesh position={[side*4.34,.33,z]}><boxGeometry args={[.16,.66,.13]}/><M color="#5b747d" roughness={.47}/></mesh>
+      {/* Low modern sound wall, rather than oversized polygonal cones */}
+      <mesh position={[side*12.7,1.13,z]}><boxGeometry args={[.20,2.26,6.42]}/><meshStandardMaterial color={i%4===0?'#1e323c':'#20343d'} metalness={.24} roughness={.64}/></mesh>
+      <mesh position={[side*12.62,1.75,z]}><boxGeometry args={[.05,.044,6.5]}/><M color="#70868f" roughness={.49}/></mesh>
+      {i%5===0?<group>
+        <mesh position={[side*9.3,3.6,z]} castShadow><cylinderGeometry args={[.055,.08,7.2,8]}/><M color="#627982" roughness={.41}/></mesh>
+        <mesh position={[side*8.5,7.05,z]}><boxGeometry args={[1.85,.09,.22]}/><M color="#859ca6" roughness={.29}/></mesh>
+        <mesh position={[side*7.7,6.96,z]}><boxGeometry args={[.42,.04,.32]}/><meshStandardMaterial color="#e6e8dc" emissive="#a3d5ea" emissiveIntensity={2.5}/></mesh>
+      </group>:null}
     </group>)}
    </group>;
   })}
-  {Array.from({length:14},(_,i)=><mesh key={i} position={[i%2?24:-24,2.7,(i*16+scroll*.43)%230-130]} castShadow><dodecahedronGeometry args={[3.7+(i%3),1]}/><meshStandardMaterial color="#152930" roughness={1}/></mesh>)}
+  {Array.from({length:12},(_,i)=>{
+    const side=i%2?1:-1,z=((i*21+scroll*.27)%240)-128;
+    const width=5+(i%3)*1.6,height=6+(i%4)*1.8;
+    return <group key={i} position={[side*(23+i%3*4),0,z]}>
+      <mesh position={[0,height/2,0]} castShadow><boxGeometry args={[width,height,10+(i%3)*2]}/><meshStandardMaterial color={i%2?'#162a33':'#1a303a'} roughness={.83} metalness={.1}/></mesh>
+      {Array.from({length:4},(_,k)=><mesh key={k} position={[-side*width*.501,1.4+k*1.5,0]}><boxGeometry args={[.03,.10,7.8]}/><meshStandardMaterial color="#63808d" emissive="#315364" emissiveIntensity={.45}/></mesh>)}
+    </group>;
+  })}
   <PremiumCar frame={frame} hero={hero}/>
  </group>;
 };
