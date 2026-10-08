@@ -95,9 +95,9 @@ def augment(g):
                     modifier.width=.0024;modifier.segments=3
         # Concentric mould line and metal insert around the existing true CAD hub.
         torus("P4_Hub_outer_tooling_ring_%d"%i,
-              (cx,-.250,.025),.126,.0034,gunmetal,node)
+              (cx,-.247,.025),.126,.0034,gunmetal,node)
         torus("P4_Hub_inset_rubber_gasket_%d"%i,
-              (cx,-.253,.025),.107,.0023,gasket,node)
+              (cx,-.248,.025),.107,.0023,gasket,node)
         cylinder("P4_Center_matte_insert_%d"%i,
                  (cx,-.249,.025),.066,.003,g["hubmat"],node,48)
         # No extra full opaque discs: cooling wells remain open to the fins.
