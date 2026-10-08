@@ -26,6 +26,19 @@ assert "M_DARK_RECESSED_FAN_WELL" in materials
 assert sum(1 for n in nodes if n.startswith("OpenSCAD_FanHub_"))==3
 assert sum(1 for n in nodes if n.startswith("BroadRotorBlade_"))==27
 assert "M_MONOLITHIC_XFX_FASCIA" in materials
+# Polish 03 structural assertions: recognizable hardware, not object spam.
+assert len([n for n in nodes if n.startswith("P3_L_fin_")])==27
+assert len([n for n in nodes if n.startswith("P3_C_fin_")])==27
+assert len([n for n in nodes if n.startswith("P3_R_fin_")])==27
+assert sum(n.startswith("P3_Heatpipe_") for n in nodes)==6
+assert sum(n.startswith("P3_Regulator_inductor_") for n in nodes)==5
+assert sum(n.startswith("P3_VRM_bulk_cap_body_") for n in nodes)==8
+assert sum(n.startswith("P3_Stator_open_well_ring_") for n in nodes)==3
+assert not any(n.startswith("Recessed_black_cooler_well_") for n in nodes)
+assert "M_P3_FIN_FOLDED_ALUMINIUM" in materials
+assert "M_P3_COPPER_WINDING" in materials
+assert "P3_GPU_BGA_footprint" in nodes
+
 motion=json.loads((root/"decomposition.json").read_text())
 assert motion["durationInFrames"]==450 and motion["fps"]==30
 assert set(motion["nodes"])<=nodes
