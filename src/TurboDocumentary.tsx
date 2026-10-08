@@ -28,8 +28,8 @@ const Direction:React.FC<{frame:number;stage:number}>=({frame,stage})=>{
  useLayoutEffect(()=>{
   const t=frame-sceneStart[stage];
   if(stage===0){
-   camera.position.set(pos(t,[0,65,149],[5.3,4.8,3.2]),pos(t,[0,149],[2.35,2.3]),pos(t,[0,75,149],[8.7,7.5,4.9]));
-   camera.lookAt(0,.67,-.1);
+   camera.position.set(pos(t,[0,65,149],[6.5,6.1,4.8]),pos(t,[0,149],[2.85,2.42]),pos(t,[0,75,149],[12.8,10.6,8.7]));
+   camera.lookAt(0,.75,0);
   }else if(stage===1){
    camera.position.set(pos(t,[0,149],[3.2,2.2]),pos(t,[0,149],[2.2,1.4]),pos(t,[0,149],[7.7,5.8]));
    camera.lookAt(-.8,.1,0);
@@ -40,8 +40,8 @@ const Direction:React.FC<{frame:number;stage:number}>=({frame,stage})=>{
    camera.position.set(pos(t,[0,90,179],[5.1,6.5,6.4]),pos(t,[0,179],[1.9,2.9]),pos(t,[0,179],[8.3,7.5]));
    camera.lookAt(pos(t,[0,179],[1.1,3]),0,0);
   }else{
-   camera.position.set(pos(t,[0,110,209],[6.9,7.4,5.8]),pos(t,[0,110,209],[2.8,3.2,2.25]),pos(t,[0,110,209],[12.7,13,9.0]));
-   camera.lookAt(0,.63,0);
+   camera.position.set(pos(t,[0,110,209],[8.1,7.7,5.6]),pos(t,[0,110,209],[3.1,2.7,2.36]),pos(t,[0,110,209],[15,13,9.9]));
+   camera.lookAt(0,.77,0);
   }
   camera.updateProjectionMatrix();
  },[camera,frame,stage]);
