@@ -6,19 +6,19 @@ A **28-second, 1080 × 1920, 30 fps, 840-frame** original automotive mini-docume
 
 The film follows the vehicle on a road, exhaust turbine, linked common shaft, fresh-air compressor/intercooler, and return to driving. Bodywork is an original parametric/lofted 3D mesh. Mechanical components include the two rotating bladed wheels, shaft, turbine housing, pipework, dynamic flow markers and intercooler. This is procedural/stylized CGI, **not an imported photoreal CAD vehicle**.
 
-**Composition:** \`TurboDocumentary\` in \`src/Root.tsx\`
+**Composition:** `TurboDocumentary` in `src/Root.tsx`
 
-**Scene director:** \`src/TurboDocumentary.tsx\`
+**Scene director:** `src/TurboDocumentary.tsx`
 
-**Original 3D models/worlds:** \`src/turbo/Mechanical.tsx\`
+**Original 3D models/worlds:** `src/turbo/Mechanical.tsx`
 
-**Source independence:** no code, models or assets from \`YunRah2103/yunus-video-lab\` or YUNEX; the prior short \`GpuDriveFilm\` remains in this repository as a separate composition.
+**Source independence:** no code, models or assets from `YunRah2103/yunus-video-lab` or YUNEX; the prior short `GpuDriveFilm` remains in this repository as a separate composition.
 
 ### Workflows
 
-- \`.github/workflows/turbo-documentary.yml\` checks TypeScript and composition registration, renders four moving native WebGL previews, produces seven 120-frame full-resolution chunks in parallel, assembles an AAC soundtrack and H264 MP4, forces limited-range yuv420p, decodes the entire file and validates 840 frames.
-- \`.github/workflows/turbo-release.yml\` publishes the verified 840-frame master using previously successful native chunks (release source run \`37776329123\`, final successful release run \`37777361493\`). Download the artifact named \`TURBOCHARGER-FINAL-840F-YUV420P\` from the release run.
-- GPU note: CI uses **software-backed** WebGL through \`--gl=swangle\`. This is genuine 3D geometry and animation but **not** hardware-GPU acceleration. A self-hosted GPU experiment for the older prototype exists separately.
+- `.github/workflows/turbo-documentary.yml` checks TypeScript and composition registration, renders four moving native WebGL previews, produces seven 120-frame full-resolution chunks in parallel, assembles an AAC soundtrack and H264 MP4, forces limited-range yuv420p, decodes the entire file and validates 840 frames.
+- `.github/workflows/turbo-release.yml` publishes the verified 840-frame master using previously successful native chunks (release source run `37776329123`, final successful release run `37777361493`). Download the artifact named `TURBOCHARGER-FINAL-840F-YUV420P` from the release run.
+- GPU note: CI uses **software-backed** WebGL through `--gl=swangle`. This is genuine 3D geometry and animation but **not** hardware-GPU acceleration. A self-hosted GPU experiment for the older prototype exists separately.
 
 ### Audio and editorial limitations
 
@@ -26,11 +26,11 @@ The narration supplied in the documentary brief is represented as precisely sche
 
 ### Local setup
 
-\`\`\`bash
+```bash
 npm install
 npm run check
 npm run studio
 npx remotion render src/index.ts TurboDocumentary out/turbo-visual.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p
-\`\`\`
+```
 
-For a rigorously validated final master use the GitHub workflows, which include audio, correct the full-range WebGL colour encoding to limited-range \`yuv420p\`, and run FFprobe plus a complete decode.
+For a rigorously validated final master use the GitHub workflows, which include audio, correct the full-range WebGL colour encoding to limited-range `yuv420p`, and run FFprobe plus a complete decode.
