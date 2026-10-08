@@ -77,7 +77,7 @@ def box(name,loc,dims,ma,parent,bev=0):
  if bev:
   mod=ob.modifiers.new("soft machined edges","BEVEL");mod.width=bev;mod.segments=2
   if hasattr(mod,"affect"):mod.affect="EDGES"
-  ob.modifiers.new("weighted normals","WEIGHTED_NORMAL")
+  # Explicit flat machined bevel; no Auto Smooth-dependent weighted-normal modifier.
  return ob
 def cylinder(name,loc,r,dep,ma,parent,verts=48):
  bpy.ops.mesh.primitive_cylinder_add(vertices=verts,radius=r,depth=dep,location=loc,rotation=(math.pi/2,0,0))

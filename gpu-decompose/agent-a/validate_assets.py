@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Validate GLB binary structurally, required exported glTF anchor names and reference envelope."""
-import pathlib,struct,json,hashlib
+import pathlib,struct,json,hashlib,os
 root=pathlib.Path(__file__).resolve().parent.parent/"assets"
 f=root/"xfx_swift_rx9060xt_triple16.glb";data=f.read_bytes()
 assert data[:4]==b"glTF" and len(data)>100000,(len(data),data[:4])
@@ -31,6 +31,7 @@ manifest={"model":"XFX Swift AMD Radeon RX 9060 XT OC Triple Fan 16GB",
  "externalAccuracy":"Manufacturer SKU, triple black fans, external dimensions and outputs verified",
  "estimatedGeometry":["PCB layout","Die package dimensions","VRAM topology","Heatpipes","Screw and fin counts","Exact fan profile"],
  "source":"gpu-decompose/agent-a/blender_generate.py",
+ "modelerCommitSha":os.environ.get("GITHUB_SHA","local-unversioned"),
  "openSCADSource":"gpu-decompose/agent-a/mechanical.scad",
  "openSCADImportedMeshes":["OpenSCAD_FanHub_0","OpenSCAD_FanHub_1","OpenSCAD_FanHub_2"],
  "glbFile":f.name,"glbBytes":len(data),"glbSha256":h,
