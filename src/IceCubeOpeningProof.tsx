@@ -19,7 +19,7 @@ const between=(t:number,a:number,b:number,r=.5)=>Math.min(ease((t-a)/r),ease((b-
 const style={fontFamily:'Arial,Helvetica,sans-serif',color:'#edf3f4'} as const;
 
 const rimShader=()=>new THREE.ShaderMaterial({
-  vertexShader: \`
+  vertexShader: `
   varying vec3 vNormal;varying vec3 vEye;varying vec3 vView;
   void main(){
     vec4 viewPos=modelViewMatrix*vec4(position,1.0);
@@ -27,8 +27,8 @@ const rimShader=()=>new THREE.ShaderMaterial({
     vEye=normalize(-viewPos.xyz);
     vView=viewPos.xyz;
     gl_Position=projectionMatrix*viewPos;
-  }\`,
-  fragmentShader: \`
+  }`,
+  fragmentShader: `
   varying vec3 vNormal;varying vec3 vEye;varying vec3 vView;
   void main(){
     vec3 N=normalize(vNormal);vec3 V=normalize(vEye);
@@ -39,7 +39,7 @@ const rimShader=()=>new THREE.ShaderMaterial({
     vec3 inner=vec3(surface*.80,surface*1.15,surface*1.50);
     vec3 rim=vec3(.12,.30,.42)*edge*0.92;
     gl_FragColor=vec4(inner+rim,0.97);
-  }\`,
+  }`,
   transparent:false,depthTest:true,depthWrite:true,side:THREE.FrontSide,
 });
 type Ring={y:number;rx:number;rz:number;z?:number};
@@ -146,9 +146,9 @@ const StreakField=({frame}:{frame:number})=>{
  })}</group>;
 };
 const earthShader=()=>new THREE.ShaderMaterial({
- vertexShader:\`varying vec3 vNormal;varying vec2 vUv;varying vec3 vPos;
- void main(){vNormal=normalize(normalMatrix*normal);vUv=uv;vPos=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}\`,
- fragmentShader:\`
+ vertexShader:`varying vec3 vNormal;varying vec2 vUv;varying vec3 vPos;
+ void main(){vNormal=normalize(normalMatrix*normal);vUv=uv;vPos=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+ fragmentShader:`
  varying vec3 vNormal;varying vec2 vUv;varying vec3 vPos;
  void main(){
   vec3 V=normalize(vec3(0.,0.,1.));float s=max(dot(normalize(vNormal),V),0.);
@@ -161,7 +161,7 @@ const earthShader=()=>new THREE.ShaderMaterial({
   vec3 base=vec3(.010,.027,.036)+vec3(.006,.017,.026)*land+vec3(.035,.08,.102)*grid;
   vec3 rim=vec3(.02,.21,.33)*f*.64;
   gl_FragColor=vec4(base+rim,1.);
- }\`,
+ }`,
 });
 const Globe=({frame}:{frame:number})=>{
  const m=useMemo(earthShader,[]);
