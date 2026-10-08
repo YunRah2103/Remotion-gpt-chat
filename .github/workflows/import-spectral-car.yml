@@ -1,0 +1,35 @@
+name: Import independently licensed CC0 performance car
+on:
+  push:
+    branches: [fix/turbo-car-quality-v2]
+    paths: ['.github/workflows/import-spectral-car.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  import-verified-model:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/turbo-car-quality-v2
+          persist-credentials: true
+      - name: Retrieve immutable original CC0 glTF file
+        run: |
+          mkdir -p public/assets
+          curl -fLSs --retry 3 -o public/assets/spectral_gt_rs_game_ready.glb 'https://raw.githubusercontent.com/JaronKBragg7337/spectral-gt-rs/34499c501908818a2b08e589a7aecf963343cee7/spectral_gt_rs_game_ready.glb'
+          test "$(wc -c < public/assets/spectral_gt_rs_game_ready.glb | tr -d ' ')" = 4688844
+          test "$(git hash-object public/assets/spectral_gt_rs_game_ready.glb)" = f5b814848453a6c75a48f5047fdadaa7bdc78969
+          python3 - <<'PY'
+          p=open('public/assets/spectral_gt_rs_game_ready.glb','rb')
+          assert p.read(4)==b'glTF'
+          print('PASS: pinned CC0 sports-car asset, binary magic, byte size and exact git blob checksum')
+          PY
+      - name: Version model inside this independent repository
+        run: |
+          git config user.name "remotion-car-asset-import"
+          git config user.email "car-asset-import@users.noreply.github.com"
+          git add public/assets/spectral_gt_rs_game_ready.glb
+          git commit -m "Add vetted CC0 Spectral GT RS native GLB for Turbo documentary"
+          git push origin HEAD:fix/turbo-car-quality-v2
