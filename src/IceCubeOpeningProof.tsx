@@ -83,7 +83,7 @@ const AnatomicalHuman=({frame}:{frame:number})=>{
  ]),[]);
  const meshParts:React.ReactNode[]=[];
  const seg=(label:string,start:number[],end:number[],r1:number,r2:number)=>{
-  const sh=shaft(new THREE.Vector3(...start),new THREE.Vector3(...end),r2,r1);
+  const sh=shaft(new THREE.Vector3(start[0],start[1],start[2]),new THREE.Vector3(end[0],end[1],end[2]),r2,r1);
   meshParts.push(<Component key={label} geom={sh.geom} mat={mat} pos={sh.mid.toArray() as [number,number,number]} qua={sh.rot}/>);
  };
  [-1,1].forEach(side=>{
