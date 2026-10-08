@@ -1,0 +1,13 @@
+{
+  "status": "RELEASE_APPROVED_INDEPENDENTLY",
+  "renderSourceSha": "e62a08f7e0c843b497fc64117027277463f85376",
+  "workflowRunId": 37857580522,
+  "artifactId": 11584473973,
+  "artifactName": "GPU-POLISH5-FINAL-450F-CANDIDATE",
+  "artifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37857580522/artifacts/11584473973",
+  "fileName": "XFX-SWIFT-RX9060XT-POLISH05-15S.mp4",
+  "sha256": "3041aad852c0d2b0a1742e2e65d4356902b7c2ad0a93c7a9930a992b5c28c3a6",
+  "sizeBytes": 15731501,
+  "frames": 450,
+  "profile": "1080x1920 H264 yuv420p 30fps + AAC 48kHz 2ch"
+}
