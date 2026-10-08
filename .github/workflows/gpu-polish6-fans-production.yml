@@ -1,0 +1,313 @@
+name: GPU POLISH06 - remodeled matte-black fan native proof and release
+on:
+  push:
+    branches: [gpu-polish6/fan-correction]
+    paths:
+      - .github/workflows/gpu-polish6-fans-production.yml
+      - gpu-decompose/polish6/manager/RELEASE_LOCK.json
+      - gpu-decompose/polish6/manager/NATIVE_VISUAL_REVIEW.md
+      - gpu-decompose/polish6/refine_fans.py
+      - gpu-decompose/polish6/verify_inputs.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      phase: ${{ steps.lock.outputs.phase }}
+      a_sha: ${{ steps.lock.outputs.a_sha }}
+      a_run: ${{ steps.lock.outputs.a_run }}
+      a_id: ${{ steps.lock.outputs.a_id }}
+      a_name: ${{ steps.lock.outputs.a_name }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check scene and signed release phase
+        id: lock
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npm run check
+          sha256sum src/gpu-polish5/GpuDecompositionPolish5.tsx src/gpu-polish5/camera.ts gpu-decompose/polish5/motion/decomposition.v1.json
+          python3 gpu-decompose/polish6/verify_inputs.py lock gpu-decompose/polish6/manager/RELEASE_LOCK.json
+          L=gpu-decompose/polish6/manager/RELEASE_LOCK.json
+          echo "phase=$(jq -r .status "$L")" >> "$GITHUB_OUTPUT"
+          echo "a_sha=$(jq -r .hardwareSourceSha "$L")" >> "$GITHUB_OUTPUT"
+          echo "a_run=$(jq -r .hardwareArtifactRunId "$L")" >> "$GITHUB_OUTPUT"
+          echo "a_id=$(jq -r .hardwareArtifactId "$L")" >> "$GITHUB_OUTPUT"
+          echo "a_name=$(jq -r .hardwareArtifactName "$L")" >> "$GITHUB_OUTPUT"
+          echo "POLISH06 TYPECHECK AND LOCK CHECK PASS (not a visual PASS)"
+
+  stage-verified-model:
+    needs: preflight
+    if: needs.preflight.outputs.phase == 'model-verified' || needs.preflight.outputs.phase == 'render-approved'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect exact successful Agent A artifact and immutable source SHA
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          A_SHA: ${{ needs.preflight.outputs.a_sha }}
+          A_RUN: ${{ needs.preflight.outputs.a_run }}
+          A_ID: ${{ needs.preflight.outputs.a_id }}
+          A_NAME: ${{ needs.preflight.outputs.a_name }}
+        run: |
+          set -euo pipefail
+          curl -fLsS -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/$A_RUN" > /tmp/a-run.json
+          jq -e --arg sha "$A_SHA" '.status=="completed" and .conclusion=="success" and .head_sha==$sha' /tmp/a-run.json
+          curl -fLsS -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/$A_RUN/artifacts?per_page=100" > /tmp/a-artifacts.json
+          jq -e --argjson id "$A_ID" --arg name "$A_NAME" '.artifacts|any(.id==$id and .name==$name and .expired==false)' /tmp/a-artifacts.json
+          echo "EXACT AGENT A RUN / SHA / ARTIFACT VERIFIED"
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.preflight.outputs.a_name }}
+          run-id: ${{ needs.preflight.outputs.a_run }}
+          github-token: ${{ github.token }}
+          path: out/hardware
+      - name: Stage exactly one verified new GLB and approved B motion (NO old fallback)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p public/gpu-decompose/polish5 out/provenance
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil
+          matches=list(Path('out/hardware').rglob('xfx_swift_rx9060xt_polish5.glb'))
+          assert len(matches)==1,f'Expected exactly ONE real final-A GLB, found: {matches}'
+          import hashlib
+          assert hashlib.sha256(matches[0].read_bytes()).hexdigest()=='254b6c0579f294c44598f4623a3b04a108d5bc728c44420dd43194f445f3a296','P5-A original model SHA mismatch'
+          dst=Path('public/gpu-decompose/polish5')
+          shutil.copyfile(matches[0],dst/'xfx_swift_rx9060xt_polish5.glb')
+          shutil.copyfile('gpu-decompose/polish5/motion/decomposition.v1.json',dst/'decomposition.v1.json')
+          print('Staged EXACT A GLB',matches[0],matches[0].stat().st_size)
+          PY
+          python3 gpu-decompose/polish6/refine_fans.py \
+            public/gpu-decompose/polish5/xfx_swift_rx9060xt_polish5.glb \
+            public/gpu-decompose/polish5/p6-fans.tmp.glb
+          mv public/gpu-decompose/polish5/p6-fans.tmp.glb public/gpu-decompose/polish5/xfx_swift_rx9060xt_polish5.glb
+          python3 gpu-decompose/polish6/verify_inputs.py assets \
+            public/gpu-decompose/polish5 gpu-decompose/polish6/manager/RELEASE_LOCK.json \
+            | tee out/provenance/VALIDATED_INPUTS.json
+          cp gpu-decompose/polish6/manager/RELEASE_LOCK.json out/provenance/RELEASE_LOCK.json
+          (cd public/gpu-decompose/polish5 && sha256sum *.glb *.json) > out/provenance/INPUT_SHA256SUMS.txt
+          echo 'Model and motion physically staged; real creative/clearance approval still required.' > out/provenance/READ_ME.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GPU-POLISH6-LOCKED-INPUTS
+          path: |
+            public/gpu-decompose/polish5/
+            out/provenance/
+          retention-days: 30
+          if-no-files-found: error
+
+  native-proof:
+    needs: [preflight,stage-verified-model]
+    if: needs.preflight.outputs.phase == 'model-verified'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: GPU-POLISH6-LOCKED-INPUTS
+          path: .
+      - name: Native 1080p portrait static and MOVING Remotion Three proofs
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          npm install --no-audit --no-fund
+          npm run check
+          python3 gpu-decompose/polish6/verify_inputs.py assets \
+            public/gpu-decompose/polish5 out/provenance/RELEASE_LOCK.json
+          mkdir -p out/native-proof
+          for frame in 0 30 60 100 135 180 225 270 310 365 415 449; do
+            npx remotion still src/index.ts XfxSwiftDecompositionPolish5 \
+              "out/native-proof/frame-$frame.png" --frame="$frame" --gl=swangle
+            test -s "out/native-proof/frame-$frame.png"
+          done
+          for clip in 75-105 130-165 190-220 245-285 315-355 395-449; do
+            npx remotion render src/index.ts XfxSwiftDecompositionPolish5 \
+              "out/native-proof/moving-$clip.mp4" --frames="$clip" \
+              --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
+            ffmpeg -v error -xerror -i "out/native-proof/moving-$clip.mp4" -f null -
+          done
+          cp out/provenance/RELEASE_LOCK.json out/native-proof/RELEASE_LOCK.json
+          cp out/provenance/INPUT_SHA256SUMS.txt out/native-proof/INPUT_SHA256SUMS.txt
+          echo 'Real Remotion/Three native proofs. YOU MUST visually review before changing lock to render-approved.' \
+            > out/native-proof/READ_ME.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GPU-POLISH6-NATIVE-12FRAMES-6CLIPS
+          path: out/native-proof/
+          retention-days: 30
+          if-no-files-found: error
+
+  full-native-chunks:
+    needs: [preflight,stage-verified-model]
+    if: needs.preflight.outputs.phase == 'render-approved'
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [0,1,2,3,4]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: GPU-POLISH6-LOCKED-INPUTS
+          path: .
+      - name: Render one verified 90-frame native moving film section
+        shell: bash
+        env:
+          PART: ${{ matrix.part }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          npm install --no-audit --no-fund
+          npm run check
+          python3 gpu-decompose/polish6/verify_inputs.py assets \
+            public/gpu-decompose/polish5 out/provenance/RELEASE_LOCK.json
+          mkdir -p out/chunks
+          START=$((PART*90))
+          END=$((START+89))
+          npx remotion render src/index.ts XfxSwiftDecompositionPolish5 \
+            "out/chunks/xfx-$PART.mp4" --frames="$START-$END" \
+            --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
+          ffmpeg -v error -xerror -i "out/chunks/xfx-$PART.mp4" -f null -
+          ffprobe -v error -show_entries stream=codec_name,nb_frames,width,height,pix_fmt,r_frame_rate \
+            -of json "out/chunks/xfx-$PART.mp4" > "out/chunks/part-$PART.json"
+          python3 - "$PART" <<'PY'
+          import json,sys
+          x=json.load(open('out/chunks/part-'+sys.argv[1]+'.json'))['streams'][0]
+          assert (x['codec_name'],x['nb_frames'],x['width'],x['height'],x['r_frame_rate']) == ('h264','90',1080,1920,'30/1'),x
+          assert x['pix_fmt'] in ('yuv420p','yuvj420p'),x
+          print('NATIVE CHUNK 90/90 DECODER PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gpu-polish6-native-chunk-${{ matrix.part }}
+          path: out/chunks/
+          retention-days: 30
+          if-no-files-found: error
+
+  final-candidate:
+    needs: [preflight,stage-verified-model,full-native-chunks]
+    if: needs.preflight.outputs.phase == 'render-approved'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: gpu-polish6-native-chunk-*
+          merge-multiple: true
+          path: out/chunks
+      - uses: actions/download-artifact@v4
+        with:
+          name: GPU-POLISH6-LOCKED-INPUTS
+          path: .
+      - uses: actions/download-artifact@v4
+        with:
+          name: GPU-POLISH5-FINAL-450F-CANDIDATE
+          run-id: 37857580522
+          github-token: ${{ github.token }}
+          path: out/baseline05
+      - name: Package EXACT 450 native frames, stereo sound and comparison images
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          mkdir -p out/release
+          : > out/concat.txt
+          for n in 0 1 2 3 4; do
+            test -s "out/chunks/xfx-$n.mp4"
+            python3 - "$n" <<'PY'
+          import subprocess,sys,json
+          p='out/chunks/xfx-'+sys.argv[1]+'.mp4'
+          q=json.loads(subprocess.check_output(['ffprobe','-v','error','-select_streams','v:0','-show_entries','stream=nb_frames','-of','json',p]))
+          assert q['streams'][0]['nb_frames']=='90',q
+          PY
+            echo "file 'chunks/xfx-$n.mp4'" >> out/concat.txt
+          done
+          ffmpeg -v error -y -f concat -safe 0 -i out/concat.txt -c copy out/visual450.mp4
+          python3 gpu-decompose/polish4/manager/synthesize_mechanical_audio.py out/mechanical.wav \
+            | tee out/release/AUDIO_PROVENANCE.txt
+          ffmpeg -v error -y -i out/visual450.mp4 -i out/mechanical.wav \
+            -map 0:v:0 -map 1:a:0 -vf 'scale=in_range=auto:out_range=tv,format=yuv420p' \
+            -c:v libx264 -preset fast -crf 18 -pix_fmt yuv420p -color_range tv -r 30 \
+            -c:a aac -b:a 192k -ar 48000 -ac 2 -t 15 -movflags +faststart \
+            out/release/XFX-SWIFT-RX9060XT-POLISH06-15S.mp4
+          F=out/release/XFX-SWIFT-RX9060XT-POLISH06-15S.mp4
+          ffmpeg -v error -xerror -i "$F" -f null -
+          ffprobe -v error -show_streams -show_format -of json "$F" > out/release/FFPROBE.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('out/release/FFPROBE.json'))
+          v=[s for s in d['streams'] if s['codec_type']=='video']
+          a=[s for s in d['streams'] if s['codec_type']=='audio']
+          assert len(v)==1 and len(a)==1
+          assert (v[0]['codec_name'],v[0]['width'],v[0]['height'],v[0]['pix_fmt'],v[0]['r_frame_rate'],v[0]['nb_frames'])==('h264',1080,1920,'yuv420p','30/1','450'),v
+          assert (a[0]['codec_name'],a[0]['sample_rate'],a[0]['channels'])==('aac','48000',2),a
+          assert abs(float(d['format']['duration'])-15)<0.075
+          print('450 decoded frames, 15 seconds, audio and final pixel format PASS')
+          PY
+          ffmpeg -hide_banner -i "$F" -vn -af volumedetect -f null - 2> out/release/AUDIO_LEVELS.txt
+          ffmpeg -hide_banner -i "$F" -vf 'blackdetect=d=0.2:pix_th=0.03' -an -f null - 2> out/release/BLACKDETECT.txt
+          if grep -q 'black_start:' out/release/BLACKDETECT.txt; then echo 'BLOCK: black interval'; exit 1; fi
+          ffmpeg -hide_banner -i "$F" -vf 'freezedetect=n=-60dB:d=0.3' -an -f null - 2> out/release/FREEZEDETECT.txt
+          for spec in 'hero:30' 'cooling-macro:186' 'pcb-processor-macro:270' 'exploded:449'; do
+            name="${spec%%:*}"
+            frame="${spec##*:}"
+            ffmpeg -v error -y -i "$F" -vf "select=eq(n\,$frame)" -vsync vfr -frames:v 1 \
+              "out/release/$name.png"
+            test -s "out/release/$name.png"
+          done
+          OLD=out/baseline05/XFX-SWIFT-RX9060XT-POLISH05-15S.mp4
+          test -s "$OLD"
+          ffmpeg -v error -y -i "$OLD" -vf 'select=eq(n\,449),scale=540:960' \
+            -vsync vfr -frames:v 1 out/old.png
+          ffmpeg -v error -y -i "$F" -vf 'select=eq(n\,449),scale=540:960' \
+            -vsync vfr -frames:v 1 out/new.png
+          ffmpeg -v error -y -i out/old.png -i out/new.png \
+            -filter_complex "[0:v]drawtext=text='POLISH 05':fontcolor=white:fontsize=23:x=24:y=24[o];[1:v]drawtext=text='POLISH 06':fontcolor=white:fontsize=23:x=24:y=24[n];[o][n]hstack=inputs=2" \
+            -frames:v 1 out/release/before-after.png
+          cp out/provenance/RELEASE_LOCK.json out/release/RELEASE_LOCK.json
+          cp gpu-decompose/polish6/manager/NATIVE_VISUAL_REVIEW.md out/release/VISUAL_REVIEW.md
+          printf '%s\n' '# GPU POLISH06: FULL VIDEO CANDIDATE — FINAL INDEPENDENT MP4 REVIEW PENDING' \
+            'A real native GitHub 450-frame candidate. Compare its pixels and audio with POLISH04 before release approval.' \
+            'Hardware exterior reconstructed from reference; internal circuits and thermal parts are illustrative.' \
+            > out/release/FINAL_RELEASE.md
+          (cd out/release && sha256sum *.mp4 *.png) > out/release/SHA256SUMS.txt
+      - name: Publish actual final candidate MP4 and proofs with artifact ID
+        id: deliver
+        uses: actions/upload-artifact@v4
+        with:
+          name: GPU-POLISH6-FINAL-450F-CANDIDATE
+          path: out/release/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Print official artifact locator (candidate, NOT independent approved)
+        run: |
+          echo "GPU_POLISH06_RUN_ID=${{ github.run_id }}"
+          echo "GPU_POLISH06_ARTIFACT_ID=${{ steps.deliver.outputs.artifact-id }}"
+          echo "GPU_POLISH06_ARTIFACT_URL=${{ steps.deliver.outputs.artifact-url }}"
