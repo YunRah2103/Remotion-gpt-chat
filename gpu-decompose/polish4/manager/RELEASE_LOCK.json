@@ -24,10 +24,19 @@
   "qaReportSha256": "03cab3fa396ecdd4e4596f6e2b91a1b95dc5f9e2765b1ec330a8501456a9fb30",
   "independentVisualQa": "PASS",
   "renderApproved": true,
-  "releaseApproved": false,
+  "releaseApproved": true,
   "integrationFix": "D-approved camera and editorial correction after independent integrated native 12-frame proof run 37842472406 artifact 11578661945 rejected tiny finale. Final yaw38/roll-61; 13 C tracks preserved; source 3d47 rejection document. Re-render full native proofs before release.; native chunk compatibility correction, allowing yuvj420p transitional Remotion codec with explicit full->limited final yuv420p.",
   "editorialSourceSha256": "ba9d72b5639e86c0b97e4526b53cdcb35e3c750532ec7653a5d0be1133064246",
   "managerAudioSmokeRunId": 37843655504,
   "managerCodeSmokeRunId": 37843776489,
-  "notes": "Corrected visual source 2de979d native proof PASS (exact A edee, C d479, B scene all13, D camera c4fb). Distinct manager reviewer report sha256 a2fa5a. Start full 5x90 native 1080 render; final release remains PENDING independent complete MP4 download and decoder/pixel/audio review. Canonical signed visual QA Git-checkout SHA256 03cab3fa verified in successful smoke run 37844776974, previous custom JS digest discarded. Native chunk4 in 37844978540 encoded 90/90 correctly but output labeled yuvj420p, previously overly strict validator blocked artifact. Final intermediate format now permits yuvj420p; finished MP4 still must be H264 yuv420p 30fps 450F."
+  "notes": "Corrected visual source 2de979d native proof PASS (exact A edee, C d479, B scene all13, D camera c4fb). Distinct manager reviewer report sha256 a2fa5a. Start full 5x90 native 1080 render; final release remains PENDING independent complete MP4 download and decoder/pixel/audio review. Canonical signed visual QA Git-checkout SHA256 03cab3fa verified in successful smoke run 37844776974, previous custom JS digest discarded. Native chunk4 in 37844978540 encoded 90/90 correctly but output labeled yuvj420p, previously overly strict validator blocked artifact. Final intermediate format now permits yuvj420p; finished MP4 still must be H264 yuv420p 30fps 450F. Official output independently downloaded: five SHA256SUMS checks passed, full FFmpeg decode, 450 native frames, no freeze/black events, AAC levels -26.9/-8.4, creative release PASS. Final GitHub native packaging recovery used existing chunks with no re-render.",
+  "finalGitHubRunId": 37846669872,
+  "finalGitHubArtifactId": 11579249363,
+  "finalGitHubArtifactName": "GPU-POLISH4-FINAL-450F",
+  "finalGitHubArtifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37846669872/artifacts/11579249363",
+  "finalOfficialMp4Sha256": "ec4323d7b3671261f5a5c21c2abaf54f239ca19817f8026ee82e29c6f5870980",
+  "finalOfficialMp4SizeBytes": 13919554,
+  "renderSourceSha": "e42e2a80cc165a73a962faed9d58b7a1a2d8028a",
+  "packagingSourceSha": "79a8aa57f0d013acde243d6639edbcc9dfc55f04",
+  "finalIndependentSignoffSha": "5ef3f6da4547edc7d7824e8d0f9fd9551e025e33"
 }
