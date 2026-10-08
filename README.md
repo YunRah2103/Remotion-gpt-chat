@@ -1,11 +1,36 @@
-# Remotion GPT Chat · GPU DRIVE 001
+# Remotion GPT Chat — Independent 3D automotive documentaries
 
-An **independent** Remotion 4 / Three.js / React Three Fiber true-3D automotive motion film, 6 seconds, 1080×1920, 30 fps. No code or assets from YUNEX or yunus-video-lab.
+## THE HIDDEN POWER OF A TURBOCHARGER
 
-Real 3D geometry includes a conceptual car, wheels, road, environment, lighting and animated 3D camera. 2D typography is overlaid for legibility.
+A **28-second, 1080 × 1920, 30 fps, 840-frame** original automotive mini-documentary. Implemented with Remotion 4, React, TypeScript, React Three Fiber, Three.js, and genuine WebGL rendering.
 
-On push to main, GitHub Actions renders MP4 using software-backed WebGL (`--gl=swangle`), adds synthesised audio and uploads a fully validated file as an artifact.
+The film follows the vehicle on a road, exhaust turbine, linked common shaft, fresh-air compressor/intercooler, and return to driving. Bodywork is an original parametric/lofted 3D mesh. Mechanical components include the two rotating bladed wheels, shaft, turbine housing, pipework, dynamic flow markers and intercooler. This is procedural/stylized CGI, **not an imported photoreal CAD vehicle**.
 
-Optional `render-gpu-self-hosted.yml` runs **only when manually triggered** on a Linux self-hosted runner with hardware GPU and labels `self-hosted, linux, x64, gpu`; registering one is separate and not automatically provisioned. Only trigger trusted code; public repositories and self-hosted runners have security implications.
+**Composition:** \`TurboDocumentary\` in \`src/Root.tsx\`
 
-Run `npm install && npm run studio` locally. `npm run check` for TS.
+**Scene director:** \`src/TurboDocumentary.tsx\`
+
+**Original 3D models/worlds:** \`src/turbo/Mechanical.tsx\`
+
+**Source independence:** no code, models or assets from \`YunRah2103/yunus-video-lab\` or YUNEX; the prior short \`GpuDriveFilm\` remains in this repository as a separate composition.
+
+### Workflows
+
+- \`.github/workflows/turbo-documentary.yml\` checks TypeScript and composition registration, renders four moving native WebGL previews, produces seven 120-frame full-resolution chunks in parallel, assembles an AAC soundtrack and H264 MP4, forces limited-range yuv420p, decodes the entire file and validates 840 frames.
+- \`.github/workflows/turbo-release.yml\` publishes the verified 840-frame master using previously successful native chunks (release source run \`37776329123\`, final successful release run \`37777361493\`). Download the artifact named \`TURBOCHARGER-FINAL-840F-YUV420P\` from the release run.
+- GPU note: CI uses **software-backed** WebGL through \`--gl=swangle\`. This is genuine 3D geometry and animation but **not** hardware-GPU acceleration. A self-hosted GPU experiment for the older prototype exists separately.
+
+### Audio and editorial limitations
+
+The narration supplied in the documentary brief is represented as precisely scheduled **on-screen subtitles**. No quality-verified speech generation is available in this pipeline, so the delivered MP4 has **no spoken narrator**; its AAC soundtrack contains generated mechanical rumble, airflow and turbo whine. There are no unsupported numerical boost/pressure claims.
+
+### Local setup
+
+\`\`\`bash
+npm install
+npm run check
+npm run studio
+npx remotion render src/index.ts TurboDocumentary out/turbo-visual.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p
+\`\`\`
+
+For a rigorously validated final master use the GitHub workflows, which include audio, correct the full-range WebGL colour encoding to limited-range \`yuv420p\`, and run FFprobe plus a complete decode.
