@@ -18,6 +18,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Canonical Git-checkout signed visual QA SHA256
+        run: |
+          sha256sum gpu-decompose/polish4/manager/NATIVE_VISUAL_REVIEW.md
+          wc -c gpu-decompose/polish4/manager/NATIVE_VISUAL_REVIEW.md
       - name: Parse active production workflow and compile validator
         shell: bash
         run: |
