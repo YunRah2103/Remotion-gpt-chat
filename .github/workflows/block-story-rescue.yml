@@ -1,0 +1,30 @@
+name: Block Story - isolated 120-frame rescue
+on:
+  push:
+    branches: [chatgpt/block-story-recreation]
+    paths: ['.github/workflows/block-story-rescue.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render-frames-960-1079:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Remotion
+        run: npm install --no-audit --no-fund
+      - name: Render original Three.js frames without relying on system FFmpeg
+        run: |
+          mkdir -p out
+          npx remotion render src/index.ts BlockStory out/block-8.mp4 --frames=960-1079 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          test -s out/block-8.mp4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BLOCK-STORY-CORRECTED-CHUNK-8
+          path: out/block-8.mp4
+          retention-days: 30
+          if-no-files-found: error
