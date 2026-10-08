@@ -57,7 +57,7 @@ jobs:
           run-id: ${{ steps.lock.outputs.model_run }}
           github-token: ${{ github.token }}
           path: out/model-artifact
-      - name: Stage ONLY new model and JSON under existing runtime name
+      - name: Stage ONLY versioned new POLISH03 model and movement JSON
         shell: bash
         run: |
           set -euo pipefail
@@ -67,7 +67,7 @@ jobs:
           from shutil import copyfile
           source = Path('out/model-artifact')
           for filename,target in (
-              ('xfx_swift_rx9060xt_polish3.glb','xfx_swift_rx9060xt_triple16.glb'),
+              ('xfx_swift_rx9060xt_polish3.glb','xfx_swift_rx9060xt_polish3.glb'),
               ('decomposition.json','decomposition.json'),
           ):
               matches=[f for f in source.rglob(filename) if f.is_file()]
@@ -82,7 +82,7 @@ jobs:
             public/gpu-decompose gpu-decompose/polish3/manager/RELEASE_LOCK.json \
             | tee out/preflight/asset-validation.json
           cp gpu-decompose/polish3/manager/RELEASE_LOCK.json out/preflight/RELEASE_LOCK.json
-          (cd public/gpu-decompose && sha256sum xfx_swift_rx9060xt_triple16.glb decomposition.json) \
+          (cd public/gpu-decompose && sha256sum xfx_swift_rx9060xt_polish3.glb decomposition.json) \
             > out/preflight/STAGED_SHA256SUMS.txt
       - name: Publish immutable validated native inputs for downstream jobs
         uses: actions/upload-artifact@v4
