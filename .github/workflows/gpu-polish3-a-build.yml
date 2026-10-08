@@ -72,6 +72,8 @@ jobs:
           ffmpeg -v error -xerror -i gpu-decompose/polish3/assets/decomposition-proof.mp4 -f null -
           python gpu-decompose/agent-a/validate_assets.py | tee gpu-decompose/polish3/assets/glb-audit.log
           /tmp/gpu-venv/bin/python gpu-decompose/agent-a/validate_dimensions.py | tee gpu-decompose/polish3/assets/dimensions-audit.log
+          /tmp/gpu-venv/bin/python gpu-decompose/agent-a/glb_pose_audit.py | tee gpu-decompose/polish3/assets/mesh-pose-audit.log
+          test -s gpu-decompose/polish3/assets/glb-pose-audit.json
           (cd gpu-decompose/polish3/assets && sha256sum *.glb *.json > SHA256SUMS.txt)
       - name: Publish model, native proof media and exact manifests
         if: always()
