@@ -1,0 +1,14 @@
+{
+  "status": "awaiting_C_real_GLb_native_and_AABB_proof",
+  "contractSourceCommit": "102064938a9a45540434c93d9ff03cdcd72f9cba",
+  "agentASourceCommit": "a3113bb0a4b450696010c6496cfcb62d2a56e2c3",
+  "agentABuildRunId": 37840656656,
+  "agentAArtifactId": 11577811444,
+  "agentAArtifactName": "GPU-POLISH4-A-XFX-HARDWARE",
+  "glbSha256": "edeeca54f6e9bf26127ed91b3debe16bae47f9c58cd9db0bf760927a0869882e",
+  "motionRelativePath": "gpu-decompose/polish4/motion/decomposition.json",
+  "motionSha256": "d4790dc9dcc6572a0d6ee5478d70431194128055fdaf6d56c171d68ae1f06fed",
+  "requiredMovingAnchors": 13,
+  "cameraForCurrentProof": "POLISH03 (provisional), B POLISH04 pending integration",
+  "verifiedByC": "Pending exact A GLB and real moving proof; do not promote this to release"
+}
