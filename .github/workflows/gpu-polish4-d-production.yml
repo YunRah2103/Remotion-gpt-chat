@@ -266,11 +266,11 @@ jobs:
           for part in 0 1 2 3 4; do
             F="out/chunks/xfx-$part.mp4"
             test -s "$F"
-            test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of csv=p=0 "$F")" = 90
+            test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=noprint_wrappers=1:nokey=1 "$F")" = 90
             echo "file 'chunks/xfx-$part.mp4'" >> out/concat.txt
           done
           ffmpeg -v error -y -f concat -safe 0 -i out/concat.txt -c copy out/visual450.mp4
-          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of csv=p=0 out/visual450.mp4)" = 450
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=noprint_wrappers=1:nokey=1 out/visual450.mp4)" = 450
           python3 gpu-decompose/polish4/manager/synthesize_mechanical_audio.py \
             out/mechanical.wav | tee out/release/audio-provenance.txt
           ffmpeg -v error -y -i out/visual450.mp4 -i out/mechanical.wav \
