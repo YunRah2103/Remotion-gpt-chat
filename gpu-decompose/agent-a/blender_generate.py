@@ -119,13 +119,15 @@ def blade_mesh(parent,cx,cz,idx,material):
   k=2*j;t=k+2
   faces.append((k,t,t+1,k+1))
   faces.append((face_count+k,face_count+k+1,face_count+t+1,face_count+t))
- for j in range(face_count-1):
-  if j%2==0:
-   faces.append((j,j+2,face_count+j+2,face_count+j))
- for j in range(0,face_count,2):
-  faces.append((j,j+1,face_count+j+1,face_count+j))
- j=face_count-2
- faces.append((j,j+1,face_count+j+1,face_count+j))
+ # Close only the leading/trailing contours and both true blade ends.
+ # All mesh indices in bounds, avoiding Blender's native crash on invalid polygons.
+ for j in range(len(sections)-1):
+  k=2*j;t=k+2
+  faces.append((k,t,face_count+t,face_count+k))
+  faces.append((k+1,face_count+k+1,face_count+t+1,t+1))
+ faces.append((0,1,face_count+1,face_count))
+ last=face_count-2
+ faces.append((last,face_count+last,face_count+last+1,last+1))
  me=bpy.data.meshes.new("MouldedSweptFanBlade")
  me.from_pydata(verts,[],faces);me.update()
  ob=bpy.data.objects.new("BroadRotorBlade_%02d"%idx,me)
