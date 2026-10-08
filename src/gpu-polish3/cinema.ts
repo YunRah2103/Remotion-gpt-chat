@@ -5,7 +5,7 @@ const rad=(d:number)=>d*Math.PI/180;
 const corners=(b:THREE.Box3)=>{const {min,max}=b;return [[min.x,min.y,min.z],[min.x,min.y,max.z],[min.x,max.y,min.z],[min.x,max.y,max.z],[max.x,min.y,min.z],[max.x,min.y,max.z],[max.x,max.y,min.z],[max.x,max.y,max.z]].map(([x,y,z])=>new THREE.Vector3(x,y,z));};
 export const cameraShot=(frame:number)=>{
  const hero=smooth(frame,0,89),reveal=smooth(frame,100,322),settle=smooth(frame,330,449);
- return {yaw:rad(9+6*hero+33*reveal+2.3*settle),pitch:rad(8+7*smooth(frame,115,300)+1.8*settle),coverage:.745+.06*hero-.03*reveal+.015*settle,verticalBias:-.29-.065*reveal};
+ return {yaw:rad(15+9*hero+29*reveal+2*settle),pitch:rad(10+7*smooth(frame,115,300)+2*settle),coverage:.79+.08*hero-.015*reveal+.02*settle,verticalBias:-.29-.065*reveal};
 };
 /** Deterministic bounds-fit camera. Real GLB mesh bounding volume, never a 2D image. */
 export function fitCamera(camera:THREE.Camera,gpu:THREE.Object3D,frame:number,width:number,height:number){
