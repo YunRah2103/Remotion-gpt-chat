@@ -61,12 +61,22 @@ jobs:
           find model-checkout/gpu-decompose/agent-a -name '*.scad' -type f | grep -q .
           find model-checkout/gpu-decompose/agent-a -name '*.py' -type f | grep -q .
           mkdir -p public/gpu-decompose out
-          for name in xfx_swift_rx9060xt_triple16.glb decomposition.json asset-manifest.json; do
+          for name in xfx_swift_rx9060xt_triple16.glb decomposition.json asset-manifest.json clearance.json godot-proof.json; do
             FILE=$(find model-checkout/gpu-decompose/assets model-artifact -type f -name "$name" 2>/dev/null | head -n1 || true)
             if [ -z "$FILE" ]; then echo "::error::Agent A missing $name";exit 1; fi
             cp "$FILE" "public/gpu-decompose/$name"
           done
           python3 gpu-decompose/director/validate_assets.py public/gpu-decompose --lock gpu-decompose/director/AGENT_A_LOCK.json | tee out/asset-preflight.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          base=Path('public/gpu-decompose')
+          p=json.loads((base/'clearance.json').read_text())
+          g=json.loads((base/'godot-proof.json').read_text())
+          assert p.get('finalClearancePass') is True and len(p.get('samples',[])) == 6, p
+          assert g.get('status')=='GODOT_PROOF_PASS' and g.get('validatedFrames')==450, g
+          print('PASS: real PyBullet and 450-frame Godot mechanical previsualisation outputs')
+          PY
       - name: Setup Remotion & ffmpeg & actual Manim/Playwright
         uses: actions/setup-node@v4
         with:
