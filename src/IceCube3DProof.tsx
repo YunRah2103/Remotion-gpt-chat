@@ -160,7 +160,7 @@ export const IceCube3DProof:React.FC=()=>{
       <ambientLight intensity={.48} color="#6c9db6"/>
       <pointLight position={[-3,2,5]} color="#70c9fb" intensity={5}/>
       <directionalLight position={[3,1,-5]} color="#38769f" intensity={7}/>
-      {human&&<group position={[0,-.39,0]} scale={1.50}>
+      {human&&<group position={[0,-.16,0]} scale={.92}>
         <Body frame={frame}/>
       </group>}
       {earth&&<group position={[0,-.13,0]}><Earth frame={frame}/></group>}
