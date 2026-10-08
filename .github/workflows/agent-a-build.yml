@@ -23,7 +23,7 @@ jobs:
       - name: Install real mechanical and 3D tools
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq blender openscad ffmpeg unzip
+          sudo apt-get install -y -qq blender openscad ffmpeg unzip python3-numpy
           python -m venv /tmp/gpu-venv
           /tmp/gpu-venv/bin/python -m pip install --disable-pip-version-check numpy==1.26.4 pybullet==3.2.7
           curl -fLsS --retry 3 --retry-delay 4 'https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip' -o /tmp/godot.zip
