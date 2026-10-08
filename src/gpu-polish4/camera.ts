@@ -19,12 +19,12 @@ export const CAMERA_KEYS:readonly CameraKey[] = [
   {frame:209, focus:'cooler',  yaw:57,pitch:23,roll:-15,fov:30,widthFill:.95,heightFill:.81,biasY:.10},
   {frame:239, focus:'thermal', yaw:65,pitch:25,roll:-17,fov:29,widthFill:.94,heightFill:.78,biasY:.10},
   {frame:265, focus:'thermal', yaw:59,pitch:26,roll:-15,fov:29,widthFill:.91,heightFill:.78,biasY:.08},
-  {frame:286, focus:'silicon', yaw:67,pitch:29,roll:-11,fov:29,widthFill:.89,heightFill:.74,biasY:.06},
-  {frame:307, focus:'silicon', yaw:76,pitch:28,roll:-12,fov:28,widthFill:.96,heightFill:.74,biasY:.06},
-  {frame:329, focus:'expand',  yaw:62,pitch:21,roll:-28,fov:33,widthFill:.84,heightFill:.77,biasY:.05},
-  {frame:364, focus:'all',     yaw:54,pitch:20,roll:-33,fov:32,widthFill:.91,heightFill:.78,biasY:.01},
-  {frame:405, focus:'all',     yaw:59,pitch:19,roll:-34,fov:32,widthFill:.93,heightFill:.80,biasY:.01},
-  {frame:449, focus:'all',     yaw:63,pitch:17,roll:-32,fov:32,widthFill:.92,heightFill:.78,biasY:0},
+  {frame:286, focus:'silicon', yaw:55,pitch:27,roll:-11,fov:29,widthFill:.89,heightFill:.74,biasY:.06},
+  {frame:307, focus:'silicon', yaw:52,pitch:30,roll:-12,fov:28,widthFill:.96,heightFill:.74,biasY:.06},
+  {frame:329, focus:'expand',  yaw:56,pitch:21,roll:-29,fov:33,widthFill:.87,heightFill:.77,biasY:.19},
+  {frame:364, focus:'all',     yaw:53,pitch:20,roll:-35,fov:32,widthFill:.92,heightFill:.79,biasY:.27},
+  {frame:405, focus:'all',     yaw:57,pitch:19,roll:-36,fov:32,widthFill:.92,heightFill:.80,biasY:.29},
+  {frame:449, focus:'all',     yaw:59,pitch:17,roll:-35,fov:32,widthFill:.92,heightFill:.80,biasY:.30},
 ] as const;
 
 export const SHOT_MAP = [
@@ -70,6 +70,13 @@ export const subjectBox=(scene:THREE.Object3D,focus:Focus):THREE.Box3=>{
   if(box.isEmpty())throw Error('POLISH04 camera focus anchors missing: '+focus);
   return box;
 };
+const FOCUS_NAMES:Record<Exclude<Focus,'all'|'expand'>,string[]>={
+  front:['FRONT_SHROUD','FAN_LEFT','FAN_CENTER','FAN_RIGHT'],
+  fan:['FAN_CENTER'],
+  cooler:['FRONT_SHROUD','HEATSINK','HEATPIPE_BUNDLE','COLD_PLATE'],
+  thermal:['HEATPIPE_BUNDLE','COLD_PLATE','GPU_DIE','PCB'],
+  silicon:['GPU_DIE','VRAM_CHIPS','VRM_COMPONENTS'],
+};
 const corners=(b:THREE.Box3)=>{
   const {min:m,max:M}=b;
   return [
@@ -100,6 +107,42 @@ function optics(box:THREE.Box3,orientation:THREE.Quaternion,target:THREE.Vector3
   }
   return distance;
 }
+/**
+ * Mesh-tight perspective fitting: a whole-scene world AABB is far too
+ * conservative for a yawed/rolled horizontal GPU in 9:16 portrait. The eight
+ * corners of each mesh's LOCAL geometry box are transformed into the same
+ * camera coordinates; the resulting distances still guarantee projected
+ * containment of every mesh AABB, including C's moved anchor descendants.
+ * This fixes the mini-card final shot without arbitrary zoom or clipped layers.
+ */
+function opticalMeshFit(scene:THREE.Object3D,focus:Focus,
+  orientation:THREE.Quaternion,target:THREE.Vector3,
+  fov:number,aspect:number,fillX:number,fillY:number):number{
+  const inverse=orientation.clone().invert();
+  const tanY=Math.tan(rad(fov)/2),tanX=tanY*aspect;
+  const roots=(focus==='all'||focus==='expand')?[scene]:
+    FOCUS_NAMES[focus].map(name=>scene.getObjectByName(name)).filter(
+      (value):value is THREE.Object3D=>Boolean(value));
+  let distance=1,seen=0;
+  for(const root of roots){
+    root.traverse(node=>{
+      const mesh=node as THREE.Mesh;
+      if(!mesh.isMesh||!mesh.geometry)return;
+      const geometry=mesh.geometry;
+      if(!geometry.boundingBox)geometry.computeBoundingBox();
+      if(!geometry.boundingBox)return;
+      for(const p of corners(geometry.boundingBox)){
+        const local=p.applyMatrix4(mesh.matrixWorld).sub(target).applyQuaternion(inverse);
+        distance=Math.max(distance,
+          local.z+Math.abs(local.x)/(tanX*fillX),
+          local.z+Math.abs(local.y)/(tanY*fillY));
+      }
+      seen++;
+    });
+  }
+  if(!seen)throw Error('POLISH04 B optical fit has no mesh: '+focus);
+  return distance;
+}
 export type CinemaPose={eye:THREE.Vector3; target:THREE.Vector3; fov:number; 
   roll:number; focusFrom:Focus; focusTo:Focus; blend:number; minDistance:number};
 export function evaluateCamera(frame:number,scene:THREE.Object3D,aspect:number):CinemaPose{
@@ -117,8 +160,8 @@ export function evaluateCamera(frame:number,scene:THREE.Object3D,aspect:number):
   const center=centerA.clone().lerp(centerB,k.t);
   const cameraUp=new THREE.Vector3(0,1,0).applyQuaternion(quaternion);
   const cameraTarget=center.clone().addScaledVector(cameraUp,k.biasY);
-  const first=optics(boxA,quaternion,centerA,k.fov,aspect,k.widthFill,k.heightFill);
-  const second=optics(boxB,quaternion,centerB,k.fov,aspect,k.widthFill,k.heightFill);
+  const first=opticalMeshFit(scene,k.a.focus,quaternion,centerA,k.fov,aspect,k.widthFill,k.heightFill);
+  const second=opticalMeshFit(scene,k.b.focus,quaternion,centerB,k.fov,aspect,k.widthFill,k.heightFill);
   const lensDistance=mix(first,second,k.t);
   // Relative clip-safe guard; no abrupt global bounding-box refit in macro.
   const safeDistance=Math.max(1.15,lensDistance);
