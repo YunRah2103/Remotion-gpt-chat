@@ -1,7 +1,7 @@
 name: GPU Agent A - native 3D asset build
 on:
   push:
-    branches: ['gpu-decompose/a-model']
+    branches: ['gpu-decompose/a-model', 'gpu-polish3/a-hardware']
     paths:
       - 'gpu-decompose/agent-a/**'
       - '.github/workflows/agent-a-build.yml'
@@ -59,6 +59,11 @@ jobs:
           test -s gpu-decompose/assets/xfx_swift_rx9060xt_triple16.glb
           test -s gpu-decompose/assets/assembled.png
           test -s gpu-decompose/assets/exploded.png
+          test -s gpu-decompose/assets/fans_shroud_detail.png
+          test -s gpu-decompose/assets/heatsink_heatpipe_detail.png
+          test -s gpu-decompose/assets/pcb_silicon_detail.png
+          test -s gpu-decompose/assets/rear_backplate_polish3.png
+          test -s gpu-decompose/assets/exploded_film_camera.png
       - name: Encode real motion proof and assert GLB structure
         run: |
           set -euo pipefail
