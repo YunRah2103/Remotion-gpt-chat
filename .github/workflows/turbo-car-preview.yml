@@ -1,0 +1,53 @@
+name: Turbo Car V2 - 3D visual approval previews
+on:
+  push:
+    branches: [fix/turbo-car-quality-v2]
+    paths:
+      - '.github/workflows/turbo-car-preview.yml'
+      - 'src/turbo/**'
+      - 'src/TurboDocumentary.tsx'
+      - 'public/assets/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Tools
+        run: |
+          npm install --no-audit --no-fund
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Strict preflight and source asset checks
+        run: |
+          test -s public/assets/spectral_gt_rs_game_ready.glb
+          test "$(git hash-object public/assets/spectral_gt_rs_game_ready.glb)" = f5b814848453a6c75a48f5047fdadaa7bdc78969
+          npm run check
+          npx remotion compositions src/index.ts --gl=swangle | tee composition.json
+          grep -q TurboDocumentary composition.json
+      - name: Three separate genuine moving WebGL car preview sequences
+        run: |
+          mkdir -p out
+          npx remotion render src/index.ts TurboDocumentary out/opening-v2.mp4 --frames=30-74 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          npx remotion render src/index.ts TurboDocumentary out/return-v2.mp4 --frames=652-696 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          npx remotion render src/index.ts TurboDocumentary out/hero-v2.mp4 --frames=770-814 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          for name in opening return hero; do
+            ffmpeg -hide_banner -loglevel error -xerror -i out/$name-v2.mp4 -f null -
+            ffmpeg -hide_banner -loglevel error -y -ss .7 -i out/$name-v2.mp4 -frames:v 1 -update 1 out/$name-middle.png
+          done
+      - name: True full-resolution proof stills
+        run: |
+          npx remotion still src/index.ts TurboDocumentary out/opening-native.png --frame=48 --gl=swangle
+          npx remotion still src/index.ts TurboDocumentary out/hero-native.png --frame=786 --gl=swangle
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TURBO-CAR-V2-GENUINE-3D-QA
+          path: out/
+          retention-days: 30
+          if-no-files-found: error
