@@ -1,0 +1,20 @@
+{
+  "_description": "TEMPLATE ONLY — not a release authorization. Do not rename this file to RELEASE_LOCK.json until exact A/B handoffs and independent proof QA exist.",
+  "contractVersion": "POLISH03-v1",
+  "status": "proofs",
+  "agentASha": "<exact fully verified remote A commit SHA>",
+  "agentBSha": "<exact fully verified remote B commit SHA>",
+  "modelArtifactRunId": null,
+  "modelArtifactId": null,
+  "modelArtifactName": "GPU-POLISH3-A-XFX-HARDWARE",
+  "glbSha256": "<new verified Polish03 GLB SHA256>",
+  "animationSha256": "<new verified Polish03 movement JSON SHA256>",
+  "sceneSourceSha256": "<SHA256 of src/gpu-polish3/GpuDecompositionPolish3.tsx>",
+  "cameraSourceSha256": "<SHA256 of src/gpu-polish3/cinema.ts>",
+  "exportSourceSha256": "<SHA256 of src/GpuDecomposition.tsx>",
+  "renderApproved": false,
+  "approvedProofRunId": null,
+  "approvedProofArtifactId": null,
+  "independentVisualQa": "PENDING",
+  "_next": "For phase one, create real RELEASE_LOCK.json with status proofs and actual nonplaceholder A/B source and artifact hashes. Once C visually reviews proof videos, update status=release; set renderApproved=true, approvedProofRunId and approvedProofArtifactId to exact validated values, independentVisualQa=PASS. The separate manager workflow then renders 450 frames and full mux. C still manually reviews candidate before claiming final release."
+}
