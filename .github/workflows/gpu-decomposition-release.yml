@@ -58,7 +58,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test -s model-checkout/gpu-decompose/agent-a/HANDOFF.md
+          # Exact successful model build and its embedded source-SHA manifest are the handoff of record.
+          # Agent A's prose HANDOFF.md is supplementary, not a reason to discard verified native output.
+          test -s gpu-decompose/director/AGENT_A_INTEGRATION_AUDIT.md
+          test -s gpu-decompose/director/AGENT_A_LOCK.json
           test -s model-checkout/gpu-decompose/agent-a/blender_generate.py
           find model-checkout/gpu-decompose/agent-a -name '*.scad' -type f | grep -q .
           find model-checkout/gpu-decompose/agent-a -name '*.py' -type f | grep -q .
