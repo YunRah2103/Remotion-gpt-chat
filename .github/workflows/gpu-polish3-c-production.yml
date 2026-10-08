@@ -252,7 +252,7 @@ jobs:
           ffmpeg -v error -y \
             -f lavfi -i 'sine=frequency=65:duration=15:sample_rate=48000' \
             -f lavfi -i 'anoisesrc=color=pink:amplitude=0.08:duration=15:sample_rate=48000' \
-            -filter_complex '[0:a]volume=0.050,lowpass=f=145,afade=t=in:st=0:d=0.5,afade=t=out:st=14:d=1[hum];[1:a]highpass=f=200,lowpass=f=2200,volume=0.025,afade=t=in:st=1:d=.6,afade=t=out:st=14:d=.8[air];[hum][air]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.85[a]' \
+            -filter_complex '[0:a]volume=0.050,lowpass=f=145,afade=t=in:st=0:d=0.5,afade=t=out:st=14:d=1[hum];[1:a]highpass=f=200,lowpass=f=2200,volume=0.025,afade=t=in:st=1:d=0.6,afade=t=out:st=14:d=0.8[air];[hum][air]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.85[a]' \
             -map '[a]' -ar 48000 -ac 2 -c:a aac -b:a 192k out/sound.m4a
 
           # CRITICAL POLISH 03 FIX: NEVER reapply old RGB/gbrp Manim screen-blend
