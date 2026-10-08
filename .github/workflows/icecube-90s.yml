@@ -104,7 +104,10 @@ jobs:
         run: |
           ffmpeg -hide_banner -loglevel error -y -i out/icecube-visual.mp4 -i out/icecube-sound.m4a \
             -map 0:v:0 -map 1:a:0 \
-            -c:v copy -c:a copy -t 90 -movflags +faststart \
+            -vf "scale=in_range=pc:out_range=tv,format=yuv420p" \
+            -c:v libx264 -preset veryfast -crf 18 -pix_fmt yuv420p -color_range tv \
+            -colorspace bt709 -color_primaries bt709 -color_trc bt709 \
+            -c:a copy -t 90 -movflags +faststart \
             out/ICECUBE-NEUTRINOS-90SEC-RECREATION.mp4
       - name: Full decoder and stream validation, stills and SHA256
         shell: bash
