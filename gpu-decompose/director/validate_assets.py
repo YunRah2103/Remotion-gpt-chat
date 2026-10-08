@@ -57,6 +57,27 @@ def validate(asset_dir, lock_file=None):
     assert len(graph.get("meshes", [])) >= 15, "Not enough genuine GLB 3D mesh structures"
     materials = graph.get("materials", [])
     assert len(materials) >= 3, "Missing physically distinct materials"
+    manifest_file = asset_dir / "asset-manifest.json"
+    assert manifest_file.is_file(), "Agent A original source/accuracy manifest missing"
+    manifest = json.loads(manifest_file.read_text())
+    assert manifest.get("glbSha256") == sha(glb), "Blender GLB differs from Agent A source manifest"
+    assert manifest.get("decompositionSha256") == sha(anim_file), "Motion JSON differs from Agent A source manifest"
+    assert manifest.get("sceneUnitsPerMillimetre") == 0.01, "Wrong scene scale"
+    assert manifest.get("accurateExternalBoundsMM") == [290, 124, 49], "Wrong XFX model envelope"
+    assert manifest.get("sku") in ("RX-96TS316B7", "RX-96TS316BA"), "Wrong GPU variant"
+    assert "PCB layout" in manifest.get("estimatedGeometry", []), "Must disclose inferred internal PCB details"
+    # These are real part nodes, not renamed empty containers with no 3D meshes.
+    def descendants(node_idx):
+        node = graph["nodes"][node_idx]
+        out = [node_idx]
+        for child in node.get("children", []):
+            out.extend(descendants(child))
+        return out
+    for fan in ("FAN_LEFT", "FAN_CENTER", "FAN_RIGHT"):
+        fan_node = names.index(fan)
+        mesh_count = sum("mesh" in graph["nodes"][i] for i in descendants(fan_node))
+        assert mesh_count >= 6, f"{fan} is not a genuine bladed 3D assembly ({mesh_count} meshes)"
+    assert sum("mesh" in graph["nodes"][i] for i in descendants(names.index("HEATSINK_FINS"))) >= 35, "Missing real fin stack"
     anim = json.loads(anim_file.read_text())
     assert (anim.get("schemaVersion"), anim.get("fps"), anim.get("durationInFrames")) == (1, 30, 450)
     moves = anim.get("nodes", {})
