@@ -37,12 +37,22 @@ function validate(animation:Animation, scene:THREE.Object3D):void {
 const Orientation:React.FC<{frame:number}>=({frame})=>{
  const {camera}=useThree();
  useLayoutEffect(()=>{
-  const p=ease(frame,205,449);
-  const hero=frame<90?ease(frame,0,89):1;
+  // Native proof r1 showed the +Z-separated layers mostly occluding each other
+  // when viewed nearly head-on. A true orbit (no mesh edits or 2D tricks) makes
+  // front-to-back separation legible. Motion eases in as the cooler unlocks,
+  // finishes before the exploded title, then settles just 1-2 degrees.
+  const reveal=ease(frame,160,332);
+  const settle=ease(frame,332,449);
+  const hero=ease(frame,0,89);
   const ortho=camera as THREE.OrthographicCamera;
-  // The ortho viewport in R3F uses native pixels; zoom is pixels per scene unit.
-  ortho.zoom=1920/lerp(6.55,7.3,p);
-  ortho.position.set(lerp(.28,2.0,p)+.17*Math.sin(hero*Math.PI*.65),lerp(.14,.55,p),lerp(10.5,11.8,p));
+  // Full 3D 56-degree angle by payoff while keeping all components in frame.
+  // The ortho viewport uses native pixel coordinates; zoom is px/scene unit.
+  ortho.zoom=1920/lerp(6.55,7.2,reveal);
+  ortho.position.set(
+    .28+10.52*reveal+.30*settle+.17*Math.sin(hero*Math.PI*.65)*(1-reveal),
+    .14+2.46*reveal+.30*settle,
+    10.5-2.90*reveal-.20*settle
+  );
   ortho.lookAt(0,0,0);
   ortho.updateProjectionMatrix();
  },[camera,frame]);
