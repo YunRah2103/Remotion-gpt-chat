@@ -6,7 +6,7 @@ The original procedural block-like car and a subsequent CC0 prototype were **rej
 
 - **Vehicle model:** [Khronos Car Concept](https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept), model and textures by **Eric Chadwick**, ©2024 Darmstadt Graphics Group GmbH, licensed **Creative Commons Attribution 4.0 International**. Credit and licence are preserved in this source and documentation.
 - **Pinned source commit:** `edc7c9e67c639d230715049ee31f9a96a6babbbe`.
-- **Exact GLB SHA1 Git blob:** `391795d5e3f7daa5519ec2e077e8def16bcecdd7`; 10,267,996 bytes.
+- **Exact GLB SHA1 Git blob:** `c0f38c989a78cc4ba63253b5338705e0afb0142f`; 11,778,688 bytes (uncompressed glTF-Binary).
 - **In-repository model:** `public/assets/carconcept.glb`.
 - **Real geometry and wheel components:** `src/turbo/PremiumCar.tsx`, with fixed-position brake pads and rotating tires/rims/discs.
 - **Visual preflight:** `.github/workflows/turbo-car-preview.yml`, including moving native Three.js WebGL footage and full-resolution screenshots.
