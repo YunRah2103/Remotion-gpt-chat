@@ -1,5 +1,15 @@
 # Remotion GPT Chat — Independent 3D automotive documentaries
 
+## Vehicle-quality correction (V2, independent CC0 asset)
+
+The original procedural lofted/body-box car was rejected as unsuitable for a premium automotive film. The corrective branch replaces it, without modifying YUNEX or the turbo internals, with an actually modelled performance vehicle.
+
+- **Car:** [Spectral GT RS](https://github.com/JaronKBragg7337/spectral-gt-rs) by Jaron K Bragg, **CC0 1.0**, Blender-built source and game-ready GLB (263 mesh objects including mechanical detail).
+- **Pinned source:** `34499c501908818a2b08e589a7aecf963343cee7`; binary Git blob SHA `f5b814848453a6c75a48f5047fdadaa7bdc78969`.
+- **Local model:** `public/assets/spectral_gt_rs_game_ready.glb`; versioned directly in this repository.
+- **Implementation:** `src/turbo/PremiumCar.tsx`; grouped independent spinning wheel components and stationary brake calipers, chassis correctly grounded and normalized to 4.98 metres, refined pearl-silver car paint and larger driving compositions.
+- **Proof workflow:** `.github/workflows/turbo-car-preview.yml`, moving WebGL footage, TypeScript, genuine 1080×1920 stills. Approval depends on inspecting actual clips, not compilation alone.
+
 ## THE HIDDEN POWER OF A TURBOCHARGER
 
 A **28-second, 1080 × 1920, 30 fps, 840-frame** original automotive mini-documentary. Implemented with Remotion 4, React, TypeScript, React Three Fiber, Three.js, and genuine WebGL rendering.
