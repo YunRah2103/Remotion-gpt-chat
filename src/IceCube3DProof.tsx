@@ -62,7 +62,7 @@ const Earth=({frame}:{frame:number})=>{
       <meshStandardMaterial map={map} color="#4b7892" roughness={1} metalness={0} emissive="#102936" emissiveIntensity={.30}/>
     </mesh>
     <mesh scale={[1.025,1.025,1.025]}>
-      <sphereGeometry args={[1.03,64,48]}/>
+      <sphereGeometry args={[.53,64,48]}/>
       <shaderMaterial
         transparent depthWrite={false} blending={THREE.AdditiveBlending}
         vertexShader={`varying vec3 vn;varying vec3 ve; void main(){
