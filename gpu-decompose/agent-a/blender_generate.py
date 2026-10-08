@@ -31,7 +31,7 @@ def mat(name,col,metal=0,rough=.45):
 plastic=mat("M_POLYMER_GRAPHITE",(.032,.037,.046),.10,.58)
 frame_mat=mat("M_SHROUD_DARK",(.055,.063,.076),.2,.36)
 rim=mat("M_FAN_RING",(.018,.022,.027),.32,.3)
-blade=mat("M_FAN_BLADE",(.025,.031,.039),.16,.46)
+blade=mat("M_FAN_BLADE",(.016,.019,.023),.08,.39)
 hubmat=mat("M_FAN_HUB",(.037,.043,.052),.15,.42)
 black_gloss=mat("M_GLOSS_ACCENT",(.012,.017,.02),.6,.20)
 steel=mat("M_BRUSHED_ALUMINIUM",(.56,.60,.63),.82,.27)
@@ -42,7 +42,7 @@ pcbmat=mat("M_PCB_DARK_GREEN",(.018,.053,.047),.1,.51)
 chipmat=mat("M_CHIP_CERAMIC_DARK",(.021,.025,.032),.08,.42)
 gold=mat("M_CONTACT_GOLD",(.73,.50,.16),.89,.22)
 accent=mat("M_LOGO_PALE_SILVER",(.79,.85,.87),.25,.31)
-ventmat=mat("M_BACKPLATE_GRAPHITE",(.066,.073,.083),.64,.44)
+ventmat=mat("M_BACKPLATE_GRAPHITE",(.032,.037,.044),.37,.57)
 groovemat=mat("M_BACKPLATE_INSET",(.013,.017,.021),.11,.61)
 root=empty("GPU_ROOT")
 fans=empty("FAN_ASSEMBLY",root)
@@ -91,28 +91,49 @@ def torus(name,loc,r,thick,ma,parent):
  for p in ob.data.polygons:p.use_smooth=True
  return ob
 def blade_mesh(parent,cx,cz,idx,material):
- # Curved swept 3D aerofoils, angled/cambered leading/trailing edges in XZ.
- N=10;ang=idx*math.tau/N
- vals=[(.135,-.32),(.22,-.23),(.34,-.08),(.43,.19)]
+ # Nine true 3D, broad, swept axial rotor blades, double-sided with camber.
+ # The source photograph shows large filled-in black aerofoils, not narrow spokes.
+ nblades=9
+ heading=idx*math.tau/nblades
+ sections=[
+  (.125,-.35,.57),
+  (.172,-.28,.64),
+  (.240,-.16,.61),
+  (.308,-.01,.55),
+  (.375,.10,.49),
+  (.421,.20,.36),
+  (.446,.27,.17)]
+ face_count=len(sections)*2
  verts=[]
- for yy in [0,.012]:
-  for r,sweep in vals:
-   for edge in [0,.14]:
-    a=ang+sweep+edge+(r-.13)*.32
-    verts.append((cx+r*math.cos(a),-.213+yy+.009*(r/.43),cz+r*math.sin(a)))
- polys=[]
- for j in range(len(vals)-1):
-  k=j*2; t=(j+1)*2
-  polys.append((k,t,t+1,k+1))
-  polys.append((8+k+1,8+t+1,8+t,8+k))
- for i in range(7):
-  j=(i+1)%8
-  if i<7:polys.append((i,j,8+j,8+i))
- polys.append((0,8,9,1));polys.append((6,7,15,14))
- mesh=bpy.data.meshes.new("SweptBladeGeometry");mesh.from_pydata(verts,[],polys);mesh.update()
- ob=bpy.data.objects.new("RotorBlade_%02d"%idx,mesh);coll.objects.link(ob);ob.parent=parent
- mesh.materials.append(material)
- for f in mesh.polygons:f.use_smooth=True
+ for back in [False,True]:
+  for radius,sweep,width in sections:
+   for edge in [0,1]:
+    angle=heading+sweep+(edge*width)+(radius-.125)*.08
+    # Aerodynamic twist: shallow camber and cupped trailing edge.
+    camber=math.sin(math.pi*edge)
+    y=-.248+.033*(radius/.446)+.011*edge+.004*camber
+    if back:y+=.016
+    verts.append((cx+radius*math.cos(angle),y,cz+radius*math.sin(angle)))
+ faces=[]
+ for j in range(len(sections)-1):
+  k=2*j;t=k+2
+  faces.append((k,k+1,t+1,t))
+  faces.append((face_count+t,face_count+t+1,face_count+k+1,face_count+k))
+ for j in range(face_count-1):
+  if j%2==0:
+   faces.append((j,j+2,face_count+j+2,face_count+j))
+ for j in range(0,face_count,2):
+  faces.append((j,j+1,face_count+j+1,face_count+j))
+ j=face_count-2
+ faces.append((j,j+1,face_count+j+1,face_count+j))
+ me=bpy.data.meshes.new("MouldedSweptFanBlade")
+ me.from_pydata(verts,[],faces);me.update()
+ ob=bpy.data.objects.new("BroadRotorBlade_%02d"%idx,me)
+ coll.objects.link(ob);ob.parent=parent
+ me.materials.append(material)
+ for p in me.polygons:p.use_smooth=True
+ mod=ob.modifiers.new("aerofoil edge bevel","BEVEL")
+ mod.width=.002;mod.segments=2
  return ob
 def stl_vertices(stl):
  data=pathlib.Path(stl).read_bytes()
@@ -139,58 +160,85 @@ def import_cad_hub(name,stl,parent,x,z):
  for tri in tris:
   idx=len(verts)
   # SCAD mm XYZ: convert XY=> XZ Blender fan plane; SCAD Z=> Blender -Y.
-  for q in tri:verts.append((x+q[0]*.01,-.219-q[2]*.01,z+q[1]*.01))
+  for q in tri:verts.append((x+q[0]*.01,-.181-q[2]*.01,z+q[1]*.01))
   polys.append((idx,idx+1,idx+2))
  me=bpy.data.meshes.new("OpenSCAD_CAD_HUB_MESH");me.from_pydata(verts,[],polys);me.update()
  ob=bpy.data.objects.new(name,me);coll.objects.link(ob);ob.parent=parent
  me.materials.append(hubmat);return ob
 cad=HERE/"fan_hub.stl"
 if not cad.exists():raise RuntimeError("Real OpenSCAD STL required before modelling: "+str(cad))
-# Fans: positions verified from three-up marketing photography, approximate 90mm rotors.
+# Accurate-looking solid black nine-blade fan rotors with dark recessed wells.
+# The OpenSCAD hub remains truly embedded, mounted behind each visible cap.
+well_mat=mat("M_DARK_RECESSED_FAN_WELL",(.006,.008,.010),.08,.82)
+fan_tip_mat=mat("M_FAN_BLADE_WARM_BLACK",(.016,.019,.023),.07,.39)
+fan_decal=mat("M_FAN_LOGOMARK_SILVER",(.47,.51,.55),.33,.38)
 for i,(x,node) in enumerate(zip([-.94,0,.94],fan_nodes)):
- torus("FAN_%d_Spinner_Rim"%i,(x,-.203,.025),.452,.012,rim,node)
- torus("FAN_%d_OuterRing"%i,(x,-.199,.025),.468,.008,frame_mat,node)
- for j in range(10):blade_mesh(node,x,.025,j,blade)
- cylinder("FAN_HUB_CORE_%d"%i,(x,-.220,.025),.144,.024,hubmat,node)
+ cylinder("Recessed_black_cooler_well_%d"%i,(x,-.157,.025),.445,.009,well_mat,node,72)
+ torus("Fan_anti_vibration_gasket_%d"%i,(x,-.211,.025),.456,.011,rim,node)
+ torus("Fan_precision_outer_bezel_%d"%i,(x,-.225,.025),.463,.007,frame_mat,node)
+ for j in range(9):blade_mesh(node,x,.025,j,blade)
  import_cad_hub("OpenSCAD_FanHub_%d"%i,cad,node,x,.025)
- # Minimal engraved X mark on each dark hub face:
+ # Circular cap (OEM design has smooth caps carrying small X marks).
+ cylinder("Fan_smooth_center_cap_%d"%i,(x,-.251,.025),.141,.026,hubmat,node)
+ torus("Fan_hub_chamfer_%d"%i,(x,-.266,.025),.138,.006,black_gloss,node)
  for sign in [-1,1]:
-  ob=box("FAN_X_badge_%d_%d"%(i,sign),(x+sign*.017,-.235,.025),(.042,.003,.006),accent,node)
-  ob.rotation_euler[1]=sign*.61
-# Shroud has open fan holes. No front-covering opaque solid panel.
-# Real dark polygon fascia surrounding circular fan cut-outs, rather than exposed silver cooling fins.
+  ob=box("Fan_X_silver_insignia_%d_%d"%(i,sign),
+         (x,-.267,.025),(.076,.002,.012),fan_decal,node)
+  ob.rotation_euler[1]=sign*.71
+
+# Entire dark seamless sculpted fascia, constructed as three annular cut-out panels.
+# Topology is real triangles with true open holes, not an image pasted on a box.
+fascia=mat("M_MONOLITHIC_XFX_FASCIA",(.025,.028,.033),.14,.61)
+fascia_highlight=mat("M_ANGULAR_FASCIA_HIGHLIGHT",(.047,.051,.058),.25,.48)
+edgeblack=mat("M_TRIPLE_FAN_BEZEL_BLACK",(.016,.019,.024),.28,.43)
 def aperture_fascia(parent,cx):
  verts=[];faces=[]
- segments=96;inner=.454
+ segments=128;inner=.453
  for i in range(segments):
   a0=i*math.tau/segments;a1=(i+1)*math.tau/segments
   def point(a,r):
-   return (cx+r*math.cos(a),-.223,.025+r*math.sin(a))
+   return (cx+r*math.cos(a),-.217,.025+r*math.sin(a))
   def outer(a):
    ca=math.cos(a);sa=math.sin(a)
-   edge_z=.525 if sa>=0 else .570
-   return min(.474/max(1e-6,abs(ca)),edge_z/max(1e-6,abs(sa)))
+   upper=.570
+   lower=.600
+   edge=upper if sa>=0 else lower
+   return min(.475/max(1e-6,abs(ca)),edge/max(1e-6,abs(sa)))
   start=len(verts)
   verts.extend([point(a0,inner),point(a0,outer(a0)),point(a1,outer(a1)),point(a1,inner)])
   faces.extend([(start,start+1,start+2),(start,start+2,start+3)])
- me=bpy.data.meshes.new("ApertureFascia");me.from_pydata(verts,[],faces);me.update()
- ob=bpy.data.objects.new("Solid_Fan_Aperture_Fascia",me);coll.objects.link(ob)
- ob.parent=parent;me.materials.append(plastic)
+ mesh=bpy.data.meshes.new("Solid_Apertured_Shroud_Tris")
+ mesh.from_pydata(verts,[],faces);mesh.update()
+ ob=bpy.data.objects.new("One_piece_black_front_fascia",mesh)
+ coll.objects.link(ob);ob.parent=parent;mesh.materials.append(fascia)
 for fan_x in [-.94,0,.94]:aperture_fascia(shroud,fan_x)
-box("Shroud_top_rail",(0,-.177,.584),(2.90,.108,.072),plastic,shroud,.010)
-box("Shroud_bottom_rail",(0,-.177,-.583),(2.90,.106,.074),plastic,shroud,.009)
-for x in [-1.419,1.419]:
- box("Shroud_end_cap",(x,-.178,0),(.062,.12,1.16),plastic,shroud,.012)
-for x in [-.468,.468]:
- box("Shroud_center_bridge",(x,-.184,0),(.018,.07,1.12),frame_mat,shroud,.006)
+# Seamless edge body: no raised square separators between individual fans.
+box("Monolithic_shroud_top",(0,-.143,.593),(2.89,.147,.046),fascia,shroud,.015)
+box("Monolithic_shroud_bottom",(0,-.143,-.596),(2.89,.146,.046),fascia,shroud,.015)
+for x in [-1.420,1.420]:
+ box("Rounded_chassis_endwall",(x,-.147,0),(.055,.150,1.16),fascia,shroud,.013)
 for x in [-.94,0,.94]:
- torus("ShroudFanBezel",(x,-.210,.025),.47,.019,frame_mat,shroud)
-# bevelled side bands/ridges
-for z in [-.519,.519]:
- box("Shroud_side_creaseline",(0,-.217,z),(2.81,.021,.015),black_gloss,shroud,.004)
-for x in [-1.33,1.33]:
- for z in [-.52,.52]:
-  box("MountBoss",(x,-.16,z),(.076,.065,.076),plastic,shroud,.008)
+ torus("Integrated_matte_black_bezel",(x,-.220,.025),.460,.008,edgeblack,shroud)
+# Actual Swift-style diagonal notches at both outside endcaps.
+def accent_polygon(name,points,ma=fascia_highlight):
+ mesh=bpy.data.meshes.new(name+"_Geo")
+ mesh.from_pydata([(x,-.222,z) for x,z in points],[],[tuple(range(len(points)))])
+ mesh.update();ob=bpy.data.objects.new(name,mesh)
+ coll.objects.link(ob);ob.parent=shroud;mesh.materials.append(ma)
+ return ob
+for side in [-1,1]:
+ def P(x,z):return (side*x,z)
+ accent_polygon("Swift_upper_corner_sweep_%s"%side,[
+  P(1.04,.570),P(1.40,.570),P(1.40,.505),P(1.27,.503),P(1.19,.532)])
+ accent_polygon("Swift_lower_corner_cut_%s"%side,[
+  P(1.03,-.566),P(1.40,-.566),P(1.40,-.505),P(1.29,-.490),P(1.16,-.533)])
+# Tight full-length anti-scratch edge piping (black-on-black).
+for z in [-.535,.542]:
+ box("Shroud_fine_tapered_piping",(0,-.221,z),(2.74,.005,.008),black_gloss,shroud,.002)
+for x in [-1.389,1.389]:
+ for z in [-.50,.50]:
+  cylinder("Hidden_fastener",(x,-.203,z),.011,.004,edgeblack,shroud,18)
+
 # Outer top/body metal spine
 box("RADEON_brand_spine",(-.86,-.085,.597),(.91,.195,.047),frame_mat,shroud,.007)
 box("XFX_brand_spine",(1.08,-.089,.600),(.48,.195,.037),frame_mat,shroud,.008)
@@ -270,6 +318,9 @@ for i in range(9):
  xvee=-.22+i*.02
  linebar("V_wave_left_%02d"%i,(x0,ztop),(xvee,.03),.012,back,groovemat)
  linebar("V_wave_right_%02d"%i,(xvee,.03),(.45,zend),.012,back,groovemat)
+# Backplate end vent is reinforced with subtle longitudinal ribs.
+for z in [-.35,-.21,-.07,.07,.21,.35]:
+ box("Rear_vent_rib",(1.01,.236,z),(.80,.022,.018),ventmat,back,.005)
 for x in [-1.25,-.64,.48,1.30]:
  for z in [-.50,.50]:
   cylinder("Backplate_screw",(x,.245,z),.012,.007,steel,back,16)
@@ -284,14 +335,14 @@ def studio():
   dire=Vector((0,0,0))-ob.location;ob.rotation_euler=dire.to_track_quat("-Z","Y").to_euler()
  light((0,-4.1,4.5),780,4.0);light((-3,-2,1.6),520,3.5);light((3.5,1,3),1100,3.0)
  camdata=bpy.data.cameras.new("Preview_camera");cam=bpy.data.objects.new("Preview_camera",camdata)
- bpy.context.scene.collection.objects.link(cam);cam.location=(3.4,-7.2,2.3)
+ bpy.context.scene.collection.objects.link(cam);cam.location=(2.0,-7.2,2.05)
  dire=Vector((0,0,0))-cam.location;cam.rotation_euler=dire.to_track_quat("-Z","Y").to_euler()
- camdata.type="ORTHO";camdata.ortho_scale=4.25;bpy.context.scene.camera=cam
+ camdata.type="ORTHO";camdata.ortho_scale=3.65;bpy.context.scene.camera=cam
  scene=bpy.context.scene
- scene.render.engine='CYCLES';scene.cycles.samples=124
+ scene.render.engine='CYCLES';scene.cycles.samples=52
  for layer in scene.view_layers:
   if hasattr(layer,'cycles'):layer.cycles.use_denoising=False
- scene.render.resolution_x=680;scene.render.resolution_y=480
+ scene.render.resolution_x=960;scene.render.resolution_y=640
  scene.render.resolution_percentage=100
  scene.render.image_settings.file_format="PNG"
  scene.render.film_transparent=False
@@ -324,14 +375,14 @@ scene.frame_set(0);scene.render.filepath=str(ASSETS/"assembled.png");bpy.ops.ren
 scene.frame_set(449)
 # Stronger three-quarter viewing angle makes front-to-back exploded offsets readable.
 camera=scene.camera
-camera.location=(6.2,-5.6,2.65)
+camera.location=(6.5,-6.0,2.65)
 camera.rotation_euler=(Vector((0,0,0))-camera.location).to_track_quat("-Z","Y").to_euler()
-camera.data.ortho_scale=5.1
+camera.data.ortho_scale=4.9
 scene.render.filepath=str(ASSETS/"exploded.png");bpy.ops.render.render(write_still=True)
 # Render REAL sampled moving frames for short evidence video, no screenshot animation fakes.
 preview=ASSETS/"moving_frames";preview.mkdir(exist_ok=True)
 scene.render.resolution_x=448;scene.render.resolution_y=316
-scene.cycles.samples=6
+scene.cycles.samples=10
 for f in list(range(89,330,12))+[380,449]:
  scene.frame_set(f)
  scene.render.filepath=str(preview/("f_%03d.png"%f))
