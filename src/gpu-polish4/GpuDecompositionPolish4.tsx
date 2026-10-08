@@ -93,12 +93,12 @@ export const StudioLighting:React.FC=()=> <React.Fragment>
   <color attach="background" args={['#1c2227']}/>
   <ambientLight intensity={.42} color="#e8ebec"/>
   <hemisphereLight args={['#f4f4f1','#2b343c',1.2]}/>
-  <directionalLight position={[-3.8,6.8,7.1]} intensity={3.1}
+  <directionalLight position={[-3.8,6.8,7.1]} intensity={3.8}
     color="#fff9f3" castShadow shadow-mapSize-width={2048}
     shadow-mapSize-height={2048} shadow-bias={-.0003}/>
   <spotLight position={[1.4,4.8,8.5]} intensity={21} angle={.88}
     penumbra={1} color="#f7f8fa"/>
-  <directionalLight position={[6.4,1.0,2.6]} intensity={1.6} color="#f5f5f3"/>
+  <directionalLight position={[6.4,1.0,2.6]} intensity={2.15} color="#f5f5f3"/>
   <directionalLight position={[2.1,3.2,-6.8]} intensity={3.5} color="#eef2f4"/>
   <directionalLight position={[-5.0,-3.7,3.0]} intensity={1.0} color="#e2e5e8"/>
 </React.Fragment>;
