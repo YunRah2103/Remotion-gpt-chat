@@ -34,6 +34,7 @@ jobs:
           set -euo pipefail
           npm install --no-audit --no-fund
           npm run check
+          sha256sum src/gpu-polish5/GpuDecompositionPolish5.tsx src/gpu-polish5/camera.ts gpu-decompose/polish5/motion/decomposition.v1.json
           python3 gpu-decompose/polish5/manager/verify_polish5.py lock gpu-decompose/polish5/manager/RELEASE_LOCK.json
           L=gpu-decompose/polish5/manager/RELEASE_LOCK.json
           echo "phase=$(jq -r .status "$L")" >> "$GITHUB_OUTPUT"
