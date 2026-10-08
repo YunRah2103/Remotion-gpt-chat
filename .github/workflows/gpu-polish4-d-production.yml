@@ -126,7 +126,7 @@ jobs:
           set -euo pipefail
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
-          npm ci --no-audit --no-fund
+          npm install --no-audit --no-fund
           npm run check
           python3 gpu-decompose/polish4/manager/verify_polish4.py assets \
             public/gpu-decompose/polish4 out/stage/RELEASE_LOCK.json
@@ -205,7 +205,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
-          npm ci --no-audit --no-fund
+          npm install --no-audit --no-fund
           npm run check
           python3 gpu-decompose/polish4/manager/verify_polish4.py assets \
             public/gpu-decompose/polish4 out/stage/RELEASE_LOCK.json
