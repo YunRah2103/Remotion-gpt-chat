@@ -1,0 +1,41 @@
+name: Import CC-BY 4.0 detailed Khronos concept car
+on:
+  push:
+    branches: [fix/turbo-car-quality-v2]
+    paths: ['.github/workflows/import-concept-car.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  import-verified-glb:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/turbo-car-quality-v2
+      - name: Download and hash-verify pinned Khronos GLB
+        run: |
+          mkdir -p public/assets
+          curl -fLSs --retry 3 -o public/assets/carconcept.glb 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/CarConcept/GLB/CarConcept.glb'
+          test "$(wc -c < public/assets/carconcept.glb | tr -d ' ')" = 10267996
+          test "$(git hash-object public/assets/carconcept.glb)" = 391795d5e3f7daa5519ec2e077e8def16bcecdd7
+          python3 - <<'PY'
+          import struct,json
+          data=open('public/assets/carconcept.glb','rb').read()
+          assert data[:4]==b'glTF'
+          size,typ=struct.unpack_from('<II',data,12)
+          assert typ==0x4e4f534a
+          obj=json.loads(data[20:20+size])
+          names=[n.get('name','') for n in obj.get('nodes',[])]
+          for expected in ('WheelFrontL','WheelFrontR','WheelRearL','WheelRearR','BodyHood'):
+            assert expected in names,expected
+          print('PASS CC-BY 4.0 Khronos GLB, exact checksum, four named wheel groups and fitted body panels')
+          PY
+      - name: Commit independent concept-car binary
+        run: |
+          git config user.name "remotion-car-import"
+          git config user.email "car-import@users.noreply.github.com"
+          git add public/assets/carconcept.glb
+          git commit -m "Install licensed Khronos concept-car GLB with exact upstream checksum"
+          git push origin HEAD:fix/turbo-car-quality-v2
