@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "task": "carbon-ceramic-001-agent-d",
   "branch": "automotive-brakes-001/d-graphics-qa",
-  "sourceSha": "94389c11b60b46ff12329244e2423ff501e32f72",
+  "sourceSha": "42a9b4833b61b1fdf3a4972e271d6429d611d355",
   "owner": "qa",
-  "summary": "Polish02 INDEPENDENT NATIVE QA performed against real source-locked A Blender GLB/Cycles PNGs and E five stills plus both 61-frame decoded moving H264 previews. Latest hero frame705 fix verified at film code 8b6ee... via successful workflow-head 683b97...; conditional pass of previews only, not full 750-frame release. Major lookdev, 531 framing and visually unproven pad stroke remain.",
+  "summary": "POLISH03 FULL 25s candidate independently inspected: source 5b378202... genuine 1080x1920 750-frame 25.0s H264 silent MP4 verified full FFmpeg decode and SHA. Film graded 5.8/10 FAIL FOR RELEASE: 20-25s nearly static hero; pad motion underexplained. Latest E film source 37e04ee... has native verified heat/camera corrections, separate 1080 pad proof; A03 Blender lookdev PASS but is not in-film. One targeted hero camera fix recommended before F approved final render; no full latest source MP4 is approved.",
   "status": "review",
   "files": [
     "src/brakes001/graphics/index.tsx",
@@ -19,52 +19,58 @@
     "production/videos/carbon-ceramic-001/qa/proofs/layout-frame-321.svg",
     "production/videos/carbon-ceramic-001/qa/proofs/layout-frame-531.svg",
     "production/videos/carbon-ceramic-001/qa/proofs/layout-frame-705.svg",
-    "production/videos/carbon-ceramic-001/qa/POLISH02_INDEPENDENT_REVIEW.md"
+    "production/videos/carbon-ceramic-001/qa/POLISH02_INDEPENDENT_REVIEW.md",
+    "production/videos/carbon-ceramic-001/qa/POLISH03_FULL_CANDIDATE_REVIEW.md"
   ],
   "evidence": [
-    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/94389c11b60b46ff12329244e2423ff501e32f72/production/videos/carbon-ceramic-001/qa/POLISH02_INDEPENDENT_REVIEW.md",
-    "REVIEWED E FILM CODE: https://github.com/YunRah2103/Remotion-gpt-chat/commit/8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d",
-    "LATEST NATIVE SUCCESS RUN SHA 683b97dea79590a7026bd2b89204ee8945f908ff: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37970589567",
-    "FIVE STILLS + BOTH REAL 61-FRAME MP4 PREVIEWS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37970589567/artifacts/11636410211",
-    "NATIVE BLENDER .BLEND/.GLB FOUR REAL CYCLES PNGS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37968622756/artifacts/11633864744",
-    "CHECK: source 8b6ee→683b97 only workflow file changed, 683b97→c8bdb9 only documentation changed",
-    "LOCAL FFPROBE + FULL FFMPEG DECODE PASS: clamp 61/61 frames 378x672 30 fps 2.033333s H264; heat 61/61 same; entire 122 frames processed, every third visually inspected in strips",
-    "GLB SHA256 261b11aa1c71610e52ad9fe25a57b179427f0de833dc6904d41d8da44013a5ac independently verified; trimesh loaded 140 geometries and 149 graph nodes including root",
-    "FRAME DIFF: 48,168,321,531 byte-identical to previous d9 E proof; new source-specific frame705 changes 149483/518400 pixels and visibly removes left caliper clipping"
+    "AGENT D SOURCE REPORT: https://github.com/YunRah2103/Remotion-gpt-chat/blob/42a9b4833b61b1fdf3a4972e271d6429d611d355/production/videos/carbon-ceramic-001/qa/POLISH03_FULL_CANDIDATE_REVIEW.md",
+    "FULL 25S CANDIDATE ARTIFACT: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37978273707/artifacts/11639835454",
+    "F CANDIDATE WORKFLOW: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37978273707  source film 5b378202187748ce9b51d884f26bb7167285c946; run SHA dcc710b04478784233fda1743904cee9e7b057af",
+    "LOCAL FULL 750-FRAME FFMPEG DECODE PASS; FFPROBE H264/yuv420p 1080x1920 30fps 750frames 25.000s; SHA256 e7ed2619ab6ed09087cdb50cfc2b4fb94e3262aa69da77b72e5142bcb51bec73",
+    "750-FRAME PIXEL MOTION AUDIT: frames 600-749 average grayscale frame delta 0.23595 vs reveal 120-269 1.57392; 74pct late delta under .25; real non-identical frames so not an actual frozen encoder",
+    "E POLISH03 SOURCE: https://github.com/YunRah2103/Remotion-gpt-chat/commit/37e04ee309dc9f96e63ad1b4eda28f25fea3a96a ; native film artifact https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976988034/artifacts/11639302827",
+    "E MACRO REAL FULLRES 61FR VIDEO: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976988178/artifacts/11638383796 ; supplementary composition not present in candidate/full film",
+    "E BENEFITS/THERMAL: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976988178/artifacts/11638918513 ; local native mp4 decode PASS",
+    "A03 BLENDER NATIVE: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976686710/artifacts/11638453325 ; independent GLB SHA256 645c4b7fbe11ea5c9715bed2eb979ae6e96ba3d3c34f85f74553b02f7ea977db",
+    "GIT DIFF: candidate 5b378... to E film 37e04... only E film benefit 1-line and E heat map 3-line + workflow; E film to 174489... only A Blender scripts and docs; hero camera math unchanged"
   ],
   "blockers": [
-    "MAJOR: Four A Blender Cycles shots overexposed/washed out; A must change proof lookdev and rerender.",
-    "MAJOR: E benefits frame531 left caliper clipped, ring nearly fills both horizontal edges; E must reframe and prove new-source frames.",
-    "MAJOR/UNPROVEN: 378x672 clamp moving proxy does not establish that the true 2.35 mm opposing pad motion is visibly understandable; E must provide 1080x1920 side/3-4 moving macro.",
-    "MODERATE: Thermal annulus mostly uniform orange in 300-360, release/cooling cycle not verified in available motion proof.",
-    "No complete 750-frame full-resolution release / full-film phone QA / final approved audio source reviewed. Agent F owns release only after Master accepts fixes."
+    "RELEASE MAJOR: visually near-static last 5s (600-749), and 19-25s lacks visible hero-camera payoff. Existing frame diff proves real but weak motion. E owns one targeted hero framing/orbit correction; no broad rework.",
+    "RELEASE MAJOR: actual main film does not clearly show opposing physical pad clamp. Separate E hi-res macro proves mechanism but is not included in final composition; E can add a short in-film cutaway, or Master explicitly waives.",
+    "NEW E film code (37e04ee..., current documented head 174489...) has NOT produced a new complete 25s 1080p MP4, so final release cannot be approved from older F candidate.",
+    "Approved narration not supplied: candidate silent as expected, do not synthesize unsupported voice or claim final sound approval.",
+    "Review environment cannot play uninterrupted realtime video; 750 frames decoded, 75 chronological story frames sampled and visually inspected, five reference stills and E native previews examined; Master real-speed viewing is release gate."
   ],
-  "notes": "Master may integrate now. This is NOT certification of the final movie. Native GLB/mechanics/thermal review, actual phone stills, 135-195 and 300-360 moving clips, full MP4 ffprobe and FFmpeg decode are PENDING. Layout SVGs intentionally show schematic placeholder, not real footage.",
+  "notes": "POLISH03: Release candidate technically PASS but artistically FAIL 5.8/10. One focused E hero fix is worthwhile; no new Agent A hardware/polish cycles. Five-shot final movie requires a NEW F source-locked full render and independent D/Master final inspection.",
   "review": {
-    "verdict": "CONDITIONAL PASS — preview/prototype only; NOT RELEASE APPROVED",
-    "reviewedFilmCodeSha": "8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d",
-    "renderedWorkflowHeadSha": "683b97dea79590a7026bd2b89204ee8945f908ff",
-    "latestEHeadDocumentationSha": "c8bdb9fd31f93364ae9ca263bd41ff439e777e14",
-    "runId": 37970589567,
-    "filmArtifactId": 11636410211,
-    "blenderArtifactId": 11633864744,
-    "reviewedStillFrames": [
-      48,
-      168,
-      321,
-      531,
-      705
-    ],
-    "reviewedMovingRanges": [
-      "135-195",
-      "300-360"
-    ],
-    "reviewedCodeComponents": [
-      "src/brakes001/CarbonCeramic001.tsx",
-      "src/brakes001/integration/integrationState.ts",
-      "src/brakes001/hardware/BrakeAssembly.tsx"
-    ],
-    "visualSequenceInspection": "all 61 frames decoded for each of 2 clips; timeline strips every third frame inspected; no uninterrupted realtime playback claimed",
+    "phase": "POLISH03_FULL_CANDIDATE",
+    "verdict": "FAIL FOR RELEASE — 5.8/10; focused E hero shot motion and in-film pad action recommended",
+    "candidateSourceSha": "5b378202187748ce9b51d884f26bb7167285c946",
+    "candidateFRunSha": "dcc710b04478784233fda1743904cee9e7b057af",
+    "candidateRunId": 37978273707,
+    "candidateArtifactId": 11639835454,
+    "candidateSha256": "e7ed2619ab6ed09087cdb50cfc2b4fb94e3262aa69da77b72e5142bcb51bec73",
+    "candidateVideoSpecs": {
+      "frames": 750,
+      "width": 1080,
+      "height": 1920,
+      "fps": 30,
+      "seconds": 25,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "audio": "silent"
+    },
+    "candidateVisualRatingOutOf10": 5.8,
+    "independentFullDecode": "PASS (all 750 frames)",
+    "visualReviewMethod": "extracted 75 frames each 10f + native five sample frames + 750-frame grayscale motion metrics; continuous real-time playback unavailable; explicitly not claimed",
+    "latestEFilmCodeSha": "37e04ee309dc9f96e63ad1b4eda28f25fea3a96a",
+    "latestEDocumentationSha": "17448993b56d33ef4fbe416f266a0b9eda865691",
+    "correctedBenefitFrame531": true,
+    "correctedThermalHeatProof": true,
+    "standaloneHiResPadMacro": true,
+    "integratedPadDemonstrationClear": false,
+    "uncorrectedLateHeroWeakMotion": true,
+    "latestFullFilmReviewed": false,
     "finalReleaseApproved": false
   }
 }
