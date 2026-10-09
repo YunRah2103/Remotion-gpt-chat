@@ -1,73 +1,77 @@
-# Agent A — Carbon-Ceramic Brakes 001 / Hardware Polish 02
+# CARBON-CERAMIC BRAKES 001 — Agent A / HARDWARE POLISH 03
 
-**Status: REVIEW, NOT READY.** The source corrections are committed, but the required **new-source native Blender stills and GLB verification have not run**. Neither a green planning check nor Agent E's **prior** GLB can replace that evidence.
+**Status: READY for Agent E to re-import and independently review. This is Agent A's native hardware lookdev signoff, NOT Master/D approval of a finished film.**
 
-- Repository: `YunRah2103/Remotion-gpt-chat`
-- Branch: `automotive-brakes-001/a-hardware`
-- **Exact implementation source SHA** (all A hardware changes, manifest, source numerical evidence): `0bfc8ce52f15e6bf883cca0ad425fd4359d5af33`
-- PR: https://github.com/YunRah2103/Remotion-gpt-chat/pull/11
-- Integration destination: `automotive-brakes-001/e-integration` (E-owned; not modified by A)
+| Provenance | Exact value |
+| --- | --- |
+| Source repository | `YunRah2103/Remotion-gpt-chat` |
+| Owned branch | `automotive-brakes-001/a-hardware` |
+| **Native rendered implementation SHA** | `f22ba2e5b2498baa52d0a22121a2f05153d894a9` |
+| Real success workflow | [37976686710](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976686710) |
+| **Native output artifact** | [11638453325](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976686710/artifacts/11638453325) |
+| Artifact name | `brakes001-a-polish03-37976686710` |
+| **GLB SHA256** | `645c4b7fbe11ea5c9715bed2eb979ae6e96ba3d3c34f85f74553b02f7ea977db` |
+| Existing Agent A PR | [#11](https://github.com/YunRah2103/Remotion-gpt-chat/pull/11) |
+| Integration agent | Agent E, `automotive-brakes-001/e-integration` (not modified by A) |
 
-## What changed relative to the earlier working GLB
+## Genuine deliverables and native proof
 
-1. **Blender render failure:** GitHub native run [37947404308](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37947404308) exported a valid older GLB, but failed on its first Cycles close-up with `Build without OpenImageDenoiser`. The builder now chooses CPU Cycles (24 samples), explicitly disables scene/view-layer/preview denoising where supported, and checks each rendered PNG exists and is substantial. This is an **implemented fix, not a verified rerender**.
-2. **Sculpted caliper:** Replaces the two broad flat sector cheeks with closed, rounded, three-lobed parametric cheek shells. Adds forged ribs, machined crown and edges, purposeful fixing ears, six piston bore/cap/seal details, hydraulics and bleed components. Three discrete structural cross-bridges replace the old solid wall; actual open windows reveal the piston and pad region.
-3. **Pad fidelity:** Distinct dark friction compound, backing plates, anti-squeal shims and two retaining ears per side. Lining faces stay at **x=±0.018 m** at rest, with **2.5 mm** of per-pad axial closure toward rotor faces x=±0.0155 m. No exaggerated animation distance.
-4. **Material separation:** Keeps textured cold composite rotor, real axial drilling and 44 curved internal vanes; forged dark satin caliper, nickel hardware, aluminium hat and steel shims each use separate materials. Does not assert calibrated heat or OEM CAD.
-5. **Three.js parity:** Existing `BrakeAssembly` export, props and eight root nodes stay stable. Removes box-caliper geometry, uses matching multi-lobed geometry and three open structural cross-bridges. All added geometry is memoized across frames. No edit to Agent B/C/D/E/F/Master work.
+The source-specific artifact contains newly generated **Blender 4.0.2 Cycles CPU** outputs:
+`after/carbon-ceramic-brake.blend`, `after/carbon-ceramic-brake.glb`,
+`after/rig-manifest.json`, `after/build-report.json`,
+`after/rotor-front.png`, `after/ventilation.png`, `after/exploded.png`,
+`after/pad-contact.png` (each **900×900**), the exact `before/` Polish02 source images,
+`review/polish02-vs-polish03-contact-sheet.png`, `review/lookdev-comparison.json`,
+log files and `SOURCE.txt` / SHA256SUMS. No original large binary was put in ordinary Git.
 
-## Current mechanical contract
+**Four actual native PNGs and the contact sheet were individually opened and visually inspected.** Results:
+- **Rotor front:** carbon disc is matte charcoal rather than white. True drilled bores, mottled composite grain and stepped hat remain visible. Caliper has a defined cool-blue forged silhouette; hub registers and bolt heads are separated.
+- **Ventilation:** directional grazing illumination reads two disc faces and curved real cooling slots, with rim edge correctly separated from dark background; no large areas of blown specular highlight.
+- **Exploded:** brushed metallic hub/hat, different carbon ring surface and pale-blue caliper are distinct. Despite dark intentional studio surroundings, hub steps and ring ventilation stay legible.
+- **Pad contact:** sculpted cheeks, two visible pistons, bridge straps and radial rotor detail are finally readable in a tight macro. Both opposing pad inner contact faces are not fully exposed from this particular front-biased camera; this does **not** substitute for E's axial pad-clamp close-up.
 
-| Stable node | Parent | Motion |
-|---|---|---|
-| `RotorAssembly` | scene | rotates about +X |
-| `FrictionRing` | RotorAssembly | rotates with rotor |
-| `RotorHat` | RotorAssembly | rotates with rotor |
-| `Hub` | RotorAssembly | rotates with rotor |
-| `CaliperBody` | scene | fixed |
-| `PadInner` | scene | approaches +X |
-| `PadOuter` | scene | approaches -X |
-| `UprightSupport` | scene | fixed |
+### Pixel-measured before/after comparison from ORIGINAL Cycles PNGs
 
-Nominal friction OD **390 mm**, Y-up in glTF/Three, Blender Z-up to glTF Y-up mapping `(x,y,z) -> (x,z,-y)`. This is a non-manufacturer-specific illustration.
+| 900px view | Polish02 image mean (0–255) | Polish03 mean | Nearly-white pixels, before → after |
+| --- | ---: | ---: | ---: |
+| Rotor front | 105.07 | 37.04 | 3.665% → 0% |
+| Ventilation | 72.88 | 27.36 | 5.147% → 0.003% |
+| Exploded | 66.05 | 22.92 | 2.832% → 0% |
+| Pad contact | 134.58 | 60.01 | 10.110% → 0% |
 
-## Tests and current evidence
+These are entire-frame statistics including dark studio background; numbers only corroborate the visually obvious highlight correction and **are not standalone aesthetic signoff**. Polish03 appears more contrasty than Polish02, but detail has been personally inspected at the full original pixel resolution. Low-light portions are deliberate, while important hardware surfaces retain readable midtones.
 
-- **PASS:** Source/handoff contract workflow [37967059274](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37967059274) at final code revision before handoff; validates handoff shape and Python compile, **not** new hardware native export.
-- **PASS (intermediate revision):** Production suite [37965390060](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37965390060), TypeScript + Python production suite and legacy 2-frame WebGL smoke; this does not include a newly rebuilt carbon-ceramic hardware GLB.
-- **PASS:** Independently reconstructed numerical mesh/clearance checks, 4/4: two Blender-cheek formulas at 486 vertices/968 triangles and two Three.js-cheek formulas at 580 vertices/1156 triangles. All four are watertight with consistent winding and positive volume. Minimum cheek inner x absolute distance is 36.5 mm versus backing absolute limit 33 mm. Report: `hardware/polish02-local-geometry-validation.json`. **This is not a native Blender result.**
-- **PASS for *old* source only:** Agent E native GLB in [37947404308](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37947404308) has **133 nodes, 125 meshes, nine materials**. E's prior mechanical/thermal Remotion preview and full FFmpeg decode passed, but this was before A's Polish02 changes.
-- **NOT VERIFIED:** Actual **Polish02** GLB mesh/material/node counts, Cycles close-ups, native moving proof, final visual appearance and independent E approval. All four newly rendered PNGs are still required.
+## Why Polish02 looked white and what changed
 
-## Native rebuild / acceptance commands
+Agent D's [independent Polish02 review](https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-brakes-001/d-graphics-qa/production/videos/carbon-ceramic-001/qa/POLISH02_INDEPENDENT_REVIEW.md) accurately diagnosed washed-out Blender images.
 
-```bash
-# At EXACT A implementation source SHA:
-git checkout 0bfc8ce52f15e6bf883cca0ad425fd4359d5af33
+- Reduced the excessive source studio light power **from the old 250W key / 350W edge / 200W rim** to **15W key / 7W fill / 9W rim**. A very low 8/3/5W intermediate pass removed the washout but crushed too many midtones; it was **rejected after directly viewing the images**, and we raised the fill and key to 15/7/9W for the successful final pass.
+- **AgX** view transform, **AgX - Medium High Contrast** look and **-0.65 stop exposure** (saved inside the final `.blend` with lights and camera). Cycles CPU 24 samples; OpenImageDenoiser is explicitly disabled on the renderer and scene view layers.
+- Reassigned the wide satin caliper crown from overreflective nickel to the existing dark forged-caliper material; **no additional material slots**.
+- Lowered carbon disc metalness **0.22 → 0.10**, raised roughness **0.72 → 0.82**, and made internal ventilation matte.
+- Raised caliper roughness **0.28 → 0.44**, lowered caliper metalness **0.70 → 0.55**; toned down machined aluminium, steel, nickel piston and backing plate reflections.
+- Kept the original textured perforated annulus, real 44 curved vanes, two opposed pads and fasteners intact. Only lookdev parameters and a material assignment changed; **no mechanical geometry edits** were required in Polish03.
+- `build_brake.py` now saves the deliverable `.blend` **after** constructing/staging the real studio look; unlike before, the saved Blender file contains the lighting and camera setup.
 
-python production/advanced/asset_contract.py \
-  production/videos/carbon-ceramic-001/hardware/asset-contract.json
+## Native engineering and code tests
 
-blender -b --factory-startup -t 2 \
-  --python production/videos/carbon-ceramic-001/hardware/build_brake.py \
-  -- out/carbon-ceramic-001/hardware
+**PASS**: [real Blender build + GLB inspect + four-PNG and exposure comparison 37976686710](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976686710). Output GLB: **148 actual asset nodes, 140 meshes, 9 PBR materials**; two dense 486-vertex sculpted caliper cheeks. The GLB material identifiers were preserved. All four images decoded and measured at full 900×900.
 
-python production/videos/carbon-ceramic-001/hardware/test_hardware.py \
-  --glb out/carbon-ceramic-001/hardware/carbon-ceramic-brake.glb \
-  --report out/carbon-ceramic-001/hardware/rig-manifest.json \
-  --proof-dir out/carbon-ceramic-001/hardware
-```
+**PASS:** Independently parsed the REAL old Polish02 and new Polish03 binary GLBs. Compared every named node's translation/rotation/scale/child relationships and every mesh's primitive vertex counts and POSITION accessor bounds. They are **identical in mechanical geometry**, with all eight required named root groups unchanged; **390mm OD** and global **X rotor axis** retained. All 9 original material names remain, but their PBR values are intentionally updated.
 
-Required artifact contents: `carbon-ceramic-brake.blend`, `carbon-ceramic-brake.glb`, `rig-manifest.json`, `build-report.json`, `rotor-front.png`, `ventilation.png`, `exploded.png`, `pad-contact.png`, and native console/test logs.
+**PASS:** [Production Suite TypeScript + Python + native smoke 37976691426](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976691426); [production PR review 37976691603](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976691603); [contract/handoff CI 37976691505](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976691505) at exact native source SHA. These checks do not certify the whole 25-second film.
 
-**Do not mark READY until** the four Blender PNGs are genuinely visually reviewed, GLB hierarchy shows two detailed cheeks, three axial bridges and both pad shims, actual model bounds/pivots are verified, and Agent E watches a moving pad-contact/thermal proof. Publish a source-SHA-labelled GitHub Actions artifact rather than placing multi-MB binaries in commits.
+## Agent E handoff — use this, not stale Polish02
 
-## Agent E integration notes
+1. Take A's files from **exact** `f22ba2e5b2498baa52d0a22121a2f05153d894a9`; download exact [Polish03 native artifact](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976686710/artifacts/11638453325).
+2. Independently verify SHA256 for `after/carbon-ceramic-brake.glb` equals **`645c4b7fbe11ea5c9715bed2eb979ae6e96ba3d3c34f85f74553b02f7ea977db`**, then use the `after/` files (not `before/` Polish02 files).
+3. Retain all eight root groups and X-axis pivots. `RotorAssembly` spins with `FrictionRing`/`RotorHat`/`Hub`; `CaliperBody` and `UprightSupport` remain fixed; `PadInner` approaches along +X and `PadOuter` along -X.
+4. Keep Agent B's deterministic `brakeStateAt`, the existing pad-face geometry, **2.5mm rest gap and max approach** unmodified. Film adapter's 2.35mm travel/0.15mm residual gap is not changed by A.
+5. Reimport the **new GLB's nine PBR materials** into E's composition if using the GLB path. Importing the GLB does **not** import the studio lights: the validated studio lights exist in the `.blend`; E must independently light their Remotion scene/cameras.
+6. Run E's actual full-resolution axial pad close-up, shot framing, thermal/cooling QA and moving previews. Then request independent D review and Master approval before any F release.
 
-Consume *only* A-owned file changes. Import `BrakeAssembly.tsx` from the revised source into E's registered film if E uses its procedural fallback. If using the .glb, wait for the **new verified binary**, stage it at the same master-approved asset path, bind the same eight root node transforms and **do not adjust Agent B's `brakeStateAt` or 2.5 mm pad travel**. In macro footage the physical gap is intentionally subtle; solve visibility through shot scale/lighting/labels, not physically incorrect pad translation. Then rerun the integration tests, native 135–195 / 300–360 previews and real 1080×1920 visual review.
+## Limits / approvals
 
-## Blockers and limitations
+**Agent A scope READY:** True native .blend, .glb, four reviewed PNGs, original image comparison, no geometry/pivot regressions, passed mechanical and project QA.
 
-Native Blender is unavailable in this execution container, and the connected GitHub repository integration cannot dispatch a new Blender Actions workflow. Consequently the source fix has not been run through the exact previous failure environment; no new true native Blender PNGs/GLB or source-locked uploaded Actions artifact exists at this stage. A supplementary **VTK prototype comparison based on the old GLB plus a newly reconstructed cheek** was visually inspected, but is explicitly **not** a Polish02 Blender render and cannot substitute for signoff.
-
-**No manufacturer CAD, precise friction temperature, calibrated wear, or real braking-performance guarantee is claimed.**
+**Film NOT release-approved:** No claim that E's new-camera full 25s source has been imported, played, rendered or independently approved. D's outstanding E-owned frame 531 crop, visual pad-clamp closeup, thermal localisation and full-film approval are separate. The carbon-disc material is an illustrative original not factory CAD and no thermal temperature simulation or friction coefficient is certified.
