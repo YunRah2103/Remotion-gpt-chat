@@ -1,0 +1,84 @@
+name: Carbon Ceramic 001 - E Polish05 Native Cutaway Proof
+on:
+  push:
+    branches: ['automotive-brakes-001/e-integration']
+    paths:
+      - 'src/brakes001/CarbonCeramic001.tsx'
+      - 'src/brakes001/integration/IntegrationCameraRig.tsx'
+      - 'src/brakes001/integration/InFilmPadCutaway.tsx'
+      - 'src/brakes001/integration/Polish05Transitions.ts'
+      - 'src/brakes001/integration/integration.test.cjs'
+      - '.github/workflows/carbon-ceramic-001-e-polish05.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: carbon-ceramic-e05-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  native-infilm-pad:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install native dependencies
+        run: |
+          set -euo pipefail
+          mkdir -p out/carbon-ceramic-p05
+          npm ci --no-audit --no-fund
+          python -m pip install --disable-pip-version-check Pillow==11.3.0
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
+      - name: Tests and exact hero-camera invariant
+        run: |
+          set -euo pipefail
+          npm run check | tee out/carbon-ceramic-p05/typescript.log
+          node src/brakes001/integration/integration.test.cjs | tee out/carbon-ceramic-p05/e-integration.json
+          bash production/videos/carbon-ceramic-001/physics/run-tests.sh | tee out/carbon-ceramic-p05/b-physics.log
+          python production/videos/carbon-ceramic-001/qa/check_graphics.py | tee out/carbon-ceramic-p05/d-graphics.log
+          python production/videos/carbon-ceramic-001/validate_setup.py | tee out/carbon-ceramic-p05/setup.log
+          python -m unittest discover -s production/tests -v > out/carbon-ceramic-p05/production-tests.log 2>&1
+          python - <<'PY' | tee out/carbon-ceramic-p05/hero-source-invariant.txt
+          import subprocess, pathlib
+          ref='21c2b581b46251b0bd45028d32eb40b4341eeb2a'
+          path='src/brakes001/integration/IntegrationCameraRig.tsx'
+          old=subprocess.check_output(['git','show',f'{ref}:{path}'],text=True)
+          new=pathlib.Path(path).read_text()
+          def hero(s):
+            return s.split("if(p.shotId==='hero'){",1)[1].split('\n  return p;',1)[0]
+          assert hero(old)==hero(new), 'ACCEPTED HERO WAS MODIFIED'
+          assert '([99,100,147,148]' not in pathlib.Path('src/brakes001/CarbonCeramic001.tsx').read_text()
+          print('PASS: ACCEPTED HERO CAMERA BYTE IDENTICAL; HARD MASK REMOVED')
+          PY
+          git rev-parse HEAD | tee out/carbon-ceramic-p05/source-sha.txt
+      - name: 15 genuine 1080x1920 Remotion stills and contact
+        run: |
+          set -euo pipefail
+          python production/tools/render.py --composition CarbonCeramic001 --mode stills --output out/carbon-ceramic-p05/stills --samples 98,99,100,101,105,107,117,132,140,145,146,147,148,149,150 --scale 1
+          python production/tools/quality.py contact out/carbon-ceramic-p05/contact-sheet.jpg out/carbon-ceramic-p05/stills/frame-*.png
+      - name: Native full-resolution in-film 61-frame cutaway
+        run: |
+          set -euo pipefail
+          python production/tools/render.py --composition CarbonCeramic001 --mode preview --start 95 --end 155 --scale 1 --concurrency 1 --output out/carbon-ceramic-p05/infilm-095-155.mp4
+          ffprobe -v error -show_entries stream=codec_name,pix_fmt,width,height,avg_frame_rate,nb_frames -show_entries format=duration -of json out/carbon-ceramic-p05/infilm-095-155.mp4 | tee out/carbon-ceramic-p05/ffprobe.json
+          ffmpeg -hide_banner -v error -xerror -i out/carbon-ceramic-p05/infilm-095-155.mp4 -map 0:v:0 -f null -
+          python production/tools/quality.py video out/carbon-ceramic-p05/infilm-095-155.mp4 --fps 30 --frames 61 --report out/carbon-ceramic-p05/video-qa.json
+          sha256sum out/carbon-ceramic-p05/infilm-095-155.mp4 | tee out/carbon-ceramic-p05/video-sha256.txt
+      - name: Upload exact-source native evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: carbon-ceramic-p05-native-${{ github.run_id }}
+          path: out/carbon-ceramic-p05/
+          if-no-files-found: warn
+          retention-days: 30
