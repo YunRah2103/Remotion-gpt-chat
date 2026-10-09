@@ -1,0 +1,79 @@
+name: Production Suite - tests and small real render
+on:
+  push:
+    branches: [main, feature/automotive-production-suite-20261009]
+    paths:
+      - 'production/**'
+      - 'src/mechanics/**'
+      - '.github/workflows/production-*.yml'
+      - 'package.json'
+      - 'package-lock.json'
+  pull_request:
+    paths:
+      - 'production/**'
+      - 'src/mechanics/**'
+      - '.github/workflows/production-*.yml'
+      - 'package.json'
+      - 'package-lock.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Python production tests and gallery build
+        run: |
+          python -m unittest discover -s production/tests -v
+          python production/tools/catalog.py --site out/production/site
+          python -m compileall -q production/tools production/tests
+      - uses: actions/upload-artifact@v4
+        with:
+          name: production-gallery-preview
+          path: out/production/site/
+          retention-days: 14
+
+  typescript-native-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Cache npm downloads keyed to dependency manifest
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node22-npm-${{ hashFiles('package-lock.json', 'package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node22-npm-
+      - name: Dependencies and compile
+        run: |
+          if test -s package-lock.json; then npm ci --no-audit --no-fund; else npm install --no-audit --no-fund; fi
+          npm run check
+      - name: Software-WebGL real Remotion two-frame preview
+        run: |
+          mkdir -p out/production
+          python3 production/tools/render.py --composition GpuDriveFilm --mode preview --output out/production/smoke.mp4 --start 0 --end 1 --scale 0.25 --concurrency 1
+          ffprobe -v error -show_entries stream=codec_name,nb_frames,width,height -of json out/production/smoke.mp4 > out/production/smoke.ffprobe.json
+          ffmpeg -v error -xerror -i out/production/smoke.mp4 -f null -
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: production-native-smoke
+          path: out/production/
+          retention-days: 14
+          if-no-files-found: warn

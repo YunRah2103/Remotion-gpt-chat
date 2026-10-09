@@ -1,0 +1,66 @@
+name: Production Suite - publish approved video as GitHub Release
+on:
+  workflow_dispatch:
+    inputs:
+      render_run_id:
+        description: Successful Production Suite render workflow run ID
+        required: true
+        type: string
+      render_artifact:
+        description: Exact artifact name, e.g. production-final-123456
+        required: true
+        type: string
+      release_tag:
+        description: Version tag, e.g. automotive-abs-001-v1
+        required: true
+        type: string
+      release_title:
+        description: Human-friendly title
+        required: true
+        type: string
+permissions:
+  contents: write
+  actions: read
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.render_artifact }}
+          run-id: ${{ inputs.render_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/source
+      - name: Verify exactly one finished video and rebuild checksums
+        env:
+          TAG: ${{ inputs.release_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$TAG" =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]{2,79}$ ]] || { echo 'Invalid release tag'; exit 1; }
+          ! gh release view "$TAG" >/dev/null 2>&1 || { echo 'Tag already published'; exit 1; }
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          mkdir -p out/release
+          mapfile -t MP4S < <(find out/source -type f -name '*.mp4')
+          [[ "${#MP4S[@]}" -eq 1 ]] || { echo 'Expected exactly one MP4'; exit 1; }
+          cp "${MP4S[0]}" out/release/
+          python3 production/tools/quality.py video "out/release/$(basename "${MP4S[0]}")" \
+            --width 1080 --height 1920 --fps 30 --report out/release/validation.json
+          find out/source -type f \( -name '*.png' -o -name '*.jpg' \) -exec cp {} out/release/ \;
+          (cd out/release && sha256sum *.mp4 *.json > SHA256SUMS.txt)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create explicit public release with permanent downloadable MP4
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.release_tag }}
+          TITLE: ${{ inputs.release_title }}
+          SOURCE_RUN: ${{ inputs.render_run_id }}
+        run: |
+          set -euo pipefail
+          gh release create "$TAG" out/release/* --target "$GITHUB_SHA" \
+            --title "$TITLE" \
+            --notes "Approved automotive engineering film. Render run: $SOURCE_RUN. Technical QA and SHA256SUMS.txt attached. Internal mechanical representations may be illustrative, not manufacturer CAD."
+          gh release view "$TAG" --json url --jq .url
