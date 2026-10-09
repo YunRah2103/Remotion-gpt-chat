@@ -1,0 +1,32 @@
+[
+  {
+    "startFrame": 0,
+    "endFrame": 119,
+    "visual": "Low dramatic tracking shot showing original bevelled Blender SUV driving a jagged trail",
+    "narrationCue": ""
+  },
+  {
+    "startFrame": 120,
+    "endFrame": 269,
+    "visual": "Left-front close mechanical cutaway, front-left boulder and right-front rut reveal linked spring/damper travel",
+    "narrationCue": ""
+  },
+  {
+    "startFrame": 270,
+    "endFrame": 419,
+    "visual": "Diagonal wheel-articulation shot with second boulder/rut crossing and responding chassis roll",
+    "narrationCue": ""
+  },
+  {
+    "startFrame": 420,
+    "endFrame": 539,
+    "visual": "Traveling rear-side mechanical cutaway shows coiled steel springs, dampers and A-arms moving",
+    "narrationCue": ""
+  },
+  {
+    "startFrame": 540,
+    "endFrame": 599,
+    "visual": "Rear three-quarter premium vehicle payoff on rocky trail",
+    "narrationCue": ""
+  }
+]
