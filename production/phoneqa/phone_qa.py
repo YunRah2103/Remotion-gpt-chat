@@ -66,11 +66,19 @@ def frame_from_video(video,directory):
     if streams[0].get("width")!=1080 or streams[0].get("height")!=1920:
         raise ValueError("Phone QC expects the final 1080x1920 master")
     outputs=[]
-    for i,factor in enumerate((.05,.27,.5,.73,.94)):
+    for i,factor in enumerate((.05,.23,.42,.61,.78)):
         dest=directory/("sample-%02d.jpg"%i)
         subprocess.run(["ffmpeg","-hide_banner","-loglevel","error","-nostdin","-y",
                         "-ss",str(duration*factor),"-i",str(video),"-frames:v","1",
                         "-q:v","3",str(dest)],check=True,capture_output=True,timeout=75)
+        if not dest.is_file() or not dest.stat().st_size:
+            # A short or oddly muxed video may report container duration beyond the last decoded frame.
+            # Fall back to its first decodable frame instead of pretending a missing proof exists.
+            subprocess.run(["ffmpeg","-hide_banner","-loglevel","error","-nostdin","-y",
+                            "-i",str(video),"-frames:v","1","-q:v","3",str(dest)],
+                           check=True,capture_output=True,timeout=75)
+        if not dest.is_file() or not dest.stat().st_size:
+            raise ValueError("Could not extract frame sample "+str(i))
         outputs.append(dest)
     return outputs
 
