@@ -60,7 +60,12 @@ export const CarbonCeramic001: React.FC = () => {
       <BrakeCameraRig frame={frame}/>
       <BrakeLighting frame={frame} heat01={motion.heat01} background ground={false}/>
       {context && <GhostCarOutline frame={frame}/>}
-      <group position={context ? [pos[0], pos[1], pos[2]] : [0, 0, 0]}>
+      {/* Integration-only framing correction: the thermal macro shot originally
+          clipped the rotor on the right edge. Scale around the true axle origin,
+          and slide the brake slightly to screen-left; A-D modules remain intact. */}
+      <group scale={shot === 'thermal' ? 0.72 : 1}
+        position={context ? [pos[0], pos[1], pos[2]] :
+          shot === 'thermal' ? [0, 0, 0.055] : [0, 0, 0]}>
         <BrakeAssembly rotorAngleRad={state.rotorAngleRad}
           padGapMetres={state.padGapMetres} heat01={motion.heat01}
           showUpright/>
