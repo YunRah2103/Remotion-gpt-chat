@@ -1,0 +1,123 @@
+name: Carbon Ceramic 001 - F assemble native 750-frame candidate
+
+on:
+  push:
+    branches: ['automotive-brakes-001/f-render']
+    paths:
+      - '.github/workflows/carbon-ceramic-001-f-assemble.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: brakes001-f-assemble-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-assembly-and-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg/Pillow verification stack
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Fetch original eight successful Remotion chunks
+        uses: actions/download-artifact@v4
+        with:
+          repository: YunRah2103/Remotion-gpt-chat
+          run-id: 37976771520
+          github-token: ${{ github.token }}
+          pattern: brakes001-f-candidate-part-*
+          path: out/candidate/parts
+          merge-multiple: true
+      - name: Fetch recovered missing chunks 07 and 09
+        uses: actions/download-artifact@v4
+        with:
+          repository: YunRah2103/Remotion-gpt-chat
+          run-id: 37977591114
+          github-token: ${{ github.token }}
+          pattern: brakes001-f-recovery-part-*
+          path: out/candidate/parts
+          merge-multiple: true
+      - name: Verify 10 locked parts, stitch 750 native frames, full decode and contact sheet
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/candidate/stills
+          printf '%s\n' '5b378202187748ce9b51d884f26bb7167285c946' > out/candidate/immutable-film-source.txt
+          : > out/candidate/parts/concat.txt
+          for i in $(seq -w 00 09); do
+            part="out/candidate/parts/part-${i}.mp4"
+            test -s "$part"
+            test -s "out/candidate/parts/part-${i}-qa.json"
+            test -s "out/candidate/parts/part-${i}.sha256"
+            expect="$(awk '{print $1}' "out/candidate/parts/part-${i}.sha256")"
+            actual="$(sha256sum "$part" | awk '{print $1}')"
+            if [ "$actual" != "$expect" ]; then echo "CHECKSUM FAILED: $part" >&2; exit 3; fi
+            python - "$i" <<'PY'
+          import json,sys
+          from pathlib import Path
+          i=sys.argv[1]
+          r=json.loads(Path(f'out/candidate/parts/part-{i}-qa.json').read_text())
+          assert r['frames']==75 and r['width']==1080 and r['height']==1920 and r['videoCodec']=='h264'
+          print('NATIVE PART VERIFIED', i)
+          PY
+            printf "file 'part-%s.mp4'\n" "$i" >> out/candidate/parts/concat.txt
+          done
+          ffmpeg -hide_banner -loglevel warning -y -f concat -safe 0 \
+            -i out/candidate/parts/concat.txt -c copy -movflags +faststart \
+            out/candidate/carbon-ceramic-001-candidate.mp4
+          python production/videos/carbon-ceramic-001/render/verify_media.py \
+            out/candidate/carbon-ceramic-001-candidate.mp4 \
+            --width 1080 --height 1920 --fps 30 --frames 750 \
+            --report out/candidate/candidate-full-verification.json
+          ffprobe -v error -count_frames -show_streams -show_format -of json \
+            out/candidate/carbon-ceramic-001-candidate.mp4 > out/candidate/ffprobe.json
+          ffmpeg -hide_banner -loglevel error -i out/candidate/carbon-ceramic-001-candidate.mp4 \
+            -vf "select='eq(n,48)+eq(n,168)+eq(n,321)+eq(n,531)+eq(n,705)'" \
+            -vsync 0 out/candidate/stills/frame-%02d.png
+          test "$(find out/candidate/stills -name '*.png' | wc -l)" -eq 5
+          python production/tools/quality.py contact out/candidate/contact-sheet.jpg out/candidate/stills/frame-*.png
+          sha256sum out/candidate/carbon-ceramic-001-candidate.mp4 > out/candidate/candidate-SHA256SUMS.txt
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('out/candidate/candidate-full-verification.json').read_text())
+          assert r['technicalPass'] and r['ffmpegDecodedFrames']==750
+          meta={
+            'status':'UNAPPROVED_FULL_LENGTH_CANDIDATE',
+            'sourceSha':'5b378202187748ce9b51d884f26bb7167285c946',
+            'renderRuns':[37976771520,37977591114],
+            'mp4':'carbon-ceramic-001-candidate.mp4',
+            'frames':750,'fps':30,'resolution':[1080,1920],
+            'codec':'h264','pixelFormat':'yuv420p',
+            'audio':'silent_no_approved_voiceover',
+            'sha256':r['sha256'],
+            'automatedVisualAlerts':r['automatedVisualReviewAlerts'],
+            'manualCreativeReview':'PENDING_AGENTS_D_AND_MASTER',
+            'masterReleaseSourceLock':'NOT_TOUCHED'}
+          Path('out/candidate/CANDIDATE_MANIFEST.json').write_text(json.dumps(meta,indent=2)+'\n')
+          print(json.dumps(meta,indent=2))
+          PY
+      - name: Publish actual playable MP4 and full independent QA package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brakes001-f-playable-25s-candidate-${{ github.run_id }}
+          path: |
+            out/candidate/carbon-ceramic-001-candidate.mp4
+            out/candidate/contact-sheet.jpg
+            out/candidate/stills/
+            out/candidate/candidate-full-verification.json
+            out/candidate/ffprobe.json
+            out/candidate/candidate-SHA256SUMS.txt
+            out/candidate/immutable-film-source.txt
+            out/candidate/CANDIDATE_MANIFEST.json
+          retention-days: 30
+          if-no-files-found: warn
