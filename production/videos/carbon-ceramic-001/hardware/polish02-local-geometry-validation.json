@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "provenance": "Independent Python/trimesh reconstruction from authored shell formulas; real Blender Polish02 build NOT executed",
+  "implementationSourceSha": "0acff936ac1f3ab25bfecc42b4e2bea5b9c9084e",
+  "evidenceType": "PARAMETRIC_NUMERICAL_NOT_NATIVE_GLB",
+  "rotorDiameterMetres": 0.39,
+  "rotorAxis": "X",
+  "backingOuterAxialLimitMetres": 0.033,
+  "cheekInnerAxialSurfaceMetres": 0.0365,
+  "approximatePadToCheekClearanceMetres": 0.0035,
+  "cases": [
+    {
+      "implementation": "Blender",
+      "side": -1,
+      "vertices": 486,
+      "triangles": 968,
+      "watertight": true,
+      "windingConsistent": true,
+      "positiveVolume": true,
+      "volumeM3": 0.00018157966121943258
+    },
+    {
+      "implementation": "Blender",
+      "side": 1,
+      "vertices": 486,
+      "triangles": 968,
+      "watertight": true,
+      "windingConsistent": true,
+      "positiveVolume": true,
+      "volumeM3": 0.00018157966121943258
+    },
+    {
+      "implementation": "Three",
+      "side": -1,
+      "vertices": 580,
+      "triangles": 1156,
+      "watertight": true,
+      "windingConsistent": true,
+      "positiveVolume": true,
+      "volumeM3": 0.0001819047781221647
+    },
+    {
+      "implementation": "Three",
+      "side": 1,
+      "vertices": 580,
+      "triangles": 1156,
+      "watertight": true,
+      "windingConsistent": true,
+      "positiveVolume": true,
+      "volumeM3": 0.00018190477812216475
+    }
+  ],
+  "limitations": [
+    "This verifies independently reconstructed algebraic mesh topology; it is not an export of current Blender scene",
+    "It does not check GPU materials, visual aesthetics, PBR, true part intersections, animations, or PNG rendering",
+    "Native build/export/PNG stills must run against latest branch commit and be inspected before READY."
+  ]
+}
