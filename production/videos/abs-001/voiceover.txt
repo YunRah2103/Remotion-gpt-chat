@@ -1,0 +1,9 @@
+When you slam on the brakes, a wheel can stop spinning while the car is still moving.
+
+This is called wheel lockup, and it makes steering much harder.
+
+ABS uses sensors to monitor each wheel's speed.
+
+If a wheel is about to lock, the system rapidly reduces and reapplies brake pressure.
+
+This helps the wheels keep rolling, allowing you to steer during emergency braking.
