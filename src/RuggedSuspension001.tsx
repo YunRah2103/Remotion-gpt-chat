@@ -6,7 +6,7 @@ import {AbsoluteFill,useCurrentFrame,useVideoConfig} from 'remotion';
 import {poseAt,heightAt,RADIUS,HALF_TRACK,HALF_WHEELBASE,SPEED,FRAMES,clamp,Corner} from './suspension/kinematics';
 
 /** Entire original engineering scene. Dimensions are illustrative metres, +Y is up, -Z is forward. */
-const INK='#071017', ORANGE='#fa8536', STEEL='#8c9da4', GRAPHITE='#252c33';
+const INK='#071017', ORANGE='#fa8536', STEEL='#8c9da4', GRAPHITE='#58636b';
 type V=[number,number,number];
 const v=(x:number,y:number,z:number):V=>[x,y,z];
 const fade=(t:number,a:number,b:number)=>clamp((t-a)/(b-a),0,1);
@@ -156,17 +156,17 @@ const Body:React.FC<{transparent:boolean}>=({transparent})=>{
  const cabin=useMemo(()=>bodyGeometry(true),[]);
  return <group>
   <mesh geometry={chassis} castShadow receiveShadow>
-   <meshPhysicalMaterial color={GRAPHITE} metalness={.67} roughness={.28} clearcoat={.88} clearcoatRoughness={.2}
-    transparent={transparent} opacity={transparent?.18:1} side={THREE.DoubleSide}/>
+   <meshPhysicalMaterial color={GRAPHITE} metalness={.23} roughness={.45} clearcoat={.75} clearcoatRoughness={.24}
+    transparent={transparent} opacity={transparent?.11:1} side={THREE.DoubleSide}/>
   </mesh>
   <mesh geometry={cabin} castShadow>
-   <meshPhysicalMaterial color="#303940" metalness={.5} roughness={.24} clearcoat={.9}
-     transparent={transparent} opacity={transparent?.15:1} side={THREE.DoubleSide}/>
+   <meshPhysicalMaterial color="#46545d" metalness={.21} roughness={.42} clearcoat={.77}
+     transparent={transparent} opacity={transparent?.13:1} side={THREE.DoubleSide}/>
   </mesh>
   {[-1,1].map(side=><group key={side}>
    <mesh position={[side*.83,.73,-.14]} rotation={[0,0,side*.14]}>
     <boxGeometry args={[.045,.48,1.77]}/>
-    <meshPhysicalMaterial color="#0d222b" metalness={.23} roughness={.16} transparent opacity={transparent?.13:.72}/>
+    <meshPhysicalMaterial color="#0d222b" metalness={.08} roughness={.20} transparent opacity={transparent?.13:.82}/>
    </mesh>
    <mesh position={[side*.96,.05,0]}>
     <boxGeometry args={[.087,.09,3.12]}/><meshStandardMaterial color={ORANGE} metalness={.65} roughness={.3}/>
@@ -282,19 +282,19 @@ const CameraRig:React.FC<{frame:number}>=({frame})=>{
   const shot=frame<120?0:frame<270?1:frame<420?2:frame<540?3:4;
   let eye:V,target:V;
   if(shot===0){
-   eye=[lerp(5.0,3.7,frame/120),lerp(3.25,2.4,frame/120),z-7.8];
+   eye=[lerp(8.0,6.5,frame/120),lerp(4.5,3.5,frame/120),z-12.5];
    target=[0,cy+.17,z-.12];
   } else if(shot===1){
-   eye=[lerp(3.5,2.3,(frame-120)/150),lerp(1.55,.92,(frame-120)/150),z-2.18];
-   target=[.92,cy-.44,z-1.50];
+   eye=[lerp(5.3,4.3,(frame-120)/150),lerp(2.3,1.6,(frame-120)/150),z-3.7];
+   target=[.82,cy-.39,z-1.60];
   } else if(shot===2){
-   eye=[-5.0,lerp(2.0,1.6,(frame-270)/150),z+1.4];
+   eye=[-11.3,lerp(3.0,2.35,(frame-270)/150),z+4.3];
    target=[0,cy-.18,z];
   } else if(shot===3){
-   eye=[lerp(2.8,3.2,(frame-420)/120),lerp(.58,1.15,(frame-420)/120),z+2.6];
+   eye=[lerp(6.0,5.6,(frame-420)/120),lerp(1.2,1.65,(frame-420)/120),z+4.6];
    target=[.55,cy-.54,z+.1];
   }else{
-   eye=[lerp(3.5,5.7,(frame-540)/60),lerp(2.2,3.8,(frame-540)/60),z+lerp(6,10,(frame-540)/60)];
+   eye=[lerp(8.6,9.3,(frame-540)/60),lerp(3.8,5.0,(frame-540)/60),z+lerp(13.2,15.5,(frame-540)/60)];
    target=[0,cy+.1,z-.9];
   }
   camera.position.set(...eye);camera.lookAt(...target);camera.updateProjectionMatrix();
@@ -306,14 +306,14 @@ const World:React.FC<{frame:number}>=({frame})=>{
  return <>
   <color attach="background" args={['#87989d']}/>
   <fog attach="fog" args={['#87989d',24,76]}/>
-  <hemisphereLight args={['#cfe5fa','#514b40',1.35]}/>
-  <ambientLight intensity={.38}/>
-  <directionalLight position={[8,19,7]} intensity={3.0} color="#fff3db" castShadow shadow-mapSize-width={2048} shadow-mapSize-height={2048}
+  <hemisphereLight args={['#f2f7f8','#a2a5a1',2.45]}/>
+  <ambientLight intensity={.85}/>
+  <directionalLight position={[8,19,7]} intensity={3.45} color="#fff3db" castShadow shadow-mapSize-width={2048} shadow-mapSize-height={2048}
    shadow-camera-left={-17} shadow-camera-right={17} shadow-camera-top={17} shadow-camera-bottom={-17}/>
   <directionalLight position={[-9,5,-7]} intensity={.9} color="#d6e4ff"/>
   <CameraRig frame={frame}/>
   <Terrain/>
-  <Vehicle frame={frame} cutaway={stage===3}/>
+  <Vehicle frame={frame} cutaway={stage===1||stage===3}/>
  </>;
 };
 const captions=[
@@ -330,7 +330,7 @@ export const RuggedSuspension001:React.FC=()=>{
  const opacity=Math.min(fade(frame,starts[stage],starts[stage]+10),1-fade(frame,ends[stage]-10,ends[stage]));
  const [headline,eyebrow]=captions[stage];
  return <AbsoluteFill style={{background:INK,fontFamily:'Arial,Helvetica,sans-serif',color:'#f1f2ec'}}>
-  <ThreeCanvas width={width} height={height} shadows camera={{position:[5,3,-6],fov:38,near:.1,far:160}}
+  <ThreeCanvas width={width} height={height} shadows camera={{position:[8,4,-12],fov:49,near:.1,far:160}}
     gl={{antialias:true,preserveDrawingBuffer:true}}>
    <World frame={frame}/>
   </ThreeCanvas>
