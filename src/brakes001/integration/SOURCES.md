@@ -21,3 +21,12 @@ Original specialist JSON and Markdown handoffs were also copied verbatim from ea
 
 ## Known gaps
 A's Blender builder and manifest are design-time contracts and have **no verified native GLB, bounds report, close-up or Blender binary**. Until verified, integration cannot be declared ready for release. Native Remotion 61-frame clamp/thermal previews, five review stills and complete FFmpeg validation are required for E readiness and D independent signoff. E handoff must truthfully list CI runs and artifacts once verified.
+
+## Polish 02 source import (supersedes original hardware revision)
+
+- Agent A latest branch HEAD: `cbce3943e490fa3eddc245ca8c2c75b942225108`.
+- Agent A **implementation** SHA: `0bfc8ce52f15e6bf883cca0ad425fd4359d5af33`.
+- E exact-blob A import commit: `a8f8d7504c4bd0f509b5a5b403ccfc095da0d615`.
+- Imported A files: `src/brakes001/hardware/**`, `production/videos/carbon-ceramic-001/hardware/**`, and `handoffs/agent-a.{json,md}`; no A-owned source edits. Upgraded three-lobed cheeks, three axial bridges, piston visibility, pad hardware, Cycles denoising guard.
+- Historical A source and state in the opening table are baseline provenance **only**; this Polish02 section is authoritative for integrated A.
+- The imported Three.js geometry is the film's active model; the Blender GLB provides an independent native geometry proof, and is not dynamically loaded into the film.

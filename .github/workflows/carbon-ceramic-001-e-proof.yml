@@ -90,7 +90,7 @@ jobs:
           set -euo pipefail
           mkdir -p out/brakes001-e/hardware
           blender -b --factory-startup -t 2 --python production/videos/carbon-ceramic-001/hardware/build_brake.py -- out/brakes001-e/hardware 2>&1 | tee out/brakes001-e/hardware/blender-build.log
-          python production/videos/carbon-ceramic-001/hardware/test_hardware.py --glb out/brakes001-e/hardware/carbon-ceramic-brake.glb --report out/brakes001-e/hardware/rig-manifest.json | tee out/brakes001-e/hardware/glb-validation.log
+          python production/videos/carbon-ceramic-001/hardware/test_hardware.py --glb out/brakes001-e/hardware/carbon-ceramic-brake.glb --report out/brakes001-e/hardware/rig-manifest.json --proof-dir out/brakes001-e/hardware | tee out/brakes001-e/hardware/glb-validation.log
       - name: Upload native Blender outputs even on failure
         if: always()
         uses: actions/upload-artifact@v4

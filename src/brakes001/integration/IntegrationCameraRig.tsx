@@ -1,0 +1,57 @@
+/**
+ * E-only photography adapter: retain C's deterministic five-shot plan while
+ * giving the fixed caliper a reveal-friendly three-quarter view and keeping
+ * the complete hot annulus away from portrait-frame edges.
+ *
+ * Does not alter C's exported camera math or the actual hardware assembly.
+ */
+import React, {useLayoutEffect} from 'react';
+import {useThree} from '@react-three/fiber';
+import * as THREE from 'three';
+import {brakeCameraAt, type BrakeCameraPose} from '../cinema/cameraMath';
+
+const lerp=(a:number,b:number,t:number)=>a+(b-a)*t;
+const smooth=(x:number)=>{const t=Math.max(0,Math.min(1,x));return t*t*(3-2*t);};
+
+export const integrationCameraAt=(frame:number):BrakeCameraPose=>{
+  const p=brakeCameraAt(frame);
+  if(p.shotId==='reveal'){
+    // Camera orbits instead of zooming the pads beyond their true 2.5mm travel.
+    const t=smooth((frame-120)/149);
+    const position:[number,number,number]=[
+      lerp(.77,.68,t),lerp(.32,.38,t),lerp(.57,.69,t)];
+    const target:[number,number,number]=[0,.062,.045];
+    return {...p,position,target,fovDegrees:37,
+      focusDistanceMetres:Math.hypot(...position.map((v,i)=>v-target[i]))};
+  }
+  if(p.shotId==='thermal'){
+    return {...p,fovDegrees:Math.max(34,p.fovDegrees)};
+  }
+  if(p.shotId==='hero'){
+    const t=smooth((frame-630)/119);
+    const position:[number,number,number]=[
+      lerp(.86,.73,t),lerp(.37,.41,t),lerp(.55,.67,t)];
+    const target:[number,number,number]=[0,.044,.045];
+    return {...p,position,target,fovDegrees:38,
+      focusDistanceMetres:Math.hypot(...position.map((v,i)=>v-target[i]))};
+  }
+  return p;
+};
+
+export const IntegrationCameraRig:React.FC<{frame:number}>=({frame})=>{
+  const {camera,size,invalidate}=useThree();
+  useLayoutEffect(()=>{
+    const p=integrationCameraAt(frame);
+    camera.position.set(...p.position);
+    camera.lookAt(new THREE.Vector3(...p.target));
+    if(camera instanceof THREE.PerspectiveCamera){
+      camera.fov=p.fovDegrees;
+      camera.aspect=size.width/Math.max(1,size.height);
+      camera.near=.012;camera.far=75;
+      camera.updateProjectionMatrix();
+    }
+    camera.updateMatrixWorld();
+    invalidate();
+  },[frame,camera,size.width,size.height,invalidate]);
+  return null;
+};

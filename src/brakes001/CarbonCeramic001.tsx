@@ -10,11 +10,12 @@ import {AbsoluteFill, useCurrentFrame, useVideoConfig} from 'remotion';
 import {BrakeAssembly} from './hardware/BrakeAssembly';
 import {brakeStateAt} from './motion/brakeState';
 import {
-  BrakeCameraRig, BrakeLighting, GhostCarOutline,
+  BrakeLighting, GhostCarOutline,
   GHOST_FRONT_BRAKE_ANCHOR, brakeShotAt, brakeCameraAt,
 } from './cinema';
 import {PartLabels, TitleOverlays} from './graphics';
 import {integrationStateAt} from './integration/integrationState';
+import {IntegrationCameraRig} from './integration/IntegrationCameraRig';
 
 /**
  * A's friction faces terminate at x=-0.0155m and +0.0155m.
@@ -65,12 +66,14 @@ export const CarbonCeramic001: React.FC = () => {
     <ThreeCanvas width={width} height={height} shadows
       camera={{position: [1.3, .6, .9], fov: 33, near: .012, far: 75}}
       gl={{antialias: true, preserveDrawingBuffer: true}}>
-      <BrakeCameraRig frame={frame}/>
+      <IntegrationCameraRig frame={frame}/>
       <BrakeLighting frame={frame} heat01={motion.heat01} background ground={false}/>
+      {!context && <directionalLight position={[.65,.55,.95]} color="#c8deec" intensity={1.1}/>}
+      {!context && <pointLight position={[.35,.25,.45]} color="#f0c9a0" intensity={0.36} distance={2} decay={2}/>}
       {context && <GhostCarOutline frame={frame}/>}
       {/* Stable macro framing: C's shot target, not a guessed static offset.
           Geometry, independent X-axis pads and fixed caliper are unmodified. */}
-      <group scale={shot === 'thermal' ? 0.56 : 1}
+      <group scale={shot === 'thermal' ? 0.56 : shot === 'reveal' ? 0.76 : shot === 'hero' ? 0.73 : 1}
         position={brakePosition}>
         <BrakeAssembly rotorAngleRad={state.rotorAngleRad}
           padGapMetres={state.padGapMetres} heat01={motion.heat01}
