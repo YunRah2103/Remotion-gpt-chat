@@ -102,7 +102,7 @@ jobs:
               --frame="$F" --gl=swangle --scale=0.5
           done
           npx remotion render src/index.ts RuggedSuspension002 out/rugged02/proofs/front-left-rock.mp4 \
-            --frames=187-216 --scale=0.42 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
+            --frames=187-216 --scale=0.4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
           ffmpeg -v error -xerror -i out/rugged02/proofs/front-left-rock.mp4 -f null -
           ffprobe -v error -show_entries stream=codec_name,width,height,nb_frames -of json \
             out/rugged02/proofs/front-left-rock.mp4 > out/rugged02/proofs/preview-ffprobe.json
