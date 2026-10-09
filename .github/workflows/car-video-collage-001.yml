@@ -1,0 +1,149 @@
+name: Automotive Video Collage 001 - Moving Footage Master
+on:
+  push:
+    branches: [automotive-edits/car-video-collage-001]
+    paths:
+      - src/AutomotiveVideoCollage001.tsx
+      - src/Root.tsx
+      - production/videos/car-video-collage-001/**
+      - .github/workflows/car-video-collage-001.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: automotive-video-collage-001-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  render-and-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Remotion and visual QA dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y ffmpeg
+          pip install 'Pillow==11.3.0' 'requests==2.32.3'
+          npm ci --no-audit --no-fund
+          npm run check
+      - name: Fetch six licensed actual moving car video assets
+        run: |
+          set -euo pipefail
+          python production/videos/car-video-collage-001/fetch_footage.py
+          python production/videos/car-photo-collage-001/make_audio.py
+      - name: Audit all six sources for temporal motion
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,subprocess,io
+          from pathlib import Path
+          from PIL import Image,ImageChops,ImageStat
+          root=Path('public/automotive-video-collage')
+          manifest=json.loads((root/'provenance.json').read_text())
+          report=[]
+          for asset in manifest:
+            path=root/(asset['id']+'.mp4')
+            def grab(second):
+              result=subprocess.check_output(['ffmpeg','-loglevel','error','-ss',str(second),'-i',str(path),'-frames:v','1','-vf','scale=320:180','-f','image2pipe','-vcodec','mjpeg','-'])
+              return Image.open(io.BytesIO(result)).convert('RGB')
+            first,second=grab(.4),grab(2.6)
+            motion=ImageStat.Stat(ImageChops.difference(first,second).convert('L')).mean[0]
+            if motion<1.5:raise RuntimeError(f'Video appears static: {asset["id"]} motion={motion}')
+            report.append({'id':asset['id'],'frame_difference':round(motion,3),'moving':True})
+          Path('out/car-video-collage-001').mkdir(parents=True,exist_ok=True)
+          (Path('out/car-video-collage-001')/'clip-motion-report.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report,indent=2))
+          PY
+      - name: Remotion still-frame smoke render
+        run: |
+          set -euo pipefail
+          mkdir -p out/car-video-collage-001/stills
+          python production/tools/render.py --composition AutomotiveVideoCollage001 --mode stills --samples 48,151,219,273,327,378,433,488,552,580 --scale 0.4 --concurrency 1 --output out/car-video-collage-001/stills
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image,ImageOps,ImageDraw,ImageStat
+          root=Path('out/car-video-collage-001')
+          images=sorted((root/'stills').glob('frame-*.png'))
+          if len(images)!=10:raise RuntimeError(f'Expected ten frames, got {len(images)}')
+          w,h=360,640
+          canvas=Image.new('RGB',(5*w,2*h),(8,9,13))
+          checks=[]
+          for i,p in enumerate(images):
+            image=Image.open(p).convert('RGB')
+            mean=ImageStat.Stat(image.convert('L')).mean[0]
+            if mean<5:raise RuntimeError(f'Unexpectedly black still: {p}')
+            checks.append([p.name,round(mean,2)])
+            image=ImageOps.fit(image,(w,h))
+            canvas.paste(image,(i%5*w,i//5*h))
+            ImageDraw.Draw(canvas).text((i%5*w+12,i//5*h+12),p.stem,fill=(255,244,229))
+          canvas.save(root/'contact-sheet.jpg',quality=91)
+          (root/'still-qa.json').write_text(__import__('json').dumps(checks,indent=2))
+          print('PASS representative real video-panel stills:',checks)
+          PY
+      - name: Render native 600-frame full-resolution H264 MP4
+        run: |
+          set -euo pipefail
+          python production/tools/render.py --composition AutomotiveVideoCollage001 --mode final --concurrency 2 --output out/car-video-collage-001/AUTOMOTIVE-VIDEO-COLLAGE-001.mp4
+      - name: Audit the actual final MP4, all frames and soundtrack
+        run: |
+          set -euo pipefail
+          OUTPUT=out/car-video-collage-001
+          FILE=$OUTPUT/AUTOMOTIVE-VIDEO-COLLAGE-001.mp4
+          ffprobe -v error -show_streams -show_format -of json "$FILE" > "$OUTPUT/ffprobe.json"
+          ffmpeg -hide_banner -v error -xerror -i "$FILE" -map 0:v:0 -map 0:a:0 -f null -
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          root=Path('out/car-video-collage-001')
+          file=root/'AUTOMOTIVE-VIDEO-COLLAGE-001.mp4'
+          data=json.loads((root/'ffprobe.json').read_text())
+          v=next(x for x in data['streams'] if x['codec_type']=='video')
+          a=next(x for x in data['streams'] if x['codec_type']=='audio')
+          duration=float(data['format']['duration'])
+          assert v['codec_name']=='h264' and (v['width'],v['height'])==(1080,1920)
+          assert v['r_frame_rate']=='30/1'
+          assert v.get('nb_frames') in (None,'600')
+          assert 19.97<=duration<=20.1
+          assert a['codec_name']=='aac'
+          motion=json.loads((root/'clip-motion-report.json').read_text())
+          assert len(motion)==6 and all(x['moving'] for x in motion)
+          report={'result':'PASS','source_sha':'${{ github.sha }}',
+           'duration_seconds':duration,'resolution':'1080x1920','fps':30,
+           'frames':v.get('nb_frames'),'codec':'H.264','audio_codec':'AAC',
+           'source_video_motion':'PASS (six unique real moving source videos)',
+           'ffmpeg_full_video_audio_decode':'PASS','source_audio':'muted, original synthesized soundtrack only',
+           'file_bytes':file.stat().st_size,'file_sha256':hashlib.sha256(file.read_bytes()).hexdigest(),
+           'visual_qa':'Ten representative stills: programmatic exposure validation; no claim of independent human viewing'}
+          (root/'final-qa.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report,indent=2))
+          PY
+      - name: Publish MP4 as separately downloadable GitHub release
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="car-video-collage-001-v1"
+          FILE="out/car-video-collage-001/AUTOMOTIVE-VIDEO-COLLAGE-001.mp4"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$FILE" --clobber
+          else
+            gh release create "$TAG" "$FILE" --target "$GITHUB_SHA" --title "AUTOMOTIVE VIDEO COLLAGE 001 | 20s real driving footage" --notes "Original edited Remotion film using six Pexels-licensed verifiably moving automotive video sources; 1080x1920 30fps H264+AAC. Source credits and media records in production/videos/car-video-collage-001."
+          fi
+      - name: Upload film, visuals, original footage provenance and QA
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: AUTOMOTIVE-VIDEO-COLLAGE-001-${{ github.run_id }}
+          path: |
+            out/car-video-collage-001/**
+            public/automotive-video-collage/provenance.json
+          retention-days: 30
+          if-no-files-found: warn
