@@ -112,7 +112,7 @@ const Director:React.FC<{f:number;stage:number}>=({f,stage})=>{
  },[camera,f,stage]);return null;
 };
 const World:React.FC<{f:number;stage:number}>=({f,stage})=>{
- const t=f-start[stage],m=stage===3?modeAt(f):null;
+ const t=f-start[stage];
  return <>
   <color attach="background" args={['#0b1722']}/>
   <ambientLight intensity={.7}/><hemisphereLight args={['#d7eef4','#101c24',2.0]}/>
@@ -120,7 +120,7 @@ const World:React.FC<{f:number;stage:number}>=({f,stage})=>{
   <spotLight position={[5,4,5]} color="#72e8f3" intensity={32} angle={.55}/>
   <Director f={f} stage={stage}/>
   {(stage===0||stage===1||stage===4)&&<Floor f={f}/>}
-  {stage===0&&<Wheel p={[0,0,0]} angle={-(Math.min(t,75)*.20+Math.max(0,t-75)*.20*(1-clamp((t-75)/20)))} pressure={ease((t-43)/34)}/>}
+  {stage===0&&<Wheel p={[0,0,0]} angle={-(Math.min(t,75)*.20 + .20*(Math.min(20,Math.max(0,t-75)) - Math.pow(Math.min(20,Math.max(0,t-75)),2)/40))} pressure={ease((t-43)/34)}/>}
   {stage===1&&<><Wheel p={[-.93,-.36,0]} scale={.62} angle={-t*.20}/><Wheel p={[.94,-.36,0]} scale={.62} angle={0}/></>}
   {stage===2&&<SensorWorld f={f}/>}
   {stage===3&&<Hydraulic f={f}/>}
