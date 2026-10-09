@@ -18,6 +18,7 @@ import bpy
 import math
 import json
 import hashlib
+import os
 import sys
 from pathlib import Path
 from mathutils import Vector
@@ -57,14 +58,14 @@ def material(name, color, metallic, roughness, texture=False):
     m.diffuse_color=(*color,1)
     return m
 
-CARBON=material("C_CERAMIC___woven_grain",(.27,.285,.30),.22,.72,True)
-VENT=material("Carbon___vent_inner_surface",(.16,.18,.19),.16,.85)
-HAT=material("AnodizedAluminium___machined",(.45,.52,.57),.83,.3)
-STEEL=material("SatinSteel___bolts_and_carrier",(.39,.44,.48),.78,.32)
-CALIPER=material("ForgedCaliper___blue_titanium",(.13,.22,.30),.70,.28)
-ACCENT=material("Piston___nickel",(.64,.68,.68),.89,.24)
+CARBON=material("C_CERAMIC___woven_grain",(.23,.247,.26),.10,.82,True)
+VENT=material("Carbon___vent_inner_surface",(.12,.135,.15),.10,.87)
+HAT=material("AnodizedAluminium___machined",(.36,.42,.46),.73,.39)
+STEEL=material("SatinSteel___bolts_and_carrier",(.34,.38,.41),.77,.40)
+CALIPER=material("ForgedCaliper___blue_titanium",(.11,.18,.24),.55,.44)
+ACCENT=material("Piston___nickel",(.53,.57,.58),.82,.34)
 PAD=material("FrictionLining___graphite",(.095,.09,.087),.035,.93)
-PADBACK=material("PadBacking___dark_steel",(.16,.19,.20),.75,.37)
+PADBACK=material("PadBacking___dark_steel",(.12,.15,.16),.68,.47)
 RUBBER=material("Seal___rubber",(.027,.032,.038),.02,.89)
 
 def parent(obj, target):
@@ -324,7 +325,7 @@ def construct():
             .205,.231,.043,sector+offset,
             -.068,.068,CALIPER,body,14)
     sector_mesh("BridgeSatinCrown",.228,.232,.230,sector,
-                -.042,.042,ACCENT,body,24)
+                -.042,.042,CALIPER,body,24)
     for a in (sector-.22,sector+.22):
         y=.205*math.sin(a);z=.205*math.cos(a)
         cylinder("BridgeRetainer_%.2f"%a,.005,.133,(0,y,z),ACCENT,body,16,.00025)
@@ -399,19 +400,39 @@ def setup_stage(out):
     scene.render.resolution_percentage=100
     scene.render.image_settings.file_format='PNG'
     scene.render.film_transparent=False
+    # Controlled studio view transform prevents highlight washout.
+    view=scene.view_settings
+    # Direct attempts matter: the Blender 4.0 distro exposes dynamic OCIO
+    # transforms that are absent from static RNA enum_items.
+    for transform in ('AgX','Filmic','Standard'):
+        try:
+            view.view_transform=transform
+            break
+        except (TypeError,ValueError):
+            continue
+    view.exposure=-0.65
+    view.gamma=1.0
+    for look in ('Medium High Contrast','AgX - Medium High Contrast',
+                 'Medium Contrast','None'):
+        try:
+            view.look=look
+            break
+        except (TypeError,ValueError):
+            continue
+    print('POLISH03_COLOR_MANAGEMENT',view.view_transform,view.look,view.exposure)
     world=bpy.data.worlds.new("NightStudio")
     scene.world=world;world.use_nodes=True
     world.node_tree.nodes.get('Background').inputs['Color'].default_value=(.012,.018,.025,1)
-    world.node_tree.nodes.get('Background').inputs['Strength'].default_value=.45
+    world.node_tree.nodes.get('Background').inputs['Strength'].default_value=.30
     def area(name,loc,power,colour,size):
         dat=bpy.data.lights.new(name,'AREA');dat.energy=power
         dat.color=colour;dat.shape='DISK';dat.size=size
         o=bpy.data.objects.new(name,dat);scene.collection.objects.link(o)
         o.location=loc;direction=Vector((0,0,0))-o.location
         o.rotation_euler=direction.to_track_quat('-Z','Y').to_euler()
-    area("Key softbox",(.48,-.36,.44),250,(.78,.87,1),.62)
-    area("Warm edge",(-.30,.36,.39),350,(1,.65,.39),.54)
-    area("Vertical rim",(-.15,-.18,.60),200,(.52,.78,1),.35)
+    area("Key softbox",(.49,-.35,.43),15,(.93,.97,1.0),.68)
+    area("Shadow lift",(-.29,.33,.36),7,(1.0,.89,.81),.72)
+    area("Vent rim",(-.18,-.18,.55),9,(.78,.88,1.0),.38)
     camera=bpy.data.cameras.new("Hero camera")
     cam=bpy.data.objects.new("Hero camera",camera)
     scene.collection.objects.link(cam);scene.camera=cam
@@ -479,8 +500,9 @@ def main(output):
                  "No direct claim of measured temperatures."],
     }
     (out/"rig-manifest.json").write_text(json.dumps(manifest,indent=2)+"\n")
-    bpy.ops.wm.save_as_mainfile(filepath=str(out/(ASSET_ID+".blend")))
     setup_stage(out)
+    # Save the final real studio lights and proof camera in the .blend.
+    bpy.ops.wm.save_as_mainfile(filepath=str(out/(ASSET_ID+".blend")))
     report={"status":"REAL_BLENDER_BUILD_PASS",
         "blenderVersion":bpy.app.version_string,
         "blenderFile":ASSET_ID+".blend","glb":glb.name,
@@ -489,7 +511,12 @@ def main(output):
         "proofImages":["rotor-front.png","exploded.png",
                        "pad-contact.png","ventilation.png"],
         "renderEngine":bpy.context.scene.render.engine,
-        "renderDenoisingDisabled":True}
+        "renderDenoisingDisabled":True,
+        "sourceSha":os.environ.get("GITHUB_SHA","local"),
+        "colorManagement":{"transform":bpy.context.scene.view_settings.view_transform,
+                           "look":bpy.context.scene.view_settings.look,
+                           "exposure":bpy.context.scene.view_settings.exposure},
+        "studioLightWatts":{"key":15,"fill":7,"rim":9}}
     (out/"build-report.json").write_text(json.dumps(report,indent=2)+"\n")
     print("BRAKE_HARDWARE_PROOF_PASS",json.dumps(report))
 
