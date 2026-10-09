@@ -94,7 +94,7 @@ export const PartLabels: React.FC<PartLabelsProps> = ({
       const alpha = opacityAt(frame, item.start, item.end);
       if (alpha <= 0) return null;
       const leftSide = item.side === 'left';
-      const x = (leftSide ? 76 : 646) * sx;
+      const x = (leftSide ? 76 : 598) * sx;
       const y = (item.row === 0 ? 1230 : 1360) * sy;
       const w = 285 * sx;
       const partName = item.part.split(',')[0] as BrakePartName;
