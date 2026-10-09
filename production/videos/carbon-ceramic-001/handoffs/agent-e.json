@@ -2,43 +2,50 @@
   "schemaVersion": 1,
   "task": "carbon-ceramic-001-agent-e",
   "branch": "automotive-brakes-001/e-integration",
-  "sourceSha": "8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d",
+  "sourceSha": "37e04ee309dc9f96e63ad1b4eda28f25fea3a96a",
   "owner": "engineering",
   "status": "review",
-  "summary": "Polish02 A source imported blob-identically, 25-second E Remotion integration improved and native verified on exact film implementation source 8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d; Blender 4.0.2 Cycles four close-ups + GLB structural check PASS, five exact native stills and two 61-frame H264 clips PASS with full FFprobe/FFmpeg decode, and final frame705 hero caliper no longer clips. Status remains REVIEW for overexposed Blender hardware proof and independent Agent D/Master artistic approval. No 750-frame release MP4.",
+  "summary": "POLISH03 verified 25-second CarbonCeramic001 source (no final film rendered): fixed entire benefits shot 450–629, especially previously clipped caliper at frame531; implemented pad-localised false-colour with visible first heating and cooling; supplied two genuine 61-frame standard Remotion motion clips, original five-frame contact, 11-frame benefits and 12-frame thermal sweep plus 41-frame benefits transition, and 1080x1920 native pad-onset cutaway (61 frames). All tests and MP4 full decodes PASS. Imported A's READY Polish03 Cycles materials/proof source after the film proof, without changes to the tested Three.js hardware. Independent D re-review and Master approval outstanding, so REVIEW.",
   "files": [
     "src/brakes001/CarbonCeramic001.tsx",
     "src/brakes001/integration/IntegrationCameraRig.tsx",
+    "src/brakes001/integration/FrictionHeatMap.tsx",
+    "src/brakes001/integration/BrakePadMacroProof.tsx",
     "src/brakes001/integration/integrationState.ts",
     "src/brakes001/integration/integration.test.cjs",
     "src/brakes001/integration/SOURCES.md",
     "src/brakes001/integration/QA_REPORT.md",
+    "src/Root.tsx",
+    ".github/workflows/carbon-ceramic-001-e-polish03.yml",
     "production/videos/carbon-ceramic-001/handoffs/agent-e.json",
     "production/videos/carbon-ceramic-001/handoffs/agent-e.md",
-    ".github/workflows/carbon-ceramic-001-e-proof.yml"
+    "production/videos/carbon-ceramic-001/hardware/build_brake.py",
+    "production/videos/carbon-ceramic-001/hardware/lookdev_compare.py"
   ],
   "evidence": [
-    "FILM SOURCE: https://github.com/YunRah2103/Remotion-gpt-chat/commit/8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d",
-    "A POLISH 02 IMPORT: https://github.com/YunRah2103/Remotion-gpt-chat/commit/a8f8d7504c4bd0f509b5a5b403ccfc095da0d615 10/10 A source blobs match branch cbce3943e490fa3eddc245ca8c2c75b942225108",
-    "BLENDER: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37968622756/artifacts/11633864744 verified Blender 4.0.2 Cycles 4 PNGs/.blend/.glb, hierarchy 148 nodes, 140 meshes, 9 materials, SHA256 261b11aa1c71610e52ad9fe25a57b179427f0de833dc6904d41d8da44013a5ac",
-    "NATIVE VIDEO: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37969454877/artifacts/11635221421 5 native stills (48,168,321,531,705) plus moving frames 135-195 / 300-360, 61 each, 30fps, full decode PASS at d9e27ab source (prior to last hero frame correction)",
-    "Dedicated npm/tsc/E integration 750 frame, B 5/5, C camera logic, A native + source, D cue 750, Python 39/39 PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37969454877",
-    "LATEST NATIVE FILM PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37970589567/artifacts/11636410211 — code 8b6ee9... (workflow commit 683b97de...), five exact PNGs and both 61-frame MP4s, full independent FFprobe / full FFmpeg decode PASS.",
-    "LATEST FINAL FRAME705 VISUAL: inspected original 540x960 Remotion still; A02 caliper and rotor both fully contained, edge clipping in d9 intermediate corrected.",
-    "LATEST NATIVE H264 CLAMP SHA256 db0d38392262f1be71efab160ba4aa4a771c6fcd6610fce5c2f91c64c39e94b8; HEAT SHA256 83ce877f41a4159fa8e2b7917fd7f4b3db3841837e0c6ee598b8a41269d92556 (both same as predecessor because only hero changed).",
-    "NEW VS OLD NATIVE FILM: A02 three-lobed caliper with open bridges and piston geometry visibly improves previous block; 321 thermal annulus remains in frame; 705 hero now fully in frame. Opening sparse, pad physical movement very subtle at 378px proxy scale."
+    "POLISH03 FILM CODE: https://github.com/YunRah2103/Remotion-gpt-chat/commit/37e04ee309dc9f96e63ad1b4eda28f25fea3a96a",
+    "A POLISH03 LIGHTING REIMPORT: https://github.com/YunRah2103/Remotion-gpt-chat/commit/c50056eeb86691b1d67dace94be4c2b2cefd231f, exact A source f22ba2e5b2498baa52d0a22121a2f05153d894a9, head e619a94cde5c525bdd9f6dfc6ed5604d4ff39252; src/brakes001/hardware/BrakeAssembly.tsx BLOB UNCHANGED",
+    "STANDARD SOURCE-LOCKED PROOF https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976988034/artifacts/11639302827 frames 48/168/321/531/705 540x960 + contact; native 135-195 and 300-360 clips 378x672 61 frames 30fps; FFprobe + complete FFmpeg decode PASS",
+    "NATIVE FULL RES PAD ONSET https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976988178/artifacts/11638383796: 1080x1920, 30fps, real source frames 85-145 in extra 61-frame A/B composition; actual pad gap 2.50mm→0.15mm. Cutaway hides caliper AFTER frame18, labelled; DOES NOT exaggerate physical pad travel. Full decode PASS.",
+    "BENEFITS SWEEP https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976988178/artifacts/11638918513: stills 450,465,480,500,510,531,550,575,600,620,629 and genuine 41-frame moving 510-550 540x960; no hardware clipped in sampled proof; FFmpeg full decode PASS",
+    "THERMAL SWEEP same native 11638918513: 270,290,305,321,345,365,395,425,445,470,515,605; cold→local heat peak→cool down, returns second cycle, no fixed temperature assertion",
+    "BLENDER A03 READY https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976686710/artifacts/11638453325; 4 native 900x900 Cycles PNG, corrected dark material separations, .blend/.glb, 148 nodes/140 meshes/9 materials; A GLB SHA256 645c4b7fbe11ea5c9715bed2eb979ae6e96ba3d3c34f85f74553b02f7ea977db",
+    "SOURCE TESTS https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976988034 dedicated E 750/750, TS check, Python 39/39, B 5/5, graphics 750 safe cue checks, setup validation PASS",
+    "NATIVE H264 SHA256 clamp=287e0cc0b3b2784e721ce6d884ea42f35f4f434674b46c7aa93b425c1c82c6ac; thermal=42d105ad1a99b78562bc477a23d7318e94dad15df1de6d5df432f4ea58c8dc14; 1080 macro=a4524898bcd802fc54c90a651c681346bc0cced33dfa6781888e46800c99034a; benefits=b2a824d1fdb20d04de55ae6bfb0e6bd09927ca3bafc501b199d7246d5911add8",
+    "INDEPENDENT E QA: inspected exact Remotion images/contact strips and full-resolution macro, completed local FFmpeg decode of all four MP4s; 531 before/after crop fixed, annotated CALIPER HIDDEN cutaway reveals both sides but displacement visually subtle. No 25-second full-release MP4."
   ],
   "blockers": [
-    "Native Blender Cycles 900x900 closeups all overexposed/washed out despite structural GLB and PBR material PASS; Agent A notified in PR #11 to improve stage lighting/exposure.",
-    "Independent Agent D full integrated film technical/creative QA and Master branch acceptance pending; physical clamp motion visually subtle at reduced 378px proof resolution.",
-    "No final 750-frame 1080x1920 H264; strictly reserved for Agent F after Master approval.",
-    "Exact-source video and frame705 now verified PASS, but frame-scale pad contact movement is subtle at 378px proxy output; independent Agent D target-size visual review still needed."
+    "Agent D has NOT independently signed off the exact Polish03 film, 1080 macro or frame531 shot sweep; Master must request D re-review before accepting PR15.",
+    "Pad movement is truthful but only 2.35mm; while side-on cutaway and numerical gap readout demonstrate it, geometry-only contact is still subtle. D must assess whether this meets educational readability. Do NOT falsely call frames135-195 pad onset: B's actual onset is frames95-117.",
+    "Intro silhouette at frame48 remains faint/sparse and final hero callout at frame705 is weak/far from hardware; D/Master aesthetic judgment remains.",
+    "Thermal sectors are explicitly illustrative; faint visible wedge edges remain at close inspection. No calibrated temperature or full-release film claims.",
+    "Master approval and Agent F 750-frame final render/VO/phone-safe signoff still pending."
   ],
   "integratedSources": {
     "A": {
-      "head": "cbce3943e490fa3eddc245ca8c2c75b942225108",
-      "handoffSource": "0bfc8ce52f15e6bf883cca0ad425fd4359d5af33",
-      "status": "review"
+      "head": "e619a94cde5c525bdd9f6dfc6ed5604d4ff39252",
+      "handoffSource": "f22ba2e5b2498baa52d0a22121a2f05153d894a9",
+      "status": "ready"
     },
     "B": {
       "head": "37b661eaba75477de4d967f430da270c399818a7",
@@ -57,58 +64,64 @@
     }
   },
   "qa": {
-    "npmCi": "PASS 37969454877",
-    "typescript": "PASS 37969454877 + latest 37969997735",
-    "integrationNode": "PASS executed actual adapter 750/750 states in 37969454877",
-    "BMotion": "PASS 5/5",
-    "cinema": "PASS tested camera plan 750 frames via E integration",
-    "AHardware": "PASS actual Blender 4.0.2 Cycles 900x900 x4 and native GLB 148/140/9",
-    "DGraphics": "PASS 750 cues and 1216 JSX instances",
+    "npmCi": "PASS source 37976988034 and 37976988178",
+    "typescript": "PASS npm run check",
+    "integrationNode": "PASS executable E adapter against B 750/750 frames",
+    "BMotion": "PASS 5/5 unchanged B physics; two braking cycles",
+    "cinema": "PASS five-shot C timing; E benefits safe in 11 sampled native frames + 41 moving frames",
+    "AHardware": "PASS unchanged hardware Three.js blobs; A03 native Blender Cycles x4, GLB 148 nodes 140 meshes nine PBR materials",
+    "DGraphics": "PASS 750-frame safe-zone and 1216 JSX cue instances",
     "productionPython": "PASS 39/39",
     "setupValidator": "PASS",
-    "nativeStills": "PASS exact current source 8b6ee9... (workflow 683b97de...) 48/168/321/531/705, 540x960 + contact sheet, frame705 caliper fully contained",
-    "nativeMotion": "PASS exact current source clamp 135–195 and heat 300–360, both 61 H264 frames, no source-motion regressions",
-    "ffprobeFfmpeg": "PASS independently checked current 61 frames / 2.033333s 378x672 30/1 fps H264 yuvj420p, two complete decodes return 0",
-    "visualReview": "REVIEW: A02 caliper visual improved, 321/360 thermal safe, 705 hero clipping fixed and inspected. Blender proof overexposed; intro thin; independent D signoff pending.",
-    "agentDVisual": "PENDING",
-    "fullRelease": "NOT RUN"
+    "nativeStills": "PASS 48/168/321/531/705 540x960 + actual contact, run37976988034",
+    "nativeMotion": "PASS standard clamp 135-195 and thermal 300-360 61 frames each 378x672 30fps, no audio",
+    "fullResolutionPadOnset": "PASS genuine 61-frame 1080x1920 source offset85, A hardware and B physics, caliper cutaway labelled, true gap 0.00015-0.0025m; visual stroke subtle",
+    "benefitsSweep": "PASS eleven stills 450-629 plus 41-frame transition 510-550 native FFmpeg decode",
+    "thermalSweep": "PASS twelve native stills cold/peak/cooling; localized illustrative annulus rather than uniformly orange all-disc material",
+    "ffprobeFfmpeg": "PASS independent local FFprobe and complete FFmpeg decode of all four MP4s; H264 30fps valid",
+    "blenderLookdev": "PASS A03 native four PNGs visually inspected vs washed-out A02",
+    "visualReview": "REVIEW frame531 crop corrected and verified; source motion plausible; cutaway actual axial clearance still small, residual intro/callout/visible segmented heat details",
+    "agentDVisual": "PENDING Polish03 independent moving-film/phone QA",
+    "fullRelease": "NOT RUN; Agent F owns 750-frame final MP4"
   },
   "artifacts": [
     {
-      "type": "exact latest source native film five-still contact+clamp+thermal",
+      "type": "polish03-film-standard-native",
+      "runId": 37976988034,
+      "artifactId": 11639302827,
+      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976988034/artifacts/11639302827"
+    },
+    {
+      "type": "polish03-1080x1920-native-pad-onset",
+      "runId": 37976988178,
+      "artifactId": 11638383796,
+      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976988178/artifacts/11638383796"
+    },
+    {
+      "type": "polish03-thermal-benefits-sweep",
+      "runId": 37976988178,
+      "artifactId": 11638918513,
+      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976988178/artifacts/11638918513"
+    },
+    {
+      "type": "agent-a-polish03-blender-native-glb-pngs",
+      "runId": 37976686710,
+      "artifactId": 11638453325,
+      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976686710/artifacts/11638453325"
+    },
+    {
+      "type": "baseline-pre-polish03-comparison",
       "runId": 37970589567,
       "artifactId": 11636410211,
       "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37970589567/artifacts/11636410211"
-    },
-    {
-      "type": "Polish02 genuine Remotion five-still/contact/motion",
-      "runId": 37969454877,
-      "artifactId": 11635221421,
-      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37969454877/artifacts/11635221421"
-    },
-    {
-      "type": "Polish02 real Blender/GLB/Cycles closeups",
-      "runId": 37968622756,
-      "artifactId": 11633864744,
-      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37968622756/artifacts/11633864744"
-    },
-    {
-      "type": "Polish02 repeated Blender proof",
-      "runId": 37969454877,
-      "artifactId": 11635570499,
-      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37969454877/artifacts/11635570499"
-    },
-    {
-      "type": "prePolish02 native comparison",
-      "runId": 37947404308,
-      "artifactId": 11624317868,
-      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37947404308/artifacts/11624317868"
     }
   ],
   "masterInstructions": [
-    "Exact film code SHA 8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d has verified frame705 and both clips in native Actions artifact 11636410211; review it alongside GLB artifact and obtain independent Agent D/Master signoff before PR acceptance.",
-    "Inspect full real A02 GLB & Cycles stills in Blender artifact; ask A to correct overexposed proof lighting, retaining the 148-node, 140-mesh hierarchy.",
-    "Compare old vs new five-frame contacts and watch complete moving clamp & heat MP4; validate the actual pad gap .00015-.0025m instead of B's 0.006m stand-in.",
-    "Request D independent film technical/visual QA and Master approval; Agent F alone renders/checks final 25-second release at 1080x1920 750frames 30fps."
+    "Keep PR15 draft until Agent D independently reviews exact source 37e04ee309dc9f96e63ad1b4eda28f25fea3a96a; review five standard PNGs/contact and both native 61-frame MP4s from artifact11639302827.",
+    "At full 1080x1920 inspect macro proof11638383796: original film frames85–145 contain first actual pressure ramp. Caliper is hidden after local frame18 as clearly labelled; no unphysical travel/real force simulation.",
+    "Review all eleven benefits shot sample frames and 41-frame 510–550 moving transition in artifact11638918513 to verify 531 no clipping and camera orbit safe.",
+    "Check thermal twelve stills and 300–360 clip for cold/peak/recovery, annulus-localized noncalibrated color, restrained heat and label safe areas.",
+    "Use A source f22ba2e5b2498baa52d0a22121a2f05153d894a9 hardware READY handoff and A03 Cycles four stills/GLB artifact11638453325: mechanical Three.js hardware geometry is blob-identical to E's tested film.",
+    "Only after independent D QA and Master approval should Agent F render and verify final 750-frame 1080x1920 30fps H264 with voiceover. E delivered no final film."
   ]
 }

@@ -26,3 +26,12 @@ All ten A-owned Polish 02 blobs in E were compared by Git SHA with Agent A HEAD 
 3. C's pure camera math and ghost car are unchanged. E's `IntegrationCameraRig` gives a true three-quarter caliper view and widens thermal perspective while preserving the five shot ranges. A's geometry and all C exports stay untouched.
 4. D's titles/labels are unchanged; leader lines remain disabled unless true projected anchors can be proven. E annulus-only thermal false colour is linked to B's heat signal; no calibrated temperature claims.
 5. Master owns full 750-frame acceptance. Agent D owns independent final artistic/technical QA; Agent F owns final 1080×1920 H.264 delivery.
+
+## Polish 03 latest provenance — authoritative after A03 source reimport
+
+- **E exact moving film-code SHA** (Remotion source, camera, B adapter and sector heat): `37e04ee309dc9f96e63ad1b4eda28f25fea3a96a`.
+- **E proof run** [37976988034](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976988034), native film stills, two complete 61-frame clips; **E separate high-res/sweep** [37976988178](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976988178), real 1080×1920 macro, 11 benefits/12 thermal sweep stills, 41-frame benefits video.
+- **A03 updated hardware lookdev READY:** branch HEAD `e619a94cde5c525bdd9f6dfc6ed5604d4ff39252`, A source `f22ba2e5b2498baa52d0a22121a2f05153d894a9`; E blob-identical import commit `c50056eeb86691b1d67dace94be4c2b2cefd231f`. Four changed A-owned blobs: A handoff JSON+MD, `hardware/build_brake.py`, new `hardware/lookdev_compare.py`. The live `src/brakes001/hardware/BrakeAssembly.tsx` and original mechanics are unchanged. A's native Cycles artifact [11638453325](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976686710/artifacts/11638453325) is authoritative for the corrected Blender material proof. Avoid describing the older A02 washout as the current A03 hardware.
+- E E-only `FrictionHeatMap.tsx` visualizes B's normalized heat as pressure-following annulus sectors; supplies zero heat to A's global material tint and C's uniform amber light (purely photographic change, physics intact).
+- E E-only `BrakePadMacroProof.tsx` replays original B film frames85–145, shows exact A pad gap and explicitly labelled caliper-hidden cutaway. Real geometric movement stays 2.35mm or less; do not pretend frames135–195 are a clamping-onset sequence.
+- Original baseline provenance table above is historic; **this section supersedes its A hardware SHA/status** and supplies the correct final film code SHA.
