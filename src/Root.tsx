@@ -5,6 +5,7 @@ import {TurboDocumentary} from './TurboDocumentary';
 import {CaptionedGpuDriveFilm, CaptionedTurboDocumentary} from './ProductionCaptions';
 import {StudioMaterialProof} from './studio/StudioMaterialProof';
 import {TwoVersionFilm} from './advanced/TwoVersionFilm';
+import {RuggedSuspension001} from './RuggedSuspension001';
 
 export const VideoRoot=()=> <>
   <Composition id="GpuDriveFilm" component={GpuDriveFilm} width={1080} height={1920} fps={30} durationInFrames={180}/>
@@ -13,4 +14,5 @@ export const VideoRoot=()=> <>
   <Composition id="TurboDocumentaryCaptioned" component={CaptionedTurboDocumentary} defaultProps={{words: [], enabled:true}} width={1080} height={1920} fps={30} durationInFrames={840}/>
   <Composition id="StudioMaterialProof" component={StudioMaterialProof} width={1080} height={1920} fps={30} durationInFrames={150}/>
   <Composition id="EngineeringDualVersion" component={TwoVersionFilm} width={1080} height={1920} fps={30} durationInFrames={750} defaultProps={{variant:"studio" as const}}/>
+  <Composition id="RuggedSuspension001" component={RuggedSuspension001} width={1080} height={1920} fps={30} durationInFrames={600}/>
 </>;
