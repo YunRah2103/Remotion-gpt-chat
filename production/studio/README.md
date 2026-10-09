@@ -70,3 +70,7 @@ python -m compileall -q production/studio
 \`\`\`
 
 Tests cover offline reference gallery, native media scene selection with FFmpeg when installed, synthetic valid-GLB inspection, mock audio word alignment, a locked-wheel telemetry warning, and model metadata validation. The full native Blender movie and opt-in cloud transcription have separate workflows and should not be called validated until their actual CI jobs pass.
+
+## Catalogue candidate workflow
+
+The manually dispatched `production-studio-catalog.yml` accepts a successful model-build run/artifact and a committed metadata file under `production/mechanics/proposals/<id>.json`. It hashes and inspects the exact GLB, then uploads a candidate entry for review. The model does **not** become an approved reusable model until the engineering reviewer validates scale, anchors, license, native Blender proof and compatibility. This prevents blindly publishing a broken model.
