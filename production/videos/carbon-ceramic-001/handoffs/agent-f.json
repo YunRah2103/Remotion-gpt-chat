@@ -2,36 +2,42 @@
   "schemaVersion": 1,
   "task": "carbon-ceramic-001-agent-f",
   "branch": "automotive-brakes-001/f-render",
-  "sourceSha": "2d9b1257f27dd09e4f0a4dfe5e3f44d73775c4a6",
+  "sourceSha": "dcc710b04478784233fda1743904cee9e7b057af",
   "owner": "release",
-  "status": "blocked",
-  "summary": "Agent F implemented and committed Master-approved immutable source lock with Git history and 3D asset checks, independent FFprobe/FFmpeg full-decode/SHA256 native MP4 verifier, 9 synthetic/git unit checks and GitHub Actions QA. Actual integrated final film has NOT been approved or rendered.",
+  "status": "review",
+  "summary": "REAL 25-second 750-frame native Remotion+Three.js CarbonCeramic001 review-candidate COMPLETE and technically verified. Ten immutable E-source full-res native chunks, FFprobe/frame-count/full FFmpeg decode PASS, H.264 yuv420p 1080x1920 30fps/25.0s, genuine final MP4 and five-frame contact sheet in accessible GitHub Actions artifact 11639835454. This is NOT Agent D/Master-approved official release.",
   "files": [
-    "production/videos/carbon-ceramic-001/render/SOURCE_LOCK.json",
-    "production/videos/carbon-ceramic-001/render/source_lock.py",
-    "production/videos/carbon-ceramic-001/render/verify_media.py",
-    "production/videos/carbon-ceramic-001/render/test_verify_media.py",
-    "production/videos/carbon-ceramic-001/render/README.md",
-    "production/videos/carbon-ceramic-001/render/REPORT.md",
+    ".github/workflows/carbon-ceramic-001-f-assemble.yml",
+    ".github/workflows/carbon-ceramic-001-f-candidate.yml",
+    ".github/workflows/carbon-ceramic-001-f-recovery.yml",
     ".github/workflows/carbon-ceramic-001-master-render.yml",
     "production/videos/carbon-ceramic-001/handoffs/agent-f.json",
     "production/videos/carbon-ceramic-001/handoffs/agent-f.md",
-    "production/videos/carbon-ceramic-001/render/test_source_lock.py"
+    "production/videos/carbon-ceramic-001/render/CANDIDATE_SOURCE.json",
+    "production/videos/carbon-ceramic-001/render/README.md",
+    "production/videos/carbon-ceramic-001/render/REPORT.md",
+    "production/videos/carbon-ceramic-001/render/SOURCE_LOCK.json",
+    "production/videos/carbon-ceramic-001/render/source_lock.py",
+    "production/videos/carbon-ceramic-001/render/test_source_lock.py",
+    "production/videos/carbon-ceramic-001/render/test_verify_media.py",
+    "production/videos/carbon-ceramic-001/render/verify_media.py"
   ],
   "evidence": [
-    "https://github.com/YunRah2103/Remotion-gpt-chat/commit/4564bde62ceaeca1e3afc4c7fa6d01cf707bb290",
-    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-brakes-001/f-render/production/videos/carbon-ceramic-001/render/verify_media.py",
-    "Local synthetic infrastructure validation: 4/4 unit tests PASS; 45-frame 108x192 H.264 synthetic testsrc2 fixture; NOT real film evidence.",
-    "GitHub Actions suite PASS source-lock/media tests and fail-closed gate: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37944935885",
-    "GitHub Actions seven-agent handoff/contract PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37945018341",
-    "Draft Agent F PR #16: https://github.com/YunRah2103/Remotion-gpt-chat/pull/16"
+    "Candidate immutable Agent E source SHA: 5b378202187748ce9b51d884f26bb7167285c946",
+    "ACTUAL complete 25-second MP4 with all QA artifacts: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37978273707/artifacts/11639835454",
+    "SUCCESS technical verification workflow run: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37978273707",
+    "Original native 8x75 frame chunks, source + production tests: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976771520",
+    "SUCCESS native recovery chunks 07/09 from same E SHA: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37977591114",
+    "Preliminary visual QA and full provenance report: https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-brakes-001/f-render/production/videos/carbon-ceramic-001/render/REPORT.md",
+    "Verified candidate MP4 12,875,114 bytes; SHA256 e7ed2619ab6ed09087cdb50cfc2b4fb94e3262aa69da77b72e5142bcb51bec73; FFprobe 750 frames decoded 750 at 30/1fps, 25.000000s, 1080x1920 H.264 yuv420p, complete FFmpeg decode PASS.",
+    "Actual GitHub stills 48/168/321/531/705 + contact sheet included in same artifact; detected stillness intervals require D manual video review.",
+    "Agent F draft PR: https://github.com/YunRah2103/Remotion-gpt-chat/pull/16"
   ],
   "blockers": [
-    "Agent A source handoff remains REVIEW: no verified native Blender export/GLB/closeup review.",
-    "Agent E integration handoff remains REVIEW; Master has not accepted a final integrated SHA, stills or moving previews.",
-    "master_gate.py --require-ready is not satisfied; SOURCE_LOCK.json deliberately pending.",
-    "No full 750-frame native MP4, accessible Actions final artifact/ID, full FFmpeg decode, film SHA256 or shot review yet.",
-    "Agent D independent whole-film assessment and Master final approval pending; narration not approved."
+    "Agent D must independently inspect this actual full-length native candidate at target/phone resolution: opening looks sparse, clamp movement subtle, low-contrast hardware, freeze/stillness intervals and creative pacing.",
+    "Master has NOT approved this film as official final release; Master SOURCE_LOCK and master_gate.py --require-ready remain intact and were not bypassed.",
+    "Agents A/E can continue Polish03 for optional further lookdev; latest candidate is pinned to E commit 5b378202187748ce9b51d884f26bb7167285c946, not any later unverified code.",
+    "Approved user narration is not accessible, so the real candidate has no audio."
   ],
-  "notes": "Master is final creative/release owner. F workflow is source-locked to the approved film, does not manufacture narration, and does not publish publicly. Revisit F status only after a real candidate and verified evidence exist."
+  "notes": "This handoff is status review (candidate ready for creative review), NOT ready (official release). Candidate workflow keeps release approval gates unchanged. GitHub artifact 11639835454 contains real MP4 and evidence. F release ownership limited to rendering; Master only approves/publicly releases."
 }
