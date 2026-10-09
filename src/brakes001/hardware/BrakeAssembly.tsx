@@ -140,7 +140,6 @@ export const BrakeAssembly: React.FC<Props> = ({
   exploded01=0, showUpright=true,
 }) => {
   const faces=useMemo(faceGeometry,[]);
-  const vent=useMemo(()=>annulusSegmentGeometry(0.116,0.192,0.021,0),[]);
   const vanes=useMemo(()=>Array.from({length:44},(_,i)=>
     annulusSegmentGeometry(0.116,0.192,0.021,i*Math.PI*2/44)),[]);
   const padLining=useMemo(()=>extrudedSector(0.126,0.187,0.008,
@@ -258,9 +257,9 @@ export const BrakeAssembly: React.FC<Props> = ({
     </group>
     <group name="PadInner" position={[-0.0155-gap-explode*.038,0,0]}>
       <mesh name="InnerFrictionLining" geometry={padLining}
-        position={[-0.009,0,0]} material={pad}/>
+        position={[-0.008,0,0]} material={pad}/>
       <mesh name="InnerBackingPlate" geometry={padBack}
-        position={[-0.012,0,0]} material={steel}/>
+        position={[-0.011,0,0]} material={steel}/>
     </group>
     <group name="PadOuter" position={[0.0155+gap+explode*.038,0,0]}>
       <mesh name="OuterFrictionLining" geometry={padLining}
