@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "task": "carbon-ceramic-001-agent-b",
+  "branch": "automotive-brakes-001/b-motion-thermal",
+  "sourceSha": "25a83c4e58e60c909624494745158385b7f962d9",
+  "owner": "engineering",
+  "summary": "UNSTARTED template: specialist has not begun implementation; this is not an approved handoff.",
+  "status": "blocked",
+  "files": [],
+  "evidence": [],
+  "blockers": [
+    "Agent session has not started. No code, native proofs, review or handoff has been supplied."
+  ],
+  "notes": "Planning-only placeholder. sourceSha is original common ancestor, NOT a specialist completion commit. Replace with actual post-implementation SHA."
+}
