@@ -1,23 +1,27 @@
-name: Production Studio - pull request visual comparison
+name: Production Studio - composition-aware PR review
 on:
   pull_request:
     paths:
       - 'src/**'
       - 'production/**'
+      - '.github/skills/**'
       - '.github/agents/**'
+      - 'package.json'
+      - 'package-lock.json'
 permissions:
   contents: read
 concurrency:
-  group: studio-pr-${{ github.event.pull_request.number }}
+  group: composition-review-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 jobs:
-  compare:
+  native-review:
     runs-on: ubuntu-24.04
-    timeout-minutes: 65
+    timeout-minutes: 110
     steps:
       - uses: actions/checkout@v4
         with:
           path: candidate
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/checkout@v4
         with:
@@ -32,34 +36,29 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Render matched native frames and compare
+      - name: Install pinned dependencies
         shell: bash
         run: |
           set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
           python -m pip install Pillow==11.3.0
           (cd baseline && npm ci --no-audit --no-fund)
           (cd candidate && npm ci --no-audit --no-fund && npm run check)
-          mkdir -p out/baseline out/candidate out/review
-          for DIR in baseline candidate; do
-            for FRAME in 0 30 60 120; do
-              (cd "$DIR" && npx --no-install remotion still src/index.ts GpuDriveFilm "../out/$DIR/frame-$FRAME.png" \
-                --frame="$FRAME" --scale=0.4 --gl=swangle)
-            done
-          done
-          python candidate/production/tools/visual_regression.py out/baseline out/candidate out/review
-          python - <<'PY'
-          import os,json
-          data=json.load(open('out/review/visual-report.json'))
-          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as fp:
-              fp.write('## Native visual comparison\n\n')
-              fp.write('Image change is not an aesthetic score. Open the artifact for real image reviews.\n\n')
-              for r in data['results']:
-                  fp.write('- '+r['frame']+': mean absolute pixel change '+str(r['meanAbsolutePixelChange'])+'\n')
-          PY
+      - name: Choose actually affected compositions and render native proof
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          git -C candidate diff --name-only "$BASE_SHA" HEAD > out/changed.txt
+          python candidate/production/tools/visual_plan.py \
+            --baseline baseline --candidate candidate --changed out/changed.txt --out out/plan.json
+          python candidate/production/tools/run_visual_review.py out/plan.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: studio-pr-review-${{ github.run_id }}
+          name: composition-review-${{ github.run_id }}
           path: out/
           retention-days: 21
           if-no-files-found: warn
