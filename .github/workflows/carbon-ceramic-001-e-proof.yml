@@ -4,7 +4,7 @@ on:
     branches: ['automotive-brakes-001/e-integration']
     paths:
       - 'src/brakes001/**'
-      - 'production/videos/carbon-ceramic-001/handoffs/agent-e.*'
+      - '!src/brakes001/integration/*.md'
       - '.github/workflows/carbon-ceramic-001-e-proof.yml'
   workflow_dispatch:
 permissions:
@@ -28,9 +28,11 @@ jobs:
       - name: Install render dependencies
         run: |
           set -euo pipefail
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg
-          python -m pip install Pillow==11.3.0
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
+          python -m pip install --disable-pip-version-check Pillow==11.3.0
           npm ci --no-audit --no-fund
       - name: Dedicated E and A-B-C-D test suites
         run: |
