@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "task": "carbon-ceramic-001-agent-d",
   "branch": "automotive-brakes-001/d-graphics-qa",
-  "sourceSha": "f8bdea2b6cb8f503b119621aaaaabe8034e6bafe",
+  "sourceSha": "94389c11b60b46ff12329244e2423ff501e32f72",
   "owner": "qa",
-  "summary": "Agent D GRAPHICS READY: frame-deterministic Remotion TitleOverlays and PartLabels, portrait-safe cues, five SVG layout proofs and independent engineering review rubric. Film-level independent QA remains PENDING actual integrated 750-frame footage.",
-  "status": "ready",
+  "summary": "Polish02 INDEPENDENT NATIVE QA performed against real source-locked A Blender GLB/Cycles PNGs and E five stills plus both 61-frame decoded moving H264 previews. Latest hero frame705 fix verified at film code 8b6ee... via successful workflow-head 683b97...; conditional pass of previews only, not full 750-frame release. Major lookdev, 531 framing and visually unproven pad stroke remain.",
+  "status": "review",
   "files": [
     "src/brakes001/graphics/index.tsx",
     "src/brakes001/graphics/graphics-cues.json",
@@ -18,20 +18,53 @@
     "production/videos/carbon-ceramic-001/qa/proofs/layout-frame-168.svg",
     "production/videos/carbon-ceramic-001/qa/proofs/layout-frame-321.svg",
     "production/videos/carbon-ceramic-001/qa/proofs/layout-frame-531.svg",
-    "production/videos/carbon-ceramic-001/qa/proofs/layout-frame-705.svg"
+    "production/videos/carbon-ceramic-001/qa/proofs/layout-frame-705.svg",
+    "production/videos/carbon-ceramic-001/qa/POLISH02_INDEPENDENT_REVIEW.md"
   ],
   "evidence": [
-    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/f8bdea2b6cb8f503b119621aaaaabe8034e6bafe/src/brakes001/graphics/index.tsx",
-    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/f8bdea2b6cb8f503b119621aaaaabe8034e6bafe/production/videos/carbon-ceramic-001/qa/INITIAL_REPORT.md",
-    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/f8bdea2b6cb8f503b119621aaaaabe8034e6bafe/production/videos/carbon-ceramic-001/qa/proofs/layout-frame-048.svg",
-    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/f8bdea2b6cb8f503b119621aaaaabe8034e6bafe/production/videos/carbon-ceramic-001/qa/proofs/layout-frame-168.svg",
-    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/f8bdea2b6cb8f503b119621aaaaabe8034e6bafe/production/videos/carbon-ceramic-001/qa/proofs/layout-frame-321.svg",
-    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/f8bdea2b6cb8f503b119621aaaaabe8034e6bafe/production/videos/carbon-ceramic-001/qa/proofs/layout-frame-531.svg",
-    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/f8bdea2b6cb8f503b119621aaaaabe8034e6bafe/production/videos/carbon-ceramic-001/qa/proofs/layout-frame-705.svg",
-    "LOCAL CHECK PASS: python3 production/videos/carbon-ceramic-001/qa/check_graphics.py — 750 frames; 8 graphics; 8 labels; safe areas and required cues.",
-    "LOCAL COMPONENT SMOKE PASS: node production/videos/carbon-ceramic-001/qa/component_smoke.cjs — 750 frame JSX evaluations; 1216 cue instances; Remotion/React hooks mocked.",
-    "LOCAL TSX TRANSPILATION PASS (not full repository npm check)."
+    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/94389c11b60b46ff12329244e2423ff501e32f72/production/videos/carbon-ceramic-001/qa/POLISH02_INDEPENDENT_REVIEW.md",
+    "REVIEWED E FILM CODE: https://github.com/YunRah2103/Remotion-gpt-chat/commit/8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d",
+    "LATEST NATIVE SUCCESS RUN SHA 683b97dea79590a7026bd2b89204ee8945f908ff: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37970589567",
+    "FIVE STILLS + BOTH REAL 61-FRAME MP4 PREVIEWS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37970589567/artifacts/11636410211",
+    "NATIVE BLENDER .BLEND/.GLB FOUR REAL CYCLES PNGS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37968622756/artifacts/11633864744",
+    "CHECK: source 8b6ee→683b97 only workflow file changed, 683b97→c8bdb9 only documentation changed",
+    "LOCAL FFPROBE + FULL FFMPEG DECODE PASS: clamp 61/61 frames 378x672 30 fps 2.033333s H264; heat 61/61 same; entire 122 frames processed, every third visually inspected in strips",
+    "GLB SHA256 261b11aa1c71610e52ad9fe25a57b179427f0de833dc6904d41d8da44013a5ac independently verified; trimesh loaded 140 geometries and 149 graph nodes including root",
+    "FRAME DIFF: 48,168,321,531 byte-identical to previous d9 E proof; new source-specific frame705 changes 149483/518400 pixels and visibly removes left caliper clipping"
   ],
-  "blockers": [],
-  "notes": "Master may integrate now. This is NOT certification of the final movie. Native GLB/mechanics/thermal review, actual phone stills, 135-195 and 300-360 moving clips, full MP4 ffprobe and FFmpeg decode are PENDING. Layout SVGs intentionally show schematic placeholder, not real footage."
+  "blockers": [
+    "MAJOR: Four A Blender Cycles shots overexposed/washed out; A must change proof lookdev and rerender.",
+    "MAJOR: E benefits frame531 left caliper clipped, ring nearly fills both horizontal edges; E must reframe and prove new-source frames.",
+    "MAJOR/UNPROVEN: 378x672 clamp moving proxy does not establish that the true 2.35 mm opposing pad motion is visibly understandable; E must provide 1080x1920 side/3-4 moving macro.",
+    "MODERATE: Thermal annulus mostly uniform orange in 300-360, release/cooling cycle not verified in available motion proof.",
+    "No complete 750-frame full-resolution release / full-film phone QA / final approved audio source reviewed. Agent F owns release only after Master accepts fixes."
+  ],
+  "notes": "Master may integrate now. This is NOT certification of the final movie. Native GLB/mechanics/thermal review, actual phone stills, 135-195 and 300-360 moving clips, full MP4 ffprobe and FFmpeg decode are PENDING. Layout SVGs intentionally show schematic placeholder, not real footage.",
+  "review": {
+    "verdict": "CONDITIONAL PASS — preview/prototype only; NOT RELEASE APPROVED",
+    "reviewedFilmCodeSha": "8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d",
+    "renderedWorkflowHeadSha": "683b97dea79590a7026bd2b89204ee8945f908ff",
+    "latestEHeadDocumentationSha": "c8bdb9fd31f93364ae9ca263bd41ff439e777e14",
+    "runId": 37970589567,
+    "filmArtifactId": 11636410211,
+    "blenderArtifactId": 11633864744,
+    "reviewedStillFrames": [
+      48,
+      168,
+      321,
+      531,
+      705
+    ],
+    "reviewedMovingRanges": [
+      "135-195",
+      "300-360"
+    ],
+    "reviewedCodeComponents": [
+      "src/brakes001/CarbonCeramic001.tsx",
+      "src/brakes001/integration/integrationState.ts",
+      "src/brakes001/hardware/BrakeAssembly.tsx"
+    ],
+    "visualSequenceInspection": "all 61 frames decoded for each of 2 clips; timeline strips every third frame inspected; no uninterrupted realtime playback claimed",
+    "finalReleaseApproved": false
+  }
 }
