@@ -1,0 +1,102 @@
+name: Carbon Ceramic 001 - E Final Polish04 Native Motion Proof
+on:
+  push:
+    branches: ['automotive-brakes-001/e-integration']
+    paths:
+      - 'src/brakes001/CarbonCeramic001.tsx'
+      - 'src/brakes001/integration/IntegrationCameraRig.tsx'
+      - 'src/brakes001/integration/InFilmPadCutaway.tsx'
+      - 'src/brakes001/integration/integration.test.cjs'
+      - '.github/workflows/carbon-ceramic-001-e-polish04.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: carbon-ceramic-p04-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  pad-onset-native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install and test native source
+        run: |
+          set -euo pipefail
+          mkdir -p out/brakes-e04/pad
+          npm ci --no-audit --no-fund
+          npm run check | tee out/brakes-e04/pad/typescript.txt
+          node src/brakes001/integration/integration.test.cjs | tee out/brakes-e04/pad/integration-test.txt
+          bash production/videos/carbon-ceramic-001/physics/run-tests.sh | tee out/brakes-e04/pad/physics.txt
+          python production/videos/carbon-ceramic-001/qa/check_graphics.py | tee out/brakes-e04/pad/graphics.txt
+          python -m unittest discover -s production/tests -v > out/brakes-e04/pad/python-tests.txt 2>&1
+          if ! command -v ffprobe >/dev/null || ! command -v ffmpeg >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
+      - name: Render and verify true 1080x1920 film pad onset and transitions
+        run: |
+          set -euo pipefail
+          python production/tools/render.py --composition CarbonCeramic001 --mode preview --start 94 --end 158 --scale 1 --concurrency 1 --output out/brakes-e04/pad/infilm-pad-094-158.mp4
+          ffprobe -v error -show_entries stream=codec_name,width,height,avg_frame_rate,nb_frames,pix_fmt -show_entries format=duration -of json out/brakes-e04/pad/infilm-pad-094-158.mp4 | tee out/brakes-e04/pad/ffprobe.json
+          ffmpeg -v error -xerror -i out/brakes-e04/pad/infilm-pad-094-158.mp4 -f null -
+          python production/tools/quality.py video out/brakes-e04/pad/infilm-pad-094-158.mp4 --fps 30 --frames 65 --report out/brakes-e04/pad/quality.json
+          sha256sum out/brakes-e04/pad/infilm-pad-094-158.mp4 > out/brakes-e04/pad/sha256.txt
+      - name: Save actual in-film clamp proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: carbon-ceramic-p04-pad-${{ github.run_id }}
+          path: out/brakes-e04/pad/
+          if-no-files-found: warn
+          retention-days: 30
+  hero-native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install prerequisites
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          if ! command -v ffprobe >/dev/null || ! command -v ffmpeg >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
+          python -m pip install --disable-pip-version-check Pillow==11.3.0
+          mkdir -p out/brakes-e04/hero
+      - name: Render eight full-res native stills and contact sheet
+        run: |
+          set -euo pipefail
+          python production/tools/render.py --composition CarbonCeramic001 --mode stills --output out/brakes-e04/hero/stills --samples 48,115,168,321,531,650,705,749 --scale 1
+          python production/tools/quality.py contact out/brakes-e04/hero/contact-sheet.jpg out/brakes-e04/hero/stills/frame-*.png
+          python production/tools/render.py --composition CarbonCeramic001 --mode stills --output out/brakes-e04/hero/extra-stills --samples 94,99,100,106,116,125,140,147,148,158,620,629,630,675,729 --scale 0.5
+          python production/tools/quality.py contact out/brakes-e04/hero/transition-contact.jpg out/brakes-e04/hero/extra-stills/frame-*.png
+      - name: Render native 1080x1920 full final hero 630 through 749
+        run: |
+          set -euo pipefail
+          python production/tools/render.py --composition CarbonCeramic001 --mode preview --start 630 --end 749 --scale 1 --concurrency 1 --output out/brakes-e04/hero/hero-630-749.mp4
+          ffprobe -v error -show_entries stream=codec_name,width,height,avg_frame_rate,nb_frames,pix_fmt -show_entries format=duration -of json out/brakes-e04/hero/hero-630-749.mp4 | tee out/brakes-e04/hero/ffprobe.json
+          ffmpeg -v error -xerror -i out/brakes-e04/hero/hero-630-749.mp4 -f null -
+          python production/tools/quality.py video out/brakes-e04/hero/hero-630-749.mp4 --fps 30 --frames 120 --report out/brakes-e04/hero/quality.json
+          sha256sum out/brakes-e04/hero/hero-630-749.mp4 > out/brakes-e04/hero/sha256.txt
+      - name: Save actual final-hero and stills proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: carbon-ceramic-p04-hero-${{ github.run_id }}
+          path: out/brakes-e04/hero/
+          if-no-files-found: warn
+          retention-days: 30
