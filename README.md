@@ -44,3 +44,7 @@ Start with **[production/README.md](production/README.md)** for the ready-to-run
 ## Five new production upgrades
 
 See [production/PIPELINE.md](production/PIPELINE.md) for a real preflight-to-final GitHub Actions workflow, opt-in animated captions using `@remotion/captions`, composition-aware native PR QA, Copilot-specific skills/handoff validation, and real software-WebGL render benchmarking. The legacy compositions remain registered and unchanged, with optional captioned versions. ABS-001 remains **preproduction** until an actual ABS animation is implemented.
+
+## Advanced Studio production tools
+
+Six additional native tools are described in [production/advanced/README.md](production/advanced/README.md): Blender-to-GLB rig export with preserved named parts, browser-only A/B video comparison, per-frame Blender AABB clearance warnings, source-locked recovery of failed render chunks, real AO/high-to-low normal texture baking, and two distinct 3D studio/circuit Remotion MP4 variants. Existing projects remain untouched. ABS-001 is still preproduction; AI agents require separate access and explicit execution.
