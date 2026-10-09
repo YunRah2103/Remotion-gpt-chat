@@ -21,6 +21,9 @@ def main(path, output):
     scene=bpy.context.scene
     scene.render.engine="CYCLES"
     scene.cycles.samples=12
+    # Ubuntu apt Blender may be built without OIDN; do not request unavailable denoiser.
+    scene.cycles.use_denoising=False
+    bpy.context.view_layer.cycles.use_denoising=False
     scene.render.resolution_x=640
     scene.render.resolution_y=640
     scene.render.resolution_percentage=100
