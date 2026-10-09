@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "task": "carbon-ceramic-001-agent-f",
   "branch": "automotive-brakes-001/f-render",
-  "sourceSha": "4564bde62ceaeca1e3afc4c7fa6d01cf707bb290",
+  "sourceSha": "2d9b1257f27dd09e4f0a4dfe5e3f44d73775c4a6",
   "owner": "release",
   "status": "blocked",
-  "summary": "Agent F implemented and committed fail-closed Master source approval lock, independent full-decode/FFprobe/SHA256 native MP4 checker, synthetic self-tests and F GitHub Actions QA. Actual integrated final film has NOT been approved or rendered.",
+  "summary": "Agent F implemented and committed Master-approved immutable source lock with Git history and 3D asset checks, independent FFprobe/FFmpeg full-decode/SHA256 native MP4 verifier, 9 synthetic/git unit checks and GitHub Actions QA. Actual integrated final film has NOT been approved or rendered.",
   "files": [
     "production/videos/carbon-ceramic-001/render/SOURCE_LOCK.json",
     "production/videos/carbon-ceramic-001/render/source_lock.py",
@@ -15,13 +15,16 @@
     "production/videos/carbon-ceramic-001/render/REPORT.md",
     ".github/workflows/carbon-ceramic-001-master-render.yml",
     "production/videos/carbon-ceramic-001/handoffs/agent-f.json",
-    "production/videos/carbon-ceramic-001/handoffs/agent-f.md"
+    "production/videos/carbon-ceramic-001/handoffs/agent-f.md",
+    "production/videos/carbon-ceramic-001/render/test_source_lock.py"
   ],
   "evidence": [
     "https://github.com/YunRah2103/Remotion-gpt-chat/commit/4564bde62ceaeca1e3afc4c7fa6d01cf707bb290",
     "https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-brakes-001/f-render/production/videos/carbon-ceramic-001/render/verify_media.py",
     "Local synthetic infrastructure validation: 4/4 unit tests PASS; 45-frame 108x192 H.264 synthetic testsrc2 fixture; NOT real film evidence.",
-    "GitHub Actions F runner initial attempt 37944380254 failed because ffmpeg absent; corrective installation committed, rerun 37944495862 pending as handoff written."
+    "GitHub Actions suite PASS source-lock/media tests and fail-closed gate: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37944935885",
+    "GitHub Actions seven-agent handoff/contract PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37945018341",
+    "Draft Agent F PR #16: https://github.com/YunRah2103/Remotion-gpt-chat/pull/16"
   ],
   "blockers": [
     "Agent A source handoff remains REVIEW: no verified native Blender export/GLB/closeup review.",
