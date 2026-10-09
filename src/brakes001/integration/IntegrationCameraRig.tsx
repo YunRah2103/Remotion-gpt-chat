@@ -15,6 +15,14 @@ const smooth=(x:number)=>{const t=Math.max(0,Math.min(1,x));return t*t*(3-2*t);}
 
 export const integrationCameraAt=(frame:number):BrakeCameraPose=>{
   const p=brakeCameraAt(frame);
+  // The demonstration covers B's real first pressure ramp (frames 95–117);
+  // camera is side-oriented so per-face axial travel has perspective.
+  if(frame>=100&&frame<=147){
+    const position:[number,number,number]=[.64,.28,.59];
+    const target:[number,number,number]=[0,.105,.105];
+    return {...p,position,target,fovDegrees:40,
+      focusDistanceMetres:Math.hypot(...position.map((v,i)=>v-target[i]))};
+  }
   if(p.shotId==='reveal'){
     // Camera orbits instead of zooming the pads beyond their true 2.5mm travel.
     const t=smooth((frame-120)/149);
@@ -38,11 +46,13 @@ export const integrationCameraAt=(frame:number):BrakeCameraPose=>{
     return {...p,fovDegrees:Math.max(34,p.fovDegrees)};
   }
   if(p.shotId==='hero'){
-    const t=smooth((frame-630)/119);
+    // Polish04: a genuine ~35° continuous orbit, not a nearly static ease.
+    // Preserve the stopped physical rotor; CAMERA parallax supplies the ending.
+    const t=Math.max(0,Math.min(1,(frame-630)/119));
     const position:[number,number,number]=[
-      lerp(.86,.73,t),lerp(.37,.41,t),lerp(.55,.67,t)];
-    const target:[number,number,number]=[0,.044,.045];
-    return {...p,position,target,fovDegrees:38,
+      lerp(.91,.38,t),lerp(.39,.45,t),lerp(.55,.90,t)];
+    const target:[number,number,number]=[0,.055,.055];
+    return {...p,position,target,fovDegrees:42,
       focusDistanceMetres:Math.hypot(...position.map((v,i)=>v-target[i]))};
   }
   return p;

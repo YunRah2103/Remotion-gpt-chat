@@ -17,6 +17,7 @@ import {PartLabels, TitleOverlays} from './graphics';
 import {integrationStateAt} from './integration/integrationState';
 import {IntegrationCameraRig} from './integration/IntegrationCameraRig';
 import {FrictionHeatMap} from './integration/FrictionHeatMap';
+import {InFilmPadCutaway,InFilmPadLabels,isInFilmPadProof} from './integration/InFilmPadCutaway';
 
 /**
  * A's friction faces terminate at x=-0.0155m and +0.0155m.
@@ -29,13 +30,15 @@ export const CarbonCeramic001: React.FC = () => {
   const motion = brakeStateAt(frame);
   const state = integrationStateAt(frame);
   const shot = brakeShotAt(frame);
-  const context = shot === 'context';
+  const padProof = isInFilmPadProof(frame);
+  const context = shot === 'context' && !padProof;
   const pos = GHOST_FRONT_BRAKE_ANCHOR;
   const cameraPose = brakeCameraAt(frame);
   // Keep the real rotor centroid aligned to C's changing thermal camera target.
   // This compensates for dolly/orbit perspective without changing C's camera code.
   const brakePosition: [number,number,number] = context ?
     [pos[0], pos[1], pos[2]] :
+    padProof ? [0,0,0] :
     shot === 'thermal' ?
       [cameraPose.target[0], cameraPose.target[1], cameraPose.target[2]] :
       shot === 'benefits' ? [0, .012, .015] :
@@ -53,18 +56,21 @@ export const CarbonCeramic001: React.FC = () => {
       {context && <GhostCarOutline frame={frame}/>}
       {/* Stable macro framing: C's shot target, not a guessed static offset.
           Geometry, independent X-axis pads and fixed caliper are unmodified. */}
-      <group scale={shot === 'thermal' ? 0.56 : shot === 'reveal' ? 0.86 : shot === 'hero' ? 0.86 : shot === 'benefits' ? 0.93 : 1}
+      <group scale={shot === 'thermal' ? 0.56 : shot === 'reveal' ? 0.86 : shot === 'hero' ? 0.86 : shot === 'benefits' ? 0.93 : padProof ? 0.78 : 1}
         position={brakePosition}>
         <BrakeAssembly rotorAngleRad={state.rotorAngleRad}
           padGapMetres={state.padGapMetres} heat01={0}
           showUpright/>
+        <InFilmPadCutaway frame={frame}/>
         {!context && <FrictionHeatMap frame={frame} rotorAngleRad={state.rotorAngleRad}/>}
       </group>
     </ThreeCanvas>
     <AbsoluteFill style={{pointerEvents: 'none', zIndex: 30,
       background: 'linear-gradient(180deg, rgba(3,8,14,.25) 0%, transparent 28%, transparent 73%, rgba(2,7,12,.35) 100%)'}}/>
     <TitleOverlays frame={frame}/>
-    <PartLabels frame={frame} showLeaderLines={false}/>
+    {!padProof && <PartLabels frame={frame} showLeaderLines={false}/>}
+    <InFilmPadLabels frame={frame}/>
+    {([99,100,147,148].includes(frame))&&<AbsoluteFill style={{pointerEvents:'none',background:'#07111b',opacity:.55,zIndex:32}}/>
   </AbsoluteFill>;
 };
 

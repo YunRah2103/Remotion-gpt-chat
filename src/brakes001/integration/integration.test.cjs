@@ -21,6 +21,13 @@ const b = loadTypeScript('src/brakes001/motion/brakeState.ts');
 const camera = loadTypeScript('src/brakes001/cinema/cameraMath.ts');
 assert.equal(camera.brakeShotAt(531),'benefits');
 const adapter = read('src/brakes001/integration/integrationState.ts');
+const eCameraSource=read('src/brakes001/integration/IntegrationCameraRig.tsx');
+const padSource=read('src/brakes001/integration/InFilmPadCutaway.tsx');
+assert.match(eCameraSource,/lerp\(\.91,\.38,t\)/);
+assert.match(eCameraSource,/frame>=100&&frame<=147/);
+assert.match(padSource,/caliper\.visible=visible/);
+assert.match(padSource,/travelMm\.toFixed\(2\)/);
+
 assert.match(adapter, /HARDWARE_REST_GAP_M = \.0025/);
 assert.match(adapter, /padGapForHardware\(s\.brakePressure01\)/);
 // Execute the actual compiled E adapter against B's untouched deterministic state.
@@ -68,6 +75,8 @@ assert.match(film, /<TitleOverlays /);
 assert.match(film, /<PartLabels /);
 const thermal = read('src/brakes001/integration/FrictionHeatMap.tsx');
 assert.match(film, /<FrictionHeatMap /);
+assert.match(film, /<InFilmPadCutaway frame=/);
+assert.match(film, /<InFilmPadLabels frame=/);
 assert.match(thermal, /frictionHotSpot01At/);
 assert.match(thermal, /ringGeometry args=\{\[\.127,\.190/);
 assert.match(read('src/Root.tsx'), /id="BrakePadMacro001"/);
