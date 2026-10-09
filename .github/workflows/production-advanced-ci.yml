@@ -51,6 +51,9 @@ jobs:
           blender -b --disable-autoexec out/advanced-ci/original-demo.blend -t 2 \
             --python production/advanced/blender_bake.py -- production/advanced/contracts/bake-demo.json out/advanced-ci/baked
           test -s out/advanced-ci/baked/Rotor-ao.png
+          blender -b --disable-autoexec out/advanced-ci/original-demo.blend -t 2 \
+            --python production/advanced/blender_bake.py -- production/advanced/contracts/normal-demo.json out/advanced-ci/normal-maps
+          test -s out/advanced-ci/normal-maps/Rotor-normal.png
           python - <<'PY'
           import json
           data=json.load(open('out/advanced-ci/export/rig-manifest.json'))
@@ -58,6 +61,8 @@ jobs:
           assert data['glb']=='rotor-demo.glb'
           baked=json.load(open('out/advanced-ci/baked/bake-manifest.json'))
           assert baked['bakes'][0]['object']=='Rotor'
+          normal=json.load(open('out/advanced-ci/normal-maps/bake-manifest.json'))
+          assert normal['bakes'][0]['type']=='normal'
           print('REAL_BLENDER_EXPORT_AO_AND_CLEARANCE_PASS')
           PY
       - uses: actions/upload-artifact@v4
@@ -69,6 +74,7 @@ jobs:
             out/advanced-ci/clearance-audit.json
             out/advanced-ci/clearance-samples.json
             out/advanced-ci/baked/
+            out/advanced-ci/normal-maps/
             out/production/site/compare/
           retention-days: 14
           if-no-files-found: warn
