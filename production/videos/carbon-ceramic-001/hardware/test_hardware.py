@@ -73,14 +73,38 @@ def inspect_glb(path):
     assert len(meshes)>=65,f"Expected real detailed geometry, only {len(meshes)} meshes"
     for token in ["CoolingVane","Piston","CarbonCeramicFace"]:
         assert any(token in (name or "") for name in names),f"Missing {token} geometry"
-    assert gltf.get("materials"),"No exported PBR materials"
-    print(f"NATIVE_GLB_STRUCTURE_PASS meshes={len(meshes)} nodes={len(nodes)} bytes={len(raw)}")
-    return {"native":True,"nodes":len(nodes),"meshes":len(meshes),"bytes":len(raw)}
+    materials=gltf.get("materials",[])
+    assert len(materials)>=9, f"Expected nine separated PBR materials, found {len(materials)}"
+    assert len(meshes)>=130, f"Polish02 requires additional real hardware geometry: {len(meshes)}"
+    # A forged cheek should be a dense closed sculpt, not the earlier
+    # flat sector / cuboid stand-in (usually under 120 vertices).
+    accessors=gltf.get("accessors",[])
+    cheeks={}
+    for cheek in ("ForgedCaliperCheek_Inboard","ForgedCaliperCheek_Outboard"):
+        ni=positions.get(cheek)
+        assert ni is not None, f"Missing sculpted cheek: {cheek}"
+        mi=nodes[ni].get("mesh")
+        assert mi is not None, f"No mesh for {cheek}"
+        counts=[accessors[p["attributes"]["POSITION"]]["count"]
+                for p in meshes[mi].get("primitives",[])
+                if "POSITION" in p.get("attributes",{})]
+        assert counts and sum(counts)>=400, f"Non-sculpted cheek {cheek}: {counts}"
+        cheeks[cheek]=sum(counts)
+    for name in ("InnerAntiSquealShim","OuterAntiSquealShim",
+                 "OuterAxialCaliperBridge","BridgeSatinCrown"):
+        assert name in positions, f"Missing pad/bridge detail: {name}"
+    print(f"NATIVE_GLB_STRUCTURE_PASS meshes={len(meshes)} nodes={len(nodes)} "
+          f"materials={len(materials)} cheeks={cheeks} bytes={len(raw)}")
+    return {"native":True,"nodes":len(nodes),"meshes":len(meshes),
+            "materials":len(materials),"sculptedCheeks":cheeks,
+            "bytes":len(raw)}
 
 def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("--glb",type=Path,help="True Blender-generated GLB to inspect")
     ap.add_argument("--report",type=Path,help="Optional native Blender rig report")
+    ap.add_argument("--proof-dir",type=Path,
+                    help="Require genuine generated 900x900 Blender PNG views")
     args=ap.parse_args()
     check_source()
     if args.glb:
@@ -88,6 +112,21 @@ def main():
         if args.report:
             report=json.loads(args.report.read_text())
             assert report.get("hashes",{}).get("glbSha256")
+        if args.proof_dir:
+            images=("rotor-front.png","ventilation.png",
+                    "exploded.png","pad-contact.png")
+            for name in images:
+                p=args.proof_dir/name
+                blob=p.read_bytes()
+                assert len(blob)>4000 and blob[:4]==bytes((137,80,78,71)), (
+                    f"Native PNG missing or invalid: {p}")
+                width,height=struct.unpack_from(">II",blob,16)
+                assert width>=900 and height>=900,(name,width,height)
+            build=json.loads((args.proof_dir/"build-report.json").read_text())
+            assert build["status"]=="REAL_BLENDER_BUILD_PASS"
+            assert build["renderDenoisingDisabled"] is True
+            result["blenderProofImages"]=list(images)
+            print("BLENDER_CLOSEUP_PNG_PASS",",".join(images))
         print("HARDWARE_NATIVE_PASS",json.dumps(result))
     else:
         print("HARDWARE_SOURCE_ONLY_PASS native Blender/GLB proof NOT EXECUTED")

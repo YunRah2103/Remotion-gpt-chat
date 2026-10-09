@@ -141,6 +141,63 @@ def sector_mesh(name, inner, outer, half_width, centre,
     obj.modifiers.new("normals","WEIGHTED_NORMAL")
     return obj
 
+def forged_shell(name, side, centre, holder):
+    """One smoothly convex closed, machined fixed-caliper cheek.
+    Curvature varies both around the disc and radially; unlike a flat box
+    this casts genuine continuous 3D highlights in native Blender and GLB.
+    The inner surface x=+/-0.0365 stays clear of both 31 mm rotor faces.
+    """
+    n_a = 26
+    n_r = 8
+    verts = []
+    def point(t, u, layer):
+        a = centre - .295 + .590*t
+        scallop=math.sin(3*math.pi*t)**2
+        r0=.142+.008*scallop
+        r1=.217-.012*scallop
+        r=r0+(r1-r0)*u
+        lobes=.5+.5*math.cos(6*math.pi*t)
+        envelope=(max(0,math.sin(math.pi*u))**.65)*(.5+.5*lobes)
+        x=side*(.0365 if layer else (.055+.015*envelope))
+        return (x,r*math.sin(a),r*math.cos(a))
+    for layer in (0,1):
+        for i in range(n_a+1):
+            for j in range(n_r+1):
+                verts.append(point(i/n_a,j/n_r,layer))
+    n = (n_a+1)*(n_r+1)
+    def cell(layer,i,j):
+        return layer*n+i*(n_r+1)+j
+    faces=[]
+    for i in range(n_a):
+        for j in range(n_r):
+            p=(cell(0,i,j),cell(0,i+1,j),cell(0,i+1,j+1),
+               cell(0,i,j+1))
+            # Correct winding for +/- axial faces, and opposite for inside.
+            faces.append(p if side>0 else tuple(reversed(p)))
+            q=(cell(1,i,j),cell(1,i+1,j),cell(1,i+1,j+1),
+               cell(1,i,j+1))
+            faces.append(tuple(reversed(q)) if side>0 else q)
+    loop=[]
+    for i in range(n_a+1):loop.append((i,0))
+    for j in range(1,n_r+1):loop.append((n_a,j))
+    for i in range(n_a-1,-1,-1):loop.append((i,n_r))
+    for j in range(n_r-1,0,-1):loop.append((0,j))
+    for k,(i,j) in enumerate(loop):
+        a=cell(0,i,j);b=cell(0,*loop[(k+1)%len(loop)])
+        c=cell(1,*loop[(k+1)%len(loop)]);d=cell(1,i,j)
+        f=(a,b,c,d)
+        faces.append(tuple(reversed(f)) if side>0 else f)
+    mesh=bpy.data.meshes.new(name+"_mesh")
+    mesh.from_pydata(verts,[],faces);mesh.update()
+    ob=bpy.data.objects.new(name,mesh)
+    bpy.context.scene.collection.objects.link(ob);parent(ob,holder)
+    ob.data.materials.append(CALIPER)
+    for polygon in ob.data.polygons:polygon.use_smooth=True
+    b=ob.modifiers.new("forging_transition_bevel","BEVEL")
+    b.width=.0012;b.segments=3;b.limit_method='ANGLE'
+    ob.modifiers.new("weighted_forging_normals","WEIGHTED_NORMAL")
+    return ob
+
 def vane_mesh(name, index, ring_parent):
     # Curved radial C-shaped pumping vane, NOT a solid spacer filling a vent.
     a0=2*math.pi*index/D["ventCount"]
@@ -234,8 +291,20 @@ def construct():
             x0,x1=-.064,-.037
         else:
             x0,x1=.037,.064
-        sector_mesh("ForgedCaliperCheek_%s"%("Inboard" if side<0 else "Outboard"),
-          .138,.214,.29,sector,x0,x1,CALIPER,body)
+        cheek = forged_shell(
+            "ForgedCaliperCheek_%s"%("Inboard" if side<0 else "Outboard"),
+            side,sector,body)
+        # Two purposeful cast ribs and a satin retaining bridge; they follow
+        # the rotor circumference instead of making a rectangular silhouette.
+        for rib, offset in enumerate((-.185,.185)):
+            sector_mesh("CheekReinforcement_%s_%d"%("I" if side<0 else "O",rib),
+                .143,.202,.045,sector+offset,
+                (-.068 if side<0 else .060),
+                (-.060 if side<0 else .068),CALIPER,body,12)
+        sector_mesh("ForgingEdgeTrim_%s"%("Inboard" if side<0 else "Outboard"),
+            .210,.215,.235,sector,
+            (-.060 if side<0 else .056),
+            (-.056 if side<0 else .060),HAT,body,24)
         for j,angleOffset in enumerate((-.17,0,.17)):
             angle=sector+angleOffset;r=.163
             cy,cz=r*math.sin(angle),r*math.cos(angle)
@@ -245,8 +314,17 @@ def construct():
                      (side*.028,cy,cz),ACCENT,body,48,.0002)
             cylinder("DustSeal_%s_%d"%(side,j+1),.013,.001,
                      (side*.0295,cy,cz),RUBBER,body,48,0)
-    sector_mesh("OuterAxialCaliperBridge",.199,.220,.285,sector,
-                -.065,.065,CALIPER,body,24)
+    # Three short structural bridges leave real open windows between
+    # caliper cheeks. The earlier single continuous sector obscured the
+    # piston bosses and pad backing in the hero view.
+    for bridge_idx, offset in enumerate((-.220,0,.220)):
+        sector_mesh(
+            "OuterAxialCaliperBridge" if bridge_idx==1 else
+            "CaliperEndBridge_%02d"%bridge_idx,
+            .205,.231,.043,sector+offset,
+            -.068,.068,CALIPER,body,14)
+    sector_mesh("BridgeSatinCrown",.228,.232,.230,sector,
+                -.042,.042,ACCENT,body,24)
     for a in (sector-.22,sector+.22):
         y=.205*math.sin(a);z=.205*math.cos(a)
         cylinder("BridgeRetainer_%.2f"%a,.005,.133,(0,y,z),ACCENT,body,16,.00025)
@@ -267,10 +345,22 @@ def construct():
                 -.027,-.018,PAD,padInner)
     sector_mesh("InnerPadStainlessBacking",.124,.192,.254,sector,
                 -.0305,-.027,PADBACK,padInner)
+    sector_mesh("InnerAntiSquealShim",.125,.191,.248,sector,
+                -.0312,-.0306,ACCENT,padInner)
     sector_mesh("OuterPadFrictionLining",.126,.190,.245,sector,
                 .018,.027,PAD,padOuter)
     sector_mesh("OuterPadStainlessBacking",.124,.192,.254,sector,
                 .027,.0305,PADBACK,padOuter)
+    sector_mesh("OuterAntiSquealShim",.125,.191,.248,sector,
+                .0306,.0312,ACCENT,padOuter)
+    # Metallic retention ears are axially behind the friction compound,
+    # not placed between pad and rotor; pad groups remain independently mobile.
+    for root,side in ((padInner,-1),(padOuter,1)):
+        for tag,a in enumerate((sector-.225,sector+.225)):
+            r=.177
+            y,z=r*math.sin(a),r*math.cos(a)
+            cube("PadCarrierEar_%s_%d"%("inner" if side<0 else "outer",tag),
+                (side*.033,y,z),(.006,.011,.012),PADBACK,root,.0017)
     for group,s in ((padInner,-1),(padOuter,1)):
         for i,a in enumerate((sector-.18,sector+.18)):
             y,z=.177*math.sin(a),.177*math.cos(a)
@@ -287,8 +377,21 @@ def construct():
 
 def setup_stage(out):
     scene=bpy.context.scene
-    scene.render.engine='CYCLES'
-    scene.cycles.samples=20
+    # A prior real GitHub Ubuntu run failed with "Build without
+    # OpenImageDenoiser". Prefer headless Cycles CPU at modest samples,
+    # deliberately WITHOUT denoising; Eevee needs a usable OpenGL context.
+    scene.render.engine = 'CYCLES'
+    scene.cycles.device = 'CPU'
+    scene.cycles.samples = 24
+    if hasattr(scene.cycles, 'use_adaptive_sampling'):
+        scene.cycles.use_adaptive_sampling = True
+    if hasattr(scene.cycles, 'use_preview_denoising'):
+        scene.cycles.use_preview_denoising = False
+    if hasattr(scene, 'cycles') and hasattr(scene.cycles, 'use_denoising'):
+        scene.cycles.use_denoising = False
+    for layer in scene.view_layers:
+        if hasattr(layer, 'cycles') and hasattr(layer.cycles, 'use_denoising'):
+            layer.cycles.use_denoising = False
     scene.render.threads_mode='FIXED'
     scene.render.threads=2
     scene.render.resolution_x=900
@@ -318,8 +421,11 @@ def setup_stage(out):
         direction=Vector(target)-cam.location
         cam.rotation_euler=direction.to_track_quat('-Z','Y').to_euler()
         camera.ortho_scale=scale
-        scene.render.filepath=str(out/(name+".png"))
+        path = out/(name+".png")
+        scene.render.filepath = str(path)
         bpy.ops.render.render(write_still=True)
+        if not path.is_file() or path.stat().st_size < 4000:
+            raise RuntimeError("Native close-up proof missing/suspiciously small: "+str(path))
     shot("rotor-front",(.62,-.27,.34),(.008,-.04,.04),.50)
     shot("ventilation",(.38,-.59,.30),(.005,0,.0),.51)
     # Proof-only exploded assemblies, avoid changing canonical GLB rest.
@@ -381,7 +487,9 @@ def main(output):
         "glbSha256":manifest["hashes"]["glbSha256"],
         "objectCount":len(hardware),
         "proofImages":["rotor-front.png","exploded.png",
-                       "pad-contact.png","ventilation.png"]}
+                       "pad-contact.png","ventilation.png"],
+        "renderEngine":bpy.context.scene.render.engine,
+        "renderDenoisingDisabled":True}
     (out/"build-report.json").write_text(json.dumps(report,indent=2)+"\n")
     print("BRAKE_HARDWARE_PROOF_PASS",json.dumps(report))
 

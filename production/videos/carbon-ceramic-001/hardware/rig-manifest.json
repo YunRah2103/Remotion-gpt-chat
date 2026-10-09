@@ -157,7 +157,7 @@
       "restGapMetres": 0.0025,
       "boundsMetres": [
         [
-          -0.033,
+          -0.036,
           0.062,
           0.055
         ],
@@ -190,7 +190,7 @@
           0.055
         ],
         [
-          0.033,
+          0.036,
           0.193,
           0.193
         ]
@@ -234,5 +234,37 @@
     "actualBLEND": "carbon-ceramic-brake.blend (generated artifact)",
     "actualGLB": "carbon-ceramic-brake.glb (generated artifact)"
   },
-  "validation": "Bounds are conservative design targets, not yet measured from a native GLB. build_brake.py emits separately measured output/bounds when run."
+  "validation": "Bounds are conservative design targets, not yet measured from a native GLB. build_brake.py emits separately measured output/bounds when run.",
+  "polish02": {
+    "state": "SOURCE_DESIGN_EXPECTATION_NOT_NEW_NATIVE_GLB",
+    "sculptedCaliperCheeks": {
+      "count": 2,
+      "angularSegments": 26,
+      "radialSegments": 8,
+      "closedSurface": true,
+      "expectedVerticesPerCheek": 486,
+      "stationary": true
+    },
+    "threeLobedExterior": true,
+    "threePistonsPerSide": true,
+    "frontDiscDiameterMetres": 0.39,
+    "addedComponents": [
+      "four forged cheek stiffener ribs",
+      "two satin cheek trims",
+      "curved axial bridge crown",
+      "two anti-squeal pad shims",
+      "four pad backing retention ears",
+      "Three individual outer axial bridge straps with two open inter-bridge windows"
+    ],
+    "imageRender": {
+      "backend": "Cycles CPU",
+      "samples": 24,
+      "denoising": false,
+      "outputPixelDimensions": [
+        900,
+        900
+      ]
+    },
+    "note": "Native GLB image QA pending; nominal manifest is not measured geometry."
+  }
 }

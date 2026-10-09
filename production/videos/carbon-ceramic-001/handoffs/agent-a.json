@@ -2,69 +2,100 @@
   "schemaVersion": 1,
   "task": "carbon-ceramic-001-agent-a",
   "branch": "automotive-brakes-001/a-hardware",
-  "sourceSha": "a201cefa64cef0f797deba34ddfbd55c58967d33",
+  "sourceSha": "0bfc8ce52f15e6bf883cca0ad425fd4359d5af33",
   "owner": "hardware",
-  "summary": "Original 390mm carbon-ceramic brake one-corner Blender builder, directly renderable Three.js/R3F geometry, separate moving pivots, physical vent and drill geometry, 120-frame isolated Remotion proof composition, rig-manifest and GLB structure validator. Real Blender export/render is outstanding; not ready for release.",
   "status": "review",
+  "summary": "HARDWARE POLISH 02: corrected Blender Cycles CPU unsupported OpenImageDenoiser path, sculpted both fixed-caliper cheeks with three-lobe forged shapes and genuine open three-point structural bridges, added pad shims/retention details and matched Three.js live hardware. Source QA and independent four-case numerical shell topology pass. New-source native Blender close-ups/GLB and visual review NOT YET PROVEN; handoff remains REVIEW.",
   "files": [
     "src/brakes001/hardware/BrakeAssembly.tsx",
-    "src/brakes001/hardware/BrakeHardwareProof.tsx",
     "production/videos/carbon-ceramic-001/hardware/build_brake.py",
-    "production/videos/carbon-ceramic-001/hardware/asset-contract.json",
-    "production/videos/carbon-ceramic-001/hardware/rig-manifest.json",
     "production/videos/carbon-ceramic-001/hardware/test_hardware.py",
     "production/videos/carbon-ceramic-001/hardware/README.md",
+    "production/videos/carbon-ceramic-001/hardware/rig-manifest.json",
+    "production/videos/carbon-ceramic-001/hardware/polish02-local-geometry-validation.json",
     "production/videos/carbon-ceramic-001/handoffs/agent-a.json",
     "production/videos/carbon-ceramic-001/handoffs/agent-a.md"
   ],
   "evidence": [
-    "SOURCE: https://github.com/YunRah2103/Remotion-gpt-chat/commit/a201cefa64cef0f797deba34ddfbd55c58967d33",
-    "PR: https://github.com/YunRah2103/Remotion-gpt-chat/pull/11 (draft; original hardware paths only)",
-    "PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37941930644 (contract QA and compileall, HEAD a201cefa)",
-    "PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37941930698 (TypeScript compilation, Python production unit suite, existing GpuDriveFilm 2-frame native smoke; NOT this new brake composition)",
-    "SOURCE CONTRACT: 10 / 10 GitHub-read static geometry/rig checks pass; no native Blender GLB was inspected."
+    "SOURCE_POLISH02: https://github.com/YunRah2103/Remotion-gpt-chat/commit/0bfc8ce52f15e6bf883cca0ad425fd4359d5af33",
+    "PR_EXISTING: https://github.com/YunRah2103/Remotion-gpt-chat/pull/11",
+    "PREVIOUS_BASELINE_NATIVE_ONLY: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37947404308 (prior integrated .blend and GLB, 133 nodes / 125 meshes / 9 materials, NOT regenerated after Polish02)",
+    "PREVIOUS_BLENDER_RENDER_FAILURE: run 37947404308 hardware-native, Cycles OpenImageDenoiser missing. Root cause now handled in source by forced disable.",
+    "SOURCE_CONTRACT_PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37967059274 (contract and Python compile only, not new Blender proof)",
+    "LOCAL_INDEPENDENT_NUMERIC: production/videos/carbon-ceramic-001/hardware/polish02-local-geometry-validation.json (Blender 2 cheeks 486 vertices / 968 triangles, Three 2 cheeks 580 vertices / 1156 triangles; both manifold/winding/positive-volume. Algebraic recreation, NOT actual new GLB)."
   ],
   "blockers": [
-    "Blender executable was unavailable in the ChatGPT execution container, so source builder did not run in actual Blender.",
-    "No native .blend/.glb binary, Blender close-up PNG render or GLB hierarchy report has been produced or verified. The source manifest bounds are design-time, not measured.",
-    "Proof component is intentionally not registered in src/Root.tsx (Master-only ownership); no brake-specific moving MP4 has been rendered or visually signed off.",
-    "Master should run Blender command and GLB inspection, upload generated artifacts, and visually review real 1080p stills and moving Remotion proof before changing status to ready."
+    "No Blender executable or installable package is available in this ChatGPT container; repository GitHub connector has no workflow-dispatch write action for starting the native Blender job on this new source SHA.",
+    "The revised Blender builder has NOT produced a new version-specific .blend, .glb, four close-up PNGs or a SHA-locked GitHub Actions artifact; exact post-polish GLB nodes/mesh/material counts and native Cycles render success remain unverified.",
+    "No independently viewed native Blender Polish02 front/side/three-quarter/pad-contact close-up or new-source Remotion moving-film proof exists yet. Neither previous E footage nor local VTK candidate design images count as Polish02 native proof.",
+    "Agent E must re-import the updated A source into E branch only after the native rebuild and source-SHA-verified visual QA passes; the integration/motion code must not be modified by Agent A."
   ],
   "design": {
     "rotorOuterDiameterMetres": 0.39,
-    "rotorSpinAxis": [
+    "rotorAxis": [
       1,
       0,
       0
     ],
-    "gltfUpAxis": [
+    "gltfUp": [
       0,
       1,
       0
     ],
-    "ventVanes": 44,
-    "drilledPerFace": 64,
     "padRestGapMetres": 0.0025,
-    "mandatoryNodes": [
+    "padClosureAxes": {
+      "PadInner": [
+        1,
+        0,
+        0
+      ],
+      "PadOuter": [
+        -1,
+        0,
+        0
+      ]
+    },
+    "stableRootNodes": [
       "RotorAssembly",
       "FrictionRing",
       "RotorHat",
-      "Hub",
       "CaliperBody",
       "PadInner",
       "PadOuter",
+      "Hub",
       "UprightSupport"
     ],
-    "note": "Composite finish/physics schematic, not manufacturer CAD or calibrated thermal simulation."
+    "coolingVanes": 44,
+    "drilledBoresPerFace": 64,
+    "caliper": {
+      "fixed": true,
+      "opposedPistons": 6,
+      "sculptedCheeks": 2,
+      "discreteOpenBridges": 3,
+      "nominalCheekInsideAbsXMetres": 0.0365
+    },
+    "sourceOnlyExpectedNativeMeshMin": 130,
+    "noManufacturerCadAttribution": true
   },
   "qa": {
-    "contract": "PASS",
-    "projectTypescript": "PASS via existing production-ci",
-    "existingRepositoryNativeSmoke": "PASS (unrelated legacy composition)",
-    "hardwareSourceStatic": "PASS",
-    "blenderNativeAsset": "NOT RUN",
-    "glbNativeInspection": "NOT RUN",
-    "nativeHardwareMovingProof": "NOT RUN",
-    "hardwareVisualReview": "NOT RUN"
-  }
+    "contractWorkflow": "PASS (source/handoff contract only)",
+    "projectTypescript": "PREVIOUS INTERMEDIATE SOURCES PASS; current candidate Actions pending",
+    "pythonCompile": "PASS (contract CI)",
+    "independentlyReconstructedTopology": "PASS 4/4 local",
+    "recoveredPriorGlbBaseline": "PASS 133 nodes, 125 meshes, 9 PBR materials (PRE-POLISH)",
+    "newlyExportedBlenderModel": "NOT RUN",
+    "newGLBNodesAndMaterials": "NOT VERIFIED",
+    "blenderCloseUpImages": "NOT RUN",
+    "nativeRemotionPolishProof": "NOT RUN",
+    "independentNewSourceVisualReview": "NOT RUN",
+    "handoffGate": "REVIEW — not READY"
+  },
+  "integrationInstructions": [
+    "Checkout A hardware at exact sourceSha above, never YUNEX.",
+    "Run native build_brake.py using headless Blender 3.x/4.x with Cycles CPU 24 samples and view-layer denoising disabled; collect outputs under one artifact named with sourceSha.",
+    "Run production/videos/carbon-ceramic-001/hardware/test_hardware.py --glb <new .glb> --report <new rig-manifest.json> --proof-dir <output folder>.",
+    "Visually inspect rotor-front.png, ventilation.png, exploded.png, pad-contact.png, and examine real geometry in a native GLB viewer.",
+    "On E integration branch import this hardware after proof acceptance; preserve 8 group names, X axis and Agent B original brakeStateAt(frame), check pads close 2.5 mm without caliper rotation.",
+    "Run native moving pad and thermal proofs plus TypeScript/FFmpeg before marking READY."
+  ]
 }

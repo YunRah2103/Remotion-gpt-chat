@@ -85,6 +85,53 @@ function extrudedSector(inner: number, outer: number, thickness: number, a0: num
   return g;
 }
 
+/** Real curved multi-radius forged caliper cheeks, not rectangular boxes.
+ * Returned vertices are in world YZ brake-plane coordinates (axle X).
+ * The inner cheek plane at |X|=.0365 clears pads at |X|<=.0312.
+ */
+function forgedCheekGeometry(side: -1 | 1): THREE.BufferGeometry {
+  const angular = 28, radial = 9;
+  const verts: number[] = [], triangles: number[] = [];
+  const width = radial + 1, layerSize = (angular + 1) * width;
+  const at = (layer:number,i:number,j:number) => layer*layerSize+i*width+j;
+  for (let layer=0;layer<2;layer++) {
+    for (let i=0;i<=angular;i++) {
+      const u=i/angular, angle=centreAngle-.295+.59*u;
+      for (let j=0;j<=radial;j++) {
+        const v=j/radial, scallop=Math.pow(Math.sin(3*Math.PI*u),2);
+        const r0=.142+.008*scallop, r1=.217-.012*scallop;
+        const r=r0+(r1-r0)*v;
+        const lobes=.5+.5*Math.cos(6*Math.PI*u);
+        const relief=Math.pow(Math.max(0,Math.sin(Math.PI*v)),.65)*(.5+.5*lobes);
+        const x=side*(layer===0 ? .055+.015*relief : .0365);
+        verts.push(x,r*Math.cos(angle),r*Math.sin(angle));
+      }
+    }
+  }
+  const quad=(a:number,b:number,c:number,d:number,reverse:boolean)=>{
+    if(reverse)triangles.push(a,c,b,a,d,c);
+    else triangles.push(a,b,c,a,c,d);
+  };
+  for(let i=0;i<angular;i++)for(let j=0;j<radial;j++) {
+    const a=at(0,i,j),b=at(0,i+1,j),c=at(0,i+1,j+1),d=at(0,i,j+1);
+    quad(a,b,c,d,side>0);
+    quad(at(1,i,j),at(1,i,j+1),at(1,i+1,j+1),at(1,i+1,j),side>0);
+  }
+  const rim: [number,number][]=[];
+  for(let i=0;i<=angular;i++)rim.push([i,0]);
+  for(let j=1;j<=radial;j++)rim.push([angular,j]);
+  for(let i=angular-1;i>=0;i--)rim.push([i,radial]);
+  for(let j=radial-1;j>0;j--)rim.push([0,j]);
+  for(let k=0;k<rim.length;k++) {
+    const [i,j]=rim[k], [ii,jj]=rim[(k+1)%rim.length];
+    quad(at(0,i,j),at(0,ii,jj),at(1,ii,jj),at(1,i,j),side<0);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));
+  g.setIndex(triangles);g.computeVertexNormals();
+  return g;
+}
+
 function annulusSegmentGeometry(inner: number, outer: number, depth: number, phase: number) {
   const s = new THREE.Shape();
   const points = 5;
@@ -146,6 +193,20 @@ export const BrakeAssembly: React.FC<Props> = ({
     centreAngle-0.245,centreAngle+0.245),[]);
   const padBack=useMemo(()=>extrudedSector(0.124,0.190,0.003,
     centreAngle-0.26,centreAngle+0.26),[]);
+  const padShim=useMemo(()=>extrudedSector(0.125,0.191,0.0007,
+    centreAngle-0.252,centreAngle+0.252),[]);
+  const caliperCheeks=useMemo(()=>[
+    forgedCheekGeometry(-1),forgedCheekGeometry(1),
+  ],[]);
+  const caliperBridges=useMemo(()=>[-.220,0,.220].map((offset)=>
+    extrudedSector(.205,.231,.136,
+      centreAngle+offset-.043,centreAngle+offset+.043)),[]);
+  const caliperEdge=useMemo(()=>extrudedSector(.210,.216,.004,
+    centreAngle-.235,centreAngle+.235),[]);
+  const caliperRibs=useMemo(()=>[-.185,.185].map((a)=>
+    extrudedSector(.143,.202,.008,centreAngle+a-.045,centreAngle+a+.045)),[]);
+  const caliperCrown=useMemo(()=>extrudedSector(.226,.230,.084,
+    centreAngle-.23,centreAngle+.23),[]);
   const carbonMap=useMemo(noiseCarbonTexture,[]);
 
   const hot=clamp(heat01), explode=clamp(exploded01), gap=Math.max(0,Math.min(0.012,padGapMetres));
@@ -179,7 +240,7 @@ export const BrakeAssembly: React.FC<Props> = ({
     color:'#1b242c',metalness:0.32,roughness:0.64,
   }),[]);
 
-  const caliperY=0.123, caliperZ=0.125;
+  // Stationary 6-piston caliper: sculpted forged cheeks are separate from the rotor.
   // All components under RotorAssembly rotate as a rigid hub/disc.
   return <group name="CarbonCeramicBrake001">
     <group name="RotorAssembly" rotation={[rotorAngleRad,0,0]}>
@@ -224,48 +285,83 @@ export const BrakeAssembly: React.FC<Props> = ({
       </group>
     </group>
     <group name="CaliperBody">
-      {[-1,1].map((s)=>
-        <group key={s} position={[s*(0.039+explode*0.062),caliperY,caliperZ]}>
-          <mesh material={caliper} rotation={[Math.PI/4,0,0]}
-            position={[0,0,0]}>
-            <boxGeometry args={[0.025,0.081,0.087,1,1,1]}/>
+      {([-1,1] as const).map((side,i)=>
+        <group key={side} position={[side*explode*.062,0,0]}>
+          <mesh name={side<0?'ForgedCaliperCheek_Inboard':'ForgedCaliperCheek_Outboard'}
+            geometry={caliperCheeks[i]} material={caliper}/>
+          <mesh name={side<0?'InboardSatinContour':'OutboardSatinContour'}
+            geometry={caliperEdge}
+            position={[side<0?-.063:.059,0,0]}
+            material={caliperTrim}/>
+          {caliperRibs.map((rib,k)=>
+            <mesh key={k} name={`CaliperReinforcement_${side}_${k}`}
+              geometry={rib}
+              position={[side<0?-.068:.060,0,0]} material={caliper}/>)}
+          {[-.17,0,.17].map((delta,piston)=>{
+            const a=centreAngle+delta, r=.164;
+            return <group key={piston}
+              name={`PistonBore_${side}_${piston}`}
+              position={[side*.033,r*Math.cos(a),r*Math.sin(a)]}>
+              <AxialCylinder radius={.015} length={.005}
+                position={[0,0,0]} material={steel} segments={40}/>
+              <AxialCylinder radius={.012} length={.005}
+                position={[-side*.003,0,0]} material={caliperTrim} segments={40}/>
+              <AxialCylinder radius={.013} length={.001}
+                position={[-side*.006,0,0]} material={black} segments={40}/>
+            </group>;
+          })}
+          <mesh name={`CaliperFixingTab_${side}`}
+            position={[side*.066,.094,.106]} material={steel}>
+            <boxGeometry args={[.014,.034,.026]}/>
           </mesh>
-          <mesh position={[s*0.014,0.008,0.013]} material={caliperTrim}>
-            <boxGeometry args={[0.004,0.049,0.060]}/>
-          </mesh>
-          {[-0.026,0,0.026].map((d,i)=>
-            <group key={i} position={[-s*.014,d/2,d/2]}>
-              <AxialCylinder radius={0.014} length={0.004}
-                position={[0,0,0]} material={steel}/>
-              <AxialCylinder radius={0.0108} length={0.005}
-                position={[-s*.003,0,0]} material={caliperTrim}/>
-            </group>)}
         </group>)}
-      <mesh name="CaliperBridge" position={[0,0.155,0.156]} material={caliper}>
-        <boxGeometry args={[0.103,0.024,0.036]}/>
+      {caliperBridges.map((geom,k)=>
+        <mesh key={k} name={k===1?'CurvedCaliperBridge':`CaliperEndBridge_${k}`}
+          geometry={geom} position={[-.068,0,0]} material={caliper}/>)}
+      <mesh name="BridgeMachinedCrown"
+        geometry={caliperCrown}
+        position={[-.042,0,0]} material={caliperTrim}/>
+      {[-.22,.22].map((delta,i)=>{
+        const a=centreAngle+delta;
+        return <AxialCylinder key={i} name={`BridgePin_${i}`}
+          radius={.005} length={.136}
+          position={[0,.205*Math.cos(a),.205*Math.sin(a)]}
+          material={caliperTrim} segments={18}/>;
+      })}
+      <mesh name="BleederNipple" position={[.063,.164,.139]} material={caliperTrim}>
+        <cylinderGeometry args={[.004,.0055,.023,16]}/>
       </mesh>
-      <mesh name="BleederNipple" position={[0.051,0.179,0.149]} material={caliperTrim}>
-        <cylinderGeometry args={[0.004,0.0055,0.024,12]}/>
-      </mesh>
-      {[-1,1].map(s=><group key={s} position={[s*0.047,0.106,0.163]}>
-        <AxialCylinder radius={0.007} length={0.007} position={[0,0,0]}
-          material={steel} segments={16}/>
-      </group>)}
-      <mesh name="MountingBracket" position={[-0.043,0.092,0.085]} material={steel}>
-        <boxGeometry args={[0.016,0.068,0.032]}/>
+      <mesh name="MountingBracket" position={[-.073,.108,.093]} material={steel}>
+        <boxGeometry args={[.020,.058,.029]}/>
       </mesh>
     </group>
     <group name="PadInner" position={[-0.0155-gap-explode*.038,0,0]}>
       <mesh name="InnerFrictionLining" geometry={padLining}
-        position={[-0.008,0,0]} material={pad}/>
+        position={[-.008,0,0]} material={pad}/>
       <mesh name="InnerBackingPlate" geometry={padBack}
-        position={[-0.011,0,0]} material={steel}/>
+        position={[-.011,0,0]} material={steel}/>
+      <mesh name="InnerAntiSquealShim" geometry={padShim}
+        position={[-.0117,0,0]} material={caliperTrim}/>
+      {[-.225,.225].map((offset,k)=>{
+        const a=centreAngle+offset;
+        return <mesh key={k} name={`InnerPadRetentionEar_${k}`}
+          position={[-.018,.177*Math.cos(a),.177*Math.sin(a)]}
+          material={steel}><boxGeometry args={[.005,.011,.012]}/></mesh>;
+      })}
     </group>
     <group name="PadOuter" position={[0.0155+gap+explode*.038,0,0]}>
       <mesh name="OuterFrictionLining" geometry={padLining}
         position={[0,0,0]} material={pad}/>
       <mesh name="OuterBackingPlate" geometry={padBack}
-        position={[0.008,0,0]} material={steel}/>
+        position={[.008,0,0]} material={steel}/>
+      <mesh name="OuterAntiSquealShim" geometry={padShim}
+        position={[.0112,0,0]} material={caliperTrim}/>
+      {[-.225,.225].map((offset,k)=>{
+        const a=centreAngle+offset;
+        return <mesh key={k} name={`OuterPadRetentionEar_${k}`}
+          position={[.018,.177*Math.cos(a),.177*Math.sin(a)]}
+          material={steel}><boxGeometry args={[.005,.011,.012]}/></mesh>;
+      })}
     </group>
     {showUpright && <group name="UprightSupport" position={[-0.09,0,0]}>
       <AxialCylinder radius={0.068} length={0.018} position={[0,0,0]}
