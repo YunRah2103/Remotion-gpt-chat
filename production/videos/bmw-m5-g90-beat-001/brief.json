@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "slug": "bmw-m5-g90-beat-001",
+  "title": "BMW M5 G90 — Beat-Synchronised Cinematic TikTok Edit",
+  "status": "preproduction",
+  "durationSeconds": 20,
+  "durationInFrames": 600,
+  "fps": 30,
+  "resolution": [
+    1080,
+    1920
+  ],
+  "compositionId": "BmwM5G90Beat001",
+  "car": {
+    "make": "BMW",
+    "model": "M5",
+    "generation": "G90",
+    "body": "saloon/sedan",
+    "years": "current-generation G90 as introduced for 2025",
+    "exclude": [
+      "F90 previous generation",
+      "G99 M5 Touring",
+      "M4/M3/other BMWs",
+      "Porsche/Ferrari/other marques"
+    ]
+  },
+  "audio": {
+    "userSupplied": true,
+    "sourceTrim": [
+      12.21,
+      32.21
+    ],
+    "masterRequired": true,
+    "sourceRightsUnverified": true
+  },
+  "requiredCuts": 39,
+  "footage": "Real moving licensed or user-authorized footage only; no AI-generated stills pretending to be video",
+  "sourceRevision": "e8f17c9ef5cc48b143b21d3cc4d8007861097464",
+  "agents": {
+    "A": "automotive-edits/bmw-m5-g90-001/a-footage",
+    "B": "automotive-edits/bmw-m5-g90-001/b-editor-master"
+  }
+}
