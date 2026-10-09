@@ -70,7 +70,7 @@ export const CarbonCeramic001: React.FC = () => {
     <TitleOverlays frame={frame}/>
     {!padProof && <PartLabels frame={frame} showLeaderLines={false}/>}
     <InFilmPadLabels frame={frame}/>
-    {([99,100,147,148].includes(frame))&&<AbsoluteFill style={{pointerEvents:'none',background:'#07111b',opacity:1,zIndex:32}}/>
+    {([99,100,147,148].includes(frame))&&<AbsoluteFill style={{pointerEvents:'none',background:'#07111b',opacity:1,zIndex:32}}/>}
   </AbsoluteFill>;
 };
 
