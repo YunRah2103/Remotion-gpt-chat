@@ -11,3 +11,11 @@
 - Optimisation is opt-in and requires model hierarchy verification and native playback; Meshopt requires decoder support.
 - Release and Pages gallery are public in this public repo and are manually invoked. Don't publish unapproved edits or user-uploaded files.
 - Use cache-aware installs and GitHub Actions artifact handoffs. Do not purchase hardware/GPU minutes or third-party services.
+
+## GitHub Media Bridge
+
+- For permitted public image/video reference downloads, follow `production/media-bridge/README.md`.
+- An ordinary ChatGPT agent may queue a rights-verified, text-only JSON request by committing a unique `production/media-bridge/requests/<slug>.json` to `main`. The `Production Suite - GitHub Media Bridge` workflow then downloads direct HTTPS media to an artifact, extracts thumbnails/video frames and writes manifest/credit/checksums.
+- Do not invent licensing information or assert that a public web URL grants reuse. Do not submit private footage, tokens or credential-bearing URLs.
+- This does **not** grant native ChatGPT binary image/video inspection; provide artifact links and use an appropriate visual tool if actually available.
+- Preserve the YUNEX repository boundary; the media bridge is entirely within `Remotion-gpt-chat`.
