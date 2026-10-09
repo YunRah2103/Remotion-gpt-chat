@@ -23,6 +23,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "a8553b2c1af11d15eb0b8f6c96e0c3e53142f9aa"
+          sudo apt-get install -y -qq ffmpeg
           ffmpeg -version | head -n 1
           npm ci --prefer-offline --no-audit --no-fund --maxsockets=3
           if ! node -e "require('@rspack/binding')" >/dev/null 2>&1; then
