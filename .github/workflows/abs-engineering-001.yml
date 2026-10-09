@@ -6,10 +6,36 @@ on:
       - 'src/ABS001.tsx'
       - 'src/Root.tsx'
       - '.github/workflows/abs-engineering-001.yml'
+      - 'automotive/abs001/**'
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
+  blender-assets:
+    name: Blender physical assembly export and render proof
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Blender
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq blender
+      - name: Build original wheel and hydraulic assembly assets
+        run: |
+          blender -b -t 2 --python automotive/abs001/blender_assets.py 2>&1 | tee /tmp/blender-abs-log.txt
+          grep -q 'BLENDER_ASSET_OK ABS001-Wheel-Brake-Sensor' /tmp/blender-abs-log.txt
+          grep -q 'BLENDER_ASSET_OK ABS001-Hydraulic-Modulator' /tmp/blender-abs-log.txt
+          for stem in ABS001-Wheel-Brake-Sensor ABS001-Hydraulic-Modulator; do
+            test -s "automotive/abs001/generated/$stem.glb"
+            test -s "automotive/abs001/generated/$stem.png"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ABS001-BLENDER-ASSETS-GLB-AND-PREVIEWS
+          path: automotive/abs001/generated/
+          retention-days: 30
+          if-no-files-found: error
   render:
     name: Three.js native frames part ${{ matrix.part }}
     runs-on: ubuntu-24.04
