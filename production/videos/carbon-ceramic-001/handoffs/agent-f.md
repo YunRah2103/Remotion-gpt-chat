@@ -1,32 +1,42 @@
-# Agent F — Lead Rendering Engineer verified candidate handoff
+# Agent F — Polish04 verified full native candidate handoff
 
-**STATUS: REVIEW. Actual 750-frame full-length MP4 is TECHNICALLY VERIFIED but is NOT approved as Master release.**
+**STATUS: REVIEW — NEW POLISH04 750-FRAME MP4 TECHNICALLY COMPLETE. Master release NOT approved.**
 
-## Native source lock
 - Repository: `YunRah2103/Remotion-gpt-chat`
-- Agent F branch: `automotive-brakes-001/f-render`
-- Immutable Agent E film source: `5b378202187748ce9b51d884f26bb7167285c946`
-- Candidate workflow implementation SHA: `dcc710b04478784233fda1743904cee9e7b057af`
-- No Master final release gate/source lock modification. This is a separate candidate pathway.
+- Render branch: `automotive-brakes-001/f-render`
+- **Immutable integrated E film source:** `21c2b581b46251b0bd45028d32eb40b4341eeb2a`
+- **Final render pipeline code:** `9f8b32702a99b551898b78cf8283f16b35156875`.
+- [E source-locked Polish04 proof PASS](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37981542125).
 
-## Real full MP4 and verification
-- [**Download verified playable candidate via GitHub Actions artifact #11639835454**](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37978273707/artifacts/11639835454)
-- GitHub Actions: [**37978273707 — SUCCESS**](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37978273707)
-- File: `carbon-ceramic-001-candidate.mp4`, real Remotion + Three.js, 12,875,114 bytes.
-- MP4 SHA256: `e7ed2619ab6ed09087cdb50cfc2b4fb94e3262aa69da77b72e5142bcb51bec73`.
-- FFprobe: **H264 / yuv420p / 1080×1920 / 30/1 fps / 750 frames / exactly 25.000 seconds**.
-- Full independent FFmpeg decode: **PASS, 750 decoded frames, no corrupt frames**.
-- Silent: no approved narration was supplied. Never invent audio.
-- Contact sheet and real native extracted frames **48, 168, 321, 531, 705**, FFprobe JSON, SHA256 and quality report are in the same artifact.
-- All 10 original 75-frame chunks and provenance verified by real per-part SHA256 before assembly. Original [native run 37976771520](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976771520), recovery of only chunks 07 and 09 [run 37977591114](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37977591114); final assembly verified above.
-- Intermediate source-range `yuvj420p` file failed strict pixel format and was **correctly corrected** by full-range-to-TV-range conversion. Final artifact passes `yuv420p`.
+## Genuine complete film
 
-## Independent visual findings
-Actual five-frame contact plus 11-point extracted scene review found real isolated caliper, rotor and hubs in frame, 5-shot narrative and illustrative friction heat. **Issues:** faint/very dark ghost-outline opening with empty negative space, low-contrast material lighting, visually subtle physical pad travel, small engineering labels and still/freeze warnings in late shots (roughly 15.8–24.8s). Freeze detection is not itself proof of a render malfunction; D must watch exact frames and transitions. No black interval detected.
+[**Download playable Polish04 MP4, native stills, contact, FFprobe and full decode QA — artifact #11641871804**](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37983072846/artifacts/11641871804).
 
-See [complete QA report](../render/REPORT.md).
+Actual full assembly and verification [Actions run 37983072846 SUCCESS](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37983072846).
 
-## Signoff pending
-Agent D must independently inspect the actual moving 25-second candidate and approve/call corrections. Agent A/E ongoing Polish03 may improve model and film, but this initial candidate remains source-locked to the exact E commit above. Master alone approves/merges the release source and publishes. **DO NOT mark F ready for final release just because this review candidate is technically valid.**
+| Property | Verified |
+| --- | --- |
+| Film | `carbon-ceramic-001-polish04-candidate.mp4` |
+| Video engine | Real `CarbonCeramic001` Remotion/Three.js, not old footage |
+| Native frame chunks | 10 x 75 from one immutable Polish04 SHA |
+| FFprobe/frame decode | **750/750 PASS**, exactly **25.000 seconds** |
+| Dimensions/fps | **1080×1920 / 30/1** |
+| Codec, pixel format | **H.264, yuv420p** |
+| Full FFmpeg decode | **PASS**, no corrupt frames |
+| Bytes | **12,314,696** |
+| Film SHA256 | `fad39a08e151913792da0c827b7c621f511b817b17e4cf4559fdcefa31ae7fbb` |
+| Audio | **Absent** — no approved authentic VO verified |
+| Formal D/Master creative signoff | **PENDING** |
 
-F PR [#16](https://github.com/YunRah2103/Remotion-gpt-chat/pull/16) is the source and evidence handoff; this does not change the separate Master release gating.
+[Native chunk run 37982325309](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982325309) built frames 0–74 and 150–749 successfully. Original runner for 75–149 stalled installing dependencies; [independent recovery run 37982665013 PASS](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982665013) rendered those exact pad demo frames from the **same new source SHA**, not from the previous candidate. All ten SHA256 and 75/75 frame checks passed before assembly.
+
+## Polish04 specific findings
+
+- **Pad onset**: the main film now includes a truthful caliper-hidden cutaway during frames100–147, with the physical per-face clearance decreasing **2.50 to 0.15mm**, a maximum **2.35mm** travel. Native actual frames105/117/132/145 reviewed.
+- **Hero orbit**: the 630–749 shot shows clear changing perspective. Across frame600–749, the average adjacent grayscale frame difference improved **0.16493 → 0.25263 (+53.17%)** versus the previous 25s native candidate. Near-still frame pairs decreased **108 → 25 / 149**. Proxy size 180×320, decoded at full 30fps; not a subjective quality rating.
+- **Thermal**: scoped illustrative heat on rotor annulus in the real film, not a precise measured heat simulation.
+- **Still open for D**: pad motion still visually subtle at phone scale; brief dark transition overlays at frames99–100 and 147–148 may look like flashes; subdued dark material lighting / generous negative space; final hero ends side-on. Automated freeze warnings in intro/benefits need creative review, not codec repairs.
+
+**Full source, run, artifact, FFprobe/FFmpeg, SHA and visual report:** [`render/POLISH04_REPORT.md`](../render/POLISH04_REPORT.md). Quantified reproducible metrics: [`render/POLISH04_MOTION_QA.json`](../render/POLISH04_MOTION_QA.json). Older first-candidate report is preserved only for historical comparison.
+
+Master final `SOURCE_LOCK.json` and `master_gate.py --require-ready` are **unchanged**. Master alone authorizes final release. Agent F [PR #16](https://github.com/YunRah2103/Remotion-gpt-chat/pull/16) contains this technical render handoff.
