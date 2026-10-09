@@ -84,7 +84,7 @@ def mux(video,fx,output,narration=None):
          "-i",str(video),"-i",str(fx)]
     if narration:
         cmd+=["-i",str(narration)]
-        graph="[1:a]volume=0.23[fx];[2:a]aresample=48000,volume=1.0[voice];[voice][fx]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-16:TP=-1.5:LRA=9,alimiter=limit=0.94[a]"
+        graph="[1:a]volume=0.23[fx];[2:a]aresample=48000,volume=1.0[voice];[voice][fx]amix=inputs=2:duration=longest:normalize=0,loudnorm=I=-16:TP=-1.5:LRA=9,alimiter=limit=0.94[a]"
     else:
         graph="[1:a]aresample=48000,loudnorm=I=-19:TP=-1.5:LRA=9,alimiter=limit=0.94[a]"
     cmd+=["-filter_complex",graph,"-map","0:v:0","-map","[a]",
