@@ -31,6 +31,7 @@ jobs:
           set -euo pipefail
           mkdir -p out/brakes-e04/pad
           npm ci --no-audit --no-fund
+          python -m pip install --disable-pip-version-check Pillow==11.3.0
           npm run check | tee out/brakes-e04/pad/typescript.txt
           node src/brakes001/integration/integration.test.cjs | tee out/brakes-e04/pad/integration-test.txt
           bash production/videos/carbon-ceramic-001/physics/run-tests.sh | tee out/brakes-e04/pad/physics.txt
