@@ -1,45 +1,39 @@
-# Agent E actual native QA — CarbonCeramic001
+# Agent E — Polish 02 integration and independent native QA
 
-**Status: REVIEW.** Verified integration branch source `714238ccd67a38036c51258821d1880145536519`. Specialist files remain imported with unchanged original blob hashes; see `SOURCES.md`.
+**Status: REVIEW (not Master approved).** Actual E film-code SHA: `8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d`; latest source correction centers the hero caliper, but the *exact-source frame 705 render has not completed* because [GitHub's last proof run](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37970589567) has not finished. Never substitute an older frame for this verification.
 
-## Native GitHub Actions evidence
+**A hardware source SHA:** `0bfc8ce52f15e6bf883cca0ad425fd4359d5af33`, latest branch head `cbce3943e490fa3eddc245ca8c2c75b942225108`. All **10/10** imported A file blobs match the original A branch exactly. No modified A/B/C/D sources or YUNEX files.
 
-- **[Run 37947404308](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37947404308)**: `integration-native` **SUCCESS**, `hardware-native` **FAILURE AFTER successful Blender export** due to a missing OpenImageDenoiser implementation. Overall workflow therefore shows FAILURE; do not conflate that with the successful film proof job.
-- **[Native video and five-still artifact](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37947404308/artifacts/11624317868)** (GitHub artifact ID `11624317868`, 30-day retention). Five genuine Remotion/Three.js PNG frames **48, 168, 321, 531, 705**, at **540×960**, plus `contact-sheet.jpg`. No synthetic still substitutions.
-- **Clamp video:** `clamp-135-195.mp4`, real frames **135–195 inclusive**, **61 frames**, 378×672, 30/1fps, H.264, 2.033333 seconds, full FFmpeg decode PASS, SHA256 `1d4f5aa5689941da6f8c015b113838504212116e6aac899ec346f9e60e0a2e7f`.
-- **Heat video:** `heat-300-360.mp4`, real frames **300–360 inclusive**, **61 frames**, 378×672, 30/1fps, H.264, 2.033333 seconds, full FFmpeg decode PASS, SHA256 `08c328b09e8d3d035bbc2c8faa5de27f99d944d7573cc6078511159d8dd93d79`.
-- Native preview video pixel format per FFprobe: `yuvj420p` (full-range YUV420). **This is acceptable for previews; Agent F must independently confirm final `yuv420p` contract.**
-- Tested locally again after GitHub artifact extraction with actual FFprobe and full `ffmpeg -v error -xerror -i <video> -f null -` decode; both passed. Frame sampling at 0,15,30,45,60 proved visual pixel change (motion). Do not confuse native movement with physical/cinematic approval.
+## Native Blender/GLB: PASS for structure and output, visual finish REVIEW
 
-## Executed software tests
+Native Blender 4.0.2/Cycles denoising disabled: [source-locked Blender artifact](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37968622756/artifacts/11633864744). `carbon-ceramic-brake.blend` (2,960,616 bytes), `carbon-ceramic-brake.glb` (1,289,716 bytes), four **900×900** actual Cycles PNGs (rotor-front/ventilation/exploded/pad-contact), build report and GLB validation logs. **OpenImageDenoiser failure fixed** with actual successful Cycles PNG renders. Repeated build at [run 37969454877](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37969454877/artifacts/11635570499) also passed.
 
-| Test | Actual result |
-| --- | --- |
-| `npm ci --no-audit --no-fund` | PASS |
-| `npm run check` | PASS |
-| `node src/brakes001/integration/integration.test.cjs` | PASS, all 750 frame states, five shots, rotor stops; fixed caliper and no face penetration |
-| `bash production/videos/carbon-ceramic-001/physics/run-tests.sh` | PASS, 5/5 |
-| `python production/videos/carbon-ceramic-001/hardware/test_hardware.py` | PASS source contract only |
-| `python production/videos/carbon-ceramic-001/qa/check_graphics.py` | PASS, 750 frame layout checks |
-| `node production/videos/carbon-ceramic-001/qa/component_smoke.cjs` | PASS, 750 frame JSX/1216 cue instances |
-| `python production/videos/carbon-ceramic-001/validate_setup.py` | PASS |
-| `python -m unittest discover -s production/tests -v` | PASS, 39/39 |
-| Native five stills / contact | PASS render + actual manual image inspection |
-| Native clamp / thermal motion | PASS render, FFprobe, complete FFmpeg decode |
-| Agent D film acceptance | PENDING |
+Binary GLB SHA256 `261b11aa1c71610e52ad9fe25a57b179427f0de833dc6904d41d8da44013a5ac`. Independent actual GLB parsing/trimesh inspection: **148 nodes, 140 meshes, 9 PBR materials**, six individual stainless pistons, both sculpted cheeks (486 native vertices each), three named cross-bridges, inner/outer anti-squeal shims, 44 cooling vanes, two rotor friction faces (ring OD .390m), eight stable root groups and fixed caliper / rotor-child hierarchy. Cheek inner planes |X|=.0365m; pads at |X|=.018m rest, nonintersecting. Denoiser was intentionally disabled; Blender completed without the old crash.
 
-## Independent visual inspection
+**Image-review finding:** the four native Cycles closeups are **overexposed/washed out** (the carbon rotor and dark forged caliper appear close to white). GLB PBR material factors are actually varied/dark, so A's proof-stage lighting/exposure must be adjusted before material-quality acceptance. E notified A on PR #11; no A source touched here.
 
-The original native review artifact showed an unacceptably cropped thermal rotor. Two strictly E-owned source changes corrected it: first a thermal-scene scale/dolly offset, then replacement of the guessed offset by C's dynamic `brakeCameraAt(frame).target` with world scale 0.56 (source `714238ccd67a38036c51258821d1880145536519`). Re-rendered native frame 321 and sequential thermal frames 300/315/330/345/360 now show rotor mostly fully on-screen. **The outer thermal rim remains near the right frame edge at 360**, so do not claim a perfect macro crop or release-grade shot.
+## True native Remotion film proofs (Polish02)
 
-The rotor/hat genuinely rotate while the caliper remains stationary (source-pose and visual sequence evidence). Real pads are separate X-axis moving geometries and pass no-penetration tests, **but pad travel is extremely difficult to resolve at 378px front-biased viewing angle** and visual proof alone cannot establish their contact surfaces. The caliper cheek looks like a blocky rectangular assembly rather than a highly detailed production caliper; Agent A owns any reconstruction. Lighting is low-key, readable but a little flat. Heat orange is localized to the annulus, does not light hub in isolation and is correctly labelled **ILLUSTRATIVE**, though saturation/visual restraint needs D's artistic signoff. Opening ghost line art is readable but thin, with conspicuous dark space in vertical composition. Titles and labels remain inside the authored safe areas. No overlay collision was obvious in five stills.
+[Source-backed moving-film artifact](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37969454877/artifacts/11635221421) from source commit `d9e27ab383356c06f326bca0804c045c9f3646bf`:
+- Five original Three.js/Remotion stills: frames **48,168,321,531,705**, PNG **540×960**; compiled contact sheet.
+- **Clamp** frames **135–195** inclusive, H.264, 378×672, 30fps, 61 frames / 2.033333s. FFprobe + full FFmpeg decode exit 0. SHA256 `db0d38392262f1be71efab160ba4aa4a771c6fcd6610fce5c2f91c64c39e94b8`.
+- **Heat** frames **300–360**, same encoding/framerate/duration, full decode exit 0. SHA256 `83ce877f41a4159fa8e2b7917fd7f4b3db3841837e0c6ee598b8a41269d92556`.
+- Preview pixel format `yuvj420p` (full-range YUV420) is valid for preview; final `yuv420p` must be checked by F.
+- Earlier original-hardware control: [pre-Polish02 five-frame and clip artifact](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37947404308/artifacts/11624317868). Both baselines are genuine source-specific native renders, not mockups.
 
-## Native Blender/GLB structure and unresolved render blocker
+**Independent actual image/video review:** A02 caliper is visibly more detailed and has open bridges and piston separation versus the primitive old block; E three-quarter reveal makes structure more readable. Two 61-frame moving proofs demonstrate actual changing rotor and false-colour annulus; C's camera and D's text/labels remain deterministic, with no obvious text collisions. Heat is clearly marked illustrative; frame360 annulus remains within portrait bounds. Intro outline remains faint with conspicuous unused vertical space. 378px preview cannot reliably resolve the 2.35mm physical pad stroke although E numerical adapter and geometry rules pass; target-resolution inspection by D is needed.
 
-The [Blender artifact 11624482332](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37947404308/artifacts/11624482332) contains a **real stock Blender 4.0.2 generated** `carbon-ceramic-brake.blend` (2,748,960 bytes), `carbon-ceramic-brake.glb` (1,194,348 bytes), `rig-manifest.json` and build log. Actual binary GLB SHA256 **`fe517944c5ee4e43dd0b6247deea59774ba82590bd6e892f546c5fa2d8db8a35`**. Independent glTF2 header/chunk parsing and node traversal: **133 nodes, 125 meshes, 9 PBR materials; required eight named groups and rotor descendant / fixed caliper/pads hierarchy PASS**.
+**Detected and corrected revision regression:** source `d9e27ab...` frame705 enlarged caliper **clipped the left border**. Latest code `8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d` repositions/reduces it; native confirmation still **PENDING**. Do not certify final frame705 or full visual approval until exact-source still is inspected.
 
-Blender builder first failed missing NumPy; E changed ONLY the scoped workflow to install distro `python3-numpy`. The second build successfully wrote GLB and .blend before `setup_stage()` Cycles proof still failed with `RuntimeError: Error: Build without OpenImageDenoiser`. There are **no actual Blender PNGs**, so no native hardware aesthetic signoff. Do not edit A-owned `build_brake.py` silently. Agent A should supply OIDN-independent Blender render or Master should stage an Eevee proof script with correct lights/camera.
+## Executed tests
 
-## Master and F acceptance
+From native proof run `37969454877`, *integration-native* PASS: `npm ci`, `npm run check`, dedicated `node src/brakes001/integration/integration.test.cjs` over all 750 frames including actual E pressure-to-pad-gap adapter, Agent B 5/5 physics tests, Agent A source contract, C pose/frame math through E tests, Agent D graphics check (750 frames/8 cues/8 labels) and JSX component smoke (750 frames/1216 instances), production Python **39/39** and project/handoff validation. The E test JSON reports B stand-in gap `.0003–.006`; **the real E hardware adapter separately enforces `.00015–.0025`**. Do not misread B schematic gap as actual hardware stroke. Newer film source compiles in [Production Suite] (https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37969997735).
 
-A–D source remains verbatim. Agent E **does not deliver a full 750-frame MP4**. Required next gates: independently review both moving native clips and stills, obtain D's technical/visual signoff, inspect hardware GLB stills from a compatible Blender renderer, resolve non-readability of pad clamp and toy-like caliper visual, then Master approves source. **Agent F**, not E, renders and checks the 25-second native release.
+## Master and D acceptance gates
+
+1. Get a true frame705 render from `8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d` (or later code-approved SHA), verify complete left caliper and safe right rotor rim. The [latest proof retry](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37970589567) remains pending, the [earlier attempt](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37969990091) stalled at dependency installation.
+2. Review new Blender four PNGs and request A to reduce Cycles proof overexposure; do not conflate source GLB structural pass with attractive material/lookdev signoff.
+3. At normal and phone resolution, review both motion sequences for spinning rotor, static caliper, real pad contact clearance and accurate annular heat. Near-subpixel clamp at reduced proxy resolution requires independent D judgement.
+4. Request Agent D independent visual/technical signoff, and Master acceptance. Only then Agent F renders the *full* 750-frame 1080×1920 final H.264 MP4 (not produced by E).
+
+This E handoff is deliberately REVIEW, not a release-ready claim.

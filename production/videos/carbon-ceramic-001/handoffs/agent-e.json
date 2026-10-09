@@ -2,43 +2,40 @@
   "schemaVersion": 1,
   "task": "carbon-ceramic-001-agent-e",
   "branch": "automotive-brakes-001/e-integration",
-  "sourceSha": "714238ccd67a38036c51258821d1880145536519",
+  "sourceSha": "8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d",
   "owner": "engineering",
   "status": "review",
-  "summary": "Integrated A-D into registered 750-frame Three.js/Remotion film; performed real source-specific GitHub Actions tests, rendered/reviewed the five required 540x960 native stills and contact sheet plus BOTH 61-frame 378x672 H264 native previews (FFprobe/full FFmpeg decode PASS). Improved frame-varying thermal framing using C's true camera target. Real Blender 4.0.2 GLB generated and independently structurally inspected (133 nodes/125 meshes/9 materials), but stock Blender Cycles screenshot step failed due unavailable OpenImageDenoiser. Independent Agent D final footage review and hardware visual quality signoff remain open; status REVIEW.",
+  "summary": "Polish02 A hardware imported blob-identically; E cinematic and physical pad-clearance adaptation implemented; native Blender 4.0 Cycles/GLB complete and two real Remotion moving previews plus exact five stills independently reviewed. Source 8b6ee hero framing fix awaits exact-SHA native rerender; A Blender close-ups overexposed; independent D/Master signoff pending. Not a finished 750-frame release.",
   "files": [
     "src/brakes001/CarbonCeramic001.tsx",
+    "src/brakes001/integration/IntegrationCameraRig.tsx",
     "src/brakes001/integration/integrationState.ts",
     "src/brakes001/integration/integration.test.cjs",
     "src/brakes001/integration/SOURCES.md",
-    "src/Root.tsx",
-    "production/videos/carbon-ceramic-001/brief.json",
+    "src/brakes001/integration/QA_REPORT.md",
     "production/videos/carbon-ceramic-001/handoffs/agent-e.json",
     "production/videos/carbon-ceramic-001/handoffs/agent-e.md",
-    ".github/workflows/carbon-ceramic-001-e-proof.yml",
-    "src/brakes001/integration/QA_REPORT.md"
+    ".github/workflows/carbon-ceramic-001-e-proof.yml"
   ],
   "evidence": [
-    "FINAL SOURCE COMMIT (thermal framing and native-proof runner): https://github.com/YunRah2103/Remotion-gpt-chat/commit/714238ccd67a38036c51258821d1880145536519",
-    "UNCHANGED A-D BLOBS: https://github.com/YunRah2103/Remotion-gpt-chat/commit/138cb4cd3d8bc07c2c0e46ae5604fd8fe05aada6; see src/brakes001/integration/SOURCES.md",
-    "E NATIVE INTEGRATION: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37947404308 job integration-native SUCCESS; npm ci, tsc, dedicated node integration.test.cjs 750/750, B 5/5, A source contract, D 750 cue validation and 750 JSX smoke, Python 39/39, setup validator PASS.",
-    "FIVE REAL NATIVE STILLS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37947404308/artifacts/11624317868 includes frames 48/168/321/531/705 and contact-sheet.jpg at 540x960 rendered from CarbonCeramic001.",
-    "NATIVE CLAMP MP4: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37947404308/artifacts/11624317868, 135–195 inclusive, 61 frames 30fps 378x672 H264 2.033333sec; full FFprobe and FFmpeg decode PASS; sha256 1d4f5aa5689941da6f8c015b113838504212116e6aac899ec346f9e60e0a2e7f.",
-    "NATIVE THERMAL MP4: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37947404308/artifacts/11624317868, 300–360 inclusive, 61 frames 30fps 378x672 H264 2.033333sec; full FFprobe and FFmpeg decode PASS; sha256 08c328b09e8d3d035bbc2c8faa5de27f99d944d7573cc6078511159d8dd93d79.",
-    "TRUE BLENDER EXPORT: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37947404308/artifacts/11624482332, Blender 4.0.2 .blend and 1,194,348-byte GLB; independent native glTF2 chunk/hierarchy analysis PASS: 133 nodes, 125 meshes, 9 materials; glb sha256 fe517944c5ee4e43dd0b6247deea59774ba82590bd6e892f546c5fa2d8db8a35; render failed at OpenImageDenoiser dependency.",
-    "PREVIOUS NATIVE VIDEO REVIEW: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37946746157/artifacts/11624416838, inspected and fixed zoom/cropping in E-only thermal adapter.",
-    "Independent QA observations documented in src/brakes001/integration/QA_REPORT.md. No final 750-frame release MP4 claimed."
+    "FILM SOURCE: https://github.com/YunRah2103/Remotion-gpt-chat/commit/8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d",
+    "A POLISH 02 IMPORT: https://github.com/YunRah2103/Remotion-gpt-chat/commit/a8f8d7504c4bd0f509b5a5b403ccfc095da0d615 10/10 A source blobs match branch cbce3943e490fa3eddc245ca8c2c75b942225108",
+    "BLENDER: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37968622756/artifacts/11633864744 verified Blender 4.0.2 Cycles 4 PNGs/.blend/.glb, hierarchy 148 nodes, 140 meshes, 9 materials, SHA256 261b11aa1c71610e52ad9fe25a57b179427f0de833dc6904d41d8da44013a5ac",
+    "NATIVE VIDEO: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37969454877/artifacts/11635221421 5 native stills (48,168,321,531,705) plus moving frames 135-195 / 300-360, 61 each, 30fps, full decode PASS at d9e27ab source (prior to last hero frame correction)",
+    "Dedicated npm/tsc/E integration 750 frame, B 5/5, C camera logic, A native + source, D cue 750, Python 39/39 PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37969454877",
+    "PENDING LATEST HERO PROOF: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37970589567; previous run https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37969990091 stalled at deps.",
+    "VISUAL COMPARE: old caliper nearly rectangular; A02 cheeks open bridges/piston detail visible, three-quarter camera improved; thermal safely framed; hero 705 clipped in d9 and recentered in latest 8b source but not verified."
   ],
   "blockers": [
-    "Agent A hardware status remains REVIEW: true Blender .blend/.glb export and structure succeeded but native Cycles close-up PNG proof stopped at RuntimeError: Build without OpenImageDenoiser on distro Blender 4.0.2. Blender artist/runner must supply working denoiser or separately render GLB with supported engine, then inspect physical assembly visually.",
-    "Native Three.js hardware is visibly diagrammatic: rectangular caliper face/low detail at proof scale and A's pad travel is visually hard to distinguish front-on; pad pose is tested numerically without penetration but a macro side view and A/D visual signoff are outstanding.",
-    "Thermal shot was corrected to track Agent C's camera target; sampled frames 300–360 largely retain rotor, but the outer rim approaches the right edge late. Requires Agent D independent final creative review at target portrait playback resolution.",
-    "Full length 750-frame native video, approved VO, full D independent signoff and release validation belong to Master/Agent F; have not been rendered or asserted by Agent E."
+    "Latest source 8b6ee... hero reframe lacks exact-SHA native frame705 / five-still proof because latest GitHub native workflow pending behind prior dependency-installation stall; cannot mark it visually passing.",
+    "Native Blender Cycles 900x900 closeups all overexposed/washed out despite structural GLB and PBR material PASS; Agent A notified in PR #11 to improve stage lighting/exposure.",
+    "Independent Agent D full integrated film technical/creative QA and Master branch acceptance pending; physical clamp motion visually subtle at reduced 378px proof resolution.",
+    "No final 750-frame 1080x1920 H264; strictly reserved for Agent F after Master approval."
   ],
   "integratedSources": {
     "A": {
-      "head": "3d02dfa264b1af51f8ae39f990e8815f5c20ecdf",
-      "handoffSource": "a201cefa64cef0f797deba34ddfbd55c58967d33",
+      "head": "cbce3943e490fa3eddc245ca8c2c75b942225108",
+      "handoffSource": "0bfc8ce52f15e6bf883cca0ad425fd4359d5af33",
       "status": "review"
     },
     "B": {
@@ -58,50 +55,52 @@
     }
   },
   "qa": {
-    "npmCi": "PASS GitHub Actions 37947404308",
-    "typescript": "PASS npm run check GitHub Actions 37947404308",
-    "integrationNode": "PASS direct node src/brakes001/integration/integration.test.cjs, 750/750 states, five shots, no pad penetration",
-    "BMotion": "PASS 5/5 node physics tests via run-tests.sh",
-    "cinema": "PASS 750/750 deterministic pose/shots via integration.test.cjs",
-    "AHardwareSource": "PASS source contract 8 nodes, X-axis and nominal dimensions",
-    "DGraphics": "PASS 750 frames eight graphics eight labels; JSX cue smoke 1216 instances",
-    "productionPython": "PASS 39/39 tests",
+    "npmCi": "PASS 37969454877",
+    "typescript": "PASS 37969454877 + latest 37969997735",
+    "integrationNode": "PASS executed actual adapter 750/750 states in 37969454877",
+    "BMotion": "PASS 5/5",
+    "cinema": "PASS tested camera plan 750 frames via E integration",
+    "AHardware": "PASS actual Blender 4.0.2 Cycles 900x900 x4 and native GLB 148/140/9",
+    "DGraphics": "PASS 750 cues and 1216 JSX instances",
+    "productionPython": "PASS 39/39",
     "setupValidator": "PASS",
-    "blenderExport": "PASS GLB and .blend physically generated by Blender 4.0.2 in Actions 37947404308",
-    "glbStructure": "PASS independent true binary glTF2 examination: 133 nodes, 125 meshes, 9 materials, rotor descendants/correct static caliper",
-    "blenderStills": "BLOCKED stock Cycles Build without OpenImageDenoiser (after successful export)",
-    "nativeStills": "PASS five real Remotion 540x960 frames and contact sheet reviewed",
-    "nativeMotion": "PASS both real 61-frame Remotion MP4s at 378x672",
-    "ffprobeFfmpeg": "PASS H264/30fps/61frames/2.033333s; full decode both",
-    "visualReview": "REVIEW moderate boxy caliper/front-facing pad motion hard to discern and late thermal rim near edge",
-    "agentDVisual": "PENDING independent integrated-film signoff",
-    "fullRelease": "NOT RUN, reserved for Agent F"
+    "nativeStills": "PASS at d9e27ab; updated 8b hero frame705 NOT YET VERIFIED",
+    "nativeMotion": "PASS both 61-frame H264 at d9e27ab",
+    "ffprobeFfmpeg": "PASS 61/61 each, full decode both, 30fps 378x672",
+    "visualReview": "REVIEW left hero clipping addressed in code but not native-confirmed; A Blender overexposure; D pending",
+    "agentDVisual": "PENDING",
+    "fullRelease": "NOT RUN"
   },
   "artifacts": [
     {
-      "type": "native-stills-contact-clamp-thermal",
+      "type": "Polish02 genuine Remotion five-still/contact/motion",
+      "runId": 37969454877,
+      "artifactId": 11635221421,
+      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37969454877/artifacts/11635221421"
+    },
+    {
+      "type": "Polish02 real Blender/GLB/Cycles closeups",
+      "runId": 37968622756,
+      "artifactId": 11633864744,
+      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37968622756/artifacts/11633864744"
+    },
+    {
+      "type": "Polish02 repeated Blender proof",
+      "runId": 37969454877,
+      "artifactId": 11635570499,
+      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37969454877/artifacts/11635570499"
+    },
+    {
+      "type": "prePolish02 native comparison",
       "runId": 37947404308,
       "artifactId": 11624317868,
       "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37947404308/artifacts/11624317868"
-    },
-    {
-      "type": "native-blender-export-no-cycles-stills",
-      "runId": 37947404308,
-      "artifactId": 11624482332,
-      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37947404308/artifacts/11624482332"
-    },
-    {
-      "type": "older-pre-fix-native-evidence",
-      "runId": 37946746157,
-      "artifactId": 11624416838,
-      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37946746157/artifacts/11624416838"
     }
   ],
   "masterInstructions": [
-    "Do NOT mistake the failed overall hardware job for failed native Remotion integration: Actions 37947404308 integration-native job SUCCESS, hardware-native FAILED after exporting a structurally verified GLB because OpenImageDenoiser absent.",
-    "Review native stills 0048,0168,0321,0531,0705 and contact-sheet.jpg in artifact 11624317868; watch clamp-135-195.mp4 and heat-300-360.mp4 at normal speed, examine caliper/pads/thermal late framing and label-safe areas.",
-    "Resolve Cycles renderer OIDN availability on runner or Agent A supplies native still render with supported Eevee/denoise OFF from exported GLB. Test native GLB using production/videos/carbon-ceramic-001/hardware/test_hardware.py --glb ... --report ...; actual GLB is artifact 11624482332.",
-    "Get Agent D independent final visual and engineering approval; specifically ask for side-on pad clamp readability, primitive caliper quality, thermal tint intensity and safe portrait framing.",
-    "Only after E PR review and visual/hardware signoff, Master approves source and Agent F renders/verifies 1080x1920 30fps 750-frame release H264 MP4. Agent E has not rendered final film."
+    "Only import E PR #15 after exact current code source SHA 8b6ee9... native frame705 is inspected and accepted; start or wait for the E native workflow at run 37970589567.",
+    "Inspect full real A02 GLB & Cycles stills in Blender artifact; ask A to correct overexposed proof lighting, retaining the 148-node, 140-mesh hierarchy.",
+    "Compare old vs new five-frame contacts and watch complete moving clamp & heat MP4; validate the actual pad gap .00015-.0025m instead of B's 0.006m stand-in.",
+    "Request D independent film technical/visual QA and Master approval; Agent F alone renders/checks final 25-second release at 1080x1920 750frames 30fps."
   ]
 }
