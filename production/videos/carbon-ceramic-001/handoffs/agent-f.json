@@ -2,15 +2,33 @@
   "schemaVersion": 1,
   "task": "carbon-ceramic-001-agent-f",
   "branch": "automotive-brakes-001/f-render",
-  "sourceSha": "9502cf776c5015fcf92fbd16f12ab638b8c70fe4",
+  "sourceSha": "4564bde62ceaeca1e3afc4c7fa6d01cf707bb290",
   "owner": "release",
-  "summary": "UNSTARTED render-engineering handoff template; common setup sourceSha is not a completed render or QA result.",
   "status": "blocked",
-  "files": [],
-  "evidence": [],
-  "blockers": [
-    "E's Master-approved integrated native composition is not yet available to F.",
-    "No native 750-frame MP4, FFprobe full-frame/decode report or verified download artifact yet."
+  "summary": "Agent F implemented and committed fail-closed Master source approval lock, independent full-decode/FFprobe/SHA256 native MP4 checker, synthetic self-tests and F GitHub Actions QA. Actual integrated final film has NOT been approved or rendered.",
+  "files": [
+    "production/videos/carbon-ceramic-001/render/SOURCE_LOCK.json",
+    "production/videos/carbon-ceramic-001/render/source_lock.py",
+    "production/videos/carbon-ceramic-001/render/verify_media.py",
+    "production/videos/carbon-ceramic-001/render/test_verify_media.py",
+    "production/videos/carbon-ceramic-001/render/README.md",
+    "production/videos/carbon-ceramic-001/render/REPORT.md",
+    ".github/workflows/carbon-ceramic-001-master-render.yml",
+    "production/videos/carbon-ceramic-001/handoffs/agent-f.json",
+    "production/videos/carbon-ceramic-001/handoffs/agent-f.md"
   ],
-  "notes": "Only replace blocked status with ready after source-locked actual Remotion MP4 and rigorous native QA; Master retains public release."
+  "evidence": [
+    "https://github.com/YunRah2103/Remotion-gpt-chat/commit/4564bde62ceaeca1e3afc4c7fa6d01cf707bb290",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-brakes-001/f-render/production/videos/carbon-ceramic-001/render/verify_media.py",
+    "Local synthetic infrastructure validation: 4/4 unit tests PASS; 45-frame 108x192 H.264 synthetic testsrc2 fixture; NOT real film evidence.",
+    "GitHub Actions F runner initial attempt 37944380254 failed because ffmpeg absent; corrective installation committed, rerun 37944495862 pending as handoff written."
+  ],
+  "blockers": [
+    "Agent A source handoff remains REVIEW: no verified native Blender export/GLB/closeup review.",
+    "Agent E integration handoff remains REVIEW; Master has not accepted a final integrated SHA, stills or moving previews.",
+    "master_gate.py --require-ready is not satisfied; SOURCE_LOCK.json deliberately pending.",
+    "No full 750-frame native MP4, accessible Actions final artifact/ID, full FFmpeg decode, film SHA256 or shot review yet.",
+    "Agent D independent whole-film assessment and Master final approval pending; narration not approved."
+  ],
+  "notes": "Master is final creative/release owner. F workflow is source-locked to the approved film, does not manufacture narration, and does not publish publicly. Revisit F status only after a real candidate and verified evidence exist."
 }
