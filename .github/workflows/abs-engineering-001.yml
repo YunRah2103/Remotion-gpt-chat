@@ -1,0 +1,115 @@
+name: ABS Engineering 001 - independent 3D render
+on:
+  push:
+    branches: ['automotive-explainers/abs-001']
+    paths:
+      - 'src/ABS001.tsx'
+      - 'src/Root.tsx'
+      - '.github/workflows/abs-engineering-001.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render:
+    name: Three.js native frames part ${{ matrix.part }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [0,1,2,3,4]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Remotion + FFmpeg
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          npm install --no-audit --no-fund
+      - name: Validate TypeScript and composition registration
+        run: |
+          npm run check
+          npx remotion compositions src/index.ts --gl=swangle | tee compositions.txt
+          grep -q ABS001 compositions.txt
+      - name: Render exactly 150 unique native 3D frames
+        run: |
+          mkdir -p out/abs
+          START=$(( ${{ matrix.part }} * 150 ))
+          LAST=$(( START + 149 ))
+          npx remotion render src/index.ts ABS001 "out/abs/chunk-${{ matrix.part }}.mp4" --frames="$START-$LAST" --gl=swangle --scale=0.5 --concurrency=1 --codec=h264 --pixel-format=yuv420p
+          ffmpeg -hide_banner -loglevel error -xerror -i "out/abs/chunk-${{ matrix.part }}.mp4" -f null -
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=noprint_wrappers=1:nokey=1 "out/abs/chunk-${{ matrix.part }}.mp4")" = 150
+      - uses: actions/upload-artifact@v4
+        with:
+          name: abs001-native-chunk-${{ matrix.part }}
+          path: out/abs/chunk-${{ matrix.part }}.mp4
+          if-no-files-found: error
+          retention-days: 30
+  assemble:
+    name: Assemble 750 frames and verify MP4
+    needs: render
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: abs001-native-chunk-*
+          merge-multiple: true
+          path: out/abs
+      - name: Concatenate true moving native renders
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          for i in 0 1 2 3 4; do
+            test -s "out/abs/chunk-$i.mp4"
+            count=$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=noprint_wrappers=1:nokey=1 "out/abs/chunk-$i.mp4")
+            test "$count" = 150
+            printf "file 'abs/chunk-%s.mp4'\n" "$i" >> out/concat.txt
+          done
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i out/concat.txt -c copy out/abs-native-750.mp4
+      - name: Final vertical H264 encode
+        run: |
+          set -euo pipefail
+          # If approved narration has been separately published in this repo, mux it without replacement.
+          if test -s public/audio/abs001-approved.mp3; then
+            ffmpeg -hide_banner -loglevel error -y -i out/abs-native-750.mp4 -i public/audio/abs001-approved.mp3 \
+              -filter_complex '[0:v]scale=1080:1920:flags=lanczos,format=yuv420p[v];[1:a]aresample=48000,aformat=channel_layouts=stereo,apad,atrim=duration=25[a]' \
+              -map '[v]' -map '[a]' -r 30 -frames:v 750 -c:v libx264 -preset veryfast -crf 19 -pix_fmt yuv420p -color_range tv \
+              -c:a aac -b:a 192k -ar 48000 -ac 2 -movflags +faststart out/ABS001-REMOTION-FINAL.mp4
+          else
+            ffmpeg -hide_banner -loglevel error -y -i out/abs-native-750.mp4 -vf 'scale=1080:1920:flags=lanczos,format=yuv420p' \
+              -r 30 -frames:v 750 -c:v libx264 -preset veryfast -crf 19 -pix_fmt yuv420p -color_range tv \
+              -movflags +faststart out/ABS001-REMOTION-FINAL.mp4
+          fi
+          ffmpeg -hide_banner -loglevel error -xerror -i out/ABS001-REMOTION-FINAL.mp4 -f null -
+          ffprobe -v error -show_format -show_streams -of json out/ABS001-REMOTION-FINAL.mp4 > out/ffprobe.json
+          python3 - <<'PY'
+          import json
+          p=json.load(open('out/ffprobe.json'))
+          v=next(s for s in p['streams'] if s['codec_type']=='video')
+          assert (v['codec_name'],v['width'],v['height'],v['pix_fmt'],v['nb_frames'],v['r_frame_rate'])==('h264',1080,1920,'yuv420p','750','30/1'),v
+          assert abs(float(p['format']['duration'])-25)<.07,p['format']
+          aud=[s for s in p['streams'] if s['codec_type']=='audio']
+          if aud:
+            a=aud[0]; assert (a['codec_name'],a['sample_rate'],a['channels'])==('aac','48000',2),a
+          print('ABS001 PASS: 750 frames, 25s, 1080x1920 H264 yuv420p 30fps, full decode')
+          PY
+          for frame in 75 314 480 689; do
+            ffmpeg -hide_banner -loglevel error -y -ss "$(awk "BEGIN{print $frame/30}")" -i out/ABS001-REMOTION-FINAL.mp4 -frames:v 1 -update 1 "out/preview-$frame.png"
+          done
+          sha256sum out/ABS001-REMOTION-FINAL.mp4 > out/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ABS001-REMOTION-FINAL-750-FRAMES
+          path: |
+            out/ABS001-REMOTION-FINAL.mp4
+            out/ffprobe.json
+            out/SHA256SUMS.txt
+            out/preview-*.png
+          if-no-files-found: error
+          retention-days: 30
