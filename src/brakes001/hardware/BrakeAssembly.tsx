@@ -198,8 +198,9 @@ export const BrakeAssembly: React.FC<Props> = ({
   const caliperCheeks=useMemo(()=>[
     forgedCheekGeometry(-1),forgedCheekGeometry(1),
   ],[]);
-  const caliperBridge=useMemo(()=>extrudedSector(.204,.227,.136,
-    centreAngle-.265,centreAngle+.265),[]);
+  const caliperBridges=useMemo(()=>[-.220,0,.220].map((offset)=>
+    extrudedSector(.205,.231,.136,
+      centreAngle+offset-.043,centreAngle+offset+.043)),[]);
   const caliperEdge=useMemo(()=>extrudedSector(.210,.216,.004,
     centreAngle-.235,centreAngle+.235),[]);
   const caliperRibs=useMemo(()=>[-.185,.185].map((a)=>
@@ -314,8 +315,9 @@ export const BrakeAssembly: React.FC<Props> = ({
             <boxGeometry args={[.014,.034,.026]}/>
           </mesh>
         </group>)}
-      <mesh name="CurvedCaliperBridge" geometry={caliperBridge}
-        position={[-.068,0,0]} material={caliper}/>
+      {caliperBridges.map((geom,k)=>
+        <mesh key={k} name={k===1?'CurvedCaliperBridge':`CaliperEndBridge_${k}`}
+          geometry={geom} position={[-.068,0,0]} material={caliper}/>)}
       <mesh name="BridgeMachinedCrown"
         geometry={caliperCrown}
         position={[-.042,0,0]} material={caliperTrim}/>
