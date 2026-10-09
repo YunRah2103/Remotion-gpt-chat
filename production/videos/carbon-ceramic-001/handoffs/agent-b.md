@@ -3,8 +3,8 @@
 **Status: READY for Master integration (not final film signoff).**
 
 **Branch:** `automotive-brakes-001/b-motion-thermal`  
-**Immutable implementation source SHA:** `2acb2a9155db826c934ca9b64c3d5c2b31452b7a`  
-**Source commit:** https://github.com/YunRah2103/Remotion-gpt-chat/commit/2acb2a9155db826c934ca9b64c3d5c2b31452b7a  
+**Immutable implementation source SHA:** `4a815e73c4e3dbc28b686e20910fdfc8865cd1bc`  
+**Source commit:** https://github.com/YunRah2103/Remotion-gpt-chat/commit/4a815e73c4e3dbc28b686e20910fdfc8865cd1bc  
 **Handoff validator:** `python production/tools/handoff.py production/videos/carbon-ceramic-001/handoffs/agent-b.json` → PASS.  
 
 ## Delivered
@@ -18,7 +18,9 @@
 
 ## Actual proof results
 
-**Local Node/tsc unit run:** 5 tests, 5 passed, 0 failed.
+**Local Node/pinned-TypeScript unit run:** 5 tests, 5 passed, 0 failed.
+
+**GitHub verification:** [CI run 37942445163](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37942445163) SUCCESS (TypeScript compilation, production Python unit tests and actual 2-frame software-WebGL Remotion smoke). [PR visual review run 37942445243](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37942445243) SUCCESS on the preceding code snapshot. Latest two commits only make the offline unit/preview runners portable via pinned npx TypeScript; recheck latest CI status.
 
 **Actual MP4 stand-in:** `carbon-brakes-agent-b-motion-proof.mp4` (Agent B chat artifact), **305 frames**, **432×768**, **30/1 fps**, MPEG-4 Part 2 codec in MP4, FFprobe PASS, FFmpeg full-decode PASS; SHA-256:
 
