@@ -1,0 +1,75 @@
+name: Production - integrated captions and pipeline smoke
+on:
+  push:
+    branches:
+      - main
+      - feature/production-pipeline-qa-agents-benchmarks-20261009
+    paths:
+      - 'src/ProductionCaptions.tsx'
+      - 'src/Root.tsx'
+      - 'production/tools/production_pipeline.py'
+      - 'production/videos/turbo-001/**'
+      - 'production/PIPELINE.md'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/production-pipeline-smoke.yml'
+  pull_request:
+    paths:
+      - 'src/ProductionCaptions.tsx'
+      - 'src/Root.tsx'
+      - 'production/tools/production_pipeline.py'
+      - 'production/videos/turbo-001/**'
+      - 'package.json'
+      - 'package-lock.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integrated-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Typecheck, real brief preflight, real captioned WebGL frames
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          npm ci --no-audit --no-fund
+          npm run check
+          mkdir -p out/smoke
+          python production/tools/production_pipeline.py --project turbo-001 --output out/smoke
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          # Synthetic timing ONLY for a 2-frame caption feature smoke test.
+          props={"enabled":True,"words":[{"word":"TURBO","start":0,"end":.08}]}
+          Path("out/smoke/demo-props.json").write_text(json.dumps(props))
+          PY
+          npx remotion still src/index.ts TurboDocumentaryCaptioned out/smoke/captioned-frame.png \
+            --frame=1 --gl=swangle --scale=0.25 --props=out/smoke/demo-props.json
+          npx remotion render src/index.ts TurboDocumentaryCaptioned out/smoke/captioned-proof.mp4 \
+            --frames=0-2 --gl=swangle --scale=0.25 --codec=h264 --pixel-format=yuv420p \
+            --concurrency=1 --props=out/smoke/demo-props.json
+          ffmpeg -v error -xerror -i out/smoke/captioned-proof.mp4 -f null -
+          ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of json \
+            out/smoke/captioned-proof.mp4 > out/smoke/ffprobe.json
+          python - <<'PY'
+          import json
+          s=json.load(open("out/smoke/ffprobe.json"))["streams"][0]
+          assert int(s["nb_frames"])==3
+          print("CAPTIONED_NATIVE_3_FRAME_SMOKE_PASS")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: production-captioned-native-smoke-${{ github.run_id }}
+          path: out/smoke/
+          retention-days: 14
+          if-no-files-found: error
