@@ -1,0 +1,205 @@
+name: Carbon Ceramic 001 - G Wheel Reveal Native Proof and Full Final
+on:
+  push:
+    branches: ['automotive-brakes-001/g-wheel-reveal']
+    paths:
+      - '.github/workflows/carbon-ceramic-001-g-wheel-reveal.yml'
+      - 'src/brakes001/wheel/**'
+      - 'src/brakes001/CarbonCeramic001.tsx'
+      - 'production/videos/carbon-ceramic-001/wheel/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: carbon-ceramic-g-final-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  wheel-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install native renderer and check untouched P05
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/carbon-ceramic-g/proof
+          npm ci --no-audit --no-fund
+          if ! node -e "require('@rspack/binding')" >/dev/null 2>&1; then
+            ver="$(node -p "require('./node_modules/@rspack/binding/package.json').version")"
+            npm install --no-save --no-package-lock --no-audit --no-fund "@rspack/binding-linux-x64-gnu@${ver}"
+          fi
+          python -m pip install --disable-pip-version-check Pillow==11.3.0
+          if ! command -v ffmpeg >/dev/null; then sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg; fi
+          npm run check | tee out/carbon-ceramic-g/proof/typescript.log
+          node src/brakes001/integration/integration.test.cjs | tee out/carbon-ceramic-g/proof/integration-test.json
+          bash production/videos/carbon-ceramic-001/physics/run-tests.sh | tee out/carbon-ceramic-g/proof/physics.log
+          python production/videos/carbon-ceramic-001/qa/check_graphics.py | tee out/carbon-ceramic-g/proof/graphics.log
+          python production/videos/carbon-ceramic-001/wheel/test_wheel.py | tee out/carbon-ceramic-g/proof/clearance-and-source-isolation.txt
+          python -m unittest discover -s production/tests -v > out/carbon-ceramic-g/proof/production-tests.log 2>&1
+          git rev-parse HEAD | tee out/carbon-ceramic-g/proof/native-source-sha.txt
+      - name: Render eleven true 1080x1920 frames
+        shell: bash
+        run: |
+          set -euo pipefail
+          python production/tools/render.py --composition CarbonCeramic001 --mode stills             --output out/carbon-ceramic-g/proof/stills --samples 0,15,35,50,68,80,90,95,100,117,155 --scale 1
+          python production/tools/quality.py contact out/carbon-ceramic-g/proof/wheel-to-brakes-contact-sheet.jpg             out/carbon-ceramic-g/proof/stills/frame-*.png
+      - name: Render four separate true 3D wheel beauty viewpoints
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/carbon-ceramic-g/proof/beauty
+          for frame in 0 30 60 90; do
+            npx --no-install remotion still src/brakes001/wheel/beauty-entry.tsx WheelBeautyG               "out/carbon-ceramic-g/proof/beauty/view-${frame}.png"               --frame="${frame}" --gl=swangle --scale=1 --log=error
+          done
+          python production/tools/quality.py contact out/carbon-ceramic-g/proof/beauty-four-view-contact.jpg             out/carbon-ceramic-g/proof/beauty/view-*.png
+      - name: Render and decode full-resolution 0-100 wheel-to-pad proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          python production/tools/render.py --composition CarbonCeramic001 --mode preview             --start 0 --end 100 --scale 1 --concurrency 1             --output out/carbon-ceramic-g/proof/wheel-to-pad-000-100.mp4
+          python production/tools/quality.py video out/carbon-ceramic-g/proof/wheel-to-pad-000-100.mp4             --width 1080 --height 1920 --fps 30 --frames 101             --report out/carbon-ceramic-g/proof/proof-native-qa.json
+          ffprobe -v error -show_streams -show_format -of json             out/carbon-ceramic-g/proof/wheel-to-pad-000-100.mp4 > out/carbon-ceramic-g/proof/proof-ffprobe.json
+          sha256sum out/carbon-ceramic-g/proof/wheel-to-pad-000-100.mp4             > out/carbon-ceramic-g/proof/proof-sha256.txt
+      - name: Upload real visual evidence before final assembly
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brakes001-g-native-wheel-proof-${{ github.run_id }}
+          path: out/carbon-ceramic-g/proof/
+          retention-days: 30
+          if-no-files-found: warn
+
+  native-chunk:
+    needs: wheel-proof
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        include:
+          - {id: "00", start: 0, end: 74}
+          - {id: "01", start: 75, end: 149}
+          - {id: "02", start: 150, end: 224}
+          - {id: "03", start: 225, end: 299}
+          - {id: "04", start: 300, end: 374}
+          - {id: "05", start: 375, end: 449}
+          - {id: "06", start: 450, end: 524}
+          - {id: "07", start: 525, end: 599}
+          - {id: "08", start: 600, end: 674}
+          - {id: "09", start: 675, end: 749}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install renderer with optional native binding recovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          if ! node -e "require('@rspack/binding')" >/dev/null 2>&1; then
+            ver="$(node -p "require('./node_modules/@rspack/binding/package.json').version")"
+            npm install --no-save --no-package-lock --no-audit --no-fund "@rspack/binding-linux-x64-gnu@${ver}"
+          fi
+          if ! command -v ffmpeg >/dev/null; then sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg; fi
+      - name: Render 75 real full-resolution Remotion frames from one G SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/carbon-ceramic-g/parts
+          test "$(git rev-parse HEAD)" = "${GITHUB_SHA}"
+          npx --no-install remotion render src/index.ts CarbonCeramic001             out/carbon-ceramic-g/parts/part-${{ matrix.id }}.mp4             --frames=${{ matrix.start }}-${{ matrix.end }}             --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1 --log=error
+          python production/tools/quality.py video             out/carbon-ceramic-g/parts/part-${{ matrix.id }}.mp4             --width 1080 --height 1920 --fps 30 --frames 75             --report out/carbon-ceramic-g/parts/part-${{ matrix.id }}-qa.json
+          sha256sum out/carbon-ceramic-g/parts/part-${{ matrix.id }}.mp4             > out/carbon-ceramic-g/parts/part-${{ matrix.id }}.sha256
+          git rev-parse HEAD > out/carbon-ceramic-g/parts/source-${{ matrix.id }}.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: brakes001-g-part-${{ matrix.id }}-${{ github.run_id }}
+          path: out/carbon-ceramic-g/parts/
+          if-no-files-found: warn
+          retention-days: 30
+
+  assemble-full-25s:
+    needs: native-chunk
+    runs-on: ubuntu-24.04
+    timeout-minutes: 95
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: brakes001-g-part-*-${{ github.run_id }}
+          merge-multiple: true
+          path: out/carbon-ceramic-g/parts/
+      - name: Install FFmpeg and Pillow
+        run: |
+          if ! command -v ffmpeg >/dev/null; then sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg; fi
+          python -m pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Verify exact source for all parts and make genuinely playable 25s film
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/carbon-ceramic-g/final/stills
+          : > out/carbon-ceramic-g/parts/concat.txt
+          for i in $(seq -w 00 09); do
+            p="out/carbon-ceramic-g/parts/part-${i}.mp4"
+            test -s "$p"
+            test -s "out/carbon-ceramic-g/parts/part-${i}-qa.json"
+            test "$(cat out/carbon-ceramic-g/parts/source-${i}.txt)" = "$GITHUB_SHA"
+            (cd out/carbon-ceramic-g/parts && sha256sum -c "part-${i}.sha256")
+            printf "file 'part-%s.mp4'\n" "$i" >> out/carbon-ceramic-g/parts/concat.txt
+          done
+          ffmpeg -hide_banner -loglevel warning -y -f concat -safe 0             -i out/carbon-ceramic-g/parts/concat.txt -c copy             out/carbon-ceramic-g/final/concatenated.mp4
+          ffmpeg -hide_banner -loglevel warning -y             -i out/carbon-ceramic-g/final/concatenated.mp4             -map 0:v:0 -vf "scale=in_range=pc:out_range=tv,format=yuv420p"             -c:v libx264 -preset faster -crf 18 -r 30 -frames:v 750             -pix_fmt yuv420p -color_range tv -an -movflags +faststart             out/carbon-ceramic-g/final/carbon-ceramic-001-wheel-reveal-final-candidate.mp4
+          python production/tools/quality.py video             out/carbon-ceramic-g/final/carbon-ceramic-001-wheel-reveal-final-candidate.mp4             --width 1080 --height 1920 --fps 30 --frames 750             --report out/carbon-ceramic-g/final/full-750-frame-qa.json
+          ffprobe -v error -count_frames -show_streams -show_format -of json             out/carbon-ceramic-g/final/carbon-ceramic-001-wheel-reveal-final-candidate.mp4             > out/carbon-ceramic-g/final/ffprobe.json
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          folder=Path('out/carbon-ceramic-g/final')
+          qa=json.loads((folder/'full-750-frame-qa.json').read_text())
+          assert 24.99<=qa['durationSeconds']<=25.04,qa
+          assert qa['videoCodec']=='h264' and qa['pixelFormat']=='yuv420p',qa
+          assert qa['frames']==750 and qa['decodedCompletely'],qa
+          manifest={'sourceSHA':os.environ['GITHUB_SHA'],'status':'FINAL_CANDIDATE_PENDING_HUMAN_VISUAL_SIGNOFF',
+            'file':'carbon-ceramic-001-wheel-reveal-final-candidate.mp4',
+            'frameRate':30,'frames':750,'durationSeconds':qa['durationSeconds'],
+            'resolution':[1080,1920],'codec':'h264','pixelFormat':'yuv420p',
+            'audio':'silent_no_independently_identified_user_voiceover',
+            'sha256':qa['sha256'],
+            'camera':'new 0-119 wheel reveal to preserved E pad transition',
+            'laterFilm':'unchanged A-D/E sources from original P05 (source-level verification)'}
+          (folder/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+          print(json.dumps(manifest,indent=2))
+          PY
+          sha256sum out/carbon-ceramic-g/final/carbon-ceramic-001-wheel-reveal-final-candidate.mp4             > out/carbon-ceramic-g/final/SHA256SUMS.txt
+          ffmpeg -hide_banner -loglevel error -i             out/carbon-ceramic-g/final/carbon-ceramic-001-wheel-reveal-final-candidate.mp4             -vf "select='eq(n,0)+eq(n,15)+eq(n,35)+eq(n,50)+eq(n,68)+eq(n,80)+eq(n,90)+eq(n,95)+eq(n,100)+eq(n,117)+eq(n,155)+eq(n,321)+eq(n,705)'"             -vsync 0 out/carbon-ceramic-g/final/stills/shot-%03d.png
+          python production/tools/quality.py contact             out/carbon-ceramic-g/final/final-contact-sheet.jpg             out/carbon-ceramic-g/final/stills/shot-*.png
+      - name: Upload new 25s actual film and all independent native QA results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brakes001-g-wheel-reveal-final-25s-${{ github.run_id }}
+          path: |
+            out/carbon-ceramic-g/final/carbon-ceramic-001-wheel-reveal-final-candidate.mp4
+            out/carbon-ceramic-g/final/manifest.json
+            out/carbon-ceramic-g/final/full-750-frame-qa.json
+            out/carbon-ceramic-g/final/SHA256SUMS.txt
+            out/carbon-ceramic-g/final/ffprobe.json
+            out/carbon-ceramic-g/final/final-contact-sheet.jpg
+            out/carbon-ceramic-g/final/stills/
+          if-no-files-found: warn
+          retention-days: 30
