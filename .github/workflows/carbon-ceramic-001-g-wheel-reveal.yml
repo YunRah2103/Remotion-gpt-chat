@@ -13,7 +13,7 @@ permissions:
   actions: read
 concurrency:
   group: carbon-ceramic-g-final-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   wheel-proof:
     runs-on: ubuntu-24.04

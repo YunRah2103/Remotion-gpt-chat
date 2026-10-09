@@ -15,21 +15,15 @@ export type IntroPose={
   fov:number;
 };
 export function wheelRevealPoseAt(frame:number):IntroPose{
-  const t=smooth((frame-12)/83);
-  // Sidewall/face-on tyre becomes a deliberately more axial three-quarter
-  // brake cutaway, then joins E's established axial pad view without jumping.
+  // G POLISH 02 VISUAL REVIEW: the previous camera had reached an almost
+  // edge-on rotor by frame 80, producing a tiny dark sliver in portrait.
+  // Keep a three-quarter face view of the real rotor/caliper through the
+  // P05 pad onset. At frame 120 E's approved reveal camera is nearly identical.
+  const t=smooth((frame-5)/85);
   return {
-    position:[
-      lerp(1.68,.10,t),
-      lerp(.24,.33,t)+.021*Math.sin(frame/28)*(1-t),
-      lerp(.43,1.18,t),
-    ],
-    target:[
-      lerp(.01,0,t),
-      lerp(0,.07,t),
-      lerp(0,.06,t),
-    ],
-    fov:lerp(40,45,t),
+    position:[lerp(1.68,.77,t),lerp(.24,.32,t),lerp(.43,.57,t)],
+    target:[lerp(.01,0,t),lerp(0,.07,t),lerp(0,.055,t)],
+    fov:lerp(40,37,t),
   };
 }
 export const WheelRevealCameraRig:React.FC<{frame:number}>=({frame})=>{
@@ -52,7 +46,7 @@ export const WheelRevealCameraRig:React.FC<{frame:number}>=({frame})=>{
 };
 /** Wheel advances axially out only as a clearly labelled cutaway at the end. */
 export const wheelExplodeAt=(frame:number):number=>{
-  if(frame<=62)return 0;
-  return 1.05*smooth((frame-62)/29);
+  if(frame<=53)return 0;
+  return 1.20*smooth((frame-53)/23);
 };
-export const wheelVisibleAt=(frame:number):boolean=>frame<94;
+export const wheelVisibleAt=(frame:number):boolean=>frame<79;

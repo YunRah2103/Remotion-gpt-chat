@@ -46,7 +46,11 @@ const BrakeStage:React.FC<{frame:number;view:'normal'|'pad'}>=({frame,view})=>{
       shot==='hero'?[-.012,0,.012]:
       [0,0,0];
   // A's 390mm rotor geometry and pad travel stay physically unmodified.
-  const size=pad?.82:shot==='thermal'?.56:shot==='reveal'?.86:
+  // Ease only the G opening world scale toward the original E reveal size.
+  // This keeps the frame-119/120 handoff stable; frames >=120 are unchanged.
+  const openingScale=1-.14*(Math.max(0,Math.min(1,(frame-65)/50))**2*
+    (3-2*Math.max(0,Math.min(1,(frame-65)/50))));
+  const size=opening&&!pad?openingScale:pad?.82:shot==='thermal'?.56:shot==='reveal'?.86:
     shot==='hero'?.86:shot==='benefits'?.93:1;
   return <AbsoluteFill style={{background:'#080f19'}}>
     <ThreeCanvas width={width} height={height} shadows

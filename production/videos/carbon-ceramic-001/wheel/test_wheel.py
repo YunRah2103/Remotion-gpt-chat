@@ -34,8 +34,8 @@ assert 'padBlendAt(frame)' in film
 assert 'PAD_ENTRY_START=96, PAD_ENTRY_END=104' in trans
 assert 'PAD_EXIT_START=143, PAD_EXIT_END=151' in trans
 assert 'durationInFrames={750}' in root
-assert 'frame<94' in camera and '(frame-62)/29' in camera
-assert 'lerp(1.68,.10,t)' in camera
+assert 'frame<79' in camera and '(frame-53)/23' in camera
+assert 'lerp(1.68,.77,t)' in camera
 try:
     base='3a27004f2c40d3707277b2d87c8faf7e92a70a0d'
     protected=[
