@@ -410,7 +410,7 @@ def setup_stage(out):
             break
         except (TypeError,ValueError):
             continue
-    view.exposure=-0.85
+    view.exposure=-0.65
     view.gamma=1.0
     for look in ('Medium High Contrast','AgX - Medium High Contrast',
                  'Medium Contrast','None'):
@@ -430,9 +430,9 @@ def setup_stage(out):
         o=bpy.data.objects.new(name,dat);scene.collection.objects.link(o)
         o.location=loc;direction=Vector((0,0,0))-o.location
         o.rotation_euler=direction.to_track_quat('-Z','Y').to_euler()
-    area("Key softbox",(.49,-.35,.43),8,(.93,.97,1.0),.68)
-    area("Shadow lift",(-.29,.33,.36),3,(1.0,.89,.81),.72)
-    area("Vent rim",(-.18,-.18,.55),5,(.78,.88,1.0),.38)
+    area("Key softbox",(.49,-.35,.43),15,(.93,.97,1.0),.68)
+    area("Shadow lift",(-.29,.33,.36),7,(1.0,.89,.81),.72)
+    area("Vent rim",(-.18,-.18,.55),9,(.78,.88,1.0),.38)
     camera=bpy.data.cameras.new("Hero camera")
     cam=bpy.data.objects.new("Hero camera",camera)
     scene.collection.objects.link(cam);scene.camera=cam
@@ -516,7 +516,7 @@ def main(output):
         "colorManagement":{"transform":bpy.context.scene.view_settings.view_transform,
                            "look":bpy.context.scene.view_settings.look,
                            "exposure":bpy.context.scene.view_settings.exposure},
-        "studioLightWatts":{"key":8,"fill":3,"rim":5}}
+        "studioLightWatts":{"key":15,"fill":7,"rim":9}}
     (out/"build-report.json").write_text(json.dumps(report,indent=2)+"\n")
     print("BRAKE_HARDWARE_PROOF_PASS",json.dumps(report))
 
