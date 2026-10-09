@@ -1,0 +1,270 @@
+{
+  "schemaVersion": 1,
+  "asset": "carbon-ceramic-brake",
+  "state": "DESIGN_CONTRACT_NOT_NATIVE_EXPORT_REPORT",
+  "units": "metres",
+  "coordinateSystem": {
+    "glTF": "Y up",
+    "rotorAxis": [
+      1,
+      0,
+      0
+    ],
+    "discPlane": "YZ",
+    "blenderToGLTF": "(x,y,z) -> (x,z,-y)",
+    "rotorSpin": "rotateX"
+  },
+  "dimensions": {
+    "rotorDiameter": 0.39,
+    "rotorRadius": 0.195,
+    "frictionInnerRadius": 0.113,
+    "faceThickness": 0.0048,
+    "airGapBetweenFaces": 0.0214,
+    "totalFrictionAssemblyThickness": 0.031,
+    "ventCount": 44,
+    "drilledHolesPerFace": 64
+  },
+  "nodes": {
+    "RotorAssembly": {
+      "parent": null,
+      "type": "pivot",
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "motion": "rotationX",
+      "boundsMetres": [
+        [
+          -0.017,
+          -0.195,
+          -0.195
+        ],
+        [
+          0.08,
+          0.195,
+          0.195
+        ]
+      ]
+    },
+    "FrictionRing": {
+      "parent": "RotorAssembly",
+      "type": "group",
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "motion": "rotates-with-rotor",
+      "boundsMetres": [
+        [
+          -0.0155,
+          -0.195,
+          -0.195
+        ],
+        [
+          0.0155,
+          0.195,
+          0.195
+        ]
+      ]
+    },
+    "RotorHat": {
+      "parent": "RotorAssembly",
+      "type": "group",
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "motion": "rotates-with-rotor",
+      "boundsMetres": [
+        [
+          -0.016,
+          -0.114,
+          -0.114
+        ],
+        [
+          0.033,
+          0.114,
+          0.114
+        ]
+      ]
+    },
+    "Hub": {
+      "parent": "RotorAssembly",
+      "type": "group",
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "motion": "rotates-with-rotor",
+      "boundsMetres": [
+        [
+          0.007,
+          -0.056,
+          -0.056
+        ],
+        [
+          0.074,
+          0.056,
+          0.056
+        ]
+      ]
+    },
+    "CaliperBody": {
+      "parent": null,
+      "type": "group",
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "motion": "stationary",
+      "boundsMetres": [
+        [
+          -0.085,
+          0.04,
+          0.038
+        ],
+        [
+          0.085,
+          0.23,
+          0.23
+        ]
+      ]
+    },
+    "PadInner": {
+      "parent": null,
+      "type": "pivot",
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "motion": "translation+X",
+      "restGapMetres": 0.0025,
+      "boundsMetres": [
+        [
+          -0.036,
+          0.062,
+          0.055
+        ],
+        [
+          -0.018,
+          0.193,
+          0.193
+        ]
+      ]
+    },
+    "PadOuter": {
+      "parent": null,
+      "type": "pivot",
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "axis": [
+        -1,
+        0,
+        0
+      ],
+      "motion": "translation-X",
+      "restGapMetres": 0.0025,
+      "boundsMetres": [
+        [
+          0.018,
+          0.062,
+          0.055
+        ],
+        [
+          0.036,
+          0.193,
+          0.193
+        ]
+      ]
+    },
+    "UprightSupport": {
+      "parent": null,
+      "type": "group",
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "motion": "stationary",
+      "boundsMetres": [
+        [
+          -0.11,
+          -0.09,
+          -0.15
+        ],
+        [
+          -0.055,
+          0.13,
+          0.13
+        ]
+      ]
+    }
+  },
+  "constraints": [
+    "Inner friction faces are x=-0.0155 and x=+0.0155 metres",
+    "Pad surfaces start x=-0.018 and x=+0.018 metres",
+    "Pad travel is 0.0025 metres toward respective faces, no penetration",
+    "Hub and hat are descendants of rotor pivot and therefore rotate together",
+    "Caliper and upright stay outside rotor pivot",
+    "Dimensions are nominal and not manufacturer CAD"
+  ],
+  "integration": {
+    "nativeReact": "src/brakes001/hardware/BrakeAssembly.tsx",
+    "proofReact": "src/brakes001/hardware/BrakeHardwareProof.tsx",
+    "blenderSource": "production/videos/carbon-ceramic-001/hardware/build_brake.py",
+    "actualBLEND": "carbon-ceramic-brake.blend (generated artifact)",
+    "actualGLB": "carbon-ceramic-brake.glb (generated artifact)"
+  },
+  "validation": "Bounds are conservative design targets, not yet measured from a native GLB. build_brake.py emits separately measured output/bounds when run.",
+  "polish02": {
+    "state": "SOURCE_DESIGN_EXPECTATION_NOT_NEW_NATIVE_GLB",
+    "sculptedCaliperCheeks": {
+      "count": 2,
+      "angularSegments": 26,
+      "radialSegments": 8,
+      "closedSurface": true,
+      "expectedVerticesPerCheek": 486,
+      "stationary": true
+    },
+    "threeLobedExterior": true,
+    "threePistonsPerSide": true,
+    "frontDiscDiameterMetres": 0.39,
+    "addedComponents": [
+      "four forged cheek stiffener ribs",
+      "two satin cheek trims",
+      "curved axial bridge crown",
+      "two anti-squeal pad shims",
+      "four pad backing retention ears",
+      "Three individual outer axial bridge straps with two open inter-bridge windows"
+    ],
+    "imageRender": {
+      "backend": "Cycles CPU",
+      "samples": 24,
+      "denoising": false,
+      "outputPixelDimensions": [
+        900,
+        900
+      ]
+    },
+    "note": "Native GLB image QA pending; nominal manifest is not measured geometry."
+  }
+}

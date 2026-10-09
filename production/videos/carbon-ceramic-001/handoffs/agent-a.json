@@ -2,14 +2,146 @@
   "schemaVersion": 1,
   "task": "carbon-ceramic-001-agent-a",
   "branch": "automotive-brakes-001/a-hardware",
-  "sourceSha": "25a83c4e58e60c909624494745158385b7f962d9",
+  "sourceSha": "f22ba2e5b2498baa52d0a22121a2f05153d894a9",
   "owner": "hardware",
-  "summary": "UNSTARTED template: specialist has not begun implementation; this is not an approved handoff.",
-  "status": "blocked",
-  "files": [],
-  "evidence": [],
-  "blockers": [
-    "Agent session has not started. No code, native proofs, review or handoff has been supplied."
+  "status": "ready",
+  "summary": "POLISH03 native hardware lookdev PASS. Corrected overexposed Cycles proof lighting and nine physically restrained PBR surfaces; verified four genuinely re-rendered 900x900 Blender Cycles PNGs by direct visual inspection. Exported .blend and .glb; 148 nodes/140 meshes/9 materials. Independent actual GLB node/primitive-bounds comparison confirms all original geometry, pad/pivot/rest positions and hierarchy unchanged. READY FOR AGENT E REIMPORT, NOT FULL FILM RELEASE.",
+  "files": [
+    "production/videos/carbon-ceramic-001/hardware/build_brake.py",
+    "production/videos/carbon-ceramic-001/hardware/lookdev_compare.py",
+    ".github/workflows/carbon-ceramic-001-a-lookdev.yml",
+    "production/videos/carbon-ceramic-001/handoffs/agent-a.json",
+    "production/videos/carbon-ceramic-001/handoffs/agent-a.md"
   ],
-  "notes": "Planning-only placeholder. sourceSha is original common ancestor, NOT a specialist completion commit. Replace with actual post-implementation SHA."
+  "evidence": [
+    "IMPLEMENTATION_EXACT_SHA https://github.com/YunRah2103/Remotion-gpt-chat/commit/f22ba2e5b2498baa52d0a22121a2f05153d894a9",
+    "NATIVE_CYCLES_FULL_PASS https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976686710 (same source SHA, Blender 4.0.2, actual 900x900 four stills, 148 nodes/140 meshes/9 PBR materials, native GLB test and before/after image metrics)",
+    "SOURCE_SPECIFIC_BLENDER_ARTIFACT https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976686710/artifacts/11638453325 (brakes001-a-polish03-37976686710; after/*.png, after/*.blend, after/*.glb, SHA256SUMS, before/ baseline, comparison sheet, logs)",
+    "GLB_SHA256 645c4b7fbe11ea5c9715bed2eb979ae6e96ba3d3c34f85f74553b02f7ea977db",
+    "BEFORE_BASELINE_ACTUAL_NATIVE https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37968622756/artifacts/11633864744 (D review Polish02 overexposed)",
+    "BEFORE_AFTER_CONTACT_SHEET https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976686710/artifacts/11638453325 (review/polish02-vs-polish03-contact-sheet.png visually inspected alongside all four full-size PNGs)",
+    "TYPECHECK_PYTHON_SMOKE_PASS https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976691426",
+    "PR_NATIVE_REVIEW_PASS https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976691603",
+    "CONTRACT_HANDOFF_PASS https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976691505",
+    "INDEPENDENT_BINARY_COMPARISON_PASS: locally parsed baseline and Polish03 actual GLBs, compared all named transforms, child relations, 140 primitive vertex counts and POSITION accessor bounds; mechanical geometry unchanged.",
+    "FIRST_POLISH03_NATIVE_VISUAL_REJECTED https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37975689628 (still blown highlights; proof failed)",
+    "SECOND_POLISH03_NATIVE_VISUAL_INTERMEDIATE https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976325519 (clipping eliminated but dark rim; filled in final)"
+  ],
+  "blockers": [],
+  "artifact": {
+    "runId": 37976686710,
+    "artifactId": 11638453325,
+    "artifactName": "brakes001-a-polish03-37976686710",
+    "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976686710/artifacts/11638453325",
+    "glbSha256": "645c4b7fbe11ea5c9715bed2eb979ae6e96ba3d3c34f85f74553b02f7ea977db",
+    "sourceSha": "f22ba2e5b2498baa52d0a22121a2f05153d894a9",
+    "blenderVersion": "4.0.2",
+    "pngDimensions": [
+      900,
+      900
+    ],
+    "files": [
+      "after/carbon-ceramic-brake.blend",
+      "after/carbon-ceramic-brake.glb",
+      "after/rotor-front.png",
+      "after/ventilation.png",
+      "after/exploded.png",
+      "after/pad-contact.png",
+      "after/build-report.json",
+      "after/rig-manifest.json",
+      "review/polish02-vs-polish03-contact-sheet.png",
+      "review/lookdev-comparison.json",
+      "SOURCE.txt",
+      "SHA256SUMS"
+    ]
+  },
+  "geometry": {
+    "rotorDiameterMetres": 0.39,
+    "spinAxis": [
+      1,
+      0,
+      0
+    ],
+    "nodeCount": 148,
+    "meshCount": 140,
+    "materialCount": 9,
+    "requiredGroups": [
+      "RotorAssembly",
+      "FrictionRing",
+      "RotorHat",
+      "Hub",
+      "CaliperBody",
+      "PadInner",
+      "PadOuter",
+      "UprightSupport"
+    ],
+    "restPadGapMetres": 0.0025,
+    "mechanicalPivotsIdenticalToPolish02": true,
+    "meshPositionAccessorBoundsIdenticalToPolish02": true
+  },
+  "lookdev": {
+    "renderEngine": "Blender Cycles CPU",
+    "samples": 24,
+    "viewTransform": "AgX",
+    "look": "AgX - Medium High Contrast",
+    "exposureStops": -0.65,
+    "lightPowerWatts": {
+      "key": 15,
+      "fill": 7,
+      "rim": 9
+    },
+    "fourNativePngVisualInspection": "PASS",
+    "beforeAfterPhotosReal": true,
+    "highlightsBelow245Fraction": {
+      "rotor-front": {
+        "before": 0.03665,
+        "after": 0
+      },
+      "ventilation": {
+        "before": 0.05147,
+        "after": 0.00003
+      },
+      "exploded": {
+        "before": 0.02832,
+        "after": 0
+      },
+      "pad-contact": {
+        "before": 0.1011,
+        "after": 0
+      }
+    },
+    "materialChanges": [
+      "carbon ceramic metallic 0.22 to 0.10 roughness 0.72 to 0.82",
+      "caliper metallic 0.70 to 0.55 roughness 0.28 to 0.44",
+      "ventilator, aluminium, piston, steel and pad backing surface finishes toned down",
+      "caliper crown assigned dark existing caliper material; still nine PBR materials"
+    ],
+    "savedBlendContainsStudioCameraAndLighting": true,
+    "glbContainsHardwareWithoutStudioLights": true
+  },
+  "qa": {
+    "nativeBuild": "PASS",
+    "nativeGlbAndHierarchy": "PASS",
+    "nativeFourPngs": "PASS 900x900 visually inspected",
+    "oldVsNewExposureMetrics": "PASS",
+    "importedMechanicalComparison": "PASS unchanged geometry and axis pivots",
+    "typescriptProductionSmoke": "PASS",
+    "sourceContractAndHandoff": "PASS",
+    "independentAgentDPostPolish03": "NOT YET REQUESTED/COMPLETE — separate film QA",
+    "filmEHighResPadClamp": "PENDING E; original gap not exaggerated",
+    "fullFilmRelease": "PENDING MASTER / F"
+  },
+  "integrationInstructions": [
+    "Use implementation SHA f22ba2e5b2498baa52d0a22121a2f05153d894a9, not previous Polish02 artifact.",
+    "Download exact native Artifact ID 11638453325, use after/ carbon-ceramic-brake.glb and verify SHA256 645c4b7fbe11ea5c9715bed2eb979ae6e96ba3d3c34f85f74553b02f7ea977db.",
+    "Reimport 9 revised PBR materials; source Blender .blend contains the proven lights, but GLB does not include its studio camera/light rigs.",
+    "Keep all eight named nodes, rotor X rotation, fixed caliper/upright, opposing pads and B's pressure/thermal animation unmodified.",
+    "Do E's own source-locked 1080x1920 axial pad close-up, moving preview, thermal/cooling and framing QA; request independent D verification before any Master/F release."
+  ],
+  "limitations": [
+    "Original generic illustrative carbon-ceramic road-car brake is not manufacturer CAD or measured heat/friction model.",
+    "Native Blender studio lookdev proof alone does not establish E's separate in-film camera framing, material appearance or lighting.",
+    "Pad-contact macro shows mechanical region but not complete independent visual pad clamp over motion; belongs to E's axial moving test.",
+    "No complete 750-frame video was rendered or reviewed by Agent A."
+  ]
 }

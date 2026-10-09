@@ -1,0 +1,103 @@
+name: Carbon Ceramic 001 - Agent E Native Integration Proof
+on:
+  push:
+    branches: ['automotive-brakes-001/e-integration']
+    paths:
+      - 'src/brakes001/**'
+      - '!src/brakes001/integration/*.md'
+      - '.github/workflows/carbon-ceramic-001-e-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: brakes001-e-native-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  integration-native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install render dependencies
+        run: |
+          set -euo pipefail
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
+          python -m pip install --disable-pip-version-check Pillow==11.3.0
+          npm ci --no-audit --no-fund
+      - name: Dedicated E and A-B-C-D test suites
+        run: |
+          set -euo pipefail
+          mkdir -p out/brakes001-e
+          node src/brakes001/integration/integration.test.cjs | tee out/brakes001-e/integration-node.txt
+          npm run check | tee out/brakes001-e/typescript.txt
+          python production/videos/carbon-ceramic-001/validate_setup.py | tee out/brakes001-e/setup.txt
+          python production/videos/carbon-ceramic-001/hardware/test_hardware.py | tee out/brakes001-e/hardware-source.txt
+          bash production/videos/carbon-ceramic-001/physics/run-tests.sh | tee out/brakes001-e/motion.txt
+          python production/videos/carbon-ceramic-001/qa/check_graphics.py | tee out/brakes001-e/graphics.txt
+          node production/videos/carbon-ceramic-001/qa/component_smoke.cjs | tee out/brakes001-e/graphics-component.txt
+          python -m unittest discover -s production/tests -v 2>&1 | tee out/brakes001-e/python-tests.txt
+      - name: Render five native 3D stills and contact sheet
+        run: |
+          set -euo pipefail
+          python production/tools/render.py --composition CarbonCeramic001 --mode stills --output out/brakes001-e/stills --samples 48,168,321,531,705 --scale 0.5
+          python production/tools/quality.py contact out/brakes001-e/contact-sheet.jpg out/brakes001-e/stills/frame-*.png
+      - name: Native 61-frame pads and rotor motion with FFmpeg QA
+        run: |
+          set -euo pipefail
+          python production/tools/render.py --composition CarbonCeramic001 --mode preview --start 135 --end 195 --scale 0.35 --concurrency 1 --output out/brakes001-e/clamp-135-195.mp4
+          ffprobe -v error -show_entries stream=codec_name,width,height,avg_frame_rate,nb_frames -show_entries format=duration -of json out/brakes001-e/clamp-135-195.mp4 > out/brakes001-e/clamp-ffprobe.json
+          ffmpeg -v error -xerror -i out/brakes001-e/clamp-135-195.mp4 -f null -
+          python production/tools/quality.py video out/brakes001-e/clamp-135-195.mp4 --fps 30 --frames 61 --report out/brakes001-e/clamp-qa.json
+      - name: Native 61-frame thermal motion with FFmpeg QA
+        run: |
+          set -euo pipefail
+          python production/tools/render.py --composition CarbonCeramic001 --mode preview --start 300 --end 360 --scale 0.35 --concurrency 1 --output out/brakes001-e/heat-300-360.mp4
+          ffprobe -v error -show_entries stream=codec_name,width,height,avg_frame_rate,nb_frames -show_entries format=duration -of json out/brakes001-e/heat-300-360.mp4 > out/brakes001-e/heat-ffprobe.json
+          ffmpeg -v error -xerror -i out/brakes001-e/heat-300-360.mp4 -f null -
+          python production/tools/quality.py video out/brakes001-e/heat-300-360.mp4 --fps 30 --frames 61 --report out/brakes001-e/heat-qa.json
+      - name: Upload native proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brakes001-e-native-${{ github.run_id }}
+          path: out/brakes001-e/
+          if-no-files-found: warn
+          retention-days: 30
+  hardware-native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 105
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install native Blender
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq blender python3-numpy
+          blender -b --factory-startup --python-expr 'import bpy,numpy; print("BLENDER_NATIVE_VERSION",bpy.app.version_string,"NUMPY",numpy.__version__)'
+      - name: Execute unmodified Agent A builder and validate GLB
+        run: |
+          set -euo pipefail
+          mkdir -p out/brakes001-e/hardware
+          blender -b --factory-startup -t 2 --python production/videos/carbon-ceramic-001/hardware/build_brake.py -- out/brakes001-e/hardware 2>&1 | tee out/brakes001-e/hardware/blender-build.log
+          python production/videos/carbon-ceramic-001/hardware/test_hardware.py --glb out/brakes001-e/hardware/carbon-ceramic-brake.glb --report out/brakes001-e/hardware/rig-manifest.json --proof-dir out/brakes001-e/hardware | tee out/brakes001-e/hardware/glb-validation.log
+      - name: Upload native Blender outputs even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brakes001-e-blender-${{ github.run_id }}
+          path: out/brakes001-e/hardware/
+          if-no-files-found: warn
+          retention-days: 30
