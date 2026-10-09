@@ -1,0 +1,76 @@
+name: Carbon Ceramic 001 - Agent A native Blender lookdev Polish03
+on:
+  push:
+    branches: ['automotive-brakes-001/a-hardware']
+    paths:
+      - 'production/videos/carbon-ceramic-001/hardware/**'
+      - '.github/workflows/carbon-ceramic-001-a-lookdev.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: brakes001-a-polish03-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  blender-lookdev:
+    name: Build original GLB, render four real Cycles stills and compare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Blender and proof libraries
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq blender python3-numpy
+          python -m pip install --disable-pip-version-check Pillow==11.3.0
+          blender --version | head -n 3
+      - name: Fetch genuine Polish02 before reference from known E action artifact
+        uses: actions/download-artifact@v4
+        with:
+          run-id: '37968622756'
+          name: brakes001-e-blender-37968622756
+          github-token: ${{ github.token }}
+          path: out/brakes001-a/before
+      - name: Build Polish03 .blend, .glb, four 900px Cycles native proofs
+        run: |
+          set -euo pipefail
+          mkdir -p out/brakes001-a/after
+          blender -b --factory-startup -t 2 \
+            --python production/videos/carbon-ceramic-001/hardware/build_brake.py \
+            -- out/brakes001-a/after 2>&1 | tee out/brakes001-a/blender-build.log
+          python production/advanced/asset_contract.py \
+            production/videos/carbon-ceramic-001/hardware/asset-contract.json \
+            | tee out/brakes001-a/asset-contract.log
+          python production/videos/carbon-ceramic-001/hardware/test_hardware.py \
+            --glb out/brakes001-a/after/carbon-ceramic-brake.glb \
+            --report out/brakes001-a/after/rig-manifest.json \
+            --proof-dir out/brakes001-a/after \
+            | tee out/brakes001-a/hardware-validation.log
+      - name: Compare actual full-size source-locked Blender frames
+        run: |
+          set -euo pipefail
+          python production/videos/carbon-ceramic-001/hardware/lookdev_compare.py \
+            --before out/brakes001-a/before \
+            --after out/brakes001-a/after \
+            --out out/brakes001-a/review 2>&1 | tee out/brakes001-a/lookdev-metrics.log
+          sha256sum out/brakes001-a/after/*.png \
+            out/brakes001-a/after/*.glb \
+            out/brakes001-a/after/*.blend \
+            > out/brakes001-a/SHA256SUMS
+          printf "SOURCE_SHA=%s\n" "$GITHUB_SHA" > out/brakes001-a/SOURCE.txt
+          echo "Actual image appearance needs independent visual inspection." >> out/brakes001-a/SOURCE.txt
+      - name: Upload native hardware, stills, baseline and comparison even when rejected
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brakes001-a-polish03-${{ github.run_id }}
+          path: out/brakes001-a/
+          if-no-files-found: warn
+          retention-days: 30
