@@ -2,14 +2,69 @@
   "schemaVersion": 1,
   "task": "carbon-ceramic-001-agent-a",
   "branch": "automotive-brakes-001/a-hardware",
-  "sourceSha": "25a83c4e58e60c909624494745158385b7f962d9",
+  "sourceSha": "a201cefa64cef0f797deba34ddfbd55c58967d33",
   "owner": "hardware",
-  "summary": "UNSTARTED template: specialist has not begun implementation; this is not an approved handoff.",
-  "status": "blocked",
-  "files": [],
-  "evidence": [],
-  "blockers": [
-    "Agent session has not started. No code, native proofs, review or handoff has been supplied."
+  "summary": "Original 390mm carbon-ceramic brake one-corner Blender builder, directly renderable Three.js/R3F geometry, separate moving pivots, physical vent and drill geometry, 120-frame isolated Remotion proof composition, rig-manifest and GLB structure validator. Real Blender export/render is outstanding; not ready for release.",
+  "status": "review",
+  "files": [
+    "src/brakes001/hardware/BrakeAssembly.tsx",
+    "src/brakes001/hardware/BrakeHardwareProof.tsx",
+    "production/videos/carbon-ceramic-001/hardware/build_brake.py",
+    "production/videos/carbon-ceramic-001/hardware/asset-contract.json",
+    "production/videos/carbon-ceramic-001/hardware/rig-manifest.json",
+    "production/videos/carbon-ceramic-001/hardware/test_hardware.py",
+    "production/videos/carbon-ceramic-001/hardware/README.md",
+    "production/videos/carbon-ceramic-001/handoffs/agent-a.json",
+    "production/videos/carbon-ceramic-001/handoffs/agent-a.md"
   ],
-  "notes": "Planning-only placeholder. sourceSha is original common ancestor, NOT a specialist completion commit. Replace with actual post-implementation SHA."
+  "evidence": [
+    "SOURCE: https://github.com/YunRah2103/Remotion-gpt-chat/commit/a201cefa64cef0f797deba34ddfbd55c58967d33",
+    "PR: https://github.com/YunRah2103/Remotion-gpt-chat/pull/11 (draft; original hardware paths only)",
+    "PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37941930644 (contract QA and compileall, HEAD a201cefa)",
+    "PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37941930698 (TypeScript compilation, Python production unit suite, existing GpuDriveFilm 2-frame native smoke; NOT this new brake composition)",
+    "SOURCE CONTRACT: 10 / 10 GitHub-read static geometry/rig checks pass; no native Blender GLB was inspected."
+  ],
+  "blockers": [
+    "Blender executable was unavailable in the ChatGPT execution container, so source builder did not run in actual Blender.",
+    "No native .blend/.glb binary, Blender close-up PNG render or GLB hierarchy report has been produced or verified. The source manifest bounds are design-time, not measured.",
+    "Proof component is intentionally not registered in src/Root.tsx (Master-only ownership); no brake-specific moving MP4 has been rendered or visually signed off.",
+    "Master should run Blender command and GLB inspection, upload generated artifacts, and visually review real 1080p stills and moving Remotion proof before changing status to ready."
+  ],
+  "design": {
+    "rotorOuterDiameterMetres": 0.39,
+    "rotorSpinAxis": [
+      1,
+      0,
+      0
+    ],
+    "gltfUpAxis": [
+      0,
+      1,
+      0
+    ],
+    "ventVanes": 44,
+    "drilledPerFace": 64,
+    "padRestGapMetres": 0.0025,
+    "mandatoryNodes": [
+      "RotorAssembly",
+      "FrictionRing",
+      "RotorHat",
+      "Hub",
+      "CaliperBody",
+      "PadInner",
+      "PadOuter",
+      "UprightSupport"
+    ],
+    "note": "Composite finish/physics schematic, not manufacturer CAD or calibrated thermal simulation."
+  },
+  "qa": {
+    "contract": "PASS",
+    "projectTypescript": "PASS via existing production-ci",
+    "existingRepositoryNativeSmoke": "PASS (unrelated legacy composition)",
+    "hardwareSourceStatic": "PASS",
+    "blenderNativeAsset": "NOT RUN",
+    "glbNativeInspection": "NOT RUN",
+    "nativeHardwareMovingProof": "NOT RUN",
+    "hardwareVisualReview": "NOT RUN"
+  }
 }

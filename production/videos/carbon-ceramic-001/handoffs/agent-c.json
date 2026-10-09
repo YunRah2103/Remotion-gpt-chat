@@ -2,14 +2,39 @@
   "schemaVersion": 1,
   "task": "carbon-ceramic-001-agent-c",
   "branch": "automotive-brakes-001/c-cinema-xray",
-  "sourceSha": "25a83c4e58e60c909624494745158385b7f962d9",
+  "sourceSha": "eca01d9f937d059e21ad935396e4293fc784cbb5",
   "owner": "director",
-  "summary": "UNSTARTED template: specialist has not begun implementation; this is not an approved handoff.",
-  "status": "blocked",
-  "files": [],
-  "evidence": [],
-  "blockers": [
-    "Agent session has not started. No code, native proofs, review or handoff has been supplied."
+  "summary": "Real frame-deterministic cinematic module: faint original procedural 3D car outline, five camera shots, heat01-responsive lighting, native-renderable Remotion proof composition, unit tests, five actual 3D CPU-projective SVG frame proofs. Ready for native Master integration; NOT final MP4/engineering approval.",
+  "status": "ready",
+  "files": [
+    "src/brakes001/cinema/cameraMath.ts",
+    "src/brakes001/cinema/cameraMath.test.ts",
+    "src/brakes001/cinema/BrakeCameraRig.tsx",
+    "src/brakes001/cinema/BrakeLighting.tsx",
+    "src/brakes001/cinema/GhostCarOutline.tsx",
+    "src/brakes001/cinema/index.ts",
+    "src/brakes001/cinema/CinemaProof.tsx",
+    "src/brakes001/cinema/proof-entry.ts",
+    "production/videos/carbon-ceramic-001/lookdev/README.md",
+    "production/videos/carbon-ceramic-001/lookdev/camera-frame-samples.json",
+    "production/videos/carbon-ceramic-001/handoffs/agent-c.md",
+    "production/videos/carbon-ceramic-001/handoffs/agent-c.json",
+    "production/videos/carbon-ceramic-001/lookdev/frame-048-vector-proof.svg",
+    "production/videos/carbon-ceramic-001/lookdev/frame-168-vector-proof.svg",
+    "production/videos/carbon-ceramic-001/lookdev/frame-321-vector-proof.svg",
+    "production/videos/carbon-ceramic-001/lookdev/frame-531-vector-proof.svg",
+    "production/videos/carbon-ceramic-001/lookdev/frame-705-vector-proof.svg"
   ],
-  "notes": "Planning-only placeholder. sourceSha is original common ancestor, NOT a specialist completion commit. Replace with actual post-implementation SHA."
+  "evidence": [
+    "https://github.com/YunRah2103/Remotion-gpt-chat/commit/8ee2a95d5c5771aa0baec3bbc5520e71823b3481",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/commit/eca01d9f937d059e21ad935396e4293fc784cbb5",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-brakes-001/c-cinema-xray/src/brakes001/cinema/cameraMath.test.ts",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-brakes-001/c-cinema-xray/production/videos/carbon-ceramic-001/lookdev/frame-048-vector-proof.svg",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-brakes-001/c-cinema-xray/production/videos/carbon-ceramic-001/lookdev/frame-168-vector-proof.svg",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-brakes-001/c-cinema-xray/production/videos/carbon-ceramic-001/lookdev/frame-321-vector-proof.svg",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-brakes-001/c-cinema-xray/production/videos/carbon-ceramic-001/lookdev/frame-531-vector-proof.svg",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-brakes-001/c-cinema-xray/production/videos/carbon-ceramic-001/lookdev/frame-705-vector-proof.svg"
+  ],
+  "blockers": [],
+  "notes": "C compiled and ran pure camera math tests: PASS all 750 poses/shot gates. Syntax transpilation of cinema files: PASS. 5 portrait vector stills committed. CPU vector moving previs: 122 frames H264 540x960 30fps, ffprobe verified and ffmpeg full decode exit 0, link available only in original C chat sandbox. CPU vector proof is not native Remotion. Master still must render native proof-entry, review A real GLB and B motion, and get D final QA."
 }
