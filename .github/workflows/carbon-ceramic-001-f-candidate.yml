@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: carbon-ceramic-f-candidate-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 env:
   CANDIDATE_E_SOURCE_SHA: 5b378202187748ce9b51d884f26bb7167285c946
@@ -152,7 +152,7 @@ jobs:
           mkdir -p out/candidate/stills
           printf '%s\n' "$CANDIDATE_E_SOURCE_SHA" > out/candidate/immutable-film-source.txt
           rm -f out/candidate/parts/concat.txt
-          for i in $(seq -w 0 9); do
+          for i in $(seq -w 00 09); do
             test -s "out/candidate/parts/part-${i}.mp4"
             test -s "out/candidate/parts/part-${i}-qa.json"
             (cd out/candidate/parts && sha256sum -c "part-${i}.sha256")
