@@ -1,49 +1,62 @@
-# Agent F — Carbon-Ceramic 001 render technical report
+# Agent F — Carbon-Ceramic Brakes 001 native candidate render report
 
-**Current status: BLOCKED — pipeline preparation only.**
+**STATUS: FIRST FULL-LENGTH CANDIDATE RENDERED AND TECHNICALLY VERIFIED; NOT APPROVED FOR RELEASE.**
 
-Repository: `YunRah2103/Remotion-gpt-chat`; working branch: `automotive-brakes-001/f-render`.
+Repository: `YunRah2103/Remotion-gpt-chat`
+F branch: `automotive-brakes-001/f-render`
+Immutable **Agent E FILM SOURCE SHA**: `5b378202187748ce9b51d884f26bb7167285c946`
+F candidate assembly tooling commit: `dcc710b04478784233fda1743904cee9e7b057af`
+Master final-source lock and Master release workflow: **UNCHANGED**. This workflow did not claim Master acceptance or bypass `master_gate.py --require-ready`. It is a review-candidate path only.
 
-## Source and dependencies
+## Actual complete 25-second playable MP4
 
-- Agent E: started integrating specialist source, but last checked JSON handoff was **blocked**. This report does **not** certify E's latest composition or a successful Master review.
-- Agent A: **review**, original source available but native Blender export, GLB hierarchy inspection and physical review still missing.
-- Agent B: component handoff **ready**; deterministic motion proof documented, not a full film.
-- Agent C: component handoff **ready**; camera/outline proof documented, not a final film.
-- Agent D: graphics handoff **ready**; independent whole-film QA remains pending.
-- Master-approved integration source SHA: **none**. `SOURCE_LOCK.json` deliberately remains `pending`.
-- `master_gate.py --require-ready`: **not passed**; expected to block until A–E approved.
-- User-approved narration: **not verified in the integration**. Do not fabricate audio.
-
-## Render results
-
-| Required item | Verified result |
+| Test | Actual verified value |
 | --- | --- |
-| Actual native five review stills | Not generated; integration not approved |
-| Moving proofs 135–195 and 300–360 | Not generated; integration not approved |
-| Real Remotion/Three.js 750-frame final | Not rendered; cannot pass gate |
-| MP4 1080x1920, 30 fps, H.264, yuv420p | Not verified |
-| Complete FFmpeg decode / frame count | Not verified |
-| SHA256 of final MP4 | Unavailable |
-| GitHub Actions MP4 artifact and ID | Unavailable |
-| D whole-film review | Awaiting native film |
-| Master final approval | Pending |
+| Film | `carbon-ceramic-001-candidate.mp4` |
+| Native source | Exact E commit `5b378202187748ce9b51d884f26bb7167285c946` |
+| Engine | Genuine Remotion `CarbonCeramic001` + Three.js `BrakeAssembly`, not slideshow or schematic |
+| Frames | **750/750 declared and decoded; PASS** |
+| Duration | **25.000000 seconds; PASS** |
+| Resolution | **1080x1920 portrait; PASS** |
+| Frame rate | **30/1 average; PASS** |
+| Codec | **H.264; PASS** |
+| Pixel format | **yuv420p; PASS** |
+| Audio | **None** — no user-approved voiceover supplied |
+| Full FFmpeg decode | **PASS**, no corrupt-frame errors |
+| MP4 bytes | **12,875,114** |
+| MP4 SHA256 | `e7ed2619ab6ed09087cdb50cfc2b4fb94e3262aa69da77b72e5142bcb51bec73` |
+| Automated blank/black detection | No intervals reported |
+| Automated freeze/stillness detection | **Review flags** for quiet opening and late shots; see below |
+| Creative approval | **PENDING Agent D + Master** |
 
-## Verified infrastructure CI
+**Verified official GitHub Actions candidate:** [run 37978273707](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37978273707) — **SUCCESS**, [artifact 11639835454](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37978273707/artifacts/11639835454), includes the actual full MP4, five native extracted stills, contact sheet, FFprobe JSON, complete QA JSON, SHA256, and source lock manifest. Artifact retention: 30 days.
 
-- GitHub Actions run [37944495862](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37944495862): **PASS** on implementation SHA `4564bde62ceaeca1e3afc4c7fa6d01cf707bb290`; synthetic H.264 fixture checks passed and the pending source lock was correctly rejected. Native 750-frame job **SKIPPED** by design.
-- GitHub Actions run [37945011076](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37945011076): **PASS** 9/9 tests on implementation SHA `2d9b1257f27dd09e4f0a4dfe5e3f44d73775c4a6`; five temporary-Git source-lock regressions, four synthetic media verification tests, approval gate fail-closed. Native film rendering was intentionally skipped.
-- Seven-agent handoff/contract validation on F handoff head: [37944734925](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37944734925) **PASS**.
-- Initial CI [37944380254](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37944380254) **FAILED** because hosted runner lacked FFmpeg; corrected workflow installs FFmpeg before tests. A failed first attempt is not concealed.
-- Draft F integration PR for Master: [#16](https://github.com/YunRah2103/Remotion-gpt-chat/pull/16).
+### Frame provenance and true-native operations
 
-## Implemented infrastructure
+1. Original `candidate` full-res native [run 37976771520](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976771520) produced the eight successful original 75-frame ranges 00–06 and 08 at E source SHA above. Chunk 09 failed once from missing optional native Rspack binding; chunk 07's runner stalled during OS dependency install. Successful original chunk artifacts were preserved.
+2. Recovery [run 37977591114](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37977591114) rendered only 07 (525–599) and 09 (675–749) as full-resolution native Remotion/Three.js with Rspack dependency recovery. Both native MP4s and per-part technical FFprobe/full-decode QA passed.
+3. First join [run 37978101268](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37978101268) verified **all ten part hashes**, assembled and fully decoded **750 frames / 25 seconds**. It reported `yuvj420p` (full-range), correctly **FAILED** strict `yuv420p` delivery criterion. This intermediate is not the approved candidate.
+4. Corrected final assembly [run 37978273707](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37978273707) retrieved all ten genuine source-matched chunks, verified independent part checksums and FFprobe, concat-copy assembled their frames, converted `yuvj420p` full-range to explicit TV-range `yuv420p` using FFmpeg, then checked all 750 frames with FFprobe **and full FFmpeg decode**. Final reports and MP4 artifact **PASS**. No visual source was changed and no narration was fabricated.
 
-- Source-approval lock: `render/SOURCE_LOCK.json`, `render/source_lock.py`. Fails closed on missing Master approval, non-ancestor commit or changed film source.
-- Strict native media checker: `render/verify_media.py`: FFprobe raw evidence, full FFmpeg decode/frame count, codec and pixel-format validation, SHA256, black/freeze warning intervals, and audio presence.
-- Synthetic validation unit tests: `render/test_verify_media.py` (clearly **not** a carbon-ceramic render).
-- Existing native workflow extended with lock and strict technical QA plus a lightweight F-branch checker self-test.
+### Real preliminary visual review
 
-## Blocking handoff to Master
+I reviewed the actual final-source sample images from frames **0, 48, 100, 168, 250, 321, 440, 531, 650, 705, 749** plus the official still contact sheet frames **48, 168, 321, 531, 705**:
 
-Obtain A's real Blender/GLB proof and Agent E's integrated, reviewed and ready commit. Record **actual** Master approval URL and SHA. Then use the native workflow, inspect the produced MP4 and complete this report with real run/artifact IDs, visual issues, duration, frame count, SHA256 and D's assessment. No MP4 is being asserted or delivered by this report.
+- **Frame 48 opening:** Minimal ghost-car outline and front brake position read as intended, but the dark, faint line art and small brake occupy relatively little of the portrait. **Creative improvement needed** to strengthen attention in first seconds.
+- **Frames 168 / 250 mechanical reveal:** Caliper, friction disc and hub visibly render with 3D geometry; labels are placed safely, no obvious full-frame clipping. Caliper material is dark and its pad/contact detail is not clearly legible at phone-scale proof size. The physical 2.35 mm pad stroke may be visually subtle.
+- **Frames 321 / 440 thermal:** Disc face shows the illustrative copper/brown heat treatment, rotor/caliper remain visible, and `THERMAL VISUALISATION — ILLUSTRATIVE` appears. Heat differentiation and rotational motion need Agent D's full video judgment; not a measured temperature simulation.
+- **Frame 531 benefits:** `FADE RESISTANCE` typography visible with isolated real brake 3D assembly. Composition is safe but very dark, with substantial unused space.
+- **Frames 650 / 705 / 749 hero:** Disc, center hat and caliper stay within frame, including the last shot. Stronger reflections/material lighting and more dynamic camera choreography would improve premium visual polish.
+- **Freeze detections** (not corrupted frames): approximately 0.5–2.03 s; around 15.8–20.37 s with interruptions; around 21–24.83 s in successive intervals. These need watching on the real MP4; some may correspond to intentionally static shots. Automated motion alerts do not, on their own, fail codec or frame continuity.
+- **No detected black/blank intervals** under the configured detector. Typography is legible in the large frame; miniature part labels merit independent phone review.
+
+**Conclusion:** Technically complete playable native candidate. Visual quality is **not signed off**. Agent D should independently review opening energy, clamp legibility, material exposure, heat contrast, late-shot stillness and transition continuity; Master decides improvements and eventual final source acceptance.
+
+### Open items
+
+- Agent A/E Polish 03 may produce a newer alternative source; this first candidate is deliberately **source-locked to 5b378202...** and not silently updated to their future changes.
+- Agent D's formal independent review of the final 25-second candidate, including transitions, is pending.
+- Master approval and source-lock release gate still pending.
+- Approved narration not supplied; video is deliberately silent. Master handles any future user-approved voiceover and final release.
+
+Technical render ownership: F only. No modifications to `YunRah2103/yunus-video-lab`.
