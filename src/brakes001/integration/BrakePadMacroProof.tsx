@@ -18,15 +18,26 @@ export const macroFilmFrameAt=(localFrame:number)=>MACRO_OFFSET+localFrame;
 const MacroCamera:React.FC=()=>{
   const {camera,invalidate}=useThree();
   useLayoutEffect(()=>{
-    camera.position.set(.047,.255,.45);
-    camera.lookAt(0,.145,.139);
+    camera.position.set(.15,.29,.84);
+    camera.lookAt(0,.09,.07);
     if(camera instanceof THREE.PerspectiveCamera){
-      camera.fov=29;camera.near=.012;camera.far=10;
+      camera.fov=42;camera.near=.012;camera.far=10;
       camera.updateProjectionMatrix();
     }
     camera.updateMatrixWorld();
     invalidate();
   },[camera,invalidate]);
+  return null;
+};
+// E-only visibility cutaway; hides the real caliper during contact proof.
+const MacroCaliperCutaway:React.FC<{frame:number}>=({frame})=>{
+  const {scene,invalidate}=useThree();
+  useLayoutEffect(()=>{
+    const caliper=scene.getObjectByName('CaliperBody');
+    if(caliper)caliper.visible=frame<18;
+    invalidate();
+    return ()=>{if(caliper)caliper.visible=true;};
+  },[scene,frame,invalidate]);
   return null;
 };
 export const BrakePadMacroProof:React.FC=()=>{
@@ -37,14 +48,15 @@ export const BrakePadMacroProof:React.FC=()=>{
   const gapMm=s.padGapMetres*1000;
   const percent=Math.min(100,Math.max(0,closedMm/2.35*100));
   return <AbsoluteFill style={{backgroundColor:'#08111a',fontFamily:'Arial,sans-serif',color:'#dce8ee'}}>
-    <ThreeCanvas width={1080} height={1920} camera={{position:[.047,.255,.45],fov:29,near:.012,far:10}}
+    <ThreeCanvas width={1080} height={1920} camera={{position:[.15,.29,.84],fov:42,near:.012,far:10}}
       gl={{antialias:true,preserveDrawingBuffer:true}} shadows>
       <MacroCamera/>
       <ambientLight intensity={.75} color="#91b6cf"/>
       <directionalLight position={[.15,.48,.58]} intensity={2.3} color="#d5e7f6"/>
       <pointLight position={[-.19,.27,.25]} intensity={1.2} distance={1} color="#efc4a8"/>
       <BrakeAssembly rotorAngleRad={s.rotorAngleRad} padGapMetres={s.padGapMetres}
-        heat01={s.heat01} showUpright={false}/>
+        heat01={0} showUpright={false}/>
+      <MacroCaliperCutaway frame={frame}/>
     </ThreeCanvas>
     <AbsoluteFill style={{pointerEvents:'none',
       background:'linear-gradient(180deg,rgba(3,7,11,.86),transparent 32%,transparent 61%,rgba(2,5,9,.90) 84%)'}}/>
@@ -53,7 +65,9 @@ export const BrakePadMacroProof:React.FC=()=>{
       <div style={{fontSize:61,fontWeight:700,lineHeight:1.06,marginTop:24}}>TWO PADS.
         <div>ONE ROTATING DISC.</div>
       </div>
-      <div style={{fontSize:26,marginTop:24,color:'#acc1cc'}}>Side-angle native 3D · caliper fixed</div>
+      <div style={{fontSize:26,marginTop:24,color:'#acc1cc'}}>
+        {frame<18?'FIXED CALIPER · FULL ASSEMBLY':'CUTAWAY: CALIPER HIDDEN TO REVEAL PADS'}
+      </div>
     </div>
     <div style={{position:'absolute',left:78,right:80,bottom:325,
       borderTop:'1px solid #637e89',paddingTop:30}}>
