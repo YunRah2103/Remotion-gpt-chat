@@ -41,14 +41,14 @@ const BrakeStage:React.FC<{frame:number;view:'normal'|'pad'}>=({frame,view})=>{
   const cameraPose=brakeCameraAt(frame);
   const brakePosition:[number,number,number]=context?
     [pos[0],pos[1],pos[2]]:
-    pad?[0,0,0]:
+    pad?[0,.13,0]:
     shot==='thermal'?
       [cameraPose.target[0],cameraPose.target[1],cameraPose.target[2]]:
       shot==='benefits'?[0,.012,.015]:
       shot==='hero'?[-.012,0,.012]:
       [0,0,0];
   // A's 390mm rotor geometry and pad travel stay physically unmodified.
-  const size=pad?.64:shot==='thermal'?.56:shot==='reveal'?.86:
+  const size=pad?.82:shot==='thermal'?.56:shot==='reveal'?.86:
     shot==='hero'?.86:shot==='benefits'?.93:1;
   return <AbsoluteFill style={{background:'#080f19'}}>
     <ThreeCanvas width={width} height={height} shadows
