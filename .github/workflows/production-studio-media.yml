@@ -1,0 +1,58 @@
+name: Production Studio - smart media reference gallery
+on:
+  workflow_dispatch:
+    inputs:
+      media_run:
+        required: true
+        type: string
+        description: Media Bridge source workflow run ID
+      media_artifact:
+        required: true
+        type: string
+        description: Exact Media Bridge artifact name
+permissions:
+  contents: read
+  actions: read
+jobs:
+  gallery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: production/requirements-qa.txt
+      - run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python -m pip install -r production/requirements-qa.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.media_artifact }}
+          run-id: ${{ inputs.media_run }}
+          github-token: ${{ github.token }}
+          path: out/references
+      - name: Render gallery and FFmpeg scene changes from existing licensed media
+        shell: bash
+        run: |
+          set -euo pipefail
+          COUNT=0
+          while IFS= read -r -d '' MANIFEST; do
+            BASE=$(dirname "$MANIFEST")
+            ID=$(basename "$BASE")
+            [[ "$ID" =~ ^[a-z0-9-]+$ ]] || exit 1
+            python production/studio/studio.py gallery "$BASE" "out/studio/galleries/$ID"
+            COUNT=$((COUNT+1))
+          done < <(find out/references -name manifest.json -print0)
+          test "$COUNT" -gt 0
+          while IFS= read -r -d '' VIDEO; do
+            KEY=$(printf '%s' "$VIDEO" | sha256sum | cut -c1-12)
+            python production/studio/studio.py scenes "$VIDEO" "out/studio/scenes/$KEY"
+          done < <(find out/references -type f \( -name '*.mp4' -o -name '*.video' \) -print0)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: studio-references-${{ github.run_id }}
+          path: out/studio/
+          retention-days: 21
+          if-no-files-found: error

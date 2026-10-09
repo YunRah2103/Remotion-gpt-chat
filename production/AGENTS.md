@@ -19,3 +19,10 @@
 - Do not invent licensing information or assert that a public web URL grants reuse. Do not submit private footage, tokens or credential-bearing URLs.
 - This does **not** grant native ChatGPT binary image/video inspection; provide artifact links and use an appropriate visual tool if actually available.
 - Preserve the YUNEX repository boundary; the media bridge is entirely within `Remotion-gpt-chat`.
+
+## Engineering Studio and specialized agents
+
+- See `production/studio/README.md` for reference galleries, FFmpeg cut-frame extraction, real Blender turntables, controlled voice alignment, kinematic telemetry checks, GLB catalogue candidate manifests and native PR visual comparisons.
+- All generated images, tracks and reference clips are evidence for review, not proof of authenticity or permission to redistribute media.
+- Agent profiles under `.github/agents/*.agent.md` are selectable only if the owner's GitHub Copilot cloud-agent features are enabled. Never represent markdown profiles as running AI workers or delegate without permission. Keep separate branches and explicit handoffs.
+- Kinematic validators are heuristic and must not be interpreted as manufacturer certified engineering or road safety claims.
