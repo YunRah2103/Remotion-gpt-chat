@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "task": "carbon-ceramic-001-agent-e",
   "branch": "automotive-brakes-001/e-integration",
-  "sourceSha": "b53c264017a6e3f10f3cae0326b0ae9257e80966",
+  "sourceSha": "a8553b2c1af11d15eb0b8f6c96e0c3e53142f9aa",
   "owner": "engineering",
-  "status": "review",
-  "summary": "POLISH04: Completed BOTH focused film fixes without hardware/physics changes: 36-degree continuous 630–749 hero camera orbit and genuine in-film frames100–147 opposing pad cutaway at real B pressure onset. Native proof run 37982072331 SUCCESS: true 1080×1920 eight stills and contact, complete 65-frame in-film pad and 120-frame hero H.264 clips, actual FFprobe/full FFmpeg decode, 750-state E integration and TypeScript/physics/graphics/Python tests PASS. Compared actual prior full candidate: final-hero mean grayscale consecutive delta 0.2562→0.4250, 73.3%→0% frames under 0.25, with rotor remaining mechanically stopped. Status REVIEW pending independent Agent D and Master evaluation of corrected full film; Agent F owns final 750-frame MP4.",
+  "status": "ready",
+  "summary": "POLISH05 READY FOR MASTER REVIEW (NOT RELEASE-APPROVED): Two focused E-only corrections. True 390mm rotor and opposite A pad plates fully visible at native frame117; physically accurate 0.15–2.50mm per-face clearance under unmodified B pressure. Removed opaque frames99/100/147/148 and crossfaded two actual full-3D views over nine deterministic frames on entry and exit. Tested 15 exact 1080x1920 stills and complete 61-frame native 95–155 H264 at 30fps with independently verified FFprobe/FFmpeg; hero camera source byte-identical to D-accepted P04. Agent D/Master still must inspect full F candidate.",
   "files": [
     "src/brakes001/CarbonCeramic001.tsx",
     "src/brakes001/integration/IntegrationCameraRig.tsx",
@@ -22,10 +22,19 @@
     "production/videos/carbon-ceramic-001/hardware/build_brake.py",
     "production/videos/carbon-ceramic-001/hardware/lookdev_compare.py",
     "src/brakes001/integration/InFilmPadCutaway.tsx",
-    ".github/workflows/carbon-ceramic-001-e-polish04.yml"
+    ".github/workflows/carbon-ceramic-001-e-polish04.yml",
+    "src/brakes001/integration/Polish05Transitions.ts",
+    ".github/workflows/carbon-ceramic-001-e-polish05.yml"
   ],
   "evidence": [
-    "FILM_SOURCE_EXACT https://github.com/YunRah2103/Remotion-gpt-chat/commit/b53c264017a6e3f10f3cae0326b0ae9257e80966",
+    "POLISH05 EXACT FILM IMPLEMENTATION SHA https://github.com/YunRah2103/Remotion-gpt-chat/commit/a8553b2c1af11d15eb0b8f6c96e0c3e53142f9aa",
+    "SOURCE-LOCKED NATIVE RUN https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37990076113 workflow success with hero invariant, TypeScript, dedicated 750-frame E integration, B physics, D graphics, setup and 39 Python tests PASS",
+    "15 TRUE 1080x1920 STILLS + CONTACT + 61-FRAME MP4 https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37990076113/artifacts/11644577616 frames 98,99,100,101,105,107,117,132,140,145,146,147,148,149,150; actual CarbonCeramic001 frames95-155 H264 1080x1920 30fps 61 frames 2.033333s full FFprobe/FFmpeg decode PASS",
+    "TRUE P05 H264 SHA256 33244341824990d2f24766b16769b50779c2da8fe4ca6facc4d79282514964ce; audio none, video yuvj420p preview (not full final H264)",
+    "AUTHORITATIVE BEFORE P04 F 750-frame silent candidate https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37983072846/artifacts/11641871804; original frame117 cropped right edge and hard masks at 99/100/147/148",
+    "INDEPENDENT NATIVE FRAME REVIEW 15 full res stills plus decoded full 61 frames; frame117 full rotor and opposed pad plates visible as side view; low-caption no longer intersects rotor; genuine 9-frame front/back crossfades maintain geometry and captions; no 25-second full film claimed",
+    "ACCEPTED HERO UNMODIFIED test in source proof: P04 SHA 21c2b581b46251b0bd45028d32eb40b4341eeb2a hero camera function body BYTE IDENTICAL at P05 run",
+    "VISUAL TRANSITION MAE at 180x320 gray 98->99 old6.293 new3.015, 100->101 old7.970 new1.381, 146->147 old11.660 new2.266, 148->149 old13.590 new3.343; meaningful reduced jumps without empty frames",
     "P04_NATIVE_PROOF_RUN https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982072331 both pad-onset-native and hero-native jobs SUCCESS, code SHA b53c264017a6e3f10f3cae0326b0ae9257e80966",
     "PAD_IN_FILM https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982072331/artifacts/11641465753 actual CarbonCeramic001 film frames94–158 inclusive, 1080×1920 30fps H.264, 65frames/2.166667seconds, FFprobe and complete independent FFmpeg decode PASS, SHA256 c29cbc95e74b2aac08454e2d4b1bc096d851138691df1e8f77f957a4cea78864",
     "HERO https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982072331/artifacts/11641735972 actual CarbonCeramic001 film frames630–749 inclusive, 1080×1920 30fps H.264, 120frames/4seconds, FFprobe and complete independent FFmpeg decode PASS, SHA256 83678c720643137e166047d5cfd202881ad087779b1f016b266ccad7f317f543",
@@ -33,13 +42,12 @@
     "BEFORE https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37978273707/artifacts/11639835454 F full candidate native source 5b378202187748ce9b51d884f26bb7167285c946, 750-frame full candidate inspected by D, baseline 630–749 mean per-frame 144×256 grayscale pixel delta 0.2562 with 73.3% frames <0.25. New exact film same metric 0.4250, 0% frames <0.25.",
     "MECHANICAL TESTS in https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982072331/artifacts/11641465753: npm ci PASS, npm run check PASS, E direct 750-frame integration PASS, B physics 5/5 PASS, D graphics PASS, production Python unittest 39 tests (2 skipped) PASS.",
     "A POLISH03 LIGHTING REIMPORT: https://github.com/YunRah2103/Remotion-gpt-chat/commit/c50056eeb86691b1d67dace94be4c2b2cefd231f, exact A source f22ba2e5b2498baa52d0a22121a2f05153d894a9, head e619a94cde5c525bdd9f6dfc6ed5604d4ff39252; src/brakes001/hardware/BrakeAssembly.tsx BLOB UNCHANGED",
-    "BLENDER A03 READY https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976686710/artifacts/11638453325; 4 native 900x900 Cycles PNG, corrected dark material separations, .blend/.glb, 148 nodes/140 meshes/9 materials; A GLB SHA256 645c4b7fbe11ea5c9715bed2eb979ae6e96ba3d3c34f85f74553b02f7ea977db",
-    "SOURCE TESTS https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976988034 dedicated E 750/750, TS check, Python 39/39, B 5/5, graphics 750 safe cue checks, setup validation PASS"
+    "BLENDER A03 READY https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976686710/artifacts/11638453325; 4 native 900x900 Cycles PNG, corrected dark material separations, .blend/.glb, 148 nodes/140 meshes/9 materials; A GLB SHA256 645c4b7fbe11ea5c9715bed2eb979ae6e96ba3d3c34f85f74553b02f7ea977db"
   ],
   "blockers": [
-    "E film source itself is now technically native-verified for both focused changes, but the physical 2.35mm pad stroke is subtle at real-time phone size. Actual separate pads are visible in side profile and measured readout is source-driven, not a false mechanical animation.",
-    "Minor polish remains: original context ghost car is thin; some existing D callouts faint/imperfectly positioned; ending remains dark/negative-space heavy despite 36-degree orbit. These are not new critical hardware defects.",
-    "Independent Agent D review of Polish04 in-film pad action and hero movement, plus Master acceptance and full source-locked 750-frame Agent F render, have not yet occurred. No release-approved final film claimed."
+    "Agent D and Master must independently examine source-locked P05 native frames95–155 and frame117 for subjective pad readability; E's full-res inspection finds actual opposed plates visible, but the truthful 2.35mm movement remains subtle at phone size.",
+    "Master and Agent F must generate/review one NEW complete exact-source 750-frame silent 1080x1920 yuv420p MP4 before any public release; Polish04 full candidate does NOT verify this P05 runtime.",
+    "No accessible, verified approved narration in E scope. Existing proof MP4 silent; do not claim approved VO."
   ],
   "integratedSources": {
     "A": {
@@ -64,29 +72,36 @@
     }
   },
   "qa": {
-    "npmCi": "PASS source 37976988034 and 37976988178",
-    "typescript": "PASS GitHub Actions run37982072331 npm run check",
-    "integrationNode": "PASS 750 deterministic states, fixed caliper and real E .15–2.5mm pad adapter",
-    "BMotion": "PASS 5/5",
+    "npmCi": "PASS 37990076113",
+    "typescript": "PASS npm run check 37990076113",
+    "integrationNode": "PASS actual E adapter 750/750 states 37990076113",
+    "BMotion": "PASS B motion 5/5 37990076113",
     "cinema": "PASS five-shot C timing; E benefits safe in 11 sampled native frames + 41 moving frames",
     "AHardware": "PASS unchanged hardware Three.js blobs; A03 native Blender Cycles x4, GLB 148 nodes 140 meshes nine PBR materials",
-    "DGraphics": "PASS 750-frame cue rules",
-    "productionPython": "PASS 39 tests with 2 skipped",
-    "setupValidator": "PASS",
-    "nativeStills": "PASS 8 true 1080×1920 film PNGs 48/115/168/321/531/650/705/749 plus 15 transition PNGs",
-    "nativeMotion": "PASS full-res native in-film pad 94–158 (65 frames) and hero 630–749 (120 frames)",
+    "DGraphics": "PASS 750-frame D graphics QA 37990076113",
+    "productionPython": "PASS 39/39 37990076113",
+    "setupValidator": "PASS 37990076113",
+    "nativeStills": "PASS 15 exact real 1080x1920 frames and contact artifact 11644577616",
+    "nativeMotion": "PASS real main film frames95-155 inclusive 61 frames H264 1080x1920 at 30fps",
     "fullResolutionPadOnset": "PASS genuine 61-frame 1080x1920 source offset85, A hardware and B physics, caliper cutaway labelled, true gap 0.00015-0.0025m; visual stroke subtle",
     "benefitsSweep": "PASS eleven stills 450-629 plus 41-frame transition 510-550 native FFmpeg decode",
     "thermalSweep": "PASS twelve native stills cold/peak/cooling; localized illustrative annulus rather than uniformly orange all-disc material",
-    "ffprobeFfmpeg": "PASS H.264 30/1fps 1080×1920 yuvj420p; 65/120 frames; 2.166667s/4.000s; complete independent ffmpeg decode both",
+    "ffprobeFfmpeg": "PASS full FFprobe and independent full FFmpeg decode, 61/61, 2.033333 sec, H264 yuvj420p",
     "blenderLookdev": "PASS A03 native four PNGs visually inspected vs washed-out A02",
-    "visualReview": "REVIEW frame531 crop corrected and verified; source motion plausible; cutaway actual axial clearance still small, residual intro/callout/visible segmented heat details",
-    "agentDVisual": "PENDING independent Polish04 review",
-    "fullRelease": "NOT RENDERED by E, reserved F",
+    "visualReview": "PASS limited P05 target-frame scope: inspected full-res frame117, both opposed side plates and complete 390mm rotor in frame; caption below model; 99/100 and147/148 genuine model-visible crossfades. Scale and position corrected after first proof. Mechanics unchanged; at phone size axial travel still subtle.",
+    "agentDVisual": "PENDING D independent P05 frame/video and subsequent F complete-candidate evaluation",
+    "fullRelease": "NOT RENDERED by E; Agent F only after Master approval",
     "heroMotion": "PASS prior 630–749 pixel delta 0.2562/73.3% low movement vs new 0.4250/0% low movement; visible geometry parallax; no major clipping in 8+15 frame review",
-    "padVisual": "REVIEW real opposing pad meshes exposed by in-film caliper-hidden profile, left-side travel annotation, physically subtle 2.35mm max movement; no displacement exaggeration"
+    "padVisual": "REVIEW real opposing pad meshes exposed by in-film caliper-hidden profile, left-side travel annotation, physically subtle 2.35mm max movement; no displacement exaggeration",
+    "heroSourceInvariant": "PASS hero camera function body byte-identical P04 source 21c2b581b46251b0bd45028d32eb40b4341eeb2a vs native-tested P05 source"
   },
   "artifacts": [
+    {
+      "type": "polish05-real-15-fullres-stills-contact-plus-native-61-frame-pad-cutaway",
+      "runId": 37990076113,
+      "artifactId": 11644577616,
+      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37990076113/artifacts/11644577616"
+    },
     {
       "type": "P04 in-film native 1080p pad onset, 65frames",
       "runId": 37982072331,
@@ -107,10 +122,9 @@
     }
   ],
   "masterInstructions": [
-    "Review source SHA b53c264017a6e3f10f3cae0326b0ae9257e80966; E docs HEAD may be later, source is exactly this commit. Compare prior full candidate https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37978273707/artifacts/11639835454 against P04 ending https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982072331/artifacts/11641735972.",
-    "Review native film pad onset https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982072331/artifacts/11641465753 at frames 94–158, especially 105/112/115/120/135; original A 390mm rotor, B pressure, opposing 2.35mm physical travel, caliper hidden only as clearly disclosed E cutaway, camera crosses toward side-angle.",
-    "Review hero https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982072331/artifacts/11641735972 frames 630–749 at normal playback. Full 1080p 120-frame MP4 genuinely orbits ~36°, never spins a physically stopped rotor. Check frame 650,705,749, margins and text fade.",
-    "Ask Agent D to independently inspect actual Polish04 moving clips and native stills; do not adopt old D 5.8/10 score for a film not yet fully rerendered.",
-    "If Master approves exact source, Agent F renders a single full 750-frame 1080×1920 30fps MP4 with approved audio and complete FFprobe/FFmpeg, moving-video and phone-safe review. Agent E has not rendered or release-approved a new full film."
+    "Read E P05 proof run https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37990076113 and artifact 11644577616. Compare original D P04 full candidate frame117/99/100/147/148 with P05 exact stills and 61-frame MP4; inspect at phone size and normal playback speed if possible.",
+    "Approve exact P05 film source SHA a8553b2c1af11d15eb0b8f6c96e0c3e53142f9aa for one new Agent F 750-frame render ONLY after independent D P05 pad/crossfade review.",
+    "Verify original A/B/C/D unchanged, approved P04 hero-camera block byte-identical; retain 390mm rotor and true physical pad movement 2.35mm.",
+    "Agent F renders exactly 750f, 1080x1920, 30fps, 25.000sec H264 yuv420p silent unless approved original VO accessible; FFprobe frame count, full FFmpeg decode, SHA256 and full-length D/Master screening. E did not produce full film."
   ]
 }

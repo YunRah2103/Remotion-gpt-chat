@@ -40,3 +40,11 @@ All ten A-owned Polish 02 blobs in E were compared by Git SHA with Agent A HEAD 
 - **Film-code SHA:** `b53c264017a6e3f10f3cae0326b0ae9257e80966` (after JSX syntax correction and second side-profile pad revision); this is the exact source of native proof [37982072331](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982072331).
 - E owns `src/brakes001/integration/InFilmPadCutaway.tsx` and modifications in `CarbonCeramic001.tsx` / `IntegrationCameraRig.tsx`. A/B/C/D components and their original blobs remain unchanged. Frame100–147 real A two-pad mesh motion continues to use E's pressure-to-.0025m gap adapter; no new braking physics. Final hero uses continuous camera orbit while B rotor is stopped.
 - P04 proof tooling: `.github/workflows/carbon-ceramic-001-e-polish04.yml`; workflow-only changes and later documentation commits must not be mistaken for film-code SHAs. Native artifacts: [pad](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982072331/artifacts/11641465753), [hero+stills](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982072331/artifacts/11641735972).
+
+## Polish05 definitive film-code provenance
+
+- **Latest native-verified P05 runtime source SHA:** `a8553b2c1af11d15eb0b8f6c96e0c3e53142f9aa`. Tests/workflow/doc changes after this runtime commit do not change its rendered bytes.
+- Native proof GitHub Actions: [run 37990076113](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37990076113) / [artifact 11644577616](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37990076113/artifacts/11644577616).
+- D-accepted P04 reference hero-camera body from `21c2b581b46251b0bd45028d32eb40b4341eeb2a` is tested **byte-identical** with P05 using real `git show` in workflow; no new hero render required solely for source equivalence.
+- E owns geometry-preserving nine-frame two-`ThreeCanvas` dissolves and P05 camera/caption adapter. All physical hardware is still original A geometry under original B pressure and E's existing 2.35mm per-pad travel cap.
+- A/B/C/D components and F release workflow remain unchanged; this P05 source is the only film-version SHA Master should hand to F once D approves the pad-crop/transition proof.

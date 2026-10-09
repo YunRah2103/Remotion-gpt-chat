@@ -65,3 +65,21 @@ After E film proof completed, Agent A branch head `e619a94cde5c525bdd9f6dfc6ed56
 5. If D approves, Master accepts exact film source `37e04ee309dc9f96e63ad1b4eda28f25fea3a96a` and requests Agent F's **750-frame / 1080×1920 / 30fps** H264 release with approved audio. E did **not** render this release.
 
 **Honest gate: REVIEW** until D and Master accept. No substitution of vector/synthetic footage for native proof.
+
+
+---
+## Polish05 actual implementation and independent native QA — 2026-10-09
+
+**READY FOR MASTER REVIEW (not release-approved).** Exact film runtime SHA `a8553b2c1af11d15eb0b8f6c96e0c3e53142f9aa`. Source-specific GitHub Actions [run 37990076113](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37990076113) **SUCCESS**; [native artifact 11644577616](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37990076113/artifacts/11644577616).
+
+Original Polish04 independent D review [full source-locked MP4](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37983072846/artifacts/11641871804) rated 6.6/10 FAIL and identified two exact faults: rotor right crop at 117 and geometry blackout at 99,100,147,148. Previous silent F MP4 SHA256 `fad39a08e151913792da0c827b7c621f511b817b17e4cf4559fdcefa31ae7fbb`. New E-only correction deliberately leaves accepted hero, material, thermal, benefits and A–D internals unchanged.
+
+**Real frames inspected:** 98/99/100/101/105/107/117/132/140/145/146/147/148/149/150 at exact **1080×1920**. At 117 true ventilated 390mm disc is fully visible and centered in upper film; actual opposing inner/outer pad plates appear on opposite axial sides with caliper hidden and clearly disclaimed. Updated pad stage uses scale 0.82, raised by 0.13m for caption clearance. An ordering legend is non-geolocated (no misleading invented leader lines). This is a view of genuine geometry and motion; visual motion remains naturally millimetre-scale, so label adds numerical context. Major old right clipping and overlapping label line are eliminated within the sampled frame proof.
+
+**Transition independent review:** real frame 98–101 and145–150 stills and decoded 61-frame clip show brake geometry maintained in both nine-frame smooth stage blends, rather than old navy all-cover masks. At180×320 grayscale successive-frame MAE, measured with full actual before-and-after MP4 decodes: 98→99 old6.293/new3.015; 99→100 old1.312/new2.173; 100→101 old7.970/new1.381; 146→147 old11.660/new2.266;147→148 old1.722/new3.081;148→149 old13.590/new3.343. This is telemetry, not substitute for normal-speed aesthetic inspection. No full-speed video player available here; dense native frame review and full decode performed.
+
+**Authentic moving proof:** `infilm-095-155.mp4` (61 frames, 30fps, 2.033333s, 1080×1920 H264 yuvj420p, no audio), SHA256 `33244341824990d2f24766b16769b50779c2da8fe4ca6facc4d79282514964ce`, independent `ffprobe` and `ffmpeg -xerror -f null -` PASS all frames. Includes both eight-frame crossfades and near-contact B state. This is NOT full 750-frame film.
+
+**Tests:** `npm ci`, TypeScript `npm run check`, E actual 750-frame state, B 5 motion tests, D 750-frame graphical cues, setup validation, Python 39/39 all PASS on run. Original P04 hero branch `if(p.shotId==='hero')` tested **byte-identical** to reference commit `21c2b581...`, no accepted hero orbit regression. A/B/C/D/F ownership boundaries preserved.
+
+**Remaining release gates:** independent D/Master phone-size P05 clip review and one Agent F exact-runtime 750-frame final MP4 then independent full candidate QA; approved VO absent, preview silent. Mark E ready **for Master review only**, not film-release approved.
