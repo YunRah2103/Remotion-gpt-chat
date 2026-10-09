@@ -42,7 +42,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if python production/videos/carbon-ceramic-001/render/source_lock.py --require-approved; then
+          echo '{"status":"pending","integrationSourceSha":null,"masterApprovalUrl":null}' > /tmp/cc-f-pending-lock.json
+          if python production/videos/carbon-ceramic-001/render/source_lock.py --lock /tmp/cc-f-pending-lock.json --require-approved; then
             echo "ERROR: pending/unapproved source lock unexpectedly passed" >&2
             exit 1
           fi
