@@ -59,7 +59,6 @@ for(const f of [97,98,99,100,101,102,103,104,143,144,145,146,147,148,149,150]){
 }
 assert.equal(blend(96),0);assert.equal(blend(104),1);
 assert.equal(blend(143),1);assert.equal(blend(151),0);
-assert.ok(!film.includes('[99,100,147,148]'),'Polish04 dark masks remain');
 assert.match(film, /<BrakeStage frame=\{frame\} view="pad"/);
 assert.match(film, /<BrakeStage frame=\{frame\} view="normal"/);
 
@@ -68,6 +67,7 @@ const brief = JSON.parse(read('production/videos/carbon-ceramic-001/brief.json')
 const shots = JSON.parse(read('production/videos/carbon-ceramic-001/shots.json'));
 const rootSource = read('src/Root.tsx');
 const film = read('src/brakes001/CarbonCeramic001.tsx');
+assert.ok(!film.includes('[99,100,147,148]'),'Polish04 dark masks remain');
 const hardware = read('src/brakes001/hardware/BrakeAssembly.tsx');
 const graphics = read('src/brakes001/graphics/index.tsx');
 const assertNear = (v, expected, tolerance=1e-7) => assert.ok(Math.abs(v-expected)<tolerance, v+' vs '+expected);
