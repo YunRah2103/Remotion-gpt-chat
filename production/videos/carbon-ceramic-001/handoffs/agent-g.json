@@ -1,0 +1,49 @@
+{
+  "agent": "G",
+  "role": "one-off independent wheel replacement, rendering and final candidate",
+  "status": "NATIVE_RENDER_IN_PROGRESS_NOT_YET_VISUALLY_APPROVED",
+  "baseApprovedEHead": "3a27004f2c40d3707277b2d87c8faf7e92a70a0d",
+  "approvedP05ImmutableFilmSource": "a8553b2c1af11d15eb0b8f6c96e0c3e53142f9aa",
+  "wheelImplementationCommit": "4eafd8049b744f26b4cc01931c343d4b57dba52b",
+  "openingIntegrationCommit": "9f54d6502ec6162f3d4805864870f1ecbc4fa7d0",
+  "sourceShaSubmittedToNativeGithubActions": "f5f7b09ae2f9e23517f8061edcf3216f6214ebf2",
+  "branch": "automotive-brakes-001/g-wheel-reveal",
+  "workflowRun": 37994189406,
+  "workflowUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37994189406",
+  "artifactNamesWhenAvailable": [
+    "brakes001-g-native-wheel-proof-37994189406",
+    "brakes001-g-wheel-reveal-final-25s-37994189406"
+  ],
+  "deliverablePlanned": "carbon-ceramic-001-wheel-reveal-final-candidate.mp4",
+  "frameCount": 750,
+  "framesPerSecond": 30,
+  "resolution": [
+    1080,
+    1920
+  ],
+  "wheelFit": {
+    "rimBeadDiameterMm": 508,
+    "tyreOutsideDiameterMm": 686.5,
+    "tyreWidthMm": 255,
+    "rotorDiameterMm": 390,
+    "caliperRadialEnvelopeMm": 231,
+    "rimInnerBarrelRadiusMm": 245,
+    "radialGapMm": 14,
+    "forgedSpokeRearFaceXmm": 100,
+    "stationaryCaliperMaxEstimatedXmm": 75,
+    "axialMarginMm": 25
+  },
+  "motion": "wheel derives angleRad from B brakeStateAt(frame), caliper remains stationary; deterministic illustrative axial separation 62-93; hidden by frame 94",
+  "preservedScope": "No changes to A-D-owned mechanical/cinema/graphics or E P05 integration physics, pad crossfade, camera, full-film hero",
+  "qa": {
+    "localTypecheck": "NOT_RUN_NO_REPOSITORY_DEPS_IN_LOCAL_ENVIRONMENT",
+    "automatedTests": "ACTION_PENDING",
+    "nativeStills": "ACTION_PENDING",
+    "nativeFourView": "ACTION_PENDING",
+    "native101FrameClip": "ACTION_PENDING",
+    "native750FrameMp4": "ACTION_PENDING",
+    "phoneSizeHumanInspection": "PENDING",
+    "finalReleaseSignoff": "NOT_GRANTED",
+    "audio": "SILENT unless exact previously supplied Cedar voiceover is independently found (not found in this branch)"
+  }
+}
