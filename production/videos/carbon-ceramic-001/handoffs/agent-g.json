@@ -1,49 +1,102 @@
 {
   "agent": "G",
-  "role": "one-off independent wheel replacement, rendering and final candidate",
-  "status": "NATIVE_RENDER_IN_PROGRESS_NOT_YET_VISUALLY_APPROVED",
-  "baseApprovedEHead": "3a27004f2c40d3707277b2d87c8faf7e92a70a0d",
-  "approvedP05ImmutableFilmSource": "a8553b2c1af11d15eb0b8f6c96e0c3e53142f9aa",
-  "wheelImplementationCommit": "4eafd8049b744f26b4cc01931c343d4b57dba52b",
-  "openingIntegrationCommit": "9f54d6502ec6162f3d4805864870f1ecbc4fa7d0",
-  "sourceShaSubmittedToNativeGithubActions": "f5f7b09ae2f9e23517f8061edcf3216f6214ebf2",
-  "branch": "automotive-brakes-001/g-wheel-reveal",
-  "workflowRun": 37994189406,
-  "workflowUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37994189406",
-  "artifactNamesWhenAvailable": [
-    "brakes001-g-native-wheel-proof-37994189406",
-    "brakes001-g-wheel-reveal-final-25s-37994189406"
-  ],
-  "deliverablePlanned": "carbon-ceramic-001-wheel-reveal-final-candidate.mp4",
-  "frameCount": 750,
-  "framesPerSecond": 30,
-  "resolution": [
-    1080,
-    1920
-  ],
-  "wheelFit": {
-    "rimBeadDiameterMm": 508,
-    "tyreOutsideDiameterMm": 686.5,
-    "tyreWidthMm": 255,
-    "rotorDiameterMm": 390,
-    "caliperRadialEnvelopeMm": 231,
-    "rimInnerBarrelRadiusMm": 245,
-    "radialGapMm": 14,
-    "forgedSpokeRearFaceXmm": 100,
-    "stationaryCaliperMaxEstimatedXmm": 75,
-    "axialMarginMm": 25
+  "role": "Single-agent final replacement of ghost-car opening with native volumetric 20in wheel → carbon-ceramic brakes",
+  "completionStatus": "COMPLETE_NATIVE_750_FRAME_FINAL_CANDIDATE_TECHNICAL_PASS",
+  "releaseStatus": "PENDING_USER_AND_MASTER_NORMAL_SPEED_PHONE_VISUAL_SIGNOFF",
+  "dedicatedBranch": "automotive-brakes-001/g-wheel-reveal",
+  "immutableNativeFilmSourceSHA": "8000fb8f5d59fae7901c4c1be9482a8a3bc5a771",
+  "originalAcceptedP05BaseSHA": "3a27004f2c40d3707277b2d87c8faf7e92a70a0d",
+  "unmodifiedProtectedFilmSource": {
+    "hardware": "src/brakes001/hardware/**",
+    "motion": "src/brakes001/motion/**",
+    "cinematography": "src/brakes001/cinema/**",
+    "graphics": "src/brakes001/graphics/**",
+    "E_P05_cutaway_camera_physics": "src/brakes001/integration/**",
+    "compositionRegister": "src/Root.tsx"
   },
-  "motion": "wheel derives angleRad from B brakeStateAt(frame), caliper remains stationary; deterministic illustrative axial separation 62-93; hidden by frame 94",
-  "preservedScope": "No changes to A-D-owned mechanical/cinema/graphics or E P05 integration physics, pad crossfade, camera, full-film hero",
-  "qa": {
-    "localTypecheck": "NOT_RUN_NO_REPOSITORY_DEPS_IN_LOCAL_ENVIRONMENT",
-    "automatedTests": "ACTION_PENDING",
-    "nativeStills": "ACTION_PENDING",
-    "nativeFourView": "ACTION_PENDING",
-    "native101FrameClip": "ACTION_PENDING",
-    "native750FrameMp4": "ACTION_PENDING",
-    "phoneSizeHumanInspection": "PENDING",
-    "finalReleaseSignoff": "NOT_GRANTED",
-    "audio": "SILENT unless exact previously supplied Cedar voiceover is independently found (not found in this branch)"
+  "changedFiles": [
+    "src/brakes001/CarbonCeramic001.tsx",
+    "src/brakes001/wheel/WheelAssembly.tsx",
+    "src/brakes001/wheel/WheelRevealCameraRig.tsx",
+    "src/brakes001/wheel/beauty-entry.tsx",
+    "production/videos/carbon-ceramic-001/wheel/test_wheel.py"
+  ],
+  "design": {
+    "source": "native Three.js procedural volumetric geometry, original non-branded",
+    "logicalGroups": [
+      "WheelAssembly",
+      "Tire",
+      "AlloyRim",
+      "CentreHub",
+      "LugHardware"
+    ],
+    "rimBeadDiameterMM": 508,
+    "outerTyreDiameterMM": 686.5,
+    "widthMM": 255,
+    "carbonCeramicRotorDiameterMM": 390,
+    "caliperRadialEnvelopeMM": 231,
+    "innerBarrelRadiusMM": 245,
+    "estimatedMinimumRadialClearanceMM": 14,
+    "estimatedSpokeToCaliperAxialClearanceMM": 25,
+    "rotatingAxle": "global X",
+    "wheelPose": "same deterministic B brakeStateAt(frame).rotorAngleRad as original rotor",
+    "inFilmOpening": "real tyre + forged ten-arm wheel until frame78, illustrative axle-separation during frames53-76, exposed brake frame79 onward",
+    "padCrossfades": "existing true P05 96-104 and 143-151 unchanged",
+    "laterFilm": "frames120-749 retain original E/A-D source; no added ghost or car model"
+  },
+  "tests": {
+    "githubPreflight": "PASS",
+    "TypeScript": "PASS",
+    "physicalMotion750Frame": "PASS",
+    "P05IntegrationCompatibility": "PASS (legacy ghost-presence expectation intentionally reversed in ephemeral test copy)",
+    "wheelDimensionsAndSourceIsolation": "PASS",
+    "graphicsQA": "PASS",
+    "nativeStills": "PASS 11 true 1080x1920 PNGs",
+    "nativeFourView": "PASS 4 true 3D wheel beauty PNGs",
+    "nativeShortProof": "PASS 101/101 frames H264 1080x1920 30fps full ffmpeg decode",
+    "nativeFullVideo": "PASS 750/750 H264 yuv420p 1080x1920 30fps 25.000 seconds full FFmpeg decode",
+    "humanOpeningAndFullContactReview": "COMPLETED at sampled portrait frames; cinematography and existing brake limitations noted; normal-speed mobile audience final approval pending",
+    "officialReleaseGate": "NOT_MODIFIED_NOT_CLAIMED"
+  },
+  "artifacts": {
+    "native101FrameProof": {
+      "runId": 37994882432,
+      "artifactId": 11646971968,
+      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37994882432/artifacts/11646971968",
+      "file": "wheel-to-pad-000-100.mp4",
+      "sha256": "b3ed468d24f8ec2fe6f21bee022bf12c2bb7c2ae42239f7f85d3785352c07749"
+    },
+    "tenNativeParts": {
+      "primaryRun": 37994882432,
+      "independentlyRecoveredSameSourcePart04Run": 37995764910,
+      "framesPerPart": 75,
+      "checksumValidation": "PASS all 10 individual SHA256",
+      "codec": "h264"
+    },
+    "full25s": {
+      "workflowRun": 37996026859,
+      "artifactId": 11647256661,
+      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37996026859/artifacts/11647256661",
+      "name": "carbon-ceramic-001-wheel-reveal-final-candidate.mp4",
+      "sha256": "32e3cb872c90a2e8c6629ad8cd2a24e370319810ed6420ce97e4586fbec66dbe",
+      "durationSeconds": 25,
+      "fps": 30,
+      "frames": 750,
+      "resolution": [
+        1080,
+        1920
+      ],
+      "codec": "h264",
+      "pixelFormat": "yuv420p",
+      "completeFFmpegDecode": true,
+      "audio": "ABSENT — original user Cedar VO not independently available; no synthetic substitute",
+      "classification": "NATIVE_FULL_LENGTH_FINAL_CANDIDATE_NEEDS_HUMAN_APPROVAL"
+    }
+  },
+  "independentVisualReview": {
+    "positive": "Original dark satin five-split-spoke tyre/alloy visible immediately and rotates with rotor; close portrait composition; brake exposure by frame79; clear enlarged stationary caliper/rotor after wheel separation; preserved existing educational thermal/benefit/ending.",
+    "limitations": "Tyre sidewall dark and tread is simplified procedural grooves, not photoreal scanned rubber; mechanical brake detail remains from P05; f96-104 intentionally ghosted during genuine 3D crossfade.",
+    "phoneSizeNormalSpeedUserReview": "RECOMMENDED before publishing",
+    "noBrandClaim": true
   }
 }
