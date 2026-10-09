@@ -56,7 +56,7 @@ export const CarbonCeramic001: React.FC = () => {
       {context && <GhostCarOutline frame={frame}/>}
       {/* Stable macro framing: C's shot target, not a guessed static offset.
           Geometry, independent X-axis pads and fixed caliper are unmodified. */}
-      <group scale={shot === 'thermal' ? 0.56 : shot === 'reveal' ? 0.86 : shot === 'hero' ? 0.86 : shot === 'benefits' ? 0.93 : padProof ? 0.78 : 1}
+      <group scale={padProof ? 0.78 : shot === 'thermal' ? 0.56 : shot === 'reveal' ? 0.86 : shot === 'hero' ? 0.86 : shot === 'benefits' ? 0.93 : 1}
         position={brakePosition}>
         <BrakeAssembly rotorAngleRad={state.rotorAngleRad}
           padGapMetres={state.padGapMetres} heat01={0}
@@ -70,7 +70,7 @@ export const CarbonCeramic001: React.FC = () => {
     <TitleOverlays frame={frame}/>
     {!padProof && <PartLabels frame={frame} showLeaderLines={false}/>}
     <InFilmPadLabels frame={frame}/>
-    {([99,100,147,148].includes(frame))&&<AbsoluteFill style={{pointerEvents:'none',background:'#07111b',opacity:.55,zIndex:32}}/>
+    {([99,100,147,148].includes(frame))&&<AbsoluteFill style={{pointerEvents:'none',background:'#07111b',opacity:1,zIndex:32}}/>
   </AbsoluteFill>;
 };
 
