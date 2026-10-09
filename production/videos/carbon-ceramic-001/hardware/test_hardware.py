@@ -118,7 +118,7 @@ def main():
             for name in images:
                 p=args.proof_dir/name
                 blob=p.read_bytes()
-                assert len(blob)>4000 and blob[:8]==b"\\x89PNG\\r\\n\\x1a\\n", (
+                assert len(blob)>4000 and blob[:4]==bytes((137,80,78,71)), (
                     f"Native PNG missing or invalid: {p}")
                 width,height=struct.unpack_from(">II",blob,16)
                 assert width>=900 and height>=900,(name,width,height)
