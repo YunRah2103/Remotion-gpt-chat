@@ -1,0 +1,198 @@
+name: Production - repair only missing native render chunks
+on:
+  workflow_dispatch:
+    inputs:
+      source_run:
+        description: Original failed/partial Production automated preflight and final render workflow run ID
+        required: true
+        type: string
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inventory:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    outputs:
+      missing: ${{ steps.plan.outputs.missing }}
+      has_missing: ${{ steps.plan.outputs.has_missing }}
+      source_sha: ${{ steps.plan.outputs.source_sha }}
+      frames: ${{ steps.plan.outputs.frames }}
+      fps: ${{ steps.plan.outputs.fps }}
+      composition: ${{ steps.plan.outputs.composition }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFprobe for validating previously completed chunks
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Check exact source workflow, source commit and each reusable frame chunk
+        id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN: ${{ inputs.source_run }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$RUN" =~ ^[0-9]+$ ]] || exit 1
+          python production/advanced/recovery.py --run "$RUN" --repo "$REPO" --out out/inventory
+          python - <<'PY'
+          import json,os
+          p=json.load(open('out/inventory/recovery-plan.json'))
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:
+              f.write('source_sha='+p['sourceSha']+'\n')
+              f.write('frames='+str(p['frames'])+'\n')
+              f.write('fps='+str(p['fps'])+'\n')
+              f.write('composition='+p['composition']+'\n')
+              f.write('missing='+json.dumps(p['missingParts'])+'\n')
+              f.write('has_missing='+str(bool(p['missingParts'])).lower()+'\n')
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f:
+              f.write('## Native render recovery\n\nSource SHA '+p['sourceSha']+'\n\n')
+              f.write('Reusable original parts: '+str(p['reusableParts'])+'\n\n')
+              f.write('Only repair: '+str(p['missingParts'])+'\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recovery-inventory-${{ github.run_id }}
+          path: |
+            out/inventory/recovery-plan.json
+            out/inventory/stage/preflight.json
+            out/inventory/stage/props.json
+          retention-days: 14
+          if-no-files-found: error
+
+  repair:
+    needs: inventory
+    if: needs.inventory.outputs.has_missing == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        part: ${{ fromJSON(needs.inventory.outputs.missing) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.inventory.outputs.source_sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/download-artifact@v4
+        with:
+          name: recovery-inventory-${{ github.run_id }}
+          path: out/recovery
+      - name: Rerender only this previously missing or invalid chunk at its exact source SHA
+        shell: bash
+        env:
+          PART: ${{ matrix.part }}
+          FRAMES: ${{ needs.inventory.outputs.frames }}
+          COMP: ${{ needs.inventory.outputs.composition }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          npm ci --no-audit --no-fund
+          npm run check
+          CHUNK=$(((FRAMES+4)/5))
+          START=$((PART*CHUNK))
+          END=$((START+CHUNK-1))
+          if ((END>=FRAMES));then END=$((FRAMES-1));fi
+          test "$START" -le "$END"
+          mkdir -p out/final-chunk
+          PROPS=()
+          if [[ "$COMP" == *Captioned ]]; then
+            test -f out/recovery/props.json || exit 1
+            PROPS=("--props=out/recovery/props.json")
+          fi
+          npx remotion render src/index.ts "$COMP" "out/final-chunk/chunk-$PART.mp4" \
+            --frames="$START-$END" --gl=swangle --codec=h264 --pixel-format=yuv420p \
+            --concurrency=2 "${PROPS[@]}"
+          python - "$PART" "$START" "$END" <<'PY'
+          import sys
+          sys.path.insert(0,'production/advanced')
+          from recovery import probe
+          part,start,end=map(int,sys.argv[1:])
+          assert probe(f'out/final-chunk/chunk-{part}.mp4',end-start+1,30), 'Invalid repaired frame range'
+          print('REPAIRED_NATIVE_CHUNK_PASS',part)
+          PY
+          ffmpeg -v error -xerror -i "out/final-chunk/chunk-$PART.mp4" -f null -
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recovery-repaired-${{ github.run_id }}-${{ matrix.part }}
+          path: out/final-chunk/
+          retention-days: 21
+          if-no-files-found: error
+
+  assemble:
+    needs: [inventory,repair]
+    if: always() && needs.inventory.result == 'success' && (needs.repair.result == 'success' || needs.repair.result == 'skipped')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.inventory.outputs.source_sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: recovery-inventory-${{ github.run_id }}
+          path: out/recovery
+      - uses: actions/download-artifact@v4
+        if: needs.inventory.outputs.has_missing == 'true'
+        with:
+          pattern: recovery-repaired-${{ github.run_id }}-*
+          merge-multiple: true
+          path: out/repaired
+      - name: Combine strictly validated original and repaired chunks without rerendering already completed work
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ inputs.source_run }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          mkdir -p out/chunks out/recovered
+          python - <<'PY'
+          import json,os,subprocess,sys,shutil
+          from pathlib import Path
+          sys.path.insert(0,'production/advanced')
+          from recovery import slices,probe
+          p=json.load(open('out/recovery/recovery-plan.json'))
+          n=p['frames'];fps=p['fps'];source=os.environ['SOURCE_RUN'];repo=os.environ['REPO']
+          originals=set(p['reusableParts'])
+          for frame in slices(n):
+              i=frame['part'];dest=Path(f'out/chunks/chunk-{i}.mp4')
+              if i in originals:
+                  folder=Path(f'out/reused/{i}');folder.mkdir(parents=True,exist_ok=True)
+                  subprocess.run(['gh','run','download',str(source),'-n',
+                     f'production-chunk-{source}-{i}','-D',str(folder),'-R',repo],check=True,timeout=90)
+                  src=folder/f'chunk-{i}.mp4'
+              else:src=Path(f'out/repaired/chunk-{i}.mp4')
+              if not probe(src,frame['end']-frame['start']+1,fps):
+                  raise ValueError(f'Source chunk {i} failed exact-frame reuse validation')
+              shutil.copyfile(src,dest)
+          Path('out/chunks/concat.txt').write_text(''.join(f"file 'chunk-{i}.mp4'\n" for i in range(5)))
+          PY
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 \
+            -i out/chunks/concat.txt -an -c:v copy out/recovered/recovered-visual.mp4
+          python - <<'PY'
+          import json,sys,subprocess
+          sys.path.insert(0,'production/advanced')
+          from recovery import probe
+          p=json.load(open('out/recovery/recovery-plan.json'))
+          assert probe('out/recovered/recovered-visual.mp4',p['frames'],p['fps'])
+          subprocess.run(['ffmpeg','-v','error','-xerror','-i',
+              'out/recovered/recovered-visual.mp4','-f','null','-'],check=True)
+          import shutil
+          shutil.copy('out/recovery/recovery-plan.json','out/recovered/recovery-plan.json')
+          print('RECOVERED_VISUAL_MP4_EXACT_FRAME_PASS')
+          PY
+          (cd out/recovered && sha256sum recovered-visual.mp4 > SHA256SUMS.txt)
+          echo 'The recovered file is a VISUAL-only candidate. Mux narration separately if original production requested it.' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: production-recovered-visual-${{ github.run_id }}
+          path: out/recovered/
+          retention-days: 30
+          if-no-files-found: error
