@@ -151,6 +151,20 @@ function bodyGeometry(cabin=false){
  }
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));g.computeVertexNormals();return g;
 }
+/** Thin three-dimensional flared arches are attached to the body, not to the moving tyre. */
+const FenderArc:React.FC<{side:number;z:number;transparent:boolean}>=({side,z,transparent})=>{
+ const geom=useMemo(()=>{
+  const pts:THREE.Vector3[]=[];
+  for(let k=0;k<=24;k++){
+   const a=Math.PI*k/24;
+   pts.push(new THREE.Vector3(side*1.153,-.67+.635*Math.sin(a),z+.64*Math.cos(a)));
+  }
+  return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),48,.064,7,false);
+ },[side,z]);
+ return <mesh geometry={geom} castShadow>
+  <meshStandardMaterial color="#232a2b" metalness={.14} roughness={.55} transparent={transparent} opacity={transparent?.23:1}/>
+ </mesh>;
+};
 const Body:React.FC<{transparent:boolean}>=({transparent})=>{
  const chassis=useMemo(()=>bodyGeometry(),[]);
  const cabin=useMemo(()=>bodyGeometry(true),[]);
@@ -163,10 +177,33 @@ const Body:React.FC<{transparent:boolean}>=({transparent})=>{
    <meshPhysicalMaterial color="#46545d" metalness={.21} roughness={.42} clearcoat={.77}
      transparent={transparent} opacity={transparent?.13:1} side={THREE.DoubleSide}/>
   </mesh>
-  {[-1,1].map(side=><group key={side}>
+  {[-1,1].map(side=><group key={side}>\n   <FenderArc side={side} z={-HALF_WHEELBASE} transparent={transparent}/>\n   <FenderArc side={side} z={HALF_WHEELBASE} transparent={transparent}/>
    <mesh position={[side*.83,.73,-.14]} rotation={[0,0,side*.14]}>
     <boxGeometry args={[.045,.48,1.77]}/>
     <meshPhysicalMaterial color="#0d222b" metalness={.08} roughness={.20} transparent opacity={transparent?.13:.82}/>
+   </mesh>
+   {/* Separate panel seams, hinges and recessed handles make the cabin legible. */}
+   {[-.72,.89].map((zDoor)=><group key={zDoor}>
+    <mesh position={[side*1.127,.22,zDoor]} rotation={[0,0,side*.045]}>
+     <boxGeometry args={[.02,.012,1.05]}/>
+     <meshStandardMaterial color="#101b20" metalness={.27} roughness={.63} transparent={transparent} opacity={transparent?.2:.66}/>
+    </mesh>
+    <mesh position={[side*1.131,.21,zDoor+.50]} rotation={[0,0,side*.045]}>
+     <boxGeometry args={[.024,.43,.013]}/>
+     <meshStandardMaterial color="#19262a" metalness={.2} roughness={.53} transparent={transparent} opacity={transparent?.2:.7}/>
+    </mesh>
+    <mesh position={[side*1.16,.41,zDoor+.35]} castShadow>
+     <boxGeometry args={[.041,.055,.23]}/>
+     <meshStandardMaterial color="#aeb9b9" metalness={.64} roughness={.3} transparent={transparent} opacity={transparent?.2:1}/>
+    </mesh>
+   </group>)}
+   <mesh position={[side*.83,.84,-.74]} rotation={[0,0,side*.10]}>
+    <boxGeometry args={[.06,.58,.042]}/>
+    <meshStandardMaterial color="#162127" metalness={.26} roughness={.44}/>
+   </mesh>
+   <mesh position={[side*.85,.84,.53]} rotation={[0,0,side*.10]}>
+    <boxGeometry args={[.06,.58,.042]}/>
+    <meshStandardMaterial color="#162127" metalness={.26} roughness={.44}/>
    </mesh>
    <mesh position={[side*.96,.05,0]}>
     <boxGeometry args={[.087,.09,3.12]}/><meshStandardMaterial color={ORANGE} metalness={.65} roughness={.3}/>
@@ -190,10 +227,32 @@ const Body:React.FC<{transparent:boolean}>=({transparent})=>{
     <meshStandardMaterial color="#222c34" metalness={.65} roughness={.28}/>
    </mesh>
   </group>)}
+  {/* Sloped smoked windshield and a bonnet intake aid vehicle scale cues. */}
+  <mesh position={[0,.82,-1.225]} rotation={[.24,0,0]}>
+   <boxGeometry args={[1.52,.56,.047]}/>
+   <meshPhysicalMaterial color="#213d46" metalness={.08} roughness={.22}
+    transparent opacity={transparent?.10:.72}/>
+  </mesh>
+  <mesh position={[0,.435,-1.63]} castShadow>
+   <boxGeometry args={[.77,.046,.46]}/>
+   <meshStandardMaterial color="#171f24" metalness={.25} roughness={.5}/>
+  </mesh>
+  {Array.from({length:7},(_,i)=><mesh key={'vent'+i} position={[-.30+i*.1,.466,-1.63]}>
+   <boxGeometry args={[.043,.019,.36]}/>
+   <meshStandardMaterial color="#69757b" metalness={.59} roughness={.4}/>
+  </mesh>)}
   <mesh position={[0,.03,-2.375]} rotation={[0,0,0]}>
    <boxGeometry args={[1.23,.33,.08]}/>
    <meshStandardMaterial color="#0b1318" metalness={.46} roughness={.39}/>
   </mesh>
+  <mesh position={[0,-.37,-2.47]} castShadow>
+   <boxGeometry args={[1.27,.087,.16]}/>
+   <meshStandardMaterial color="#8c9294" metalness={.72} roughness={.34}/>
+  </mesh>
+  {[-.68,.68].map(x=><mesh key={x} position={[x,-.25,-2.48]}>
+   <torusGeometry args={[.096,.028,8,16]}/>
+   <meshStandardMaterial color="#f0a565" metalness={.67} roughness={.34}/>
+  </mesh>)}
   {Array.from({length:8},(_,i)=><mesh key={i} position={[-.51+i*.145,.025,-2.431]}>
     <boxGeometry args={[.044,.24,.025]}/>
     <meshStandardMaterial color="#78848c" metalness={.78} roughness={.32}/>
@@ -201,6 +260,10 @@ const Body:React.FC<{transparent:boolean}>=({transparent})=>{
   <mesh position={[0,-.27,-2.4]} castShadow>
    <boxGeometry args={[1.96,.16,.2]}/>
    <meshStandardMaterial color="#171d22" metalness={.56} roughness={.5}/>
+  </mesh>
+  <mesh position={[0,.20,2.44]}>
+   <boxGeometry args={[1.15,.06,.03]}/>
+   <meshStandardMaterial color="#a9413e" emissive="#c54130" emissiveIntensity={.5}/>
   </mesh>
   <mesh position={[0,-.17,2.45]} castShadow>
    <boxGeometry args={[1.88,.21,.18]}/>
@@ -211,6 +274,11 @@ const Body:React.FC<{transparent:boolean}>=({transparent})=>{
    <meshStandardMaterial color="#4c5960" metalness={.7} roughness={.48}/>
   </mesh>
   {[-1,1].map(side=><Rod key={side} a={[side*.54,-.44,-2]} b={[side*.54,-.44,2]} r={.075} color="#636f76"/>)}
+  {[-.88,-.15,.61,1.2].map(z=><Rod key={z} a={[-.74,1.22,z]} b={[.74,1.22,z]} r={.029} color="#161e22"/>)}
+  <mesh position={[0,-.54,-1.58]} castShadow>
+   <boxGeometry args={[1.30,.045,.65]}/>
+   <meshStandardMaterial color="#7a8081" metalness={.65} roughness={.42}/>
+  </mesh>
  </group>;
 };
 const Vehicle:React.FC<{frame:number;cutaway:boolean}>=({frame,cutaway})=>{
@@ -282,13 +350,13 @@ const CameraRig:React.FC<{frame:number}>=({frame})=>{
   const shot=frame<120?0:frame<270?1:frame<420?2:frame<540?3:4;
   let eye:V,target:V;
   if(shot===0){
-   eye=[lerp(8.0,6.5,frame/120),lerp(4.5,3.5,frame/120),z-12.5];
+   eye=[lerp(7.3,6.1,frame/120),lerp(4.2,3.5,frame/120),z-11.5];
    target=[0,cy+.17,z-.12];
   } else if(shot===1){
    eye=[lerp(5.3,4.3,(frame-120)/150),lerp(2.3,1.6,(frame-120)/150),z-3.7];
    target=[.82,cy-.39,z-1.60];
   } else if(shot===2){
-   eye=[-11.3,lerp(3.0,2.35,(frame-270)/150),z+4.3];
+   eye=[-10.4,lerp(2.8,2.25,(frame-270)/150),z+3.8];
    target=[0,cy-.18,z];
   } else if(shot===3){
    eye=[lerp(6.0,5.6,(frame-420)/120),lerp(1.2,1.65,(frame-420)/120),z+4.6];
