@@ -1,0 +1,115 @@
+name: POLISH02 - Blender vehicle, mechanical QA and native proofs
+on:
+  push:
+    branches: [automotive-tests/rugged-suspension-002]
+    paths:
+      - 'src/RuggedSuspension002.tsx'
+      - 'src/suspension/polish02/**'
+      - 'src/Root.tsx'
+      - 'production/videos/rugged-suspension-002/**'
+      - 'production/tests/rugged02_qa.cjs'
+      - '.github/workflows/rugged-suspension-002-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  engineering:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Native source typecheck, mechanical full-frame QA and production preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          npm run check
+          mkdir -p out/rugged02
+          python -m pip install -r production/requirements-qa.txt
+          python production/tools/production_pipeline.py --project rugged-suspension-002 --output out/rugged02/preflight
+          node production/tests/rugged02_qa.cjs
+          python -m unittest discover -s production/tests -v
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: polish02-engineering-${{ github.run_id }}
+          path: out/rugged02/
+          retention-days: 30
+          if-no-files-found: warn
+  blender-asset:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 95
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install actual Blender and inspect original geometry
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq blender ffmpeg python3-numpy
+          python -m pip install -r production/requirements-qa.txt
+      - name: Rebuild real named hard-surface vehicle, retain .blend and export binary glTF
+        shell: bash
+        run: |
+          set -euo pipefail
+          blender -b -t 2 --python production/videos/rugged-suspension-002/build_blender_suv.py -- out/rugged02/model
+          test -s out/rugged02/model/rugged-suv-body-002.blend
+          test -s out/rugged02/model/rugged-suv-body-002.glb
+          python production/studio/studio.py inspect out/rugged02/model/rugged-suv-body-002.glb out/rugged02/model/inspection
+          blender -b -t 2 --python production/studio/blender_turntable.py -- \
+            out/rugged02/model/rugged-suv-body-002.glb out/rugged02/model/turntable
+          ffmpeg -hide_banner -loglevel error -y -framerate 3 -i out/rugged02/model/turntable/view-%02d.png \
+            -c:v libx264 -pix_fmt yuv420p out/rugged02/model/turntable.mp4
+          ffmpeg -v error -xerror -i out/rugged02/model/turntable.mp4 -f null -
+          (cd out/rugged02/model && sha256sum rugged-suv-body-002.glb > GLB_SHA256SUMS.txt)
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: polish02-native-blender-model-${{ github.run_id }}
+          path: out/rugged02/model/
+          retention-days: 30
+          if-no-files-found: warn
+  moving-proof:
+    needs: [engineering,blender-asset]
+    if: needs.engineering.result == 'success' && needs.blender-asset.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/download-artifact@v4
+        with:
+          name: polish02-native-blender-model-${{ github.run_id }}
+          path: out/rugged02/model
+      - name: Stage the exact original Blender source-locked GLB in Remotion static public tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          mkdir -p public/mechanics out/rugged02/proofs
+          cp out/rugged02/model/rugged-suv-body-002.glb public/mechanics/rugged-suv-body-002.glb
+          (cd out/rugged02/model && sha256sum -c GLB_SHA256SUMS.txt)
+          npm run check
+          for F in 25 195 325 467 565; do
+            npx remotion still src/index.ts RuggedSuspension002 "out/rugged02/proofs/frame-${F}.png" \
+              --frame="$F" --gl=swangle --scale=0.5
+          done
+          npx remotion render src/index.ts RuggedSuspension002 out/rugged02/proofs/front-left-rock.mp4 \
+            --frames=187-216 --scale=0.42 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
+          ffmpeg -v error -xerror -i out/rugged02/proofs/front-left-rock.mp4 -f null -
+          ffprobe -v error -show_entries stream=codec_name,width,height,nb_frames -of json \
+            out/rugged02/proofs/front-left-rock.mp4 > out/rugged02/proofs/preview-ffprobe.json
+          git rev-parse HEAD > out/rugged02/proofs/SOURCE_SHA.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: polish02-moving-proof-${{ github.run_id }}
+          path: out/rugged02/proofs/
+          retention-days: 30
+          if-no-files-found: warn
