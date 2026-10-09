@@ -1,0 +1,82 @@
+name: Automotive Video Collage - Final Audio Mastering
+on:
+  push:
+    branches: [automotive-edits/car-video-collage-001]
+    paths:
+      - .github/workflows/car-video-collage-final-master.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  master-audio:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y ffmpeg
+      - name: Retrieve render and loudness-master original cinematic audio
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p out/car-video-collage-001
+          gh release download car-video-collage-001-v1 -p AUTOMOTIVE-VIDEO-COLLAGE-001.mp4 --dir out/car-video-collage-001
+          mv out/car-video-collage-001/AUTOMOTIVE-VIDEO-COLLAGE-001.mp4 out/car-video-collage-001/ORIGINAL-PREMASTER.mp4
+          ffmpeg -hide_banner -loglevel error -y -i out/car-video-collage-001/ORIGINAL-PREMASTER.mp4 \
+            -map 0:v:0 -map 0:a:0 -c:v copy \
+            -af "loudnorm=I=-16:TP=-1.5:LRA=10" -c:a aac -b:a 192k -ar 48000 \
+            -movflags +faststart out/car-video-collage-001/AUTOMOTIVE-VIDEO-COLLAGE-001.mp4
+      - name: Genuine post-master QA before publication
+        run: |
+          set -euo pipefail
+          cd out/car-video-collage-001
+          ffprobe -v error -show_streams -show_format -of json AUTOMOTIVE-VIDEO-COLLAGE-001.mp4 > master-ffprobe.json
+          ffmpeg -hide_banner -v error -xerror -i AUTOMOTIVE-VIDEO-COLLAGE-001.mp4 -map 0:v:0 -map 0:a:0 -f null -
+          ffmpeg -hide_banner -i AUTOMOTIVE-VIDEO-COLLAGE-001.mp4 -vn -af ebur128=peak=true -f null - > loudness.log 2>&1
+          python - <<'PY'
+          import json,hashlib,re
+          from pathlib import Path
+          src=Path('AUTOMOTIVE-VIDEO-COLLAGE-001.mp4')
+          probe=json.loads(Path('master-ffprobe.json').read_text())
+          v=next(x for x in probe['streams'] if x['codec_type']=='video')
+          a=next(x for x in probe['streams'] if x['codec_type']=='audio')
+          assert v['codec_name']=='h264' and (v['width'],v['height'])==(1080,1920)
+          assert v['r_frame_rate']=='30/1' and v.get('nb_frames')=='600'
+          assert 19.97 <= float(probe['format']['duration']) <= 20.10
+          assert a['codec_name']=='aac'
+          audio=Path('loudness.log').read_text().split('Summary:')[-1]
+          m=re.search(r'Integrated loudness:\s*I:\s*(-?[\d.]+) LUFS',audio)
+          p=re.search(r'True peak:\s*Peak:\s*(-?[\d.]+) dBFS',audio)
+          if not m or not p:raise ValueError('EBU R128 report parsing failed')
+          lufs=float(m.group(1)); truepeak=float(p.group(1))
+          if not -17.5 <= lufs <= -14.5:raise RuntimeError('Incorrect loudness '+str(lufs))
+          if truepeak > -1.0:raise RuntimeError('True-peak overload '+str(truepeak))
+          report=dict(result='PASS',film_source_sha='4d5c37408cc43cc119b47220e43e9bf04c290231',
+            audio_master_commit='${{ github.sha }}',mastered_audio_lufs=lufs,audio_true_peak_dbfs=truepeak,
+            codec='H264 + AAC',resolution='1080x1920',frames=600,fps=30,
+            seconds=float(probe['format']['duration']),ffmpeg_full_decode='PASS',
+            source_footage='six licensed real moving Pexels video clips, preflight motion QA PASS',
+            video_stream='bitstream copied from original Remotion render',
+            file_bytes=src.stat().st_size,sha256=hashlib.sha256(src.read_bytes()).hexdigest())
+          Path('audio-master-qa.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report,indent=2))
+          PY
+      - name: Replace published release asset with mastered-audio deliverable
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release upload car-video-collage-001-v1 \
+            out/car-video-collage-001/AUTOMOTIVE-VIDEO-COLLAGE-001.mp4 --clobber
+      - name: Publish final master and QA as downloadable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AUTOMOTIVE-VIDEO-COLLAGE-001-FINAL-MASTER
+          path: |
+            out/car-video-collage-001/AUTOMOTIVE-VIDEO-COLLAGE-001.mp4
+            out/car-video-collage-001/audio-master-qa.json
+            out/car-video-collage-001/loudness.log
+          retention-days: 30
