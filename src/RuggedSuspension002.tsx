@@ -208,14 +208,64 @@ function buildTerrain(){
  g.setIndex(idx);g.computeVertexNormals();
  return g;
 }
+/** Faceted stone mantle follows the very same equation as the physical tyre surface. */
+function capGeometry(c:typeof BOULDERS[number]){
+ const rings=[0,.21,.43,.65,.81,.94,1.0],sections=17;
+ const vertices:number[]=[],indices:number[]=[];
+ for(const r of rings){
+  for(let i=0;i<sections;i++){
+   const a=(i/sections)*Math.PI*2;
+   const x=c.x+c.rx*r*Math.cos(a),z=c.z+c.rz*r*Math.sin(a);
+   vertices.push(x,heightAt(x,z)+.004,z);
+  }
+ }
+ for(let j=0;j<rings.length-1;j++)for(let i=0;i<sections;i++){
+  const a=j*sections+i,b=j*sections+(i+1)%sections,c=(j+1)*sections+i,d=(j+1)*sections+(i+1)%sections;
+  indices.push(a,c,b,b,c,d);
+ }
+ const geo=new THREE.BufferGeometry();
+ geo.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));
+ geo.setIndex(indices);geo.computeVertexNormals();return geo;
+}
+const EmbeddedStone:React.FC<{rock:typeof BOULDERS[number]}>=({rock})=>{
+ const shape=useMemo(()=>capGeometry(rock),[rock]);
+ return <mesh geometry={shape} receiveShadow castShadow>
+  <meshStandardMaterial color="#6d6860" roughness={.98} flatShading side={THREE.DoubleSide}/>
+ </mesh>;
+};
+function mountains(){
+ const verts:number[]=[],ids:number[]=[];
+ for(let row=0;row<2;row++){
+  const depth=-51-row*8,baseX=-42;
+  for(let i=0;i<39;i++){
+   const x=baseX+i*2.2;
+   const hill=2.5+2.0*Math.sin(i*.59+row)+1.2*Math.sin(i*1.52+row*.8)+.9*Math.sin(i*2.94);
+   verts.push(x,Math.max(1.0,hill)+row*1.1,depth);
+   verts.push(x,-2.1,depth);
+   if(i>0){
+    const a=row*78+(i-1)*2,b=a+1,c=row*78+i*2,d=c+1;
+    ids.push(a,b,c,c,b,d);
+   }
+  }
+ }
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));g.setIndex(ids);g.computeVertexNormals();return g;
+}
+const MountainRidge:React.FC=()=>{
+ const geo=useMemo(mountains,[]);
+ return <mesh geometry={geo} castShadow>
+  <meshStandardMaterial color="#515852" roughness={1} side={THREE.DoubleSide}/>
+ </mesh>;
+};
 const Terrain:React.FC=()=>{
  const geom=useMemo(buildTerrain,[]);
  return <>
   <mesh geometry={geom} receiveShadow castShadow>
    <meshStandardMaterial vertexColors roughness={.99} side={THREE.DoubleSide}/>
   </mesh>
+  <MountainRidge/>
+  {BOULDERS.map((rock,i)=><EmbeddedStone key={i} rock={rock}/>)}
   {/* Rock scatter avoids rolling footprints; centre-track features are actual heightfield. */}
-  {Array.from({length:115},(_,i)=>{
+  {Array.from({length:170},(_,i)=>{
    const side=i%2===0?-1:1,dist=2.55+(i*17%24)*.19;
    const z=17-(i*37%74),x=side*dist;
    const size=.11+(i*11%12)*.065;
@@ -260,25 +310,26 @@ const Camera:React.FC<{frame:number}>=({frame})=>{
   let eye:Vec,target:Vec;
   if(stage===0){
    const t=(frame)/120;
-   eye=[lerp(-7.5,-6.1,t),lerp(3.25,2.75,t),z-lerp(10.5,9.2,t)];
-   target=[-.05,y+.04,z-.20];
+   eye=[lerp(-6.8,-5.7,t),lerp(3.14,2.62,t),z-lerp(9.7,8.55,t)];
+   target=[-.05,y-.34,z-.20];
   } else if(stage===1){
    const t=(frame-120)/150;
-   eye=[lerp(-4.65,-3.3,t),lerp(1.7,1.4,t),z-lerp(3.9,2.7,t)];
-   target=[-1.03,y-.56,z-1.72];
+   eye=[lerp(-5.8,-5.05,t),lerp(2.33,1.98,t),z-lerp(5.0,4.55,t)];
+   target=[-.91,y-.50,z-1.70];
   } else if(stage===2){
    const t=(frame-270)/150;
-   eye=[lerp(-7.0,-5.55,t),lerp(3.0,2.10,t),z-lerp(7.4,5.2,t)];
-   target=[0,y-.08,z-.4];
+   eye=[lerp(-6.2,-5.1,t),lerp(2.85,2.18,t),z-lerp(6.8,5.6,t)];
+   target=[0,y-.27,z-.40];
   }else if(stage===3){
    const t=(frame-420)/120;
-   eye=[lerp(-4.25,-3.8,t),lerp(.88,1.35,t),z+lerp(3.6,2.8,t)];
-   target=[-.56,y-.59,z+.12];
+   eye=[lerp(-6.15,-5.55,t),lerp(1.34,1.72,t),z+lerp(5.0,4.65,t)];
+   target=[-.40,y-.58,z+.06];
   }else{
    const t=(frame-540)/60;
-   eye=[lerp(7.3,8.1,t),lerp(3.0,3.65,t),z+lerp(10,11.3,t)];
-   target=[0,y+.14,z-1.0];
+   eye=[lerp(6.75,7.05,t),lerp(2.8,3.40,t),z+lerp(9.3,10.2,t)];
+   target=[0,y-.28,z-.85];
   }
+  if(camera instanceof THREE.PerspectiveCamera){camera.fov=[34,43,40,43,35][stage];}
   camera.position.set(...eye);camera.lookAt(...target);
   camera.updateProjectionMatrix();
  },[camera,frame]);
@@ -289,8 +340,8 @@ const Scene:React.FC<{frame:number}>=({frame})=>{
  return <>
   <color attach="background" args={['#73858b']}/>
   <fog attach="fog" args={['#73858b',24,81]}/>
-  <hemisphereLight args={['#e9f0e8','#5a5c52',1.7]}/>
-  <ambientLight intensity={.46}/>
+  <hemisphereLight args={['#e9f0e8','#515a51',1.40]}/>
+  <ambientLight intensity={.37}/>
   <directionalLight position={[-9,18,-9]} intensity={3.6} color="#ffe9cf" castShadow
     shadow-mapSize-width={2048} shadow-mapSize-height={2048}
     shadow-camera-left={-18} shadow-camera-right={18}
