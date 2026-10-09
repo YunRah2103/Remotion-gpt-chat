@@ -1,0 +1,110 @@
+name: Carbon Ceramic 001 - G Recovery Independent Final 750 Frame Assembly
+on:
+  push:
+    branches: ['automotive-brakes-001/g-wheel-reveal']
+    paths: ['.github/workflows/carbon-ceramic-001-g-final-assembly.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  assemble-independent:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 8000fb8f5d59fae7901c4c1be9482a8a3bc5a771
+      - uses: actions/download-artifact@v4
+        with:
+          repository: YunRah2103/Remotion-gpt-chat
+          run-id: 37994882432
+          github-token: ${{ github.token }}
+          pattern: brakes001-g-part-*-37994882432
+          path: out/carbon-ceramic-g/parts
+          merge-multiple: true
+      - name: Independently recover same-SHA 75-frame part 04
+        uses: actions/download-artifact@v4
+        with:
+          repository: YunRah2103/Remotion-gpt-chat
+          run-id: 37995764910
+          github-token: ${{ github.token }}
+          pattern: brakes001-g-recovered-part-04-37995764910
+          path: out/carbon-ceramic-g/parts
+          merge-multiple: true
+      - name: Prepare FFmpeg and visual proof tooling
+        run: |
+          set -euo pipefail
+          if ! command -v ffmpeg >/dev/null; then sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg; fi
+          python -m pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Verify exact matching original frames with 10 individual 75 frame checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/carbon-ceramic-g/final/stills
+          test "$(git rev-parse HEAD)" = "8000fb8f5d59fae7901c4c1be9482a8a3bc5a771"
+          : > out/carbon-ceramic-g/parts/concat.txt
+          for i in $(seq -w 00 09); do
+            f="out/carbon-ceramic-g/parts/part-${i}.mp4"
+            test -s "$f"
+            test -s "out/carbon-ceramic-g/parts/part-${i}-qa.json"
+            test -s "out/carbon-ceramic-g/parts/part-${i}.sha256"
+            test "$(cat out/carbon-ceramic-g/parts/source-${i}.txt)" = "8000fb8f5d59fae7901c4c1be9482a8a3bc5a771"
+            # checksums contain repo-root-relative paths: verify from repo root.
+            sha256sum -c "out/carbon-ceramic-g/parts/part-${i}.sha256"
+            python - "$i" <<'PY'
+          import json,sys
+          from pathlib import Path
+          i=sys.argv[1]
+          r=json.loads(Path(f'out/carbon-ceramic-g/parts/part-{i}-qa.json').read_text())
+          assert r['frames']==75 and r['width']==1080 and r['height']==1920
+          assert r['decodedCompletely'] and r['videoCodec']=='h264',r
+          PY
+            printf "file 'part-%s.mp4'\n" "$i" >> out/carbon-ceramic-g/parts/concat.txt
+          done
+      - name: Assemble exact 750 native frames into the playable silent full-length final candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          ffmpeg -hide_banner -loglevel warning -y -f concat -safe 0             -i out/carbon-ceramic-g/parts/concat.txt -c copy             out/carbon-ceramic-g/final/native-full-joined.mp4
+          ffmpeg -hide_banner -loglevel warning -y             -i out/carbon-ceramic-g/final/native-full-joined.mp4             -map 0:v:0 -vf "scale=in_range=pc:out_range=tv,format=yuv420p"             -c:v libx264 -preset faster -crf 18 -r 30 -frames:v 750             -pix_fmt yuv420p -color_range tv -an -movflags +faststart             out/carbon-ceramic-g/final/carbon-ceramic-001-wheel-reveal-final-candidate.mp4
+          python production/tools/quality.py video             out/carbon-ceramic-g/final/carbon-ceramic-001-wheel-reveal-final-candidate.mp4             --width 1080 --height 1920 --fps 30 --frames 750             --report out/carbon-ceramic-g/final/full-native-qa.json
+          ffprobe -v error -count_frames -show_streams -show_format -of json             out/carbon-ceramic-g/final/carbon-ceramic-001-wheel-reveal-final-candidate.mp4             > out/carbon-ceramic-g/final/ffprobe.json
+          sha256sum out/carbon-ceramic-g/final/carbon-ceramic-001-wheel-reveal-final-candidate.mp4             > out/carbon-ceramic-g/final/SHA256SUMS.txt
+          ffmpeg -hide_banner -loglevel error -i             out/carbon-ceramic-g/final/carbon-ceramic-001-wheel-reveal-final-candidate.mp4             -vf "select='eq(n,0)+eq(n,35)+eq(n,68)+eq(n,90)+eq(n,100)+eq(n,155)+eq(n,321)+eq(n,531)+eq(n,705)+eq(n,749)'"             -vsync 0 out/carbon-ceramic-g/final/stills/shot-%03d.png
+          python production/tools/quality.py contact             out/carbon-ceramic-g/final/full-10-shot-contact.jpg             out/carbon-ceramic-g/final/stills/shot-*.png
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path('out/carbon-ceramic-g/final')
+          qa=json.loads((p/'full-native-qa.json').read_text())
+          assert qa['frames']==750 and qa['decodedCompletely']
+          assert qa['videoCodec']=='h264' and qa['pixelFormat']=='yuv420p'
+          assert 24.99<=qa['durationSeconds']<=25.04
+          manifest={'status':'G_WHEEL_REVEAL_FULL_NATIVE_CANDIDATE_PENDING_HUMAN_CREATIVE_SIGNOFF',
+            'sourceSHA':'8000fb8f5d59fae7901c4c1be9482a8a3bc5a771',
+            'nativeChunkRuns':[37994882432,37995764910],
+            'native101FrameProofRun':37994882432,
+            'frames':750,'fps':30,'resolution':[1080,1920],
+            'codec':'h264','pixelFormat':'yuv420p','durationSeconds':qa['durationSeconds'],
+            'fullDecode':qa['decodedCompletely'],'audio':'silent_no_verified_Cedar',
+            'sha256':qa['sha256'],'visualReview':'human signoff pending',
+            'protectedLaterScenes':'A-D and E sources unchanged from P05 accepted commit'}
+          (p/'G_FINAL_MANIFEST.json').write_text(json.dumps(manifest,indent=2)+'\n')
+          print(json.dumps(manifest,indent=2))
+          PY
+      - name: Upload final playable G 25 second candidate and verified proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: carbon-ceramic-001-g-wheel-reveal-final-25s-${{ github.run_id }}
+          path: |
+            out/carbon-ceramic-g/final/carbon-ceramic-001-wheel-reveal-final-candidate.mp4
+            out/carbon-ceramic-g/final/G_FINAL_MANIFEST.json
+            out/carbon-ceramic-g/final/full-native-qa.json
+            out/carbon-ceramic-g/final/ffprobe.json
+            out/carbon-ceramic-g/final/SHA256SUMS.txt
+            out/carbon-ceramic-g/final/full-10-shot-contact.jpg
+            out/carbon-ceramic-g/final/stills/
+          retention-days: 30
+          if-no-files-found: warn
