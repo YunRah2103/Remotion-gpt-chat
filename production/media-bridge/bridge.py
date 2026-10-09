@@ -28,7 +28,8 @@ HOSTS = frozenset({
     "objects.githubusercontent.com", "release-assets.githubusercontent.com",
 })
 KINDS = {"image", "video"}
-LICENSES = {"CC0", "CC BY 4.0", "CC BY-SA 4.0", "Public Domain",
+LICENSES = {"CC0", "CC BY 4.0", "CC BY-SA 4.0", "CC BY 3.0", "CC BY-SA 3.0",
+            "Unsplash License", "Pexels License", "Pixabay Content License", "Public Domain",
             "Self-owned", "Permission Granted"}
 MAX_ITEMS = 6
 MAX_BYTES = {"image": 20 * 1024**2, "video": 80 * 1024**2}
@@ -47,7 +48,7 @@ def safe_url(value):
     if not isinstance(value, str) or len(value) > 1800:
         raise ValueError("Invalid URL length")
     u = urllib.parse.urlsplit(value)
-    if u.scheme != "https" or not u.netloc or not u.path or u.fragment:
+    if u.scheme != "https" or not u.netloc or u.path in ("", "/") or u.fragment:
         raise ValueError("Only direct HTTPS media URLs with a path and no fragment are supported")
     if u.username or u.password or u.port not in (None, 443):
         raise ValueError("Credentials and non-standard ports are not allowed")
