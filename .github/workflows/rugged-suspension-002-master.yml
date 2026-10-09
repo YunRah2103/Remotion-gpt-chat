@@ -1,0 +1,161 @@
+name: POLISH02 - 600-frame source-locked final film
+on:
+  push:
+    branches:
+      - automotive-tests/rugged-suspension-002
+    paths:
+      - '.github/workflows/rugged-suspension-002-master.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Verify production plan, true four-bar mechanical QA and registered composition
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          npm run check
+          python production/tools/production_pipeline.py --project rugged-suspension-002 --output out/p02/preflight
+          node production/tests/rugged02_qa.cjs
+          cp out/rugged02/physics/mechanical-qa.json out/p02/preflight/mechanical-qa.json
+          git rev-parse HEAD > out/p02/preflight/SOURCE_SHA.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: polish02-master-preflight-${{ github.run_id }}
+          path: out/p02/preflight/
+          retention-days: 30
+          if-no-files-found: error
+  blender-asset:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate original Blender source and validate GLB hierarchy and checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq blender
+          python -m pip install -r production/requirements-qa.txt
+          blender -b -t 2 --python production/videos/rugged-suspension-002/build_blender_suv.py -- out/p02/vehicle
+          python production/studio/studio.py inspect out/p02/vehicle/rugged-suv-body-002.glb out/p02/vehicle/inspection
+          test -s out/p02/vehicle/rugged-suv-body-002.glb
+          (cd out/p02/vehicle && sha256sum rugged-suv-body-002.glb > GLB_SHA256SUMS.txt)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: polish02-master-blender-${{ github.run_id }}
+          path: out/p02/vehicle/
+          retention-days: 30
+          if-no-files-found: error
+  native-chunks:
+    needs: [preflight,blender-asset]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        chunk: [0,1,2,3,4]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/download-artifact@v4
+        with:
+          name: polish02-master-blender-${{ github.run_id }}
+          path: out/p02/vehicle
+      - name: Render 120 native 1080x1920 software-WebGL frames from immutable source and verified GLB
+        env:
+          CHUNK: ${{ matrix.chunk }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          mkdir -p public/mechanics out/p02/chunks
+          (cd out/p02/vehicle && sha256sum -c GLB_SHA256SUMS.txt)
+          cp out/p02/vehicle/rugged-suv-body-002.glb public/mechanics/rugged-suv-body-002.glb
+          START=$((CHUNK*120))
+          END=$((START+119))
+          npx remotion render src/index.ts RuggedSuspension002 "out/p02/chunks/part-${CHUNK}.mp4" \
+            --frames="${START}-${END}" --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
+          python production/tools/quality.py video "out/p02/chunks/part-${CHUNK}.mp4" \
+            --width 1080 --height 1920 --fps 30 --frames 120 \
+            --report "out/p02/chunks/part-${CHUNK}.json"
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 "out/p02/chunks/part-${CHUNK}.mp4")" = h264
+          git rev-parse HEAD > "out/p02/chunks/SOURCE-${CHUNK}.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: polish02-native-chunk-${{ github.run_id }}-${{ matrix.chunk }}
+          path: out/p02/chunks/
+          retention-days: 30
+          if-no-files-found: warn
+  master:
+    needs: [preflight,blender-asset,native-chunks]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: polish02-native-chunk-${{ github.run_id }}-*
+          merge-multiple: true
+          path: out/p02/chunks
+      - uses: actions/download-artifact@v4
+        with:
+          name: polish02-master-preflight-${{ github.run_id }}
+          path: out/p02/preflight
+      - name: Verify source-locked chunks, concatenate, decode all frames and extract review images
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python -m pip install -r production/requirements-qa.txt
+          mkdir -p out/p02/final/review
+          ORIGINAL="$(git rev-parse HEAD)"
+          test "$ORIGINAL" = "$(tr -d '\n' < out/p02/preflight/SOURCE_SHA.txt)"
+          for I in 0 1 2 3 4; do
+            test -s "out/p02/chunks/part-${I}.mp4"
+            test "$ORIGINAL" = "$(tr -d '\n' < "out/p02/chunks/SOURCE-${I}.txt")"
+            python - "$I" <<'PY'
+          import json,sys
+          i=int(sys.argv[1])
+          p=json.load(open('out/p02/chunks/part-%d.json'%i))
+          assert p['width']==1080 and p['height']==1920 and p['frames']==120
+          assert p['fps']=='30/1' and p['videoCodec']=='h264'
+          assert p['decodedCompletely']
+          PY
+            printf "file 'part-%s.mp4'\n" "$I" >> out/p02/chunks/concat.txt
+          done
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i out/p02/chunks/concat.txt \
+            -an -c:v copy -movflags +faststart out/p02/final/RUGGED-SUSPENSION-POLISH02.mp4
+          python production/tools/quality.py video out/p02/final/RUGGED-SUSPENSION-POLISH02.mp4 \
+            --width 1080 --height 1920 --fps 30 --frames 600 \
+            --report out/p02/final/validation.json
+          ffmpeg -v error -xerror -i out/p02/final/RUGGED-SUSPENSION-POLISH02.mp4 -f null -
+          for PAIR in "25 intro" "195 hero" "325 extreme" "467 cutaway" "565 payoff"; do
+            set -- $PAIR
+            ffmpeg -hide_banner -loglevel error -y -i out/p02/final/RUGGED-SUSPENSION-POLISH02.mp4 \
+              -vf "select=eq(n\\,$1)" -vsync 0 -frames:v 1 "out/p02/final/review/$2.png"
+          done
+          python production/tools/quality.py contact out/p02/final/review/contact-sheet.jpg out/p02/final/review/*.png
+          (cd out/p02/final && sha256sum RUGGED-SUSPENSION-POLISH02.mp4 > SHA256SUMS.txt)
+          git rev-parse HEAD > out/p02/final/SOURCE_SHA.txt
+          cp out/p02/preflight/mechanical-qa.json out/p02/final/mechanical-qa.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: polish02-verified-master-${{ github.run_id }}
+          path: out/p02/final/
+          retention-days: 30
+          if-no-files-found: warn
