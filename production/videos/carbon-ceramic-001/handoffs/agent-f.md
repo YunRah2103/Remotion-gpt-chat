@@ -4,10 +4,10 @@
 
 - Repository: `YunRah2103/Remotion-gpt-chat`
 - Branch: `automotive-brakes-001/f-render`
-- Verified tooling source commit: `4564bde62ceaeca1e3afc4c7fa6d01cf707bb290`
+- Verified tooling source commit: `2d9b1257f27dd09e4f0a4dfe5e3f44d73775c4a6`
 - Work: added `render/SOURCE_LOCK.json`, `source_lock.py`, `verify_media.py`, `test_verify_media.py`, `README.md`, `REPORT.md`; enhanced the existing carbon-ceramic master render workflow.
-- Infra local test: **4/4 PASS** with synthetic 45-frame H.264 fixture; this is not native brake footage.
-- Initial GitHub Actions smoke run [37944380254](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37944380254) failed because its runner lacked FFmpeg. Corrected workflow in code commit above; follow-up run [37944495862](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37944495862) queued/in progress when this handoff was recorded.
+- Infra tests: **9/9 PASS** in GitHub Actions (five temporary-Git source-lock tests and four synthetic 45-frame H.264 media checks); this is not native brake footage.
+- Initial GitHub Actions smoke run [37944380254](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37944380254) failed because its runner lacked FFmpeg. Corrected workflow: runs [37944495862](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37944495862) and [37945011076](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37945011076) both **PASS**, latter verifies 9/9 tests and the fail-closed gate. Draft PR [#16](https://github.com/YunRah2103/Remotion-gpt-chat/pull/16).
 
 ## Source acceptance blockers
 
