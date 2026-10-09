@@ -1,0 +1,345 @@
+{
+  "schemaVersion": 1,
+  "project": "bmw-m5-g90-beat-001",
+  "audioSource": {
+    "kind": "user-uploaded",
+    "originalName": "Porsche 992 Turbo S TikTok sound.mp3 (user-uploaded filename; MUSIC is not Porsche-specific)",
+    "sha256": "f3ef6669a88ebe0420587067bf0b03d03e949f73b2fd0fd6567b4bf33e299f0d",
+    "durationSeconds": 61.048,
+    "storage": "NOT in public GitHub. User must attach original MP3 or derived permitted 20s preview to Agent B.",
+    "publicRedistributionRights": "unverified"
+  },
+  "selection": {
+    "inSeconds": 12.21,
+    "outSeconds": 32.21,
+    "durationSeconds": 20,
+    "videoFPS": 30,
+    "totalFrames": 600,
+    "measuredTempoBPM": 117.45,
+    "analysis": "librosa onset-strength tempo/beat grid; frame-rounded edit cues; editorial review still required"
+  },
+  "beatCutFrames": [
+    0,
+    16,
+    31,
+    47,
+    62,
+    78,
+    93,
+    109,
+    124,
+    139,
+    155,
+    171,
+    187,
+    202,
+    217,
+    233,
+    249,
+    264,
+    279,
+    295,
+    311,
+    326,
+    341,
+    357,
+    373,
+    388,
+    403,
+    419,
+    435,
+    450,
+    465,
+    481,
+    497,
+    512,
+    527,
+    543,
+    559,
+    574,
+    589
+  ],
+  "cutCount": 39,
+  "cuts": [
+    {
+      "index": 1,
+      "frame": 0,
+      "timeSeconds": 0,
+      "endFrame": 15,
+      "audioSourceSeconds": 12.21
+    },
+    {
+      "index": 2,
+      "frame": 16,
+      "timeSeconds": 0.533,
+      "endFrame": 30,
+      "audioSourceSeconds": 12.743
+    },
+    {
+      "index": 3,
+      "frame": 31,
+      "timeSeconds": 1.033,
+      "endFrame": 46,
+      "audioSourceSeconds": 13.243
+    },
+    {
+      "index": 4,
+      "frame": 47,
+      "timeSeconds": 1.567,
+      "endFrame": 61,
+      "audioSourceSeconds": 13.777
+    },
+    {
+      "index": 5,
+      "frame": 62,
+      "timeSeconds": 2.067,
+      "endFrame": 77,
+      "audioSourceSeconds": 14.277
+    },
+    {
+      "index": 6,
+      "frame": 78,
+      "timeSeconds": 2.6,
+      "endFrame": 92,
+      "audioSourceSeconds": 14.81
+    },
+    {
+      "index": 7,
+      "frame": 93,
+      "timeSeconds": 3.1,
+      "endFrame": 108,
+      "audioSourceSeconds": 15.31
+    },
+    {
+      "index": 8,
+      "frame": 109,
+      "timeSeconds": 3.633,
+      "endFrame": 123,
+      "audioSourceSeconds": 15.843
+    },
+    {
+      "index": 9,
+      "frame": 124,
+      "timeSeconds": 4.133,
+      "endFrame": 138,
+      "audioSourceSeconds": 16.343
+    },
+    {
+      "index": 10,
+      "frame": 139,
+      "timeSeconds": 4.633,
+      "endFrame": 154,
+      "audioSourceSeconds": 16.843
+    },
+    {
+      "index": 11,
+      "frame": 155,
+      "timeSeconds": 5.167,
+      "endFrame": 170,
+      "audioSourceSeconds": 17.377
+    },
+    {
+      "index": 12,
+      "frame": 171,
+      "timeSeconds": 5.7,
+      "endFrame": 186,
+      "audioSourceSeconds": 17.91
+    },
+    {
+      "index": 13,
+      "frame": 187,
+      "timeSeconds": 6.233,
+      "endFrame": 201,
+      "audioSourceSeconds": 18.443
+    },
+    {
+      "index": 14,
+      "frame": 202,
+      "timeSeconds": 6.733,
+      "endFrame": 216,
+      "audioSourceSeconds": 18.943
+    },
+    {
+      "index": 15,
+      "frame": 217,
+      "timeSeconds": 7.233,
+      "endFrame": 232,
+      "audioSourceSeconds": 19.443
+    },
+    {
+      "index": 16,
+      "frame": 233,
+      "timeSeconds": 7.767,
+      "endFrame": 248,
+      "audioSourceSeconds": 19.977
+    },
+    {
+      "index": 17,
+      "frame": 249,
+      "timeSeconds": 8.3,
+      "endFrame": 263,
+      "audioSourceSeconds": 20.51
+    },
+    {
+      "index": 18,
+      "frame": 264,
+      "timeSeconds": 8.8,
+      "endFrame": 278,
+      "audioSourceSeconds": 21.01
+    },
+    {
+      "index": 19,
+      "frame": 279,
+      "timeSeconds": 9.3,
+      "endFrame": 294,
+      "audioSourceSeconds": 21.51
+    },
+    {
+      "index": 20,
+      "frame": 295,
+      "timeSeconds": 9.833,
+      "endFrame": 310,
+      "audioSourceSeconds": 22.043
+    },
+    {
+      "index": 21,
+      "frame": 311,
+      "timeSeconds": 10.367,
+      "endFrame": 325,
+      "audioSourceSeconds": 22.577
+    },
+    {
+      "index": 22,
+      "frame": 326,
+      "timeSeconds": 10.867,
+      "endFrame": 340,
+      "audioSourceSeconds": 23.077
+    },
+    {
+      "index": 23,
+      "frame": 341,
+      "timeSeconds": 11.367,
+      "endFrame": 356,
+      "audioSourceSeconds": 23.577
+    },
+    {
+      "index": 24,
+      "frame": 357,
+      "timeSeconds": 11.9,
+      "endFrame": 372,
+      "audioSourceSeconds": 24.11
+    },
+    {
+      "index": 25,
+      "frame": 373,
+      "timeSeconds": 12.433,
+      "endFrame": 387,
+      "audioSourceSeconds": 24.643
+    },
+    {
+      "index": 26,
+      "frame": 388,
+      "timeSeconds": 12.933,
+      "endFrame": 402,
+      "audioSourceSeconds": 25.143
+    },
+    {
+      "index": 27,
+      "frame": 403,
+      "timeSeconds": 13.433,
+      "endFrame": 418,
+      "audioSourceSeconds": 25.643
+    },
+    {
+      "index": 28,
+      "frame": 419,
+      "timeSeconds": 13.967,
+      "endFrame": 434,
+      "audioSourceSeconds": 26.177
+    },
+    {
+      "index": 29,
+      "frame": 435,
+      "timeSeconds": 14.5,
+      "endFrame": 449,
+      "audioSourceSeconds": 26.71
+    },
+    {
+      "index": 30,
+      "frame": 450,
+      "timeSeconds": 15,
+      "endFrame": 464,
+      "audioSourceSeconds": 27.21
+    },
+    {
+      "index": 31,
+      "frame": 465,
+      "timeSeconds": 15.5,
+      "endFrame": 480,
+      "audioSourceSeconds": 27.71
+    },
+    {
+      "index": 32,
+      "frame": 481,
+      "timeSeconds": 16.033,
+      "endFrame": 496,
+      "audioSourceSeconds": 28.243
+    },
+    {
+      "index": 33,
+      "frame": 497,
+      "timeSeconds": 16.567,
+      "endFrame": 511,
+      "audioSourceSeconds": 28.777
+    },
+    {
+      "index": 34,
+      "frame": 512,
+      "timeSeconds": 17.067,
+      "endFrame": 526,
+      "audioSourceSeconds": 29.277
+    },
+    {
+      "index": 35,
+      "frame": 527,
+      "timeSeconds": 17.567,
+      "endFrame": 542,
+      "audioSourceSeconds": 29.777
+    },
+    {
+      "index": 36,
+      "frame": 543,
+      "timeSeconds": 18.1,
+      "endFrame": 558,
+      "audioSourceSeconds": 30.31
+    },
+    {
+      "index": 37,
+      "frame": 559,
+      "timeSeconds": 18.633,
+      "endFrame": 573,
+      "audioSourceSeconds": 30.843
+    },
+    {
+      "index": 38,
+      "frame": 574,
+      "timeSeconds": 19.133,
+      "endFrame": 588,
+      "audioSourceSeconds": 31.343
+    },
+    {
+      "index": 39,
+      "frame": 589,
+      "timeSeconds": 19.633,
+      "endFrame": 599,
+      "audioSourceSeconds": 31.843
+    }
+  ],
+  "constraints": [
+    "Every detected beat boundary starts a new piece of genuine moving footage of BMW M5 G90 SALOON only.",
+    "Do not substitute F90 M5, G99 M5 Touring, M3, M4 or an unrelated BMW, and do not label ambiguous footage as G90.",
+    "Sound begins at original MP3 12.21s; exact 20s audio excerpt matches frame-0 playback. Agent B must listen, audition the selected section, and correct sync/phrase timing if needed.",
+    "Never commit user-uploaded music to a public GitHub repository or publish an audio-muxed public Release until redistribution rights are confirmed.",
+    "If licensed moving footage cannot be obtained, report exact missing slots and request user-supplied authorized clips; do not render mislabeled footage as final."
+  ]
+}
