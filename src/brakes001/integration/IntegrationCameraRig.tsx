@@ -31,7 +31,7 @@ export const integrationCameraAt=(frame:number):BrakeCameraPose=>{
     const position:[number,number,number]=[
       lerp(.87,.83,t),lerp(.38,.42,t),lerp(.67,.77,t)];
     const target:[number,number,number]=[0,.045,.035];
-    return {...p,position,target,fovDegrees:42,
+    return {...p,position,target,fovDegrees:39,
       focusDistanceMetres:Math.hypot(...position.map((v,i)=>v-target[i]))};
   }
   if(p.shotId==='thermal'){

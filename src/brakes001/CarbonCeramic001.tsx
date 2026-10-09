@@ -53,7 +53,7 @@ export const CarbonCeramic001: React.FC = () => {
       {context && <GhostCarOutline frame={frame}/>}
       {/* Stable macro framing: C's shot target, not a guessed static offset.
           Geometry, independent X-axis pads and fixed caliper are unmodified. */}
-      <group scale={shot === 'thermal' ? 0.56 : shot === 'reveal' ? 0.86 : shot === 'hero' ? 0.86 : shot === 'benefits' ? 0.75 : 1}
+      <group scale={shot === 'thermal' ? 0.56 : shot === 'reveal' ? 0.86 : shot === 'hero' ? 0.86 : shot === 'benefits' ? 0.93 : 1}
         position={brakePosition}>
         <BrakeAssembly rotorAngleRad={state.rotorAngleRad}
           padGapMetres={state.padGapMetres} heat01={0}
