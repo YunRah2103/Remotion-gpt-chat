@@ -253,7 +253,8 @@
       "two satin cheek trims",
       "curved axial bridge crown",
       "two anti-squeal pad shims",
-      "four pad backing retention ears"
+      "four pad backing retention ears",
+      "Three individual outer axial bridge straps with two open inter-bridge windows"
     ],
     "imageRender": {
       "backend": "Cycles CPU",
@@ -264,6 +265,6 @@
         900
       ]
     },
-    "note": "Not new native proof. Generated builder report must replace design expectations."
+    "note": "Native GLB image QA pending; nominal manifest is not measured geometry."
   }
 }
