@@ -325,7 +325,7 @@ def construct():
             .205,.231,.043,sector+offset,
             -.068,.068,CALIPER,body,14)
     sector_mesh("BridgeSatinCrown",.228,.232,.230,sector,
-                -.042,.042,ACCENT,body,24)
+                -.042,.042,CALIPER,body,24)
     for a in (sector-.22,sector+.22):
         y=.205*math.sin(a);z=.205*math.cos(a)
         cylinder("BridgeRetainer_%.2f"%a,.005,.133,(0,y,z),ACCENT,body,16,.00025)
@@ -402,15 +402,24 @@ def setup_stage(out):
     scene.render.film_transparent=False
     # Controlled studio view transform prevents highlight washout.
     view=scene.view_settings
-    transforms={i.identifier for i in view.bl_rna.properties['view_transform'].enum_items}
-    view.view_transform='AgX' if 'AgX' in transforms else ('Filmic' if 'Filmic' in transforms else 'Standard')
-    view.exposure=-0.45
-    view.gamma=1.0
-    looks={i.identifier for i in view.bl_rna.properties['look'].enum_items}
-    for name in ('AgX - Medium High Contrast','Medium High Contrast','Medium Contrast','None'):
-        if name in looks:
-            view.look=name
+    # Direct attempts matter: the Blender 4.0 distro exposes dynamic OCIO
+    # transforms that are absent from static RNA enum_items.
+    for transform in ('AgX','Filmic','Standard'):
+        try:
+            view.view_transform=transform
             break
+        except (TypeError,ValueError):
+            continue
+    view.exposure=-0.85
+    view.gamma=1.0
+    for look in ('Medium High Contrast','AgX - Medium High Contrast',
+                 'Medium Contrast','None'):
+        try:
+            view.look=look
+            break
+        except (TypeError,ValueError):
+            continue
+    print('POLISH03_COLOR_MANAGEMENT',view.view_transform,view.look,view.exposure)
     world=bpy.data.worlds.new("NightStudio")
     scene.world=world;world.use_nodes=True
     world.node_tree.nodes.get('Background').inputs['Color'].default_value=(.012,.018,.025,1)
@@ -421,9 +430,9 @@ def setup_stage(out):
         o=bpy.data.objects.new(name,dat);scene.collection.objects.link(o)
         o.location=loc;direction=Vector((0,0,0))-o.location
         o.rotation_euler=direction.to_track_quat('-Z','Y').to_euler()
-    area("Key softbox",(.49,-.35,.43),60,(.90,.95,1.0),.68)
-    area("Shadow lift",(-.29,.33,.36),20,(1.0,.82,.70),.72)
-    area("Vent rim",(-.18,-.18,.55),50,(.66,.79,1.0),.38)
+    area("Key softbox",(.49,-.35,.43),8,(.93,.97,1.0),.68)
+    area("Shadow lift",(-.29,.33,.36),3,(1.0,.89,.81),.72)
+    area("Vent rim",(-.18,-.18,.55),5,(.78,.88,1.0),.38)
     camera=bpy.data.cameras.new("Hero camera")
     cam=bpy.data.objects.new("Hero camera",camera)
     scene.collection.objects.link(cam);scene.camera=cam
@@ -507,7 +516,7 @@ def main(output):
         "colorManagement":{"transform":bpy.context.scene.view_settings.view_transform,
                            "look":bpy.context.scene.view_settings.look,
                            "exposure":bpy.context.scene.view_settings.exposure},
-        "studioLightWatts":{"key":60,"fill":20,"rim":50}}
+        "studioLightWatts":{"key":8,"fill":3,"rim":5}}
     (out/"build-report.json").write_text(json.dumps(report,indent=2)+"\n")
     print("BRAKE_HARDWARE_PROOF_PASS",json.dumps(report))
 
