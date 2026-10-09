@@ -1,0 +1,57 @@
+name: Production Studio - phone UI safety and short-form QA
+on:
+  workflow_dispatch:
+    inputs:
+      video_run:
+        required: true
+        type: string
+        description: Approved production MP4 run ID
+      video_artifact:
+        required: true
+        type: string
+        description: Exact successful MP4 artifact name
+      layout:
+        required: true
+        type: string
+        description: Committed authored object layout JSON
+        default: production/phoneqa/layouts/default.json
+permissions:
+  contents: read
+  actions: read
+jobs:
+  phone-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: production/requirements-qa.txt
+      - run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python -m pip install -r production/requirements-qa.txt
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ inputs.video_run }}
+          name: ${{ inputs.video_artifact }}
+          github-token: ${{ github.token }}
+          path: out/source
+      - name: Generate phone-screen masks, authored-layout overlap report and sampled stills
+        env:
+          LAYOUT: ${{ inputs.layout }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$LAYOUT" =~ ^production/phoneqa/layouts/[a-z0-9-]+\.json$ ]] && test -f "$LAYOUT"
+          mapfile -t MOVIES < <(find out/source -type f -name '*.mp4')
+          test "${#MOVIES[@]}" -eq 1
+          python production/phoneqa/phone_qa.py --layout "$LAYOUT" --video "${MOVIES[0]}" --output out/phoneqa
+          cat out/phoneqa/phone-report.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: studio-phoneqa-${{ github.run_id }}
+          path: out/phoneqa/
+          retention-days: 21
+          if-no-files-found: error
