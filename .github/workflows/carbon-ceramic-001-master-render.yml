@@ -33,6 +33,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
           command -v ffmpeg && command -v ffprobe
           python -m unittest discover -s production/videos/carbon-ceramic-001/render -p 'test_*.py' -v
           python -m py_compile production/videos/carbon-ceramic-001/render/source_lock.py production/videos/carbon-ceramic-001/render/verify_media.py
@@ -51,6 +53,8 @@ jobs:
     timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # required by approved source SHA ancestry/diff lock
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
