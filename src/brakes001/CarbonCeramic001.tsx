@@ -47,7 +47,7 @@ export const CarbonCeramic001: React.FC = () => {
       camera={{position: [1.3, .6, .9], fov: 33, near: .012, far: 75}}
       gl={{antialias: true, preserveDrawingBuffer: true}}>
       <IntegrationCameraRig frame={frame}/>
-      <BrakeLighting frame={frame} heat01={motion.heat01} background ground={false}/>
+      <BrakeLighting frame={frame} heat01={0} background ground={false}/>
       {!context && <directionalLight position={[.65,.55,.95]} color="#c8deec" intensity={1.1}/>}
       {!context && <pointLight position={[.35,.25,.45]} color="#f0c9a0" intensity={0.36} distance={2} decay={2}/>}
       {context && <GhostCarOutline frame={frame}/>}

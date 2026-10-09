@@ -41,13 +41,13 @@ export const FrictionHeatMap:React.FC<{frame:number;rotorAngleRad:number}>=({
           const start=i*2*Math.PI/sectors;
           const worldTheta=start+Math.PI/sectors+rotorAngleRad;
           const intensity=frictionHotSpot01At(frame,worldTheta);
-          const localAlpha=Math.min(.31,.31*intensity);
+          const localAlpha=Math.min(.62,.62*intensity);
           return <group key={i}>
             <mesh renderOrder={3} name={'ThermalFrictionSector_'+side+'_'+i}>
               <ringGeometry args={[.127,.190,5,1,start,2*Math.PI/sectors+.001]}/>
-              <meshBasicMaterial color={intensity>.38?'#e98c59':'#b76944'}
+              <meshBasicMaterial color={intensity>.38?'#f79151':'#bd7555'}
                 transparent opacity={localAlpha} depthWrite={false}
-                depthTest side={THREE.DoubleSide} toneMapped={true}/>
+                depthTest side={THREE.DoubleSide} toneMapped={false}/>
             </mesh>
             <mesh position={[0,0,side===0?-.00009:.00009]} renderOrder={4}>
               <ringGeometry args={[.133,.164,4,1,start,2*Math.PI/sectors+.001]}/>
