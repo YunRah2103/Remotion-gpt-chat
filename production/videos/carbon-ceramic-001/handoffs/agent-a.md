@@ -1,61 +1,73 @@
-# Agent A — hardware integration handoff
+# Agent A — Carbon-Ceramic Brakes 001 / Hardware Polish 02
 
-**Status:** REVIEW / native Blender proof outstanding. Do not treat this as a complete native-asset signoff.
+**Status: REVIEW, NOT READY.** The source corrections are committed, but the required **new-source native Blender stills and GLB verification have not run**. Neither a green planning check nor Agent E's **prior** GLB can replace that evidence.
 
+- Repository: `YunRah2103/Remotion-gpt-chat`
 - Branch: `automotive-brakes-001/a-hardware`
-- **Implementation source SHA (full):** `a201cefa64cef0f797deba34ddfbd55c58967d33`
+- **Exact implementation source SHA** (all A hardware changes, manifest, source numerical evidence): `0bfc8ce52f15e6bf883cca0ad425fd4359d5af33`
 - PR: https://github.com/YunRah2103/Remotion-gpt-chat/pull/11
-- Hardware owner: `hardware`
+- Integration destination: `automotive-brakes-001/e-integration` (E-owned; not modified by A)
 
-## Delivered real source (7 authored files)
+## What changed relative to the earlier working GLB
 
-- `src/brakes001/hardware/BrakeAssembly.tsx`: real geometry via Three.js extrusion and drilled holes, separate spinning rotor / inboard and outboard pads / static caliper and upright, 390 mm OD and 44 internal curved cooling vanes.
-- `src/brakes001/hardware/BrakeHardwareProof.tsx`: standalone 120-frame Remotion scene with mechanical orbit, pad-clamp movement and exploded views. **Master must register it** to render; Agent A has not touched `Root.tsx`.
-- `production/videos/carbon-ceramic-001/hardware/build_brake.py`: original Blender builder. Creates independent annular friction faces with real boolean perforation, actual vent vanes, caliper cast sectors, piston/seal cylinders, pad sectors, aluminium hat, hardware and bearing context. Exports hierarchy-preserving Y-up GLB, saves .blend, renders four views and writes SHA256 reporting.
-- `hardware/asset-contract.json`: machine-readable moving pivot agreement.
-- `hardware/rig-manifest.json`: **design target** nodes, scale/axis, approximate bounds and integration instructions (not measured GLB proof).
-- `hardware/test_hardware.py`: source-level contract checks and optional real glTF2 binary structure inspector; requires actual GLB to assert native PASS.
-- `hardware/README.md`: production/export, engineering caveats, native QA instructions.
+1. **Blender render failure:** GitHub native run [37947404308](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37947404308) exported a valid older GLB, but failed on its first Cycles close-up with `Build without OpenImageDenoiser`. The builder now chooses CPU Cycles (24 samples), explicitly disables scene/view-layer/preview denoising where supported, and checks each rendered PNG exists and is substantial. This is an **implemented fix, not a verified rerender**.
+2. **Sculpted caliper:** Replaces the two broad flat sector cheeks with closed, rounded, three-lobed parametric cheek shells. Adds forged ribs, machined crown and edges, purposeful fixing ears, six piston bore/cap/seal details, hydraulics and bleed components. Three discrete structural cross-bridges replace the old solid wall; actual open windows reveal the piston and pad region.
+3. **Pad fidelity:** Distinct dark friction compound, backing plates, anti-squeal shims and two retaining ears per side. Lining faces stay at **x=±0.018 m** at rest, with **2.5 mm** of per-pad axial closure toward rotor faces x=±0.0155 m. No exaggerated animation distance.
+4. **Material separation:** Keeps textured cold composite rotor, real axial drilling and 44 curved internal vanes; forged dark satin caliper, nickel hardware, aluminium hat and steel shims each use separate materials. Does not assert calibrated heat or OEM CAD.
+5. **Three.js parity:** Existing `BrakeAssembly` export, props and eight root nodes stay stable. Removes box-caliper geometry, uses matching multi-lobed geometry and three open structural cross-bridges. All added geometry is memoized across frames. No edit to Agent B/C/D/E/F/Master work.
 
-## Node interface
+## Current mechanical contract
 
-| GLB / React node | Parent | Master / Agent B motion |
-| --- | --- | --- |
-| RotorAssembly | scene | Global X rotor rotation |
-| FrictionRing | RotorAssembly | Inherits rotor X rotation |
-| RotorHat | RotorAssembly | Inherits rotor X rotation |
-| Hub | RotorAssembly | Inherits rotor X rotation |
-| CaliperBody | scene | Never rotates |
-| PadInner | scene | +X travel up to 2.5 mm |
-| PadOuter | scene | -X travel up to 2.5 mm |
-| UprightSupport | scene | Never rotates |
+| Stable node | Parent | Motion |
+|---|---|---|
+| `RotorAssembly` | scene | rotates about +X |
+| `FrictionRing` | RotorAssembly | rotates with rotor |
+| `RotorHat` | RotorAssembly | rotates with rotor |
+| `Hub` | RotorAssembly | rotates with rotor |
+| `CaliperBody` | scene | fixed |
+| `PadInner` | scene | approaches +X |
+| `PadOuter` | scene | approaches -X |
+| `UprightSupport` | scene | fixed |
 
-**World units:** metres; rotor disc plane YZ and axle X. Blender is native Z-up; glTF export Y-up uses `(x,y,z)_glTF=(x,z,-y)_Blender`. The axle X is invariant. In Blender the two machined friction faces lie at `x=±0.0155m`, pads rest at `x=±0.018m`; both pad faces can reach contact without intended penetration. Node origins are preserved.
+Nominal friction OD **390 mm**, Y-up in glTF/Three, Blender Z-up to glTF Y-up mapping `(x,y,z) -> (x,z,-y)`. This is a non-manufacturer-specific illustration.
 
-## Automated QA evidence
+## Tests and current evidence
 
-- Contract CI run [37941930644](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37941930644): **PASS** (full source SHA `a201cefa64cef0f797deba34ddfbd55c58967d33`).
-- Production CI [37941930698](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37941930698): **PASS** (TypeScript compilation, Python QA tests, existing GpuDriveFilm native smoke — does **not** prove native brake rendering).
-- Direct source/rig invariant tests run on GitHub-fetched sources: **10/10 PASS** (node contract, X axis, gap geometry, source drilling, independent static caliper).
-- Native Blender execution: **NOT RUN**. Real GLB inspection: **NOT RUN**. Four rendered close-ups: **NOT RUN**. New brake hardware visual QA: **NOT RUN**.
+- **PASS:** Source/handoff contract workflow [37967059274](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37967059274) at final code revision before handoff; validates handoff shape and Python compile, **not** new hardware native export.
+- **PASS (intermediate revision):** Production suite [37965390060](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37965390060), TypeScript + Python production suite and legacy 2-frame WebGL smoke; this does not include a newly rebuilt carbon-ceramic hardware GLB.
+- **PASS:** Independently reconstructed numerical mesh/clearance checks, 4/4: two Blender-cheek formulas at 486 vertices/968 triangles and two Three.js-cheek formulas at 580 vertices/1156 triangles. All four are watertight with consistent winding and positive volume. Minimum cheek inner x absolute distance is 36.5 mm versus backing absolute limit 33 mm. Report: `hardware/polish02-local-geometry-validation.json`. **This is not a native Blender result.**
+- **PASS for *old* source only:** Agent E native GLB in [37947404308](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37947404308) has **133 nodes, 125 meshes, nine materials**. E's prior mechanical/thermal Remotion preview and full FFmpeg decode passed, but this was before A's Polish02 changes.
+- **NOT VERIFIED:** Actual **Polish02** GLB mesh/material/node counts, Cycles close-ups, native moving proof, final visual appearance and independent E approval. All four newly rendered PNGs are still required.
 
-## Required next actions for Master / native runner
-
-Execute **without modifying this branch**:
+## Native rebuild / acceptance commands
 
 ```bash
-blender -b --factory-startup -t 2 \
-  --python production/videos/carbon-ceramic-001/hardware/build_brake.py \
-  -- out/carbon-ceramic-001/hardware
+# At EXACT A implementation source SHA:
+git checkout 0bfc8ce52f15e6bf883cca0ad425fd4359d5af33
 
 python production/advanced/asset_contract.py \
   production/videos/carbon-ceramic-001/hardware/asset-contract.json
 
+blender -b --factory-startup -t 2 \
+  --python production/videos/carbon-ceramic-001/hardware/build_brake.py \
+  -- out/carbon-ceramic-001/hardware
+
 python production/videos/carbon-ceramic-001/hardware/test_hardware.py \
   --glb out/carbon-ceramic-001/hardware/carbon-ceramic-brake.glb \
-  --report out/carbon-ceramic-001/hardware/rig-manifest.json
+  --report out/carbon-ceramic-001/hardware/rig-manifest.json \
+  --proof-dir out/carbon-ceramic-001/hardware
 ```
 
-Check generated `rotor-front.png`, `ventilation.png`, `pad-contact.png`, `exploded.png` visually at pixel resolution. Inspect the GLB axes/named hierarchy and 3D mesh/vent clearance. Place binary assets and contact sheet in an Actions artifact. Register `BrakeHardwareProof` or the final Master composition and render moving frames 135–195 and 300–360, watching for clipping and no-caliper rotation.
+Required artifact contents: `carbon-ceramic-brake.blend`, `carbon-ceramic-brake.glb`, `rig-manifest.json`, `build-report.json`, `rotor-front.png`, `ventilation.png`, `exploded.png`, `pad-contact.png`, and native console/test logs.
 
-**No manufacturer-verified geometry or thermal calibration is claimed.** If the native Blender exporter, CSG holes, pad clearance or actual footage fails, keep handoff in REVIEW and correct source before marking ready. Once actual binary/visual proof exists, update JSON with the new source SHA, run links, QA evidence and `status: ready`.
+**Do not mark READY until** the four Blender PNGs are genuinely visually reviewed, GLB hierarchy shows two detailed cheeks, three axial bridges and both pad shims, actual model bounds/pivots are verified, and Agent E watches a moving pad-contact/thermal proof. Publish a source-SHA-labelled GitHub Actions artifact rather than placing multi-MB binaries in commits.
+
+## Agent E integration notes
+
+Consume *only* A-owned file changes. Import `BrakeAssembly.tsx` from the revised source into E's registered film if E uses its procedural fallback. If using the .glb, wait for the **new verified binary**, stage it at the same master-approved asset path, bind the same eight root node transforms and **do not adjust Agent B's `brakeStateAt` or 2.5 mm pad travel**. In macro footage the physical gap is intentionally subtle; solve visibility through shot scale/lighting/labels, not physically incorrect pad translation. Then rerun the integration tests, native 135–195 / 300–360 previews and real 1080×1920 visual review.
+
+## Blockers and limitations
+
+Native Blender is unavailable in this execution container, and the connected GitHub repository integration cannot dispatch a new Blender Actions workflow. Consequently the source fix has not been run through the exact previous failure environment; no new true native Blender PNGs/GLB or source-locked uploaded Actions artifact exists at this stage. A supplementary **VTK prototype comparison based on the old GLB plus a newly reconstructed cheek** was visually inspected, but is explicitly **not** a Polish02 Blender render and cannot substitute for signoff.
+
+**No manufacturer CAD, precise friction temperature, calibrated wear, or real braking-performance guarantee is claimed.**
