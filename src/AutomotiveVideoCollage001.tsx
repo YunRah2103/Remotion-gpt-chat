@@ -6,7 +6,7 @@ type Car = 'mclaren'|'ferrari'|'lamborghini'|'gtr'|'bmw'|'mclaren2';
 const cars: Car[] = ['mclaren','ferrari','lamborghini','gtr','bmw','mclaren2'];
 const labels: Record<Car,string> = {
   mclaren:'McLAREN 650S', ferrari:'FERRARI F8', lamborghini:'LAMBORGHINI',
-  gtr:'NISSAN GT-R', bmw:'BMW M4', mclaren2:'McLAREN'
+  gtr:'NISSAN S13', bmw:'BMW M4', mclaren2:'McLAREN'
 };
 const line: Record<Car,string> = {
   mclaren:'BRITISH PRECISION', ferrari:'ITALIAN THEATRE', lamborghini:'PURE DRAMA',
