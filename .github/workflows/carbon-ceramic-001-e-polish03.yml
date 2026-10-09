@@ -29,6 +29,10 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p out/brakes001-e-polish03/macro
+          if ! command -v ffprobe >/dev/null || ! command -v ffmpeg >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
           npm ci --no-audit --no-fund
           npm run check
           node src/brakes001/integration/integration.test.cjs | tee out/brakes001-e-polish03/macro/integration-test.txt
@@ -66,6 +70,10 @@ jobs:
       - name: Install pinned deps
         run: |
           set -euo pipefail
+          if ! command -v ffprobe >/dev/null || ! command -v ffmpeg >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
           npm ci --no-audit --no-fund
           python -m pip install --disable-pip-version-check Pillow==11.3.0
           mkdir -p out/brakes001-e-polish03/sweeps
