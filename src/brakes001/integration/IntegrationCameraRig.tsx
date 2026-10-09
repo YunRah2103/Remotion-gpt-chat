@@ -18,9 +18,11 @@ export const integrationCameraAt=(frame:number):BrakeCameraPose=>{
   // The demonstration covers B's real first pressure ramp (frames 95–117);
   // camera is side-oriented so per-face axial travel has perspective.
   if(frame>=100&&frame<=147){
-    const position:[number,number,number]=[.64,.28,.59];
-    const target:[number,number,number]=[0,.105,.105];
-    return {...p,position,target,fovDegrees:40,
+    const reveal=smooth((frame-101)/12);
+    const position:[number,number,number]=[
+      lerp(.64,.09,reveal),lerp(.28,.25,reveal),lerp(.59,.85,reveal)];
+    const target:[number,number,number]=[0,.055,.085];
+    return {...p,position,target,fovDegrees:39,
       focusDistanceMetres:Math.hypot(...position.map((v,i)=>v-target[i]))};
   }
   if(p.shotId==='reveal'){
