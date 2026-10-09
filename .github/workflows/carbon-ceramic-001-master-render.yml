@@ -1,0 +1,98 @@
+name: Carbon Ceramic 001 - Master proof and final rendering
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Native frame proofs, two motion sequences, or exact 750-frame final
+        required: true
+        type: choice
+        default: proof
+        options: [proof, moving, final]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: carbon-ceramic-master-${{ github.ref }}-${{ inputs.mode }}
+  cancel-in-progress: false
+
+jobs:
+  native-render:
+    if: github.ref == 'refs/heads/automotive-brakes-001/master'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify complete integrated source, not planning-only handoffs
+        run: |
+          set -euo pipefail
+          mkdir -p out/carbon-ceramic-001
+          python -m unittest discover -s production/videos/carbon-ceramic-001 -p 'test_master_gate.py' -v
+          python production/videos/carbon-ceramic-001/validate_setup.py
+          python production/videos/carbon-ceramic-001/master_gate.py \
+            --report out/carbon-ceramic-001/master-readiness.json --require-ready
+      - name: Install native rendering dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -r production/requirements-qa.txt
+          npm ci --no-audit --no-fund
+          npm run check
+      - name: Produce five genuine shot-review stills
+        shell: bash
+        run: |
+          set -euo pipefail
+          python production/tools/render.py --composition CarbonCeramic001 --mode stills \
+            --output out/carbon-ceramic-001/stills --samples 48,168,321,531,705 --scale 0.5
+          python production/tools/quality.py contact out/carbon-ceramic-001/contact-sheet.jpg \
+            out/carbon-ceramic-001/stills/frame-*.png
+      - name: Render and fully decode both motion studies
+        if: inputs.mode == 'moving' || inputs.mode == 'final'
+        run: |
+          set -euo pipefail
+          python production/tools/render.py --composition CarbonCeramic001 --mode preview \
+            --start 135 --end 195 --scale 0.45 --concurrency 2 \
+            --output out/carbon-ceramic-001/clamp-135-195.mp4
+          python production/tools/render.py --composition CarbonCeramic001 --mode preview \
+            --start 300 --end 360 --scale 0.45 --concurrency 2 \
+            --output out/carbon-ceramic-001/heat-300-360.mp4
+          for clip in clamp-135-195 heat-300-360; do
+            python production/tools/quality.py video "out/carbon-ceramic-001/${clip}.mp4" \
+              --fps 30 --frames 61 --report "out/carbon-ceramic-001/${clip}-qa.json"
+          done
+      - name: Render native 25-second 1080x1920 H.264 film
+        if: inputs.mode == 'final'
+        run: |
+          set -euo pipefail
+          python production/tools/render.py --composition CarbonCeramic001 --mode final \
+            --output out/carbon-ceramic-001/carbon-ceramic-001-master.mp4 --concurrency 2
+          python production/tools/quality.py video out/carbon-ceramic-001/carbon-ceramic-001-master.mp4 \
+            --width 1080 --height 1920 --fps 30 --frames 750 \
+            --report out/carbon-ceramic-001/final-native-qa.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result=json.loads(Path('out/carbon-ceramic-001/final-native-qa.json').read_text())
+          assert 24.99 <= result['durationSeconds'] <= 25.04, result
+          assert result['videoCodec']=='h264', result
+          assert result['pixelFormat']=='yuv420p', result
+          assert result['decodedCompletely'] is True, result
+          print('NATIVE FINAL 750/750 / 1080x1920 / H264 / DECODE CHECK PASS')
+          PY
+          (cd out/carbon-ceramic-001 && sha256sum carbon-ceramic-001-master.mp4 > SHA256SUMS.txt)
+      - name: Publish reproducible proofs and native MP4 where available
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: carbon-ceramic-001-${{ inputs.mode }}-${{ github.run_id }}
+          path: out/carbon-ceramic-001/
+          retention-days: 30
+          if-no-files-found: warn
