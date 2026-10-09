@@ -1,56 +1,62 @@
 [
   {
     "id": "porsche",
-    "file": "Porsche_911_GT3_RS_992.jpg",
-    "model": "Porsche 911 GT3 RS (992)",
-    "author": "Calreyn88",
-    "license": "CC BY-SA 4.0",
-    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
-    "source_page": "https://commons.wikimedia.org/wiki/File:Porsche_911_GT3_RS_992.jpg"
+    "model": "Porsche 911 GT3",
+    "author": "Patrick",
+    "pexels_id": 27505234,
+    "source_page": "https://www.pexels.com/photo/a-blue-porsche-911-gt3-is-driving-on-the-track-27505234/",
+    "license": "Pexels License",
+    "license_url": "https://www.pexels.com/license/",
+    "download_url": "https://images.pexels.com/photos/27505234/pexels-photo-27505234.jpeg?auto=compress&cs=tinysrgb&w=2200"
   },
   {
     "id": "lambo",
-    "file": "Lamborghini_Huracán.jpg",
     "model": "Lamborghini Huracán",
-    "author": "Alexandre Prevot",
-    "license": "CC BY-SA 4.0",
-    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
-    "source_page": "https://commons.wikimedia.org/wiki/File:Lamborghini_Hurac%C3%A1n.jpg"
+    "author": "Kamshotthat",
+    "pexels_id": 12513516,
+    "source_page": "https://www.pexels.com/photo/gray-lamborghini-huracan-on-road-12513516/",
+    "license": "Pexels License",
+    "license_url": "https://www.pexels.com/license/",
+    "download_url": "https://images.pexels.com/photos/12513516/pexels-photo-12513516.jpeg?auto=compress&cs=tinysrgb&w=2200"
   },
   {
     "id": "ferrari",
-    "file": "Ferrari_488_GTB_IMG_4120.jpg",
     "model": "Ferrari 488 GTB",
-    "author": "Alexander Migl",
-    "license": "CC BY-SA 4.0",
-    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
-    "source_page": "https://commons.wikimedia.org/wiki/File:Ferrari_488_GTB_IMG_4120.jpg"
+    "author": "Sai Krishna",
+    "pexels_id": 19480400,
+    "source_page": "https://www.pexels.com/photo/ferrari-488-gtb-back-view-19480400/",
+    "license": "Pexels License",
+    "license_url": "https://www.pexels.com/license/",
+    "download_url": "https://images.pexels.com/photos/19480400/pexels-photo-19480400.jpeg?auto=compress&cs=tinysrgb&w=2200"
   },
   {
     "id": "mclaren",
-    "file": "McLaren_720S_IMG_2945.jpg",
     "model": "McLaren 720S",
-    "author": "Alexander Migl",
-    "license": "CC BY-SA 4.0",
-    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
-    "source_page": "https://commons.wikimedia.org/wiki/File:McLaren_720S_IMG_2945.jpg"
+    "author": "txomcs",
+    "pexels_id": 13857256,
+    "source_page": "https://www.pexels.com/photo/mclaren-720s-on-an-asphalt-road-13857256/",
+    "license": "Pexels License",
+    "license_url": "https://www.pexels.com/license/",
+    "download_url": "https://images.pexels.com/photos/13857256/pexels-photo-13857256.jpeg?auto=compress&cs=tinysrgb&w=2200"
   },
   {
     "id": "gtr",
-    "file": "Nissan_GT-R_R35_1.jpg",
     "model": "Nissan GT-R R35",
-    "author": "Calreyn88",
-    "license": "CC BY-SA 4.0",
-    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
-    "source_page": "https://commons.wikimedia.org/wiki/File:Nissan_GT-R_R35_1.jpg"
+    "author": "WAVYVISUALS",
+    "pexels_id": 18818784,
+    "source_page": "https://www.pexels.com/photo/nissan-gt-r-on-the-parking-lot-at-night-18818784/",
+    "license": "Pexels License",
+    "license_url": "https://www.pexels.com/license/",
+    "download_url": "https://images.pexels.com/photos/18818784/pexels-photo-18818784.jpeg?auto=compress&cs=tinysrgb&w=2200"
   },
   {
     "id": "bmw",
-    "file": "BMW_M4_(G82)_1X7A0155.jpg",
-    "model": "BMW M4 (G82)",
-    "author": "Alexander Migl",
-    "license": "CC BY-SA 4.0",
-    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
-    "source_page": "https://commons.wikimedia.org/wiki/File:BMW_M4_(G82)_1X7A0155.jpg"
+    "model": "BMW M4",
+    "author": "Bradley De Melo",
+    "pexels_id": 27353884,
+    "source_page": "https://www.pexels.com/photo/bmw-m4-27353884/",
+    "license": "Pexels License",
+    "license_url": "https://www.pexels.com/license/",
+    "download_url": "https://images.pexels.com/photos/27353884/pexels-photo-27353884.jpeg?auto=compress&cs=tinysrgb&w=2200"
   }
 ]

@@ -12,7 +12,7 @@ const fade = (f: number, from: number, to: number, enter=10, leave=12) =>
 type Car = 'porsche'|'lambo'|'ferrari'|'mclaren'|'gtr'|'bmw';
 const tint: Record<Car,string> = {porsche:'#c9ced2',lambo:'#c490ba',ferrari:'#da4a3b',mclaren:'#cc8e58',gtr:'#bcc1c8',bmw:'#c5c9c7'};
 const names: Record<Car,string> = {
-  porsche:'911 GT3 RS', lambo:'HURACÁN', ferrari:'488 GTB',
+  porsche:'911 GT3', lambo:'HURACÁN', ferrari:'488 GTB',
   mclaren:'720S', gtr:'GT-R R35', bmw:'M4 COMPETITION'
 };
 const cars:Car[]=['porsche','lambo','ferrari','mclaren','gtr','bmw'];
