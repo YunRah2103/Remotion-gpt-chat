@@ -314,9 +314,16 @@ def construct():
                      (side*.028,cy,cz),ACCENT,body,48,.0002)
             cylinder("DustSeal_%s_%d"%(side,j+1),.013,.001,
                      (side*.0295,cy,cz),RUBBER,body,48,0)
-    sector_mesh("OuterAxialCaliperBridge",.204,.227,.265,sector,
-                -.068,.068,CALIPER,body,26)
-    sector_mesh("BridgeSatinCrown",.226,.230,.230,sector,
+    # Three short structural bridges leave real open windows between
+    # caliper cheeks. The earlier single continuous sector obscured the
+    # piston bosses and pad backing in the hero view.
+    for bridge_idx, offset in enumerate((-.220,0,.220)):
+        sector_mesh(
+            "OuterAxialCaliperBridge" if bridge_idx==1 else
+            "CaliperEndBridge_%02d"%bridge_idx,
+            .205,.231,.043,sector+offset,
+            -.068,.068,CALIPER,body,14)
+    sector_mesh("BridgeSatinCrown",.228,.232,.230,sector,
                 -.042,.042,ACCENT,body,24)
     for a in (sector-.22,sector+.22):
         y=.205*math.sin(a);z=.205*math.cos(a)
