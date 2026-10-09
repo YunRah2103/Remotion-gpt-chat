@@ -1,6 +1,6 @@
 # Agent E — Polish 02 integration and independent native QA
 
-**Status: REVIEW (not Master approved).** Actual E film-code SHA: `8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d`; latest source correction centers the hero caliper, but the *exact-source frame 705 render has not completed* because [GitHub's last proof run](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37970589567) has not finished. Never substitute an older frame for this verification.
+**Status: REVIEW pending independent D/Master quality signoff.** True current E film code SHA `8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d`; **native exact-code source five-frame and motion render PASSED** in [GitHub Actions run 37970589567](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37970589567). The frame705 hero is now fully visible without frame-edge clipping.
 
 **A hardware source SHA:** `0bfc8ce52f15e6bf883cca0ad425fd4359d5af33`, latest branch head `cbce3943e490fa3eddc245ca8c2c75b942225108`. All **10/10** imported A file blobs match the original A branch exactly. No modified A/B/C/D sources or YUNEX files.
 
@@ -23,7 +23,7 @@ Binary GLB SHA256 `261b11aa1c71610e52ad9fe25a57b179427f0de833dc6904d41d8da44013a
 
 **Independent actual image/video review:** A02 caliper is visibly more detailed and has open bridges and piston separation versus the primitive old block; E three-quarter reveal makes structure more readable. Two 61-frame moving proofs demonstrate actual changing rotor and false-colour annulus; C's camera and D's text/labels remain deterministic, with no obvious text collisions. Heat is clearly marked illustrative; frame360 annulus remains within portrait bounds. Intro outline remains faint with conspicuous unused vertical space. 378px preview cannot reliably resolve the 2.35mm physical pad stroke although E numerical adapter and geometry rules pass; target-resolution inspection by D is needed.
 
-**Detected and corrected revision regression:** source `d9e27ab...` frame705 enlarged caliper **clipped the left border**. Latest code `8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d` repositions/reduces it; native confirmation still **PENDING**. Do not certify final frame705 or full visual approval until exact-source still is inspected.
+**Detected and corrected revision regression:** d9 frame705 caliper clipped the left frame. Latest code `8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d` repositions/reduces it, with frame705 **native visual verification PASS** in artifact 11636410211; caliper, friction ring and hub all stay on screen.
 
 ## Executed tests
 
@@ -31,9 +31,15 @@ From native proof run `37969454877`, *integration-native* PASS: `npm ci`, `npm r
 
 ## Master and D acceptance gates
 
-1. Get a true frame705 render from `8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d` (or later code-approved SHA), verify complete left caliper and safe right rotor rim. The [latest proof retry](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37970589567) remains pending, the [earlier attempt](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37969990091) stalled at dependency installation.
+1. Review newly **completed** exact-source proof [artifact 11636410211](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37970589567/artifacts/11636410211): frames 48/168/321/531/705, contact and both 61-frame videos. Frame705 complete caliper/ring visual confirmed by E. Earlier run 37969990091 stalled at dependencies; no longer a blocker.
 2. Review new Blender four PNGs and request A to reduce Cycles proof overexposure; do not conflate source GLB structural pass with attractive material/lookdev signoff.
 3. At normal and phone resolution, review both motion sequences for spinning rotor, static caliper, real pad contact clearance and accurate annular heat. Near-subpixel clamp at reduced proxy resolution requires independent D judgement.
 4. Request Agent D independent visual/technical signoff, and Master acceptance. Only then Agent F renders the *full* 750-frame 1080×1920 final H.264 MP4 (not produced by E).
 
 This E handoff is deliberately REVIEW, not a release-ready claim.
+
+## Final verification addendum — exact film source
+- Workflow [37970589567](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37970589567): overall SUCCESS; real Blender and integration-native jobs both SUCCESS.
+- [Artifact 11636410211](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37970589567/artifacts/11636410211), exact film-code source `8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d`: five native 540x960 proof frames plus contact sheet; **frame705 hero full caliper visible (PASS), no left crop**.
+- Independent FFprobe & FFmpeg verified both source-exact 61-frame clips: clamp H264 SHA256 `db0d38392262f1be71efab160ba4aa4a771c6fcd6610fce5c2f91c64c39e94b8`, thermal `83ce877f41a4159fa8e2b7917fd7f4b3db3841837e0c6ee598b8a41269d92556`; 378×672, 30fps, 2.033333s, all frames decoded successfully. Same clip hashes as the d9 run because only the hero shot changed.
+- **Open issues are quality/approval only**, not E integration correctness: Blender native materials appear overexposed in all four Cycles renders, approved dark PBR GLB structurally valid; tiny real 2.35mm pad travel below low-res motion readability; original intro sparse; independent Agent D signoff/Master release gate pending. **Status remains REVIEW.**

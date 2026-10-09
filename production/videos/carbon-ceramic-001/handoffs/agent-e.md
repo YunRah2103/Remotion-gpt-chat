@@ -1,6 +1,6 @@
 # Agent E — Carbon-Ceramic Brakes 001 / Polish 02
 
-**Handoff status: REVIEW.** Latest true film implementation source SHA `8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d`; PR [#15](https://github.com/YunRah2103/Remotion-gpt-chat/pull/15) remains draft pending independent D/Master approval. Polish02 A hardware implementation `0bfc8ce52f15e6bf883cca0ad425fd4359d5af33` imported **exactly unchanged** (10/10 original Git blob SHAs); B/C/D source untouched.
+**Handoff status: REVIEW — native E integration now fully technically verified, independent D/artistic acceptance pending.** Latest true film implementation source SHA `8b6ee9ccfc3151f44aaa56a4ff663ffbef1d934d`; PR [#15](https://github.com/YunRah2103/Remotion-gpt-chat/pull/15) remains draft pending independent D/Master approval. Polish02 A hardware implementation `0bfc8ce52f15e6bf883cca0ad425fd4359d5af33` imported **exactly unchanged** (10/10 original Git blob SHAs); B/C/D source untouched.
 
 ## Delivered and genuinely verified
 
@@ -28,3 +28,6 @@ python production/tools/render.py --composition CarbonCeramic001 --mode stills -
 python production/tools/render.py --composition CarbonCeramic001 --mode preview --start 135 --end 195 --scale 0.35 --concurrency 1 --output out/brakes001-e/clamp-135-195.mp4
 python production/tools/render.py --composition CarbonCeramic001 --mode preview --start 300 --end 360 --scale 0.35 --concurrency 1 --output out/brakes001-e/heat-300-360.mp4
 ```
+
+## Final exact-source proof acceptance
+[latest exact-SHA native proof](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37970589567/artifacts/11636410211), run 37970589567 overall **SUCCESS**, both native jobs **SUCCESS**. Five real Remotion 540×960 stills at 48/168/321/531/705 and contact sheet; exact current hero frame 705 independently watched (entire caliper and rotor visible, no clip). Clamp 135–195 and thermal 300–360 both real 61-frame 378×672 H264/30 fps clips, FFprobe and whole-file FFmpeg decode PASS, duration 2.033333 s each. This supersedes the previous d9 clipped-hero evidence. Agent E technical integration complete; independent D review / A overexposed Cycles finish keeps status REVIEW.
