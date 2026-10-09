@@ -40,3 +40,7 @@ For a rigorously validated final master use the GitHub workflows, which include 
 A separate, reusable video production toolchain has been added for mechanical explainers (ABS, suspension, brakes, differentials). It **does not** use or touch `yunus-video-lab` or YUNEX.
 
 Start with **[production/README.md](production/README.md)** for the ready-to-run GitHub Actions workflows, model library, rendering modes, independent QA, versioned GitHub Releases and optional Pages gallery. The reusable procedural mechanical parts are in **[src/mechanics/parts.tsx](src/mechanics/parts.tsx)**. The unit/native test workflow is **Production Suite - tests and small real render**.
+
+## Five new production upgrades
+
+See [production/PIPELINE.md](production/PIPELINE.md) for a real preflight-to-final GitHub Actions workflow, opt-in animated captions using `@remotion/captions`, composition-aware native PR QA, Copilot-specific skills/handoff validation, and real software-WebGL render benchmarking. The legacy compositions remain registered and unchanged, with optional captioned versions. ABS-001 remains **preproduction** until an actual ABS animation is implemented.
