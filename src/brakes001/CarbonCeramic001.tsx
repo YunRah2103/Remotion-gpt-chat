@@ -11,7 +11,7 @@ import {BrakeAssembly} from './hardware/BrakeAssembly';
 import {brakeStateAt} from './motion/brakeState';
 import {
   BrakeCameraRig, BrakeLighting, GhostCarOutline,
-  GHOST_FRONT_BRAKE_ANCHOR, brakeShotAt,
+  GHOST_FRONT_BRAKE_ANCHOR, brakeShotAt, brakeCameraAt,
 } from './cinema';
 import {PartLabels, TitleOverlays} from './graphics';
 import {integrationStateAt} from './integration/integrationState';
@@ -52,6 +52,14 @@ export const CarbonCeramic001: React.FC = () => {
   const shot = brakeShotAt(frame);
   const context = shot === 'context';
   const pos = GHOST_FRONT_BRAKE_ANCHOR;
+  const cameraPose = brakeCameraAt(frame);
+  // Keep the real rotor centroid aligned to C's changing thermal camera target.
+  // This compensates for dolly/orbit perspective without changing C's camera code.
+  const brakePosition: [number,number,number] = context ?
+    [pos[0], pos[1], pos[2]] :
+    shot === 'thermal' ?
+      [cameraPose.target[0], cameraPose.target[1], cameraPose.target[2]] :
+      [0, 0, 0];
 
   return <AbsoluteFill style={{backgroundColor: '#080f19', overflow: 'hidden'}}>
     <ThreeCanvas width={width} height={height} shadows
@@ -60,12 +68,10 @@ export const CarbonCeramic001: React.FC = () => {
       <BrakeCameraRig frame={frame}/>
       <BrakeLighting frame={frame} heat01={motion.heat01} background ground={false}/>
       {context && <GhostCarOutline frame={frame}/>}
-      {/* Integration-only framing correction: the thermal macro shot originally
-          clipped the rotor on the right edge. Scale around the true axle origin,
-          and slide the brake slightly to screen-left; A-D modules remain intact. */}
-      <group scale={shot === 'thermal' ? 0.72 : 1}
-        position={context ? [pos[0], pos[1], pos[2]] :
-          shot === 'thermal' ? [0, 0, 0.055] : [0, 0, 0]}>
+      {/* Stable macro framing: C's shot target, not a guessed static offset.
+          Geometry, independent X-axis pads and fixed caliper are unmodified. */}
+      <group scale={shot === 'thermal' ? 0.56 : 1}
+        position={brakePosition}>
         <BrakeAssembly rotorAngleRad={state.rotorAngleRad}
           padGapMetres={state.padGapMetres} heat01={motion.heat01}
           showUpright/>
