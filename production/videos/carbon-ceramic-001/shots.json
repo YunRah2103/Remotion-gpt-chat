@@ -1,0 +1,37 @@
+[
+  {
+    "startFrame": 0,
+    "endFrame": 119,
+    "shot": "Ghosted car context",
+    "visual": "Faint minimal x-ray sports-car outline with turning wheels; braking begins; spotlight front-brake corner. No full car model.",
+    "narrationCue": "Every hard stop turns speed into heat."
+  },
+  {
+    "startFrame": 120,
+    "endFrame": 269,
+    "shot": "Brake reveal",
+    "visual": "Fly into isolated front rotor, caliper and two brake pads; wheel outline fades, rotor rotates and pads clamp inward.",
+    "narrationCue": "Brake pads squeeze the spinning disc, and temperatures climb fast."
+  },
+  {
+    "startFrame": 270,
+    "endFrame": 449,
+    "shot": "Heat",
+    "visual": "Close-up detailed carbon-ceramic friction annulus and ventilation; clearly illustrative thermal false-colour tied to pad friction.",
+    "narrationCue": "Carbon-ceramic discs are built to withstand repeated thermal stress while keeping braking response consistent."
+  },
+  {
+    "startFrame": 450,
+    "endFrame": 629,
+    "shot": "Why carbon-ceramic",
+    "visual": "Repeated brake cycle, stable qualitative friction indication, weight comparison with labelled generic cast-iron disc; no invented measured heat or stopping distance.",
+    "narrationCue": "They're also much lighter than traditional cast iron."
+  },
+  {
+    "startFrame": 630,
+    "endFrame": 749,
+    "shot": "Hero payoff",
+    "visual": "Premium orbital hero of approved brake assembly; x-ray outline faintly returns if helpful.",
+    "narrationCue": "The advantage is dependable performance, stop after stop."
+  }
+]
