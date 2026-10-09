@@ -112,18 +112,18 @@ const Showcase:React.FC=()=> <Scene start={239} end={410}>
 const Montage:React.FC=()=>{
  const f=useCurrentFrame();
  const beat=Math.min(3,Math.floor(Math.max(0,f-408)/29));
- const xoffset=(f-408)%29;
+ const xoffset=((f-408)%29+29)%29;
  const variants:Car[][]=[['gtr','porsche','lambo','ferrari','bmw','mclaren'],['bmw','lambo','ferrari','gtr','mclaren','porsche'],['ferrari','mclaren','gtr','bmw','porsche','lambo'],['porsche','gtr','bmw','mclaren','lambo','ferrari']];
  const ids=variants[beat];
  return <Scene start={395} end={520}>
    <Background id={ids[0]}/>
    <Title small="A FEW FRAMES.  /  A LOT OF FEELING." large="Fast / Faster" top={205}/>
-   <Photo id={ids[0]} x={-90} y={470} w={730} h={460} inAt={408+beat*29} fromX={-340} fromY={0} angle={-7} border={7}/>
-   <Photo id={ids[1]} x={585} y={410} w={610} h={460} inAt={408+beat*29} delay={3} fromX={460} fromY={-30} angle={6} border={7}/>
-   <Photo id={ids[2]} x={-110} y={950} w={670} h={445} inAt={408+beat*29} delay={6} fromX={-460} fromY={15} angle={7} border={7}/>
-   <Photo id={ids[3]} x={530} y={900} w={690} h={472} inAt={408+beat*29} delay={8} fromX={480} fromY={0} angle={-7} border={7}/>
-   <Photo id={ids[4]} x={-80} y={1400} w={700} h={385} inAt={408+beat*29} delay={11} fromX={-540} fromY={0} angle={-3} border={7}/>
-   <Photo id={ids[5]} x={580} y={1370} w={610} h={425} inAt={408+beat*29} delay={13} fromX={460} fromY={0} angle={5} border={7}/>
+   <Photo id={ids[0]} x={-90} y={470} w={730} h={460} inAt={398} fromX={-340} fromY={0} angle={-7} border={7}/>
+   <Photo id={ids[1]} x={585} y={410} w={610} h={460} inAt={398} delay={3} fromX={460} fromY={-30} angle={6} border={7}/>
+   <Photo id={ids[2]} x={-110} y={950} w={670} h={445} inAt={398} delay={6} fromX={-460} fromY={15} angle={7} border={7}/>
+   <Photo id={ids[3]} x={530} y={900} w={690} h={472} inAt={398} delay={8} fromX={480} fromY={0} angle={-7} border={7}/>
+   <Photo id={ids[4]} x={-80} y={1400} w={700} h={385} inAt={398} delay={11} fromX={-540} fromY={0} angle={-3} border={7}/>
+   <Photo id={ids[5]} x={580} y={1370} w={610} h={425} inAt={398} delay={13} fromX={460} fromY={0} angle={5} border={7}/>
    <div style={{position:'absolute',left:74,top:445,height:5,width:lerp(xoffset,0,25,0,260),background:'#d9d0bf'}}/>
    <FrameData chapter="04 / THE MONTAGE" number="006"/>
   </Scene>;

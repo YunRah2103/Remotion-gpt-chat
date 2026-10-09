@@ -2,24 +2,24 @@
 
 20 seconds · 600 frames · 1080 × 1920 · 30 fps · H.264 with original audio.
 
-The film is a standalone Remotion composition in \`YunRah2103/Remotion-gpt-chat\`. It has **no dependency on and does not modify YUNEX**.
+The film is a standalone Remotion composition in `YunRah2103/Remotion-gpt-chat`. It has **no dependency on and does not modify YUNEX**.
 
 ## Reproduce
 
-\`\`\`sh
+```sh
 python -m pip install Pillow==11.3.0
 python production/videos/car-photo-collage-001/fetch_assets.py
 python production/videos/car-photo-collage-001/make_audio.py
 npm ci
 npm run check
 python production/tools/render.py --composition AutomotivePhotoCollage001 --mode final --output out/car-photo-collage-001.mp4 --concurrency 2
-\`\`\`
+```
 
 ## Photos and rights
 
-The six photographs were made by real photographers, **not generated**. Photos are downloaded from the **Pexels** hosted photo CDN in the GitHub Actions runner, with exact attribution and source photo pages enumerated in [assets.json](assets.json). Each is used under the [Pexels License](https://www.pexels.com/license/), which permits creative use in social-video edits. Credit is documented even though attribution is not mandatory. The downloader records each delivered asset's source and output SHA256 and pixel dimensions in \`public/automotive-collage/provenance.json\` during the build.
+The six photographs were made by real photographers, **not generated**. Photos are downloaded from the **Pexels** hosted photo CDN in the GitHub Actions runner, with exact attribution and source photo pages enumerated in [assets.json](assets.json). Each is used under the [Pexels License](https://www.pexels.com/license/), which permits creative use in social-video edits. Credit is documented even though attribution is not mandatory. The downloader records each delivered asset's source and output SHA256 and pixel dimensions in `public/automotive-collage/provenance.json` during the build.
 
-Source contributors: Patrick (911 GT3), Kamshotthat (Huracán), Sai Krishna (Ferrari 488), txomcs (McLaren 720S), WAVYVISUALS (Nissan GT-R), and Bradley De Melo (BMW M4). Model names are editorial context; photo rights do not imply endorsement by manufacturers or photographers. The Porsche photo is a 911 GT3 rather than the wider-wing GT3 RS.
+Source contributors: Patrick (911 GT3), Kamshotthat (Huracán), Sai Krishna (Ferrari 488), Lazaro Rodriguez Jr (McLaren 720S), Ibrahim Bilgin (Nissan GT-R), and Bradley De Melo (BMW M4). Model names are editorial context; photo rights do not imply endorsement by manufacturers or photographers. The Porsche photo is a 911 GT3 rather than the wider-wing GT3 RS.
 
 Original audio is procedurally synthesised in [make_audio.py](make_audio.py); no commercial samples or songs.
 
@@ -32,3 +32,7 @@ Original audio is procedurally synthesised in [make_audio.py](make_audio.py); no
 - **17–20 seconds:** a six-car collage resolves into a single closing design.
 
 The GitHub workflow [car-photo-collage-001.yml](../../../.github/workflows/car-photo-collage-001.yml) renders a preview, 10 intermediate stills/contact sheet and the full 600-frame film. FFprobe verifies H.264, 1080×1920, 30 FPS, ~20.0s, and AAC audio. FFmpeg must decode the entire file without error and stills must not be almost entirely black. The film, preview, source records, FFprobe, contact-sheet and QA report are uploaded together for download.
+
+## Independent visual polish record
+
+The first real 600-frame render (GitHub Actions run 38000612385) was decoded successfully, but contact-sheet review revealed two genuine problems: the McLaren frame was cropped to empty track scenery, and the montage card introductions reset to invisible at each new beat, leaving large dead areas (especially frame 495). This revision uses a vehicle-dominant McLaren photo, brighter Nissan GT-R, and persistent photographic panels with deliberate beat-timed image cuts rather than clearing the whole collage. Full film re-render and new QA required after this correction.
