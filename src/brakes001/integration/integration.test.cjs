@@ -19,6 +19,9 @@ function loadTypeScript(relative) {
 }
 const b = loadTypeScript('src/brakes001/motion/brakeState.ts');
 const camera = loadTypeScript('src/brakes001/cinema/cameraMath.ts');
+const adapter = read('src/brakes001/integration/integrationState.ts');
+assert.match(adapter, /HARDWARE_REST_GAP_M = \.0025/);
+assert.match(adapter, /padGapForHardware\(s\.brakePressure01\)/);
 const manifest = JSON.parse(read('production/videos/carbon-ceramic-001/hardware/rig-manifest.json'));
 const brief = JSON.parse(read('production/videos/carbon-ceramic-001/brief.json'));
 const shots = JSON.parse(read('production/videos/carbon-ceramic-001/shots.json'));
@@ -65,6 +68,9 @@ for (let f = 0; f < 750; f++) {
   assert.ok(s.heat01 >= 0 && s.heat01 <= 1, 'heat bound '+f);
   assert.ok(s.brakePressure01 >= 0 && s.brakePressure01 <= 1.001, 'pressure bound '+f);
   assert.equal(b.brakePoseAt(f).fixedCaliperXRotationRad,0);
+  const hardwareGap=.00015+(.0025-.00015)*(1-Math.min(1,Math.max(0,s.brakePressure01)));
+  assert.ok(hardwareGap>=.0001499 && hardwareGap<=.0025001, 'hardware pad gap over 2.5mm at '+f);
+  assert.ok(.0025-hardwareGap<=.0025001, 'overshot physical pad travel at '+f);
   // Each pad starts precisely one per-face clearance from the 15.5mm rotor face.
   const innerSurfaceX = -0.0155 - s.padGapMetres;
   const outerSurfaceX = 0.0155 + s.padGapMetres;

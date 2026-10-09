@@ -30,3 +30,6 @@ A's Blender builder and manifest are design-time contracts and have **no verifie
 - Imported A files: `src/brakes001/hardware/**`, `production/videos/carbon-ceramic-001/hardware/**`, and `handoffs/agent-a.{json,md}`; no A-owned source edits. Upgraded three-lobed cheeks, three axial bridges, piston visibility, pad hardware, Cycles denoising guard.
 - Historical A source and state in the opening table are baseline provenance **only**; this Polish02 section is authoritative for integrated A.
 - The imported Three.js geometry is the film's active model; the Blender GLB provides an independent native geometry proof, and is not dynamically loaded into the film.
+
+## B-to-A physical travel correction
+B's unchanged `brakeStateAt` is a 6mm schematic pad clearance, whereas A's physical rig specifies 2.5mm at rest. E's `integrationState.ts` maps **only B's dimensionless pressure** to A's 2.5mm physical gap, preserving a 0.15mm conservative nonpenetrating clearance. The largest command is 2.35mm, safely within 2.5mm; **rotor speed, angle, temperature illustration and B's source code are unchanged**. This prevents implausibly long pad strokes without falsifying pressure history.
