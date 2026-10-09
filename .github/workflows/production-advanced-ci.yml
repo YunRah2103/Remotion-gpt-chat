@@ -24,7 +24,7 @@ jobs:
           node-version: '22'
       - name: Prepare real Blender, Python and media checks
         run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq blender ffmpeg
+          sudo apt-get update -qq && sudo apt-get install -y -qq blender ffmpeg python3-numpy
           python -m pip install -r production/requirements-qa.txt
       - name: Test all Python contracts and browser comparison syntax
         run: |
