@@ -1,0 +1,122 @@
+name: Automotive Suspension 001 - native proof and 600-frame master
+on:
+  push:
+    branches:
+      - automotive-tests/rugged-suspension-001
+    paths:
+      - 'src/RuggedSuspension001.tsx'
+      - 'src/suspension/**'
+      - 'src/Root.tsx'
+      - 'production/videos/rugged-suspension-001/**'
+      - 'production/tests/rugged_kinematics.mjs'
+      - '.github/workflows/rugged-suspension-001.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preflight-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install and validate the entire registered production pipeline
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          npm run check
+          python -m unittest discover -s production/tests -v
+          python production/tools/production_pipeline.py --project rugged-suspension-001 --output out/rugged/preflight
+          node --experimental-strip-types production/tests/rugged_kinematics.mjs
+      - name: Native moving-frame proof and critical stills
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          mkdir -p out/rugged/proofs
+          for F in 15 160 315 475 570; do
+            npx remotion still src/index.ts RuggedSuspension001 "out/rugged/proofs/frame-$F.png" --frame="$F" --gl=swangle --scale=0.5
+          done
+          npx remotion render src/index.ts RuggedSuspension001 out/rugged/proofs/moving.mp4 \
+            --frames=165-194 --scale=0.35 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
+          ffmpeg -v error -xerror -i out/rugged/proofs/moving.mp4 -f null -
+          ffprobe -v error -show_entries stream=codec_name,width,height,nb_frames -of json out/rugged/proofs/moving.mp4 > out/rugged/proofs/preview-ffprobe.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rugged-suspension-001-proof-${{ github.run_id }}
+          path: out/rugged/
+          retention-days: 30
+          if-no-files-found: warn
+  native-parts:
+    needs: preflight-proof
+    if: needs.preflight-proof.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [0,1,2,3,4]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Native full-resolution frames, exact 120-frame chunks
+        env:
+          PART: ${{ matrix.part }}
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          START=$((PART*120)); END=$((START+119))
+          mkdir -p out/rugged/chunks
+          npx remotion render src/index.ts RuggedSuspension001 "out/rugged/chunks/part-${PART}.mp4" \
+            --frames="$START-$END" --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
+          ffmpeg -v error -xerror -i "out/rugged/chunks/part-${PART}.mp4" -f null -
+          python production/tools/quality.py video "out/rugged/chunks/part-${PART}.mp4" \
+            --width 1080 --height 1920 --fps 30 --frames 120 --report "out/rugged/chunks/part-${PART}.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rugged-suspension-001-part-${{ github.run_id }}-${{ matrix.part }}
+          path: out/rugged/chunks/
+          retention-days: 30
+          if-no-files-found: warn
+  master:
+    needs: [preflight-proof,native-parts]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: rugged-suspension-001-part-${{ github.run_id }}-*
+          merge-multiple: true
+          path: out/rugged/chunks
+      - name: Concatenate source-locked native chunks, full decoder/codec/duration QA
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          mkdir -p out/rugged/master
+          for N in 0 1 2 3 4; do
+            test -s "out/rugged/chunks/part-${N}.mp4"
+            echo "file 'part-${N}.mp4'" >> out/rugged/chunks/concat.txt
+          done
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i out/rugged/chunks/concat.txt \
+            -an -c:v copy -movflags +faststart out/rugged/master/RUGGED-SUSPENSION-001.mp4
+          python production/tools/quality.py video out/rugged/master/RUGGED-SUSPENSION-001.mp4 \
+            --width 1080 --height 1920 --fps 30 --frames 600 --report out/rugged/master/validation.json
+          ffmpeg -v error -xerror -i out/rugged/master/RUGGED-SUSPENSION-001.mp4 -f null -
+          (cd out/rugged/master && sha256sum RUGGED-SUSPENSION-001.mp4 > SHA256SUMS.txt)
+          git rev-parse HEAD > out/rugged/master/SOURCE_SHA.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rugged-suspension-001-master-${{ github.run_id }}
+          path: out/rugged/master/
+          retention-days: 30
+          if-no-files-found: warn
