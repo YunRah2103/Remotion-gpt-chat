@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "task": "carbon-ceramic-001-agent-e",
+  "branch": "automotive-brakes-001/e-integration",
+  "sourceSha": "3e73466d8c3ee36f9f38bdf31df0e71fab25eebc",
+  "owner": "engineering",
+  "summary": "UNSTARTED template: Agent E integration work has not been performed. Initial sourceSha is setup ancestry, not proof of integration.",
+  "status": "blocked",
+  "files": [],
+  "evidence": [],
+  "blockers": [
+    "Integration source not written; native stills/moving footage and PR not produced.",
+    "Agent A Blender/GLB handoff currently requires independent real native proof before final release."
+  ],
+  "notes": "E replaces this JSON with actual post-implementation SHA, file list and artifact IDs. Do not treat initial validation as readiness."
+}

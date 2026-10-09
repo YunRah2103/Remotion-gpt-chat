@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Master release readiness gate for Carbon-Ceramic 001.
 
-A contract can validate while all four specialists remain BLOCKED.
+A contract can validate while any specialist or the integrator remains BLOCKED.
 This deliberately distinguishes a legal handoff from an integrated film.
 This check is deterministic, offline and has no side effects.
 """
@@ -17,6 +17,7 @@ SPECIALISTS = {
     "b": ("engineering", "b-motion-thermal", "src/brakes001/motion/"),
     "c": ("director", "c-cinema-xray", "src/brakes001/cinema/"),
     "d": ("qa", "d-graphics-qa", "src/brakes001/graphics/"),
+    "e": ("engineering", "e-integration", "src/brakes001/integration/"),
 }
 
 

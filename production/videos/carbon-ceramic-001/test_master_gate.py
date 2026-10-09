@@ -53,10 +53,10 @@ class MasterGateTests(unittest.TestCase):
             json.dumps(self.handoffs[letter]), encoding="utf8"
         )
 
-    def test_ready_only_when_all_four_agents_and_master_are_integrated(self):
+    def test_ready_only_when_all_five_agents_and_master_are_integrated(self):
         report = evaluate(self.root)
         self.assertTrue(report["releaseReadyForRendering"])
-        self.assertEqual(len(report["specialists"]), 4)
+        self.assertEqual(len(report["specialists"]), 5)
 
     def test_placeholder_is_not_counted_as_implementation(self):
         self.handoffs["a"]["status"] = "blocked"
@@ -66,6 +66,14 @@ class MasterGateTests(unittest.TestCase):
         report = evaluate(self.root)
         self.assertFalse(report["releaseReadyForRendering"])
         self.assertTrue(any("Agent A" in issue for issue in report["blockers"]))
+
+    def test_missing_integrator_handoff_blocks_release(self):
+        self.handoffs["e"]["status"] = "blocked"
+        self.handoffs["e"]["evidence"] = []
+        self._handoff("e")
+        result = evaluate(self.root)
+        self.assertFalse(result["releaseReadyForRendering"])
+        self.assertTrue(any("Agent E" in issue for issue in result["blockers"]))
 
     def test_missing_merged_source_rejects_ready_label(self):
         path = self.root / self.handoffs["b"]["files"][0]

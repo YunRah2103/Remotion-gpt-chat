@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail-fast contract check for the five-agent carbon-ceramic film setup.
+"""Fail-fast contract check for the six-agent carbon-ceramic film setup.
 
 This verifies planning data and handoff state, NOT geometry, MP4s or aesthetics.
 """
@@ -16,6 +16,7 @@ ROLES = {
     "b": ("engineering", "b-motion-thermal"),
     "c": ("director", "c-cinema-xray"),
     "d": ("qa", "d-graphics-qa"),
+    "e": ("engineering", "e-integration"),
 }
 
 def load(relative):
@@ -46,7 +47,7 @@ def check():
     assert "DO NOT model a complete car" in contract and "PREPRODUCTION" in voice.upper() or (
         "DO NOT model a complete car" in contract and "Narration audio is NOT committed" in voice
     ), "Missing no-full-car or honest audio contract"
-    for name in ("MASTER","AGENT-A","AGENT-B","AGENT-C","AGENT-D"):
+    for name in ("MASTER","AGENT-A","AGENT-B","AGENT-C","AGENT-D","AGENT-E"):
         path=PROJECT/"agent-prompts"/(name+".md")
         assert path.exists() and path.stat().st_size>800, "Missing substantial assigned prompt: "+name
     for key,(role,suffix) in ROLES.items():

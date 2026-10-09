@@ -1,10 +1,11 @@
 # AUTOMOTIVE ENGINEERING 002 — Carbon-ceramic brake heat film
-## Production contract v1 · 4 specialists + 1 Master
+## Production contract v2 · 4 specialists + 1 Integrator E + 1 Master
 
 Source repository: YunRah2103/Remotion-gpt-chat ONLY.
 Base SHA: 25a83c4e58e60c909624494745158385b7f962d9
 Master branch: automotive-brakes-001/master
 Specialist branches: automotive-brakes-001/a-hardware, automotive-brakes-001/b-motion-thermal, automotive-brakes-001/c-cinema-xray, automotive-brakes-001/d-graphics-qa.
+Integrator branch: automotive-brakes-001/e-integration.
 
 ### Film scope
 
@@ -29,8 +30,9 @@ A owns: src/brakes001/hardware/** and production/videos/carbon-ceramic-001/hardw
 B owns: src/brakes001/motion/** and production/videos/carbon-ceramic-001/physics/**.
 C owns: src/brakes001/cinema/** and production/videos/carbon-ceramic-001/lookdev/**.
 D owns: src/brakes001/graphics/** and production/videos/carbon-ceramic-001/qa/**.
-Each specialist ALSO owns only its respective handoffs/agent-[a-d].json + .md.
-MASTER alone owns src/brakes001/CarbonCeramic001.tsx, src/Root.tsx, shared adapters, full-film workflows, central package/dependency changes, release, and shared contract/voiceover files. No existing videos should be modified.
+Each A–D specialist ALSO owns only its respective handoffs/agent-[a-d].json + .md.
+E alone owns src/brakes001/CarbonCeramic001.tsx, src/brakes001/integration/**, src/Root.tsx (ONLY to append CarbonCeramic001 registration), production/videos/carbon-ceramic-001/brief.json (ONLY factual composition implementation state), and handoffs/agent-e.json + .md. E can copy verified A–D-owned files verbatim into its integration branch and must preserve source provenance; any modifications to owned component paths require approval and corrections on their original branches.
+MASTER alone owns the shared contract, prompts, release gate/tests, central workflows, central dependencies, approved VO, branch acceptance, final creative review and final publishing. Master must not concurrently edit E's permitted integration files while E works. No existing videos or compositions may be changed.
 Never access or modify YunRah2103/yunus-video-lab.
 
 ### Handoff and integration
@@ -38,13 +40,14 @@ Never access or modify YunRah2103/yunus-video-lab.
 1. Master publishes this contract first. Specialists branch from the master head and read their own prompt.
 2. All specialist work is separate GitHub chat sessions, NOT auto-launched by these docs.
 3. Each agent commits real files and real proofs, documents source SHA, and writes/validates its own handoff JSON with existing production/tools/handoff.py.
-4. Role mapping for the existing validator: A hardware; B engineering; C director; D qa. Master release.
+4. Role mapping for the existing validator: A hardware; B engineering; C director; D qa; E engineering (integration). Master release.
 5. A first: real Blender original hard-surface asset + GLB export/inspection + close-up lighting proof; preserve geometry nodes and materials. No giant binaries committed.
 6. B first: deterministic kinematic/thermal proof with stand-in geometry; Master later replaces the stand-in with A's real nodes.
 7. C first: original lightweight x-ray silhouette/camera rigs and full-story shot frames using simple placeholders, then replace with A.
 8. D first: legible 9:16 graphics and engineering acceptance rubric; final independent visual QA AFTER Master integrates real native footage.
-9. Master reviews SHA, tests and artifact links; integrate with real verified work, render moving previews, then final 750 frames with native FFprobe exact-frame and full FFmpeg decode.
-10. Passing automated tests is not a substitute for watching frames and video. Deliver one real MP4, not a plan.
+9. E reviews real source SHAs, handoff evidence and artifact links; integrates A–D source into E's branch without altering owned source; registers a playable CarbonCeramic001 composition; runs moving native proofs and five-frame contact sheet; commits an honest integrator handoff and opens a PR against Master. E must keep A's review/GLB blocker visible and may proceed with integration previews, but must NOT label E ready or claim final quality if hardware/artifacts are not verified.
+10. Master independently reviews and accepts E's handoff/PR, checks hardware GLB and actual proof; requests D's independent final QA on integrated footage; renders and validates exact 750-frame final 1080x1920 H.264 MP4 using full FFprobe, FFmpeg decode and SHA256.
+11. Passing automated tests is not a substitute for watching frames and video. Deliver one real MP4, not a plan.
 
 ### Independent review criteria
 
