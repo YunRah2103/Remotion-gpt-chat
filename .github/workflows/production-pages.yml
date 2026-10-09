@@ -3,6 +3,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
+  issues: read
+  pull-requests: read
   pages: write
   id-token: write
 concurrency:
@@ -14,7 +17,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
-      - run: python3 production/tools/catalog.py --site out/production/site
+      - name: Build existing film catalogue
+        run: python3 production/tools/catalog.py --site out/production/site
+      - name: Add production dashboard and interactive 3D viewer
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 production/portal/build.py --site out/production/site
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out/production/site

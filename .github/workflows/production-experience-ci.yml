@@ -1,0 +1,107 @@
+name: Production Experience - real audio, phone QA, dashboard and 3D lighting
+on:
+  pull_request:
+    paths: ['production/portal/**','production/sound/**','production/phoneqa/**','production/tests/test_studio_experience.py','src/studio/**','src/Root.tsx','.github/workflows/production-experience-ci.yml']
+  push:
+    branches: [main,feature/studio-experience-20261009]
+    paths: ['production/portal/**','production/sound/**','production/phoneqa/**','production/tests/test_studio_experience.py','src/studio/**','src/Root.tsx','.github/workflows/production-experience-ci.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  media-and-web:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: production/requirements-qa.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install media QA prerequisites
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python -m pip install -r production/requirements-qa.txt
+      - name: Run project tests and build actual offline viewer + dashboard
+        run: |
+          python -m unittest discover -s production/tests -v
+          python production/tools/catalog.py --site out/production/site
+          python production/portal/build.py --site out/production/site --offline
+          node --check out/production/site/viewer/viewer.mjs
+      - name: Actual FFmpeg audio mix and real 1080x1920 phone-frame review
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/experience
+          ffmpeg -hide_banner -loglevel error -y -f lavfi -i testsrc2=size=1080x1920:rate=10 \
+            -t 1.5 -an -preset ultrafast -c:v libx264 -pix_fmt yuv420p out/experience/source.mp4
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p={"schemaVersion":1,"fps":30,"frames":45,"events":[
+            {"type":"motor","frame":0,"lengthFrames":44,"gain":0.15},
+            {"type":"valve","frame":20,"lengthFrames":7,"gain":0.23}]}
+          Path("out/experience/events.json").write_text(json.dumps(p))
+          PY
+          python production/sound/sound.py render out/experience/events.json out/experience/effects.wav
+          python production/sound/sound.py mux out/experience/source.mp4 out/experience/effects.wav out/experience/mixed.mp4
+          ffprobe -v error -show_entries stream=codec_type,codec_name -of json out/experience/mixed.mp4 > out/experience/mux-probe.json
+          python production/phoneqa/phone_qa.py --layout production/phoneqa/layouts/abs-001-example.json \
+            --video out/experience/mixed.mp4 --output out/experience/phoneqa
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          v=json.load(open('out/experience/mux-probe.json'))
+          assert {'video','audio'} <= {s['codec_type'] for s in v['streams']}
+          q=json.load(open('out/experience/phoneqa/phone-report.json'))
+          assert q['inputFrames']==5
+          assert len(list(Path('out/experience/phoneqa').glob('phone-preview*.jpg')))==5
+          print('AUDIO_MUX_AND_PHONE_PREVIEW_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: experience-media-${{ github.run_id }}
+          path: |
+            out/experience/
+            out/production/site/
+          retention-days: 14
+          if-no-files-found: error
+  lighting:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Render real WebGL material/lighting test
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          npm ci --no-audit --no-fund
+          npm run check
+          mkdir -p out/studio-lighting
+          npx remotion still src/index.ts StudioMaterialProof out/studio-lighting/lighting.png \
+            --frame=42 --gl=swangle --scale=.25
+          npx remotion render src/index.ts StudioMaterialProof out/studio-lighting/moving.mp4 \
+            --frames=40-42 --gl=swangle --scale=.25 --codec=h264 --pixel-format=yuv420p --concurrency=1
+          ffmpeg -v error -xerror -i out/studio-lighting/moving.mp4 -f null -
+          ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of json \
+            out/studio-lighting/moving.mp4 > out/studio-lighting/probe.json
+          python - <<'PY'
+          import json
+          assert int(json.load(open('out/studio-lighting/probe.json'))['streams'][0]['nb_frames'])==3
+          print('REAL_STUDIO_LIGHTING_THREE_FRAMES_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: studio-lighting-proof-${{ github.run_id }}
+          path: out/studio-lighting/
+          retention-days: 14
+          if-no-files-found: error

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "captions": [
+    {
+      "name": "Main narration",
+      "bounds": [
+        0.13,
+        0.67,
+        0.63,
+        0.08
+      ],
+      "fontSizePx": 52
+    }
+  ],
+  "subjects": [
+    {
+      "name": "Brake assembly",
+      "bounds": [
+        0.1,
+        0.24,
+        0.6,
+        0.33
+      ]
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+name: Production Studio - generate mechanical effects and optional final audio mix
+on:
+  workflow_dispatch:
+    inputs:
+      plan:
+        description: Committed production/sound/plans/<slug>.json
+        required: true
+        type: string
+        default: production/sound/plans/abs-demo.json
+      video_run:
+        description: Optional Actions run containing final original MP4
+        required: false
+        type: string
+      video_artifact:
+        description: Optional exact artifact name containing one MP4
+        required: false
+        type: string
+      voice_run:
+        description: Optional approved narration Actions run ID
+        required: false
+        type: string
+      voice_artifact:
+        description: Optional approved narration artifact name
+        required: false
+        type: string
+permissions:
+  contents: read
+  actions: read
+jobs:
+  sound:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install audio encoding tools
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - uses: actions/download-artifact@v4
+        if: inputs.video_run != '' && inputs.video_artifact != ''
+        with:
+          run-id: ${{ inputs.video_run }}
+          name: ${{ inputs.video_artifact }}
+          github-token: ${{ github.token }}
+          path: out/video-source
+      - uses: actions/download-artifact@v4
+        if: inputs.voice_run != '' && inputs.voice_artifact != ''
+        with:
+          run-id: ${{ inputs.voice_run }}
+          name: ${{ inputs.voice_artifact }}
+          github-token: ${{ github.token }}
+          path: out/voice-source
+      - name: Synthesize frame-aligned cues, master with approved voice only if supplied
+        env:
+          PLAN: ${{ inputs.plan }}
+          VIDEO_RUN: ${{ inputs.video_run }}
+          VIDEO_ARTIFACT: ${{ inputs.video_artifact }}
+          VOICE_RUN: ${{ inputs.voice_run }}
+          VOICE_ARTIFACT: ${{ inputs.voice_artifact }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$PLAN" =~ ^production/sound/plans/[a-z0-9-]+\.json$ ]] && test -f "$PLAN"
+          if [[ -n "$VIDEO_RUN" || -n "$VIDEO_ARTIFACT" ]]; then
+            [[ "$VIDEO_RUN" =~ ^[0-9]+$ && -n "$VIDEO_ARTIFACT" ]] || exit 1
+          fi
+          if [[ -n "$VOICE_RUN" || -n "$VOICE_ARTIFACT" ]]; then
+            [[ "$VOICE_RUN" =~ ^[0-9]+$ && -n "$VOICE_ARTIFACT" && -n "$VIDEO_RUN" ]] || exit 1
+          fi
+          python production/sound/sound.py render "$PLAN" out/sound/mechanical-effects.wav
+          if [[ -n "$VIDEO_RUN" ]]; then
+            mapfile -t MP4S < <(find out/video-source -type f -name '*.mp4')
+            [[ "${#MP4S[@]}" -eq 1 ]] || exit 1
+            if [[ -n "$VOICE_RUN" ]]; then
+              mapfile -t VOICES < <(find out/voice-source -type f \( -iname '*.m4a' -o -iname '*.wav' -o -iname '*.mp3' \))
+              [[ "${#VOICES[@]}" -eq 1 ]] || exit 1
+              python production/sound/sound.py mux "${MP4S[0]}" out/sound/mechanical-effects.wav out/sound/review-mix.mp4 --narration "${VOICES[0]}"
+            else
+              python production/sound/sound.py mux "${MP4S[0]}" out/sound/mechanical-effects.wav out/sound/review-mix.mp4
+            fi
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: studio-sound-${{ github.run_id }}
+          path: out/sound/
+          retention-days: 21
+          if-no-files-found: error
