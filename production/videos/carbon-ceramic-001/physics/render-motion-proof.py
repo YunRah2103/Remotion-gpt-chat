@@ -14,7 +14,7 @@ out = Path(a.out).resolve()
 out.parent.mkdir(parents=True,exist_ok=True)
 with tempfile.TemporaryDirectory() as td:
     js = Path(td)
-    subprocess.run(['tsc','--target','ES2022','--module','commonjs','--moduleResolution',
+    subprocess.run(['npx','--no-install','tsc','--target','ES2022','--module','commonjs','--moduleResolution',
         'node','--strict','--skipLibCheck','--rootDir','src','--outDir',td,
         'src/brakes001/motion/brakeState.ts'],cwd=ROOT,check=True)
     module_path = str(js/'brakes001/motion/brakeState.js')
