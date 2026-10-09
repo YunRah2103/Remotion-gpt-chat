@@ -1,0 +1,49 @@
+name: Production Studio - propose reusable 3D model catalogue entry
+on:
+  workflow_dispatch:
+    inputs:
+      source_run:
+        description: Approved model build run ID
+        required: true
+        type: string
+      source_artifact:
+        description: Exact artifact containing a single GLB
+        required: true
+        type: string
+      metadata_path:
+        description: Committed asset metadata JSON inside production/mechanics/proposals/
+        required: true
+        type: string
+permissions:
+  contents: read
+  actions: read
+jobs:
+  propose:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.source_artifact }}
+          run-id: ${{ inputs.source_run }}
+          github-token: ${{ github.token }}
+          path: out/model
+      - name: Build verifiable candidate model catalogue entry
+        shell: bash
+        env:
+          META: ${{ inputs.metadata_path }}
+        run: |
+          set -euo pipefail
+          [[ "$META" =~ ^production/mechanics/proposals/[a-z0-9-]+\.json$ ]] || exit 1
+          test -f "$META"
+          mapfile -t FILES < <(find out/model -name '*.glb' -type f)
+          test "${#FILES[@]}" -eq 1
+          python production/studio/studio.py register "${FILES[0]}" "$META" out/studio/model-candidate.json
+          cat out/studio/model-candidate.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: studio-model-candidate-${{ github.run_id }}
+          path: out/studio/model-candidate.json
+          retention-days: 30
+          if-no-files-found: error
