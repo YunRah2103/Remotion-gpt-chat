@@ -34,7 +34,7 @@ def validate_words(words):
 def subtitle_cues(words,max_words=5,max_seconds=2.4):
     cues=[]; current=[]
     for w in words:
-        if current and (len(current)>=max_words or w["end"]-current[0]["start"]>max_seconds):
+        if current and (len(current)>=max_words or w["end"]-current[0]["start"]>max_seconds or w["start"]-current[-1]["end"]>.16):
             cues.append(current);current=[]
         current.append(w)
     if current:cues.append(current)
