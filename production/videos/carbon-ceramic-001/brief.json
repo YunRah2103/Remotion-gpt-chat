@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "slug": "carbon-ceramic-001",
+  "title": "How Carbon-Ceramic Brakes Handle Heat",
+  "fps": 30,
+  "durationSeconds": 25,
+  "durationInFrames": 750,
+  "resolution": [
+    1080,
+    1920
+  ],
+  "status": "preproduction",
+  "sourceCompositionId": null,
+  "filmSeries": "Automotive Engineering",
+  "narration": "Approved audio not yet supplied",
+  "visualApproach": "Faint x-ray outline of an original performance-car silhouette for context only, then detailed isolated front carbon-ceramic brake hardware. No fully modelled car.",
+  "team": {
+    "master": "automotive-brakes-001/master",
+    "a": "automotive-brakes-001/a-hardware",
+    "b": "automotive-brakes-001/b-motion-thermal",
+    "c": "automotive-brakes-001/c-cinema-xray",
+    "d": "automotive-brakes-001/d-graphics-qa"
+  },
+  "sourceBaseSha": "25a83c4e58e60c909624494745158385b7f962d9"
+}
