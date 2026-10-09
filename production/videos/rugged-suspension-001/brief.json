@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "slug": "rugged-suspension-001",
+  "title": "Off-Road Suspension — Four Corners, One Terrain",
+  "fps": 30,
+  "durationSeconds": 20,
+  "durationInFrames": 600,
+  "resolution": [
+    1080,
+    1920
+  ],
+  "status": "existing-composition",
+  "sourceCompositionId": "RuggedSuspension001",
+  "mechanicalAssets": [
+    "double-wishbone-links",
+    "coilover-dampers",
+    "independently-sampled-heightfield",
+    "offroad-tyres"
+  ],
+  "engineeringScope": "Original illustrative long-travel independent suspension with deterministic heightfield following. No manufacturer-certified physics, no tyre deformation or contact forces. No narration."
+}
