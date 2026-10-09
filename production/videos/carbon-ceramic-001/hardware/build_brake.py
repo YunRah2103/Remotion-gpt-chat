@@ -173,10 +173,10 @@ def forged_shell(name, side, centre, holder):
             p=(cell(0,i,j),cell(0,i+1,j),cell(0,i+1,j+1),
                cell(0,i,j+1))
             # Correct winding for +/- axial faces, and opposite for inside.
-            faces.append(tuple(reversed(p)) if side>0 else p)
+            faces.append(p if side>0 else tuple(reversed(p)))
             q=(cell(1,i,j),cell(1,i+1,j),cell(1,i+1,j+1),
                cell(1,i,j+1))
-            faces.append(q if side>0 else tuple(reversed(q)))
+            faces.append(tuple(reversed(q)) if side>0 else q)
     loop=[]
     for i in range(n_a+1):loop.append((i,0))
     for j in range(1,n_r+1):loop.append((n_a,j))
