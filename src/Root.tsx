@@ -15,4 +15,4 @@ export const VideoRoot=()=> <>
   <Composition id="StudioMaterialProof" component={StudioMaterialProof} width={1080} height={1920} fps={30} durationInFrames={150}/>
   <Composition id="EngineeringDualVersion" component={TwoVersionFilm} width={1080} height={1920} fps={30} durationInFrames={750} defaultProps={{variant:"studio" as const}}/>
   <Composition id="CarbonCeramic001" component={CarbonCeramic001} width={1080} height={1920} fps={30} durationInFrames={750}/>
->;
+</>;
