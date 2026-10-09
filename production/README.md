@@ -82,3 +82,9 @@ For the optional gallery, navigate to **Repository → Settings → Pages → Bu
 ## Production suite checks
 
 The production CI runs Python unit tests, TypeScript compile and two actual Remotion software-WebGL frames. Separate full-fidelity proof and explicit release are still necessary. Visual regression can report pixel differences from a prior baseline; any intentional new edit should receive human review rather than automatically failing solely for visual change.
+
+## GitHub Media Bridge — images and videos for agent reference
+
+A normal chat agent with this repository's GitHub connector can create a **JSON request file**, triggering `production-media-bridge.yml` on `main`. GitHub Actions then downloads authorized public HTTPS images/videos, creates video-frame samples, contact sheets, thumbnail JPEGs, attribution manifest and checksums, and uploads them as an artifact. Manual workflow dispatch is also supported.
+
+Read **[production/media-bridge/README.md](media-bridge/README.md)** for the exact schema, allowed sources, media-size limits, rights declarations and agent instructions. GitHub can store/download binaries but the GitHub text connector alone **cannot visually inspect them**. Generated references are not automatically inserted into a published film.

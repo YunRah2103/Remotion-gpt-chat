@@ -1,0 +1,81 @@
+name: Production Suite - GitHub Media Bridge
+
+on:
+  push:
+    branches: [main, feature/media-bridge-20261009]
+    paths:
+      - 'production/media-bridge/**'
+      - 'production/tests/test_media_bridge.py'
+      - '.github/workflows/production-media-bridge.yml'
+  workflow_dispatch:
+    inputs:
+      request_file:
+        description: 'Committed request JSON, e.g. production/media-bridge/requests/abs-rotor-001.json'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: media-bridge-${{ github.ref }}-${{ github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  download-and-preview:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: production/requirements-qa.txt
+      - name: Prepare media tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -r production/requirements-qa.txt
+      - name: Verify allowed URLs, request rules, and real image/video previews
+        run: python -m unittest discover -s production/tests -p 'test_media_bridge.py' -v
+      - name: Process committed media requests or offline CI fixture
+        shell: bash
+        env:
+          EVENT: ${{ github.event_name }}
+          REQUEST: ${{ inputs.request_file }}
+        run: |
+          set -euo pipefail
+          mkdir -p out/media-bridge
+          PROCESSED=0
+          if [[ "$EVENT" == workflow_dispatch ]]; then
+            # Request is data, never interpolated into a shell command.
+            python production/media-bridge/bridge.py --request "$REQUEST" --output out/media-bridge
+            PROCESSED=1
+          else
+            while IFS= read -r FILE; do
+              if [[ "$FILE" =~ ^production/media-bridge/requests/[a-z0-9-]+\.json$ && -f "$FILE" ]]; then
+                python production/media-bridge/bridge.py --request "$FILE" --output out/media-bridge
+                PROCESSED=$((PROCESSED+1))
+              fi
+            done < <(git diff --name-only HEAD^ HEAD -- production/media-bridge/requests/)
+          fi
+          if [[ "$PROCESSED" -eq 0 ]]; then
+            # Tests processing without externally downloading anyone's content.
+            python production/media-bridge/bridge.py --demo --output out/media-bridge/ci-demo
+          fi
+          printf '## Media Bridge\n\n' >> "$GITHUB_STEP_SUMMARY"
+          printf 'Processed request count: %s\n\n' "$PROCESSED" >> "$GITHUB_STEP_SUMMARY"
+          find out/media-bridge -name INDEX.md -print >> "$GITHUB_STEP_SUMMARY"
+          find out/media-bridge -name contact-sheet.jpg -print >> "$GITHUB_STEP_SUMMARY"
+      - name: Publish verified source media, previews and provenance
+        uses: actions/upload-artifact@v4
+        with:
+          name: media-bridge-${{ github.run_id }}
+          path: out/media-bridge/
+          retention-days: 14
+          if-no-files-found: error
