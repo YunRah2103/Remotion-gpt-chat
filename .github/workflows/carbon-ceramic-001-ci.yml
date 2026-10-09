@@ -1,4 +1,4 @@
-name: Carbon Ceramic 001 - six-agent contract and handoff QA
+name: Carbon Ceramic 001 - seven-agent contract and handoff QA
 on:
   push:
     branches:
@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Verify shots, no full car scope, five assigned worker prompts and honest handoffs
+      - name: Verify shots, no full car scope, six assigned worker prompts and honest handoffs
         run: |
           set -euo pipefail
           python production/videos/carbon-ceramic-001/validate_setup.py
@@ -31,5 +31,5 @@ jobs:
           python production/videos/carbon-ceramic-001/master_gate.py --report out/carbon-ceramic-001/master-readiness.json
       - name: Report contract-only scope
         run: |
-          echo 'Verified carbon-ceramic five-agent planning contract and handoff JSON.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Verified carbon-ceramic seven-agent planning contract and handoff JSON.' >> "$GITHUB_STEP_SUMMARY"
           echo 'This workflow does NOT demonstrate any finished Blender hardware, thermal simulation or MP4.' >> "$GITHUB_STEP_SUMMARY"

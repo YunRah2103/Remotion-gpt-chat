@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "task": "carbon-ceramic-001-agent-f",
+  "branch": "automotive-brakes-001/f-render",
+  "sourceSha": "9502cf776c5015fcf92fbd16f12ab638b8c70fe4",
+  "owner": "release",
+  "summary": "UNSTARTED render-engineering handoff template; common setup sourceSha is not a completed render or QA result.",
+  "status": "blocked",
+  "files": [],
+  "evidence": [],
+  "blockers": [
+    "E's Master-approved integrated native composition is not yet available to F.",
+    "No native 750-frame MP4, FFprobe full-frame/decode report or verified download artifact yet."
+  ],
+  "notes": "Only replace blocked status with ready after source-locked actual Remotion MP4 and rigorous native QA; Master retains public release."
+}

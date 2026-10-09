@@ -1,10 +1,10 @@
-# Carbon-ceramic brakes — six-agent project
+# Carbon-ceramic brakes — seven-agent project
 
 Production scope: 25-second technical film. A faint minimalist x-ray car silhouette reveals a detailed standalone carbon-ceramic front brake corner, with visible friction heat and fade resistance.
 
 **Status: PREPRODUCTION — no final composition or MP4 yet.**
 
-Read PRODUCTION_CONTRACT.md, shots.json, VOICEOVER.md and your assigned agent-prompts/AGENT-X.md. The Master owns integration and final delivery. Hardware/physics/cinema/graphics specialists own separate source directories and branches. Integrator E owns the composition assembly and a narrowly scoped src/Root.tsx registration; Master alone approves the final release.
+Read PRODUCTION_CONTRACT.md, shots.json, VOICEOVER.md and your assigned agent-prompts/AGENT-X.md. The Master owns integration and final delivery. Hardware/physics/cinema/graphics specialists own separate source directories and branches. Integrator E owns the composition assembly and a narrowly scoped src/Root.tsx registration; F owns the source-locked final render candidate and technical media QA; Master alone approves the final release.
 
 Use the existing production toolkit described in production/advanced/README.md, production/PIPELINE.md and production/EXPERIENCE.md. Large GLB/PNG/MP4 binaries should be GitHub Actions artifacts; do not silently commit huge media files or copy YUNEX assets.
 
