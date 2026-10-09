@@ -169,10 +169,10 @@ def forged_shell(name, side, centre, holder):
             p=(cell(0,i,j),cell(0,i+1,j),cell(0,i+1,j+1),
                cell(0,i,j+1))
             # Correct winding for +/- axial faces, and opposite for inside.
-            faces.append(p if side>0 else tuple(reversed(p)))
+            faces.append(tuple(reversed(p)) if side>0 else p)
             q=(cell(1,i,j),cell(1,i+1,j),cell(1,i+1,j+1),
                cell(1,i,j+1))
-            faces.append(tuple(reversed(q)) if side>0 else q)
+            faces.append(q if side>0 else tuple(reversed(q)))
     loop=[]
     for i in range(n_a+1):loop.append((i,0))
     for j in range(1,n_r+1):loop.append((n_a,j))
@@ -182,7 +182,7 @@ def forged_shell(name, side, centre, holder):
         a=cell(0,i,j);b=cell(0,*loop[(k+1)%len(loop)])
         c=cell(1,*loop[(k+1)%len(loop)]);d=cell(1,i,j)
         f=(a,b,c,d)
-        faces.append(f if side>0 else tuple(reversed(f)))
+        faces.append(tuple(reversed(f)) if side>0 else f)
     mesh=bpy.data.meshes.new(name+"_mesh")
     mesh.from_pydata(verts,[],faces);mesh.update()
     ob=bpy.data.objects.new(name,mesh)
@@ -382,8 +382,8 @@ def setup_stage(out):
             scene.eevee.taa_render_samples = 64
         if hasattr(scene.eevee, 'use_gtao'):
             scene.eevee.use_gtao = True
-    if hasattr(scene, 'cycles'):
-        scene.cycles.use_denoising = False if hasattr(scene.cycles, 'use_denoising') else False
+    if hasattr(scene, 'cycles') and hasattr(scene.cycles, 'use_denoising'):
+        scene.cycles.use_denoising = False
     for layer in scene.view_layers:
         if hasattr(layer, 'cycles') and hasattr(layer.cycles, 'use_denoising'):
             layer.cycles.use_denoising = False
