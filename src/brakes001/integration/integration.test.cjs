@@ -24,7 +24,7 @@ const adapter = read('src/brakes001/integration/integrationState.ts');
 const eCameraSource=read('src/brakes001/integration/IntegrationCameraRig.tsx');
 const padSource=read('src/brakes001/integration/InFilmPadCutaway.tsx');
 assert.match(eCameraSource,/lerp\(\.91,\.38,t\)/);
-assert.match(eCameraSource,/frame>=100&&frame<=147/);
+assert.match(eCameraSource,/view==='pad'/);
 assert.match(padSource,/caliper\.visible=visible/);
 assert.match(padSource,/travelMm\.toFixed\(2\)/);
 
@@ -41,6 +41,28 @@ Function('exports','require',adapterTranspiled.outputText)(adapterOutput,(module
   if(moduleName==='../cinema/cameraMath') return camera;
   throw new Error('Unrecognised E adapter import: '+moduleName);
 });
+
+// Polish05 dedicated source contract and exact nine-frame smooth transition.
+const transitionSrc=read('src/brakes001/integration/Polish05Transitions.ts');
+const transitionExports={};
+const compiledTransition=ts.transpileModule(transitionSrc,{fileName:'Polish05Transitions.ts',
+  compilerOptions:{target:ts.ScriptTarget.ES2020,module:ts.ModuleKind.CommonJS}});
+Function('exports',compiledTransition.outputText)(transitionExports);
+const blend=transitionExports.padBlendAt;
+for(let frame=0;frame<750;frame++){
+  const opacity=blend(frame);
+  assert.ok(opacity>=0&&opacity<=1, 'invalid pad view opacity '+frame);
+  if(frame<96||frame>151)assert.equal(opacity,0,'pad stage outside the cutaway');
+}
+for(const f of [97,98,99,100,101,102,103,104,143,144,145,146,147,148,149,150]){
+  assert.ok(blend(f)>0&&blend(f)<=1,'mask or missing geometry in crossfade '+f);
+}
+assert.equal(blend(96),0);assert.equal(blend(104),1);
+assert.equal(blend(143),1);assert.equal(blend(151),0);
+assert.ok(!film.includes('[99,100,147,148]'),'Polish04 dark masks remain');
+assert.match(film, /<BrakeStage frame=\{frame\} view="pad"/);
+assert.match(film, /<BrakeStage frame=\{frame\} view="normal"/);
+
 const manifest = JSON.parse(read('production/videos/carbon-ceramic-001/hardware/rig-manifest.json'));
 const brief = JSON.parse(read('production/videos/carbon-ceramic-001/brief.json'));
 const shots = JSON.parse(read('production/videos/carbon-ceramic-001/shots.json'));

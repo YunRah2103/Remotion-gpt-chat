@@ -13,16 +13,16 @@ import {brakeCameraAt, type BrakeCameraPose} from '../cinema/cameraMath';
 const lerp=(a:number,b:number,t:number)=>a+(b-a)*t;
 const smooth=(x:number)=>{const t=Math.max(0,Math.min(1,x));return t*t*(3-2*t);};
 
-export const integrationCameraAt=(frame:number):BrakeCameraPose=>{
+export const integrationCameraAt=(frame:number,view:'auto'|'normal'|'pad'='auto'):BrakeCameraPose=>{
   const p=brakeCameraAt(frame);
   // The demonstration covers B's real first pressure ramp (frames 95–117);
   // camera is side-oriented so per-face axial travel has perspective.
-  if(frame>=100&&frame<=147){
-    const reveal=smooth((frame-101)/12);
-    const position:[number,number,number]=[
-      lerp(.64,.09,reveal),lerp(.28,.25,reveal),lerp(.59,.85,reveal)];
-    const target:[number,number,number]=[0,.055,.085];
-    return {...p,position,target,fovDegrees:39,
+  if(view==='pad'||(view==='auto'&&frame>=100&&frame<=147)){
+    // Axial three-quarter view, fully showing the 390mm disc at phone scale.
+    // True pads retain their real 0.15-2.50 mm per-face clearance.
+    const position:[number,number,number]=[.10,.33,1.18];
+    const target:[number,number,number]=[0,.07,.06];
+    return {...p,position,target,fovDegrees:45,
       focusDistanceMetres:Math.hypot(...position.map((v,i)=>v-target[i]))};
   }
   if(p.shotId==='reveal'){
@@ -60,10 +60,10 @@ export const integrationCameraAt=(frame:number):BrakeCameraPose=>{
   return p;
 };
 
-export const IntegrationCameraRig:React.FC<{frame:number}>=({frame})=>{
+export const IntegrationCameraRig:React.FC<{frame:number;view?:'auto'|'normal'|'pad'}>=({frame,view='auto'})=>{
   const {camera,size,invalidate}=useThree();
   useLayoutEffect(()=>{
-    const p=integrationCameraAt(frame);
+    const p=integrationCameraAt(frame,view);
     camera.position.set(...p.position);
     camera.lookAt(new THREE.Vector3(...p.target));
     if(camera instanceof THREE.PerspectiveCamera){
@@ -74,6 +74,6 @@ export const IntegrationCameraRig:React.FC<{frame:number}>=({frame})=>{
     }
     camera.updateMatrixWorld();
     invalidate();
-  },[frame,camera,size.width,size.height,invalidate]);
+  },[frame,view,camera,size.width,size.height,invalidate]);
   return null;
 };
