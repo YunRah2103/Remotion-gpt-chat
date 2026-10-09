@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "task": "carbon-ceramic-001-agent-f",
   "branch": "automotive-brakes-001/f-render",
-  "sourceSha": "dcc710b04478784233fda1743904cee9e7b057af",
+  "sourceSha": "929630b1b9692b87b904f57ca2a8deb250a417ac",
   "owner": "release",
   "status": "review",
-  "summary": "REAL 25-second 750-frame native Remotion+Three.js CarbonCeramic001 review-candidate COMPLETE and technically verified. Ten immutable E-source full-res native chunks, FFprobe/frame-count/full FFmpeg decode PASS, H.264 yuv420p 1080x1920 30fps/25.0s, genuine final MP4 and five-frame contact sheet in accessible GitHub Actions artifact 11639835454. This is NOT Agent D/Master-approved official release.",
+  "summary": "POLISH04 REAL FULL NATIVE 25.000s REVIEW CANDIDATE COMPLETE: 750/750 frames, 1080x1920, 30fps, H.264 yuv420p, no corrupt decode, accurate first-onset cutaway frames100-147 and visibly improved continuous hero orbit. Source locked to Agent E 21c2b581...; artifact 11641871804. Technical PASS; D/Master creative signoff and approved narration pending.",
   "files": [
     ".github/workflows/carbon-ceramic-001-f-assemble.yml",
     ".github/workflows/carbon-ceramic-001-f-candidate.yml",
@@ -20,24 +20,32 @@
     "production/videos/carbon-ceramic-001/render/source_lock.py",
     "production/videos/carbon-ceramic-001/render/test_source_lock.py",
     "production/videos/carbon-ceramic-001/render/test_verify_media.py",
-    "production/videos/carbon-ceramic-001/render/verify_media.py"
+    "production/videos/carbon-ceramic-001/render/verify_media.py",
+    ".github/workflows/carbon-ceramic-001-f-polish04.yml",
+    ".github/workflows/carbon-ceramic-001-f-polish04-recovery.yml",
+    ".github/workflows/carbon-ceramic-001-f-polish04-assemble.yml",
+    "production/videos/carbon-ceramic-001/render/POLISH04_REPORT.md",
+    "production/videos/carbon-ceramic-001/render/POLISH04_MOTION_QA.json"
   ],
   "evidence": [
-    "Candidate immutable Agent E source SHA: 5b378202187748ce9b51d884f26bb7167285c946",
-    "ACTUAL complete 25-second MP4 with all QA artifacts: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37978273707/artifacts/11639835454",
-    "SUCCESS technical verification workflow run: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37978273707",
-    "Original native 8x75 frame chunks, source + production tests: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976771520",
-    "SUCCESS native recovery chunks 07/09 from same E SHA: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37977591114",
-    "Preliminary visual QA and full provenance report: https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-brakes-001/f-render/production/videos/carbon-ceramic-001/render/REPORT.md",
-    "Verified candidate MP4 12,875,114 bytes; SHA256 e7ed2619ab6ed09087cdb50cfc2b4fb94e3262aa69da77b72e5142bcb51bec73; FFprobe 750 frames decoded 750 at 30/1fps, 25.000000s, 1080x1920 H.264 yuv420p, complete FFmpeg decode PASS.",
-    "Actual GitHub stills 48/168/321/531/705 + contact sheet included in same artifact; detected stillness intervals require D manual video review.",
-    "Agent F draft PR: https://github.com/YunRah2103/Remotion-gpt-chat/pull/16"
+    "CURRENT EXACT E POLISH04 FILM SOURCE: 21c2b581b46251b0bd45028d32eb40b4341eeb2a",
+    "Source verified at E native proof PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37981542125",
+    "Nine 75-frame real new native Remotion/Three.js chunks and source check PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982325309",
+    "Pad demonstration frames 75–149 separately source-locked and native-rendered PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982665013",
+    "FINAL POLISH04 FILM ACTUAL FULL PLAYABLE H264 MP4 AND TECHNICAL QA ARTIFACT: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37983072846/artifacts/11641871804",
+    "Final technical assembly GitHub Actions SUCCESS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37983072846",
+    "MP4 12,314,696 bytes, 750 declared/750 decoded by FFprobe and full FFmpeg decode, 1080x1920, 30/1fps, exactly 25.000s, H264 yuv420p, silent; sha256 fad39a08e151913792da0c827b7c621f511b817b17e4cf4559fdcefa31ae7fbb, independently downloaded/rehashed PASS",
+    "Polish04 actual 22-frame native video visual review, 14 stills + contact, quality and real hero comparison: https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-brakes-001/f-render/production/videos/carbon-ceramic-001/render/POLISH04_REPORT.md",
+    "Hero last-150 frame analysis same resolution/fps: mean adjacent grayscale MAD 0.16493 old -> 0.25263 new (1.5317x improvement); near-static pairs 108 ->25. F-source report: render/POLISH04_MOTION_QA.json",
+    "Original previous first-candidate artifact retained solely as comparison (NOT reused in film): https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37978273707/artifacts/11639835454",
+    "Agent F PR #16: https://github.com/YunRah2103/Remotion-gpt-chat/pull/16"
   ],
   "blockers": [
-    "Agent D must independently inspect this actual full-length native candidate at target/phone resolution: opening looks sparse, clamp movement subtle, low-contrast hardware, freeze/stillness intervals and creative pacing.",
-    "Master has NOT approved this film as official final release; Master SOURCE_LOCK and master_gate.py --require-ready remain intact and were not bypassed.",
-    "Agents A/E can continue Polish03 for optional further lookdev; latest candidate is pinned to E commit 5b378202187748ce9b51d884f26bb7167285c946, not any later unverified code.",
-    "Approved user narration is not accessible, so the real candidate has no audio."
+    "Independent Agent D must watch exact Polish04 MP4 including 100-147 in-film brake pad demonstration, thermal 270-449, benefits 450-629 and final orbit 630-749; current technical pass is NOT creative approval.",
+    "Pad motion physically 2.35mm and subtle at phone scale; full-frame navy transitions at frames 99-100 and 147-148 should be assessed for distracting flashes.",
+    "Material/lighting still dark and hero becomes thin side-on at last frame; user/Master may request future polish despite measurable 53.17% motion gain.",
+    "No verified original approved narration file was accessible for this render; silent review candidate, audio pending.",
+    "Master release SOURCE_LOCK/master_gate acceptance and public delivery remain untouched and pending."
   ],
-  "notes": "This handoff is status review (candidate ready for creative review), NOT ready (official release). Candidate workflow keeps release approval gates unchanged. GitHub artifact 11639835454 contains real MP4 and evidence. F release ownership limited to rendering; Master only approves/publicly releases."
+  "notes": "Current new Polish04 sourceSha is Agent E commit 21c2b581b46251b0bd45028d32eb40b4341eeb2a; F tooling code commit is 9f8b32702a99b551898b78cf8283f16b35156875. Field sourceSha above identifies current F verification/report implementation commit. Real MP4 in immutable GitHub Actions artifact 11641871804. Handoff REVIEW not ready/released."
 }
