@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "task": "carbon-ceramic-001-agent-f",
   "branch": "automotive-brakes-001/f-render",
-  "sourceSha": "929630b1b9692b87b904f57ca2a8deb250a417ac",
+  "sourceSha": "e76de3e7408568b625f34396806cf6fac91ee667",
   "owner": "release",
   "status": "review",
-  "summary": "POLISH04 REAL FULL NATIVE 25.000s REVIEW CANDIDATE COMPLETE: 750/750 frames, 1080x1920, 30fps, H.264 yuv420p, no corrupt decode, accurate first-onset cutaway frames100-147 and visibly improved continuous hero orbit. Source locked to Agent E 21c2b581...; artifact 11641871804. Technical PASS; D/Master creative signoff and approved narration pending.",
+  "summary": "POLISH05 COMPLETE: exact immutable E film a8553b2c1af11d15eb0b8f6c96e0c3e53142f9aa rendered as new real 750-frame 25.000s H264/yuv420p 1080x1920 30fps MP4. Full FFprobe/FFmpeg decode verified, artifact 11644654385 SHA256 2c9f75e96a60376d15e3efb938c5625142ecad82e635a2ffcb11b121ca37c0a9. Actual P04/P05 frame comparison shows corrected f117 rotor crop and removal of opaque transition masks; hero identical to P04. Pending independent D/Master creative gate.",
   "files": [
     ".github/workflows/carbon-ceramic-001-f-assemble.yml",
     ".github/workflows/carbon-ceramic-001-f-candidate.yml",
@@ -25,27 +25,32 @@
     ".github/workflows/carbon-ceramic-001-f-polish04-recovery.yml",
     ".github/workflows/carbon-ceramic-001-f-polish04-assemble.yml",
     "production/videos/carbon-ceramic-001/render/POLISH04_REPORT.md",
-    "production/videos/carbon-ceramic-001/render/POLISH04_MOTION_QA.json"
+    "production/videos/carbon-ceramic-001/render/POLISH04_MOTION_QA.json",
+    ".github/workflows/carbon-ceramic-001-f-polish05.yml",
+    ".github/workflows/carbon-ceramic-001-f-polish05-recovery.yml",
+    ".github/workflows/carbon-ceramic-001-f-polish05-thermal-recovery.yml",
+    ".github/workflows/carbon-ceramic-001-f-polish05-fast-pad.yml",
+    ".github/workflows/carbon-ceramic-001-f-polish05-assemble.yml",
+    "production/videos/carbon-ceramic-001/render/POLISH05_REPORT.md",
+    "production/videos/carbon-ceramic-001/render/POLISH05_MOTION_QA.json"
   ],
   "evidence": [
-    "CURRENT EXACT E POLISH04 FILM SOURCE: 21c2b581b46251b0bd45028d32eb40b4341eeb2a",
-    "Source verified at E native proof PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37981542125",
-    "Nine 75-frame real new native Remotion/Three.js chunks and source check PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982325309",
-    "Pad demonstration frames 75–149 separately source-locked and native-rendered PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982665013",
-    "FINAL POLISH04 FILM ACTUAL FULL PLAYABLE H264 MP4 AND TECHNICAL QA ARTIFACT: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37983072846/artifacts/11641871804",
-    "Final technical assembly GitHub Actions SUCCESS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37983072846",
-    "MP4 12,314,696 bytes, 750 declared/750 decoded by FFprobe and full FFmpeg decode, 1080x1920, 30/1fps, exactly 25.000s, H264 yuv420p, silent; sha256 fad39a08e151913792da0c827b7c621f511b817b17e4cf4559fdcefa31ae7fbb, independently downloaded/rehashed PASS",
-    "Polish04 actual 22-frame native video visual review, 14 stills + contact, quality and real hero comparison: https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-brakes-001/f-render/production/videos/carbon-ceramic-001/render/POLISH04_REPORT.md",
-    "Hero last-150 frame analysis same resolution/fps: mean adjacent grayscale MAD 0.16493 old -> 0.25263 new (1.5317x improvement); near-static pairs 108 ->25. F-source report: render/POLISH04_MOTION_QA.json",
-    "Original previous first-candidate artifact retained solely as comparison (NOT reused in film): https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37978273707/artifacts/11639835454",
-    "Agent F PR #16: https://github.com/YunRah2103/Remotion-gpt-chat/pull/16"
+    "IMMUTABLE REAL FILM E POLISH05 SOURCE SHA: a8553b2c1af11d15eb0b8f6c96e0c3e53142f9aa",
+    "E real P05 native film cutaway proof PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37990076113/artifacts/11644577616",
+    "PRECHECK and eight full-res genuine native P05 chunks: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37990832060",
+    "SUCCESS P05 true pad frames 75–149 recovery (identical source SHA): https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37991321387",
+    "SUCCESS P05 true thermal frames 375–449 recovery (identical source SHA): https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37991135243",
+    "ACTUAL FULL 25s P05 MP4 + 19 frame contact + ffprobe full-decode QA + SHA256: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37991422139/artifacts/11644654385",
+    "Complete verified source-locked P05 H264 yuv420p 1080x1920 30/1 fps exactly 25.000s, 750/750 frames, full decode PASS, 11,679,515 bytes, sha256 2c9f75e96a60376d15e3efb938c5625142ecad82e635a2ffcb11b121ca37c0a9",
+    "Independent P04/P05 actual full MP4 frame analysis: P05 true rotor fully within frame117, no dark opaque full-frame mask at f99,100,147,148; P05= P04 hero pixels exactly at f630/650/705/749; full last-150 frames motion metric exactly unchanged: https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-brakes-001/f-render/production/videos/carbon-ceramic-001/render/POLISH05_MOTION_QA.json",
+    "Full actual detailed QA: https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-brakes-001/f-render/production/videos/carbon-ceramic-001/render/POLISH05_REPORT.md",
+    "Agent F PR#16 https://github.com/YunRah2103/Remotion-gpt-chat/pull/16"
   ],
   "blockers": [
-    "Independent Agent D must watch exact Polish04 MP4 including 100-147 in-film brake pad demonstration, thermal 270-449, benefits 450-629 and final orbit 630-749; current technical pass is NOT creative approval.",
-    "Pad motion physically 2.35mm and subtle at phone scale; full-frame navy transitions at frames 99-100 and 147-148 should be assessed for distracting flashes.",
-    "Material/lighting still dark and hero becomes thin side-on at last frame; user/Master may request future polish despite measurable 53.17% motion gain.",
-    "No verified original approved narration file was accessible for this render; silent review candidate, audio pending.",
-    "Master release SOURCE_LOCK/master_gate acceptance and public delivery remain untouched and pending."
+    "Agent D must independently inspect actual newly completed Polish05 film, not earlier Polish04. Specifically whether true opposing pad 2.35mm motion and narrow end-on 117 image communicate at phone size; do not claim creative pass without D.",
+    "Master creative/source-lock approval pending; Master release gate unchanged and not bypassed.",
+    "Original approved narration not authenticated/accessibly available; no audio track, clearly silent review.",
+    "Possible nonblocking visual reservations: dark isolated model, low-energy opening and intentionally long static benefits holds; automated freeze warnings not corruption."
   ],
-  "notes": "Current new Polish04 sourceSha is Agent E commit 21c2b581b46251b0bd45028d32eb40b4341eeb2a; F tooling code commit is 9f8b32702a99b551898b78cf8283f16b35156875. Field sourceSha above identifies current F verification/report implementation commit. Real MP4 in immutable GitHub Actions artifact 11641871804. Handoff REVIEW not ready/released."
+  "notes": "F handoff JSON sourceSha is latest F report code commit e76de3... (not to be confused with exact rendered film E SHA a8553b2c...). Candidate in GitHub full 25sec artifact 11644654385; status REVIEW not released. No old Polish04 frames used."
 }
