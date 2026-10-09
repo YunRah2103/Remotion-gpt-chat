@@ -63,7 +63,7 @@ That prior GLB is **not** an export of the new Polish 02 source.
   fallback. Matching Blender and Three geometry uses a watertight curved,
   radially scalloped, three-lobe forged housing on each side of the X axle.
 - Added contoured rim trim, forged ribs, crossover bridge satin crown,
-  six opposed piston/bore/seal groups, caliper retaining hardware and a
+  six opposed piston/bore/seal groups, three separated axial bridge straps with genuine open windows, caliper retaining hardware and a
   distinct static mounting bracket. The rotor hub/hat remains independent.
 - Added friction/backing/shim contrast and backing carrier ears for both pads
   **without changing travel range or contact surfaces**.
@@ -113,3 +113,5 @@ does not certify good lighting or convincing shape.
 Blender GLB and real close-up renders are inspected. The recovered earlier
 GLB and local VTK design comparison are useful diagnostics, not proof
 of a new Blender export.
+
+**POLISH02 final visual architecture:** The initially corrected solid bridge still obscured the sculpted caliper, so it was replaced by three discrete bridge connections (one centre named `OuterAxialCaliperBridge`, two end bridges). This retains structural connection while permitting meaningful close-up views into the pad and piston area. Each is radially outside the 195 mm disc radius; the actual native renders still require reinspection.
