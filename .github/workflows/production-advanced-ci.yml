@@ -1,0 +1,120 @@
+name: Advanced Studio - six-feature native integration tests
+on:
+  push:
+    branches: [main,feature/advanced-studio-six-20261009]
+    paths: ['production/advanced/**','production/portal/compare/**','production/tests/test_advanced.py','src/advanced/**','src/Root.tsx','.github/workflows/production-advanced-*.yml']
+  pull_request:
+    paths: ['production/advanced/**','production/portal/compare/**','production/tests/test_advanced.py','src/advanced/**','src/Root.tsx','.github/workflows/production-advanced-*.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  python-and-blender:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: production/requirements-qa.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare real Blender, Python and media checks
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq blender ffmpeg
+          python -m pip install -r production/requirements-qa.txt
+      - name: Test all Python contracts and browser comparison syntax
+        run: |
+          python -m unittest discover -s production/tests -v
+          python -m compileall -q production/advanced
+          node --check production/portal/compare/compare.mjs
+          python production/tools/catalog.py --site out/production/site
+          python production/portal/build.py --site out/production/site --offline
+          test -f out/production/site/compare/index.html
+          test -f out/production/site/compare/compare.mjs
+      - name: Native Blender 3D GLB export, exact component pivots, real UV AO bake and sampled clearance
+        shell: bash
+        run: |
+          set -euo pipefail
+          blender -b -t 2 --python production/advanced/blender_smoke_scene.py
+          python production/advanced/asset_contract.py production/advanced/contracts/rotor-demo.json
+          blender -b --disable-autoexec out/advanced-ci/original-demo.blend -t 2 \
+            --python production/advanced/blender_export.py -- production/advanced/contracts/rotor-demo.json out/advanced-ci/export
+          test -s out/advanced-ci/export/rotor-demo.glb
+          python production/studio/studio.py inspect out/advanced-ci/export/rotor-demo.glb out/advanced-ci/export/model-inspection
+          blender -b --disable-autoexec out/advanced-ci/original-demo.blend -t 2 \
+            --python production/advanced/blender_clearance.py -- production/advanced/contracts/clearance-demo.json out/advanced-ci/clearance-samples.json
+          python production/advanced/clearance.py out/advanced-ci/clearance-samples.json out/advanced-ci/clearance-audit.json
+          blender -b --disable-autoexec out/advanced-ci/original-demo.blend -t 2 \
+            --python production/advanced/blender_bake.py -- production/advanced/contracts/bake-demo.json out/advanced-ci/baked
+          test -s out/advanced-ci/baked/Rotor-ao.png
+          python - <<'PY'
+          import json
+          data=json.load(open('out/advanced-ci/export/rig-manifest.json'))
+          assert data['movingParts'][0]['name']=='Rotor'
+          assert data['glb']=='rotor-demo.glb'
+          baked=json.load(open('out/advanced-ci/baked/bake-manifest.json'))
+          assert baked['bakes'][0]['object']=='Rotor'
+          print('REAL_BLENDER_EXPORT_AO_AND_CLEARANCE_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: advanced-blender-native-proof-${{ github.run_id }}
+          path: |
+            out/advanced-ci/export/
+            out/advanced-ci/clearance-audit.json
+            out/advanced-ci/clearance-samples.json
+            out/advanced-ci/baked/
+            out/production/site/compare/
+          retention-days: 14
+          if-no-files-found: warn
+  remotion-two-environments:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Build original real 3D composition both environmental versions
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          npm ci --no-audit --no-fund
+          npm run check
+          mkdir -p out/two-versions
+          for NAME in studio circuit; do
+            echo "{\"variant\":\"$NAME\"}" > "out/two-versions/$NAME.json"
+            npx remotion still src/index.ts EngineeringDualVersion \
+              "out/two-versions/$NAME.png" --frame=32 --scale=.25 \
+              --gl=swangle "--props=out/two-versions/$NAME.json"
+            npx remotion render src/index.ts EngineeringDualVersion \
+              "out/two-versions/$NAME.mp4" --frames=30-32 --scale=.25 \
+              --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1 \
+              "--props=out/two-versions/$NAME.json"
+            ffmpeg -v error -xerror -i "out/two-versions/$NAME.mp4" -f null -
+            FRAME_COUNT=$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames \
+              -of default=nw=1:nk=1 "out/two-versions/$NAME.mp4")
+            test "$FRAME_COUNT" = 3
+          done
+          python - <<'PY'
+          from PIL import Image,ImageChops
+          a=Image.open('out/two-versions/studio.png').convert('RGB')
+          b=Image.open('out/two-versions/circuit.png').convert('RGB')
+          assert a.size==b.size
+          assert ImageChops.difference(a,b).getbbox() is not None, 'Two variants rendered identical imagery'
+          print('TWO_DISTINCT_ENVIRONMENT_NATIVE_PROOFS_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: advanced-two-version-native-proof-${{ github.run_id }}
+          path: out/two-versions/
+          retention-days: 14
+          if-no-files-found: warn
