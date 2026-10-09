@@ -124,7 +124,7 @@ function forgedCheekGeometry(side: -1 | 1): THREE.BufferGeometry {
   for(let j=radial-1;j>0;j--)rim.push([0,j]);
   for(let k=0;k<rim.length;k++) {
     const [i,j]=rim[k], [ii,jj]=rim[(k+1)%rim.length];
-    quad(at(0,i,j),at(0,ii,jj),at(1,ii,jj),at(1,i,j),side>0);
+    quad(at(0,i,j),at(0,ii,jj),at(1,ii,jj),at(1,i,j),side<0);
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));
