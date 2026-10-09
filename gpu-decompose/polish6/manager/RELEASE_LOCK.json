@@ -1,7 +1,7 @@
 {
   "contractVersion": "POLISH05-v1",
   "contractCommitSha": "5f512efbacaa0446df37fc5c4c07bd3f031fe84a",
-  "status": "model-verified",
+  "status": "render-approved",
   "startingPolish04Sha": "e9a14f5d8e1b3bf805bb4916f9ce8bdc0155ff6a",
   "polish04ArtifactId": 11579249363,
   "polish04RunId": 37846669872,
@@ -14,9 +14,12 @@
   "managerSceneSha256": "17f2e32691b7588569c697686e723fcaef8b9b40228ad17bb79bac6027ad53c7",
   "managerCameraSha256": "e428a8aca90e31f66fae45d0bdd2049835c812e7796f02cf286f4c198b9de9d8",
   "motionCompatibilityAudit": "gpu-decompose/polish5/manager/MOTION_COMPATIBILITY_FINAL.md",
-  "renderApproved": false,
+  "renderApproved": true,
   "releaseApproved": false,
-  "note": "POLISH06 PENDING independent new fan native review. Source hardware is verified P5-A binary patched by /polish6/refine_fans.py; all other parts, camera and motion are unchanged. NOT final approved.",
+  "note": "Independent real 12 native still / 6 motion clip POLISH06 fan QA PASS; 450-frame render approved only, NOT MP4 release.",
   "newFanSourceSha256": "cbf4bb39969d212afc706389f6239cc5fdc70726b3a3aca81902a72c9307878f",
-  "nativeReviewPath": "gpu-decompose/polish6/manager/NATIVE_VISUAL_REVIEW.md"
+  "nativeReviewPath": "gpu-decompose/polish6/manager/NATIVE_VISUAL_REVIEW.md",
+  "nativeProofRunId": 37861896934,
+  "nativeProofArtifactId": 11587555171,
+  "nativeReviewSha256": "ebc2c4069b7d891688e599a57bf2247faf376756b28f7c6ee74807cd46b60e65"
 }
