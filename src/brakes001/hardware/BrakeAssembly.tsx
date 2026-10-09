@@ -111,8 +111,8 @@ function forgedCheekGeometry(side: -1 | 1): THREE.BufferGeometry {
   };
   for(let i=0;i<angular;i++)for(let j=0;j<radial;j++) {
     const a=at(0,i,j),b=at(0,i+1,j),c=at(0,i+1,j+1),d=at(0,i,j+1);
-    quad(a,b,c,d,side<0);
-    quad(at(1,i,j),at(1,i,j+1),at(1,i+1,j+1),at(1,i+1,j),side<0);
+    quad(a,b,c,d,side>0);
+    quad(at(1,i,j),at(1,i,j+1),at(1,i+1,j+1),at(1,i+1,j),side>0);
   }
   const rim: [number,number][]=[];
   for(let i=0;i<=angular;i++)rim.push([i,0]);
@@ -121,7 +121,7 @@ function forgedCheekGeometry(side: -1 | 1): THREE.BufferGeometry {
   for(let j=radial-1;j>0;j--)rim.push([0,j]);
   for(let k=0;k<rim.length;k++) {
     const [i,j]=rim[k], [ii,jj]=rim[(k+1)%rim.length];
-    quad(at(0,i,j),at(0,ii,jj),at(1,ii,jj),at(1,i,j),side<0);
+    quad(at(0,i,j),at(0,ii,jj),at(1,ii,jj),at(1,i,j),side>0);
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));
@@ -199,6 +199,10 @@ export const BrakeAssembly: React.FC<Props> = ({
     centreAngle-.265,centreAngle+.265),[]);
   const caliperEdge=useMemo(()=>extrudedSector(.210,.216,.004,
     centreAngle-.235,centreAngle+.235),[]);
+  const caliperRibs=useMemo(()=>[-.185,.185].map((a)=>
+    extrudedSector(.143,.202,.008,centreAngle+a-.045,centreAngle+a+.045)),[]);
+  const caliperCrown=useMemo(()=>extrudedSector(.226,.230,.084,
+    centreAngle-.23,centreAngle+.23),[]);
   const carbonMap=useMemo(noiseCarbonTexture,[]);
 
   const hot=clamp(heat01), explode=clamp(exploded01), gap=Math.max(0,Math.min(0.012,padGapMetres));
@@ -285,10 +289,9 @@ export const BrakeAssembly: React.FC<Props> = ({
             geometry={caliperEdge}
             position={[side<0?-.063:.059,0,0]}
             material={caliperTrim}/>
-          {[-.185,.185].map((a,k)=>
+          {caliperRibs.map((rib,k)=>
             <mesh key={k} name={`CaliperReinforcement_${side}_${k}`}
-              geometry={extrudedSector(.143,.202,.008,
-                centreAngle+a-.045,centreAngle+a+.045)}
+              geometry={rib}
               position={[side<0?-.068:.060,0,0]} material={caliper}/>)}
           {[-.17,0,.17].map((delta,piston)=>{
             const a=centreAngle+delta, r=.164;
@@ -311,7 +314,7 @@ export const BrakeAssembly: React.FC<Props> = ({
       <mesh name="CurvedCaliperBridge" geometry={caliperBridge}
         position={[-.068,0,0]} material={caliper}/>
       <mesh name="BridgeMachinedCrown"
-        geometry={extrudedSector(.226,.230,.084,centreAngle-.23,centreAngle+.23)}
+        geometry={caliperCrown}
         position={[-.042,0,0]} material={caliperTrim}/>
       {[-.22,.22].map((delta,i)=>{
         const a=centreAngle+delta;
