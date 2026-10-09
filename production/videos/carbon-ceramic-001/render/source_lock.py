@@ -11,9 +11,14 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[3]
 LOCK = HERE / "SOURCE_LOCK.json"
 SOURCE_PATHS = (
-    "src/brakes001", "src/Root.tsx", "src/index.ts",
+    "src/brakes001", "src/Root.tsx", "src/index.ts", "public",
     "package.json", "package-lock.json",
     "production/videos/carbon-ceramic-001/brief.json",
+    "production/videos/carbon-ceramic-001/hardware",
+    "production/videos/carbon-ceramic-001/physics",
+    "production/videos/carbon-ceramic-001/lookdev",
+    "production/videos/carbon-ceramic-001/qa",
+    "production/videos/carbon-ceramic-001/approved-words.json",
 )
 
 def git(*args):
