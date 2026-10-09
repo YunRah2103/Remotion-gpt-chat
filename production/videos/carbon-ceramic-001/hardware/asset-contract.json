@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "carbon-ceramic-brake",
+  "units": "metres",
+  "source": "Original non-manufacturer-specific 390mm carbon-ceramic vented brake corner modelled parametrically for automotive engineering 002, no third-party asset/CAD.",
+  "movingParts": [
+    {
+      "name": "RotorAssembly",
+      "mode": "rotation",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "start": 0,
+      "end": 0.7,
+      "frameStart": 0,
+      "frameEnd": 120
+    },
+    {
+      "name": "PadInner",
+      "mode": "translation",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "start": 0,
+      "end": 0.0025,
+      "frameStart": 35,
+      "frameEnd": 78
+    },
+    {
+      "name": "PadOuter",
+      "mode": "translation",
+      "axis": [
+        -1,
+        0,
+        0
+      ],
+      "start": 0,
+      "end": 0.0025,
+      "frameStart": 35,
+      "frameEnd": 78
+    }
+  ]
+}
