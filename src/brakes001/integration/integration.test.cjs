@@ -22,6 +22,17 @@ const camera = loadTypeScript('src/brakes001/cinema/cameraMath.ts');
 const adapter = read('src/brakes001/integration/integrationState.ts');
 assert.match(adapter, /HARDWARE_REST_GAP_M = \.0025/);
 assert.match(adapter, /padGapForHardware\(s\.brakePressure01\)/);
+// Execute the actual compiled E adapter against B's untouched deterministic state.
+const adapterOutput = {};
+const adapterTranspiled = ts.transpileModule(adapter, {
+  fileName: 'src/brakes001/integration/integrationState.ts',
+  compilerOptions: {target: ts.ScriptTarget.ES2020, module: ts.ModuleKind.CommonJS},
+});
+Function('exports','require',adapterTranspiled.outputText)(adapterOutput,(moduleName)=>{
+  if(moduleName==='../motion/brakeState') return b;
+  if(moduleName==='../cinema/cameraMath') return camera;
+  throw new Error('Unrecognised E adapter import: '+moduleName);
+});
 const manifest = JSON.parse(read('production/videos/carbon-ceramic-001/hardware/rig-manifest.json'));
 const brief = JSON.parse(read('production/videos/carbon-ceramic-001/brief.json'));
 const shots = JSON.parse(read('production/videos/carbon-ceramic-001/shots.json'));
@@ -60,6 +71,13 @@ let maxHeat = 0, minGap = Infinity, maxGap = -Infinity, lastAngle = -1, lastSpee
 for (let f = 0; f < 750; f++) {
   const s = b.brakeStateAt(f);
   const repeat = b.brakeStateAt(f);
+  const e = adapterOutput.integrationStateAt(f);
+  assertNear(e.rotorAngleRad,s.rotorAngleRad);
+  assertNear(e.rotorSpeedRadPerSec,s.rotorSpeedRadPerSec);
+  assertNear(e.brakePressure01,s.brakePressure01);
+  assertNear(e.heat01,s.heat01);
+  assert.ok(e.padGapMetres >= .0001499 && e.padGapMetres <= .0025001, 'E physical gap out of bounds '+f);
+  assert.ok(.0025-e.padGapMetres <= .0025001, 'E stroke over 2.5mm '+f);
   assert.deepEqual(s, repeat, 'non-deterministic frame '+f);
   assertNear(s.timeSeconds, f/30);
   assert.ok(s.rotorAngleRad >= lastAngle, 'rotor reversed at '+f);
