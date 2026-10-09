@@ -98,3 +98,7 @@ Four specialised **GitHub Copilot custom agent profiles** live in `.github/agent
 ## Integrated video production pipeline — 2026
 
 Follow [PIPELINE.md](PIPELINE.md) for the new one-dispatch project preflight, still/moving previews and five-way final renderer, actual Remotion word-highlight captions, source-aware PR visual comparisons, agent skills and verified handoff templates, plus concurrency benchmarks. The pipeline refuses projects that have not yet registered a real composition (including ABS-001). Existing animations, GitHub workflows and the YUNEX separation are preserved.
+
+## Advanced Studio — Blender integration, QA, render recovery, paired versions
+
+Read [advanced/README.md](advanced/README.md). It covers native Blender GLB/pivot/animation export, inspected model geometry, real AO and high-to-low normal-map baking, conservative per-frame AABB clearance checks, Actions render-chunk recovery tied to original source SHA, a GitHub Pages side-by-side video reviewer and an opt-in dual-environment Remotion composition. These modules are optional; production signoff requires actual native evidence and human review.
