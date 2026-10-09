@@ -60,7 +60,7 @@ export const WheelSpeedSensor: React.FC<PartProps> = ({scale = 1}) => (
 
 export const WheelAssembly: React.FC<PartProps> = ({scale = 1}) => (
   <group scale={scale}>
-    <mesh rotation={[Math.PI / 2, 0, 0]}>
+    <mesh>
       <torusGeometry args={[0.87, 0.22, 16, 72]}/>
       <meshStandardMaterial color="#171b1e" metalness={0.02} roughness={0.96}/>
     </mesh>

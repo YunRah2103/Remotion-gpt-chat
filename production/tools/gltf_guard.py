@@ -47,7 +47,7 @@ def compare(original,candidate,required=()):
                 if i in seen:raise ValueError("Cycle")
                 seen.add(i)
                 chain.append(nodes[i].get("name",""))
-            result[anchor]=[x for x in chain if x in required]
+            result[anchor]=chain
         return result
     summary(original,required);summary(candidate,required)
     if anchor_parents(old)!=anchor_parents(new):raise ValueError("Compressed model changed anchor parents")

@@ -8,11 +8,15 @@ from quality import compare
 
 def check(baseline,candidate,out,max_mean=None,change_threshold=18):
     baseline=Path(baseline);candidate=Path(candidate);out=Path(out);out.mkdir(parents=True,exist_ok=True)
-    names=sorted({p.name for p in baseline.glob("*.png")} & {p.name for p in candidate.glob("*.png")})
-    if not names: raise ValueError("No matching .png names across folders")
+    # Artifacts may store proof images under nested 'stills/' subdirectories.
+    before={str(p.relative_to(baseline)):p for p in baseline.rglob("*.png")}
+    after={str(p.relative_to(candidate)):p for p in candidate.rglob("*.png")}
+    names=sorted(set(before) & set(after))
+    if not names: raise ValueError("No matching relative .png paths across folders")
     scores=[]
     for name in names:
-        with Image.open(baseline/name) as a, Image.open(candidate/name) as b:
+        short=name.replace("/", "__").replace("\\\\","__")
+        with Image.open(before[name]) as a, Image.open(after[name]) as b:
             if a.size!=b.size:raise ValueError(f"Different image sizes: {name}")
             aa=a.convert("RGB");bb=b.convert("RGB")
             diff=ImageChops.difference(aa,bb)
@@ -20,8 +24,8 @@ def check(baseline,candidate,out,max_mean=None,change_threshold=18):
             binary=diff.convert("L").point(lambda n: 255 if n>change_threshold else 0)
             changed=binary.histogram()[255]/(a.width*a.height)
             heat=diff.point(lambda x: min(255,x*4))
-            heat.save(out/("diff-"+name))
-        compare(baseline/name,candidate/name,out/("compare-"+name))
+            heat.save(out/("diff-"+short))
+        compare(before[name],after[name],out/("compare-"+short))
         scores.append({"frame":name,"meanAbsolutePixelChange":round(mean,3),
                        "fractionNoticeablyChanged":round(changed,5),
                        "passesNumericThreshold":max_mean is None or mean<=max_mean})

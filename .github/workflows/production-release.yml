@@ -36,6 +36,7 @@ jobs:
       - name: Verify exactly one finished video and rebuild checksums
         env:
           TAG: ${{ inputs.release_tag }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
           set -euo pipefail

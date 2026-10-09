@@ -66,6 +66,7 @@ jobs:
           npm run check
       - name: Software-WebGL real Remotion two-frame preview
         run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
           mkdir -p out/production
           python3 production/tools/render.py --composition GpuDriveFilm --mode preview --output out/production/smoke.mp4 --start 0 --end 1 --scale 0.25 --concurrency 1
           ffprobe -v error -show_entries stream=codec_name,nb_frames,width,height -of json out/production/smoke.mp4 > out/production/smoke.ffprobe.json

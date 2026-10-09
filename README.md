@@ -34,3 +34,9 @@ npx remotion render src/index.ts TurboDocumentary out/turbo-visual.mp4 --gl=swan
 ```
 
 For a rigorously validated final master use the GitHub workflows, which include audio, correct the full-range WebGL colour encoding to limited-range `yuv420p`, and run FFprobe plus a complete decode.
+
+## Automotive Engineering production suite
+
+A separate, reusable video production toolchain has been added for mechanical explainers (ABS, suspension, brakes, differentials). It **does not** use or touch `yunus-video-lab` or YUNEX.
+
+Start with **[production/README.md](production/README.md)** for the ready-to-run GitHub Actions workflows, model library, rendering modes, independent QA, versioned GitHub Releases and optional Pages gallery. The reusable procedural mechanical parts are in **[src/mechanics/parts.tsx](src/mechanics/parts.tsx)**. The unit/native test workflow is **Production Suite - tests and small real render**.
