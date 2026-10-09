@@ -34,6 +34,8 @@ def validate(path):
         assert e['id'] not in ids; ids.add(e['id'])
         assert 120 <= e['start'] < e['end'] < 750
         assert e['side'] in ('left', 'right') and e['row'] in (0, 1)
+        x = 76 if e['side'] == 'left' else 598
+        assert x >= c['safeLeft'] and x + 285 <= c['width'] - c['safeRight'], e
         assert set(e['part'].split(',')) <= ALLOWED, e
         parts.add(e['text'])
     assert {'Carbon-Ceramic Disc', 'Friction Ring', 'Caliper', 'Brake Pads', 'Rotor Hat'} <= parts
