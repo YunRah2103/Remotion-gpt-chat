@@ -35,3 +35,7 @@
 - Use reviewed actual word timestamps for `Captioned` variants; never manufacture approved speech or timestamp data. Keep original compositions unchanged.
 - Run source-aware PR moving/native visual evidence, validated cross-agent handoffs, and real benchmark results before optimizing.
 - Custom agent profiles and repo skills are instructions, not independently running coding agents or paid external services.
+
+## Advanced original asset and video production
+
+Before using advanced mechanical tooling read `production/advanced/README.md`. Scope exclusively to `Remotion-gpt-chat`; never use `yunus-video-lab`. Keep Blender object origins, rig names and author-approved source metadata. Treat overlap warnings as AABB broadphase signals only, not confirmed mechanical collisions. Review baked AO/normal textures before claiming production materials. Render recovery must reuse only exact source-commit SHA verified chunks from one original run. Two-version demo uses original illustrative 3D brake geometry, not a completed ABS episode. Comparison browser processes local clips unless explicitly provided otherwise.
