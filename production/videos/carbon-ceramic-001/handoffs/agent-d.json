@@ -2,14 +2,94 @@
   "schemaVersion": 1,
   "task": "carbon-ceramic-001-agent-d",
   "branch": "automotive-brakes-001/d-graphics-qa",
-  "sourceSha": "25a83c4e58e60c909624494745158385b7f962d9",
+  "sourceSha": "1bcec00cf6028e9a7600b92306f134854dedbd20",
   "owner": "qa",
-  "summary": "UNSTARTED template: specialist has not begun implementation; this is not an approved handoff.",
-  "status": "blocked",
-  "files": [],
-  "evidence": [],
-  "blockers": [
-    "Agent session has not started. No code, native proofs, review or handoff has been supplied."
+  "summary": "POLISH04 independent 750-frame real source-specific MP4 visual and technical QA completed. Exact source 21c2b581... from F artifact 11641871804 matches SHA256 fad39a...; FFprobe 1080x1920 H264 yuv420p 30fps 750frames 25s and full FFmpeg decode PASS. Independent old/new 750-frame motion audit confirms genuine hero orbit improvement. Creative FAIL 6.6/10 due in-film pad macro right-edge clipping / hard-to-distinguish opposed pads and 99-100/147-148 2-frame dark flashes. Only narrow E Polish05 pad and transition fix needed, not hero/hardware/thermal rebuild.",
+  "status": "review",
+  "files": [
+    "src/brakes001/graphics/index.tsx",
+    "src/brakes001/graphics/graphics-cues.json",
+    "production/videos/carbon-ceramic-001/qa/check_graphics.py",
+    "production/videos/carbon-ceramic-001/qa/component_smoke.cjs",
+    "production/videos/carbon-ceramic-001/qa/render_layout_proofs.py",
+    "production/videos/carbon-ceramic-001/qa/REVIEW_RUBRIC.md",
+    "production/videos/carbon-ceramic-001/qa/INITIAL_REPORT.md",
+    "production/videos/carbon-ceramic-001/qa/proofs/layout-frame-048.svg",
+    "production/videos/carbon-ceramic-001/qa/proofs/layout-frame-168.svg",
+    "production/videos/carbon-ceramic-001/qa/proofs/layout-frame-321.svg",
+    "production/videos/carbon-ceramic-001/qa/proofs/layout-frame-531.svg",
+    "production/videos/carbon-ceramic-001/qa/proofs/layout-frame-705.svg",
+    "production/videos/carbon-ceramic-001/qa/POLISH02_INDEPENDENT_REVIEW.md",
+    "production/videos/carbon-ceramic-001/qa/POLISH03_FULL_CANDIDATE_REVIEW.md",
+    "production/videos/carbon-ceramic-001/qa/POLISH04_FULL_INDEPENDENT_REVIEW.md",
+    "production/videos/carbon-ceramic-001/qa/POLISH04_FRAME_EVIDENCE.md",
+    "production/videos/carbon-ceramic-001/qa/POLISH04_E_POLISH05_HANDOFF.md"
   ],
-  "notes": "Planning-only placeholder. sourceSha is original common ancestor, NOT a specialist completion commit. Replace with actual post-implementation SHA."
+  "evidence": [
+    "INDEPENDENT POLISH04 FULL QA: https://github.com/YunRah2103/Remotion-gpt-chat/blob/6576413930db83120d71bb947497f76ce0088fcc/production/videos/carbon-ceramic-001/qa/POLISH04_FULL_INDEPENDENT_REVIEW.md",
+    "FRAME ANNOTATIONS: https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-brakes-001/d-graphics-qa/production/videos/carbon-ceramic-001/qa/POLISH04_FRAME_EVIDENCE.md",
+    "PRECISE E CORRECTION HANDOFF: https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-brakes-001/d-graphics-qa/production/videos/carbon-ceramic-001/qa/POLISH04_E_POLISH05_HANDOFF.md",
+    "EXACT FILM CODE SHA: https://github.com/YunRah2103/Remotion-gpt-chat/commit/21c2b581b46251b0bd45028d32eb40b4341eeb2a",
+    "REAL FULL FILM ARTIFACT 11641871804: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37983072846/artifacts/11641871804",
+    "INDEPENDENT MP4 SHA256 fad39a08e151913792da0c827b7c621f511b817b17e4cf4559fdcefa31ae7fbb MATCH, FFprobe H264 yuv420p 1080x1920 30fps 750frames 25.0s; full FFmpeg -xerror decode PASS",
+    "PREVIOUS 25S ARTIFACT 11639835454: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37978273707/artifacts/11639835454",
+    "INDEPENDENT OLD/NEW native 750-frame OpenCV motion audit; hero 630-749 mean adjacent gray frame delta old 0.1294 vs new 0.2489; last 150 frames old 0.1649 vs new 0.2526; 600-749 near-still pairs <0.15 old 108 vs new 25",
+    "ACTUAL NATIVE 1080 FRAMES 98-101 105 107 117 132 140 145-150 inspected; rotor right edge clipped at frame117; dark masks at 99-100 / 147-148 corroborated by E source",
+    "VISUAL REVIEW LIMIT: completed native 750-frame decode, ~50 frame-specific inspected samples, 750-frame image-change audit; uninterrupted normal-speed playback unavailable and not claimed"
+  ],
+  "blockers": [
+    "MAJOR creator-quality: actual frame117 (3.900s) in-film macro crops physical rotor at right canvas edge and 107-145 does not visually distinguish both real opposing pad faces; targeted E camera/staging/label layout required, without altering 2.35mm physical per-pad stroke.",
+    "MAJOR creator-quality: source inserts two-frame fully opaque dark masks at frames99-100 and 147-148; verified abrupt assembly disappearance/reappearance; E must replace with clean transition.",
+    "Only after narrow E Polish05 source-locked proof may F render one NEW actual full 750-frame final candidate and D/Master review it; Polish04 is not creative-release approved.",
+    "Review tooling cannot watch uninterrupted real-time playback; Master must do normal-speed viewing before release."
+  ],
+  "notes": "POLISH04 verdict FAIL creative 6.6/10 vs Polish03 5.8/10; technical all PASS. Hero orbit is genuinely improved; thermal localized, A hardware no rework. Precise E-only prompt included in qa/POLISH04_E_POLISH05_HANDOFF.md. No YUNEX, F, E, A, Master changes.",
+  "review": {
+    "phase": "POLISH04_25S_INDEPENDENT",
+    "verdict": "FAIL — targeted E-only pad macro/transition correction before final Master creative review",
+    "ratedOverallOutOf10": 6.6,
+    "scores": {
+      "hardware": 7,
+      "mechanics": 8.2,
+      "materialsLighting": 6.2,
+      "cinematography": 7.2,
+      "padClarity": 4.6,
+      "thermalExplanation": 7.1,
+      "typography": 6,
+      "transitions": 4.6
+    },
+    "reviewedSourceSha": "21c2b581b46251b0bd45028d32eb40b4341eeb2a",
+    "fRunId": 37983072846,
+    "artifactId": 11641871804,
+    "candidateSha256": "fad39a08e151913792da0c827b7c621f511b817b17e4cf4559fdcefa31ae7fbb",
+    "specs": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30,
+      "frames": 750,
+      "seconds": 25,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "silent": true
+    },
+    "ffprobe": "PASS",
+    "fullFfmpegDecode": "PASS",
+    "independentOldNewHeroMeanDelta": {
+      "old": 0.1294,
+      "polish04": 0.2489
+    },
+    "independentLast150MeanDelta": {
+      "old": 0.1649,
+      "polish04": 0.2526
+    },
+    "criticalIssues": [],
+    "majorIssues": [
+      "f107-145:pad macro confusing and right clipped f117",
+      "f99-100 and f147-148:hard dark geometry masks"
+    ],
+    "noNewHeroCorrectionRequired": true,
+    "noNewHardwareCorrectionRequired": true,
+    "masterReleaseApproved": false,
+    "continuousNormalSpeedPlayback": "UNAVAILABLE — independently decoded all frames and inspected sampled native images; no full-speed playback claim"
+  }
 }
