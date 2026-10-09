@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "production": "carbon-ceramic-001",
+  "status": "user-supplied, prepared audio candidate; exact binary not committed",
+  "durationSeconds": 25,
+  "frameRate": 30,
+  "outputSampleRate": 48000,
+  "outputChannels": 2,
+  "source": {
+    "filename": "openai-fm-cedar-audio (3).mp3",
+    "durationSeconds": 21.504,
+    "sampleRate": 24000,
+    "channels": 1,
+    "sha256": "d801a47e0b13421ad11b3a871fcb1a55f8be82a660d2a2e646d4d010e15c8044"
+  },
+  "files": [
+    {
+      "filename": "Carbon_Ceramic_001_Cedar_VO_25s_48k_master.wav",
+      "sha256": "b5ee270bfa713400545c21fe04796181d08068dfd9aa4ac2d09e37571e8d237e",
+      "codec": "pcm_s24le",
+      "durationSeconds": 25
+    },
+    {
+      "filename": "Carbon_Ceramic_001_Cedar_VO_25s_48k_preview.m4a",
+      "sha256": "c9590da67cd7cc39eb904c620d69c296a053eab8cbb2b27996d743d4eb6ab15e",
+      "codec": "aac",
+      "durationSeconds": 25
+    }
+  ],
+  "processing": "Natural speech speed and pitch preserved; original pause boundaries trimmed; narrative gaps placed to align shots 1-5; high-pass 65 Hz; loudness normalized near -20 LUFS. Resampling does not restore frequencies above original MP3 24k Nyquist.",
+  "segments": [
+    {
+      "id": "S01",
+      "start": 0.3,
+      "end": 3,
+      "shot": "0-4 seconds",
+      "text": "Every hard stop turns speed into heat."
+    },
+    {
+      "id": "S02",
+      "start": 3.93,
+      "end": 8.11,
+      "shot": "4-9 seconds",
+      "text": "Brake pads squeeze the spinning disc, and temperatures climb fast."
+    },
+    {
+      "id": "S03",
+      "start": 8.78,
+      "end": 15.35,
+      "shot": "9-15 seconds",
+      "text": "Carbon ceramic discs are built to withstand repeated thermal stress, while keeping braking response consistent."
+    },
+    {
+      "id": "S04",
+      "start": 16.08,
+      "end": 18.88,
+      "shot": "15-21 seconds",
+      "text": "They're also much lighter than traditional cast iron."
+    },
+    {
+      "id": "S05",
+      "start": 20.95,
+      "end": 24.61,
+      "shot": "21-25 seconds",
+      "text": "The advantage is dependable performance, stop after stop."
+    }
+  ],
+  "warnings": [
+    "Sentence timestamps are audible-phrase approximations based on detected silence, NOT exact word-level timestamps.",
+    "MP3 user upload stays in ChatGPT; GitHub only receives these text contracts. Download the WAV/AAC from the originating chat and attach it to the Master agent or a verified Action artifact.",
+    "The 25s master is a narration-only file, not yet muxed to any actual finished video.",
+    "Do not invent a GitHub audio artifact link."
+  ]
+}
