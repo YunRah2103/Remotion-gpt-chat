@@ -233,9 +233,10 @@ def dyn(frame,stage,e):
     sec=frame/FPS
     if stage==0:
         # Rolling tyre v=R*omega, then sudden lock while road still moving.
-        omega=-(frame*.20 if frame<76 else 76*.20+(frame-76)*(.20*(1-clamp((frame-76)/18))))
+        q=min(20,max(0,frame-75))
+        omega=-(frame*.20 if frame<=75 else 75*.20+.20*(q-q*q/40))
         e['rolling']['spin'].SetOrientation(omega*180/math.pi,0,0)
-        for i,a in enumerate(e['road']):a.SetPosition(2.45,-.898,((i-8)*1.3+frame*.11+12)%21-10)
+        for i,a in enumerate(e['road']):a.SetPosition(2.45,-.898,((i-8)*1.3+frame*.18+12)%21-10)
     elif stage==1:
         e['rolling']['spin'].SetOrientation(-frame*.20*180/math.pi,0,0)
         e['locked']['spin'].SetOrientation(-120*.20*180/math.pi,0,0)
@@ -281,7 +282,7 @@ def dyn(frame,stage,e):
         e['locked']['spin'].SetOrientation(-120*.20*180/math.pi,0,0)
         # Oscillating anti-lock release prevents imminent stall while road translates.
         phase=l%43
-        omega=.10+(.07*math.sin(phase*math.tau/43))
+        omega=.20+(.027*math.sin(phase*math.tau/43))
         old=e.get('rolling_angle',0.0);new=old-omega;e['rolling_angle']=new
         e['rolling']['spin'].SetOrientation(new*180/math.pi,0,0)
         # Steering input is resisted in sliding case but induces change of heading at right.
