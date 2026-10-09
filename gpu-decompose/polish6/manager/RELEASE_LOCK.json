@@ -1,7 +1,7 @@
 {
   "contractVersion": "POLISH05-v1",
   "contractCommitSha": "5f512efbacaa0446df37fc5c4c07bd3f031fe84a",
-  "status": "render-approved",
+  "status": "release-approved",
   "startingPolish04Sha": "e9a14f5d8e1b3bf805bb4916f9ce8bdc0155ff6a",
   "polish04ArtifactId": 11579249363,
   "polish04RunId": 37846669872,
@@ -15,11 +15,19 @@
   "managerCameraSha256": "e428a8aca90e31f66fae45d0bdd2049835c812e7796f02cf286f4c198b9de9d8",
   "motionCompatibilityAudit": "gpu-decompose/polish5/manager/MOTION_COMPATIBILITY_FINAL.md",
   "renderApproved": true,
-  "releaseApproved": false,
-  "note": "Independent real 12 native still / 6 motion clip POLISH06 fan QA PASS; 450-frame render approved only, NOT MP4 release.",
+  "releaseApproved": true,
+  "note": "Downloaded official 450-frame MP4 independently verified all six SHA256SUMS, 450 unique frames, full video decode, AAC 48kHz, blackdetect zero, and actual frame montage visual PASS; reference-based fan geometry is illustrative.",
   "newFanSourceSha256": "cbf4bb39969d212afc706389f6239cc5fdc70726b3a3aca81902a72c9307878f",
   "nativeReviewPath": "gpu-decompose/polish6/manager/NATIVE_VISUAL_REVIEW.md",
   "nativeProofRunId": 37861896934,
   "nativeProofArtifactId": 11587555171,
-  "nativeReviewSha256": "ebc2c4069b7d891688e599a57bf2247faf376756b28f7c6ee74807cd46b60e65"
+  "nativeReviewSha256": "ebc2c4069b7d891688e599a57bf2247faf376756b28f7c6ee74807cd46b60e65",
+  "finalRenderSourceSha": "a4678e9a5d137b08a46d61995c0355ed43a6ba46",
+  "finalGitHubRunId": 37863030112,
+  "finalGitHubArtifactId": 11587741220,
+  "finalGitHubArtifactName": "GPU-POLISH6-FINAL-450F-CANDIDATE",
+  "finalGitHubArtifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37863030112/artifacts/11587741220",
+  "finalOfficialMp4Sha256": "4cd4d99d21b1ee2b970fbdba4f4ecaafb8bbb68143aabf9f4d04e9f496d38c36",
+  "finalOfficialMp4SizeBytes": 15938553,
+  "finalReleaseReportPath": "gpu-decompose/polish6/manager/FINAL_RELEASE_SIGNOFF.md"
 }
