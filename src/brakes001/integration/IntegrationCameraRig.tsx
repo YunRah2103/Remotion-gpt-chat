@@ -24,6 +24,16 @@ export const integrationCameraAt=(frame:number):BrakeCameraPose=>{
     return {...p,position,target,fovDegrees:37,
       focusDistanceMetres:Math.hypot(...position.map((v,i)=>v-target[i]))};
   }
+  if(p.shotId==='benefits'){
+    // D Polish02: preserve whole caliper and annular perimeter across 450-629.
+    // Only gently orbit the camera, never enlarge the moving brake model.
+    const t=smooth((frame-450)/179);
+    const position:[number,number,number]=[
+      lerp(.87,.83,t),lerp(.38,.42,t),lerp(.67,.77,t)];
+    const target:[number,number,number]=[0,.045,.035];
+    return {...p,position,target,fovDegrees:42,
+      focusDistanceMetres:Math.hypot(...position.map((v,i)=>v-target[i]))};
+  }
   if(p.shotId==='thermal'){
     return {...p,fovDegrees:Math.max(34,p.fovDegrees)};
   }

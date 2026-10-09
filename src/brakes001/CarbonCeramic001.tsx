@@ -16,35 +16,13 @@ import {
 import {PartLabels, TitleOverlays} from './graphics';
 import {integrationStateAt} from './integration/integrationState';
 import {IntegrationCameraRig} from './integration/IntegrationCameraRig';
+import {FrictionHeatMap} from './integration/FrictionHeatMap';
 
 /**
  * A's friction faces terminate at x=-0.0155m and +0.0155m.
  * The overlays sit just outside those surfaces, move rigidly with the rotor,
  * never attach to the caliper, and do not claim a measured temperature.
  */
-const FrictionFalseColour: React.FC<{frame: number; heat01: number; rotorAngleRad: number}> = ({
-  frame, heat01, rotorAngleRad,
-}) => {
-  const visible = frame >= 270 && frame < 630;
-  const alpha = Math.max(0, Math.min(0.36, heat01 * 0.38));
-  if (!visible || alpha < 0.012) return null;
-  return <group name="IllustrativeFrictionHeat" rotation={[rotorAngleRad, 0, 0]}>
-    {[-0.0158, 0.0158].map((x, i) =>
-      <group key={i} position={[x, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
-        <mesh name={'ThermalFrictionBand' + i} renderOrder={2}>
-          <ringGeometry args={[0.127, 0.190, 128]}/>
-          <meshBasicMaterial color="#ff8244" transparent opacity={alpha}
-            depthWrite={false} depthTest side={THREE.DoubleSide} toneMapped={false}/>
-        </mesh>
-        <mesh name={'ThermalInnerBand' + i} position={[0, 0, i === 0 ? -0.00008 : 0.00008]} renderOrder={3}>
-          <ringGeometry args={[0.127, 0.146, 128]}/>
-          <meshBasicMaterial color="#ffb35b" transparent opacity={alpha * 0.29}
-            depthWrite={false} depthTest side={THREE.DoubleSide} toneMapped={false}/>
-        </mesh>
-      </group>)}
-  </group>;
-};
-
 export const CarbonCeramic001: React.FC = () => {
   const frame = useCurrentFrame();
   const {width, height} = useVideoConfig();
@@ -60,6 +38,7 @@ export const CarbonCeramic001: React.FC = () => {
     [pos[0], pos[1], pos[2]] :
     shot === 'thermal' ?
       [cameraPose.target[0], cameraPose.target[1], cameraPose.target[2]] :
+      shot === 'benefits' ? [0, .012, .015] :
       shot === 'hero' ? [-0.012, 0, 0.012] :
       [0, 0, 0];
 
@@ -74,13 +53,12 @@ export const CarbonCeramic001: React.FC = () => {
       {context && <GhostCarOutline frame={frame}/>}
       {/* Stable macro framing: C's shot target, not a guessed static offset.
           Geometry, independent X-axis pads and fixed caliper are unmodified. */}
-      <group scale={shot === 'thermal' ? 0.56 : shot === 'reveal' ? 0.86 : shot === 'hero' ? 0.86 : 1}
+      <group scale={shot === 'thermal' ? 0.56 : shot === 'reveal' ? 0.86 : shot === 'hero' ? 0.86 : shot === 'benefits' ? 0.75 : 1}
         position={brakePosition}>
         <BrakeAssembly rotorAngleRad={state.rotorAngleRad}
           padGapMetres={state.padGapMetres} heat01={motion.heat01}
           showUpright/>
-        {!context && <FrictionFalseColour frame={frame}
-          heat01={motion.heat01} rotorAngleRad={state.rotorAngleRad}/>}
+        {!context && <FrictionHeatMap frame={frame} rotorAngleRad={state.rotorAngleRad}/>}
       </group>
     </ThreeCanvas>
     <AbsoluteFill style={{pointerEvents: 'none', zIndex: 30,

@@ -19,6 +19,7 @@ function loadTypeScript(relative) {
 }
 const b = loadTypeScript('src/brakes001/motion/brakeState.ts');
 const camera = loadTypeScript('src/brakes001/cinema/cameraMath.ts');
+assert.equal(camera.brakeShotAt(531),'benefits');
 const adapter = read('src/brakes001/integration/integrationState.ts');
 assert.match(adapter, /HARDWARE_REST_GAP_M = \.0025/);
 assert.match(adapter, /padGapForHardware\(s\.brakePressure01\)/);
@@ -65,7 +66,14 @@ assert.match(film, /<BrakeLighting /);
 assert.match(film, /<GhostCarOutline /);
 assert.match(film, /<TitleOverlays /);
 assert.match(film, /<PartLabels /);
-assert.match(film, /ringGeometry args=\{\[0\.127, 0\.190, 128\]\}/);
+const thermal = read('src/brakes001/integration/FrictionHeatMap.tsx');
+assert.match(film, /<FrictionHeatMap /);
+assert.match(thermal, /frictionHotSpot01At/);
+assert.match(thermal, /ringGeometry args=\{\[\.127,\.190/);
+assert.match(read('src/Root.tsx'), /id="BrakePadMacro001"/);
+const macro = read('src/brakes001/integration/BrakePadMacroProof.tsx');
+assert.match(macro, /MACRO_OFFSET=85/);
+assert.match(macro, /BrakeAssembly rotorAngleRad=/);
 assert.match(graphics, /export const PartLabels/);
 let maxHeat = 0, minGap = Infinity, maxGap = -Infinity, lastAngle = -1, lastSpeed = Infinity;
 for (let f = 0; f < 750; f++) {
