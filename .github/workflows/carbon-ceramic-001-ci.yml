@@ -27,6 +27,8 @@ jobs:
           set -euo pipefail
           python production/videos/carbon-ceramic-001/validate_setup.py
           python -m compileall -q production/videos/carbon-ceramic-001
+          python -m unittest discover -s production/videos/carbon-ceramic-001 -p 'test_master_gate.py' -v
+          python production/videos/carbon-ceramic-001/master_gate.py --report out/carbon-ceramic-001/master-readiness.json
       - name: Report contract-only scope
         run: |
           echo 'Verified carbon-ceramic five-agent planning contract and handoff JSON.' >> "$GITHUB_STEP_SUMMARY"
