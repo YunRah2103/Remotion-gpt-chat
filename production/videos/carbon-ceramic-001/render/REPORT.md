@@ -29,6 +29,13 @@ Repository: `YunRah2103/Remotion-gpt-chat`; working branch: `automotive-brakes-0
 | D whole-film review | Awaiting native film |
 | Master final approval | Pending |
 
+## Verified infrastructure CI
+
+- GitHub Actions run [37944495862](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37944495862): **PASS** on implementation SHA `4564bde62ceaeca1e3afc4c7fa6d01cf707bb290`; synthetic H.264 fixture checks passed and the pending source lock was correctly rejected. Native 750-frame job **SKIPPED** by design.
+- Seven-agent handoff/contract validation on F handoff head: [37944734925](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37944734925) **PASS**.
+- Initial CI [37944380254](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37944380254) **FAILED** because hosted runner lacked FFmpeg; corrected workflow installs FFmpeg before tests. A failed first attempt is not concealed.
+- Draft F integration PR for Master: [#16](https://github.com/YunRah2103/Remotion-gpt-chat/pull/16).
+
 ## Implemented infrastructure
 
 - Source-approval lock: `render/SOURCE_LOCK.json`, `render/source_lock.py`. Fails closed on missing Master approval, non-ancestor commit or changed film source.
