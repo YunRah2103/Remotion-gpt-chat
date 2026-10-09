@@ -1,0 +1,57 @@
+name: Production Studio - narration timestamps
+on:
+  workflow_dispatch:
+    inputs:
+      audio_run:
+        required: true
+        type: string
+        description: Existing approved audio artifact run ID
+      audio_artifact:
+        required: true
+        type: string
+        description: Exact audio artifact name
+      model:
+        type: choice
+        options: [tiny.en, base.en, small.en]
+        default: tiny.en
+        required: true
+permissions:
+  contents: read
+  actions: read
+jobs:
+  transcription:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: production/studio/requirements-voice.txt
+      - run: |
+          python -m pip install -r production/studio/requirements-voice.txt
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.audio_artifact }}
+          run-id: ${{ inputs.audio_run }}
+          github-token: ${{ github.token }}
+          path: out/source
+      - name: Timestamp actual narration with CPU transcription
+        shell: bash
+        env:
+          MODEL: ${{ inputs.model }}
+        run: |
+          set -euo pipefail
+          mapfile -t FILES < <(find out/source -type f \( -iname '*.wav' -o -iname '*.mp3' -o -iname '*.m4a' \))
+          test "${#FILES[@]}" -eq 1
+          test "$(stat -c%s "${FILES[0]}")" -le 52428800
+          python production/studio/voice_sync.py --audio "${FILES[0]}" --model "$MODEL" --output out/studio/voice
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: studio-voice-${{ github.run_id }}
+          path: out/studio/voice/
+          retention-days: 21
+          if-no-files-found: warn
