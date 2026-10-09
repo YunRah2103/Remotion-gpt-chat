@@ -2,14 +2,36 @@
   "schemaVersion": 1,
   "task": "carbon-ceramic-001-agent-d",
   "branch": "automotive-brakes-001/d-graphics-qa",
-  "sourceSha": "25a83c4e58e60c909624494745158385b7f962d9",
+  "sourceSha": "f8bdea2b6cb8f503b119621aaaaabe8034e6bafe",
   "owner": "qa",
-  "summary": "UNSTARTED template: specialist has not begun implementation; this is not an approved handoff.",
-  "status": "blocked",
-  "files": [],
-  "evidence": [],
-  "blockers": [
-    "Agent session has not started. No code, native proofs, review or handoff has been supplied."
+  "summary": "Agent D GRAPHICS READY: frame-deterministic Remotion TitleOverlays and PartLabels, portrait-safe cues, five SVG layout proofs and independent engineering review rubric. Film-level independent QA remains PENDING actual integrated 750-frame footage.",
+  "status": "ready",
+  "files": [
+    "src/brakes001/graphics/index.tsx",
+    "src/brakes001/graphics/graphics-cues.json",
+    "production/videos/carbon-ceramic-001/qa/check_graphics.py",
+    "production/videos/carbon-ceramic-001/qa/component_smoke.cjs",
+    "production/videos/carbon-ceramic-001/qa/render_layout_proofs.py",
+    "production/videos/carbon-ceramic-001/qa/REVIEW_RUBRIC.md",
+    "production/videos/carbon-ceramic-001/qa/INITIAL_REPORT.md",
+    "production/videos/carbon-ceramic-001/qa/proofs/layout-frame-048.svg",
+    "production/videos/carbon-ceramic-001/qa/proofs/layout-frame-168.svg",
+    "production/videos/carbon-ceramic-001/qa/proofs/layout-frame-321.svg",
+    "production/videos/carbon-ceramic-001/qa/proofs/layout-frame-531.svg",
+    "production/videos/carbon-ceramic-001/qa/proofs/layout-frame-705.svg"
   ],
-  "notes": "Planning-only placeholder. sourceSha is original common ancestor, NOT a specialist completion commit. Replace with actual post-implementation SHA."
+  "evidence": [
+    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/f8bdea2b6cb8f503b119621aaaaabe8034e6bafe/src/brakes001/graphics/index.tsx",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/f8bdea2b6cb8f503b119621aaaaabe8034e6bafe/production/videos/carbon-ceramic-001/qa/INITIAL_REPORT.md",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/f8bdea2b6cb8f503b119621aaaaabe8034e6bafe/production/videos/carbon-ceramic-001/qa/proofs/layout-frame-048.svg",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/f8bdea2b6cb8f503b119621aaaaabe8034e6bafe/production/videos/carbon-ceramic-001/qa/proofs/layout-frame-168.svg",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/f8bdea2b6cb8f503b119621aaaaabe8034e6bafe/production/videos/carbon-ceramic-001/qa/proofs/layout-frame-321.svg",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/f8bdea2b6cb8f503b119621aaaaabe8034e6bafe/production/videos/carbon-ceramic-001/qa/proofs/layout-frame-531.svg",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/f8bdea2b6cb8f503b119621aaaaabe8034e6bafe/production/videos/carbon-ceramic-001/qa/proofs/layout-frame-705.svg",
+    "LOCAL CHECK PASS: python3 production/videos/carbon-ceramic-001/qa/check_graphics.py — 750 frames; 8 graphics; 8 labels; safe areas and required cues.",
+    "LOCAL COMPONENT SMOKE PASS: node production/videos/carbon-ceramic-001/qa/component_smoke.cjs — 750 frame JSX evaluations; 1216 cue instances; Remotion/React hooks mocked.",
+    "LOCAL TSX TRANSPILATION PASS (not full repository npm check)."
+  ],
+  "blockers": [],
+  "notes": "Master may integrate now. This is NOT certification of the final movie. Native GLB/mechanics/thermal review, actual phone stills, 135-195 and 300-360 moving clips, full MP4 ffprobe and FFmpeg decode are PENDING. Layout SVGs intentionally show schematic placeholder, not real footage."
 }
