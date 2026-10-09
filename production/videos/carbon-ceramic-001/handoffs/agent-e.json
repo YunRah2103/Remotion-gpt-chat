@@ -2,15 +2,78 @@
   "schemaVersion": 1,
   "task": "carbon-ceramic-001-agent-e",
   "branch": "automotive-brakes-001/e-integration",
-  "sourceSha": "3e73466d8c3ee36f9f38bdf31df0e71fab25eebc",
+  "sourceSha": "8e99138dde19b165258fb89b14297140bc8bf761",
   "owner": "engineering",
-  "summary": "UNSTARTED template: Agent E integration work has not been performed. Initial sourceSha is setup ancestry, not proof of integration.",
-  "status": "blocked",
-  "files": [],
-  "evidence": [],
-  "blockers": [
-    "Integration source not written; native stills/moving footage and PR not produced.",
-    "Agent A Blender/GLB handoff currently requires independent real native proof before final release."
+  "status": "review",
+  "summary": "Implemented 25-second 1080x1920 Remotion/Three.js CarbonCeramic001 composition by importing A-D source files blob-identically, wiring real brake hardware to deterministic frame physics, five-shot cinematic camera, restrained graphics and friction-face false-colour. Source integration is committed; native render/GLB and film-level visual QA remain unverified. Master final render has NOT been delivered.",
+  "files": [
+    "src/brakes001/CarbonCeramic001.tsx",
+    "src/brakes001/integration/integrationState.ts",
+    "src/brakes001/integration/integration.test.cjs",
+    "src/brakes001/integration/SOURCES.md",
+    "src/Root.tsx",
+    "production/videos/carbon-ceramic-001/brief.json",
+    "production/videos/carbon-ceramic-001/handoffs/agent-e.json",
+    "production/videos/carbon-ceramic-001/handoffs/agent-e.md"
   ],
-  "notes": "E replaces this JSON with actual post-implementation SHA, file list and artifact IDs. Do not treat initial validation as readiness."
+  "evidence": [
+    "SOURCE: https://github.com/YunRah2103/Remotion-gpt-chat/commit/8e99138dde19b165258fb89b14297140bc8bf761",
+    "BLOB-IDENTICAL IMPORT: https://github.com/YunRah2103/Remotion-gpt-chat/commit/138cb4cd3d8bc07c2c0e46ae5604fd8fe05aada6",
+    "COMPONENT PROVENANCE: src/brakes001/integration/SOURCES.md (four live heads, four specialist handoff source SHAs)",
+    "FRAME CONTRACT: src/Root.tsx registers CarbonCeramic001 at 1080x1920, 30fps and 750 frames; five-shot timeline drives camera via C.",
+    "INTEGRATION UNIT SCRIPT: node src/brakes001/integration/integration.test.cjs (awaiting dependency-backed execution and native QA)",
+    "No E native preview, approved five-film stills, rendered contact sheet or GitHub Actions film proof has yet been verified."
+  ],
+  "blockers": [
+    "Agent A remains REVIEW: no Blender executable/native model GLB or measured geometry hierarchy and close-up hardware proof validated.",
+    "Full npm ci / npm run check, E integration tests, and specialist tests on integrated branch require execution in dependency-backed CI; no passing result is yet confirmed.",
+    "Frames 135-195 and 300-360 native Remotion moving previews, five requested native stills and independent visual review are pending; FFprobe/FFmpeg checks cannot honestly pass without actual clips.",
+    "Agent D final integrated-footage technical and visual signoff is pending; narration audio is not yet approved; final full 750-frame render belongs to Master."
+  ],
+  "integratedSources": {
+    "A": {
+      "head": "3d02dfa264b1af51f8ae39f990e8815f5c20ecdf",
+      "handoffSource": "a201cefa64cef0f797deba34ddfbd55c58967d33",
+      "status": "review"
+    },
+    "B": {
+      "head": "37b661eaba75477de4d967f430da270c399818a7",
+      "handoffSource": "4a815e73c4e3dbc28b686e20910fdfc8865cd1bc",
+      "status": "ready"
+    },
+    "C": {
+      "head": "09c6b0a4a8acd0e4625fa35cad50f3d10f37388e",
+      "handoffSource": "eca01d9f937d059e21ad935396e4293fc784cbb5",
+      "status": "ready"
+    },
+    "D": {
+      "head": "e31ded3731014f9c2a22148f7a32408e92e38bdd",
+      "handoffSource": "f8bdea2b6cb8f503b119621aaaaabe8034e6bafe",
+      "status": "ready"
+    }
+  },
+  "qa": {
+    "typescript": "PENDING CI",
+    "productionPython": "PENDING CI",
+    "integrationNode": "PENDING CI",
+    "blenderExport": "NOT RUN (binary unavailable locally)",
+    "glbHierarchy": "NOT RUN",
+    "nativeStills": "NOT RUN",
+    "nativeMotion": "NOT RUN",
+    "ffprobeFfmpeg": "NOT RUN",
+    "agentDVisual": "PENDING"
+  },
+  "artifacts": [],
+  "masterInstructions": [
+    "Review E PR targeting automotive-brakes-001/master; check only original A-D blobs and scoped E files were introduced.",
+    "npm ci --no-audit --no-fund && npm run check",
+    "node src/brakes001/integration/integration.test.cjs",
+    "python production/videos/carbon-ceramic-001/validate_setup.py && python -m unittest discover -s production/tests -v",
+    "python production/videos/carbon-ceramic-001/hardware/test_hardware.py (then Blender build_brake.py with native Blender if available; inspect exported GLB real nodes)",
+    "python production/tools/render.py --composition CarbonCeramic001 --mode stills --output out/carbon-ceramic-001/stills --samples 48,168,321,531,705 --scale 0.5",
+    "python production/tools/render.py --composition CarbonCeramic001 --mode preview --output out/carbon-ceramic-001/clamp.mp4 --start 135 --end 195 --scale 0.45 --concurrency 1",
+    "python production/tools/render.py --composition CarbonCeramic001 --mode preview --output out/carbon-ceramic-001/heat.mp4 --start 300 --end 360 --scale 0.45 --concurrency 1",
+    "Inspect five native stills, both clips, FFprobe and full FFmpeg decode; fix occlusion, pad clipping, heat/fov, and label issues before acceptance.",
+    "Get independent Agent D final film QA, then Master renders exactly 750 frames and verifies H264/1080x1920/30 fps+SHA256."
+  ]
 }

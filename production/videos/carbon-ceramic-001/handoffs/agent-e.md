@@ -1,9 +1,33 @@
-# Agent E integration handoff (template only)
+# Agent E Integration Handoff — REVIEW (not final approval)
 
-**Status: BLOCKED — E has not started.**
+**Integration implementation SHA:** `8e99138dde19b165258fb89b14297140bc8bf761` (the source commit, before this reporting-only handoff commit).
 
-Branch: `automotive-brakes-001/e-integration`.
-Owner: `engineering` (technical integration).
-Master acceptance branch: `automotive-brakes-001/master`.
+**Specialist source heads (live branch heads):** A `3d02dfa264b1af51f8ae39f990e8815f5c20ecdf`; B `37b661eaba75477de4d967f430da270c399818a7`; C `09c6b0a4a8acd0e4625fa35cad50f3d10f37388e`; D `e31ded3731014f9c2a22148f7a32408e92e38bdd`. The reported implementation SHA in each specialist handoff differs from its latest documentation head; both values are pinned in `integration/SOURCES.md`.
 
-Read `agent-prompts/AGENT-E.md`, then fill in actual source SHAs for A/B/C/D and E, node/pivot mapping, runnable composition ID, integration tests, native motion proof links, frame still IDs, hardware GLB verification and known blocking issues. Status can be marked `ready` only with *real checked evidence*. Master retains 25-second final MP4 and release.
+## Implemented
+- All specialist source/proof files were copied with **identical Git blob SHAs** in import commit `138cb4cd3d8bc07c2c0e46ae5604fd8fe05aada6`. No specialist-owned source edits.
+- Actual `CarbonCeramic001.tsx` registered in `src/Root.tsx` at 1080×1920, 30fps, 750 frames, preserving previous compositions.
+- A 3D mesh, rotating `RotorAssembly` (including `RotorHat` and `Hub`), fixed caliper, independently X-clamping pads from B's per-face clearance. Front brake appears at C's proper corner in intro, isolated brake takes over in four subsequent shots. C camera/lighting and D graphics share the same global frame.
+- Annulus-only illustrative thermal band rides the rotating friction rotor; opacity is driven from B's `heat01`. No calibrated temperature claims.
+- Added dependency-backed 750-frame integration test script.
+
+## Tests and proof status
+**NOT YET PASS:** Integrated `npm ci`, `npm run check`, B/C/D/integration test scripts, native moving Remotion 135–195 and 300–360, FFprobe/FFmpeg decode, required stills at 48/168/321/531/705, contact sheet, independent video visual QA. No E native proof video or CI artifact has been falsely attributed to this commit.
+
+**UNRESOLVED A HARDWARE:** A provided a real Three.js procedural hard-surface model and Blender Python builder, but **no verified Blender-generated GLB, measured native hierarchy or close-up render**. Manifest bounds are theoretical. No native Blender was available to E.
+
+## Master reproduction
+```bash
+npm ci --no-audit --no-fund
+npm run check
+node src/brakes001/integration/integration.test.cjs
+python production/videos/carbon-ceramic-001/validate_setup.py
+python -m unittest discover -s production/tests -v
+python production/tools/render.py --composition CarbonCeramic001 --mode stills --output out/carbon-ceramic-001/stills --samples 48,168,321,531,705 --scale 0.5
+python production/tools/render.py --composition CarbonCeramic001 --mode preview --output out/carbon-ceramic-001/clamp.mp4 --start 135 --end 195 --scale 0.45 --concurrency 1
+python production/tools/render.py --composition CarbonCeramic001 --mode preview --output out/carbon-ceramic-001/heat.mp4 --start 300 --end 360 --scale 0.45 --concurrency 1
+python production/tools/quality.py video out/carbon-ceramic-001/clamp.mp4 --fps 30 --frames 61
+python production/tools/quality.py video out/carbon-ceramic-001/heat.mp4 --fps 30 --frames 61
+```
+
+Before Master can accept this PR as **ready**, require actual native previews, fully decodable files, five inspected native stills, verified Blender/GLB status, and independent Agent D final review. Final 750-frame 25-second MP4 belongs to Master; it has not been rendered in this handoff.
