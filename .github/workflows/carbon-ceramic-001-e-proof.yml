@@ -83,8 +83,8 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -qq
-          sudo apt-get install -y -qq blender
-          blender -b --factory-startup --python-expr 'import bpy; print("BLENDER_NATIVE_VERSION",bpy.app.version_string)'
+          sudo apt-get install -y -qq blender python3-numpy
+          blender -b --factory-startup --python-expr 'import bpy,numpy; print("BLENDER_NATIVE_VERSION",bpy.app.version_string,"NUMPY",numpy.__version__)'
       - name: Execute unmodified Agent A builder and validate GLB
         run: |
           set -euo pipefail
