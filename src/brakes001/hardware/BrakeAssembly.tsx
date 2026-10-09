@@ -98,9 +98,12 @@ function forgedCheekGeometry(side: -1 | 1): THREE.BufferGeometry {
     for (let i=0;i<=angular;i++) {
       const u=i/angular, angle=centreAngle-.295+.59*u;
       for (let j=0;j<=radial;j++) {
-        const v=j/radial, r=.137+.076*v;
-        const bulge=Math.pow(Math.max(0,Math.sin(Math.PI*u)*Math.sin(Math.PI*v)),.85);
-        const x=side*(layer===0 ? .058+.010*bulge : .0365);
+        const v=j/radial, scallop=Math.pow(Math.sin(3*Math.PI*u),2);
+        const r0=.142+.008*scallop, r1=.217-.012*scallop;
+        const r=r0+(r1-r0)*v;
+        const lobes=.5+.5*Math.cos(6*Math.PI*u);
+        const relief=Math.pow(Math.max(0,Math.sin(Math.PI*v)),.65)*(.5+.5*lobes);
+        const x=side*(layer===0 ? .055+.015*relief : .0365);
         verts.push(x,r*Math.cos(angle),r*Math.sin(angle));
       }
     }
