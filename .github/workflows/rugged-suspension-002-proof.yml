@@ -1,4 +1,5 @@
 name: POLISH02 - Blender vehicle, mechanical QA and native proofs
+# Native Blender turntable uses disabled OIDN on Ubuntu runner builds without denoiser support.
 on:
   push:
     branches: [automotive-tests/rugged-suspension-002]
