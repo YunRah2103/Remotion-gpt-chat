@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "task": "carbon-ceramic-001-agent-e",
   "branch": "automotive-brakes-001/e-integration",
-  "sourceSha": "8e99138dde19b165258fb89b14297140bc8bf761",
+  "sourceSha": "065f79c9f53d4bd9f43464f0248b97d60edb6dc6",
   "owner": "engineering",
   "status": "review",
   "summary": "Implemented 25-second 1080x1920 Remotion/Three.js CarbonCeramic001 composition by importing A-D source files blob-identically, wiring real brake hardware to deterministic frame physics, five-shot cinematic camera, restrained graphics and friction-face false-colour. Source integration is committed; native render/GLB and film-level visual QA remain unverified. Master final render has NOT been delivered.",
@@ -22,13 +22,17 @@
     "COMPONENT PROVENANCE: src/brakes001/integration/SOURCES.md (four live heads, four specialist handoff source SHAs)",
     "FRAME CONTRACT: src/Root.tsx registers CarbonCeramic001 at 1080x1920, 30fps and 750 frames; five-shot timeline drives camera via C.",
     "INTEGRATION UNIT SCRIPT: node src/brakes001/integration/integration.test.cjs (awaiting dependency-backed execution and native QA)",
-    "No E native preview, approved five-film stills, rendered contact sheet or GitHub Actions film proof has yet been verified."
+    "No E native preview, approved five-film stills, rendered contact sheet or GitHub Actions film proof has yet been verified.",
+    "PASS: npm ci, npm run check, Python production unit suite, existing composition two-frame native software-WebGL smoke: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37944193160 (legacy preview, not brake footage)",
+    "PASS: Carbon Ceramic contract and all handoff schemas: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37944192734",
+    "PASS: source-level 750-frame direct JS analysis of B physics and C camera source: no pad penetration or reverse motion, 5 shot ranges, 8 mesh node contracts, max illustrative heat 0.906596; this is NOT native visual QA.",
+    "RUNNING at last inspection: native composition-aware PR visual review https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37944192805 ; no E video result claimed."
   ],
   "blockers": [
     "Agent A remains REVIEW: no Blender executable/native model GLB or measured geometry hierarchy and close-up hardware proof validated.",
-    "Full npm ci / npm run check, E integration tests, and specialist tests on integrated branch require execution in dependency-backed CI; no passing result is yet confirmed.",
     "Frames 135-195 and 300-360 native Remotion moving previews, five requested native stills and independent visual review are pending; FFprobe/FFmpeg checks cannot honestly pass without actual clips.",
-    "Agent D final integrated-footage technical and visual signoff is pending; narration audio is not yet approved; final full 750-frame render belongs to Master."
+    "Agent D final integrated-footage technical and visual signoff is pending; narration audio is not yet approved; final full 750-frame render belongs to Master.",
+    "Dedicated E Node integration.test.cjs has not yet been executed in CI; TypeScript and Python suites have passed."
   ],
   "integratedSources": {
     "A": {
@@ -53,13 +57,13 @@
     }
   },
   "qa": {
-    "typescript": "PENDING CI",
-    "productionPython": "PENDING CI",
-    "integrationNode": "PENDING CI",
+    "typescript": "PASS: GitHub Actions 37944193160 (npm ci + tsc)",
+    "productionPython": "PASS: GitHub Actions 37944193160",
+    "integrationNode": "SOURCE MATH VALIDATED 750/750 with JS type-erased source; dedicated node integration.test.cjs NOT RUN in CI",
     "blenderExport": "NOT RUN (binary unavailable locally)",
     "glbHierarchy": "NOT RUN",
-    "nativeStills": "NOT RUN",
-    "nativeMotion": "NOT RUN",
+    "nativeStills": "PENDING: PR native review running; exact required five shots not yet rendered/verified",
+    "nativeMotion": "PENDING: PR native review running (only short selected proof); required 61-frame sequences not yet verified",
     "ffprobeFfmpeg": "NOT RUN",
     "agentDVisual": "PENDING"
   },
