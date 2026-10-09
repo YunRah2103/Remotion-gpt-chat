@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "status": "pending",
+  "integrationSourceSha": null,
+  "masterApprovalUrl": null,
+  "observedEBranchHead": "8e99138dde19b165258fb89b14297140bc8bf761",
+  "notes": "Not an approval. Agent E handoff is blocked and Agent A native Blender/GLB proof is unresolved. Master must approve a ready integrated commit and provide approval evidence before rendering."
+}
