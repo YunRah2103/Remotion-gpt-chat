@@ -26,3 +26,12 @@
 - All generated images, tracks and reference clips are evidence for review, not proof of authenticity or permission to redistribute media.
 - Agent profiles under `.github/agents/*.agent.md` are selectable only if the owner's GitHub Copilot cloud-agent features are enabled. Never represent markdown profiles as running AI workers or delegate without permission. Keep separate branches and explicit handoffs.
 - Kinematic validators are heuristic and must not be interpreted as manufacturer certified engineering or road safety claims.
+
+## Integrated production automation
+
+- Read `production/PIPELINE.md` before film production or release edits.
+- Do not claim `abs-001` is finished; its brief is preproduction and `sourceCompositionId` is null. Implement and register its real native Remotion composition before running the complete pipeline.
+- Use `production/tools/production_pipeline.py` for honest video/shot/voiceover/registered-composition preflight. Run the Actions production pipeline for previews and exact native final output.
+- Use reviewed actual word timestamps for `Captioned` variants; never manufacture approved speech or timestamp data. Keep original compositions unchanged.
+- Run source-aware PR moving/native visual evidence, validated cross-agent handoffs, and real benchmark results before optimizing.
+- Custom agent profiles and repo skills are instructions, not independently running coding agents or paid external services.
