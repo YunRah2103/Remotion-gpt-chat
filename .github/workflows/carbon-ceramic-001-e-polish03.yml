@@ -1,0 +1,92 @@
+name: Carbon Ceramic 001 - E Polish03 HiRes Macro and Safety Proof
+on:
+  push:
+    branches: ['automotive-brakes-001/e-integration']
+    paths:
+      - 'src/brakes001/integration/**'
+      - 'src/brakes001/CarbonCeramic001.tsx'
+      - 'src/Root.tsx'
+      - '.github/workflows/carbon-ceramic-001-e-polish03.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: brakes001-e-polish03-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  macro-full-resolution:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Dependencies and focused tests
+        run: |
+          set -euo pipefail
+          mkdir -p out/brakes001-e-polish03/macro
+          npm ci --no-audit --no-fund
+          npm run check
+          node src/brakes001/integration/integration.test.cjs | tee out/brakes001-e-polish03/macro/integration-test.txt
+      - name: Native macro reference stills 1080x1920
+        run: |
+          set -euo pipefail
+          python production/tools/render.py --composition BrakePadMacro001 --mode stills --output out/brakes001-e-polish03/macro/stills --samples 0,10,20,30,45,60 --scale 1
+      - name: Render full-resolution true-displacement pad-onset MP4
+        run: |
+          set -euo pipefail
+          python production/tools/render.py --composition BrakePadMacro001 --mode preview --start 0 --end 60 --scale 1 --concurrency 1 --output out/brakes001-e-polish03/macro/pad-macro-native-1080x1920.mp4
+          ffprobe -v error -show_entries stream=codec_name,width,height,avg_frame_rate,nb_frames,pix_fmt -show_entries format=duration -of json out/brakes001-e-polish03/macro/pad-macro-native-1080x1920.mp4 | tee out/brakes001-e-polish03/macro/ffprobe.json
+          ffmpeg -v error -xerror -i out/brakes001-e-polish03/macro/pad-macro-native-1080x1920.mp4 -f null -
+          python production/tools/quality.py video out/brakes001-e-polish03/macro/pad-macro-native-1080x1920.mp4 --fps 30 --frames 61 --report out/brakes001-e-polish03/macro/quality.json
+          sha256sum out/brakes001-e-polish03/macro/pad-macro-native-1080x1920.mp4 > out/brakes001-e-polish03/macro/sha256.txt
+      - name: Save macro native proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: carbon-ceramic-e03-fullres-macro-${{ github.run_id }}
+          path: out/brakes001-e-polish03/macro/
+          retention-days: 30
+          if-no-files-found: warn
+  benefits-framing-and-thermal:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned deps
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          python -m pip install --disable-pip-version-check Pillow==11.3.0
+          mkdir -p out/brakes001-e-polish03/sweeps
+      - name: Render camera sweep around benefits and heat
+        run: |
+          set -euo pipefail
+          python production/tools/render.py --composition CarbonCeramic001 --mode stills --output out/brakes001-e-polish03/sweeps/benefits --samples 450,465,480,500,510,531,550,575,600,620,629 --scale 0.5
+          python production/tools/render.py --composition CarbonCeramic001 --mode stills --output out/brakes001-e-polish03/sweeps/thermal --samples 270,290,305,321,345,365,395,425,445,470,515,605 --scale 0.5
+          python production/tools/quality.py contact out/brakes001-e-polish03/sweeps/benefits-contact.jpg out/brakes001-e-polish03/sweeps/benefits/frame-*.png
+          python production/tools/quality.py contact out/brakes001-e-polish03/sweeps/thermal-contact.jpg out/brakes001-e-polish03/sweeps/thermal/frame-*.png
+      - name: Native moving benefits transition with complete decode
+        run: |
+          set -euo pipefail
+          python production/tools/render.py --composition CarbonCeramic001 --mode preview --start 510 --end 550 --scale 0.5 --concurrency 1 --output out/brakes001-e-polish03/sweeps/benefits-510-550.mp4
+          ffprobe -v error -show_entries stream=codec_name,width,height,avg_frame_rate,nb_frames -of json out/brakes001-e-polish03/sweeps/benefits-510-550.mp4 > out/brakes001-e-polish03/sweeps/benefits-ffprobe.json
+          ffmpeg -v error -xerror -i out/brakes001-e-polish03/sweeps/benefits-510-550.mp4 -f null -
+      - name: Save benefits and thermal native sweep
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: carbon-ceramic-e03-sweeps-${{ github.run_id }}
+          path: out/brakes001-e-polish03/sweeps/
+          retention-days: 30
+          if-no-files-found: warn
