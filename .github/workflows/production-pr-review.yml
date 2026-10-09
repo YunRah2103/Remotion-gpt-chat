@@ -1,0 +1,65 @@
+name: Production Studio - pull request visual comparison
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'production/**'
+      - '.github/agents/**'
+permissions:
+  contents: read
+concurrency:
+  group: studio-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: candidate
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: baseline
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: candidate/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Render matched native frames and compare
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install Pillow==11.3.0
+          (cd baseline && npm ci --no-audit --no-fund)
+          (cd candidate && npm ci --no-audit --no-fund && npm run check)
+          mkdir -p out/baseline out/candidate out/review
+          for DIR in baseline candidate; do
+            for FRAME in 0 30 60 120; do
+              (cd "$DIR" && npx --no-install remotion still src/index.ts GpuDriveFilm "../out/$DIR/frame-$FRAME.png" \
+                --frame="$FRAME" --scale=0.4 --gl=swangle)
+            done
+          done
+          python candidate/production/tools/visual_regression.py out/baseline out/candidate out/review
+          python - <<'PY'
+          import os,json
+          data=json.load(open('out/review/visual-report.json'))
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as fp:
+              fp.write('## Native visual comparison\n\n')
+              fp.write('Image change is not an aesthetic score. Open the artifact for real image reviews.\n\n')
+              for r in data['results']:
+                  fp.write('- '+r['frame']+': mean absolute pixel change '+str(r['meanAbsolutePixelChange'])+'\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: studio-pr-review-${{ github.run_id }}
+          path: out/
+          retention-days: 21
+          if-no-files-found: warn
