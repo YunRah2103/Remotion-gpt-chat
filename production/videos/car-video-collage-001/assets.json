@@ -1,0 +1,56 @@
+[
+  {
+    "id": "mclaren",
+    "brand": "McLaren 650S",
+    "author": "Taryn Elliott",
+    "pexels_id": 5309394,
+    "source_page": "https://www.pexels.com/video/a-person-driving-fast-on-the-street-5309394/",
+    "license": "Pexels License",
+    "license_url": "https://www.pexels.com/license/"
+  },
+  {
+    "id": "ferrari",
+    "brand": "Ferrari F8",
+    "author": "Yash Rao",
+    "pexels_id": 8443781,
+    "source_page": "https://www.pexels.com/video/a-man-driving-a-red-ferrari-8443781/",
+    "license": "Pexels License",
+    "license_url": "https://www.pexels.com/license/"
+  },
+  {
+    "id": "lamborghini",
+    "brand": "Lamborghini Aventador",
+    "author": "Jarod Barton",
+    "pexels_id": 17051328,
+    "source_page": "https://www.pexels.com/video/lamborghini-aventador-in-the-city-of-lisbon-17051328/",
+    "license": "Pexels License",
+    "license_url": "https://www.pexels.com/license/"
+  },
+  {
+    "id": "gtr",
+    "brand": "Nissan GT-R R35",
+    "author": "Yash Rao",
+    "pexels_id": 32121001,
+    "source_page": "https://www.pexels.com/video/yellow-nissan-gtr-and-motorcycle-on-tree-lined-road-32121001/",
+    "license": "Pexels License",
+    "license_url": "https://www.pexels.com/license/"
+  },
+  {
+    "id": "bmw",
+    "brand": "BMW M4",
+    "author": "Jorge Zaldívar Marroquín",
+    "pexels_id": 16532416,
+    "source_page": "https://www.pexels.com/video/a-black-bmw-car-driving-down-the-road-16532416/",
+    "license": "Pexels License",
+    "license_url": "https://www.pexels.com/license/"
+  },
+  {
+    "id": "mclaren2",
+    "brand": "McLaren sports car",
+    "author": "Taryn Elliott",
+    "pexels_id": 5309345,
+    "source_page": "https://www.pexels.com/video/man-driving-a-mclaren-sports-car-5309345/",
+    "license": "Pexels License",
+    "license_url": "https://www.pexels.com/license/"
+  }
+]
