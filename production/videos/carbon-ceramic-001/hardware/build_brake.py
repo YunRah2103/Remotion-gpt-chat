@@ -152,9 +152,13 @@ def forged_shell(name, side, centre, holder):
     verts = []
     def point(t, u, layer):
         a = centre - .295 + .590*t
-        r = .137 + .076*u
-        envelope = max(0.0, math.sin(math.pi*t)*math.sin(math.pi*u))
-        x = side*(.0365 if layer else (.058+.010*envelope**.85))
+        scallop=math.sin(3*math.pi*t)**2
+        r0=.142+.008*scallop
+        r1=.217-.012*scallop
+        r=r0+(r1-r0)*u
+        lobes=.5+.5*math.cos(6*math.pi*t)
+        envelope=(max(0,math.sin(math.pi*u))**.65)*(.5+.5*lobes)
+        x=side*(.0365 if layer else (.055+.015*envelope))
         return (x,r*math.sin(a),r*math.cos(a))
     for layer in (0,1):
         for i in range(n_a+1):
@@ -366,22 +370,16 @@ def construct():
 
 def setup_stage(out):
     scene=bpy.context.scene
-    # Debian / GitHub runners may ship Cycles without OpenImageDenoiser.
-    # Native realtime Eevee produces reliable close-up proofs without OIDN.
-    # Keep Cycles as a strictly denoiser-OFF fallback on older/headless builds.
-    try:
-        scene.render.engine = 'BLENDER_EEVEE_NEXT'
-    except (TypeError, ValueError):
-        try:
-            scene.render.engine = 'BLENDER_EEVEE'
-        except (TypeError, ValueError):
-            scene.render.engine = 'CYCLES'
-            scene.cycles.samples = 28
-    if hasattr(scene, 'eevee'):
-        if hasattr(scene.eevee, 'taa_render_samples'):
-            scene.eevee.taa_render_samples = 64
-        if hasattr(scene.eevee, 'use_gtao'):
-            scene.eevee.use_gtao = True
+    # A prior real GitHub Ubuntu run failed with "Build without
+    # OpenImageDenoiser". Prefer headless Cycles CPU at modest samples,
+    # deliberately WITHOUT denoising; Eevee needs a usable OpenGL context.
+    scene.render.engine = 'CYCLES'
+    scene.cycles.device = 'CPU'
+    scene.cycles.samples = 24
+    if hasattr(scene.cycles, 'use_adaptive_sampling'):
+        scene.cycles.use_adaptive_sampling = True
+    if hasattr(scene.cycles, 'use_preview_denoising'):
+        scene.cycles.use_preview_denoising = False
     if hasattr(scene, 'cycles') and hasattr(scene.cycles, 'use_denoising'):
         scene.cycles.use_denoising = False
     for layer in scene.view_layers:
