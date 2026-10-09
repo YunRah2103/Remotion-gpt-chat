@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "task": "carbon-ceramic-001-agent-b",
   "branch": "automotive-brakes-001/b-motion-thermal",
-  "sourceSha": "2acb2a9155db826c934ca9b64c3d5c2b31452b7a",
+  "sourceSha": "4a815e73c4e3dbc28b686e20910fdfc8865cd1bc",
   "owner": "engineering",
   "summary": "Implemented deterministic 750-frame two-cycle rotor deceleration, paired pad X-axis clamp, annular friction heat illustration, optional Remotion Three.js stand-in, 5 unit tests and a real 305-frame schematic MP4 motion proof. Final film integration belongs to Master.",
   "status": "ready",
@@ -15,17 +15,17 @@
     "production/videos/carbon-ceramic-001/physics/README.md"
   ],
   "evidence": [
-    "Actual source commit: https://github.com/YunRah2103/Remotion-gpt-chat/commit/2acb2a9155db826c934ca9b64c3d5c2b31452b7a",
+    "Actual source commit: https://github.com/YunRah2103/Remotion-gpt-chat/commit/4a815e73c4e3dbc28b686e20910fdfc8865cd1bc",
     "Local unit run: 5/5 PASS, 750/750 frame states checked with Node test runner and tsc, test output retained in Agent B conversation",
     "Real schematic motion preview: carbon-brakes-agent-b-motion-proof.mp4, 305 frames, 432x768 at 30/1 fps, MPEG-4 part 2; verified FFprobe and complete FFmpeg decode; SHA256 55ae0eaa148cd41b9957026109572376995a3752004a34919bef36343e350ca5",
     "Five visual proof still frames: 48, 168, 321, 531, 705; contact sheet agent-b-proof-contact-sheet.jpg in Agent B conversation",
     "Reproducible preview generator (requires OpenCV): production/videos/carbon-ceramic-001/physics/render-motion-proof.py",
-    "Frame 321 rotor 33.059rad/s/heat .8776; frame 531 rotor 11.846rad/s/heat .7860; frame 705 stopped/heat .6418 cooling"
+    "Frame 321 rotor 33.059rad/s/heat .8776; frame 531 rotor 11.846rad/s/heat .7860; frame 705 stopped/heat .6418 cooling",
+    "GitHub Actions run 37942445163 SUCCESS: npm dependency compilation, TypeScript, native 2-frame Remotion software-WebGL smoke, Python production tests; run 37942445243 composition-aware PR native review SUCCESS on predecessor source; latest runner-only changes require repeat CI."
   ],
   "blockers": [],
   "limitations": [
     "The supplied MP4 is an OpenCV schematic stand-in, not a native Remotion/Three.js-rendered clip or approved Blender/GLB hardware; Master must produce real 3D moving preview after integrating A.",
-    "No calibrated temperatures, stopping distances, component mass measurements or fade-resistance data are modelled.",
-    "Full project npm check is not yet confirmed from a remote CI run; the standalone TypeScript source was compiled with installed tsc."
+    "No calibrated temperatures, stopping distances, component mass measurements or fade-resistance data are modelled."
   ]
 }
