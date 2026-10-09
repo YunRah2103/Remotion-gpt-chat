@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "task": "replace-with-concrete-task-id",
+  "branch": "feature/task-branch",
+  "sourceSha": "0000000000000000000000000000000000000000",
+  "owner": "engineering",
+  "summary": "Replace with actual verifiable work completed",
+  "status": "blocked",
+  "files": [],
+  "evidence": [],
+  "blockers": [
+    "Template only; no approved render or source commit"
+  ],
+  "notes": "Do not treat this template as a real agent completion or working source SHA"
+}
