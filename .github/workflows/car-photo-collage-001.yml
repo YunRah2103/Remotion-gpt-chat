@@ -1,0 +1,122 @@
+name: Automotive Photo Collage 001 - Full Film
+on:
+  push:
+    branches: [automotive-edits/car-photo-collage-001]
+    paths:
+      - src/AutomotivePhotoCollage001.tsx
+      - src/Root.tsx
+      - production/videos/car-photo-collage-001/**
+      - .github/workflows/car-photo-collage-001.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: automotive-photo-collage-001-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  render-and-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install film production dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y ffmpeg
+          python -m pip install Pillow==11.3.0
+          npm ci --no-audit --no-fund
+          npm run check
+      - name: Download licensed photos and synthesize original audio
+        run: |
+          set -euo pipefail
+          python production/videos/car-photo-collage-001/fetch_assets.py
+          python production/videos/car-photo-collage-001/make_audio.py
+      - name: Render actual preview and representative stills
+        run: |
+          set -euo pipefail
+          mkdir -p out/car-photo-collage-001/stills
+          python production/tools/render.py --composition AutomotivePhotoCollage001 --mode preview --start 0 --end 74 --scale 0.35 --concurrency 1 --output out/car-photo-collage-001/preview.mp4
+          python production/tools/render.py --composition AutomotivePhotoCollage001 --mode stills --samples 40,145,225,270,325,385,440,495,560,590 --scale 0.40 --concurrency 1 --output out/car-photo-collage-001/stills
+          python - <<'PY'
+          from PIL import Image,ImageOps,ImageDraw
+          from pathlib import Path
+          p=Path('out/car-photo-collage-001/stills')
+          shots=sorted(p.glob('frame-*.png'))
+          if len(shots)!=10:raise RuntimeError(f'Only {len(shots)} contact sheet frames')
+          w,h=360,640
+          canvas=Image.new('RGB',(w*5,h*2),(15,16,19))
+          for i,shot in enumerate(shots):
+              im=Image.open(shot).convert('RGB')
+              im=ImageOps.fit(im,(w,h))
+              canvas.paste(im,((i%5)*w,(i//5)*h))
+              ImageDraw.Draw(canvas).text(((i%5)*w+8,(i//5)*h+8),shot.stem,fill=(255,255,255))
+          canvas.save('out/car-photo-collage-001/contact-sheet.jpg',quality=91)
+          print('Contact sheet',canvas.size)
+          PY
+      - name: Render native final H264 with AAC 600 frames
+        run: |
+          set -euo pipefail
+          python production/tools/render.py --composition AutomotivePhotoCollage001 --mode final --concurrency 2 --output out/car-photo-collage-001/automotive-photo-collage-001.mp4
+      - name: Verify FFprobe and complete decoding plus image QA
+        run: |
+          set -euo pipefail
+          FILE=out/car-photo-collage-001/automotive-photo-collage-001.mp4
+          ffmpeg -hide_banner -v error -xerror -i "$FILE" -map 0:v:0 -map 0:a:0 -f null -
+          ffprobe -v error -show_streams -show_format -of json "$FILE" > out/car-photo-collage-001/ffprobe.json
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          from PIL import Image,ImageStat
+          out=Path('out/car-photo-collage-001')
+          data=json.loads((out/'ffprobe.json').read_text())
+          streams=data['streams']; video=next(s for s in streams if s['codec_type']=='video')
+          audio=next(s for s in streams if s['codec_type']=='audio')
+          fps=video['r_frame_rate']; dur=float(data['format']['duration'])
+          if video['codec_name']!='h264' or video['width']!=1080 or video['height']!=1920:raise RuntimeError('Wrong codec or size')
+          if fps!='30/1' or not 19.97<=dur<=20.10:raise RuntimeError('Wrong fps/duration '+str((fps,dur)))
+          if video.get('nb_frames') not in ('600',None):raise RuntimeError('Wrong frame count')
+          if audio['codec_name']!='aac':raise RuntimeError('Missing AAC')
+          checks=[]
+          for shot in sorted((out/'stills').glob('frame-*.png')):
+              im=Image.open(shot).convert('RGB')
+              luma=ImageStat.Stat(im.convert('L')).mean[0]
+              dark=sum(1 for x in im.convert('L').resize((32,56)).getdata() if x<9)/(32*56)
+              if dark>.94:raise RuntimeError('Black still: '+str(shot))
+              checks.append(dict(frame=shot.name,luma=round(luma,2),black_fraction=round(dark,3)))
+          final=out/'automotive-photo-collage-001.mp4'
+          report={'result':'PASS','source_sha':'${{ github.sha }}','duration_seconds':dur,'fps':fps,
+            'frames':video.get('nb_frames'),'codec':video['codec_name'],'audio_codec':audio['codec_name'],
+            'mp4_bytes':final.stat().st_size,'sha256':hashlib.sha256(final.read_bytes()).hexdigest(),
+            'full_ffmpeg_decode':'PASS','contact_frames':checks,
+            'limitations':'Representative stills audited computationally; creative assessment still needs actual viewing.'}
+          (out/'quality-report.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report,indent=2))
+          PY
+      - name: Publish contact sheet in same branch for visual review
+        if: success()
+        run: |
+          set -euo pipefail
+          cp out/car-photo-collage-001/contact-sheet.jpg production/videos/car-photo-collage-001/QA-CONTACT-SHEET.jpg
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add production/videos/car-photo-collage-001/QA-CONTACT-SHEET.jpg
+          git commit -m "qa: publish collage contact sheet [skip ci]" || true
+          git push origin HEAD:automotive-edits/car-photo-collage-001 || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: AUTOMOTIVE-PHOTO-COLLAGE-001-${{ github.run_id }}
+          path: |
+            out/car-photo-collage-001/
+            public/automotive-collage/provenance.json
+          retention-days: 30
+          if-no-files-found: warn

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "porsche",
+    "file": "Porsche_911_GT3_RS_992.jpg",
+    "model": "Porsche 911 GT3 RS (992)",
+    "author": "Calreyn88",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Porsche_911_GT3_RS_992.jpg"
+  },
+  {
+    "id": "lambo",
+    "file": "Lamborghini_Huracán.jpg",
+    "model": "Lamborghini Huracán",
+    "author": "Alexandre Prevot",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Lamborghini_Hurac%C3%A1n.jpg"
+  },
+  {
+    "id": "ferrari",
+    "file": "Ferrari_488_GTB_IMG_4120.jpg",
+    "model": "Ferrari 488 GTB",
+    "author": "Alexander Migl",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Ferrari_488_GTB_IMG_4120.jpg"
+  },
+  {
+    "id": "mclaren",
+    "file": "McLaren_720S_IMG_2945.jpg",
+    "model": "McLaren 720S",
+    "author": "Alexander Migl",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source_page": "https://commons.wikimedia.org/wiki/File:McLaren_720S_IMG_2945.jpg"
+  },
+  {
+    "id": "gtr",
+    "file": "Nissan_GT-R_R35_1.jpg",
+    "model": "Nissan GT-R R35",
+    "author": "Calreyn88",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Nissan_GT-R_R35_1.jpg"
+  },
+  {
+    "id": "bmw",
+    "file": "BMW_M4_(G82)_1X7A0155.jpg",
+    "model": "BMW M4 (G82)",
+    "author": "Alexander Migl",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source_page": "https://commons.wikimedia.org/wiki/File:BMW_M4_(G82)_1X7A0155.jpg"
+  }
+]
