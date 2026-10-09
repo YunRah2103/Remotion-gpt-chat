@@ -59,8 +59,8 @@ for(const f of [97,98,99,100,101,102,103,104,143,144,145,146,147,148,149,150]){
 }
 assert.equal(blend(96),0);assert.equal(blend(104),1);
 assert.equal(blend(143),1);assert.equal(blend(151),0);
-assert.match(film, /<BrakeStage frame=\{frame\} view="pad"/);
-assert.match(film, /<BrakeStage frame=\{frame\} view="normal"/);
+assert.match(read('src/brakes001/CarbonCeramic001.tsx'), /<BrakeStage frame=\{frame\} view="pad"/);
+assert.match(read('src/brakes001/CarbonCeramic001.tsx'), /<BrakeStage frame=\{frame\} view="normal"/);
 
 const manifest = JSON.parse(read('production/videos/carbon-ceramic-001/hardware/rig-manifest.json'));
 const brief = JSON.parse(read('production/videos/carbon-ceramic-001/brief.json'));
