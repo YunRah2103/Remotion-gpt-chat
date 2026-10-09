@@ -1,0 +1,228 @@
+name: Carbon Ceramic 001 - Polish04 native complete candidate
+
+on:
+  push:
+    branches: ['automotive-brakes-001/f-render']
+    paths:
+      - '.github/workflows/carbon-ceramic-001-f-polish04.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: carbon-ceramic-f-polish04-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CANDIDATE_E_SOURCE_SHA: 21c2b581b46251b0bd45028d32eb40b4341eeb2a
+
+jobs:
+  source-check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - name: Checkout immutable E source (not Master)
+        uses: actions/checkout@v4
+        with:
+          ref: 21c2b581b46251b0bd45028d32eb40b4341eeb2a
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prove exact source and run full composition checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_E_SOURCE_SHA"
+          mkdir -p out/candidate/preflight
+          git rev-parse HEAD | tee out/candidate/preflight/immutable-e-source-sha.txt
+          npm ci --no-audit --no-fund
+          npm run check | tee out/candidate/preflight/typescript.log
+          node src/brakes001/integration/integration.test.cjs | tee out/candidate/preflight/integration.log
+          python production/videos/carbon-ceramic-001/validate_setup.py | tee out/candidate/preflight/setup.log
+          python production/videos/carbon-ceramic-001/hardware/test_hardware.py | tee out/candidate/preflight/hardware.log
+          bash production/videos/carbon-ceramic-001/physics/run-tests.sh | tee out/candidate/preflight/motion.log
+          python production/videos/carbon-ceramic-001/qa/check_graphics.py | tee out/candidate/preflight/graphics.log
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('src/Root.tsx').read_text()
+          film=Path('src/brakes001/CarbonCeramic001.tsx').read_text()
+          brief=json.loads(Path('production/videos/carbon-ceramic-001/brief.json').read_text())
+          shots=json.loads(Path('production/videos/carbon-ceramic-001/shots.json').read_text())
+          assert 'id="CarbonCeramic001"' in root and 'durationInFrames={750}' in root
+          assert brief['sourceCompositionId']=='CarbonCeramic001' and brief['durationInFrames']==750
+          assert brief['fps']==30 and brief['resolution']==[1080,1920]
+          assert [(x['startFrame'],x['endFrame']) for x in shots]==[(0,119),(120,269),(270,449),(450,629),(630,749)]
+          for name in ('BrakeAssembly','integrationStateAt','FrictionHeatMap','BrakeLighting','IntegrationCameraRig','TitleOverlays','PartLabels','InFilmPadCutaway','InFilmPadLabels'):
+              assert name in film,name
+          cam=Path('src/brakes001/integration/IntegrationCameraRig.tsx').read_text()
+          pads=Path('src/brakes001/integration/InFilmPadCutaway.tsx').read_text()
+          assert "frame>=100&&frame<=147" in pads
+          assert "frame-630" in cam and "frame-630)/119" in cam
+          print('POLISH04 FIVE SHOTS / PAD CUTAWAY / CONTINUOUS HERO CAMERA: SOURCE PASS')
+          PY
+      - name: Store source preflight
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brakes001-f-polish04-preflight-${{ github.run_id }}
+          path: out/candidate/preflight/
+          retention-days: 30
+          if-no-files-found: warn
+
+  chunk:
+    needs: source-check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        include:
+          - {id: "00", start: 0, end: 74}
+          - {id: "01", start: 75, end: 149}
+          - {id: "02", start: 150, end: 224}
+          - {id: "03", start: 225, end: 299}
+          - {id: "04", start: 300, end: 374}
+          - {id: "05", start: 375, end: 449}
+          - {id: "06", start: 450, end: 524}
+          - {id: "07", start: 525, end: 599}
+          - {id: "08", start: 600, end: 674}
+          - {id: "09", start: 675, end: 749}
+    steps:
+      - name: Checkout exact E film SHA
+        uses: actions/checkout@v4
+        with:
+          ref: 21c2b581b46251b0bd45028d32eb40b4341eeb2a
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install native Remotion and FFmpeg dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          npm ci --no-audit --no-fund
+          # Isolated runners can omit the Rspack optional native package.
+          if ! node -e "require('@rspack/binding')" >/dev/null 2>&1; then
+            ver="$(node -p "require('./node_modules/@rspack/binding/package.json').version")"
+            npm install --no-save --no-package-lock --no-audit --no-fund "@rspack/binding-linux-x64-gnu@${ver}"
+            node -e "require('@rspack/binding')"
+          fi
+      - name: Render genuine 1080x1920 native R3F/Three.js frames
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_E_SOURCE_SHA"
+          mkdir -p out/candidate
+          npx --no-install remotion render src/index.ts CarbonCeramic001 "out/candidate/part-${{ matrix.id }}.mp4" \
+            --frames=${{ matrix.start }}-${{ matrix.end }} \
+            --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1 --log=error
+          python production/tools/quality.py video "out/candidate/part-${{ matrix.id }}.mp4" \
+            --width 1080 --height 1920 --fps 30 --frames 75 \
+            --report "out/candidate/part-${{ matrix.id }}-qa.json"
+          sha256sum "out/candidate/part-${{ matrix.id }}.mp4" \
+            > "out/candidate/part-${{ matrix.id }}.sha256"
+      - name: Publish complete or partial chunk evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brakes001-f-polish04-part-${{ matrix.id }}-${{ github.run_id }}
+          path: out/candidate/
+          if-no-files-found: warn
+          retention-days: 30
+
+  assemble-verify:
+    needs: chunk
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - name: Checkout F verification scripts only (not Master)
+        uses: actions/checkout@v4
+      - name: Install independent native QA tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Download ten real 75-frame rendered parts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: brakes001-f-polish04-part-*-${{ github.run_id }}
+          path: out/candidate/parts
+          merge-multiple: true
+      - name: Verify exact locked source and concatenate contiguous native film
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/candidate/stills
+          printf '%s\n' "$CANDIDATE_E_SOURCE_SHA" > out/candidate/immutable-film-source.txt
+          rm -f out/candidate/parts/concat.txt
+          for i in $(seq -w 00 09); do
+            test -s "out/candidate/parts/part-${i}.mp4"
+            test -s "out/candidate/parts/part-${i}-qa.json"
+            test -n "$(awk '{print $1}' "out/candidate/parts/part-${i}.sha256")"
+            expected="$(awk '{print $1}' "out/candidate/parts/part-${i}.sha256")"
+            actual="$(sha256sum "out/candidate/parts/part-${i}.mp4" | awk '{print $1}')"
+            test "$expected" = "$actual"
+            printf "file 'part-%s.mp4'\n" "$i" >> out/candidate/parts/concat.txt
+          done
+          ffmpeg -hide_banner -loglevel warning -y -f concat -safe 0 \
+            -i out/candidate/parts/concat.txt -c copy \
+            out/candidate/carbon-ceramic-001-polish04-joined-fullrange.mp4
+          # Remotion chunks encode yuvj420p; convert full to limited explicitly.
+          ffmpeg -hide_banner -loglevel warning -y \
+            -i out/candidate/carbon-ceramic-001-polish04-joined-fullrange.mp4 \
+            -map 0:v:0 -vf "scale=in_range=pc:out_range=tv,format=yuv420p" \
+            -c:v libx264 -preset faster -crf 18 -r 30 -frames:v 750 \
+            -pix_fmt yuv420p -color_range tv -an -movflags +faststart \
+            out/candidate/carbon-ceramic-001-polish04-candidate.mp4
+          python production/videos/carbon-ceramic-001/render/verify_media.py \
+            out/candidate/carbon-ceramic-001-polish04-candidate.mp4 \
+            --width 1080 --height 1920 --fps 30 --frames 750 \
+            --report out/candidate/candidate-full-verification.json
+          ffprobe -v error -count_frames -show_streams -show_format -of json \
+            out/candidate/carbon-ceramic-001-polish04-candidate.mp4 > out/candidate/ffprobe.json
+          ffmpeg -hide_banner -loglevel error -i out/candidate/carbon-ceramic-001-polish04-candidate.mp4 \
+            -vf "select='eq(n,48)+eq(n,168)+eq(n,321)+eq(n,531)+eq(n,705)'" \
+            -vsync 0 out/candidate/stills/frame-%02d.png
+          test "$(find out/candidate/stills -name '*.png' | wc -l)" -eq 5
+          python production/tools/quality.py contact out/candidate/contact-sheet.jpg out/candidate/stills/frame-*.png
+          sha256sum out/candidate/carbon-ceramic-001-polish04-candidate.mp4 > out/candidate/candidate-SHA256SUMS.txt
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('out/candidate/candidate-full-verification.json').read_text())
+          assert r['technicalPass'] and r['ffmpegDecodedFrames']==750
+          meta={'status':'CANDIDATE_NOT_MASTER_APPROVED','sourceSha':'21c2b581b46251b0bd45028d32eb40b4341eeb2a',
+            'mp4':'carbon-ceramic-001-polish04-candidate.mp4',
+            'frames':750,'fps':30,'resolution':[1080,1920],
+            'codec':'h264','pixelFormat':'yuv420p',
+            'audio':'silent_no_approved_voiceover',
+            'sha256':r['sha256'],
+            'visualWarnings':r['automatedVisualReviewAlerts'],
+            'releaseGate':'Master approval intentionally not invoked or modified'}
+          Path('out/candidate/CANDIDATE_MANIFEST.json').write_text(json.dumps(meta,indent=2)+'\n')
+          print(json.dumps(meta,indent=2))
+          PY
+      - name: Upload playable 25-second candidate and QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brakes001-f-polish04-full-25s-candidate-${{ github.run_id }}
+          path: |
+            out/candidate/carbon-ceramic-001-polish04-candidate.mp4
+            out/candidate/contact-sheet.jpg
+            out/candidate/stills/
+            out/candidate/candidate-full-verification.json
+            out/candidate/ffprobe.json
+            out/candidate/candidate-SHA256SUMS.txt
+            out/candidate/immutable-film-source.txt
+            out/candidate/CANDIDATE_MANIFEST.json
+          retention-days: 30
+          if-no-files-found: warn

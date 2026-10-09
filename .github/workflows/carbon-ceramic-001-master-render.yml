@@ -1,6 +1,11 @@
 name: Carbon Ceramic 001 - Master proof and final rendering
 
 on:
+  push:
+    branches: ['automotive-brakes-001/f-render']
+    paths:
+      - 'production/videos/carbon-ceramic-001/render/**'
+      - '.github/workflows/carbon-ceramic-001-master-render.yml'
   workflow_dispatch:
     inputs:
       mode:
@@ -18,12 +23,39 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  f-render-tooling-check:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/automotive-brakes-001/f-render'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test F media verifier with a synthetic clip (not film proof)
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          command -v ffmpeg && command -v ffprobe
+          python -m unittest discover -s production/videos/carbon-ceramic-001/render -p 'test_*.py' -v
+          python -m py_compile production/videos/carbon-ceramic-001/render/source_lock.py production/videos/carbon-ceramic-001/render/verify_media.py
+      - name: Confirm a non-approved integration cannot enter rendering
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '{"status":"pending","integrationSourceSha":null,"masterApprovalUrl":null}' > /tmp/cc-f-pending-lock.json
+          if python production/videos/carbon-ceramic-001/render/source_lock.py --lock /tmp/cc-f-pending-lock.json --require-approved; then
+            echo "ERROR: pending/unapproved source lock unexpectedly passed" >&2
+            exit 1
+          fi
+          echo "PASS: source gate rejects pending approval"
   native-render:
-    if: github.ref == 'refs/heads/automotive-brakes-001/master'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/automotive-brakes-001/master'
     runs-on: ubuntu-24.04
     timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # required by approved source SHA ancestry/diff lock
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -35,6 +67,11 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p out/carbon-ceramic-001
+          python production/videos/carbon-ceramic-001/render/source_lock.py \
+            --require-approved --report out/carbon-ceramic-001/source-lock-verification.json
+          git rev-parse HEAD > out/carbon-ceramic-001/checkout-source-sha.txt
+          cp production/videos/carbon-ceramic-001/render/SOURCE_LOCK.json \
+            out/carbon-ceramic-001/SOURCE_LOCK.json
           python -m unittest discover -s production/videos/carbon-ceramic-001 -p 'test_master_gate.py' -v
           python production/videos/carbon-ceramic-001/validate_setup.py
           python production/videos/carbon-ceramic-001/master_gate.py \
@@ -87,6 +124,10 @@ jobs:
           assert result['decodedCompletely'] is True, result
           print('NATIVE FINAL 750/750 / 1080x1920 / H264 / DECODE CHECK PASS')
           PY
+          python production/videos/carbon-ceramic-001/render/verify_media.py \
+            out/carbon-ceramic-001/carbon-ceramic-001-master.mp4 \
+            --width 1080 --height 1920 --fps 30 --frames 750 \
+            --report out/carbon-ceramic-001/full-media-verification.json
           (cd out/carbon-ceramic-001 && sha256sum carbon-ceramic-001-master.mp4 > SHA256SUMS.txt)
       - name: Publish reproducible proofs and native MP4 where available
         if: always()

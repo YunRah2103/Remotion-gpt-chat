@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "task": "carbon-ceramic-001-polish04-hero-motion",
+  "sourceSha": "21c2b581b46251b0bd45028d32eb40b4341eeb2a",
+  "previousFilm": "carbon-ceramic-001-candidate.mp4",
+  "polish04Film": "carbon-ceramic-001-polish04-candidate.mp4",
+  "window": {
+    "startFrame": 600,
+    "endFrame": 749,
+    "totalFrames": 150,
+    "sampledFps": 30,
+    "grayscaleProxy": [
+      180,
+      320
+    ]
+  },
+  "old": {
+    "meanAdjacentMAD": 0.16493,
+    "medianAdjacentMAD": 0.12707,
+    "p95AdjacentMAD": 0.29631,
+    "adjacentAlmostStaticUnder0_15": 108,
+    "blackFramesMeanUnder6": 0
+  },
+  "polish04": {
+    "meanAdjacentMAD": 0.25263,
+    "medianAdjacentMAD": 0.23948,
+    "p95AdjacentMAD": 0.38345,
+    "adjacentAlmostStaticUnder0_15": 25,
+    "blackFramesMeanUnder6": 0
+  },
+  "ratioNewToOld": 1.5317,
+  "conclusion": "53.17% increase in mean adjacent-frame absolute difference, with 83 fewer near-static pairs; visible hero orbital movement improved but further Agent D/Master aesthetic review required.",
+  "limitations": "Absolute pixel difference is a motion proxy; text, transitions, lighting, material changes and compression may affect it. No fabricated subjective rating."
+}

@@ -1,0 +1,54 @@
+name: Carbon Ceramic 001 - Polish05 pad chunk recovery
+
+on:
+  push:
+    branches: ['automotive-brakes-001/f-render']
+    paths:
+      - '.github/workflows/carbon-ceramic-001-f-polish05-recovery.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recover-pad-frames-75-149:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: a8553b2c1af11d15eb0b8f6c96e0c3e53142f9aa
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve native renderer dependencies
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "a8553b2c1af11d15eb0b8f6c96e0c3e53142f9aa"
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          npm ci --no-audit --no-fund
+          if ! node -e "require('@rspack/binding')" >/dev/null 2>&1; then
+            version="$(node -p "require('./node_modules/@rspack/binding/package.json').version")"
+            npm install --no-save --no-package-lock --no-audit --no-fund "@rspack/binding-linux-x64-gnu@${version}"
+          fi
+          node -e "require('@rspack/binding')"
+      - name: Render actual Polish05 pads in source film
+        run: |
+          set -euo pipefail
+          mkdir -p out/polish05
+          npx --no-install remotion render src/index.ts CarbonCeramic001 out/polish05/part-01.mp4 \
+            --frames=75-149 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1 --log=error
+          python production/tools/quality.py video out/polish05/part-01.mp4 \
+            --width 1080 --height 1920 --fps 30 --frames 75 \
+            --report out/polish05/part-01-qa.json
+          sha256sum out/polish05/part-01.mp4 > out/polish05/part-01.sha256
+          echo "a8553b2c1af11d15eb0b8f6c96e0c3e53142f9aa" > out/polish05/E_SOURCE_SHA.txt
+      - name: Publish real recovered chunk
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: carbon-brakes-polish05-pad-recovery-${{ github.run_id }}
+          path: out/polish05/
+          if-no-files-found: warn
+          retention-days: 30

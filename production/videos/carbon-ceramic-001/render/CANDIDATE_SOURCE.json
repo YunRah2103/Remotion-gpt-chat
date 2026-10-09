@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "mode": "review-candidate",
+  "releaseApproved": false,
+  "sourceRepository": "YunRah2103/Remotion-gpt-chat",
+  "sourceBranch": "automotive-brakes-001/e-integration",
+  "sourceSha": "5b378202187748ce9b51d884f26bb7167285c946",
+  "renderBranch": "automotive-brakes-001/f-render",
+  "workflow": ".github/workflows/carbon-ceramic-001-f-candidate.yml",
+  "firstRun": 37976697530,
+  "correctedRun": 37976771520,
+  "compositionId": "CarbonCeramic001",
+  "spec": {
+    "frames": 750,
+    "fps": 30,
+    "width": 1080,
+    "height": 1920,
+    "codec": "h264",
+    "pixelFormat": "yuv420p",
+    "audio": "silent_pending_approved_narration"
+  },
+  "reason": "Separate unapproved candidate intentionally skips final release acceptance only; official master_gate/source_lock preserved without edits",
+  "status": "render-running-unverified",
+  "qa": "Do not claim MP4 exists until assemble-verify job completes and produces artifact"
+}
