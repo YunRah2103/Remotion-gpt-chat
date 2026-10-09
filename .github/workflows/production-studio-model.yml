@@ -1,0 +1,52 @@
+name: Production Studio - inspect 3D model
+on:
+  workflow_dispatch:
+    inputs:
+      source_run:
+        required: true
+        type: string
+        description: Approved workflow run ID containing one GLB
+      source_artifact:
+        required: true
+        type: string
+        description: Exact workflow artifact name
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install CPU Blender and FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq blender ffmpeg
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.source_artifact }}
+          run-id: ${{ inputs.source_run }}
+          github-token: ${{ github.token }}
+          path: out/input
+      - name: Model hierarchy, six native rendered views, video
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t FILES < <(find out/input -type f -name '*.glb')
+          test "${#FILES[@]}" -eq 1
+          test "$(stat -c%s "${FILES[0]}")" -le 125829120
+          python production/studio/studio.py inspect "${FILES[0]}" out/studio/model
+          blender -b -t 2 --python production/studio/blender_turntable.py -- "${FILES[0]}" out/studio/model
+          ffmpeg -hide_banner -loglevel error -y -framerate 3 -i out/studio/model/view-%02d.png -c:v libx264 -pix_fmt yuv420p out/studio/model/turntable.mp4
+          ffmpeg -v error -xerror -i out/studio/model/turntable.mp4 -f null -
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: studio-model-${{ github.run_id }}
+          path: out/studio/model/
+          retention-days: 21
+          if-no-files-found: warn
