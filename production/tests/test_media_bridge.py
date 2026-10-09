@@ -1,4 +1,5 @@
 import json
+import shutil
 import socket
 import sys
 import tempfile
@@ -87,6 +88,8 @@ class MediaBridgeTests(unittest.TestCase):
             handler.redirect_request(req, None, 302, "Moved",
                                      {}, "http://169.254.169.254/")
 
+    @unittest.skipUnless(shutil.which("ffmpeg") and shutil.which("ffprobe"),
+                         "FFmpeg is installed by the dedicated Media Bridge workflow")
     def test_offline_image_and_video_end_to_end(self):
         with tempfile.TemporaryDirectory() as tmp:
             output = Path(tmp) / "proof"
