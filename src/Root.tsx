@@ -6,6 +6,7 @@ import {CaptionedGpuDriveFilm, CaptionedTurboDocumentary} from './ProductionCapt
 import {StudioMaterialProof} from './studio/StudioMaterialProof';
 import {TwoVersionFilm} from './advanced/TwoVersionFilm';
 import {AutomotivePhotoCollage001} from './AutomotivePhotoCollage001';
+import {AutomotiveVideoCollage001} from './AutomotiveVideoCollage001';
 
 export const VideoRoot=()=> <>
   <Composition id="GpuDriveFilm" component={GpuDriveFilm} width={1080} height={1920} fps={30} durationInFrames={180}/>
@@ -15,4 +16,5 @@ export const VideoRoot=()=> <>
   <Composition id="StudioMaterialProof" component={StudioMaterialProof} width={1080} height={1920} fps={30} durationInFrames={150}/>
   <Composition id="EngineeringDualVersion" component={TwoVersionFilm} width={1080} height={1920} fps={30} durationInFrames={750} defaultProps={{variant:"studio" as const}}/>
   <Composition id="AutomotivePhotoCollage001" component={AutomotivePhotoCollage001} width={1080} height={1920} fps={30} durationInFrames={600}/>
+  <Composition id="AutomotiveVideoCollage001" component={AutomotiveVideoCollage001} width={1080} height={1920} fps={30} durationInFrames={600}/>
 </>;
