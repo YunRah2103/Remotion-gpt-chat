@@ -18,7 +18,9 @@ results=[]
 for row in data:
     file=row["file"]
     hashed=hashlib.md5(file.encode("utf-8")).hexdigest()
-    url=f"https://upload.wikimedia.org/wikipedia/commons/{hashed[0]}/{hashed[:2]}/{quote(file)}"
+    original=f"https://upload.wikimedia.org/wikipedia/commons/{hashed[0]}/{hashed[:2]}/{quote(file)}"
+    host="upload.wikimedia.org" if row["id"] in ("lambo","gtr") else "thumb.wikimedia.org"
+    url=original if row["id"]=="gtr" else f"https://{host}/wikipedia/commons/thumb/{hashed[0]}/{hashed[:2]}/{quote(file)}/1280px-{quote(file)}"
     if row.get("license")!="CC BY-SA 4.0":
         raise RuntimeError("License allowlist mismatch: "+file)
     response=None
@@ -33,11 +35,12 @@ for row in data:
         except Exception as e:
             print("Download failed",file,attempt+1,str(e),flush=True)
             if attempt==4: raise
-            time.sleep(3*(attempt+1))
+            time.sleep(12*(attempt+1))
+    time.sleep(4)
     im=Image.open(io.BytesIO(response))
     im=ImageOps.exif_transpose(im).convert("RGB")
     source_size=im.size
-    if im.width<1100 or im.height<650:raise RuntimeError(f"Source {file} insufficient size {source_size}")
+    if im.width<1100 or im.height<520:raise RuntimeError(f"Source {file} insufficient size {source_size}")
     im.thumbnail((2700,1800), Image.Resampling.LANCZOS)
     im=ImageEnhance.Contrast(im).enhance(1.07)
     out=target/(row["id"]+".jpg")
