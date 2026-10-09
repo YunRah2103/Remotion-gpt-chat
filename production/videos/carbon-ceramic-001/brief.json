@@ -9,8 +9,8 @@
     1080,
     1920
   ],
-  "status": "preproduction",
-  "sourceCompositionId": null,
+  "status": "implemented",
+  "sourceCompositionId": "CarbonCeramic001",
   "filmSeries": "Automotive Engineering",
   "narration": "Approved audio not yet supplied",
   "visualApproach": "Faint x-ray outline of an original performance-car silhouette for context only, then detailed isolated front carbon-ceramic brake hardware. No fully modelled car.",
