@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "description": "Reusable original procedural mechanical assemblies. Files are code-driven geometry, not manufacturer CAD.",
+  "components": [
+    {
+      "id": "brake-disc",
+      "module": "src/mechanics/parts.tsx",
+      "export": "BrakeDisc",
+      "reuse": [
+        "ABS",
+        "disc-brakes",
+        "traction-control"
+      ]
+    },
+    {
+      "id": "brake-caliper",
+      "module": "src/mechanics/parts.tsx",
+      "export": "BrakeCaliper",
+      "reuse": [
+        "ABS",
+        "disc-brakes"
+      ]
+    },
+    {
+      "id": "wheel-and-tyre",
+      "module": "src/mechanics/parts.tsx",
+      "export": "WheelAssembly",
+      "reuse": [
+        "ABS",
+        "suspension",
+        "traction-control"
+      ]
+    },
+    {
+      "id": "wheel-speed-sensor",
+      "module": "src/mechanics/parts.tsx",
+      "export": "WheelSpeedSensor",
+      "reuse": [
+        "ABS",
+        "traction-control",
+        "ESC"
+      ]
+    },
+    {
+      "id": "coil-spring",
+      "module": "src/mechanics/parts.tsx",
+      "export": "CoilSpring",
+      "reuse": [
+        "suspension"
+      ]
+    },
+    {
+      "id": "mechanical-gear",
+      "module": "src/mechanics/parts.tsx",
+      "export": "MechanicalGear",
+      "reuse": [
+        "differential",
+        "gearbox"
+      ]
+    },
+    {
+      "id": "hydraulic-valve",
+      "module": "src/mechanics/parts.tsx",
+      "export": "HydraulicValve",
+      "reuse": [
+        "ABS",
+        "power-steering"
+      ]
+    }
+  ]
+}

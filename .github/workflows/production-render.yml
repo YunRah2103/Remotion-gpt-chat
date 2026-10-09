@@ -1,0 +1,118 @@
+name: Production Suite - preview, stills or final MP4
+on:
+  workflow_dispatch:
+    inputs:
+      composition:
+        description: Registered Remotion composition ID (e.g. GpuDriveFilm)
+        type: string
+        required: true
+        default: GpuDriveFilm
+      quality:
+        description: Preview at reduced scale, stills, or full-resolution final
+        type: choice
+        required: true
+        options: [preview, stills, final]
+        default: preview
+      start_frame:
+        description: Optional first frame (leave empty for full film)
+        required: false
+        type: string
+      end_frame:
+        description: Optional last frame (leave empty for full film)
+        required: false
+        type: string
+      samples:
+        description: Frame numbers for stills
+        required: false
+        type: string
+        default: '0,30,60,120'
+      preview_scale:
+        description: 0.1-1 preview size (ignored for final)
+        required: false
+        type: string
+        default: '0.4'
+permissions:
+  contents: read
+concurrency:
+  group: production-render-${{ github.ref }}-${{ inputs.composition }}-${{ inputs.quality }}
+  cancel-in-progress: false
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node22-npm-${{ hashFiles('package-lock.json', 'package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node22-npm-
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: production/requirements-qa.txt
+      - name: Install rendering and image inspection tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -r production/requirements-qa.txt
+          if test -s package-lock.json; then npm ci --no-audit --no-fund; else npm install --no-audit --no-fund; fi
+          npm run check
+      - name: Render requested composition at requested quality
+        env:
+          COMPOSITION: ${{ inputs.composition }}
+          MODE: ${{ inputs.quality }}
+          START: ${{ inputs.start_frame }}
+          END: ${{ inputs.end_frame }}
+          SAMPLE_LIST: ${{ inputs.samples }}
+          SCALE: ${{ inputs.preview_scale }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/production
+          if [[ "$MODE" == stills ]]; then
+            python production/tools/render.py --composition "$COMPOSITION" --mode stills \
+              --output out/production/stills --samples "$SAMPLE_LIST" --scale "$SCALE" --concurrency 1
+          else
+            CMD=(python production/tools/render.py --composition "$COMPOSITION" --mode "$MODE" \
+              --output out/production/video.mp4 --scale "$SCALE" --concurrency 2)
+            if [[ -n "$START" || -n "$END" ]]; then
+              if [[ -z "$START" || -z "$END" ]]; then echo 'Supply BOTH start and end' >&2; exit 1; fi
+              CMD+=(--start "$START" --end "$END")
+            fi
+            "${CMD[@]}"
+            if [[ "$MODE" == final && -z "$START" ]]; then
+              python production/tools/quality.py video out/production/video.mp4 \
+                --width 1080 --height 1920 --fps 30 --report out/production/validation.json
+            else
+              python production/tools/quality.py video out/production/video.mp4 \
+                --report out/production/validation.json
+            fi
+            python - <<'PY'
+          from pathlib import Path
+          import json
+          import sys
+          sys.path.insert(0,'production/tools')
+          from quality import extract_samples,contact_sheet
+          d=json.loads(Path('out/production/validation.json').read_text())['durationSeconds']
+          times=[d*x for x in (.05,.27,.5,.73,.94)]
+          extract_samples('out/production/video.mp4','out/production/stills',times)
+          contact_sheet(sorted(Path('out/production/stills').glob('*.png')),'out/production/contact-sheet.jpg')
+          PY
+          fi
+          if [[ "$MODE" == stills ]]; then
+            python production/tools/quality.py contact out/production/contact-sheet.jpg out/production/stills/*.png
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: production-${{ inputs.quality }}-${{ github.run_id }}
+          path: out/production/
+          retention-days: 30
+          if-no-files-found: warn

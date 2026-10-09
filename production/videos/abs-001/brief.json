@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "slug": "abs-001",
+  "title": "How ABS brakes work",
+  "fps": 30,
+  "durationSeconds": 25,
+  "durationInFrames": 750,
+  "resolution": [
+    1080,
+    1920
+  ],
+  "status": "preproduction",
+  "narrationPath": "voiceover.txt",
+  "mechanicalAssets": [
+    "brake-disc",
+    "brake-caliper",
+    "wheel-and-tyre",
+    "wheel-speed-sensor",
+    "hydraulic-valve"
+  ],
+  "sourceCompositionId": null
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "startFrame": 0,
+    "endFrame": 119,
+    "visual": "Braking problem: rotating wheel to approaching lockup",
+    "narrationCue": "Brake lockup"
+  },
+  {
+    "startFrame": 120,
+    "endFrame": 239,
+    "visual": "Wheel lock and skidding contrasted with rolling",
+    "narrationCue": "Steering"
+  },
+  {
+    "startFrame": 240,
+    "endFrame": 359,
+    "visual": "Sensor rotation monitoring and ABS controller",
+    "narrationCue": "Sensor"
+  },
+  {
+    "startFrame": 360,
+    "endFrame": 599,
+    "visual": "Inlet and outlet valves release, hold, reapply pressure",
+    "narrationCue": "Hydraulic modulation"
+  },
+  {
+    "startFrame": 600,
+    "endFrame": 749,
+    "visual": "ABS versus locked wheel, preserve steering response",
+    "narrationCue": "Control"
+  }
+]

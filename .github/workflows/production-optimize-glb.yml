@@ -1,0 +1,64 @@
+name: Production Suite - optionally optimize GLB model
+on:
+  workflow_dispatch:
+    inputs:
+      asset_run_id:
+        description: GitHub Actions run containing the source GLB
+        required: true
+        type: string
+      asset_artifact:
+        description: Exact source artifact name
+        required: true
+        type: string
+      method:
+        description: dedup (safe) or meshopt (requires decoder)
+        required: true
+        type: choice
+        options: [dedup, meshopt]
+        default: dedup
+      gpu_anchors:
+        description: Enforce canonical GPU anchors and parenting
+        type: boolean
+        default: true
+permissions:
+  contents: read
+  actions: read
+jobs:
+  optimise:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.asset_artifact }}
+          run-id: ${{ inputs.asset_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/asset
+      - name: Lossless optimisation or explicit opt-in Meshopt with GLB anchor guard
+        env:
+          METHOD: ${{ inputs.method }}
+          GPU_ANCHORS: ${{ inputs.gpu_anchors }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t ASSETS < <(find out/asset -type f -name '*.glb')
+          [[ "${#ASSETS[@]}" -eq 1 ]] || { echo 'Expected one GLB'; exit 1; }
+          mkdir -p out/production/optimized
+          CMD=(python3 production/tools/optimize_model.py "${ASSETS[0]}" \
+            out/production/optimized/model.glb --method "$METHOD" \
+            --report out/production/optimized/report.json)
+          if [[ "$GPU_ANCHORS" == true ]]; then CMD+=(--gpu-anchors); fi
+          "${CMD[@]}"
+          (cd out/production/optimized && sha256sum model.glb report.json > SHA256SUMS.txt)
+          if [[ "$METHOD" == meshopt ]]; then
+            echo '::warning::Meshopt-compressed GLB requires a compatible runtime Meshopt decoder. Never replace the live asset until native Remotion proof passes.'
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: production-optimized-glb-${{ github.run_id }}
+          path: out/production/optimized/
+          retention-days: 30
