@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "film": "carbon-ceramic-001-polish05-candidate.mp4",
+  "filmSha256": "2c9f75e96a60376d15e3efb938c5625142ecad82e635a2ffcb11b121ca37c0a9",
+  "immutableESource": "a8553b2c1af11d15eb0b8f6c96e0c3e53142f9aa",
+  "baseline": {
+    "file": "carbon-ceramic-001-polish04-candidate.mp4",
+    "sha256": "fad39a08e151913792da0c827b7c621f511b817b17e4cf4559fdcefa31ae7fbb"
+  },
+  "window": {
+    "startFrame": 600,
+    "endFrame": 749,
+    "frames": 150,
+    "framePairs": 149,
+    "proxyResolution": [
+      180,
+      320
+    ],
+    "measure": "mean absolute adjacent grayscale pixel difference",
+    "fps": 30
+  },
+  "polish04": {
+    "meanMAD": 0.25263,
+    "medianMAD": 0.23948,
+    "p95MAD": 0.38345,
+    "pairsWithMeanMADBelow0_15": 25,
+    "meanLumaBelow6Frames": 0
+  },
+  "polish05": {
+    "meanMAD": 0.25263,
+    "medianMAD": 0.23948,
+    "p95MAD": 0.38345,
+    "pairsWithMeanMADBelow0_15": 25,
+    "meanLumaBelow6Frames": 0
+  },
+  "filmSpecificEquality": {
+    "exactDecodedEqualFrames": [
+      531,
+      630,
+      650,
+      705,
+      749
+    ],
+    "nonEqualCorrectionFrames": [
+      99,
+      100,
+      107,
+      117,
+      132,
+      147,
+      148,
+      149,
+      150
+    ],
+    "note": "Values measured from independently downloaded complete decoded Polish04 and Polish05 H264 MP4s. Unchanged hero pixels prove no P05 regression in inspected frames."
+  },
+  "transitionLuma": {
+    "frame99": {
+      "oldFractionBelow16": 98.17,
+      "newFractionBelow16": 77.69
+    },
+    "frame100": {
+      "oldFractionBelow16": 96.85,
+      "newFractionBelow16": 81.24
+    },
+    "frame147": {
+      "oldFractionBelow16": 98.25,
+      "newFractionBelow16": 71.75
+    },
+    "frame148": {
+      "oldFractionBelow16": 99.56,
+      "newFractionBelow16": 71.26
+    }
+  },
+  "conclusion": "Polish05 corrected actual pad/transition shot, retained exactly previous 630–749 hero choreography. Motion proxy change 0%. Source-locked genuine full film. Creative QA still needed.",
+  "limitations": "Motion proxy is not artistic assessment. Near-black fraction includes intentional dark background and is only comparative, not proof of feature readability."
+}
