@@ -42,7 +42,22 @@ jobs:
           python -m pip install --disable-pip-version-check Pillow==11.3.0
           if ! command -v ffmpeg >/dev/null; then sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg; fi
           npm run check | tee out/carbon-ceramic-g/proof/typescript.log
-          node src/brakes001/integration/integration.test.cjs | tee out/carbon-ceramic-g/proof/integration-test.json
+          # P05's original integration test requires the ghost-car silhouette.
+          # Run every P05 physics/shot assertion against an ephemeral copy whose
+          # ONLY exception requires the exact opposite, per the user's request.
+          node - <<'JS'
+          const fs=require('fs');
+          const original='src/brakes001/integration/integration.test.cjs';
+          const tmp='src/brakes001/integration/integration.g-wheel-compat.tmp.cjs';
+          const before=fs.readFileSync(original,'utf8');
+          const needle='assert.match(film, /<GhostCarOutline /);';
+          if(!before.includes(needle))throw Error('Unexpected E original test source');
+          fs.writeFileSync(tmp,before.replace(needle,
+            'assert.doesNotMatch(film, /<GhostCarOutline /);'));
+          JS
+          node src/brakes001/integration/integration.g-wheel-compat.tmp.cjs |
+            tee out/carbon-ceramic-g/proof/integration-g-compat.json
+          rm -f src/brakes001/integration/integration.g-wheel-compat.tmp.cjs
           bash production/videos/carbon-ceramic-001/physics/run-tests.sh | tee out/carbon-ceramic-g/proof/physics.log
           python production/videos/carbon-ceramic-001/qa/check_graphics.py | tee out/carbon-ceramic-g/proof/graphics.log
           python production/videos/carbon-ceramic-001/wheel/test_wheel.py | tee out/carbon-ceramic-g/proof/clearance-and-source-isolation.txt
