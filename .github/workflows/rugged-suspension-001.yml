@@ -28,6 +28,7 @@ jobs:
           set -euo pipefail
           npm ci --no-audit --no-fund
           npm run check
+          python -m pip install -r production/requirements-qa.txt
           python -m unittest discover -s production/tests -v
           python production/tools/production_pipeline.py --project rugged-suspension-001 --output out/rugged/preflight
           node --experimental-strip-types production/tests/rugged_kinematics.mjs
