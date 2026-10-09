@@ -71,7 +71,15 @@ jobs:
             printf "file 'part-%s.mp4'\n" "$i" >> out/candidate/parts/concat.txt
           done
           ffmpeg -hide_banner -loglevel warning -y -f concat -safe 0 \
-            -i out/candidate/parts/concat.txt -c copy -movflags +faststart \
+            -i out/candidate/parts/concat.txt -c copy \
+            out/candidate/carbon-ceramic-001-joined-fullrange.mp4
+          # Native Remotion chunks report yuvj420p (full-range). Explicitly
+          # convert to compliant video-range yuv420p for final candidate delivery.
+          ffmpeg -hide_banner -loglevel warning -y \
+            -i out/candidate/carbon-ceramic-001-joined-fullrange.mp4 \
+            -map 0:v:0 -vf "scale=in_range=pc:out_range=tv,format=yuv420p" \
+            -c:v libx264 -preset faster -crf 18 -r 30 -frames:v 750 \
+            -pix_fmt yuv420p -color_range tv -an -movflags +faststart \
             out/candidate/carbon-ceramic-001-candidate.mp4
           python production/videos/carbon-ceramic-001/render/verify_media.py \
             out/candidate/carbon-ceramic-001-candidate.mp4 \
