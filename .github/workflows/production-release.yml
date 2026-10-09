@@ -50,8 +50,6 @@ jobs:
             --width 1080 --height 1920 --fps 30 --report out/release/validation.json
           find out/source -type f \( -name '*.png' -o -name '*.jpg' \) -exec cp {} out/release/ \;
           (cd out/release && sha256sum *.mp4 *.json > SHA256SUMS.txt)
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create explicit public release with permanent downloadable MP4
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
