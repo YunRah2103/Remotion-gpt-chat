@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "slug": "rugged-suspension-002",
+  "title": "Off-Road Suspension — Polish 02",
+  "fps": 30,
+  "durationSeconds": 20,
+  "durationInFrames": 600,
+  "resolution": [
+    1080,
+    1920
+  ],
+  "status": "existing-composition",
+  "sourceCompositionId": "RuggedSuspension002",
+  "mechanicalAssets": [
+    "native-blender-original-suv-glb",
+    "fourbar-double-wishbone",
+    "independent-tyre-contact",
+    "rock-and-rut-heightfield"
+  ],
+  "engineeringScope": "Original Blender static SUV asset plus Remotion/Three.js independent fixed-length four-bar linkage motion. Geometric wheel contact and damped sprung chassis, no multibody force-certified dynamics. No narration."
+}
