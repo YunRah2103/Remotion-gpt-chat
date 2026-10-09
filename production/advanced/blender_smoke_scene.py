@@ -5,6 +5,8 @@ bpy.ops.object.select_all(action="SELECT")
 bpy.ops.object.delete(use_global=False)
 bpy.ops.mesh.primitive_cylinder_add(vertices=48,radius=.70,depth=.11,location=(0,0,0))
 rotor=bpy.context.object;rotor.name="Rotor"
+bpy.ops.mesh.primitive_cylinder_add(vertices=96,radius=.708,depth=.112,location=(0,0,0))
+high=bpy.context.object;high.name="RotorHigh"
 bpy.ops.mesh.primitive_cube_add(size=1,location=(.88,.15,0))
 caliper=bpy.context.object;caliper.name="Caliper"
 caliper.scale=(.18,.27,.22)
