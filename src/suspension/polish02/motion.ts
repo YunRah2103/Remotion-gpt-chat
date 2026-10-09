@@ -10,7 +10,7 @@ export type Vec=[number,number,number];
 const DT=1/FPS;
 const PIVOT_X=.43,UPPER_Y=-.11,LOWER_Y=-.52;
 export const UPPER_ARM=.75,LOWER_ARM=.86,KNUCKLE=.52;
-export const ANGLE_MIN=-.95,ANGLE_MAX=.28;
+export const ANGLE_MIN=-1.19,ANGLE_MAX=.28;
 export const RIDE=1.17;
 export const upperChassis=(s:number,z:number):Vec=>[s*PIVOT_X,UPPER_Y,z];
 export const lowerChassis=(s:number,z:number):Vec=>[s*PIVOT_X,LOWER_Y,z];
