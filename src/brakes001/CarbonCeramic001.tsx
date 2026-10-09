@@ -56,7 +56,7 @@ export const CarbonCeramic001: React.FC = () => {
       <group scale={shot === 'thermal' ? 0.56 : shot === 'reveal' ? 0.86 : shot === 'hero' ? 0.86 : shot === 'benefits' ? 0.75 : 1}
         position={brakePosition}>
         <BrakeAssembly rotorAngleRad={state.rotorAngleRad}
-          padGapMetres={state.padGapMetres} heat01={motion.heat01}
+          padGapMetres={state.padGapMetres} heat01={0}
           showUpright/>
         {!context && <FrictionHeatMap frame={frame} rotorAngleRad={state.rotorAngleRad}/>}
       </group>
