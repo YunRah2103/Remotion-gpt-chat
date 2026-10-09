@@ -43,7 +43,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          sudo apt-get update -qq && sudo apt-get install -y -qq blender
+          sudo apt-get update -qq && sudo apt-get install -y -qq blender python3-numpy
           python -m pip install -r production/requirements-qa.txt
           blender -b -t 2 --python production/videos/rugged-suspension-002/build_blender_suv.py -- out/p02/vehicle
           python production/studio/studio.py inspect out/p02/vehicle/rugged-suv-body-002.glb out/p02/vehicle/inspection
