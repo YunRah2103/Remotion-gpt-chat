@@ -88,3 +88,9 @@ The production CI runs Python unit tests, TypeScript compile and two actual Remo
 A normal chat agent with this repository's GitHub connector can create a **JSON request file**, triggering `production-media-bridge.yml` on `main`. GitHub Actions then downloads authorized public HTTPS images/videos, creates video-frame samples, contact sheets, thumbnail JPEGs, attribution manifest and checksums, and uploads them as an artifact. Manual workflow dispatch is also supported.
 
 Read **[production/media-bridge/README.md](media-bridge/README.md)** for the exact schema, allowed sources, media-size limits, rights declarations and agent instructions. GitHub can store/download binaries but the GitHub text connector alone **cannot visually inspect them**. Generated references are not automatically inserted into a published film.
+
+## Engineering Studio (reference galleries, mechanical QA and optional AI agent roles)
+
+See **[production/studio/README.md](studio/README.md)** for the additional tools: self-contained Media Bridge reference gallery, FFmpeg scene-change reference extraction, real Blender six-angle/turntable model inspection, conditional narration transcription and SRT/VTT timestamps, kinematic telemetry diagnostics, candidate model catalogue entries and PR native before/after image reports. New workflows are `production-studio-model.yml`, `production-studio-media.yml`, `production-studio-voice.yml` and `production-pr-review.yml`. Some are manual opt-in and require existing artifacts; they do not run paid AI services or automatically publish reference content. Real engineering accuracy still needs independent expert/source review.
+
+Four specialised **GitHub Copilot custom agent profiles** live in `.github/agents/`; eligible Copilot access must be enabled before they can actually run as coding agents. Profiles do not spawn workers or consume credits just by existing in GitHub.
