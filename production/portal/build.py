@@ -70,6 +70,7 @@ def build(repo,site,data=None):
     root=Path(repo);target=Path(site)
     target.mkdir(parents=True,exist_ok=True)
     shutil.copytree(root/"production/portal/viewer",target/"viewer",dirs_exist_ok=True)
+    shutil.copytree(root/"production/portal/compare",target/"compare",dirs_exist_ok=True)
     model=projects(root)
     data=data if data is not None else snapshot(os.environ.get("GITHUB_TOKEN"))
     generated=dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
@@ -102,7 +103,7 @@ def build(repo,site,data=None):
     content=''.join(cards) or "<p>No registered project briefs found.</p>"
     page='''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>Automotive Engineering · Production Control</title><style>
 *{box-sizing:border-box}body{margin:0;background:#0c141e;color:#eff5f7;font:15px/1.55 system-ui}main{max-width:1130px;margin:auto;padding:40px 23px}h1{font-size:clamp(27px,5vw,49px);margin:0}h2{font-size:23px}h3{font-size:18px}p{color:#b8cad5}a{color:#b2e4fd;text-decoration:none}a:hover{text-decoration:underline}.hero{background:linear-gradient(135deg,#173445,#192331);padding:36px;border-radius:17px}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin:26px 0}.stat,article,section{border:1px solid #2e485c;background:#182635;border-radius:12px;padding:17px}.stat strong{display:block;font-size:30px}.projects{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:13px}section{margin:24px 0}li{padding:5px 0}nav{display:flex;gap:20px;flex-wrap:wrap;margin-top:17px}.warning{color:#f1cb89}
-</style></head><body><main><header class="hero"><div>GITHUB • ORIGINAL 3D ENGINEERING FILMS</div><h1>Production Control</h1><p>Snapshot generated '''+escape(generated)+'''. This page is not live monitoring; open each Actions run for the current result.</p><nav><a href="../">Video catalogue</a><a href="../viewer/">Interactive 3D Model Lab</a><a href="'''+GH+'''/actions">Live GitHub Actions ↗</a></nav></header>'''
+</style></head><body><main><header class="hero"><div>GITHUB • ORIGINAL 3D ENGINEERING FILMS</div><h1>Production Control</h1><p>Snapshot generated '''+escape(generated)+'''. This page is not live monitoring; open each Actions run for the current result.</p><nav><a href="../">Video catalogue</a><a href="../viewer/">Interactive 3D Model Lab</a><a href="../compare/">Shot Comparison Studio</a><a href="'''+GH+'''/actions">Live GitHub Actions ↗</a></nav></header>'''
     page+='<div class="stats"><div class="stat"><strong>'+str(len(model))+'</strong>Project briefs</div><div class="stat"><strong>'+str(sum(p["registered"] for p in model))+'</strong>Registered films</div><div class="stat"><strong>'+str(len(data.get("prs",[])))+'</strong>Open PRs (snapshot)</div></div>'
     if notice:page+='<p class="warning">'+ "; ".join(notice)+'</p>'
     page+='<section><h2>Projects</h2><div class="projects">'+content+'</div></section>'

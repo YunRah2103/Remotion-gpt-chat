@@ -1,0 +1,69 @@
+name: Advanced Studio - produce both 3D environment versions
+on:
+  workflow_dispatch:
+    inputs:
+      quality:
+        description: 36-frame low-resolution proof or full 750-frame native pair
+        type: choice
+        options: [proof,final]
+        required: true
+        default: proof
+permissions:
+  contents: read
+jobs:
+  two-versions:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [studio,circuit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          npm ci --no-audit --no-fund
+          npm run check
+      - name: Render same mechanical timeline in distinct physical environments and cameras
+        shell: bash
+        env:
+          VARIANT: ${{ matrix.variant }}
+          QUALITY: ${{ inputs.quality }}
+        run: |
+          set -euo pipefail
+          mkdir -p out/version
+          python - <<'PY'
+          import os,json
+          from pathlib import Path
+          Path('out/version/props.json').write_text(json.dumps({'variant':os.environ['VARIANT']}))
+          PY
+          OPTS=()
+          if [[ "$QUALITY" == proof ]]; then OPTS=('--frames=0-35' '--scale=0.4'); fi
+          npx remotion render src/index.ts EngineeringDualVersion \
+            "out/version/$VARIANT.mp4" --props=out/version/props.json \
+            --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2 "${OPTS[@]}"
+          ffmpeg -v error -xerror -i "out/version/$VARIANT.mp4" -f null -
+          python - <<'PY'
+          import os,json,subprocess
+          file='out/version/'+os.environ['VARIANT']+'.mp4'
+          x=json.loads(subprocess.run(['ffprobe','-v','error','-select_streams','v:0',
+            '-show_entries','stream=nb_frames,width,height,r_frame_rate','-of','json',file],
+            capture_output=True,text=True,check=True).stdout)['streams'][0]
+          n=36 if os.environ['QUALITY']=='proof' else 750
+          assert int(x['nb_frames'])==n
+          assert x['r_frame_rate']=='30/1'
+          if os.environ['QUALITY']=='final':assert (int(x['width']),int(x['height']))==(1080,1920)
+          print('TWO_VERSION_NATIVE_QA_PASS',os.environ['VARIANT'],n)
+          PY
+          (cd out/version && sha256sum *.mp4 > SHA256SUMS.txt)
+          echo "Source SHA ${{ github.sha }}; variant $VARIANT; proof/final mode $QUALITY" >> out/version/PROVENANCE.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-environment-${{ matrix.variant }}-${{ github.run_id }}
+          path: out/version/
+          retention-days: 30
+          if-no-files-found: error

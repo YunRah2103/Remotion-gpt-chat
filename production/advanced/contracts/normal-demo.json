@@ -1,0 +1,11 @@
+{
+  "objects": [
+    "Rotor"
+  ],
+  "size": 128,
+  "samples": 6,
+  "mode": "normal",
+  "highSources": {
+    "Rotor": "RotorHigh"
+  }
+}

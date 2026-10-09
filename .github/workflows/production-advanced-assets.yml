@@ -1,0 +1,84 @@
+name: Advanced Studio - Blender export, AO bake and clearance proof
+on:
+  workflow_dispatch:
+    inputs:
+      source_run:
+        required: true
+        type: string
+        description: Same-repository run containing an approved original .blend
+      source_artifact:
+        required: true
+        type: string
+        description: Exact .blend artifact name
+      contract:
+        required: true
+        type: string
+        default: production/advanced/contracts/rotor-demo.json
+      clearance_config:
+        required: false
+        type: string
+      bake_config:
+        required: false
+        type: string
+permissions:
+  contents: read
+  actions: read
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq blender ffmpeg python3-numpy
+          python -m pip install -r production/requirements-qa.txt
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ inputs.source_run }}
+          name: ${{ inputs.source_artifact }}
+          github-token: ${{ github.token }}
+          path: out/source
+      - name: Convert source scene without auto-running embedded scripts
+        shell: bash
+        env:
+          CONTRACT: ${{ inputs.contract }}
+          CLEARANCE: ${{ inputs.clearance_config }}
+          BAKE: ${{ inputs.bake_config }}
+        run: |
+          set -euo pipefail
+          [[ "$CONTRACT" =~ ^production/advanced/contracts/[a-z0-9-]+\.json$ ]] || exit 1
+          [[ -z "$CLEARANCE" || "$CLEARANCE" =~ ^production/advanced/contracts/[a-z0-9-]+\.json$ ]] || exit 1
+          [[ -z "$BAKE" || "$BAKE" =~ ^production/advanced/contracts/[a-z0-9-]+\.json$ ]] || exit 1
+          test -f "$CONTRACT"
+          mapfile -t FILES < <(find out/source -type f -name '*.blend')
+          test "${#FILES[@]}" -eq 1
+          test "$(stat -c%s "${FILES[0]}")" -le 83886080
+          python production/advanced/asset_contract.py "$CONTRACT"
+          blender -b --disable-autoexec "${FILES[0]}" -t 2 \
+            --python production/advanced/blender_export.py -- "$CONTRACT" out/assets
+          mapfile -t GLBS < <(find out/assets -maxdepth 1 -name '*.glb')
+          test "${#GLBS[@]}" -eq 1
+          python production/studio/studio.py inspect "${GLBS[0]}" out/assets/inspection
+          if [[ -n "$CLEARANCE" ]]; then
+            test -f "$CLEARANCE"
+            blender -b --disable-autoexec "${FILES[0]}" -t 2 \
+              --python production/advanced/blender_clearance.py -- "$CLEARANCE" out/assets/aabb.json
+            python production/advanced/clearance.py out/assets/aabb.json out/assets/clearance.json
+          fi
+          if [[ -n "$BAKE" ]]; then
+            test -f "$BAKE"
+            blender -b --disable-autoexec "${FILES[0]}" -t 2 \
+              --python production/advanced/blender_bake.py -- "$BAKE" out/assets/maps
+          fi
+          (cd out/assets && sha256sum *.glb > SHA256SUMS.txt)
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-blender-model-${{ github.run_id }}
+          path: out/assets/
+          retention-days: 30
+          if-no-files-found: warn

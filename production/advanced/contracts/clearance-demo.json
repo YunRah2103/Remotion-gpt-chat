@@ -1,0 +1,14 @@
+{
+  "objects": [
+    "Rotor",
+    "Caliper"
+  ],
+  "frames": [
+    1,
+    20,
+    40,
+    60
+  ],
+  "allowedContactPairs": [],
+  "tolerance": 0.001
+}

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "rotor-demo",
+  "units": "metres",
+  "source": "Original demonstration geometry only, not a production-certified vehicle",
+  "movingParts": [
+    {
+      "name": "Rotor",
+      "mode": "rotation",
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "start": 0,
+      "end": 6.28,
+      "frameStart": 0,
+      "frameEnd": 120
+    }
+  ]
+}
