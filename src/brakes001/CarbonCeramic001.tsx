@@ -9,10 +9,9 @@ import {ThreeCanvas} from '@remotion/three';
 import {AbsoluteFill, useCurrentFrame, useVideoConfig} from 'remotion';
 import {BrakeAssembly} from './hardware/BrakeAssembly';
 import {brakeStateAt} from './motion/brakeState';
-import {
-  BrakeLighting, GhostCarOutline,
-  GHOST_FRONT_BRAKE_ANCHOR, brakeShotAt, brakeCameraAt,
-} from './cinema';
+import {BrakeLighting,brakeShotAt,brakeCameraAt} from './cinema';
+import {WheelAssembly} from './wheel/WheelAssembly';
+import {WheelRevealCameraRig,wheelExplodeAt,wheelVisibleAt} from './wheel/WheelRevealCameraRig';
 import {PartLabels, TitleOverlays} from './graphics';
 import {integrationStateAt} from './integration/integrationState';
 import {IntegrationCameraRig} from './integration/IntegrationCameraRig';
@@ -36,12 +35,11 @@ const BrakeStage:React.FC<{frame:number;view:'normal'|'pad'}>=({frame,view})=>{
   const state=integrationStateAt(frame);
   const shot=brakeShotAt(frame);
   const pad=view==='pad';
-  const context=shot==='context'&&!pad;
-  const pos=GHOST_FRONT_BRAKE_ANCHOR;
+  // G correction: context is always an actual brake assembly, never ghost-car.
+  const opening=frame<120;
+  const context=false;
   const cameraPose=brakeCameraAt(frame);
-  const brakePosition:[number,number,number]=context?
-    [pos[0],pos[1],pos[2]]:
-    pad?[0,.13,0]:
+  const brakePosition:[number,number,number]=pad?[0,.13,0]:
     shot==='thermal'?
       [cameraPose.target[0],cameraPose.target[1],cameraPose.target[2]]:
       shot==='benefits'?[0,.012,.015]:
@@ -54,14 +52,16 @@ const BrakeStage:React.FC<{frame:number;view:'normal'|'pad'}>=({frame,view})=>{
     <ThreeCanvas width={width} height={height} shadows
       camera={{position:[1.3,.6,.9],fov:33,near:.012,far:75}}
       gl={{antialias:true,preserveDrawingBuffer:true}}>
-      <IntegrationCameraRig frame={frame} view={view}/>
+      {opening?<WheelRevealCameraRig frame={frame}/>:<IntegrationCameraRig frame={frame} view={view}/>}
       <BrakeLighting frame={frame} heat01={0} background ground={false}/>
       {!context&&<directionalLight position={[.65,.55,.95]} color="#c8deec" intensity={1.1}/>}
       {!context&&<pointLight position={[.35,.25,.45]} color="#f0c9a0" intensity={.36} distance={2} decay={2}/>}
-      {context&&<GhostCarOutline frame={frame}/>}
       <group scale={size} position={brakePosition}>
         <BrakeAssembly rotorAngleRad={state.rotorAngleRad}
           padGapMetres={state.padGapMetres} heat01={0} showUpright/>
+        {opening&&!pad&&wheelVisibleAt(frame)&&
+          <WheelAssembly angleRad={motion.rotorAngleRad}
+            axialCutawayMetres={wheelExplodeAt(frame)}/>}
         <InFilmPadCutaway frame={frame} active={pad}/>
         {!context&&<FrictionHeatMap frame={frame} rotorAngleRad={state.rotorAngleRad}/>}
       </group>
