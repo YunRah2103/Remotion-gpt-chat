@@ -1,0 +1,239 @@
+name: Production - automated preflight, 3D proofs and final master
+on:
+  workflow_dispatch:
+    inputs:
+      project:
+        description: Existing production/videos/<slug> with approved registered composition
+        type: string
+        required: true
+        default: turbo-001
+      mode:
+        description: proof uses real moving preview and stills; final uses parallel native render chunks
+        type: choice
+        required: true
+        options: [proof, final]
+        default: proof
+      words_file:
+        description: Optional reviewed word timestamps at production/videos/<slug>/approved-words.json
+        type: string
+        required: false
+      audio_run:
+        description: Optional approved narration artifact run ID; only for final mode
+        type: string
+        required: false
+      audio_artifact:
+        description: Optional exact narration audio artifact name
+        type: string
+        required: false
+permissions:
+  contents: read
+  actions: read
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    outputs:
+      frames: ${{ steps.inspect.outputs.frames }}
+      composition: ${{ steps.inspect.outputs.composition }}
+      fps: ${{ steps.inspect.outputs.fps }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate true registered composition, storyboard, captions and narration contract
+        id: inspect
+        shell: bash
+        env:
+          PROJECT: ${{ inputs.project }}
+          WORDS_FILE: ${{ inputs.words_file }}
+          AUDIO_RUN: ${{ inputs.audio_run }}
+          AUDIO_ARTIFACT: ${{ inputs.audio_artifact }}
+          MODE: ${{ inputs.mode }}
+        run: |
+          set -euo pipefail
+          [[ "$PROJECT" =~ ^[a-z][a-z0-9-]{1,63}$ ]] || exit 1
+          if [[ -n "$AUDIO_RUN" || -n "$AUDIO_ARTIFACT" ]]; then
+            [[ "$MODE" == final && "$AUDIO_RUN" =~ ^[0-9]+$ && -n "$AUDIO_ARTIFACT" && -n "$WORDS_FILE" ]] || exit 1
+          fi
+          if [[ -n "$WORDS_FILE" ]]; then
+            [[ "$WORDS_FILE" == "production/videos/$PROJECT/approved-words.json" ]] || exit 1
+            python production/tools/production_pipeline.py --project "$PROJECT" --captions "$WORDS_FILE" --output out/preflight
+          else
+            python production/tools/production_pipeline.py --project "$PROJECT" --output out/preflight
+          fi
+          echo "frames=$(python -c 'import json;print(json.load(open("out/preflight/preflight.json"))["frames"])')" >> "$GITHUB_OUTPUT"
+          echo "fps=$(python -c 'import json;print(json.load(open("out/preflight/preflight.json"))["fps"])')" >> "$GITHUB_OUTPUT"
+          echo "composition=$(python -c 'import json;print(json.load(open("out/preflight/preflight.json"))["renderCompositionId"])')" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: production-stage-${{ github.run_id }}
+          path: out/preflight/
+          retention-days: 7
+          if-no-files-found: error
+
+  proofs:
+    needs: preflight
+    if: inputs.mode == 'proof'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/download-artifact@v4
+        with:
+          name: production-stage-${{ github.run_id }}
+          path: out/preflight
+      - name: Render real native preview + four stills + decode
+        shell: bash
+        env:
+          COMP: ${{ needs.preflight.outputs.composition }}
+          N: ${{ needs.preflight.outputs.frames }}
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          npm run check
+          mkdir -p out/proofs
+          PROPS=()
+          if [[ "$COMP" == *Captioned ]]; then PROPS=("--props=out/preflight/props.json"); fi
+          for FACTOR in 0 25 55 85; do
+            F=$((N*FACTOR/100))
+            npx remotion still src/index.ts "$COMP" "out/proofs/frame-$F.png" --frame="$F" --gl=swangle --scale=0.5 "${PROPS[@]}"
+          done
+          END=$((N>60?59:N-1))
+          npx remotion render src/index.ts "$COMP" out/proofs/moving.mp4 --frames="0-$END" \
+            --scale=0.4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2 "${PROPS[@]}"
+          ffmpeg -v error -xerror -i out/proofs/moving.mp4 -f null -
+          cp out/preflight/preflight.json out/proofs/preflight.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: production-proof-${{ github.run_id }}
+          path: out/proofs/
+          retention-days: 21
+          if-no-files-found: error
+
+  native-chunks:
+    needs: preflight
+    if: inputs.mode == 'final'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [0, 1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/download-artifact@v4
+        with:
+          name: production-stage-${{ github.run_id }}
+          path: out/preflight
+      - name: Exact chunk from a single verified source commit
+        env:
+          N: ${{ needs.preflight.outputs.frames }}
+          COMP: ${{ needs.preflight.outputs.composition }}
+          PART: ${{ matrix.part }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          CHUNK=$(((N+4)/5))
+          START=$((PART*CHUNK))
+          END=$((START+CHUNK-1))
+          if ((END>=N)); then END=$((N-1)); fi
+          if ((START>N-1)); then echo 'Too few frames for five chunks' >&2; exit 1; fi
+          mkdir -p out/chunks
+          PROPS=()
+          if [[ "$COMP" == *Captioned ]]; then PROPS=("--props=out/preflight/props.json"); fi
+          npx remotion render src/index.ts "$COMP" "out/chunks/chunk-$PART.mp4" \
+            --frames="$START-$END" --gl=swangle --codec=h264 \
+            --pixel-format=yuv420p --concurrency=2 "${PROPS[@]}"
+          ffmpeg -v error -xerror -i "out/chunks/chunk-$PART.mp4" -f null -
+          ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames,r_frame_rate -of json \
+            "out/chunks/chunk-$PART.mp4" > "out/chunks/chunk-$PART.json"
+          python - "$START" "$END" "$PART" <<'PY'
+          import json,sys
+          start,end,part=map(int,sys.argv[1:])
+          s=json.load(open(f"out/chunks/chunk-{part}.json"))["streams"][0]
+          assert int(s["nb_frames"])==end-start+1
+          assert s["r_frame_rate"]=="30/1"
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: production-chunk-${{ github.run_id }}-${{ matrix.part }}
+          path: out/chunks/
+          retention-days: 14
+          if-no-files-found: error
+
+  final-master:
+    needs: [preflight, native-chunks]
+    if: inputs.mode == 'final'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: production-chunk-${{ github.run_id }}-*
+          merge-multiple: true
+          path: out/chunks
+      - uses: actions/download-artifact@v4
+        with:
+          name: production-stage-${{ github.run_id }}
+          path: out/preflight
+      - uses: actions/download-artifact@v4
+        if: inputs.audio_run != '' && inputs.audio_artifact != ''
+        with:
+          name: ${{ inputs.audio_artifact }}
+          run-id: ${{ inputs.audio_run }}
+          github-token: ${{ github.token }}
+          path: out/narration
+      - name: Stitch exactly five rendered chunks, optionally mux approved narration, fully validate MP4
+        env:
+          EXPECTED: ${{ needs.preflight.outputs.frames }}
+          FPS: ${{ needs.preflight.outputs.fps }}
+          PROJECT: ${{ inputs.project }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          mkdir -p out/final
+          python - <<'PY'
+          from pathlib import Path
+          folder=Path('out/chunks')
+          paths=[folder/f'chunk-{i}.mp4' for i in range(5)]
+          assert all(p.is_file() for p in paths), paths
+          (folder/'concat.txt').write_text(''.join("file '"+p.name+"'\n" for p in paths))
+          PY
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i out/chunks/concat.txt \
+            -an -c:v copy out/final/film-visual.mp4
+          if [ -d out/narration ]; then
+            mapfile -t AUDIO < <(find out/narration -type f \( -iname '*.m4a' -o -iname '*.wav' -o -iname '*.mp3' \))
+            test "${#AUDIO[@]}" -eq 1
+            test "$(stat -c%s "${AUDIO[0]}")" -le 52428800
+            DURATION=$(python -c 'import os;print(int(os.environ["EXPECTED"])/int(os.environ["FPS"]))')
+            ffmpeg -hide_banner -loglevel error -y -i out/final/film-visual.mp4 -i "${AUDIO[0]}" \
+              -map 0:v:0 -map 1:a:0 -c:v copy -c:a aac -ar 48000 -af apad \
+              -t "$DURATION" -movflags +faststart out/final/film.mp4
+          else
+            cp out/final/film-visual.mp4 out/final/film.mp4
+          fi
+          python production/tools/quality.py video out/final/film.mp4 --width 1080 --height 1920 \
+            --fps "$FPS" --frames "$EXPECTED" --report out/final/validation.json
+          (cd out/final && sha256sum film.mp4 > SHA256SUMS.txt)
+          cp out/preflight/preflight.json out/final/preflight.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: production-approved-candidate-${{ github.run_id }}
+          path: |
+            out/final/film.mp4
+            out/final/validation.json
+            out/final/SHA256SUMS.txt
+            out/final/preflight.json
+          retention-days: 30
+          if-no-files-found: error

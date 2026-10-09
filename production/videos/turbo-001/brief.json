@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "slug": "turbo-001",
+  "title": "The Hidden Power of a Turbocharger",
+  "fps": 30,
+  "durationSeconds": 28,
+  "durationInFrames": 840,
+  "resolution": [
+    1080,
+    1920
+  ],
+  "status": "existing-composition",
+  "sourceCompositionId": "TurboDocumentary",
+  "narrationPath": "voiceover.txt",
+  "mechanicalAssets": [
+    "turbo-turbine",
+    "intercooler"
+  ]
+}

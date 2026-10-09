@@ -1,0 +1,32 @@
+[
+  {
+    "startFrame": 0,
+    "endFrame": 149,
+    "visual": "Driving introduction",
+    "narrationCue": ""
+  },
+  {
+    "startFrame": 150,
+    "endFrame": 299,
+    "visual": "Exhaust turbine",
+    "narrationCue": ""
+  },
+  {
+    "startFrame": 300,
+    "endFrame": 449,
+    "visual": "Shared shaft and compressor",
+    "narrationCue": ""
+  },
+  {
+    "startFrame": 450,
+    "endFrame": 629,
+    "visual": "Intercooler and engine airflow",
+    "narrationCue": ""
+  },
+  {
+    "startFrame": 630,
+    "endFrame": 839,
+    "visual": "Moving car payoff",
+    "narrationCue": ""
+  }
+]

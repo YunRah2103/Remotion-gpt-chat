@@ -22,3 +22,7 @@ The isolated CI smoke-test tools (Blender, Godot 4, Manim Community, OpenSCAD, P
 Read `production/README.md` and `production/AGENTS.md` before starting a new engineering explainer. Use the existing `src/mechanics/parts.tsx` for illustrative reusable brake/wheel/sensor/spring/gears before designing new assets. Use `production/tools/scaffold.py` for a new lesson brief and voiceover placeholder. New compositions must be registered explicitly; scaffolding is not a completed video.
 
 Use the `production-render.yml` preview/stills workflow first and do actual moving-frame visual inspection. Only promote an independently reviewed, decoded full-resolution MP4 to `production-release.yml`. Pages gallery is optional and requires Pages configured under Settings. Never silently optimise/replace animation-critical GLB meshes; `production/tools/gltf_guard.py` enforces the canonical GPU anchors. Never replace approved narration with invented audio.
+
+## Production pipeline, agent specialisms and captions
+
+For standalone automotive engineering explainer work, read `production/PIPELINE.md`, use `.github/skills/` as appropriate, verify cross-agent work with `production/tools/handoff.py`, and run `production/tools/production_pipeline.py` to ensure a real registered composition and contiguous storyboard exist before rendering. `GpuDriveFilmCaptioned` and `TurboDocumentaryCaptioned` add optional word-timed overlays while preserving originals. ABS-001 remains preproduction. Never access `yunus-video-lab` or YUNEX sources.

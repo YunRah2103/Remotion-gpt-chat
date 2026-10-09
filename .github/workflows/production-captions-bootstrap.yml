@@ -1,0 +1,38 @@
+name: Production - resolve pinned caption dependency lockfile
+on:
+  push:
+    branches:
+      - feature/production-pipeline-qa-agents-benchmarks-20261009
+    paths:
+      - package.json
+      - .github/workflows/production-captions-bootstrap.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  lockfile:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve exact Remotion captions dependency graph
+        run: |
+          set -euo pipefail
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          npm ci --ignore-scripts --no-audit --no-fund
+      - name: Commit updated lockfile only on feature branch
+        if: github.ref == 'refs/heads/feature/production-pipeline-qa-agents-benchmarks-20261009'
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package-lock.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Pin Remotion captions exact dependency tree'
+            git push origin HEAD:feature/production-pipeline-qa-agents-benchmarks-20261009
+          fi
