@@ -35,3 +35,8 @@ All ten A-owned Polish 02 blobs in E were compared by Git SHA with Agent A HEAD 
 - E E-only `FrictionHeatMap.tsx` visualizes B's normalized heat as pressure-following annulus sectors; supplies zero heat to A's global material tint and C's uniform amber light (purely photographic change, physics intact).
 - E E-only `BrakePadMacroProof.tsx` replays original B film frames85–145, shows exact A pad gap and explicitly labelled caliper-hidden cutaway. Real geometric movement stays 2.35mm or less; do not pretend frames135–195 are a clamping-onset sequence.
 - Latest provenance table and this addendum agree on A03 source and give the correct final film-code SHA.
+
+## Final Polish04 in-film source lock
+- **Film-code SHA:** `b53c264017a6e3f10f3cae0326b0ae9257e80966` (after JSX syntax correction and second side-profile pad revision); this is the exact source of native proof [37982072331](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982072331).
+- E owns `src/brakes001/integration/InFilmPadCutaway.tsx` and modifications in `CarbonCeramic001.tsx` / `IntegrationCameraRig.tsx`. A/B/C/D components and their original blobs remain unchanged. Frame100–147 real A two-pad mesh motion continues to use E's pressure-to-.0025m gap adapter; no new braking physics. Final hero uses continuous camera orbit while B rotor is stopped.
+- P04 proof tooling: `.github/workflows/carbon-ceramic-001-e-polish04.yml`; workflow-only changes and later documentation commits must not be mistaken for film-code SHAs. Native artifacts: [pad](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982072331/artifacts/11641465753), [hero+stills](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982072331/artifacts/11641735972).

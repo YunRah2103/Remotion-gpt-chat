@@ -1,29 +1,27 @@
-# Agent E — Carbon-Ceramic Brakes 001 / Polish03 handoff
+# Agent E — Final Polish04 handoff · REVIEW (for D + Master)
 
-**Status: REVIEW (not full-film release approved).** **Exact film code SHA:** `37e04ee309dc9f96e63ad1b4eda28f25fea3a96a`. **A03 READY hardware lookdev import commit:** `c50056eeb86691b1d67dace94be4c2b2cefd231f`, based on A implementation `f22ba2e5b2498baa52d0a22121a2f05153d894a9` (A branch `e619a94cde5c525bdd9f6dfc6ed5604d4ff39252`). **PR:** https://github.com/YunRah2103/Remotion-gpt-chat/pull/15 (draft).
+**Exact P04 film-code SHA:** `b53c264017a6e3f10f3cae0326b0ae9257e80966`  
+**Repository/branch:** `YunRah2103/Remotion-gpt-chat` / `automotive-brakes-001/e-integration`  
+**PR:** https://github.com/YunRah2103/Remotion-gpt-chat/pull/15 (draft)
 
-## Delivered and genuinely verified
+Both requested final corrections are **implemented and genuinely native-rendered** inside existing `CarbonCeramic001` at 750 frames / 30fps / 1080×1920. Agent A–D modules and approved assets are untouched. **No full 25-second release MP4 was rendered by E.**
 
-- **Actual 25-second timeline source:** `CarbonCeramic001`, 750 frames at 1080×1920 and 30fps, with A–D specialist files preserved, E full benefits-shot camera correction and E localized rotating annulus heat; no 750-frame MP4 was rendered by E.
-- **[Native five-film stills/contact and standard moving clips](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976988034/artifacts/11639302827):** 48,168,321,531,705 at 540×960; 135–195 and 300–360 real Remotion/Three.js H264 clips 61 frames each at 378×672, 30fps. Source-locked jobs both PASS.
-- **[Full-res measured opposing-pad movement](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976988178/artifacts/11638383796):** genuine 1080×1920 H264 61 frames, replays A hardware/B physical state from film85–145 (first pressure clamp), **2.35mm** per-face max travel, initially fixed caliper visible, then explicitly labelled caliper-hidden cutaway. Complete FFmpeg decode PASS. Standard 135–195 clip is *after* first clamping, not a demonstration of onset.
-- **[Shot 450–629 and heat native sweep](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976988178/artifacts/11638918513):** 11 benefits frames incl. 480/531/600, 12 thermal frames from cold to recovery, real 41-frame benefits motion 510–550. Frame531 cropped caliper FIXED in directly viewed native comparison; entire new caliper/rotor visible. All MP4 decodes PASS.
-- **[A03 material corrected .blend/.glb and four real Cycles close-ups](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37976686710/artifacts/11638453325):** native Blender lookdev visually reviewed, 148 nodes, 140 meshes, nine materials, no mechanical/Three.js changes. A source `f22ba2e5b2498baa52d0a22121a2f05153d894a9` READY. E imported its changed A Blender-only source blob-identically, preserving moving-film SHA.
+## 1. Closing hero
 
-## Passed tests
+Native [120-frame 1080×1920 H.264 proof](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982072331/artifacts/11641735972) covering film **630–749**; FFprobe H.264 30/1fps, 120 frames, 4.000s and full FFmpeg decode PASS. SHA256 `83678c720643137e166047d5cfd202881ad087779b1f016b266ccad7f317f543`. E camera moves a real ~36° in three dimensions and reveals continuous changing caliper/hub/disc perspective while preserving B's stopped rotor. Source-matched full-res stills at 650,705,749 show no hardware frame-edge clipping. Against prior D-inspected F [full candidate](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37978273707/artifacts/11639835454), same 144×256 grayscale per-frame method across 630–749 changes **0.2562→0.4250 average** (+66%) with **73.3%→0%** below delta 0.25.
 
-`npm ci`, `npm run check`, real executable 750-frame E integration, B 5/5 motion, C camera plan, D 750-frame graphics/1216 JSX cue instances, A native GLB structure, Python production 39/39, setup/handoff validations. Four MP4s independently checked with FFprobe and complete FFmpeg decode (61/61 main clamp; 61/61 thermal; 61/61 full-res macro; 41/41 benefits). All clips silent by design (release voiceover belongs to F).
+## 2. In-film real opposing clamp
 
-## Open approval gates
+Native [65-frame 1080×1920 H.264 proof](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982072331/artifacts/11641465753) covering film **94–158** includes full first pressure onset and actual integrated cutaway **100–147**. Full 65-frame FFmpeg decode and FFprobe PASS, 2.166667s at 30fps. SHA256 `c29cbc95e74b2aac08454e2d4b1bc096d851138691df1e8f77f957a4cea78864`. Caliper is visible initially, then explicitly disclosed as **hidden for the demonstration**. Side-profile camera shows actual opposing A-model pads flanking the ventilated rotor. E displays real B-pressure-driven travel: maximum **2.35 mm per side**, at least **0.15 mm safe friction-face clearance**, caliper never rotates, rotor retains B angle/speed. Actual movement remains visually subtle as physically appropriate; annotation enhances understanding without false mesh travel. Clean 99/100 and 147/148 brief editorial dips. Before prior film was a small ghost car into 120+ reveal without an in-film pad clamp; now frames 105/115/135 demonstrate clamp and rejoin reveal.
 
-- **D independent Polish03 integrated-film QA and Master artistic/source approval PENDING**. E status stays REVIEW.
-- Real 2.35mm pad stroke is mathematically and visually represented at actual geometry scale, but hard to resolve from geometry alone; high-res labelled readout aids comprehension. D to decide if education target is met.
-- Heat is explicitly uncalibrated false colour, and sector borders can be slightly noticeable at high zoom.
-- Intro ghost (48) faint, hero callout (705) weak/position less precise; no fake leader line added. D must judge if further polish required.
-- **NO final 25-second 750-frame release H264 was rendered.** Agent F works only after Master approves.
+## 3. Eight full-resolution stills, transition and tests
 
-See [full Agent E native QA report](https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-brakes-001/e-integration/src/brakes001/integration/QA_REPORT.md) for real proof filenames, source hashes, and every independent visual observation.
+[Same hero artifact](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982072331/artifacts/11641735972) contains native 1080×1920 PNGs **48,115,168,321,531,650,705,749**, `contact-sheet.jpg`, plus sampled transitions 94,99,100,106,116,125,140,147,148,158,620,629,630,675,729 and `transition-contact.jpg`. Sources are original Remotion/Three.js components, not synthetic stand-ins.
 
-### Direct instruction to Agent D
+[Workflow 37982072331](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982072331) **both jobs SUCCESS**. `npm ci` and `npm run check` PASS; dedicated `node src/brakes001/integration/integration.test.cjs` PASSES 750 frame states, mechanical bounds and shot contracts; Agent B physics **5/5**, D graphics layout PASS, production Python **39 tests (2 skipped)**. Both video H.264 streams decoded fully and independently with local FFmpeg and FFprobe.
 
-Watch artifact 11639302827 standard clips, 11638383796 1080 pad-onset cutaway, 11638918513 benefits moving and heat sweeps, then compare A03 four native Blender stills. Report independent verdict and grounded failing frames. Do not call 135–195 first-clamp motion or the full 25-second film approved. Master accepts/rejects exact E source `37e04ee309dc9f96e63ad1b4eda28f25fea3a96a`; F renders final.
+## 4. What is still open
+
+**REVIEW for approval, not READY for final public release.** Major previous hero stillness and absent in-film clamp explanation are addressed with actual proof. Minor limitations: realistic pad travel is extremely small visually, original ghost-context intro remains thin, some D callouts are faint/imperfect, and the final orbit keeps substantial dark negative space. A Polish03 Blender hardware lookdev has already passed separately, but native film uses the procedural Three.js asset rather than Blender-lit studio renders.
+
+**Next:** Agent D independently review new full-res motion and 8+15 native stills; Master approve exact film-code SHA `b53c264017a6e3f10f3cae0326b0ae9257e80966`; then **Agent F alone** render the definitive full 750-frame 25-second film and independently verify full video/VO/audio. Existing D rating **5.8/10** belongs to an older pre-P04 F candidate; do not transfer that score to this unrendered complete P04 source.

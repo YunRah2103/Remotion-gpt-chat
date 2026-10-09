@@ -1,3 +1,24 @@
+# Agent E Polish04 — SOURCE-LOCKED NATIVE QA (2026-10-09)
+
+**Film implementation SHA `b53c264017a6e3f10f3cae0326b0ae9257e80966`**. PR #15. Workflow [37982072331](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982072331) **success (both jobs)**. This report supersedes the P03 report for the two corrected segments. Other earlier proof remains historical.
+
+## Actual proofs and machine QA
+
+- **Full-res hero** [artifact 11641735972](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982072331/artifacts/11641735972): genuine `CarbonCeramic001` frames630–749, 120 frames, 30fps, 1080×1920 H264, 4.000000s, yuvj420p preview, FFprobe PASS and independent full FFmpeg decode PASS; SHA256 `83678c720643137e166047d5cfd202881ad087779b1f016b266ccad7f317f543`.
+- **Full-res in-film pad** [artifact 11641465753](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37982072331/artifacts/11641465753): genuine `CarbonCeramic001` frames94–158, 65 frames, 30fps, 1080×1920 H264, 2.166667s, yuvj420p preview, FFprobe PASS and independent full FFmpeg decode PASS; SHA256 `c29cbc95e74b2aac08454e2d4b1bc096d851138691df1e8f77f957a4cea78864`.
+- 8 exact PNGs at full 1080×1920: 48/115/168/321/531/650/705/749 and contact-sheet.jpg. Additional 15 transition frame samples 94/99/100/106/116/125/140/147/148/158/620/629/630/675/729 and transition-contact.jpg. Physical caliper and disc fully inside frame at hero 650/705/749, title safe zones. Video frames inspect across entire 120-frame orbit and 65-frame pad segment, not static animation mockups.
+- **Native tests** run 37982072331: npm ci PASS; TypeScript PASS; E integration 750 states PASS, A rig/rotor axis and E physical gap .15–2.50mm, caliper static and no pad face penetration; B physics 5/5 PASS; D 750-frame graphics layout PASS; Python unittest **39 executed with two skips**, rest PASS. Source CLI/test report logs in pad artifact.
+- **Quantified hero motion**: from original [D-inspected full candidate (F artifact 11639835454)](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/37978273707/artifacts/11639835454) at 144×256 grayscale consecutive-frame metric, 630–749 old 0.2562 avg pixel difference (73.3% consecutive pairs under .25); new hero 0.4250 (+66%, 0% below .25), native FFmpeg decoded 120 frames. There is genuine lateral parallax, not a fake rotor spin. Full-res inspection still shows a dark minimalist background, but important hardware is not cropped.
+- **In-film pad visual**: at frame105 true A caliper is visible, frame112→135 caliper hidden by E's clearly stated cutaway and true individual inner/outer pads are seen on both sides of edge-on ventilated rotor. Annotation follows actual B braking pressure and displays 2.35mm maximum individual travel with minimum .15mm safe clearance. Pixel displacement is inherently tiny. Frames99/100 and147/148 intentional short dark editorial cuts, then full assembly reveal resumes. No A–D source or motion altered.
+
+## Release gate
+
+**REVIEW pending Agent D and Master independent approval** of these exact clips and transition stills. Prior D 5.8/10 rating applies exclusively to source 5b378..., not this P04 film. No final 750-frame output, audio, new full-film rating or release-approved delivery claimed. Master should approve SHA `b53c264017a6e3f10f3cae0326b0ae9257e80966` only after actual P04 review; Agent F owns final 25-second 1080×1920 30fps H264 release with full decoding and phone-safe review.
+
+---
+
+## Historical QA notes (superseded where P04 conflicts)
+
 # Carbon-Ceramic Brakes 001 — Agent E Polish 03 Native Integration QA
 
 **Gate: REVIEW (not Master-approved).** Exact film code SHA: `37e04ee309dc9f96e63ad1b4eda28f25fea3a96a`; A's newly READY Blender lookdev imported on E in `c50056eeb86691b1d67dace94be4c2b2cefd231f` from A source `f22ba2e5b2498baa52d0a22121a2f05153d894a9`, without changing the film's A-owned `BrakeAssembly.tsx` blob. E branch PR [#15](https://github.com/YunRah2103/Remotion-gpt-chat/pull/15) remains draft. This review only covers source-locked proof sequences, **not** any final 25-second release.
