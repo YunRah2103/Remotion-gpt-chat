@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "status": "blocked",
+  "car": "BMW M5 G90 sedan/saloon only",
+  "expectedCount": 39,
+  "frames": 600,
+  "shots": [],
+  "sourceLicenses": [],
+  "footageHandoff": "Agent A must provide verified 39-slot footage manifest, licensing and binary clips before status can be set to ready."
+}
