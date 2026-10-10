@@ -51,6 +51,18 @@ class MidnightV12ContractTests(unittest.TestCase):
         self.assertTrue(all(0 <= t <= d["durationSeconds"] for t in d["musicalLandmarksSeconds"]))
         self.assertEqual(sorted(d["musicalLandmarksSeconds"]), d["musicalLandmarksSeconds"])
 
+    def test_exotic_aggressive_director_override_is_locked(self) -> None:
+        d = self.data
+        self.assertIn("aggressive", d["creativeDirective"].lower())
+        self.assertIn("exotic", d["creativeDirective"].lower())
+        self.assertFalse(d["heroVehicle"]["mandatoryNight"])
+        self.assertFalse(d["heroVehicle"]["mandatoryV12"])
+        self.assertGreaterEqual(len(d["heroVehicle"]["candidates"]), 5)
+        self.assertIn("f77", d["editPhilosophy"])
+        self.assertNotIn("slow industrial", d["editPhilosophy"].lower())
+        self.assertTrue(all(s.get("visual") and s.get("movement") and s.get("cut")
+                            for s in d["shots"]))
+
     def test_private_audio_integrity_fingerprint(self) -> None:
         a = self.data["audio"]
         self.assertRegex(a["sha256"], r"^[0-9a-f]{64}$")
