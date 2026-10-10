@@ -1,0 +1,75 @@
+name: Porsche D - independent native QA of three real Agent A excerpts
+on:
+  push:
+    branches: [automotive-edits/porsche-911-turbo-evolution-001/d-master]
+    paths: ['.github/workflows/porsche-d-three-excerpt-review.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  native-4k-excerpt-source-integrity:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download Agent A's real 930 excerpt artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Porsche-Agent-A-real-Turbo-excerpt-38059580603
+          run-id: 38059580603
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/a-excerpts/930
+      - name: Download Agent A's real 992 excerpt artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Porsche-Agent-A-real-Turbo-excerpt-38059700708
+          run-id: 38059700708
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/a-excerpts/992
+      - name: Download Agent A's real B-roll excerpt artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Porsche-Agent-A-real-Turbo-excerpt-38059812967
+          run-id: 38059812967
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/a-excerpts/broll
+      - name: Install native FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Independently verify actual untranscoded video bytes and decode all excerpts
+        run: |
+          set -euo pipefail
+          python production/videos/porsche-911-turbo-evolution-001/integration/verify_official_excerpts.py \
+            --excerpt-root out/a-excerpts/930 \
+            --excerpt-root out/a-excerpts/992 \
+            --excerpt-root out/a-excerpts/broll \
+            --report-output out/porsche-d-review/three-native-excerpts-proof.json
+          python - <<'PY'
+          from pathlib import Path
+          import json,os
+          data=json.loads(Path('out/porsche-d-review/three-native-excerpts-proof.json').read_text())
+          assert data['verifiedNativeExcerptCount']==3
+          assert data['verifiedUniqueTurboDrivingShots']==0
+          ids={s['sourceVideoId'] for s in data['sourceExcerpts']}
+          assert ids=={'286726','286727','286687'}
+          checksums={
+              '286726':'c8bdf3c8675644bbf2764588c8a63741c6e6f5d31c0e8fa5437e88928f3e9436',
+              '286727':'88f021459292782c721d928095bad69f3ecf72a5690fe02637e552fdcf6f7b27',
+              '286687':'74791d83b6ac0c985cb842c9c1d8e6de3faac62639bd2e40c0af24922e8be9ab'}
+          for source in data['sourceExcerpts']:
+              assert source['excerptSha256']==checksums[source['sourceVideoId']]
+              assert source['probe']['width']==3840 and source['probe']['height']==2160
+              assert source['recheckedIndependentDecode']=='PASS'
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as summary:
+              summary.write('Independently re-hashed and decoded **three real native 4K Porsche excerpts** (930, 992, B-roll). 0/30 visually accepted camera-setup slots; film remains blocked.\n')
+          print('THREE_OFFICIAL_EXCERPTS_REAL_BINARY_NATIVE_QA_PASS')
+          PY
+      - name: Upload verification record only (not original third-party footage)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Porsche-D-native-excerpt-QA-${{ github.run_id }}
+          path: out/porsche-d-review/three-native-excerpts-proof.json
+          retention-days: 7
+          if-no-files-found: error
