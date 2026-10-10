@@ -30,6 +30,24 @@ class FXToolkitTests(unittest.TestCase):
                 self.assertEqual(len(x),3)
                 self.assertTrue(all(0<=v<=1 for v in x))
                 self.assertTrue(all(math.isfinite(v) for v in x))
+    def test_optional_grade_strength_is_neutral_reproducible_and_bounded(self):
+        source=(.28,.54,.84)
+        for preset in PRESETS.values():
+            self.assertEqual(grade(source,preset,0.0),list(source))
+            full=grade(source,preset,1.0)
+            half=grade(source,preset,.5)
+            for i in range(3):
+                self.assertAlmostEqual(half[i],(source[i]+full[i])/2,places=9)
+        for value in (float('nan'),float('inf'),-0.01,1.01):
+            with self.assertRaises(ValueError):
+                grade(source,next(iter(PRESETS.values())),value)
+            with tempfile.TemporaryDirectory() as folder:
+                with self.assertRaises(ValueError):
+                    generate(folder,17,value)
+        with tempfile.TemporaryDirectory() as folder:
+            weak=generate(folder,17,.5)
+            self.assertEqual(weak['strength'],.5)
+            self.assertNotEqual(weak['presets'][0]['sha256'],generate(folder,17,1.0)['presets'][0]['sha256'])
     def test_speed_ramps_produce_contiguous_filter(self):
         parts=json.loads((FX/"plans/sample-ramp.json").read_text())["segments"]
         self.assertAlmostEqual(validate(parts),1.8,places=4)

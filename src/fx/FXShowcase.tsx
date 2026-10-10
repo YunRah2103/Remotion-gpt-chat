@@ -15,13 +15,14 @@ const colours=[
 ] as const;
 const looks:GradePreset[]=['archive','warm-vintage','titanium','night','natural'];
 const cuts:Cut[]=[{frame:0,style:'cut'},{frame:17,style:'whip-left'},{frame:35,style:'punch'}];
+const newCuts:Cut[]=[{frame:0,style:'cut'},{frame:17,style:'zoom-through'},{frame:35,style:'light-leak'}];
 /** Original abstract technical visual; this demonstrates FX renderability, NOT real Porsche footage. */
 const Exhibit:React.FC<{index:number}> = ({index})=>{
   const frame=useCurrentFrame();
   const color=colours[index],progress=interpolate(frame,[0,52],[0,1],{extrapolateLeft:'clamp',extrapolateRight:'clamp'});
   const dx=progress*160;
   return <Grade preset={looks[index]}>
-    <BeatFxTransform cuts={cuts} duration={52} strength={.58}>
+    <BeatFxTransform cuts={index===4?newCuts:cuts} duration={52} strength={.58}>
       <AbsoluteFill style={{background:`linear-gradient(130deg,${color[0]} 20%,#03070d 88%)`,overflow:'hidden'}}>
         <div style={{position:'absolute',top:390,left:-130,width:1350,height:900,
           border:'1px solid rgba(255,255,255,.07)',borderRadius:180,
