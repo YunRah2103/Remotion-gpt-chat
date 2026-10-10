@@ -1,0 +1,35 @@
+name: M5 Agent A actual source acquisition
+on:
+  push:
+    branches: ['automotive-edits/bmw-m5-evolution-001/a-footage']
+    paths:
+      - '.github/workflows/bmw-m5-agent-a-source.yml'
+      - 'production/videos/bmw-m5-evolution-001/footage/cloud_acquire.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  download-real-sources:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prepare native FFmpeg, Pillow and public-video downloader
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check 'Pillow>=11,<13' yt-dlp
+      - name: Fetch actual source video, source SHA, FFprobe, sampled contact sheets
+        run: python production/videos/bmw-m5-evolution-001/footage/cloud_acquire.py
+      - name: Deliver private-review acquisition evidence as ephemeral artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: M5-A-SOURCES-${{ github.run_id }}
+          path: out/m5-agent-a/
+          retention-days: 5
+          compression-level: 0
+          if-no-files-found: warn
