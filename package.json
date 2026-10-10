@@ -15,7 +15,9 @@
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "@react-three/fiber": "9.3.0",
-    "three": "0.179.1"
+    "three": "0.179.1",
+    "@remotion/transitions": "4.0.533",
+    "@remotion/motion-blur": "4.0.533"
   },
   "devDependencies": {
     "@types/react": "19.1.13",
