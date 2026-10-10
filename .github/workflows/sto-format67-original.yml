@@ -1,0 +1,47 @@
+name: STO V10 Agent A - original night driving film
+on:
+  push:
+    branches: [automotive-edits/huracan-sto-v10-001/a-footage]
+    paths:
+      - production/videos/huracan-sto-v10-001/footage/acquire_format67.py
+      - .github/workflows/sto-format67-original.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install real codec and preview QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          pip install Pillow
+          python -m py_compile production/videos/huracan-sto-v10-001/footage/acquire_format67.py
+      - name: Acquire real directly published director film masters
+        run: python production/videos/huracan-sto-v10-001/footage/acquire_format67.py
+      - name: Print source resolution evidence
+        if: always()
+        run: |
+          python - <<'PY'
+          import pathlib,json
+          p=pathlib.Path('out/sto-format67/manifest.json')
+          if p.exists():
+           for r in json.loads(p.read_text()):
+            print(r['id'],r['gate'],r.get('ffprobe',{}))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STO-FORMAT67-FULL-ORIGINAL-FILMS
+          path: |
+            out/STO_FORMAT67_NIGHT_FILM_MASTERS.zip
+            out/sto-format67/manifest.json
+          if-no-files-found: warn
+          retention-days: 5
+          compression-level: 0
