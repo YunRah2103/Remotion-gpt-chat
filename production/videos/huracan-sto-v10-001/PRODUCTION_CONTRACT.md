@@ -1,5 +1,7 @@
 # HURACÁN STO V10 — Production contract (10 October 2026)
 
+> **SUPERSEDING USER FORMAT OVERRIDE — 10 October 2026:** All outputs for this Huracán STO edit are now **1920×1080 landscape (16:9), 30 fps, exactly 316 frames**. The original portrait 1080×1920 references below are historical and must NOT be used by Agents B/C/D. The real-source landscape timeline is `shot-map-landscape.json`, composition `HuracanSTOLandscapeCandidate`, with audio handled by C. The candidate does not satisfy the distinct moving-angle gate; do not call it final approved footage.
+
 ## Mission
 Recreate the kinetic rhythm and mechanical-to-driving reveal of the user's supplied 16.207-second Lexus LFA reference, using a **Lamborghini Huracán STO** and the supplied 10.553-second MP3. Do not reproduce the source video's branding, overlays, shots, or engine audio. New film, same high-level structure. Extreme and cinematic, not cheap.
 
