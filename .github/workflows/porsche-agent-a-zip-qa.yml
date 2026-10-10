@@ -1,0 +1,42 @@
+name: Porsche Agent A - single ZIP strict QA
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-zip-qa.yml'
+      - 'production/videos/porsche-911-turbo-evolution-001/footage/build_all_30_zip.py'
+      - 'production/videos/porsche-911-turbo-evolution-001/footage/test_build_all_30_zip.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-no-incomplete-package-can-ship:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install final bundle QA utilities
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install 'Pillow>=10,<12'
+      - name: Compile packaging code and execute strict 30-shot tests
+        run: |
+          python -m py_compile production/videos/porsche-911-turbo-evolution-001/footage/build_all_30_zip.py
+          python -m unittest discover -s production/videos/porsche-911-turbo-evolution-001/footage -p 'test_build_all_30_zip.py' -v
+      - name: Verify empty planning template REFUSED as finished footage
+        run: |
+          set -euo pipefail
+          if python production/videos/porsche-911-turbo-evolution-001/footage/build_all_30_zip.py \
+              --manifest production/videos/porsche-911-turbo-evolution-001/footage/shot-manifest.template.json \
+              --beat-map production/videos/porsche-911-turbo-evolution-001/beat-map.json \
+              --sources /tmp --output /tmp/porsche-output --validate-only; then
+            echo 'CRITICAL: empty template must be rejected' >&2
+            exit 1
+          fi
+          test ! -e /tmp/porsche-output/PORSCHE_911_TURBO_EVOLUTION_ALL_30_CLIPS_1080P.zip
+          echo 'PASS: 30-shot delivery gate blocked unsourced media'
