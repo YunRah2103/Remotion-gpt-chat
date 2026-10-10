@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "task": "bmw-m5-evolution-001-agent-a",
   "branch": "automotive-edits/bmw-m5-evolution-001/a-footage",
-  "sourceSha": "d4663982a640ab1e913ef3a820502fab4a7fa826",
+  "sourceSha": "8cc2e07a0bfa10a3867b5972c49e4740f7778816",
   "owner": "research",
   "status": "review",
-  "summary": "42 actual 0.8-second moving BMW M5 candidate files sourced from real BMW Group footage, six per E28/E34/E39/E60/F10/F90/G90; all 42 passed full FFmpeg decode and measured motion. Artifact M5-42-REAL-PROVISIONAL-38047298176 (ID 11668700332), GitHub Actions run 38047298176 SUCCESS. Not READY: E34 mixed-generation visuals and native low-resolution old archives; unique-angle human review and public reuse rights remain unresolved.",
+  "summary": "Produced 42 real moving BMW M5 source-cut files in upgraded V2, exactly six candidate slots per E28/E34/E39/E60/F10/F90/G90. Native E28/F10/F90 1920×1080, G90 3840×2160, E34/E39/E60 720×576 original archive. FFmpeg full video stream decode, per-slot motion test, and SHA256 for all 42 clips PASSED. GitHub Actions 38048763831 SUCCESS, artifact 11668682025. E34 group footage still contains additional generations and some similar camera angles; distinct six-pure-model visual shots NOT confirmed. Status REVIEW, not READY.",
   "files": [
     "production/videos/bmw-m5-evolution-001/footage/source-catalog.json",
     "production/videos/bmw-m5-evolution-001/footage/shot-board.json",
@@ -18,23 +18,31 @@
     "production/videos/bmw-m5-evolution-001/footage/test_prepare.py",
     "production/videos/bmw-m5-evolution-001/footage/validate_sources.py",
     "production/videos/bmw-m5-evolution-001/handoffs/agent-a.json",
-    "production/videos/bmw-m5-evolution-001/handoffs/agent-a.md"
+    "production/videos/bmw-m5-evolution-001/handoffs/agent-a.md",
+    "production/videos/bmw-m5-evolution-001/footage/assemble_v2.py",
+    "production/videos/bmw-m5-evolution-001/footage/e34_focused.py",
+    "production/videos/bmw-m5-evolution-001/footage/legacy_hd_upgrades.py"
   ],
   "evidence": [
+    "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38048763831",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38048763831/artifacts/11668682025",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38048499011/artifacts/11668118626",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38047591610/artifacts/11668242116",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38047365846/artifacts/11667807177",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38046928757/artifacts/11666924618",
     "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38047298176",
     "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38047298176/artifacts/11668700332",
-    "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38046928757/artifacts/11666924618",
     "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38045881998/artifacts/11667643927",
     "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38014477573"
   ],
   "blockers": [
-    "E34 six provisional clips come from a mixed E28/E34/E39/E60 multi-vehicle archival master. Some E34 clips visibly include wrong BMW M5 generations, and the six distinct camera setups have NOT been independently certified. Replace/isolate E34 before final cut.",
-    "E34/E39/E60/F10 initial candidate video source files are archive preview quality 480x360 or 540x304; high-resolution upgrades underway and no 4K claims are justified for historic media.",
-    "Public video/music distribution rights are not verified; do not publish these BMW Group originals or third-party audio publicly.",
-    "The 42 clips passed temporal motion and native video decode, but not comprehensive independent human visual QA for no repeated camera shots."
+    "E34 slots 07–12 contain some E28/E39/E60 in the same BMW M5 historical group driving footage, and the two wet-runway angles may be related; no independent certification of six different solo E34 M5 moving camera setups.",
+    "E34 E39 E60 source masters are objectively native 720×576 BMW archival material; they cannot meet modern 4K sharpness or full-screen vertical high-resolution crops. Do not fake 4K.",
+    "42 files verified with full FFmpeg decode and actual measurable temporal difference, but human review of all shot identities and angle uniqueness is incomplete.",
+    "BMW Group source licensing and private soundtrack public-redistribution rights are unverified; no public release is approved."
   ],
   "qa": {
-    "sourceOriginalsDownloaded": 9,
+    "sourceOriginalsDownloaded": "multiple BMW Group masters; provenance per run",
     "footageClipsGenerated": 42,
     "uniqueChronologicalGenerations": 7,
     "perGeneration": 6,
@@ -42,18 +50,20 @@
     "measuredMotionPass": 42,
     "independentEditorialUniquenessApproval": false,
     "identityApprovalForE34": false,
-    "artifactId": 11668700332,
-    "artifactRun": 38047298176,
+    "artifactId": 11668682025,
+    "artifactRun": 38048763831,
     "artifactRetentionDays": 7,
     "currentResolutions": {
       "E28": "1920x1080",
-      "E34": "480x360 mixed footage",
-      "E39": "480x360",
-      "E60": "480x360",
-      "F10": "540x304",
+      "E34": "720x576 original archive",
+      "E39": "720x576 original archive",
+      "E60": "720x576 original archive",
+      "F10": "1920x1080",
       "F90": "1920x1080",
       "G90": "3840x2160"
-    }
+    },
+    "uniqueFileSha256Count": 42,
+    "artifactName": "BMW-M5-42-UPGRADED-SOURCES-38048763831"
   },
-  "notes": "Review-level handoff only. Agent C may retrieve actual bytes from the GitHub Actions artifact and edit a private evaluation candidate, but MUST not mark a 42-shot final pass without fixing mixed-generation E34 and low-resolution archive sources."
+  "notes": "V2 has been actually assembled on GitHub native runner from stored genuine source artifacts with no additional re-encode at assembly. The delivery is safe to inspect for private editorial evaluation, not to mark 42 unique model-authentic clips ready. E34 specifically remains BLOCKED."
 }
