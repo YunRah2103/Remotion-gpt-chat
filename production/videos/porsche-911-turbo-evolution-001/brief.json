@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "slug": "porsche-911-turbo-evolution-001",
+  "title": "PORSCHE 911 TURBO — EVOLUTION",
+  "status": "preproduction",
+  "sourceCompositionId": null,
+  "sourceBranch": "automotive-edits/bmw-m5-evolution-001/c-master",
+  "sourceCommit": "e8f31e0872f6adef3796963a99078b6a8b21bdd6",
+  "durationSeconds": 17,
+  "durationInFrames": 510,
+  "fps": 30,
+  "resolution": [
+    1080,
+    1920
+  ],
+  "sourceAudioSha256": "5c83d4d0e1d8dbd86bb141855c21e56c627b2fce5b5cf62ddef75432c3f4d52c",
+  "masterAudioSha256": "39b8d7eef63b1c67cb14108484de8a63508149f64b6d3b84b7f7252dcd0bcdc9",
+  "modelScope": "Seven Porsche 911 Turbo chassis eras 930/964/993/996/997/991/992. Coupe Turbo or Turbo S, never plain Carrera, GT3, GT2, or unrelated models. 930 3.0/3.3 are grouped as ONE chassis era.",
+  "style": "Exact approved BMW M5 V2 clean edit philosophy: nothing but real moving footage and small plain white chassis code at upper left. No HUD or wide decorative borders.",
+  "sourceRights": "Private-review by default. Source provenance mandatory, public distribution requires permission.",
+  "roles": {
+    "A": "automotive-edits/porsche-911-turbo-evolution-001/a-footage",
+    "B": "automotive-edits/porsche-911-turbo-evolution-001/b-creative",
+    "C": "automotive-edits/porsche-911-turbo-evolution-001/c-transitions",
+    "D": "automotive-edits/porsche-911-turbo-evolution-001/d-master"
+  }
+}
