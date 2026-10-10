@@ -53,7 +53,7 @@ def run(inp,out,lut=None,reencode=False,crf=16):
     return {"status":"PASS","file":str(out),"source":str(inp),
             "codec":v["codec_name"],"frames":v.get("nb_frames"),
             "dimensions":[v["width"],v["height"]],"fps":v["r_frame_rate"],
-            "reencoded":"-c:v copy" not in args,"lut":str(lut) if lut else None,
+            "reencoded":not ("-c:v" in args and args[args.index("-c:v")+1]=="copy"),"lut":str(lut) if lut else None,
             "fullDecode":"PASS"}
 if __name__=="__main__":
     p=argparse.ArgumentParser()
