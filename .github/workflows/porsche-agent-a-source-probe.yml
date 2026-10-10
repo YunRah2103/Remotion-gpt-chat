@@ -7,6 +7,7 @@ on:
     paths:
       - 'production/videos/porsche-911-turbo-evolution-001/footage/probe_youtube_sources.py'
       - '.github/workflows/porsche-agent-a-source-probe.yml'
+      - 'production/videos/porsche-911-turbo-evolution-001/footage/probe_porsche_newsroom.py'
   workflow_dispatch:
 
 permissions:
@@ -33,11 +34,18 @@ jobs:
       - name: Query actual source format metadata (NO video bytes)
         continue-on-error: true
         run: python production/videos/porsche-911-turbo-evolution-001/footage/probe_youtube_sources.py --output out/porsche-a-source-probe.json
+      - name: Probe Porsche official newsroom public B-roll URLs
+        continue-on-error: true
+        run: |
+          python production/videos/porsche-911-turbo-evolution-001/footage/probe_porsche_newsroom.py --self-test
+          python production/videos/porsche-911-turbo-evolution-001/footage/probe_porsche_newsroom.py --output out/porsche-a-newsroom.json
       - name: Preserve source metadata evidence and honest failures
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: porsche-a-yt-dlp-metadata-${{ github.run_id }}
-          path: out/porsche-a-source-probe.json
+          path: |
+            out/porsche-a-source-probe.json
+            out/porsche-a-newsroom.json
           retention-days: 7
           if-no-files-found: warn
