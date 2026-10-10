@@ -2,14 +2,32 @@
   "schemaVersion": 1,
   "task": "porsche-911-turbo-evolution-001-agent-c",
   "branch": "automotive-edits/porsche-911-turbo-evolution-001/c-transitions",
-  "sourceSha": "e8f31e0872f6adef3796963a99078b6a8b21bdd6",
+  "sourceSha": "442175a39b93ee5e1299f9e3de49ce35060703f0",
   "owner": "qa",
-  "summary": "UNSTARTED planning-only handoff placeholder: this agent has not produced real implementation or footage yet.",
-  "status": "blocked",
-  "files": [],
-  "evidence": [],
-  "blockers": [
-    "The user has not started this specialist in a separate ChatGPT session; no code, actual video or QA deliverable has been submitted."
+  "summary": "Implemented optional deterministic conservative 2-3-frame chapter effects, shared Cinematic FX Toolkit integration, clean/crop policy, independent source-motion checker, full 30-slot QA matrix, and real locally decoded SYNTHETIC FFmpeg A/B proof. Integration code ready; authentic Porsche footage and complete final film independent visual QA remain pending.",
+  "status": "review",
+  "files": [
+    "src/porsche-turbo-evolution/polish/presets.ts",
+    "src/porsche-turbo-evolution/polish/PolishLayer.tsx",
+    "production/videos/porsche-911-turbo-evolution-001/qa/test_polish.mjs",
+    "production/videos/porsche-911-turbo-evolution-001/qa/check_footage.py",
+    "production/videos/porsche-911-turbo-evolution-001/qa/render_optical_proof.py",
+    "production/videos/porsche-911-turbo-evolution-001/qa/REPORT.md",
+    "production/videos/porsche-911-turbo-evolution-001/qa/PROOF_QA.json",
+    "production/videos/porsche-911-turbo-evolution-001/handoffs/agent-c.md",
+    "production/videos/porsche-911-turbo-evolution-001/handoffs/agent-c.json"
   ],
-  "notes": "Placeholder source SHA is the baseline from approved BMW M5 V2, NOT proof of this agent's work. Agent replaces it with their own source SHA after actual implementation."
+  "evidence": [
+    "Node22 --experimental-strip-types: 510 frames / 30 slots / six chapter boundaries / eight effect-active frames PASS",
+    "tsc --strict --target ES2022 --module esnext --noEmit pure preset module PASS",
+    "FFmpeg native 112-frame 720x1280 30fps H.264 CRF15 synthetic moving A/B output, FFprobe and full decode PASS; sha256=68c896812543f01357c05893745fa2c228657431ca0204f4f97e580ec6237b65",
+    "Visual inspection of real encoded SYNTHETIC frame-205+0.png comparison PASS for restrained effect only, NOT authentic Porsche",
+    "GitHub Actions Porsche planning/schema contract run 38055547634 success at 442175a39b93ee5e1299f9e3de49ce35060703f0"
+  ],
+  "blockers": [
+    "30 verified genuine moving Porsche Turbo clips and staged source binary videos not accessible to Agent C; independent shot identity/quality/duplicate-camera matrix PENDING",
+    "Agent D integrated full native Remotion 510-frame Porsche MP4 and private song not available for honest final visual QA",
+    "Full npm run check and native Remotion proof with actual Porsche clips require integration runner and footage; synthetic FFmpeg comparison is not a substitute"
+  ],
+  "notes": "This is a truthful partial specialist handoff, NOT final movie approval. D should merge exact source SHA, rerun code tests, inspect native movie and select cut when source match fails."
 }
