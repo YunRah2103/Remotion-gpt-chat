@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "privacy": "USER PRIVATE REVIEW ONLY - no public TikTok/social publication permitted by current evidence",
+  "source": {
+    "agentACommit": "96a4cec9eac460d7ec44c625292b781dda6830b8",
+    "artifactId": 11652333164,
+    "source": "BMW Group PF0009730 Driving Scene 3",
+    "vehicle": "BMW M5 G90 sedan (bright green)",
+    "originalSHA256": "59947dad266e74d92843cd90c2b2c90a3e118b277898f001c30c51e4e9b428a9",
+    "filesChecked": 39,
+    "sha256ChecksPassed": 39,
+    "allVideoCodec": "h264",
+    "allDimensions": [
+      1280,
+      720
+    ],
+    "allFps": "30/1",
+    "combinedFrames": 600,
+    "movingClips": 39
+  },
+  "film": {
+    "name": "BMW_M5_G90_PRIVATE_REVIEW_20s.mp4",
+    "sha256": "30ffe824a1694f386b94d524b170fb950801d6230fc6972dcc38c1fa7465e4f4",
+    "builder": "FFmpeg native private offline fall-back; independently of separate Remotion GitHub native render",
+    "sizeBytes": 9628136,
+    "durationSeconds": 20,
+    "frames": 600,
+    "width": 1080,
+    "height": 1920,
+    "fps": "30/1",
+    "videoCodec": "h264",
+    "audioCodec": "aac",
+    "sampleRate": 48000,
+    "channels": 2,
+    "maxMusicPeakDBFS": -0.1,
+    "fullDecode": "PASS",
+    "textOverlays": 0,
+    "observedVehicle": "BMW M5 G90 saloon exclusively",
+    "beatClips": 39,
+    "allCutsOnSpecifiedFrameGrid": true,
+    "perClipMotionCheck": "39/39 pass, median compressed-frame diff 2.98, minimum 1.166",
+    "blackClipRejection": "39/39 pass, dark cinematic dusk frame #36 mean luma 13.38"
+  },
+  "nativeRemotion": {
+    "repositoryWorkflow": ".github/workflows/bmw-m5-g90-private-render.yml",
+    "runId": 38010694333,
+    "progressWhenReportWritten": "in progress",
+    "artifactName": "G90-PRIVATE-REMOTION-VISUAL-20S",
+    "containsCopyrightedAudio": false
+  },
+  "rights": {
+    "sourcePublicRedistribution": false,
+    "musicPublicRedistribution": "not established",
+    "publishable": false
+  }
+}
