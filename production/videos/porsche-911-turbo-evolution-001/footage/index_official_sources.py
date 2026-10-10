@@ -18,6 +18,7 @@ OFFICIAL = {
     "286687": "Porsche 50 Years Turbo B-roll",
     "286726": "Porsche 930 Turbo dedicated footage",
     "286727": "Porsche 992 Turbo dedicated footage",
+    "167585": "A duel between seven 911 Turbo generations from 1975 to 2020",
 }
 PRESS_KIT = "https://newsroom.porsche.com/en/press-kits/50-years-porsche-turbo.html"
 
