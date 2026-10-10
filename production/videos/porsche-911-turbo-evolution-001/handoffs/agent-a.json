@@ -2,14 +2,28 @@
   "schemaVersion": 1,
   "task": "porsche-911-turbo-evolution-001-agent-a",
   "branch": "automotive-edits/porsche-911-turbo-evolution-001/a-footage",
-  "sourceSha": "e8f31e0872f6adef3796963a99078b6a8b21bdd6",
+  "sourceSha": "10caf93309db479e0d3108f764917f792f5efd7f",
   "owner": "research",
-  "summary": "UNSTARTED planning-only handoff placeholder: this agent has not produced real implementation or footage yet.",
+  "summary": "Implemented and locally tested native FFprobe/SHA/motion/contact-sheet auditor; published researched Porsche/Carwow video candidate pages. No actual verified Porsche Turbo source clips have been retrieved or transferred.",
   "status": "blocked",
-  "files": [],
-  "evidence": [],
-  "blockers": [
-    "The user has not started this specialist in a separate ChatGPT session; no code, actual video or QA deliverable has been submitted."
+  "files": [
+    "production/videos/porsche-911-turbo-evolution-001/footage/audit_footage.py",
+    "production/videos/porsche-911-turbo-evolution-001/footage/test_audit_footage.py",
+    "production/videos/porsche-911-turbo-evolution-001/footage/source-candidates.json",
+    "production/videos/porsche-911-turbo-evolution-001/footage/AUDIT_README.md",
+    "production/videos/porsche-911-turbo-evolution-001/handoffs/agent-a.md",
+    "production/videos/porsche-911-turbo-evolution-001/handoffs/agent-a.json"
   ],
-  "notes": "Placeholder source SHA is the baseline from approved BMW M5 V2, NOT proof of this agent's work. Agent replaces it with their own source SHA after actual implementation."
+  "evidence": [
+    "GitHub preproduction contract CI SUCCESS, run https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38055299705 (not real media QA)",
+    "Local Python compile PASS; local native FFmpeg synthetic testsrc2 file 960x540 30fps probe SHA motion three JPEGs and contact-sheet 182563 bytes PASS",
+    "Local deliberate 29-missing-slot scenario correctly returned BLOCKED/exit 2; only synthetic fixture slot decoded",
+    "Candidate source pages https://newsroom.porsche.com/en/press-kits/50-years-porsche-turbo.html and https://www.youtube.com/watch?v=gbnBo2Au-uA"
+  ],
+  "blockers": [
+    "0/30 Porsche Turbo moving shots downloaded/verified or transferred; every slot lacks a real source video SHA, FFprobe proof and manually verified unique scene",
+    "No verified accessible private source-media binary artifact/contact sheet of real Porsche footage",
+    "Media acquisition unavailable in this execution environment and source reuse/redistribution rights require independent assessment"
+  ],
+  "notes": "The sourceSha records latest source/tooling commit before handoff-only updates, not fictitious Porsche footage. Tooling QA uses explicitly synthetic non-Porsche video only; hold Agent D integration."
 }
