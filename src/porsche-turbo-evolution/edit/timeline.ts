@@ -136,8 +136,8 @@ export const adaptAgentAManifest=(
       sourceInSeconds:a.sourceInSeconds??NaN,sourceOutSeconds:a.sourceOutSeconds??NaN,
       sourceWidth:a.width??NaN,sourceHeight:a.height??NaN,nativeFps:a.fps??NaN,
       angle:a.cameraAngle??'rolling',identityVerified:true,actualMotionVerified:true,
-      uniqueAngleVerified:true,turboIdentityEvidence:a.actualTurboIdentityEvidence,
-      motionEvidence:a.motionEvidence||a.angleAndMotion,
+      uniqueAngleVerified:true,turboIdentityEvidence:a.actualTurboIdentityEvidence||'',
+      motionEvidence:a.motionEvidence||a.angleAndMotion||'',
       framing:media.framing,cropX:media.cropX,cropY:media.cropY,
       fullBleedCropVerified:media.fullBleedCropVerified,
     };
