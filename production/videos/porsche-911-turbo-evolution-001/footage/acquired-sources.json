@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "project": "porsche-911-turbo-evolution-001",
+  "status": "REAL_ORIGINAL_MEDIA_ACQUIRED_AWAITING_30_SLOT_VISUAL_ASSIGNMENT",
+  "asOf": "2026-10-10",
+  "sources": [
+    {
+      "sourceId": "porsche-newsroom-286306",
+      "originCreator": "Porsche AG, Porsche Newsroom",
+      "title": "50 Years of Porsche Turbo",
+      "sourcePageUrl": "https://newsroom.porsche.com/en/press-kits/50-years-porsche-turbo.html",
+      "originalMediaUrl": "https://newstv.porsche.com/porschevideos/newstv.porsche.com_286306_en.mp4",
+      "mediaType": "video/mp4",
+      "nativeWidth": 3840,
+      "nativeHeight": 2160,
+      "nativeFps": 25,
+      "nativeDurationSeconds": 55.68,
+      "reportedOriginalFrames": 1392,
+      "originalBytes": 411746613,
+      "originalSha256": "3dadbf0718f4ff0f54039be6a34252194f250fbe50cdda0b41b9b12df7839a52",
+      "videoCodec": "h264",
+      "fullDecode": "PASS",
+      "reencoded": false,
+      "upscaled": false,
+      "githubActionsRunId": 38058522380,
+      "githubActionsArtifactId": 11672460900,
+      "githubActionsArtifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38058522380/artifacts/11672460900",
+      "contactSheetArtifactId": 11672746367,
+      "contactSheetArtifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38059196876/artifacts/11672746367",
+      "contactFramesSampled": 12,
+      "licenseStatus": "UNVERIFIED; PRIVATE REVIEW RESEARCH AND QA, NOT PUBLIC REDISTRIBUTION CLEARANCE",
+      "verifiedGenerationSegments": [],
+      "verifiedDistinctMovingShots": 0,
+      "manualContentReview": "NOT_SIGNED_OFF",
+      "note": "Real 4K original and full technical decode verified. The press-kit headline does not prove all seven Turbo chassis or 30 unique moving camera setups in this specific 55.68-second file. None of the 30 timeline slots may be marked verified until frame-by-frame model identity and angle review."
+    }
+  ],
+  "technicalStatus": "1 original high-quality video source fetched and decoded",
+  "timelineReady": false,
+  "slotsVerified": 0,
+  "slotsRequired": 30,
+  "masterBlockers": [
+    "Independently identify Turbo/Turbo S chassis and distinguish scenes, not generic 911 footage",
+    "Assign 30 unique moving setups from authentic media and verify each duration/provenance",
+    "Rights for public reuse unverified; original source media sits in short-retention actions artifact"
+  ],
+  "important": "Do not use this manifest to falsely mark 30 slots READY."
+}
