@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "status": "RESEARCH_ONLY_NO_MEDIA_DOWNLOADED",
+  "lastReviewed": "2026-10-10",
+  "note": "These are actual public source PAGES, not original media files, proof of shot quality, redistribution permission, direct-download URLs or verified frame content. No frame range, FPS, resolution or SHA256 is asserted.",
+  "sources": [
+    {
+      "id": "porsche-50-years-broll",
+      "sourcePageUrl": "https://newsroom.porsche.com/en/press-kits/50-years-porsche-turbo.html",
+      "creator": "Porsche AG / Porsche Newsroom",
+      "description": "Official 50 Years Turbo press kit lists a 13:53 B-Roll film and separate 16:38 930 / 14:06 992 footage videos.",
+      "potentialGenerations": [
+        "930",
+        "992"
+      ],
+      "researchConfidence": "page-confirmed; video scenes not reviewed",
+      "usageRights": "UNVERIFIED; Porsche-owned promotional material; no sublicence assumed",
+      "downloadState": "not_downloaded",
+      "quality": "unverified; do not assume 4K"
+    },
+    {
+      "id": "carwow-all-turbos-2026",
+      "sourcePageUrl": "https://www.youtube.com/watch?v=gbnBo2Au-uA",
+      "creator": "carwow",
+      "description": "2026 video explicitly lists 930 Turbo, 964 Turbo S, 993 Turbo, 996 Turbo S, 997 Turbo, 991.1 Turbo S, 992.1 and 992.2 Turbo S in actual drag races.",
+      "potentialGenerations": [
+        "930",
+        "964",
+        "993",
+        "996",
+        "997",
+        "991",
+        "992"
+      ],
+      "researchConfidence": "description-confirmed; usable unique moving shot count not reviewed",
+      "usageRights": "UNVERIFIED; Carwow copyright; private source candidate only",
+      "downloadState": "not_downloaded",
+      "quality": "unverified source resolution; do not assume native 4K"
+    },
+    {
+      "id": "porsche-hockenheim-2020",
+      "sourcePageUrl": "https://newsroom.porsche.com/en/2020/history/porsche-911-turbo-generations-walter-roehrl-23139.html",
+      "creator": "Porsche AG / Porsche Newsroom",
+      "description": "Porsche article identifies 930, 964, 993, 996, 997, 991 and 992 Turbos at the Hockenheimring; article/gallery do not prove usable moving clips.",
+      "potentialGenerations": [
+        "930",
+        "964",
+        "993",
+        "996",
+        "997",
+        "991",
+        "992"
+      ],
+      "researchConfidence": "car identity page-confirmed; video footage not established",
+      "usageRights": "UNVERIFIED; publication is not media clearance",
+      "downloadState": "not_downloaded",
+      "quality": "no moving-video master verified"
+    },
+    {
+      "id": "savagegeese-history-2025",
+      "sourcePageUrl": "https://www.youtube.com/watch?v=Jj2yUtiy7rk",
+      "creator": "savagegeese",
+      "description": "Turbo history documentary description indexes 930 04:55, 964 07:37, 993 08:39, 996 09:51, 997 11:00, 991 12:30 and 992 13:52.",
+      "potentialGenerations": [
+        "930",
+        "964",
+        "993",
+        "996",
+        "997",
+        "991",
+        "992"
+      ],
+      "researchConfidence": "timestamp chapters confirmed in description; moving shot content unverified",
+      "usageRights": "UNVERIFIED; research candidate only",
+      "downloadState": "not_downloaded",
+      "quality": "unverified; documentary may include talks/stills unsuitable for edit"
+    }
+  ]
+}
