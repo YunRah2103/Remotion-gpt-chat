@@ -1,0 +1,388 @@
+{
+  "schemaVersion": 1,
+  "slug": "porsche-911-turbo-evolution-001",
+  "audioSource": {
+    "filename": "True adam #beamng #beamngdrive #trueadam #forza #assettocorsa  [7694756256057232662].mp3",
+    "durationSeconds": 17.057959,
+    "sampleRateHz": 44100,
+    "channels": 2,
+    "sha256": "5c83d4d0e1d8dbd86bb141855c21e56c627b2fce5b5cf62ddef75432c3f4d52c",
+    "notCommittedToGitHub": true,
+    "distributionRights": "unverified"
+  },
+  "analysis": {
+    "tempoBPM": 103.359375,
+    "method": "librosa onset-strength rhythmic beat tracker, 22050 Hz; quantized to 30fps",
+    "note": "Beat boundaries are measured candidate cuts, NOT verified ear-perfect editing or downbeat/phrase signoff; final agent must review actual audio",
+    "songHasBriefFadeAtEnd": true
+  },
+  "output": {
+    "seconds": 17,
+    "frames": 510,
+    "fps": 30,
+    "width": 1080,
+    "height": 1920,
+    "videoCodec": "h264",
+    "audioCodec": "aac",
+    "privateReview": true
+  },
+  "privateMaster": {
+    "filename": "Porsche_911_Turbo_Evolution_17s_48k_master.wav",
+    "sampleRateHz": 48000,
+    "channels": 2,
+    "bitDepth": 24,
+    "sha256": "39b8d7eef63b1c67cb14108484de8a63508149f64b6d3b84b7f7252dcd0bcdc9",
+    "durationSeconds": 17,
+    "storage": "separate downloadable ChatGPT audio pack; not in public GitHub"
+  },
+  "privatePreview": {
+    "filename": "Porsche_911_Turbo_Evolution_17s_48k_preview.m4a",
+    "sha256": "bc11829afd55079d3d01931c9b429e32d0e5383b74132fdac205b0035a68dd1d"
+  },
+  "generations": [
+    {
+      "generation": "930",
+      "firstYear": 1974,
+      "startSlot": 1,
+      "endSlot": 4
+    },
+    {
+      "generation": "964",
+      "firstYear": 1991,
+      "startSlot": 5,
+      "endSlot": 8
+    },
+    {
+      "generation": "993",
+      "firstYear": 1995,
+      "startSlot": 9,
+      "endSlot": 12
+    },
+    {
+      "generation": "996",
+      "firstYear": 2000,
+      "startSlot": 13,
+      "endSlot": 16
+    },
+    {
+      "generation": "997",
+      "firstYear": 2006,
+      "startSlot": 17,
+      "endSlot": 20
+    },
+    {
+      "generation": "991",
+      "firstYear": 2013,
+      "startSlot": 21,
+      "endSlot": 25
+    },
+    {
+      "generation": "992",
+      "firstYear": 2020,
+      "startSlot": 26,
+      "endSlot": 30
+    }
+  ],
+  "cuts": [
+    {
+      "slot": 1,
+      "generation": "930",
+      "startFrame": 0,
+      "endFrame": 14,
+      "startSeconds": 0,
+      "durationFrames": 15,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 2,
+      "generation": "930",
+      "startFrame": 15,
+      "endFrame": 31,
+      "startSeconds": 0.5,
+      "durationFrames": 17,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 3,
+      "generation": "930",
+      "startFrame": 32,
+      "endFrame": 48,
+      "startSeconds": 1.067,
+      "durationFrames": 17,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 4,
+      "generation": "930",
+      "startFrame": 49,
+      "endFrame": 66,
+      "startSeconds": 1.633,
+      "durationFrames": 18,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 5,
+      "generation": "964",
+      "startFrame": 67,
+      "endFrame": 83,
+      "startSeconds": 2.233,
+      "durationFrames": 17,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 6,
+      "generation": "964",
+      "startFrame": 84,
+      "endFrame": 100,
+      "startSeconds": 2.8,
+      "durationFrames": 17,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 7,
+      "generation": "964",
+      "startFrame": 101,
+      "endFrame": 117,
+      "startSeconds": 3.367,
+      "durationFrames": 17,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 8,
+      "generation": "964",
+      "startFrame": 118,
+      "endFrame": 135,
+      "startSeconds": 3.933,
+      "durationFrames": 18,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 9,
+      "generation": "993",
+      "startFrame": 136,
+      "endFrame": 152,
+      "startSeconds": 4.533,
+      "durationFrames": 17,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 10,
+      "generation": "993",
+      "startFrame": 153,
+      "endFrame": 169,
+      "startSeconds": 5.1,
+      "durationFrames": 17,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 11,
+      "generation": "993",
+      "startFrame": 170,
+      "endFrame": 186,
+      "startSeconds": 5.667,
+      "durationFrames": 17,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 12,
+      "generation": "993",
+      "startFrame": 187,
+      "endFrame": 204,
+      "startSeconds": 6.233,
+      "durationFrames": 18,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 13,
+      "generation": "996",
+      "startFrame": 205,
+      "endFrame": 221,
+      "startSeconds": 6.833,
+      "durationFrames": 17,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 14,
+      "generation": "996",
+      "startFrame": 222,
+      "endFrame": 238,
+      "startSeconds": 7.4,
+      "durationFrames": 17,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 15,
+      "generation": "996",
+      "startFrame": 239,
+      "endFrame": 256,
+      "startSeconds": 7.967,
+      "durationFrames": 18,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 16,
+      "generation": "996",
+      "startFrame": 257,
+      "endFrame": 273,
+      "startSeconds": 8.567,
+      "durationFrames": 17,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 17,
+      "generation": "997",
+      "startFrame": 274,
+      "endFrame": 290,
+      "startSeconds": 9.133,
+      "durationFrames": 17,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 18,
+      "generation": "997",
+      "startFrame": 291,
+      "endFrame": 307,
+      "startSeconds": 9.7,
+      "durationFrames": 17,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 19,
+      "generation": "997",
+      "startFrame": 308,
+      "endFrame": 325,
+      "startSeconds": 10.267,
+      "durationFrames": 18,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 20,
+      "generation": "997",
+      "startFrame": 326,
+      "endFrame": 342,
+      "startSeconds": 10.867,
+      "durationFrames": 17,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 21,
+      "generation": "991",
+      "startFrame": 343,
+      "endFrame": 359,
+      "startSeconds": 11.433,
+      "durationFrames": 17,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 22,
+      "generation": "991",
+      "startFrame": 360,
+      "endFrame": 377,
+      "startSeconds": 12,
+      "durationFrames": 18,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 23,
+      "generation": "991",
+      "startFrame": 378,
+      "endFrame": 394,
+      "startSeconds": 12.6,
+      "durationFrames": 17,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 24,
+      "generation": "991",
+      "startFrame": 395,
+      "endFrame": 411,
+      "startSeconds": 13.167,
+      "durationFrames": 17,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 25,
+      "generation": "991",
+      "startFrame": 412,
+      "endFrame": 428,
+      "startSeconds": 13.733,
+      "durationFrames": 17,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 26,
+      "generation": "992",
+      "startFrame": 429,
+      "endFrame": 446,
+      "startSeconds": 14.3,
+      "durationFrames": 18,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 27,
+      "generation": "992",
+      "startFrame": 447,
+      "endFrame": 463,
+      "startSeconds": 14.9,
+      "durationFrames": 17,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 28,
+      "generation": "992",
+      "startFrame": 464,
+      "endFrame": 480,
+      "startSeconds": 15.467,
+      "durationFrames": 17,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 29,
+      "generation": "992",
+      "startFrame": 481,
+      "endFrame": 495,
+      "startSeconds": 16.033,
+      "durationFrames": 15,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    },
+    {
+      "slot": 30,
+      "generation": "992",
+      "startFrame": 496,
+      "endFrame": 509,
+      "startSeconds": 16.533,
+      "durationFrames": 14,
+      "verifiedSourceClipId": null,
+      "verifiedMovingFootage": false
+    }
+  ]
+}
