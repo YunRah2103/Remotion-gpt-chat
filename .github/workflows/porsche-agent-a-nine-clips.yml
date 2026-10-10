@@ -1,0 +1,37 @@
+name: Porsche Agent A - nine genuine 930 and 992 beat candidates
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-nine-clips.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-nine-moving-sources:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install native FFmpeg and still proof requirements
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install 'Pillow>=10,<12'
+      - name: Extract actual source-codec 930 and 992 footage for exactly nine target beat slots
+        run: |
+          python production/videos/porsche-911-turbo-evolution-001/footage/extract_nine_candidate_beats.py \
+            --out out/porsche-a-nine-candidates
+      - name: Publish nine original 4K clip excerpts plus decoded frame-by-frame evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Porsche-Agent-A-nine-native-shot-candidates-${{ github.run_id }}
+          path: out/porsche-a-nine-candidates/
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: warn
