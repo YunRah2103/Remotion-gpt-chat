@@ -1,0 +1,35 @@
+name: Porsche Agent A - Vimeo native 964 footage source probe
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-vimeo-964.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  confirm-non-youtube-964-source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install video provider metadata extractor
+        run: |
+          python -m pip install 'yt-dlp[default]==2026.08.19'
+          python -m yt_dlp --version
+      - name: Probe official 964 Turbo enthusiast Vimeo uploads
+        continue-on-error: true
+        run: |
+          python production/videos/porsche-911-turbo-evolution-001/footage/probe_964_vimeo.py
+      - name: Publish actual source resolution findings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Porsche-Agent-A-Vimeo-964-metadata-${{ github.run_id }}
+          path: out/porsche-964-vimeo-probe.json
+          retention-days: 7
+          if-no-files-found: warn
