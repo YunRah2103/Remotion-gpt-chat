@@ -40,35 +40,52 @@ jobs:
           python -m unittest discover -s production/tests -p test_yt_dlp_ingest.py -v
           node production/videos/porsche-911-turbo-evolution-001/edit/test_timeline.mjs
           node production/videos/porsche-911-turbo-evolution-001/qa/test_polish.mjs
-      - name: Probe live YouTube metadata (no video download; advisory only)
+      - name: Explicit live YouTube metadata check (manual only, fail on blocked access)
         if: github.event_name == 'workflow_dispatch'
-        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
-          python -m pip install --disable-pip-version-check 'yt-dlp[default]==2026.08.19'
+          python -m pip install --disable-pip-version-check -r production/footage/requirements.txt
           mkdir -p out/porsche-d-proof
+          set +e
           timeout 150s python -m yt_dlp --ignore-config --no-playlist \
             --js-runtimes node --skip-download --dump-single-json --no-warnings \
             'https://www.youtube.com/watch?v=gbnBo2Au-uA' \
-            > out/porsche-d-proof/source-metadata.json
-          python - <<'PY'
-          import json
+            > out/porsche-d-proof/source-metadata.json \
+            2> out/porsche-d-proof/source-metadata.stderr
+          result=$?
+          set -e
+          STATUS_CODE="$result" python - <<'PY'
+          import json,os
           from pathlib import Path
-          path=Path('out/porsche-d-proof/source-metadata.json')
-          m=json.loads(path.read_text())
-          formats=[f for f in m.get('formats',[]) if f.get('vcodec','none') != 'none']
-          assert formats, 'No accessible video formats were reported'
-          heights=sorted({int(f.get('height') or 0) for f in formats})
+          root=Path('out/porsche-d-proof')
+          raw=root/'source-metadata.json'
+          err_file=root/'source-metadata.stderr'
+          message=err_file.read_text(errors='replace')
+          outcome=int(os.environ['STATUS_CODE'])
           summary={'probe':'PUBLIC_METADATA_ONLY_NO_DOWNLOAD',
-                   'videoFormats':len(formats),'heights':heights,
-                   'sourceAccess':'metadata-extract-PASS',
-                   'verifiedPorscheClips':0}
-          Path('out/porsche-d-proof/metadata-probe-summary.json').write_text(json.dumps(summary,indent=2)+'\n')
-          path.unlink()
+                   'verifiedPorscheClips':0,'exitCode':outcome}
+          if outcome:
+              summary['sourceAccess']='BOT_CHALLENGE' if 'not a bot' in message.lower() else 'UNAVAILABLE'
+              summary['result']='FAIL'
+          else:
+              try:
+                  data=json.loads(raw.read_text())
+                  videos=[f for f in data.get('formats',[]) if f.get('vcodec','none')!='none']
+                  if not videos: raise ValueError('no accessible video formats')
+                  summary.update(result='PASS',sourceAccess='FORMAT_METADATA_AVAILABLE',
+                                 videoFormats=len(videos),
+                                 heights=sorted({int(f.get('height') or 0) for f in videos}))
+              except (ValueError,OSError) as exc:
+                  summary.update(result='FAIL',sourceAccess='INVALID_RESPONSE',errorType=type(exc).__name__)
+          (root/'metadata-probe-summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+          raw.unlink(missing_ok=True)
+          err_file.unlink(missing_ok=True)
           print(json.dumps(summary,indent=2))
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as report:
+              report.write('YouTube metadata check: **'+summary['result']+'** ('+summary['sourceAccess']+'). No media downloaded.\n')
+          if summary['result']!='PASS':raise SystemExit(2)
           PY
-          echo "Live YouTube formats were listed, but NO video was downloaded or copyrighted files committed." >> "$GITHUB_STEP_SUMMARY"
       - name: Validate beat map and reject incomplete media release
         shell: bash
         run: |
