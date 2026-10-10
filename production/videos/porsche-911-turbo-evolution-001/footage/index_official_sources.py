@@ -19,6 +19,7 @@ OFFICIAL = {
     "286726": "Porsche 930 Turbo dedicated footage",
     "286727": "Porsche 992 Turbo dedicated footage",
     "167585": "A duel between seven 911 Turbo generations from 1975 to 2020",
+    "202036": "9:11 Magazine Episode 21 - Eight Porsche 911 Turbo generations",
 }
 PRESS_KIT = "https://newsroom.porsche.com/en/press-kits/50-years-porsche-turbo.html"
 
@@ -75,6 +76,24 @@ def main():
         ap.error("Invalid sample interval or count")
     a.out.mkdir(parents=True,exist_ok=True)
     url=f"https://newstv.porsche.com/porschevideos/newstv.porsche.com_{a.media_id}_en.mp4"
+    if a.media_id=="202036":
+        urls=[
+            url,
+            "https://newstv.porsche.com/porschevideos/202036_en_12000000.mp4",
+            "https://newstv.porsche.com/porschevideos/202036_en_6000000.mp4",
+            "https://newstv.porsche.com/porschevideos/202036_en_3000000.mp4",
+        ]
+        viable=[]
+        for candidate in urls:
+            try:
+                probe=remote_info(candidate)
+                viable.append((probe['nativeHeight'],probe['nativeWidth'],probe['nativeFps'],candidate))
+            except Exception as e:
+                print("SOURCE_VARIANT_UNAVAILABLE",candidate,str(e)[:130])
+        if not viable:
+            raise SystemExit("No accessible Porsche 9:11 Magazine media source")
+        url=max(viable)[3]
+        print("ACTUAL_SELECTED_SOURCE_URL",url)
     report={"schemaVersion":1,"sourceId":"porsche-newsroom-"+a.media_id,
             "title":OFFICIAL[a.media_id],"sourceUrl":url,"sourcePageUrl":PRESS_KIT,
             "status":"FAILED", "sourceVideoDownloaded":False, "originalSourceBytesSha256":None,
