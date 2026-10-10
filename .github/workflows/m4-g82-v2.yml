@@ -1,0 +1,79 @@
+name: BMW M4 G82 V2 - detailed studio turntable
+on:
+  push:
+    branches: [experiments/bmw-m4-g82-blender-turntable]
+    paths:
+      - 'production/experiments/bmw-m4-g82/v2/**'
+      - '.github/workflows/m4-g82-v2.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  turntable:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 115
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Blender FFmpeg
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq blender ffmpeg
+          blender --version | head -2
+      - name: Download licensed high fidelity BMW model with checksum verification
+        run: |
+          set -euo pipefail
+          mkdir -p out/m4-v2
+          curl -fsSL --retry 4 --retry-delay 4 --connect-timeout 30 --max-time 180 https://raw.githubusercontent.com/coopercodes/bmwGLB/main/bmw_m4_competition_m_package.glb -o out/m4-v2/car.glb
+          echo '913ac951ba2645777c91393b86aed2def2433a807e57e626b203908aa474b8fb  out/m4-v2/car.glb' | sha256sum -c -
+          test "$(stat -c '%s' out/m4-v2/car.glb)" -eq 22739084
+      - name: Native Blender proof frames (4 different angles)
+        env:
+          M4_MODE: preview
+        run: |
+          set -euo pipefail
+          blender -b -t 4 --python production/experiments/bmw-m4-g82/v2/source_model_scene.py > proof.log 2>&1 || { tail -100 proof.log; exit 1; }
+          grep -E 'CAR_ASSET_MESHES|RAW_BOUNDS|NORMALIZED_BOUNDS|PROOF_FRAME|SAVED_EDITABLE_SCENE' proof.log
+          test -s out/m4-v2/BMW_M4_G82_V2.blend
+          test "$(find out/m4-v2/proof -name 'angle_*.png' | wc -l)" -eq 4
+      - name: Create 4-angle proof contact sheet
+        run: |
+          set -euo pipefail
+          ffmpeg -hide_banner -loglevel error -y -framerate 1 -pattern_type glob -i 'out/m4-v2/proof/angle_*.png' -filter_complex 'tile=2x2:padding=10:margin=10' -frames:v 1 out/m4-v2/FOUR_ANGLE_PROOF.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: M4-G82-V2-FOUR-ANGLE-QA
+          path: |
+            out/m4-v2/FOUR_ANGLE_PROOF.png
+            out/m4-v2/proof/*.png
+            proof.log
+          retention-days: 30
+      - name: Render full 360 degree orbit
+        env:
+          M4_MODE: final
+        run: |
+          set -euo pipefail
+          blender -b -t 4 --python production/experiments/bmw-m4-g82/v2/source_model_scene.py > full_render.log 2>&1 || { tail -100 full_render.log; exit 1; }
+          test "$(find out/m4-v2/frames -name 'f_*.png' | wc -l)" -eq 144
+      - name: Encode 720x1280 H264 MP4 with full frame decode QA
+        run: |
+          set -euo pipefail
+          cd out/m4-v2
+          ffmpeg -hide_banner -loglevel error -y -framerate 24 -start_number 1 -i frames/f_%04d.png -c:v libx264 -preset slow -crf 17 -pix_fmt yuv420p -movflags +faststart BMW_M4_G82_V2_360.mp4
+          ffmpeg -v error -xerror -i BMW_M4_G82_V2_360.mp4 -f null -
+          ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,width,height,nb_frames,avg_frame_rate -of json BMW_M4_G82_V2_360.mp4 > qa.json
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of csv=p=0 BMW_M4_G82_V2_360.mp4)" -eq 144
+          sha256sum BMW_M4_G82_V2_360.mp4 BMW_M4_G82_V2.blend > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: BMW-M4-G82-V2-DETAIL-FINAL
+          path: |
+            out/m4-v2/BMW_M4_G82_V2_360.mp4
+            out/m4-v2/BMW_M4_G82_V2.blend
+            out/m4-v2/FOUR_ANGLE_PROOF.png
+            out/m4-v2/qa.json
+            out/m4-v2/SHA256SUMS.txt
+            full_render.log
+          if-no-files-found: warn
+          retention-days: 30
