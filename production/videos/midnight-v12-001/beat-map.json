@@ -1,150 +1,198 @@
 {
   "project": "midnight-v12-001",
+  "title": "EXOTIC AFTER DARK — new user-provided soundtrack (2026-10-10)",
+  "status": "NEW AUDIO LOCKED BY USER; FRAME MAP PROVISIONAL UNTIL DIRECTOR + B/D REBASE",
+  "userOverrideDate": "2026-10-10",
   "fps": 30,
   "width": 1080,
   "height": 1920,
-  "frames": 316,
-  "durationSeconds": 10.533333333333333,
+  "frames": 814,
+  "durationSeconds": 27.133333333333333,
   "audio": {
-    "filename": "TikTok video #7690925557919403294 [7690925557919403294].mp3",
-    "sha256": "87a663860585e1714fd6fbb6a8006d19d655bda863db66cdaa75ba1830a2d678",
-    "decodedPcmSeconds": 10.52734693877551,
-    "containerSeconds": 10.553469,
+    "filename": "｜18_00｜｜Spider man discovers what's hypergamy ｜ #edit #fyp #viral #hy... [7694012207188790546].mp3",
+    "sha256": "cac310f3d76709d5bbdd13a7d8015b1bcc4e5152cde6587838b2ebae76826592",
+    "containerSeconds": 27.141224,
+    "decodedPcmSeconds": 27.115102,
     "sampleRateHz": 44100,
     "channels": 2,
+    "fileSizeBytes": 462547,
     "storedInRepo": false,
-    "handoff": "private user attachment to Agent D; exact SHA check before native render",
-    "highConfidenceStructuralShiftSeconds": 2.56,
-    "caption": "Onsets estimated from actual audio spectral flux; re-confirm by listening and inspecting real rendered film"
+    "handoff": "Pass the newly attached 27.14s MP3 from user to Agent D via authorised private transfer; verify SHA256. Do NOT use old soundtrack.",
+    "highConfidenceStructuralShiftSeconds": 6.5,
+    "highConfidenceStructuralShiftFrame": 195,
+    "intro": "Overlapping high-energy spoken/argument sample, rough chaotic rhythmic tension, 0–approximately 6.5s",
+    "secondAct": "Instrumental/string-like distorted bass rhythm begins at approximately 6.5s and dominates through end",
+    "note": "Analyzed actual user-uploaded MP3 with ffprobe, FFmpeg PCM decode, RMS and spectral flux. Drop is approximate + cannot be treated as frame-accurate without render/listening QA. Master must decide whether to retain spoken intro."
   },
-  "editPhilosophy": "High-impact ultra-exotic hypercar and 11 genuinely distinct moving sources, keep full intensity across vocal half, real acceleration/wing and low rolling tracking first; f77 music switch locked, other cuts +/-3f after listening review; artistic camera moves and selective whips/zoom crashes/speed ramps.",
+  "supersedes": {
+    "priorAudio": {
+      "filename": "TikTok video #7690925557919403294 [7690925557919403294].mp3",
+      "sha256": "87a663860585e1714fd6fbb6a8006d19d655bda863db66cdaa75ba1830a2d678",
+      "decodedPcmSeconds": 10.52734693877551,
+      "containerSeconds": 10.553469,
+      "frames": 316,
+      "priorDropFrame": 77
+    },
+    "priorFrameCount": 316,
+    "priorDropFrame": 77,
+    "priorBeatMap": "user's new uploaded audio replaces previous music; old 10.53s length and frame-77 change invalid",
+    "oldFootageRulesRetained": "One new exotic hypercar, no footage or visual copying from prior Lamborghini reference or older projects, 11 distinct real moving angles, quality gate strict"
+  },
+  "editPhilosophy": "AGGRESSIVE cinematic single NEW exotic hero. Do not borrow any footage from user's old Lamborghini visual reference, and do not reuse Porsche/BMW/earlier project clips. Intro tension 0–195f then violent main music impact 195f. No tacky HUD; real kinetic hero. Do not mistake draft beat positions for footage source QA.",
+  "sections": [
+    {
+      "name": "Rising spoken intro",
+      "in": 0,
+      "out": 195,
+      "seconds": [
+        0,
+        6.5
+      ],
+      "direction": "Tension; shadow silhouettes, headlights, fast tight camera fragments building toward drop. Distinct real moving angles once acquired."
+    },
+    {
+      "name": "Instrumental bass drop",
+      "in": 195,
+      "out": 330,
+      "seconds": [
+        6.5,
+        11
+      ],
+      "direction": "Major car reveal at music impact f195. True violent acceleration/low chase, fast cuts and controlled whips."
+    },
+    {
+      "name": "Relentless pulse",
+      "in": 330,
+      "out": 630,
+      "seconds": [
+        11,
+        21
+      ],
+      "direction": "Wing and diffuser, rear and side attacks, changing angle every forceful musical phrase; no dead frames or prolonged parked beauty."
+    },
+    {
+      "name": "Final assault",
+      "in": 630,
+      "out": 814,
+      "seconds": [
+        21,
+        27.133
+      ],
+      "direction": "Escalating rear/side/pass shots, last devastating clean 3/4 hypercar full-body payoff."
+    }
+  ],
   "shots": [
     {
       "id": "S01",
       "in": 0,
-      "out": 14,
-      "visual": "Rare hypercar aero detail / carbon wing / sculpted intake, tease its monstrous shape",
-      "movement": "fast macro reveal",
-      "cut": "hard punch"
+      "out": 55,
+      "visual": "Rare new hypercar's moving carbon/active-aero detail, truly filmed",
+      "cut": "staccato intro start"
     },
     {
       "id": "S02",
-      "in": 14,
-      "out": 47,
-      "visual": "Brutal front LED / low bumper / hypercar nose at speed, real rolling shot",
-      "movement": "rapid low tracking with strong parallax",
-      "cut": "rhythmic snap cut"
+      "in": 55,
+      "out": 117,
+      "visual": "Moving low front lights/nose reveal, NOT Lamborghini reference frames",
+      "cut": "rhythmic intro punctuation"
     },
     {
       "id": "S03",
-      "in": 47,
-      "out": 77,
-      "visual": "Genuine hard acceleration / rear aero release / close rolling pass",
-      "movement": "aggressive moving pursuit or side pass",
-      "cut": "build to f77 visual impact"
+      "in": 117,
+      "out": 195,
+      "visual": "Dramatic moving acceleration/macro tension before drop",
+      "cut": "hard f195 impact"
     },
     {
       "id": "S04",
-      "in": 77,
-      "out": 99,
-      "visual": "Explosive full hypercar reveal on main vocal switch; giant wing and exotic silhouette visible",
-      "movement": "fast direction whip into full-body push",
-      "cut": "controlled 2–4f impact whip at f77"
+      "in": 195,
+      "out": 258,
+      "visual": "Full new exotic hypercar reveal with ferocious identifiable wing/profile",
+      "cut": "HARD IMPACT at f195"
     },
     {
       "id": "S05",
-      "in": 99,
-      "out": 128,
-      "visual": "High-speed 3/4 front roll, wide stance and aggressive headlight signature",
-      "movement": "low chase with dynamic depth",
-      "cut": "precision matched beat cut"
+      "in": 258,
+      "out": 327,
+      "visual": "Fast front three-quarter pursuit",
+      "cut": "snapped musical hit"
     },
     {
       "id": "S06",
-      "in": 128,
-      "out": 158,
-      "visual": "Huge diffuser, racing aero and rear light, real motion and velocity",
-      "movement": "rear/side low rolling speed pass",
-      "cut": "hard match cut with selective short ramp"
+      "in": 327,
+      "out": 388,
+      "visual": "Rear diffuser, wing/rear-light genuine vehicle movement",
+      "cut": "motion-match"
     },
     {
       "id": "S07",
-      "in": 158,
-      "out": 187,
-      "visual": "Knife-edge side profile, open aero channels, detailed wheels moving sharply",
-      "movement": "fast parallel pursuit",
-      "cut": "clean fast rhythm cut"
+      "in": 388,
+      "out": 452,
+      "visual": "High-energy side low profile, moving wheels",
+      "cut": "very short whip"
     },
     {
       "id": "S08",
-      "in": 187,
-      "out": 219,
-      "visual": "Unexpected high-angle tracking or dramatic close fly-by with recognisable rare hypercar",
-      "movement": "pursuit/drop move with genuine parallax",
-      "cut": "short controlled zoom crash on hit"
+      "in": 452,
+      "out": 526,
+      "visual": "Unexpected high angle or front flyby, new shot",
+      "cut": "beat-aligned zoom crash"
     },
     {
       "id": "S09",
-      "in": 219,
-      "out": 248,
-      "visual": "Real car mid-pass under dramatic lighting; no parked-garage filler",
-      "movement": "moving three-quarter hero shot",
-      "cut": "motion-aligned whip, only where source permits"
+      "in": 526,
+      "out": 618,
+      "visual": "Moving three-quarter hero with dramatic light",
+      "cut": "hard motion-match"
     },
     {
       "id": "S10",
-      "in": 248,
-      "out": 283,
-      "visual": "Intense carbon aero/wing, rear vent or headlight macro WITH GENUINE MOTION",
-      "movement": "tight powerful lateral camera push",
-      "cut": "selective impact bloom"
+      "in": 618,
+      "out": 716,
+      "visual": "Real moving wing/vent/engine detail; no stationary car animation passed as driving",
+      "cut": "selective fast impact"
     },
     {
       "id": "S11",
-      "in": 283,
-      "out": 316,
-      "visual": "Iconic wide full-hypercar silhouette and intimidating final hard hero payoff",
-      "movement": "fast sweeping reveal, brief settling last few frames",
-      "cut": "final aggressive impact into clean end"
+      "in": 716,
+      "out": 814,
+      "visual": "Iconic full car driving under dramatic background; short final settle",
+      "cut": "clean ending"
     }
   ],
+  "shotFrameTiming": "PROVISIONAL structural 11-source storyboard. Timings need music/visual QA and additional punch cuts if 11 real clips support them; do not claim 11 sources acquired.",
   "musicalLandmarksSeconds": [
-    0.45,
-    1.59,
-    2.56,
-    3,
-    3.78,
-    4.56,
-    5.27,
-    5.83,
-    6.47,
-    7.55,
-    8.11,
-    8.87,
-    9.42,
-    10.31
+    6.5,
+    7.28,
+    7.8,
+    8.15,
+    8.71,
+    9.4,
+    10.17,
+    10.72,
+    10.9,
+    11.63,
+    12.34,
+    13.17,
+    14.65,
+    15.36,
+    16.15,
+    17.22,
+    17.75,
+    18.29,
+    19.05,
+    19.8,
+    20.54,
+    21.23,
+    22.89,
+    23.95,
+    24.15
   ],
-  "directorNotes": "Landmarks derived from listening + spectral changes; not all are edit cuts. Dramatic lighting and real footage outrank transition quantity.",
-  "title": "EXOTIC AFTER DARK — aggressive rare hypercar edit",
-  "creativeDirective": "USER OVERRIDE: ultra-exotic and aggressive, not slow/luxury or obligatory Lamborghini/night. Source one hypercar with savage aero and real speed; fast music-aligned cuts and clean decisive effects; final moment brief.",
-  "heroVehicle": {
-    "selection": "pending Agent A actual footage QA",
-    "candidates": [
-      "Koenigsegg Jesko Attack",
-      "Apollo Intensa Emozione",
-      "Pagani Huayra R",
-      "McLaren Senna GTR",
-      "Lamborghini Veneno",
-      "Lamborghini Sian FKP 37"
-    ],
-    "requirements": [
-      "1 coherent visibly verified hero vehicle",
-      "exceptional unique moving footage",
-      "real permission to use",
-      "crop-safe source quality",
-      "at least eleven non-repeated video moments"
-    ],
-    "mandatoryV12": false,
-    "mandatoryNight": false
+  "landmarkQuality": "RMS transition strong at approx 6.50 s; subsequent values are spectral-flux candidate transient times, not authenticated frame-accurate musical beats.",
+  "footageGate": {
+    "status": "FAIL",
+    "reason": "No approved original high-res one-new-car 11-angle footage pack; audio acquisition does not change video gate",
+    "mainHero": "Koenigsegg Jesko Attack scouting candidate, not locked production source",
+    "referenceVideoUsage": "ZERO frames, ZERO excerpts; previous user's Lamborghini clip may not be used"
   }
 }
