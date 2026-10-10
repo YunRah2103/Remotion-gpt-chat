@@ -1,4 +1,4 @@
-name: Porsche Agent A - contact sheet visual output
+name: Porsche Agent A - scene review visual output
 
 on:
   push:
@@ -12,26 +12,25 @@ permissions:
   contents: read
   actions: read
 jobs:
-  emit-verified-contact-image:
+  emit-authentic-source-scene-sheet:
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     steps:
-      - name: Retrieve verified contact-only artifact
+      - name: Retrieve real 25-candidate-contact artifact and expose its actual image
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh api repos/$GITHUB_REPOSITORY/actions/artifacts/11672746367/zip > /tmp/contact-proof.zip
-          unzip -Z1 /tmp/contact-proof.zip
-          PHOTO=$(unzip -Z1 /tmp/contact-proof.zip | grep 'contact-sheet.jpg' | head -1)
-          test -n "$PHOTO"
-          unzip -p /tmp/contact-proof.zip "$PHOTO" > /tmp/contact-sheet.jpg
+          gh api repos/$GITHUB_REPOSITORY/actions/artifacts/11672382328/zip > /tmp/source-contact.zip
+          unzip -Z1 /tmp/source-contact.zip
+          IMAGE=$(unzip -Z1 /tmp/source-contact.zip | grep 'scene-contact-page-01.jpg' | head -1)
+          test -n "$IMAGE"
+          unzip -p /tmp/source-contact.zip "$IMAGE" > /tmp/scene-contact.jpg
           python - <<'PY'
           import base64
           from pathlib import Path
-          payload=base64.b64encode(Path('/tmp/contact-sheet.jpg').read_bytes()).decode('ascii')
-          print('CONTACT_IMAGE_BASE64_START')
-          for offset in range(0,len(payload),4000):
-              print('CONTACT_IMAGE_PART:'+payload[offset:offset+4000])
-          print('CONTACT_IMAGE_BASE64_END')
+          content=base64.b64encode(Path('/tmp/scene-contact.jpg').read_bytes()).decode()
+          print('SCENE_IMAGE_BASE64_START')
+          for i in range(0,len(content),4000):print('SCENE_IMAGE_PART:'+content[i:i+4000])
+          print('SCENE_IMAGE_BASE64_END')
           PY
