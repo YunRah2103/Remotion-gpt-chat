@@ -71,9 +71,11 @@ def main():
     ap.add_argument("--media-id",choices=sorted(OFFICIAL),default="286687")
     ap.add_argument("--step",type=float,default=24.0)
     ap.add_argument("--max-samples",type=int,default=40)
+    ap.add_argument("--start",type=float,default=0.0)
+    ap.add_argument("--end",type=float,default=None)
     ap.add_argument("--out",type=Path,default=Path("out/porsche-official-sparse-index"))
     a=ap.parse_args()
-    if not 2<=a.step<=120 or not 1<=a.max_samples<=80:
+    if not 0.8<=a.step<=120 or not 1<=a.max_samples<=80:
         ap.error("Invalid sample interval or count")
     a.out.mkdir(parents=True,exist_ok=True)
     url=f"https://newstv.porsche.com/porschevideos/newstv.porsche.com_{a.media_id}_en.mp4"
@@ -104,8 +106,10 @@ def main():
     try:
         metadata=remote_info(url)
         report.update(metadata)
-        marks=[min(metadata["durationSeconds"]-1,(n+.5)*a.step)
-               for n in range(min(a.max_samples,math.ceil(metadata["durationSeconds"]/a.step)))]
+        end=min(float(a.end) if a.end is not None else metadata["durationSeconds"], metadata["durationSeconds"]-.05)
+        if not 0<=a.start<end: raise ValueError("Bad seek range")
+        marks=[min(end-.03,a.start+(n+.5)*a.step)
+               for n in range(min(a.max_samples,math.ceil((end-a.start)/a.step)))]
         marks=sorted(set(round(x,2) for x in marks if x>=0))
         good=[]
         errors=[]
@@ -122,7 +126,8 @@ def main():
         good.sort(key=lambda x:x["index"])
         pages=generate_sheet(good,a.out,a.media_id) if good else []
         report.update(status="SPARSE_SOURCE_VISUAL_LEADS" if len(good)>=4 else "INSUFFICIENT_PREVIEWS",
-                      sampleIntervalSeconds=a.step,requestedSamples=len(marks),usableSamples=len(good),
+                      sampleIntervalSeconds=a.step,requestedStartSeconds=a.start,requestedEndSeconds=end,
+                      requestedSamples=len(marks),usableSamples=len(good),
                       contactSheets=pages,samples=good,failures=errors)
     except Exception as e:
         report["error"]=str(e)[:700]
