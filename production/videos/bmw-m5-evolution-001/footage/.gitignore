@@ -1,0 +1,5 @@
+local-originals/
+local-proofs/
+approved-cuts.local.json
+source-manifest.json
+__pycache__/
