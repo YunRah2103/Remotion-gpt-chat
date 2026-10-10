@@ -1,60 +1,54 @@
 import React from 'react';
 import {AbsoluteFill,OffthreadVideo,Sequence,interpolate,staticFile,useCurrentFrame} from 'remotion';
-import mapJSON from '../../production/videos/huracan-sto-v10-001/shot-map.json';
-import {evaluateBeatFx} from '../fx/beat';
-import type {CutStyle} from '../fx/beat';
+import mapData from '../../production/videos/huracan-sto-v10-001/shot-map-landscape.json';
+
+type Key={frame:number;x:number;y:number;zoom:number};
+type Cut='cut'|'whip-left'|'whip-right'|'punch'|'impact';
+type Shot={id:string;startFrame:number;endFrameExclusive:number;file:string;cutStyle:Cut;cropKeyframes:Key[]};
+type Map={output:{width:number;height:number;fps:number;durationFrames:number};revealFrame:number;sourceGatePassed:boolean;shots:Shot[]};
+const map=mapData as Map;
+const clamp=(v:number,a=0,b=1)=>Math.max(a,Math.min(b,v));
 
 /**
- * Every sequence is a DIFFERENT physical camera angle once Agent A supplies approved media.
- * With missing files, only the intentionally conspicuous PROVISIONAL layout is renderable.
- * No automotive footage is generated, faked, or implied by this fallback.
+ * HURACÁN STO 001 / LANDSCAPE. REAL publisher-origin footage, source QA pending.
+ * Requires the 14 verified 30fps shot clips in public/sto-v10 created by
+ * prepare_landscape_assets.py from the user's uploaded ZIP.
+ * No invented car render, unrelated model substitution, UI, or missing-asset fallback.
  */
-type Keyframe={frame:number;x:number;y:number;zoom:number};
-type Source={file:string|null;sourceStartSeconds:number|null;sourceEndSeconds:number|null};
-type Shot={id:string;startFrame:number;endFrameExclusive:number;intendedSubject:string;desiredCameraAngle:string;cutStyle:CutStyle;source:Source;cropKeyframes:Keyframe[]};
-type ShotMap={fps:number;durationFrames:number;revealFrame:number;shots:Shot[]};
-const shotMap=mapJSON as unknown as ShotMap;
-const clamp=(v:number,min:number,max:number)=>Math.min(max,Math.max(min,v));
-const interpolateCrop=(local:number,keys:Keyframe[])=>{
- const prev=keys[0];
- const next=keys[keys.length-1];
- const sample=(field:'x'|'y'|'zoom')=>interpolate(local,[prev.frame,next.frame],[prev[field],next[field]],{extrapolateLeft:'clamp',extrapolateRight:'clamp'});
- return {x:sample('x'),y:sample('y'),zoom:sample('zoom')};
-};
-const Scene:React.FC<{shot:Shot;mode:'provisional'|'final'}>=({shot,mode})=>{
- const frame=useCurrentFrame();
- const duration=shot.endFrameExclusive-shot.startFrame;
- const crop=interpolateCrop(frame,shot.cropKeyframes);
- const fx=evaluateBeatFx(frame,[{frame:0,style:shot.cutStyle}],duration,.58);
- const x=clamp(crop.x,.08,.92),y=clamp(crop.y,.08,.92),zoom=clamp(crop.zoom,1,1.18);
- const overscan=Math.max(zoom,1+Math.abs(fx.shiftX)/540+.012);
- const real=shot.source.file!==null&&shot.source.sourceStartSeconds!==null;
- if(mode==='final'&&!real)throw new Error('UNVERIFIED STO MEDIA: '+shot.id+'. Populate shot-map.json and run --final validation.');
- return <AbsoluteFill style={{backgroundColor:'#050608',overflow:'hidden'}}>
-   {real?<AbsoluteFill style={{transform:`translateX(${fx.shiftX}px) rotate(${fx.tilt}deg) scale(${overscan*fx.zoom})`,transformOrigin:'center'}}>
-    <OffthreadVideo src={staticFile('sto-v10/'+shot.source.file)}
-      startFrom={Math.round(shot.source.sourceStartSeconds!*shotMap.fps)}
-      volume={0} style={{width:'100%',height:'100%',objectFit:'cover',
-        objectPosition:`${x*100}% ${y*100}%`,
-        filter:'contrast(1.055) saturate(1.04) brightness(1.01)'}}/>
-   </AbsoluteFill>:<AbsoluteFill style={{background:'linear-gradient(145deg,#05080e,#171d29 45%,#05080e)'}}>
-    <div style={{position:'absolute',top:550,left:70,right:70,fontFamily:'Arial,sans-serif',color:'#e9edf3'}}>
-      <div style={{fontSize:27,letterSpacing:5,color:'#f3bc77'}}>PROVISIONAL · MEDIA MISSING</div>
-      <div style={{fontSize:91,fontWeight:800,marginTop:25}}>STO {shot.id.slice(0,2)}</div>
-      <div style={{fontSize:32,lineHeight:1.25,marginTop:22}}>{shot.intendedSubject}</div>
-      <div style={{fontSize:25,color:'#909bab',marginTop:32}}>{shot.startFrame}–{shot.endFrameExclusive-1} / 316 FRAMES</div>
-    </div>
-   </AbsoluteFill>}
-   {fx.flash>0?<AbsoluteFill style={{backgroundColor:'#eef4ff',opacity:Math.min(.32,fx.flash),pointerEvents:'none'}}/>:null}
-   {fx.rgbOffset>0?<AbsoluteFill style={{opacity:Math.min(.12,fx.rgbOffset/20),pointerEvents:'none',
-     background:'linear-gradient(90deg,rgba(240,52,67,.13),transparent 25%,transparent 75%,rgba(63,170,254,.13))'}}/>:null}
+const CutVideo:React.FC<{shot:Shot}>=({shot})=>{
+ const f=useCurrentFrame();
+ const length=shot.endFrameExclusive-shot.startFrame;
+ const a=shot.cropKeyframes[0],b=shot.cropKeyframes[shot.cropKeyframes.length-1];
+ const lerp=(x:number,y:number)=>interpolate(f,[a.frame,b.frame],[x,y],{extrapolateLeft:'clamp',extrapolateRight:'clamp'});
+ const mx=lerp(a.x,b.x),my=lerp(a.y,b.y),zoom=lerp(a.zoom,b.zoom);
+ const entry=clamp(1-f/5),impact=shot.cutStyle==='impact';
+ const whip=shot.cutStyle==='whip-left'||shot.cutStyle==='whip-right';
+ const direction=shot.cutStyle==='whip-left'?-1:1;
+ // Shift a few frames only; overscan prevents empty edges. Do not smudge half the scene.
+ const pan=whip?direction*entry*112:0;
+ const punch=(impact||shot.cutStyle==='punch')?entry*entry*.10:0;
+ const totalZoom=zoom+punch+(whip?entry*.065:0);
+ const flash=impact?Math.max(0,(1-f/3))*.25:0;
+ const blur=whip?Math.max(0,2.5-f*.7):0;
+ return <AbsoluteFill style={{backgroundColor:'#06090d',overflow:'hidden'}}>
+  <AbsoluteFill style={{transform:`translate3d(${pan}px,0,0) scale(${totalZoom})`,
+    transformOrigin:`${mx*100}% ${my*100}%`,
+    filter:`contrast(1.055) saturate(1.035) brightness(1.005) blur(${blur}px)`}}>
+    <OffthreadVideo src={staticFile('sto-v10/'+shot.file)} volume={0}
+      startFrom={0} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+  </AbsoluteFill>
+  {flash>0?<AbsoluteFill style={{pointerEvents:'none',background:'#f2f5fc',opacity:flash}}/>:null}
  </AbsoluteFill>;
 };
-export const HuracanStoFilm:React.FC<{mode:'provisional'|'final'}>=({mode})=>{
- if(shotMap.fps!==30||shotMap.durationFrames!==316||shotMap.revealFrame!==78)throw new Error('STO locked format changed');
- return <AbsoluteFill style={{backgroundColor:'#050608'}}>
-  {shotMap.shots.map(shot=><Sequence key={shot.id} from={shot.startFrame} durationInFrames={shot.endFrameExclusive-shot.startFrame} name={shot.id}>
-    <Scene shot={shot} mode={mode}/>
+export const HuracanStoFilm:React.FC<{mode:'candidate'|'release'}>=({mode})=>{
+ if(map.output.width!==1920||map.output.height!==1080||map.output.fps!==30||map.output.durationFrames!==316||map.revealFrame!==78)
+   throw new Error('STO landscape production contract modified');
+ if(mode==='release'&&!map.sourceGatePassed)
+   throw new Error('STOP: moving-angle identity gate A NOT PASSED. Do not call candidate footage final.');
+ return <AbsoluteFill style={{backgroundColor:'#05070a'}}>
+  {map.shots.map(s=><Sequence key={s.id} from={s.startFrame}
+     durationInFrames={s.endFrameExclusive-s.startFrame} name={s.id}>
+    <CutVideo shot={s}/>
   </Sequence>)}
  </AbsoluteFill>;
 };

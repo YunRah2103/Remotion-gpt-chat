@@ -1,0 +1,25 @@
+name: Huracan STO Agent B landscape code tests
+on:
+  push:
+    branches: [automotive-edits/huracan-sto-v10-001/b-edit]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  editor-code:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
+      - name: Check landscape beats and moving-angle truthfulness
+        run: |
+          node --test production/videos/huracan-sto-v10-001/edit-landscape.test.cjs
+          node production/videos/huracan-sto-v10-001/validate-landscape-edit.cjs
+      - name: Source media is provided separately; do not pretend this workflow renders the car
+        run: echo 'REAL STO CLIPS REQUIRED FROM AGENT-B HANDOFF PACK BEFORE NATIVE REMOTION RENDER'
