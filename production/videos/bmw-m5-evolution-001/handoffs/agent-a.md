@@ -1,45 +1,65 @@
-# Agent A — Real BMW M5 footage handoff (REVIEW, not READY)
+# BMW M5 Evolution 001 — Agent A source delivery V2
 
+**Agent:** A, Automotive Footage Director  
+**Repository:** `YunRah2103/Remotion-gpt-chat`  
 **Branch:** `automotive-edits/bmw-m5-evolution-001/a-footage`  
-**Research code source commit:** `d4663982a640ab1e913ef3a820502fab4a7fa826`  
-**Status:** `review`. Real moving 42 cuts are AVAILABLE as a GitHub artifact. **Not fully editorially approved.**
+**Source implementation SHA:** `8cc2e07a0bfa10a3867b5972c49e4740f7778816`  
+**Handoff:** **REVIEW (not READY)**
 
 ## Actual deliverables
 
-**[42 actual BMW M5 clips — GitHub Actions artifact 11668700332](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38047298176/artifacts/11668700332)**, run **[38047298176 (SUCCESS)](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38047298176)**. File names `e28-01.mp4` ... `g90-06.mp4`, with 42 original-segment timecodes, source/clip SHA256, actual native stream dimensions/FPS, all-source metadata, contact sheet and 42 full decode/motion checks. Retention initially 7 days. Nothing was committed as a public MP4 Git blob or release. Archive access is subject to GitHub permissions.
+**[Download actual improved 42-clip bundle — GitHub Actions artifact 11668682025](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38048763831/artifacts/11668682025)**
 
-`footage/provisional-cuts.json` is the authoritative generation/slot/source timestamp mapping. `footage/build_review_bundle.py` reassembles these cuts directly from original sources. Asset production was performed by existing **isolated GitHub Actions** with real native media.
+**[View run 38048763831, SUCCESS](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38048763831)**
 
-Research: BMW PressClub originals in [8-source artifact 11667643927](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38045881998/artifacts/11667643927), and dedicated authentic 1920×1080 **E28** driving MOV (not a still) in [artifact 11666924618](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38046928757/artifacts/11666924618).
+The artifact includes 42 unique video **files** named `clips/e28-01.mp4` through `clips/g90-06.mp4`, `MANIFEST.json` (each source slot, SHA256, actual resolution, actual FPS, duration, source in-point, motion score and limitations), `CONTACT-42-V2.jpg`, `SHA256SUMS.txt`, and `README.md`.
 
-## Source coverage
+This is a real moving source asset pack, not a planning placeholder, a repeated static image, or a public release. Files were byte-copied from actual earlier prepared high-quality video segments and **not re-encoded during V2 assembly**.
 
-| Generation | Year | Slots | Source native dimension | Primary real source | Editorial status |
-|---|---:|---:|---:|---|---|
-| E28 | 1985 | 1–6 | 1920×1080 | Dedicated authentic BMW Group 2016 driving master | Good candidate; camera variety to approve |
-| E34 | 1988 | 7–12 | 480×360 | Mixed 2005 BMW Group M5 formation/slalom footage | BLOCKER: other generations clearly appear |
-| E39 | 1998 | 13–18 | 480×360 | 2000 Nürburgring BMW Group historical film | Technically valid; low resolution |
-| E60 | 2005 | 19–24 | 480×360 | 2005 BMW Group country-road tracking footage | Technically valid; low resolution |
-| F10 | 2011 | 25–30 | 540×304 | 2011 BMW Group Ascari track footage | Technically valid; low resolution; HD upgrade job running |
-| F90 | 2017 | 31–36 | 1920×1080 | 2017 BMW Group Estoril master | Good visual variety |
-| G90 | 2024 | 37–42 | 3840×2160 | 2024 BMW Group M5 driving footage | 4K dimensions; source bitrate still matters |
+## Exact native resolution by generation
 
-Note: each extracted cut is 0.80s of genuine source video; beat-map clips are only about 0.4–0.5s after Agent B/C trim. Agent C must adjust source in/out to beat-map frames and independently verify there is no static/repeated shot or unsuitable frame at the final exact timing.
+| Generation | Era | Slot numbers | Actual native source excerpt pixels | Comment |
+|---|---|---|---|---|
+| E28 | 1985 | 01–06 | 1920×1080 | Dedicated moving BMW M5 heritage archive |
+| E34 | 1988 | 07–12 | 720×576 | Genuine original group-driving archive. **Not acceptable as clean solo E34 footage throughout.** |
+| E39 | 1998 | 13–18 | 720×576 | Original circa-2000 BMW M5 Nürburgring footage, six different movement scenarios |
+| E60 | 2005 | 19–24 | 720×576 | Original BMW M5 driving-alongside footage |
+| F10 | 2011 | 25–30 | 1920×1080 | Upgraded from 540×304 preview to genuine original HD |
+| F90 | 2017 | 31–36 | 1920×1080 | Genuine BMW F90 track driving footage |
+| G90 | 2024 | 37–42 | 3840×2160 | Genuine BMW G90 launch driving footage |
 
-## Blocking issues
+**Quality improvements from V1:** E34/E39/E60 now use native 720×576 masters instead of scaled-down 480×360 previews, while F10 now uses native 1920×1080 instead of a 540×304 compressed preview. E28, F90 and G90 preserve their verified video originals.
 
-1. **E34 is not acceptable for final signoff:** the 2005 archival source is mixed-generation formation/slalom. Several clips show E28, E39 or E60 cars in addition to an E34. Prevent wrong-generation content dominating the frame. Obtain six isolated, genuinely distinct high-quality E34 shots or redesign its framing; do not label unrelated cars E34.
-2. **Archive sharpness:** E34, E39, E60 and F10 clips are real but native archive-preview resolution. They must not be stretched into a 1080×1920 centre crop with fake resolution. Use a deliberate framed vintage-treatment or improve by downloading the genuine native masters. Existing source quality upgrade job `38047365846` targets 1920×1080 F10 and 1024×576 E39 (pending/verify separately).
-3. **No public publishing rights are claimed** for the BMW or other footage and no final soundtrack is in this bundle. Only use for review while rights remain unresolved.
-4. Temporal motion > threshold and full FFmpeg decode tests passed all 42 **but do not certify creative uniqueness or correct generation in every frame**.
+## Measured QA — actual GitHub native run
 
-## Master / Agent B handoff
+- **42/42 full FFmpeg video stream decodes PASS.**
+- **42/42 moving-video temporal difference tests PASS.**
+- **42/42 non-identical video SHA256 files PASS.**
+- All seven generations represented in the six-cut chronological timeline.
+- Real frame contact sheet was extracted directly from all 42 delivered video files.
+- The source runner did not silently upscale historical material or reuse a file byte-for-byte under another name.
+- **This mechanical QA does not prove 42 distinct creative camera angles or correct car dominance on every E34 shot.**
 
-Read `provisional-cuts.json`, download artifact **11668700332** from run **38047298176**, unpack 42 individual MP4 files, validate SHA and contact sheet. Map strictly E28 slots 1–6, E34 slots 7–12, E39 13–18, E60 19–24, F10 25–30, F90 31–36, G90 37–42. Treat E34 as a block requiring editorial replacement; low-res sources as review-only. Preserve all original source rights provenance and never leak the private song into public GitHub releases.
+## Editorial blockers that must not be concealed
 
-## QA evidence
+**E34 — do not sign off as clean or fully unique.** The BMW 2005 footage is a formation and wet-course montage featuring E28, E34, E39 and E60 cars. For the six E34 selections, other generations sometimes remain visible in background/foreground, and two wet-course takes have related camera framing. The authentic E34 is visible in several samples, but this cannot honestly be certified as six perfectly isolated unique E34 shots. Agent B/C must replace or repair these before presenting the film as final.
 
-- Actual 42-cut native runner, GitHub Actions **38047298176**, completed SUCCESS; FFmpeg decoded all 42 cut MP4s, source/clip hashes produced, image-motion difference tested, real visual contact sheet output.
-- Historical source real footage download run **38045881998** and 1080p E28 archive run **38046928757** completed.
-- Earlier preparation 4/4 unit tests, run **38014477573**.
-- Initial incorrect generation matches during the first acquisition run **38045592362** were explicitly rejected after inspecting actual frames. Only the corrected later run should be used. The first run is NOT part of the final generation mapping.
+**Vintage resolution.** E34/E39/E60 truly originate from 720×576 masters (25 fps). They cannot fill a 1080×1920 vertical crop at modern sharpness. Use refined archival panels/intentional composition instead of invented 4K or aggressive sharpening.
+
+**Usage rights.** BMW Group copyright and the user-provided private music require rights review before public distribution. Only private inspection was authorized; no public GitHub Release was made.
+
+## Sources, reproducibility, and previous runs
+
+The production source and exact forty-two slot timepoints are committed at `footage/provisional-cuts.json`, `footage/assemble_v2.py`, `footage/build_review_bundle.py`, and `footage/e34_focused.py`. V2 generated via a dedicated GitHub Actions runner, retrieving source artifacts:
+
+- [Initial verified-motion 42-source cut pack](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38047298176/artifacts/11668700332).
+- [Native E28 1080p historical master](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38046928757/artifacts/11666924618).
+- [E34 native 720×576 focused selects](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38048499011/artifacts/11668118626).
+- [Native E34/E39/E60 archival extracts](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38047591610/artifacts/11668242116).
+- [Native 1920×1080 F10 new extracts](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38047365846/artifacts/11667807177).
+
+The run artifact is temporary (7-day retention) and may require repository access. The full-size source originals remain outside Git history; only scripts, manifests and handoffs are Git-committed.
+
+## Action for Agent B and Agent C
+
+Fetch **artifact ID `11668682025`**, run **`38048763831`** from the A branch; verify `SHA256SUMS.txt` and `MANIFEST.json`, use clips 01–42 at their chronological beat-map positions, and handle E34 as **editorial BLOCKED** until identity/camera uniqueness is defensible. The film's actual 18.4-second cut timing, audio mix, full visual inspection and final delivery belong to B/C. Do not use initial inaccurate low-resolution preview sources or claim final quality without these corrections.
