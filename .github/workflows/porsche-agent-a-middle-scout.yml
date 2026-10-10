@@ -5,6 +5,7 @@ on:
       - automotive-edits/porsche-911-turbo-evolution-001/a-footage
     paths:
       - '.github/workflows/porsche-agent-a-middle-scout.yml'
+      - 'production/videos/porsche-911-turbo-evolution-001/footage/discover_mid_era_sources.py'
   workflow_dispatch:
 permissions:
   contents: read
