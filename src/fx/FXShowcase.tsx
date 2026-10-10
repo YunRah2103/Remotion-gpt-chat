@@ -6,8 +6,8 @@ import {slide} from '@remotion/transitions/slide';
 import {wipe} from '@remotion/transitions/wipe';
 import {flip} from '@remotion/transitions/flip';
 import {BeatFxTransform,FilmTexture,Grade,MotionBlurShot,StyledTrail} from './FXComponents';
-import type {BeatCut,CutStyle,GradePreset} from './FXComponents';
-import type {BeatCut as Cut} from './beat';
+import type {GradePreset} from './FXComponents';
+import type {BeatCut as Cut,CutStyle} from './beat';
 
 const colours=[
   ['#141b27','#7b9ab3'],['#1b202a','#9eb5a0'],['#19182a','#c59a6b'],
