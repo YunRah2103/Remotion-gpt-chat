@@ -1,0 +1,32 @@
+name: Porsche 911 Turbo Evolution - four agent beat and handoff checks
+on:
+  push:
+    branches:
+      - 'automotive-edits/porsche-911-turbo-evolution-001/**'
+    paths:
+      - 'production/videos/porsche-911-turbo-evolution-001/**'
+      - '.github/workflows/porsche-911-turbo-evolution-001-ci.yml'
+  pull_request:
+    paths:
+      - 'production/videos/porsche-911-turbo-evolution-001/**'
+      - '.github/workflows/porsche-911-turbo-evolution-001-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-production-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify 30 source-audio beat cuts, seven Porsche Turbo eras, 510 frames and 4 real handoff schemas
+        shell: bash
+        run: |
+          set -euo pipefail
+          python production/videos/porsche-911-turbo-evolution-001/validate_setup.py
+          python production/videos/porsche-911-turbo-evolution-001/footage/validate_shots.py production/videos/porsche-911-turbo-evolution-001/footage/shot-manifest.template.json
+          python -m compileall -q production/videos/porsche-911-turbo-evolution-001
+          echo "This PASSES a PLANNING CONTRACT ONLY. It does NOT establish actual Porsche footage, clip licences, a final film or master WAV availability." >> "$GITHUB_STEP_SUMMARY"
