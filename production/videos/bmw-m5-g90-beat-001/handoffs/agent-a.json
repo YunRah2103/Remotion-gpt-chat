@@ -2,14 +2,31 @@
   "schemaVersion": 1,
   "task": "bmw-m5-g90-beat-001-agent-a",
   "branch": "automotive-edits/bmw-m5-g90-001/a-footage",
-  "sourceSha": "e8f17c9ef5cc48b143b21d3cc4d8007861097464",
+  "sourceSha": "2da1f31683fdc02bc2993d0b34da7e9cd8080ef5",
   "owner": "research",
-  "summary": "UNSTARTED: role assigned; no real footage, edit, render or final QA claimed.",
+  "summary": "Research and implementation completed but footage delivery BLOCKED: 39 verified beat intervals and unique desired shot concepts; 0/39 authorized, downloaded, G90-verified moving video selections. Fail-closed FFprobe/decoded motion licensing audit implemented and tested.",
   "status": "blocked",
-  "files": [],
-  "evidence": [],
-  "blockers": [
-    "This agent has not begun implementation and has not supplied verified source or media proof."
+  "files": [
+    "production/videos/bmw-m5-g90-beat-001/footage/shot-plan.json",
+    "production/videos/bmw-m5-g90-beat-001/footage/research.json",
+    "production/videos/bmw-m5-g90-beat-001/footage/approved.json",
+    "production/videos/bmw-m5-g90-beat-001/footage/audit.py",
+    "production/videos/bmw-m5-g90-beat-001/footage/test_audit.py",
+    "production/videos/bmw-m5-g90-beat-001/footage/README.md"
   ],
-  "notes": "Planning placeholder. Source SHA is the previous real collage base; replace with actual work SHA before READY."
+  "evidence": [
+    "Actual code+research work commit: https://github.com/YunRah2103/Remotion-gpt-chat/commit/2da1f31683fdc02bc2993d0b34da7e9cd8080ef5",
+    "BMW PressClub video candidate PF0009730 G90 Sedan scene #3 (6m30s) source metadata: https://www.press.bmwgroup.com/global/tv-footage/detail/PF0009730/the-new-bmw-m5",
+    "BMW media copyright and use restrictions: https://mediapool.bmwgroup.com/download/edown/common/info?actEvent=mediaRights",
+    "Local execution: python3 -m unittest -v test_audit.py = 6/6 PASS (ffprobe, FFmpeg decoded motion vs static, frame/gap/model/duplicate/rights rejection); synthetic QA fixtures only, not G90 sources.",
+    "Local execution: python3 audit.py --plan shot-plan.json --sources approved.json --mode plan => PASS, 39 slots, 600 contiguous frames, 0 assigned; --mode ready => FAIL as designed: No approved sources."
+  ],
+  "blockers": [
+    "0 of 39 genuinely moving BMW M5 G90 saloon shot selections have approved source videos; all sourceId/in/out fields intentionally null.",
+    "No authorised downloadable G90 video with explicit public TikTok edit/reupload rights, verified source creator and permitted scope was obtained.",
+    "No original downloaded G90 media => no real G90 FFprobe, SHA256, decoded frame/contact sheet, identity confirmation or media artifact.",
+    "BMW Group PressClub scene #3 appears ideal visually but copyright and licensing terms prohibit assuming arbitrary edited-public-social reuse; obtain written permission or authorised alternatives.",
+    "Agent B also requires the separately supplied music and applicable audio redistribution rights."
+  ],
+  "notes": "Research only, NOT a READY handoff and NOT permission to reuse BMW press clips. SourceSha is the actual code+research commit before handoff registration. Agent B must not render substitutions from older F90, G99, M4 or still images."
 }
