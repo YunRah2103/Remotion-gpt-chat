@@ -21,6 +21,7 @@ OFFICIAL = {
     "167585": "A duel between seven 911 Turbo generations from 1975 to 2020",
     "295872": "Porsche Turbo Transfagarasan highway with 930, 964, 993 and 992 Turbo",
     "202036": "9:11 Magazine Episode 21 - Eight Porsche 911 Turbo generations",
+    "326868": "Porsche 911 Turbo S 964 Speed Yellow driving at Ascari media drive",
     "326868": "964 911 Turbo S Speed Yellow Porsche Ascari media drive",
 }
 PRESS_KIT = "https://newsroom.porsche.com/en/press-kits/50-years-porsche-turbo.html"
