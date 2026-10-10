@@ -1,0 +1,37 @@
+name: Porsche A - acquire four 964 native Turbo S shots
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-a-964-native.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  extract-four-genuine-camera-setups:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install H264 original video decoder
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install 'Pillow>=10,<12'
+      - name: Extract real 4K Porsche 964 Turbo S shots and native decode
+        run: |
+          python production/videos/porsche-911-turbo-evolution-001/footage/extract_four_964.py \
+            --output out/four-964-genuine-native
+      - name: Preserve unchanged source quality plus visual proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Porsche-A-four-original-964-candidates-${{ github.run_id }}
+          path: out/four-964-genuine-native/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
