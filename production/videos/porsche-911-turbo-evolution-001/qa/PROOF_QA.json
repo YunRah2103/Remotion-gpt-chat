@@ -1,0 +1,28 @@
+{
+  "status": "PASS_TECHNICAL_SYNTHETIC_ONLY",
+  "codec": "h264",
+  "size": [
+    720,
+    1280
+  ],
+  "fps": 30,
+  "frames": 112,
+  "durationSeconds": 3.7333333333333334,
+  "fullDecode": "PASS",
+  "sha256": "68c896812543f01357c05893745fa2c228657431ca0204f4f97e580ec6237b65",
+  "clipsRepresentRealPorsches": false,
+  "nativeRemotionProof": false,
+  "transitionChapterFrameStarts": [
+    67,
+    205,
+    343,
+    429
+  ],
+  "localArtifact": "private ChatGPT generated proof, NOT uploaded publicly",
+  "pending": [
+    "real Turbo clip frames",
+    "30-camera uniqueness",
+    "actual 510-frame master",
+    "source licence review"
+  ]
+}
