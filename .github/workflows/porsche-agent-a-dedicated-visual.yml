@@ -1,0 +1,53 @@
+name: Porsche Agent A - dedicated 930 and 992 source galleries
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-dedicated-visual.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect-source-gallery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 14
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - media_id: '286726'
+            artifact: '11672398775'
+            page: '01'
+          - media_id: '286726'
+            artifact: '11672398775'
+            page: '02'
+          - media_id: '286727'
+            artifact: '11673181069'
+            page: '01'
+          - media_id: '286727'
+            artifact: '11673181069'
+            page: '02'
+    steps:
+      - name: Output actual timecoded Porsche source thumbnails for human review
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT: ${{ matrix.artifact }}
+          PAGE: ${{ matrix.page }}
+          MEDIA_ID: ${{ matrix.media_id }}
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/${ARTIFACT}/zip" > /tmp/gallery.zip
+          ASSET=$(unzip -Z1 /tmp/gallery.zip | grep "source-${MEDIA_ID}-page-${PAGE}.jpg" | head -1)
+          test -n "$ASSET"
+          unzip -p /tmp/gallery.zip "$ASSET" > /tmp/contact.jpg
+          python - <<'PY'
+          import base64
+          from pathlib import Path
+          b=base64.b64encode(Path('/tmp/contact.jpg').read_bytes()).decode()
+          print('SOURCE_CONTACT_START')
+          for i in range(0,len(b),4000):
+            print('SOURCE_CONTACT_PART:'+b[i:i+4000])
+          print('SOURCE_CONTACT_END')
+          PY
