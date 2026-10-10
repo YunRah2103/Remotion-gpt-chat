@@ -1,0 +1,40 @@
+name: M5 Agent A 42 source-cut QA artifact
+on:
+  push:
+    branches: ['automotive-edits/bmw-m5-evolution-001/a-footage']
+    paths: ['.github/workflows/m5-42-review.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  clips:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: M5-A-SOURCES-38045881998
+          run-id: 38045881998
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: staging/bmw
+      - uses: actions/download-artifact@v4
+        with:
+          name: M5-E28-HD-38046928757
+          run-id: 38046928757
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: staging/heritage
+      - run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check 'Pillow>=11,<13'
+      - name: Produce actual 42 cut files, preview, SHA and full native decode verification
+        run: python production/videos/bmw-m5-evolution-001/footage/build_review_bundle.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: M5-42-REAL-PROVISIONAL-${{ github.run_id }}
+          path: out/m5-cuts-42/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
