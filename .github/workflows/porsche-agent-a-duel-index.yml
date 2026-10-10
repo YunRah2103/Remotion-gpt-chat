@@ -25,7 +25,7 @@ jobs:
       - name: Survey official 2020 seven-generation Turbo 1:46 film at 4s cadence
         run: |
           python production/videos/porsche-911-turbo-evolution-001/footage/index_official_sources.py \
-            --media-id 167585 --step 4 --max-samples 40 \
+            --media-id 167585 --step 5 --max-samples 40 \
             --out out/official-seven-gen-duel
       - name: Upload actual source contact gallery and URL metadata
         if: always()
