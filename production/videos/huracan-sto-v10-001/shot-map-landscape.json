@@ -1,0 +1,460 @@
+{
+  "schemaVersion": 2,
+  "project": "huracan-sto-v10-001",
+  "status": "REAL_FOOTAGE_ASSEMBLY_PENDING_GATE_A_APPROVAL",
+  "output": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "durationFrames": 316
+  },
+  "revealFrame": 78,
+  "sourceGatePassed": false,
+  "mediaDirectory": "public/sto-v10",
+  "inputPackage": "HURACAN_STO_LANDSCAPE_FOOTAGE.zip",
+  "sourceFiles": {
+    "phantom-sto-primary": {
+      "sha256": "dba560aea7cbdf0f64f7e7bb647ae2d43cabcf03a7af9a6a7a445122caa43f33",
+      "url": "https://phantommedia.sgp1.cdn.digitaloceanspaces.com/Phantom-Footer-Videos/2022/04/Rent-Lamborghini-Huracan-STO-In-Dubai.mp4",
+      "fps": 25,
+      "width": 1920,
+      "height": 1080
+    },
+    "phantom-sto-lambo": {
+      "sha256": "62deb84ce58be337c61402b8d1534b369d2d41c0b1797d0577cfdfe07365d502",
+      "url": "https://phantommedia.sgp1.cdn.digitaloceanspaces.com/Phantom-Footer-Videos/2022/04/STO-LAMBO-VIDEO-.mp4",
+      "fps": 60,
+      "width": 1920,
+      "height": 1080
+    },
+    "phantom-sto-huracan": {
+      "sha256": "d4d34a89be7b27f50e5f1a82a28521eae2fae9ac28e78613a847b0ef36564697",
+      "url": "https://phantommedia.sgp1.cdn.digitaloceanspaces.com/Phantom-Footer-Videos/2022/04/Lamborghini-Huracan-STO.mp4",
+      "fps": 60,
+      "width": 1920,
+      "height": 1080
+    }
+  },
+  "shots": [
+    {
+      "id": "01-prelaunch",
+      "startFrame": 0,
+      "endFrameExclusive": 14,
+      "sourceOriginal": "phantom-sto-primary.mp4",
+      "sourceStartSeconds": 9.64,
+      "sourceEndSeconds": 10.106667,
+      "file": "shot-01.mp4",
+      "intendedSubject": "STO cockpit prelaunch mechanical macro",
+      "cutStyle": "punch",
+      "plannedFocalX": 0.5,
+      "plannedFocalY": 0.5,
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.08
+        },
+        {
+          "frame": 13,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.12
+        }
+      ],
+      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
+      "uniqueMovingAngleKey": null,
+      "movingAngleVerified": false
+    },
+    {
+      "id": "02-exhaust",
+      "startFrame": 14,
+      "endFrameExclusive": 34,
+      "sourceOriginal": "phantom-sto-primary.mp4",
+      "sourceStartSeconds": 5.83,
+      "sourceEndSeconds": 6.496667,
+      "file": "shot-02.mp4",
+      "intendedSubject": "STO rear mesh and exhaust physical detail",
+      "cutStyle": "cut",
+      "plannedFocalX": 0.5,
+      "plannedFocalY": 0.5,
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.055
+        },
+        {
+          "frame": 19,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.075
+        }
+      ],
+      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
+      "uniqueMovingAngleKey": null,
+      "movingAngleVerified": false
+    },
+    {
+      "id": "03-wing",
+      "startFrame": 34,
+      "endFrameExclusive": 56,
+      "sourceOriginal": "phantom-sto-huracan.mp4",
+      "sourceStartSeconds": 21.5,
+      "sourceEndSeconds": 22.233333,
+      "file": "shot-03.mp4",
+      "intendedSubject": "STO wing and air duct on stationary display car",
+      "cutStyle": "whip-left",
+      "plannedFocalX": 0.5,
+      "plannedFocalY": 0.5,
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.065
+        },
+        {
+          "frame": 21,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.105
+        }
+      ],
+      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
+      "uniqueMovingAngleKey": null,
+      "movingAngleVerified": false
+    },
+    {
+      "id": "04-wheel",
+      "startFrame": 56,
+      "endFrameExclusive": 78,
+      "sourceOriginal": "phantom-sto-primary.mp4",
+      "sourceStartSeconds": 11.9,
+      "sourceEndSeconds": 12.633333,
+      "file": "shot-04.mp4",
+      "intendedSubject": "STO wheel and bodywork detail",
+      "cutStyle": "punch",
+      "plannedFocalX": 0.5,
+      "plannedFocalY": 0.5,
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.055
+        },
+        {
+          "frame": 21,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.095
+        }
+      ],
+      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
+      "uniqueMovingAngleKey": null,
+      "movingAngleVerified": false
+    },
+    {
+      "id": "05-reveal",
+      "startFrame": 78,
+      "endFrameExclusive": 95,
+      "sourceOriginal": "phantom-sto-primary.mp4",
+      "sourceStartSeconds": 0,
+      "sourceEndSeconds": 0.566667,
+      "file": "shot-05.mp4",
+      "intendedSubject": "STO moving front three-quarter in roadway",
+      "cutStyle": "impact",
+      "plannedFocalX": 0.5,
+      "plannedFocalY": 0.5,
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.025
+        },
+        {
+          "frame": 16,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.055
+        }
+      ],
+      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
+      "uniqueMovingAngleKey": null,
+      "movingAngleVerified": false
+    },
+    {
+      "id": "06-front-pursuit",
+      "startFrame": 95,
+      "endFrameExclusive": 113,
+      "sourceOriginal": "phantom-sto-lambo.mp4",
+      "sourceStartSeconds": 22.26,
+      "sourceEndSeconds": 22.86,
+      "file": "shot-06.mp4",
+      "intendedSubject": "STO approaching from low front camera",
+      "cutStyle": "whip-right",
+      "plannedFocalX": 0.5,
+      "plannedFocalY": 0.5,
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.035
+        },
+        {
+          "frame": 17,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.075
+        }
+      ],
+      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
+      "uniqueMovingAngleKey": null,
+      "movingAngleVerified": false
+    },
+    {
+      "id": "07-side-road",
+      "startFrame": 113,
+      "endFrameExclusive": 134,
+      "sourceOriginal": "phantom-sto-primary.mp4",
+      "sourceStartSeconds": 16.85,
+      "sourceEndSeconds": 17.55,
+      "file": "shot-07.mp4",
+      "intendedSubject": "STO side road pass",
+      "cutStyle": "cut",
+      "plannedFocalX": 0.5,
+      "plannedFocalY": 0.5,
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.04
+        },
+        {
+          "frame": 20,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.07
+        }
+      ],
+      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
+      "uniqueMovingAngleKey": null,
+      "movingAngleVerified": false
+    },
+    {
+      "id": "08-corner-approach",
+      "startFrame": 134,
+      "endFrameExclusive": 157,
+      "sourceOriginal": "phantom-sto-lambo.mp4",
+      "sourceStartSeconds": 23.08,
+      "sourceEndSeconds": 23.846667,
+      "file": "shot-08.mp4",
+      "intendedSubject": "STO continued approach / passing camera",
+      "cutStyle": "whip-left",
+      "plannedFocalX": 0.5,
+      "plannedFocalY": 0.5,
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.055
+        },
+        {
+          "frame": 22,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.095
+        }
+      ],
+      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
+      "uniqueMovingAngleKey": null,
+      "movingAngleVerified": false
+    },
+    {
+      "id": "09-rear-three-quarter",
+      "startFrame": 157,
+      "endFrameExclusive": 182,
+      "sourceOriginal": "phantom-sto-lambo.mp4",
+      "sourceStartSeconds": 18.43,
+      "sourceEndSeconds": 19.263333,
+      "file": "shot-09.mp4",
+      "intendedSubject": "STO rear three-quarter roadway low camera",
+      "cutStyle": "punch",
+      "plannedFocalX": 0.5,
+      "plannedFocalY": 0.5,
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.045
+        },
+        {
+          "frame": 24,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.08
+        }
+      ],
+      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
+      "uniqueMovingAngleKey": null,
+      "movingAngleVerified": false
+    },
+    {
+      "id": "10-side-exit",
+      "startFrame": 182,
+      "endFrameExclusive": 206,
+      "sourceOriginal": "phantom-sto-primary.mp4",
+      "sourceStartSeconds": 17.6,
+      "sourceEndSeconds": 18.4,
+      "file": "shot-10.mp4",
+      "intendedSubject": "STO lateral road exit",
+      "cutStyle": "cut",
+      "plannedFocalX": 0.5,
+      "plannedFocalY": 0.5,
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.025
+        },
+        {
+          "frame": 23,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.055
+        }
+      ],
+      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
+      "uniqueMovingAngleKey": null,
+      "movingAngleVerified": false
+    },
+    {
+      "id": "11-approach-low",
+      "startFrame": 206,
+      "endFrameExclusive": 232,
+      "sourceOriginal": "phantom-sto-lambo.mp4",
+      "sourceStartSeconds": 0.62,
+      "sourceEndSeconds": 1.486667,
+      "file": "shot-11.mp4",
+      "intendedSubject": "STO front-quarter low camera",
+      "cutStyle": "whip-right",
+      "plannedFocalX": 0.5,
+      "plannedFocalY": 0.5,
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.035
+        },
+        {
+          "frame": 25,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.07
+        }
+      ],
+      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
+      "uniqueMovingAngleKey": null,
+      "movingAngleVerified": false
+    },
+    {
+      "id": "12-rear-wheel",
+      "startFrame": 232,
+      "endFrameExclusive": 256,
+      "sourceOriginal": "phantom-sto-lambo.mp4",
+      "sourceStartSeconds": 20.28,
+      "sourceEndSeconds": 21.08,
+      "file": "shot-12.mp4",
+      "intendedSubject": "STO rear camera on road",
+      "cutStyle": "cut",
+      "plannedFocalX": 0.5,
+      "plannedFocalY": 0.5,
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.025
+        },
+        {
+          "frame": 23,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.05
+        }
+      ],
+      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
+      "uniqueMovingAngleKey": null,
+      "movingAngleVerified": false
+    },
+    {
+      "id": "13-rear-follow",
+      "startFrame": 256,
+      "endFrameExclusive": 284,
+      "sourceOriginal": "phantom-sto-lambo.mp4",
+      "sourceStartSeconds": 2.32,
+      "sourceEndSeconds": 3.253333,
+      "file": "shot-13.mp4",
+      "intendedSubject": "STO rear three-quarter camera",
+      "cutStyle": "whip-left",
+      "plannedFocalX": 0.5,
+      "plannedFocalY": 0.5,
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.025
+        },
+        {
+          "frame": 27,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.065
+        }
+      ],
+      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
+      "uniqueMovingAngleKey": null,
+      "movingAngleVerified": false
+    },
+    {
+      "id": "14-hero-payoff",
+      "startFrame": 284,
+      "endFrameExclusive": 316,
+      "sourceOriginal": "phantom-sto-primary.mp4",
+      "sourceStartSeconds": 16.2,
+      "sourceEndSeconds": 17.266667,
+      "file": "shot-14.mp4",
+      "intendedSubject": "STO three-quarter roadway hero",
+      "cutStyle": "punch",
+      "plannedFocalX": 0.5,
+      "plannedFocalY": 0.5,
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.02
+        },
+        {
+          "frame": 31,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.06
+        }
+      ],
+      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
+      "uniqueMovingAngleKey": null,
+      "movingAngleVerified": false
+    }
+  ]
+}
