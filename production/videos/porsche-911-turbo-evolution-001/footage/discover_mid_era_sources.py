@@ -13,6 +13,8 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 PAGES = [
+  ("2025 Turbo S launch press kit with 964 Ascari", "https://newsroom.porsche.com/en/press-kits/pfv-porsche-911-turbo-s.html"),
+  ("2025 Turbo S press kit EU", "https://newsroom.porsche.eu/en/press-kits/pfv-porsche-911-turbo-s.html"),
   ("991 exclusive","https://newsroom.porsche.com/en/products/porsche-911-turbo-s-exclusive-series-limited-online-campaign-robots-13811.html"),
   ("991 turbo handcraft","https://newsroom.porsche.com/en/products/porsche-911-turbo-s-exclusive-series-porsche-exclusive-manufaktur-finished-by-hand-stuttgart-media-13923.html"),
   ("991 aerodynamics","https://newsroom.porsche.com/en/innovation/engineering/storm-tested-10734.html"),
