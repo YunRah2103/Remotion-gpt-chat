@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "status": "VISUAL_CORRECTION_PASS_3_ONLY_SLOTS_20_24_PENDING",
-  "note": "Independent FFmpeg full-decode pass-2 found only 997 slot20 internal cut and 991 slot24 undesired chassis overlay/scene cut. Slot20 moved to next clean frontal moving 997 scene; slot24 moved to later clear white 991 road-driving scene. Pending new 30-video visual and motion QA.",
+  "status": "FINAL_NATIVE_SOURCE_REVIEWED_CORRECTIVE_PASS_4_RENDER_PENDING",
+  "note": "Rest of 28 slots passed independent full video decode/scene-cut inspection in pass 3. Precisely sampled official Porsche 997 (207-221s) and 991 (220-250s) source neighborhoods at 0.5-second steps; 997 slot 20 and 991 slot 24 candidate timestamps screened against three-frame portrait crops and frame-motion jump detector. Final original native source ZIP QA pending.",
   "sourceResolutionDisclosure": "930 964 992 original 3840x2160; 993 996 997 991 original 1920x1080; latter 1080x1920 portrait output requires genuine optical upscale of crop",
   "slots": [
     {
@@ -315,13 +315,13 @@
       "sourceUrl": "https://newstv.porsche.com/porschevideos/newstv.porsche.com_202036_en.mp4",
       "originCreator": "Porsche AG / Porsche Newsroom",
       "sourcePageUrl": "https://newsroom.porsche.com/en_US/2022/products/porsche-911-magazine-episode-21-tale-of-the-turbo-mark-webber-911-turbo-models-cayenne-turbo-gt-911-gt1-27314.html",
-      "sourceCenterSeconds": 213.25,
-      "focusX": 0.52,
+      "sourceCenterSeconds": 213.86,
+      "focusX": 0.53,
       "focusY": 0.5,
       "shotKey": "porsche-202036-camera-20",
-      "angleAndMotion": "silver 997 front driving on roadside after prior wheel-detail cut",
+      "angleAndMotion": "silver 997 Turbo front road-corner approach with motion throughout one source setup",
       "sourceLicenseStatus": "UNVERIFIED_PRIVATE_REVIEW",
-      "visualReviewStatus": "CORRECTIVE_CANDIDATE_REQUIRES_NEW_OUTPUT_INSPECTION",
+      "visualReviewStatus": "SOURCE_NATIVE_SCREENED_FINAL_RENDER_AWAITING_QA",
       "transitionHandleFrames": 4
     },
     {
@@ -379,13 +379,13 @@
       "sourceUrl": "https://newstv.porsche.com/porschevideos/newstv.porsche.com_202036_en.mp4",
       "originCreator": "Porsche AG / Porsche Newsroom",
       "sourcePageUrl": "https://newsroom.porsche.com/en_US/2022/products/porsche-911-magazine-episode-21-tale-of-the-turbo-mark-webber-911-turbo-models-cayenne-turbo-gt-911-gt1-27314.html",
-      "sourceCenterSeconds": 239.42,
-      "focusX": 0.5,
+      "sourceCenterSeconds": 244.05,
+      "focusX": 0.52,
       "focusY": 0.5,
       "shotKey": "porsche-202036-camera-24",
-      "angleAndMotion": "white 991 clear exterior forward-moving canyon road rather than technical chassis graphic",
+      "angleAndMotion": "white 991 Turbo roadside exterior side-to-rear pass on canyon road, no technical overlays",
       "sourceLicenseStatus": "UNVERIFIED_PRIVATE_REVIEW",
-      "visualReviewStatus": "CORRECTIVE_CANDIDATE_REQUIRES_NEW_OUTPUT_INSPECTION",
+      "visualReviewStatus": "SOURCE_NATIVE_SCREENED_FINAL_RENDER_AWAITING_QA",
       "transitionHandleFrames": 4
     },
     {
