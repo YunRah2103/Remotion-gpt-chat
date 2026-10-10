@@ -1,0 +1,37 @@
+name: Porsche Agent A - Transfagarasan 964 993 road footage
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-romania.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  authentic-porsche-930-964-993-992-source-review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install full resolution 4K evidence sampler
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install 'Pillow>=10,<12'
+      - name: Check actual original Porsche Newsroom MP4 frames
+        run: |
+          python production/videos/porsche-911-turbo-evolution-001/footage/index_official_sources.py \
+            --media-id 295872 --step 2.4 --max-samples 40 \
+            --out out/porsche-romania
+      - name: Preserve source contact and individual proof JPEGs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Porsche-Romania-Turbo-964-993-source-${{ github.run_id }}
+          path: out/porsche-romania/
+          retention-days: 7
+          if-no-files-found: warn
