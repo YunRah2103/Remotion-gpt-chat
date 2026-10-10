@@ -4,6 +4,7 @@ on:
     branches: [automotive-edits/porsche-911-turbo-evolution-001/d-master]
     paths:
       - '.github/workflows/porsche-d-broll-preview.yml'
+      - 'production/videos/porsche-911-turbo-evolution-001/integration/sample_official_stream.py'
   workflow_dispatch:
     inputs:
       media_id:
