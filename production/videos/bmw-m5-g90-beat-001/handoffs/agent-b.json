@@ -15,7 +15,7 @@
   "evidence": [
     "Independent download of Agent A G90-PRIVATE-39-SHOTS artifact 11652333164, run 38009881261 (actual ZIP media).",
     "Agent A final source commit 96a4cec9eac460d7ec44c625292b781dda6830b8; origin PF0009730 BMW Group G90 Scene 3; SHA256 original 59947dad266e74d92843cd90c2b2c90a3e118b277898f001c30c51e4e9b428a9.",
-    "38/39 first? No: 39/39 video clip SHA256 matched source manifest, all FFprobe H.264 1280×720 30fps, exact 600 frames, individual actual motion proofs.",
+    "39/39 video clip SHA256 matched source manifest, all FFprobe H.264 1280×720 30fps, exact 600 frames, individual actual motion proofs.",
     "Local private final MP4 /mnt/data/BMW_M5_G90_PRIVATE_REVIEW_20s.mp4 SHA256 30ffe824a1694f386b94d524b170fb950801d6230fc6972dcc38c1fa7465e4f4.",
     "Actual complete decode and FFprobe PASS: H.264 1080x1920 30fps 600 frames 20.000s; audio AAC 48 kHz 2 channel.",
     "Independent 39-shot review every scene median per-frame difference 2.98, min 1.166, nonblack 39/39; user video text-free.",
