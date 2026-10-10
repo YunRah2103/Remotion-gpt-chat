@@ -1,0 +1,90 @@
+name: STO Agent B NATIVE REAL landscape candidate render
+on:
+  push:
+    branches:
+      - automotive-edits/huracan-sto-v10-001/b-edit
+    paths:
+      - '.github/workflows/sto-agent-b-native-real-landscape.yml'
+      - 'src/huracan/**'
+      - 'src/Root.tsx'
+      - 'production/videos/huracan-sto-v10-001/shot-map-landscape.json'
+      - 'production/videos/huracan-sto-v10-001/prepare_landscape_assets.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-real-source-candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install actual FFmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
+      - name: Acquire identical SHA-pinned real STO source files from Agent A publisher hosts
+        run: |
+          mkdir -p out
+          python - <<'PY'
+          import hashlib, json, zipfile, urllib.request, time
+          from pathlib import Path
+          spec=json.loads(Path('production/videos/huracan-sto-v10-001/shot-map-landscape.json').read_text())
+          output=Path('out/agent-a-exact-sources.zip')
+          with zipfile.ZipFile(output,'w',compression=zipfile.ZIP_STORED) as package:
+              for name,source in spec['sourceFiles'].items():
+                  content=None;error=None
+                  for retry in range(3):
+                      try:
+                          req=urllib.request.Request(source['url'],headers={'User-Agent':'Mozilla/5.0 (compatible; internal QA)'})
+                          with urllib.request.urlopen(req,timeout=90) as response:content=response.read()
+                          if hashlib.sha256(content).hexdigest()!=source['sha256']:
+                              raise RuntimeError('SHA mismatch for '+name)
+                          break
+                      except Exception as exc:
+                          error=exc;time.sleep(2*(retry+1))
+                  if content is None or hashlib.sha256(content).hexdigest()!=source['sha256']:
+                      raise RuntimeError('Unable to obtain SHA-locked Agent A bytes: '+name+': '+str(error))
+                  package.writestr('sources/'+name+'.mp4',content)
+                  print('SOURCE_VERIFIED',name,len(content),flush=True)
+          print('VERIFIED_THREE_SOURCE_PACKAGE',output.stat().st_size)
+          PY
+      - name: Cut actual source to fourteen frame-locked 1080p segments
+        run: |
+          python production/videos/huracan-sto-v10-001/prepare_landscape_assets.py --zip out/agent-a-exact-sources.zip
+          node production/videos/huracan-sto-v10-001/validate-landscape-edit.cjs --assembly
+      - name: Render REAL native 1920x1080 silent Remotion candidate (not final)
+        run: |
+          npx remotion render src/index.ts HuracanSTOLandscapeCandidate out/STO-B-NATIVE-REAL-LANDSCAPE-CANDIDATE-SILENT.mp4 --codec=h264 --pixel-format=yuv420p --concurrency=2
+      - name: Native complete decode and 316-frame / 16:9 QA
+        run: |
+          ffmpeg -hide_banner -v error -xerror -i out/STO-B-NATIVE-REAL-LANDSCAPE-CANDIDATE-SILENT.mp4 -f null -
+          python - <<'PY'
+          import subprocess,json,hashlib
+          from pathlib import Path
+          p=Path('out/STO-B-NATIVE-REAL-LANDSCAPE-CANDIDATE-SILENT.mp4')
+          result=json.loads(subprocess.check_output(['ffprobe','-v','error','-count_frames','-show_entries','stream=codec_name,width,height,avg_frame_rate,nb_read_frames:format=duration','-of','json',str(p)]))
+          stream=result['streams'][0]
+          assert (stream['width'],stream['height'],stream['avg_frame_rate'],int(stream['nb_read_frames']))==(1920,1080,'30/1',316),result
+          result['candidate_only']=True;result['gate_A_passed']=False
+          result['SHA256']=hashlib.sha256(p.read_bytes()).hexdigest()
+          Path('out/native-real-landscape-QA.json').write_text(json.dumps(result,indent=2))
+          print('NATIVE_REAL_PREVIEW_PASS_NOT_GATE_A',result['SHA256'])
+          PY
+          ffmpeg -v error -y -ss 2.6 -i out/STO-B-NATIVE-REAL-LANDSCAPE-CANDIDATE-SILENT.mp4 -frames:v 1 out/frame78-real-STO-reveal.jpg
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STO-B-NATIVE-REAL-1920x1080-CANDIDATE-NOT-FINAL
+          path: |
+            out/STO-B-NATIVE-REAL-LANDSCAPE-CANDIDATE-SILENT.mp4
+            out/native-real-landscape-QA.json
+            out/frame78-real-STO-reveal.jpg
+          retention-days: 3
+          if-no-files-found: warn
