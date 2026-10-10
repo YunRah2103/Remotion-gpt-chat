@@ -1,4 +1,4 @@
-# GPT-6 — AGENT B: PREMIUM CINEMATIC AUTOMOTIVE EDITOR
+# GPT-6 — AGENT B: AGGRESSIVE EXOTIC HYPERCAR EDITOR
 
 **Only begin source-specific assembly once Agent A delivered an ACTUAL authorised, playable footage package and accepted source manifest.**
 
@@ -17,9 +17,9 @@ Build a real, 316-frame **1080×1920, 30fps** Remotion composition for the user'
 - minimal `src/Root.tsx` composition registration if needed, coordinate with integration to avoid conflicts.
 
 ## Visual design
-- Act I: macro badge/light detail → low rolling headlight view → tunnel acceleration; rare heavy but polished punch at beat around f77.
-- Act II: rhythmic but more fluid low rolling tracking, reflected tunnel glints, rear lighting, side silhouette, industrial stillness and final elegant hero. Minimal overlays; no cheap RGB glitch pack.
-- Car always hero, undistorted; no giant motion blur on entire sequence; camera movement and matched direction beat random zoom FX.
+- Act I: ultra-exotic wing/intake detail, fierce LED/front silhouette, intense acceleration or dramatic fly-by, spectacular beat change near f77.
+- Act II: STILL INTENSE despite melodic vocals. Layer fast/high-end pursuit, whip-reveal, wing/diffuser tracking, high-contrast hero angles, short tasteful speed ramps and a massive closing exotic reveal. No slow industrial-car-documentary shots; no cheap RGB glitch pack.
+- Car always hero, undistorted; **bold selective** zoom crashes, 2–4f direction whips, speed ramps and short impact bloom tied to the rhythm; real kinetic footage remains sharper and more valuable than overlays.
 - **Every beat shot genuinely different**: enforce sourceFile SHA/time interval mapping and no accidental duplicate IDs.
 - Best 4K-origin portrait crop and horizon/headlight/wheel framing; apply optical stabilization only when needed, avoid smeary interpolation.
 - Use deterministic frame-accurate cuts; cinematic quick ramps are optional and must preserve intended 316-frame structure.
