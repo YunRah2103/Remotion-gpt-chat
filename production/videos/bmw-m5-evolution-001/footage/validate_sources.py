@@ -44,3 +44,6 @@ if __name__=="__main__":
     # CI audits the NEW Agent A research board as well as the preserved 42-slot template.
     from prepare import validate_board
     validate_board()
+    # Execute independent offline FFmpeg/FFprobe smoke tests in the same CI job.
+    import subprocess,sys
+    subprocess.run([sys.executable,str(Path(__file__).with_name("test_prepare.py"))],check=True)
