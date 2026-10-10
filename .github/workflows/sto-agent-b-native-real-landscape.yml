@@ -1,4 +1,4 @@
-name: STO Agent B NATIVE REAL landscape candidate render
+name: STO Agent B NIGHT V3 native landscape candidate
 on:
   push:
     branches:
@@ -29,7 +29,7 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
       - run: npm ci --no-audit --no-fund
       - run: npm run check
-      - name: Acquire identical SHA-pinned real STO source files from Agent A publisher hosts
+      - name: Acquire SHA-pinned Agent A and new FORMAT67 original source videos
         run: |
           mkdir -p out
           python - <<'PY'
@@ -53,15 +53,15 @@ jobs:
                       raise RuntimeError('Unable to obtain SHA-locked Agent A bytes: '+name+': '+str(error))
                   package.writestr('sources/'+name+'.mp4',content)
                   print('SOURCE_VERIFIED',name,len(content),flush=True)
-          print('VERIFIED_THREE_SOURCE_PACKAGE',output.stat().st_size)
+          print('VERIFIED_FOUR_SOURCE_PACKAGE',output.stat().st_size)
           PY
-      - name: Cut actual source to fourteen frame-locked 1080p segments
+      - name: Cut both actual landscape source geometries to 14 frame-locked 16:9 segments
         run: |
           python production/videos/huracan-sto-v10-001/prepare_landscape_assets.py --zip out/agent-a-exact-sources.zip
           node production/videos/huracan-sto-v10-001/validate-landscape-edit.cjs --assembly
       - name: Render REAL native 1920x1080 silent Remotion candidate (not final)
         run: |
-          npx remotion render src/index.ts HuracanSTOLandscapeCandidate out/STO-B-NATIVE-REAL-LANDSCAPE-CANDIDATE-SILENT.mp4 --codec=h264 --pixel-format=yuv420p --concurrency=2
+          npx remotion render src/index.ts HuracanSTOLandscapeCandidate out/STO-B-V3-NIGHT-LANDSCAPE-REMOTION-SILENT.mp4 --codec=h264 --pixel-format=yuv420p --concurrency=2
       - name: Native complete decode and 316-frame / 16:9 QA
         run: |
           ffmpeg -hide_banner -v error -xerror -i out/STO-B-NATIVE-REAL-LANDSCAPE-CANDIDATE-SILENT.mp4 -f null -
@@ -74,14 +74,14 @@ jobs:
           assert (stream['width'],stream['height'],stream['avg_frame_rate'],int(stream['nb_read_frames']))==(1920,1080,'30/1',316),result
           result['candidate_only']=True;result['gate_A_passed']=False
           result['SHA256']=hashlib.sha256(p.read_bytes()).hexdigest()
-          Path('out/native-real-landscape-QA.json').write_text(json.dumps(result,indent=2))
+          Path('out/night-v3-landscape-QA.json').write_text(json.dumps(result,indent=2))
           print('NATIVE_REAL_PREVIEW_PASS_NOT_GATE_A',result['SHA256'])
           PY
-          ffmpeg -v error -y -ss 2.6 -i out/STO-B-NATIVE-REAL-LANDSCAPE-CANDIDATE-SILENT.mp4 -frames:v 1 out/frame78-real-STO-reveal.jpg
+          ffmpeg -v error -y -ss 2.6 -i out/STO-B-NATIVE-REAL-LANDSCAPE-CANDIDATE-SILENT.mp4 -frames:v 1 out/night-v3-frame78-STO-reveal.jpg
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: STO-B-NATIVE-REAL-1920x1080-CANDIDATE-NOT-FINAL
+          name: STO-B-V3-NIGHT-REAL-1920x1080-NOT-FINAL
           path: |
             out/STO-B-NATIVE-REAL-LANDSCAPE-CANDIDATE-SILENT.mp4
             out/native-real-landscape-QA.json

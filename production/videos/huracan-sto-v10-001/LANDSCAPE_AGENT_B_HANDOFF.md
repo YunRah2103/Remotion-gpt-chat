@@ -1,5 +1,21 @@
 # Agent B — Actual landscape STO edit handoff (10 October 2026)
 
+## 10–11 October 2026 V3 — USER'S NEW FORMAT67 NIGHT MOVIE (IMPORTANT)
+User uploaded original `HURACAN_STO_AGENT_B_NIGHT_CINEMATIC_SOURCE.zip` (one real filmmaker source `format67_sto_directors_full.mp4`, 75.72s, 25fps, **1920×810 native cinemascope**, checksum `4c47e642babedfce0c7bd1cf60fa15a397b60679d430c534f5def4792738bfa3`). Inspected at regular intervals across original; excluded all swimmer/face/underwater/copy/logo scenes and all post-67s branded end credits. It has actual night/smoke/reflection footage, high-quality red/white STO closeups, and some white car container-yard motion. No accurate claim of pure race-track acceleration. Movie rights NOT GRANTED by source metadata.
+
+A stronger **V3 selected-source timeline** is committed in `shot-map-landscape.json`, with **10 selected shots from new FORMAT67 film** and 4 shots from original native-FHD Agent A Phantom source videos. Every slot is a real source time window; frame 78 reveal replaced with **red STO full-car moody nighttime beauty** (mostly stationary), ending with red STO in night smoke. Full duration/fps/reveal remains **1920×1080 / 30fps / exactly 316 frames / frame 78**. All model/car footage; no overlays/HUD/misidentified swim/title scenes. Blue / red / white STO body colours across shots are real colour differences, not claimed one car. **Still fewer than 10 independently VERIFIED moving camera angles; Gate A and B formal release remain unpassed.**
+
+Cinematic **810p height** original is NOT a native Full-HD video. To meet the required 1920×1080 output canvas without letterbox bars or changing the aspect of the car: uniformly upscale 1920×810 to 2560×1080 (**1.333×**) and crop 1920px horizontal window centred on car (per-shot `sourceCropX`), without stretching or black bars. Each shot's `aspectTreatment` and the source `native1080:false` are recorded machine-readably. This is a **scaled source**, not native 1080p; no claim of added original detail.
+
+Local reproduction:
+```bash
+python production/videos/huracan-sto-v10-001/prepare_landscape_assets.py --zip HURACAN_STO_LANDSCAPE_FOOTAGE.zip --night-zip HURACAN_STO_AGENT_B_NIGHT_CINEMATIC_SOURCE.zip
+node --test production/videos/huracan-sto-v10-001/edit-landscape.test.cjs
+node production/videos/huracan-sto-v10-001/validate-landscape-edit.cjs --assembly
+npx remotion render src/index.ts HuracanSTOLandscapeCandidate out/STO-B-V3-NIGHT-LANDSCAPE-REMOTION-SILENT.mp4 --codec=h264 --pixel-format=yuv420p --concurrency=2
+```
+GitHub Actions runner reproduces the same 4 source bytes directly from publisher original URLs, verifies all hashes, frame locks each of 14 outputs, renders native 16:9 Remotion and decodes final. Music + isolated verified V10 engine remain Agent C scope; use **V3 NIGHT** visual (NOT old V1/V2) when available.
+
 ## 11 October editing revision: retimed landscape candidate V2
 
 The original `HuracanSTOLandscapeCandidate` was reviewed at the start and midpoint of **every** shot. Five cuts needed stronger subject framing or had obvious repeated/empty-road content. Corrected at branch commit `2bdb1cc618bb3efc554083f3f4bfadc70be32f75`:

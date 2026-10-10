@@ -16,6 +16,12 @@ function validate({assembly=false,release=false,root=path.resolve(__dirname,'../
   assert(s.file==='shot-'+String(index+1).padStart(2,'0')+'.mp4','incorrect fixed clip identity '+s.id);
   assert(!s.sourceOriginal.includes('/')&&s.sourceOriginal.endsWith('.mp4'),'untrusted path '+s.id);
   assert(s.sourceStartSeconds>=0&&s.sourceEndSeconds>s.sourceStartSeconds,'source in/out invalid '+s.id);
+  const src=map.sourceFiles[s.sourceOriginal.slice(0,-4)];
+  assert(!!src,'missing source manifest '+s.id);
+  assert(src.width===1920&&[810,1080].includes(src.height),'unapproved original source dimensions '+s.id);
+  assert(Number.isFinite(s.sourceCropX)&&s.sourceCropX>=0&&s.sourceCropX<=1,'out-of-frame cinema crop '+s.id);
+  const nonNative=src.height===810;
+  assert(s.aspectTreatment===(nonNative?'UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080':'NATIVE_1920X1080_UNSCALED'),'uncleared source crop treatment '+s.id);
   assert(s.cropKeyframes.length>=2,'missing crop tracking '+s.id);
   assert(s.cropKeyframes[0].frame===0&&s.cropKeyframes.at(-1).frame===duration-1,'crop out of range '+s.id);
   for(const k of s.cropKeyframes)assert(k.x>=.08&&k.x<=.92&&k.y>=.08&&k.y<=.92&&k.zoom>=1&&k.zoom<=1.18,'crop too aggressive '+s.id);

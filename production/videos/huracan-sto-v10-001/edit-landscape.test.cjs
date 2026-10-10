@@ -12,9 +12,14 @@ test('all timeline frames exactly once',()=>{
  for(const s of map.shots)for(let f=s.startFrame;f<s.endFrameExclusive;f++)n[f]++;
  assert(n.every(v=>v===1));
 });
-test('three real 1080p originals and no fictional source gate claims',()=>{
- assert.equal(Object.keys(map.sourceFiles).length,3);
- assert(Object.values(map.sourceFiles).every(s=>s.width===1920&&s.height===1080&&/^[0-9a-f]{64}$/.test(s.sha256)));
+test('native 1080p sources + explicitly upscaled 810p FORMAT67 source, gate still fails',()=>{
+ assert.equal(Object.keys(map.sourceFiles).length,4);
+ assert(Object.values(map.sourceFiles).every(s=>s.width===1920&&[810,1080].includes(s.height)&&/^[0-9a-f]{64}$/.test(s.sha256)));
+ assert.equal(map.sourceFiles.format67_sto_directors_full.height,810);
+ assert.equal(map.sourceFiles.format67_sto_directors_full.native1080,false);
+ assert.equal(map.nonNativeFullHDOriginals.length,1);
+ assert.equal(map.nightSourceSceneCount,10);
+ assert(map.shots.every(s=>s.aspectTreatment==='NATIVE_1920X1080_UNSCALED'||s.aspectTreatment==='UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080'));
  assert(map.shots.every(s=>s.movingAngleVerified===false&&s.uniqueMovingAngleKey===null));
  assert.equal(map.sourceGatePassed,false);
 });

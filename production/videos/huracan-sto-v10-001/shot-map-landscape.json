@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "project": "huracan-sto-v10-001",
-  "status": "CANDIDATE_V2_RETIMED_FOR_CAR_VISIBILITY_SOURCE_GATE_NOT_APPROVED",
+  "status": "NIGHT_CINEMATIC_CANDIDATE_REAL_SOURCE_VERIFIED_IDENTITY_AND_RIGHTS_GATE_UNPASSED",
   "output": {
     "width": 1920,
     "height": 1080,
@@ -11,7 +11,7 @@
   "revealFrame": 78,
   "sourceGatePassed": false,
   "mediaDirectory": "public/sto-v10",
-  "inputPackage": "HURACAN_STO_LANDSCAPE_FOOTAGE.zip",
+  "inputPackage": "HURACAN_STO_LANDSCAPE_FOOTAGE.zip + HURACAN_STO_AGENT_B_NIGHT_CINEMATIC_SOURCE.zip",
   "sourceFiles": {
     "phantom-sto-primary": {
       "sha256": "dba560aea7cbdf0f64f7e7bb647ae2d43cabcf03a7af9a6a7a445122caa43f33",
@@ -33,18 +33,29 @@
       "fps": 60,
       "width": 1920,
       "height": 1080
+    },
+    "format67_sto_directors_full": {
+      "sha256": "4c47e642babedfce0c7bd1cf60fa15a397b60679d430c534f5def4792738bfa3",
+      "url": "https://format67.net/wp-content/uploads/2024/08/STO_FORMAT.mp4",
+      "fps": 25,
+      "width": 1920,
+      "height": 810,
+      "originalBytes": 113939885,
+      "native1080": false,
+      "sourceRelease": "NOT_GRANTED",
+      "sourceNote": "Actual filmmaker original is cinematic 1920x810; private-review 1920x1080 editor crop requires 1.333x uniform enlargement and horizontal trimming. DO NOT label native FHD or approve public release."
     }
   },
   "shots": [
     {
-      "id": "01-prelaunch",
+      "id": "01-night-exhaust",
       "startFrame": 0,
       "endFrameExclusive": 14,
-      "sourceOriginal": "phantom-sto-primary.mp4",
-      "sourceStartSeconds": 9.64,
-      "sourceEndSeconds": 10.106667,
+      "sourceOriginal": "format67_sto_directors_full.mp4",
+      "sourceStartSeconds": 15.02,
+      "sourceEndSeconds": 15.486667,
       "file": "shot-01.mp4",
-      "intendedSubject": "STO cockpit prelaunch mechanical macro",
+      "intendedSubject": "Night red STO exhaust macro closeup",
       "cutStyle": "punch",
       "plannedFocalX": 0.5,
       "plannedFocalY": 0.5,
@@ -53,58 +64,30 @@
           "frame": 0,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.08
+          "zoom": 1.045
         },
         {
           "frame": 13,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.12
+          "zoom": 1.085
         }
       ],
       "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
       "uniqueMovingAngleKey": null,
-      "movingAngleVerified": false
+      "movingAngleVerified": false,
+      "sourceCropX": 0.32,
+      "aspectTreatment": "UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080"
     },
     {
-      "id": "02-exhaust",
+      "id": "02-night-rear-lamps",
       "startFrame": 14,
       "endFrameExclusive": 34,
-      "sourceOriginal": "phantom-sto-primary.mp4",
-      "sourceStartSeconds": 5.83,
-      "sourceEndSeconds": 6.496667,
+      "sourceOriginal": "format67_sto_directors_full.mp4",
+      "sourceStartSeconds": 12.17,
+      "sourceEndSeconds": 12.836667,
       "file": "shot-02.mp4",
-      "intendedSubject": "STO rear mesh and exhaust physical detail",
-      "cutStyle": "cut",
-      "plannedFocalX": 0.5,
-      "plannedFocalY": 0.5,
-      "cropKeyframes": [
-        {
-          "frame": 0,
-          "x": 0.5,
-          "y": 0.5,
-          "zoom": 1.055
-        },
-        {
-          "frame": 19,
-          "x": 0.5,
-          "y": 0.5,
-          "zoom": 1.075
-        }
-      ],
-      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
-      "uniqueMovingAngleKey": null,
-      "movingAngleVerified": false
-    },
-    {
-      "id": "03-wing",
-      "startFrame": 34,
-      "endFrameExclusive": 56,
-      "sourceOriginal": "phantom-sto-huracan.mp4",
-      "sourceStartSeconds": 21.5,
-      "sourceEndSeconds": 22.233333,
-      "file": "shot-03.mp4",
-      "intendedSubject": "STO wing and air duct on stationary display car",
+      "intendedSubject": "Red STO rear tail lamp and wing lit on night road",
       "cutStyle": "whip-left",
       "plannedFocalX": 0.5,
       "plannedFocalY": 0.5,
@@ -113,28 +96,62 @@
           "frame": 0,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.065
+          "zoom": 1.02
+        },
+        {
+          "frame": 19,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.06
+        }
+      ],
+      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
+      "uniqueMovingAngleKey": null,
+      "movingAngleVerified": false,
+      "sourceCropX": 0.23,
+      "aspectTreatment": "UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080"
+    },
+    {
+      "id": "03-original-blue-cockpit",
+      "startFrame": 34,
+      "endFrameExclusive": 56,
+      "sourceOriginal": "phantom-sto-primary.mp4",
+      "sourceStartSeconds": 9.64,
+      "sourceEndSeconds": 10.373333,
+      "file": "shot-03.mp4",
+      "intendedSubject": "Genuine blue STO open cockpit",
+      "cutStyle": "cut",
+      "plannedFocalX": 0.5,
+      "plannedFocalY": 0.5,
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.02
         },
         {
           "frame": 21,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.105
+          "zoom": 1.06
         }
       ],
       "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
       "uniqueMovingAngleKey": null,
-      "movingAngleVerified": false
+      "movingAngleVerified": false,
+      "sourceCropX": 0.5,
+      "aspectTreatment": "NATIVE_1920X1080_UNSCALED"
     },
     {
-      "id": "04-headlight",
+      "id": "04-night-front-headlight",
       "startFrame": 56,
       "endFrameExclusive": 78,
-      "sourceOriginal": "phantom-sto-primary.mp4",
-      "sourceStartSeconds": 13.98,
-      "sourceEndSeconds": 14.713333,
+      "sourceOriginal": "format67_sto_directors_full.mp4",
+      "sourceStartSeconds": 31.91,
+      "sourceEndSeconds": 32.643333,
       "file": "shot-04.mp4",
-      "intendedSubject": "STO left headlight and yellow livery macro; genuine source detail, not moving-car proof",
+      "intendedSubject": "White STO illuminated front LED and bodywork",
       "cutStyle": "punch",
       "plannedFocalX": 0.5,
       "plannedFocalY": 0.5,
@@ -143,28 +160,30 @@
           "frame": 0,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.065
+          "zoom": 1.045
         },
         {
           "frame": 21,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.1
+          "zoom": 1.085
         }
       ],
       "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
       "uniqueMovingAngleKey": null,
-      "movingAngleVerified": false
+      "movingAngleVerified": false,
+      "sourceCropX": 0.6,
+      "aspectTreatment": "UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080"
     },
     {
-      "id": "05-reveal",
+      "id": "05-night-red-reveal",
       "startFrame": 78,
       "endFrameExclusive": 95,
-      "sourceOriginal": "phantom-sto-primary.mp4",
-      "sourceStartSeconds": 0,
-      "sourceEndSeconds": 0.566667,
+      "sourceOriginal": "format67_sto_directors_full.mp4",
+      "sourceStartSeconds": 5.03,
+      "sourceEndSeconds": 5.596667,
       "file": "shot-05.mp4",
-      "intendedSubject": "STO moving front three-quarter in roadway",
+      "intendedSubject": "Red STO parked wide night full-car hero on wet floor",
       "cutStyle": "impact",
       "plannedFocalX": 0.5,
       "plannedFocalY": 0.5,
@@ -173,28 +192,30 @@
           "frame": 0,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.025
+          "zoom": 1.02
         },
         {
           "frame": 16,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.055
+          "zoom": 1.06
         }
       ],
       "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
       "uniqueMovingAngleKey": null,
-      "movingAngleVerified": false
+      "movingAngleVerified": false,
+      "sourceCropX": 0.55,
+      "aspectTreatment": "UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080"
     },
     {
-      "id": "06-front-pursuit",
+      "id": "06-industrial-front-roll",
       "startFrame": 95,
       "endFrameExclusive": 113,
-      "sourceOriginal": "phantom-sto-lambo.mp4",
-      "sourceStartSeconds": 1.28,
-      "sourceEndSeconds": 1.88,
+      "sourceOriginal": "format67_sto_directors_full.mp4",
+      "sourceStartSeconds": 27.23,
+      "sourceEndSeconds": 27.83,
       "file": "shot-06.mp4",
-      "intendedSubject": "Oncoming blue STO near low roadside camera; a different take from the later approach shot",
+      "intendedSubject": "White STO low front tracking approaching on wet industrial road",
       "cutStyle": "whip-right",
       "plannedFocalX": 0.5,
       "plannedFocalY": 0.5,
@@ -203,28 +224,30 @@
           "frame": 0,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.1
+          "zoom": 1.02
         },
         {
           "frame": 17,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.16
+          "zoom": 1.06
         }
       ],
       "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
       "uniqueMovingAngleKey": null,
-      "movingAngleVerified": false
+      "movingAngleVerified": false,
+      "sourceCropX": 0.64,
+      "aspectTreatment": "UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080"
     },
     {
-      "id": "07-side-road",
+      "id": "07-blue-road-side",
       "startFrame": 113,
       "endFrameExclusive": 134,
       "sourceOriginal": "phantom-sto-primary.mp4",
       "sourceStartSeconds": 16.85,
       "sourceEndSeconds": 17.55,
       "file": "shot-07.mp4",
-      "intendedSubject": "STO side road pass",
+      "intendedSubject": "Blue STO side road moving angle",
       "cutStyle": "cut",
       "plannedFocalX": 0.5,
       "plannedFocalY": 0.5,
@@ -233,28 +256,30 @@
           "frame": 0,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.04
+          "zoom": 1.02
         },
         {
           "frame": 20,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.07
+          "zoom": 1.06
         }
       ],
       "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
       "uniqueMovingAngleKey": null,
-      "movingAngleVerified": false
+      "movingAngleVerified": false,
+      "sourceCropX": 0.5,
+      "aspectTreatment": "NATIVE_1920X1080_UNSCALED"
     },
     {
-      "id": "08-corner-approach",
+      "id": "08-industrial-white-side",
       "startFrame": 134,
       "endFrameExclusive": 157,
-      "sourceOriginal": "phantom-sto-lambo.mp4",
-      "sourceStartSeconds": 23.25,
-      "sourceEndSeconds": 24.016667,
+      "sourceOriginal": "format67_sto_directors_full.mp4",
+      "sourceStartSeconds": 42.42,
+      "sourceEndSeconds": 43.186667,
       "file": "shot-08.mp4",
-      "intendedSubject": "Blue STO approaching low road camera; car becomes larger toward cut",
+      "intendedSubject": "White STO multiple continuous industrial sweeping side/tracking perspectives",
       "cutStyle": "whip-left",
       "plannedFocalX": 0.5,
       "plannedFocalY": 0.5,
@@ -263,28 +288,30 @@
           "frame": 0,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.06
+          "zoom": 1.02
         },
         {
           "frame": 22,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.105
+          "zoom": 1.06
         }
       ],
       "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
       "uniqueMovingAngleKey": null,
-      "movingAngleVerified": false
+      "movingAngleVerified": false,
+      "sourceCropX": 0.7,
+      "aspectTreatment": "UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080"
     },
     {
-      "id": "09-rear-three-quarter",
+      "id": "09-white-front-tracking",
       "startFrame": 157,
       "endFrameExclusive": 182,
-      "sourceOriginal": "phantom-sto-lambo.mp4",
-      "sourceStartSeconds": 18.43,
-      "sourceEndSeconds": 19.263333,
+      "sourceOriginal": "format67_sto_directors_full.mp4",
+      "sourceStartSeconds": 52.93,
+      "sourceEndSeconds": 53.763333,
       "file": "shot-09.mp4",
-      "intendedSubject": "STO rear three-quarter roadway low camera",
+      "intendedSubject": "White STO bright front bumper/headlights passing in dark industrial setting",
       "cutStyle": "punch",
       "plannedFocalX": 0.5,
       "plannedFocalY": 0.5,
@@ -299,143 +326,25 @@
           "frame": 24,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.08
+          "zoom": 1.085
         }
       ],
       "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
       "uniqueMovingAngleKey": null,
-      "movingAngleVerified": false
+      "movingAngleVerified": false,
+      "sourceCropX": 0.46,
+      "aspectTreatment": "UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080"
     },
     {
-      "id": "10-side-exit",
+      "id": "10-blue-rear-rolling",
       "startFrame": 182,
       "endFrameExclusive": 206,
-      "sourceOriginal": "phantom-sto-primary.mp4",
-      "sourceStartSeconds": 17.6,
-      "sourceEndSeconds": 18.4,
+      "sourceOriginal": "phantom-sto-lambo.mp4",
+      "sourceStartSeconds": 18.43,
+      "sourceEndSeconds": 19.23,
       "file": "shot-10.mp4",
-      "intendedSubject": "STO lateral road exit",
+      "intendedSubject": "Blue STO rear-three-quarter road motion",
       "cutStyle": "cut",
-      "plannedFocalX": 0.5,
-      "plannedFocalY": 0.5,
-      "cropKeyframes": [
-        {
-          "frame": 0,
-          "x": 0.5,
-          "y": 0.5,
-          "zoom": 1.025
-        },
-        {
-          "frame": 23,
-          "x": 0.5,
-          "y": 0.5,
-          "zoom": 1.055
-        }
-      ],
-      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
-      "uniqueMovingAngleKey": null,
-      "movingAngleVerified": false
-    },
-    {
-      "id": "11-approach-low",
-      "startFrame": 206,
-      "endFrameExclusive": 232,
-      "sourceOriginal": "phantom-sto-primary.mp4",
-      "sourceStartSeconds": 0.81,
-      "sourceEndSeconds": 1.676667,
-      "file": "shot-11.mp4",
-      "intendedSubject": "Fast STO side-to-rear rolling pass, less empty paving at the start",
-      "cutStyle": "whip-right",
-      "plannedFocalX": 0.5,
-      "plannedFocalY": 0.5,
-      "cropKeyframes": [
-        {
-          "frame": 0,
-          "x": 0.5,
-          "y": 0.5,
-          "zoom": 1.03
-        },
-        {
-          "frame": 25,
-          "x": 0.5,
-          "y": 0.5,
-          "zoom": 1.07
-        }
-      ],
-      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
-      "uniqueMovingAngleKey": null,
-      "movingAngleVerified": false
-    },
-    {
-      "id": "12-rear-wheel",
-      "startFrame": 232,
-      "endFrameExclusive": 256,
-      "sourceOriginal": "phantom-sto-lambo.mp4",
-      "sourceStartSeconds": 20.28,
-      "sourceEndSeconds": 21.08,
-      "file": "shot-12.mp4",
-      "intendedSubject": "STO rear camera on road",
-      "cutStyle": "cut",
-      "plannedFocalX": 0.5,
-      "plannedFocalY": 0.5,
-      "cropKeyframes": [
-        {
-          "frame": 0,
-          "x": 0.5,
-          "y": 0.5,
-          "zoom": 1.025
-        },
-        {
-          "frame": 23,
-          "x": 0.5,
-          "y": 0.5,
-          "zoom": 1.05
-        }
-      ],
-      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
-      "uniqueMovingAngleKey": null,
-      "movingAngleVerified": false
-    },
-    {
-      "id": "13-rear-follow",
-      "startFrame": 256,
-      "endFrameExclusive": 284,
-      "sourceOriginal": "phantom-sto-lambo.mp4",
-      "sourceStartSeconds": 14.55,
-      "sourceEndSeconds": 15.483333,
-      "file": "shot-13.mp4",
-      "intendedSubject": "Large STO low rear-quarter/wing close shot, not the repeated wide rear-follow angle",
-      "cutStyle": "whip-left",
-      "plannedFocalX": 0.5,
-      "plannedFocalY": 0.5,
-      "cropKeyframes": [
-        {
-          "frame": 0,
-          "x": 0.5,
-          "y": 0.5,
-          "zoom": 1.035
-        },
-        {
-          "frame": 27,
-          "x": 0.5,
-          "y": 0.5,
-          "zoom": 1.08
-        }
-      ],
-      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
-      "uniqueMovingAngleKey": null,
-      "movingAngleVerified": false
-    },
-    {
-      "id": "14-hero-payoff",
-      "startFrame": 284,
-      "endFrameExclusive": 316,
-      "sourceOriginal": "phantom-sto-primary.mp4",
-      "sourceStartSeconds": 16.2,
-      "sourceEndSeconds": 17.266667,
-      "file": "shot-14.mp4",
-      "intendedSubject": "STO three-quarter roadway hero",
-      "cutStyle": "punch",
       "plannedFocalX": 0.5,
       "plannedFocalY": 0.5,
       "cropKeyframes": [
@@ -446,7 +355,7 @@
           "zoom": 1.02
         },
         {
-          "frame": 31,
+          "frame": 23,
           "x": 0.5,
           "y": 0.5,
           "zoom": 1.06
@@ -454,8 +363,142 @@
       ],
       "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
       "uniqueMovingAngleKey": null,
-      "movingAngleVerified": false
+      "movingAngleVerified": false,
+      "sourceCropX": 0.5,
+      "aspectTreatment": "NATIVE_1920X1080_UNSCALED"
+    },
+    {
+      "id": "11-blue-close-pass",
+      "startFrame": 206,
+      "endFrameExclusive": 232,
+      "sourceOriginal": "phantom-sto-primary.mp4",
+      "sourceStartSeconds": 0.81,
+      "sourceEndSeconds": 1.676667,
+      "file": "shot-11.mp4",
+      "intendedSubject": "Blue STO dynamic roadside angle",
+      "cutStyle": "whip-right",
+      "plannedFocalX": 0.5,
+      "plannedFocalY": 0.5,
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.02
+        },
+        {
+          "frame": 25,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.06
+        }
+      ],
+      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
+      "uniqueMovingAngleKey": null,
+      "movingAngleVerified": false,
+      "sourceCropX": 0.5,
+      "aspectTreatment": "NATIVE_1920X1080_UNSCALED"
+    },
+    {
+      "id": "12-white-high-contrast-pass",
+      "startFrame": 232,
+      "endFrameExclusive": 256,
+      "sourceOriginal": "format67_sto_directors_full.mp4",
+      "sourceStartSeconds": 54.49,
+      "sourceEndSeconds": 55.29,
+      "file": "shot-12.mp4",
+      "intendedSubject": "White STO bright high-contrast night-side acceleration shot",
+      "cutStyle": "cut",
+      "plannedFocalX": 0.5,
+      "plannedFocalY": 0.5,
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.02
+        },
+        {
+          "frame": 23,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.06
+        }
+      ],
+      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
+      "uniqueMovingAngleKey": null,
+      "movingAngleVerified": false,
+      "sourceCropX": 0.6,
+      "aspectTreatment": "UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080"
+    },
+    {
+      "id": "13-white-moving-side",
+      "startFrame": 256,
+      "endFrameExclusive": 284,
+      "sourceOriginal": "format67_sto_directors_full.mp4",
+      "sourceStartSeconds": 56.08,
+      "sourceEndSeconds": 57.013333,
+      "file": "shot-13.mp4",
+      "intendedSubject": "White STO full visible side profile tracking in the industrial night corridor",
+      "cutStyle": "whip-left",
+      "plannedFocalX": 0.5,
+      "plannedFocalY": 0.5,
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.02
+        },
+        {
+          "frame": 27,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.06
+        }
+      ],
+      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
+      "uniqueMovingAngleKey": null,
+      "movingAngleVerified": false,
+      "sourceCropX": 0.55,
+      "aspectTreatment": "UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080"
+    },
+    {
+      "id": "14-red-smoke-wet-road-payoff",
+      "startFrame": 284,
+      "endFrameExclusive": 316,
+      "sourceOriginal": "format67_sto_directors_full.mp4",
+      "sourceStartSeconds": 62.55,
+      "sourceEndSeconds": 63.616667,
+      "file": "shot-14.mp4",
+      "intendedSubject": "Red STO full-car neon-and-smoke wet roadway hero, stationary/slow",
+      "cutStyle": "punch",
+      "plannedFocalX": 0.5,
+      "plannedFocalY": 0.5,
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.045
+        },
+        {
+          "frame": 31,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.085
+        }
+      ],
+      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
+      "uniqueMovingAngleKey": null,
+      "movingAngleVerified": false,
+      "sourceCropX": 0.66,
+      "aspectTreatment": "UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080"
     }
   ],
-  "editRevision": "v2-car-in-frame"
+  "editRevision": "v3-night-cinematic-real-footage",
+  "nonNativeFullHDOriginals": [
+    "format67_sto_directors_full"
+  ],
+  "nightSourceSceneCount": 10
 }
