@@ -7,14 +7,13 @@ import {wipe} from '@remotion/transitions/wipe';
 import {flip} from '@remotion/transitions/flip';
 import {BeatFxTransform,FilmTexture,Grade,MotionBlurShot,StyledTrail} from './FXComponents';
 import type {GradePreset} from './FXComponents';
-import type {BeatCut as Cut,CutStyle} from './beat';
+import type {BeatCut as Cut} from './beat';
 
 const colours=[
   ['#141b27','#7b9ab3'],['#1b202a','#9eb5a0'],['#19182a','#c59a6b'],
   ['#101c25','#86b7d7'],['#201b21','#c7a19d']
 ] as const;
 const looks:GradePreset[]=['archive','warm-vintage','titanium','night','natural'];
-const moves:CutStyle[]=['whip-left','punch','rgb-edge','flash','film-burn'];
 const cuts:Cut[]=[{frame:0,style:'cut'},{frame:17,style:'whip-left'},{frame:35,style:'punch'}];
 /** Original abstract technical visual; this demonstrates FX renderability, NOT real Porsche footage. */
 const Exhibit:React.FC<{index:number}> = ({index})=>{
