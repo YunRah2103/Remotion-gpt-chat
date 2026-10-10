@@ -59,7 +59,7 @@ def validate_sources(args, spec):
     video = probe(args.picture, count=True)
     v = stream(video, 'video')
     require(v is not None, 'picture contains no video')
-    require((v['width'],v['height']) == (1080,1920), 'picture must be 1080x1920, not upscaled by this tool')
+    require((v['width'],v['height']) == (1920,1080), 'picture must be 1920x1080 LANDSCAPE, not upscaled by this tool')
     require(v['avg_frame_rate'] in ('30/1','30000/1000'), 'picture must be 30 fps')
     require(int(v.get('nb_read_frames') or 0) == FRAMES, f'picture must contain exactly {FRAMES} decoded frames')
     e = probe(args.engine)
@@ -120,7 +120,7 @@ def render(args, spec, video, music_sha, engine_sha):
                            'alimiter=limit=0.94:level=0:attack=5:release=75[mix]',
          '-map','[mix]','-ar','48000','-ac','2','-c:a','pcm_s24le',mix_out])
     picture_v=stream(video,'video')
-    copy_safe=(picture_v['codec_name']=='h264' and picture_v.get('pix_fmt')=='yuv420p')
+    copy_safe=(picture_v['codec_name']=='h264' and picture_v.get('pix_fmt') in ('yuv420p','yuvj420p'))
     movie=out/('HURACAN_STO_FIXTURE_ONLY.mp4' if args.test_fixture else 'HURACAN_STO_V10_PRIVATE_REVIEW.mp4')
     encode=['-c:v','copy'] if copy_safe else ['-c:v','libx264','-crf','17','-preset','slow','-pix_fmt','yuv420p']
     run(['ffmpeg','-hide_banner','-loglevel','error','-y','-i',args.picture,'-i',mix_out,
@@ -130,7 +130,7 @@ def render(args, spec, video, music_sha, engine_sha):
     qa=probe(movie,count=True)
     v=stream(qa,'video'); a=stream(qa,'audio')
     require(v and a and int(v.get('nb_read_frames') or 0)==FRAMES, 'final decoded frame count differs')
-    require(v['codec_name']=='h264' and v['pix_fmt']=='yuv420p' and (v['width'],v['height'])==(1080,1920), 'final video codec/geometry incorrect')
+    require(v['codec_name']=='h264' and v['pix_fmt'] in ('yuv420p','yuvj420p') and (v['width'],v['height'])==(1920,1080), 'final video codec/geometry incorrect')
     require(a['codec_name']=='aac' and a['sample_rate']=='48000' and a['channels']==2, 'final audio codec incorrect')
     require(abs(float(qa['format']['duration'])-DURATION)<.1, 'final duration mismatch')
     decoded = run(['ffmpeg','-hide_banner','-nostats','-i',movie,
@@ -160,7 +160,7 @@ def main():
     p.add_argument('--music',required=True,type=Path)
     p.add_argument('--engine',required=True,type=Path)
     p.add_argument('--engine-manifest',required=True,type=Path)
-    p.add_argument('--picture',required=True,type=Path,help='Agent B verified 316-frame 1080x1920/30fps edit')
+    p.add_argument('--picture',required=True,type=Path,help='Agent B verified 316-frame 1920x1080 LANDSCAPE/30fps edit')
     p.add_argument('--out',required=True,type=Path)
     p.add_argument('--test-fixture',action='store_true',help='Never count fixture output as gate C or public release')
     args=p.parse_args()
