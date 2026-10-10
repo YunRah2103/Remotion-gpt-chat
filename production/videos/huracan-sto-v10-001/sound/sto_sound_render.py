@@ -144,7 +144,7 @@ def render(args, spec, video, music_sha, engine_sha):
     vf=f"select='{'+'.join(f'eq(n\,{n})' for n in selected)}',scale=270:480,tile=4x4"
     run(['ffmpeg','-hide_banner','-loglevel','error','-y','-i',movie,'-vf',vf,'-vsync','vfr','-frames:v','1','-q:v','2',sheet])
     report={'mode':'TEST FIXTURE — NOT RELEASE' if args.test_fixture else 'REAL SOURCE — INDEPENDENT REVIEW REQUIRED',
-            'gate_c':'BLOCKED_FIXTURE' if args.test_fixture else 'TECHNICAL_QA_PASS_VISUAL_AND_AUDIO_REVIEW_PENDING',
+            'gate_c':('BLOCKED_FIXTURE' if args.test_fixture else ('BLOCKED_BLACK_OR_SILENCE_REVIEW' if black or silent else 'TECHNICAL_QA_PASS_VISUAL_AND_AUDIO_REVIEW_PENDING')),
             'frames':FRAMES,'fps':FPS,'music_sha256':music_sha,'engine_sha256':engine_sha,
             'mp4_sha256':sha(movie),'duration':qa['format']['duration'],'video_copy':copy_safe,
             'blackdetect_intervals':black,'silencedetect_starts':silent,
