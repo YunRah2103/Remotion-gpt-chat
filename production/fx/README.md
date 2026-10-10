@@ -68,3 +68,13 @@ Improvement branch: `feature/fx-toolkit-audit-reliability-20261010`; base: integ
 **Conservative rendering rules:** keep `CameraMotionBlur` disabled except for selected shots (typically 4 samples), avoid stacking LUTs, and prefer AAC bitstream copying. CPU render times vary with runner hardware: use the recorded render elapsed time in CI as the empirical benchmark, not a promised fixed runtime.
 
 **Outstanding limits:** No optical-flow interpolation, real lens-distortion calibration, camera matching from footage, or colour-managed HDR/LOG pipeline is implemented. The 17-point SDR LUT generator remains gamma-encoded approximate maths: compare neutral greys, shadow detail, and highlights against *your actual source* before final application. The original showcases are synthetic, so green CI alone cannot establish editorial quality on real moving cars.
+
+### New mix-intensity control for inconsistent source footage
+
+The LUT generator accepts `--strength` from **0.0** (identity/no creative grade) to **1.0** (the exact original preset). This mixes the LUT's output towards the source mathematically and avoids a second encoding pass or the need to stack multiple LUTs.
+
+```bash
+python production/fx/make_luts.py --out out/fx-luts-subtle --size 17 --strength 0.55
+```
+
+Typical restrained archival footage often benefits from a weaker preset than clean modern footage. Compare highlights and faces/paint under the true source lighting. The original `generate(out, 17)` API still defaults to 1.0 and creates the same 3D cube values as before.
