@@ -1,26 +1,33 @@
-# SHOT_SELECTION — verified scout only
+# MIDNIGHT V12 — real shot selection from expanded Agent A source inspection
 
-**Footage gate: FAIL.** No defensible 11-shot selection exists yet. Do not manufacture slot assignments or repeat footage to fill beats.
+**A gate: FAIL.** 12 real independent Pexels source videos acquired and screened. Actual 8 short source excerpt MP4s + crop/image proofs for all 12 in the [19.19MB V2 ZIP](https://378e0378-9dfe-48d4-9d9c-73912757403f.sandbox.floot.app/_cdn/static/midnight-v12-001/agent-a-expanded-scout-v2.zip). **No 11-shot single-car, 4K/native vertical, night-aggression set has been approved.** Do not repeat the same clip across several slots or present a new paint colour as the same car.
 
-| Beat slot | Requested angle | Candidate | Decision |
+## Strongest visual options
+| Source ID | Real footage | Source quality | Director verdict |
 |---|---|---|---|
-| S01 (0–14f) | Rare aero macro / intake / wing | PX-20153915 wheel macro (0.3–3.0s) | **Conditional**, only when Lamborghini identity/grade continuity approved |
-| S02 (14–47f) | 3/4 front low rolling | NONE | BLOCKED |
-| S03 (47–77f) | Genuine hard acceleration | NONE | BLOCKED |
-| S04 (77–99f) | Full heroic exotic reveal at main soundtrack transition | NONE | BLOCKED |
-| S05 (99–128f) | Fast front chase | NONE | BLOCKED |
-| S06 (128–158f) | Rear diffuser/wing high-speed motion | NONE | BLOCKED |
-| S07 (158–187f) | Profile pursuit | PX-20153917 wide lateral | **REJECTED**, vertical center crop excludes car |
-| S08 (187–219f) | High-angle car flyby | NONE | BLOCKED |
-| S09 (219–248f) | Three-quarter moving pass | NONE | BLOCKED |
-| S10 (248–283f) | Fast motion detail | PX-20153915 same wheel macro | **NOT a second distinct shot**; can't use in addition to S01 |
-| S11 (283–316f) | Dramatic wide final hero | NONE | BLOCKED |
+| 7727415 | **Black Aventador-style**, head-on rolling shot | 1920×1080 25fps | Conditional; very strong tracking, soft after 9:16 crop |
+| 7727416 | **Black Aventador-style**, moving freeway low side | 1920×1080 25fps | Conditional; matching uploader and colour but exact vehicle ID not proven |
+| 14052063 | Orange Aventador-style low driving angle | 1920×1080 25fps | Conditional; different hero, daytime |
+| 32068488 | Purple Lamborghini aggressive race-track pass | 1920×1080 59.94fps, ~3.8Mbps | Conditional motion, weak compression and different car |
+| 17051328 | White Aventador moving through Lisbon | 1920×1080 24fps | Conditional, different car, daylight |
+| 20153915 | Lamborghini wheel macro | 3840×2160 24fps | Conditional S01/S10 detail only; not car acceleration |
+| 14052141 | Orange Aventador low frontal close pass | 1280×720 25fps | Rejected: portrait crop extremely soft |
+| 20153917 | Black distant car on road | 3840×2160 24fps | Rejected: car far off-centre, crop cuts it out |
+| 14052023, 14052035, 11541170, 4634388 | Drone, parked/detail, badge, red parked car | Mixed | Rejected; still included as still-proof JPGs |
 
-Reference footage `192907.mp4` is **not included** in this package. The final film still requires the single exotic hero vehicle and 11 non-repeated real shots. Do not mistake clips filmed by the same contributor for conclusive evidence that the car is identical.
+## Locked S01–S11 edit positions
+| Shot | Intent | Best actual source | Gate |
+|---|---|---|---|
+| S01 | Hypercar aero detail | 20153915 wheel macro | Conditional, unproven same vehicle |
+| S02 | Low frontal rolling speed | 7727415 | Conditional 1080p crop |
+| S03 | Acceleration/rear aero | None | BLOCKED |
+| S04 | Massive hypercar silhouette reveal at **frame 77** | None | BLOCKED |
+| S05 | Three-quarter tracking | None | BLOCKED |
+| S06 | Huge rear diffuser | None | BLOCKED |
+| S07 | Parallel side pursuit | 7727416 | Conditional 1080p crop |
+| S08 | High-angle fly-by | None | BLOCKED |
+| S09 | Another moving three-quarter | 32068488 purple racer | REJECT continuity |
+| S10 | Different fast macro | None | BLOCKED |
+| S11 | Final iconic full-car hero | None | BLOCKED |
 
-## Ranked pathways
-1. Commission or obtain **rights-cleared original B-roll for one exotic car**: 4K 24–60fps raw/full-length, 11+ actual camera angles, proper rolling shots, signed permission; only pathway known to satisfy all hard requirements without fabricating identity.
-2. Licensed specialist exotic-footage catalog (e.g. [Pond5 Aventador SVJ listings](https://www.pond5.com/search?kw=lamborghini-aventador-svj&media=footage)), subject to **purchase and review**. Listings are **not usable licences** on their own.
-3. Free [Pexels](https://www.pexels.com/license/) stock footage with exact image analysis: usable for supplementary inserts, but the two acquired 4K clips do **not** satisfy the locked hero/night/vertical shots.
-
-Audio main cut **frame 77 (2.5667s at 30fps)** remains locked in beat map; footage gate must pass before constructing beat-true visuals.
+**Never label these as approved 11 shots.** Source footage license, actual SHA256, publisher, crop proofs and quality notes in source-manifest.json. The intended *single identifiable hero* needs new multi-angle rushes. Main transition **f77** untouched.
