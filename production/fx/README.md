@@ -51,3 +51,20 @@ Copy this toolkit by cherry-picking/merging the feature into Porsche contract br
 - `CameraMotionBlur` can change colours, and high samples make renders expensive. The default in our opt-in wrapper is **disabled**. Use at most 4–5 samples for occasional close-up movements.
 - The original song is privately user-supplied, and Porsche media rights must be reviewed. The FX proof is independent and safe to include in public GH Actions artifacts.
 - Workflow: `.github/workflows/production-fx-ci.yml`. Produces real video proof, FFmpeg LUT outputs, QA metadata and original compare images.
+
+## Independent reliability audit — 10 October 2026
+
+Improvement branch: `feature/fx-toolkit-audit-reliability-20261010`; base: integrated Porsche contract head `bdd17b2c127a0055bba09b6b46f4bcc442a459db` (NOT outdated `main`).
+
+- `BeatFxTransform` now calculates **viewport-aware, inverse-rotated corner coverage** for directional whip zoom and tilt. This avoids black slivers from a fixed 540-pixel overscan assumption. Same transform code works at native output and scaled Remotion proof resolution.
+- Added optional `zoom-through` (short scale-based impact, no optical flow) and `light-leak` (four-frame restrained warm original graphic overlay); these do not mix in any previous clip or assume duplicated source frames.
+- `validateCuts` now rejects unknown effect styles; `buildChapterFx` rejects duplicate/unsorted beats; nonfinite grades/effect intensities are refused instead of producing invalid CSS. Geometry corners are checked in `production/fx/test_beat.cjs` at four aspect/resolution combinations.
+- Existing AAC audio is now **copied**, including during video/LUT re-encoding; no sound quality loss from gratuitous AAC-to-AAC conversion. Dimensions, nominal frame rates, frame counts (when supplied by probe), and audio presence are checked after export.
+- `AutomotiveFXComparison` is an original 120-frame / 30fps native A/B: first two seconds show clean cuts; second two seconds use exactly the same moving graphics with whip, zoom-through and light-leak. The comparison isolates the effect from footage differences.
+- Updated CI includes source tests, native 540×960 MP4+decode, sixteen stills, one native-size 1080×1920 still, elapsed render time, FFprobe frame verification, and numerical pixel difference checks between equivalent A/B frames. CI is required to complete before describing the changes as production-ready.
+
+**Usage:** `{frame:30,style:'zoom-through'}` and `{frame:45,style:'light-leak'}` in a normal `BeatCut[]`. Use `strength` around 0.35–0.65 for transitions. Stronger settings may crop important edges despite technically safe borders; choose based on visual intent.
+
+**Conservative rendering rules:** keep `CameraMotionBlur` disabled except for selected shots (typically 4 samples), avoid stacking LUTs, and prefer AAC bitstream copying. CPU render times vary with runner hardware: use the recorded render elapsed time in CI as the empirical benchmark, not a promised fixed runtime.
+
+**Outstanding limits:** No optical-flow interpolation, real lens-distortion calibration, camera matching from footage, or colour-managed HDR/LOG pipeline is implemented. The 17-point SDR LUT generator remains gamma-encoded approximate maths: compare neutral greys, shadow detail, and highlights against *your actual source* before final application. The original showcases are synthetic, so green CI alone cannot establish editorial quality on real moving cars.
