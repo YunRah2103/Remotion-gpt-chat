@@ -1,11 +1,11 @@
-# MIDNIGHT V12 001
+# EXOTIC AFTER DARK (internal slug: midnight-v12-001)
 
-Short-form night supercar film inspired by the **mood and cinematography** of user's uploaded Lamborghini night reference (not copied footage), precisely timed to a separate **10.53s user-provided MP3**.
+Ultra-exotic **HIGH-AGGRESSION** hypercar edit, precisely timed to the user's **10.53s MP3**. The user rejected the earlier slow/understated Lamborghini treatment. Show unusual bodywork, extreme aero, truly powerful moving angles and dramatic impact-synced cinematography. Source from authorised real footage; the uploaded Lamborghini night reference is an energy/lighting reference, not a shot prescription.
 
 - Deliverable: **316 frames, 1080×1920, 30fps**, original supplied audio; ~11 genuinely unique moving shots.
 - Approach: **real, licensed/authorised video** rather than expensive full-car CGI.
-- Car priority: dark Lamborghini Aventador V12 / SVJ, with exact model verified by Scout A.
-- Strong visual switch: **frame 77 / 2.567 seconds**.
+- Car priority: verify one rare, extremely aggressive hypercar; scout Jesko Attack, Apollo IE, Pagani Huayra R, McLaren Senna GTR, Lamborghini Veneno / Sián **as candidates**, with actual availability and footage licences verified.
+- Editing: visually ferocious first-to-last, with deliberate fast whips, speed ramps, zoom hits, awesome rolling motion, rare intense flashes; strong sync switch at **frame 77 / 2.567 seconds**.
 - First deliverable is **Scout A's verified source-footage handoff**, not a premature full film.
 
 ## Important files
