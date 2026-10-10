@@ -1,0 +1,37 @@
+name: STO V10 Agent A - public embedded 1080p original MP4
+on:
+  push:
+    branches: [automotive-edits/huracan-sto-v10-001/a-footage]
+    paths:
+      - production/videos/huracan-sto-v10-001/footage/probe_public_embeds.py
+      - .github/workflows/sto-public-embeds.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Native tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          pip install Pillow
+          python -m py_compile production/videos/huracan-sto-v10-001/footage/probe_public_embeds.py
+      - name: Inspect publicly accessible 1080p progressive film masters
+        run: python production/videos/huracan-sto-v10-001/footage/probe_public_embeds.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STO-PUBLIC-EMBED-NATIVE-1080P
+          path: |
+            out/STO_VIMEO_PUBLIC_HD_MASTERS.zip
+            out/sto-vimeo-public-embeds/manifest.json
+          retention-days: 5
+          if-no-files-found: warn
+          compression-level: 0
