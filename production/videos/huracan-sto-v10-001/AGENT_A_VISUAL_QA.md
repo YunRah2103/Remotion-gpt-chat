@@ -1,5 +1,8 @@
 # Huracán STO V10 — Agent A native visual QA (10 October 2026)
 
+> **FORMAT OVERRIDE — latest user instruction (10 October 2026): ALL SOURCE SHOTS AND THE ENTIRE FINISHED FILM MUST BE LANDSCAPE 16:9. FINAL OUTPUT 1920×1080, 30fps, 316 frames.** This supersedes ALL earlier vertical/portrait source-quality verdicts and instructions below. The three Phantom 1920×1080 landscape sources NOW PASS NATIVE OUTPUT-RESOLUTION CHECKS without cropping/upscaling. Monaco 1280×720 is landscape but has a lower-resolution warning. Six LA Modz 720×1280 portrait sources are EXCLUDED from landscape edit production. **Gate A still NOT PASSED** because distinct fast-moving STO camera angles remain insufficient/unverified, despite three technically acceptable FHD landscape sources. Historical results below reflect the earlier vertical requirement and are preserved as an audit trail.
+
+
 ## Audited deliverable
 
 **Run:** https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38089620500
