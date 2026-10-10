@@ -5,6 +5,7 @@ on:
       - automotive-edits/porsche-911-turbo-evolution-001/a-footage
     paths:
       - '.github/workflows/porsche-agent-a-vimeo-964.yml'
+      - 'production/videos/porsche-911-turbo-evolution-001/footage/probe_964_vimeo.py'
   workflow_dispatch:
 permissions:
   contents: read
