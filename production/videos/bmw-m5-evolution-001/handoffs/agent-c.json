@@ -2,14 +2,26 @@
   "schemaVersion": 1,
   "task": "bmw-m5-evolution-001-agent-c",
   "branch": "automotive-edits/bmw-m5-evolution-001/c-master",
-  "sourceSha": "e8f17c9ef5cc48b143b21d3cc4d8007861097464",
+  "sourceSha": "4e7818f65b52a5999fec4d33a717e49d905c06e3",
   "owner": "release",
-  "summary": "UNSTARTED planning template only. This agent has not delivered footage/code or QA.",
+  "summary": "Verified user-supplied private music master by SHA and ffprobe; validated all 42 beat slots/552 timeline frames; produced an actual user-only playable beat-grid QA clip with AAC sound (not car footage). BLOCKED on unstarted A footage and B Remotion branches, so the BMW M5 movie must not be falsely released.",
   "status": "blocked",
-  "files": [],
-  "evidence": [],
-  "blockers": [
-    "Agent session has not started, no implementation commits or actual artifacts have been submitted."
+  "files": [
+    "production/videos/bmw-m5-evolution-001/master/MASTER_STATUS.md",
+    "production/videos/bmw-m5-evolution-001/handoffs/agent-c.md",
+    "production/videos/bmw-m5-evolution-001/handoffs/agent-c.json"
   ],
-  "notes": "This is a placeholder, base SHA is not a claimed completion SHA."
+  "evidence": [
+    "User editor-pack WAV SHA256=47713ca53679b6011f7482232092daa4414e11a0e5c598007bf3fef31b5bb449; FFprobe PCM24 stereo 48000Hz 18.400000s",
+    "Validated beat-map 42 chronological, contiguous shot slots, frames 0 through 551",
+    "Local private beat-grid diagnostic MP4 full decode, FFprobe: 552 H.264 1080x1920 30fps frames + stereo 48kHz AAC; NOT a car film, NOT a GitHub Actions artifact",
+    "Agent A branch SHA e1fe940dfde8817f485ca58887bda750e6461dd8: empty footage template; handoff blocked",
+    "Agent B branch SHA cc8e49d78b1c575941db4297ce6f1b129aff5ff4: absent Remotion scene implementation; handoff blocked"
+  ],
+  "blockers": [
+    "Agent A has not supplied any of the 42 real, unique, generation-verified moving BMW M5 sedan clips or source artifact bytes",
+    "Agent B has not supplied the actual Remotion cinematic edit/composition or handoff",
+    "A real final 18.4s BMW M5 evolution MP4 cannot be rendered or aesthetically verified from missing source footage and scene code"
+  ],
+  "notes": "User owns the private audio input; no private music bytes committed to public GitHub. Current shareable MP4 is explicitly a diagnostic synchronisation video only, not the final BMW film. Never claim private footage licensing or public release clearance."
 }
