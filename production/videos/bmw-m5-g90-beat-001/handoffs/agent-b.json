@@ -2,31 +2,29 @@
   "schemaVersion": 1,
   "task": "bmw-m5-g90-beat-001-agent-b",
   "branch": "automotive-edits/bmw-m5-g90-001/b-editor-master",
-  "sourceSha": "4c1f61c4699c63e83120d3e73f4c88f85fb32e1e",
+  "sourceSha": "c54105aeed777787ce5e35fda96649f4a3493675",
   "owner": "director",
-  "summary": "Editorial implementation and private full-length beat-grid/audio render proof completed; final moving BMW G90 film correctly BLOCKED. Registered 600-frame Remotion film, 39 cut starts, strict licence+source media gates, typed/CI checks. Agent A delivered 0/39 licensed verified G90 moving clips.",
-  "status": "blocked",
+  "summary": "REAL BMW G90 private footage integrated: 39/39 source SHA verified; source MP4 format matches 1280x720 30fps H.264, 600 beat frames. No-text Remotion timeline implemented and compiled. Complete locally mixed FFmpeg private 20.000s final MP4 1080x1920 H.264 AAC available in conversation, 600-frame full decode + frame-by-frame motion QA passed; native Remotion Actions video-only render running as separate proof. Public publishing BLOCKED by rights.",
+  "status": "review",
   "files": [
     "src/bmw-m5-g90-beat/BeatFilm.tsx",
-    "src/bmw-m5-g90-beat/shot-manifest.json",
     "src/Root.tsx",
-    "production/videos/bmw-m5-g90-beat-001/editor/validate_editor.py",
-    "production/videos/bmw-m5-g90-beat-001/editor/render.sh",
-    "production/videos/bmw-m5-g90-beat-001/editor/README.md",
-    ".github/workflows/bmw-m5-g90-beat-001-ci.yml"
+    ".github/workflows/bmw-m5-g90-private-render.yml",
+    "production/videos/bmw-m5-g90-beat-001/editor/README.md"
   ],
   "evidence": [
-    "Actual Agent B editorial/source revision 4c1f61c4699c63e83120d3e73f4c88f85fb32e1e (pre-handoff).",
-    "CI with Remotion TypeScript npm run check and production 39/600 frame contract: PASS https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38008449276",
-    "Actual local private non-final sync diagnostic rendered and FFmpeg-decoded: H.264 1080x1920 30fps, 600 decoded frames, 20.000 seconds, stereo AAC 48kHz; audio preview SHA256 925c58cfb8268f8f11c58c131a562310741eeb959c33dfbf31832cef8c0a3da5.",
-    "Agent A real handoff on its assigned branch: BLOCKED, 0/39 real approved clips, SHA 2da1f31683fdc02bc2993d0b34da7e9cd8080ef5; no footage media artifact.",
-    "Local 39-boundary spectral-flux audio proof: approximately 117.45 BPM, 38/39 candidate local peaks within +/-120ms. Not a claim of end-to-end music-video sync."
+    "Independent download of Agent A G90-PRIVATE-39-SHOTS artifact 11652333164, run 38009881261 (actual ZIP media).",
+    "Agent A final source commit 96a4cec9eac460d7ec44c625292b781dda6830b8; origin PF0009730 BMW Group G90 Scene 3; SHA256 original 59947dad266e74d92843cd90c2b2c90a3e118b277898f001c30c51e4e9b428a9.",
+    "38/39 first? No: 39/39 video clip SHA256 matched source manifest, all FFprobe H.264 1280×720 30fps, exact 600 frames, individual actual motion proofs.",
+    "Local private final MP4 /mnt/data/BMW_M5_G90_PRIVATE_REVIEW_20s.mp4 SHA256 30ffe824a1694f386b94d524b170fb950801d6230fc6972dcc38c1fa7465e4f4.",
+    "Actual complete decode and FFprobe PASS: H.264 1080x1920 30fps 600 frames 20.000s; audio AAC 48 kHz 2 channel.",
+    "Independent 39-shot review every scene median per-frame difference 2.98, min 1.166, nonblack 39/39; user video text-free.",
+    "GitHub Actions native Remotion visual master run https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38010694333 ; latest state must be checked separately.",
+    "GitHub planning and TypeScript CI passed on branch."
   ],
   "blockers": [
-    "Agent A could not obtain a single legitimately redistributable, downloaded and visually verified new BMW M5 G90 SALOON moving footage source: 0/39 slots populated.",
-    "BMW Group press footage is not proven licensed for independently edited public TikTok reuse. No rights-approved media files to integrate or render.",
-    "User-supplied private music excerpt is available only in this ChatGPT session; public distribution/music sync rights have not been verified.",
-    "Consequently no final genuine footage-led MP4 can truthfully be delivered, irrespective of editor composition and private diagnostic success."
+    "Public TikTok/social redistribution permissions for BMW PressClub sourced footage unverified.",
+    "Uploaded music permission for public redistribution not established; only private local review video was muxed and no private user audio added to public repository."
   ],
-  "notes": "Private waveform/card diagnostic MP4 is technical proof only (NOT the requested car video), never a final release. No audio committed to public repo. Await user-provided rights-cleared G90 moving videos or new Agent A READY handoff and music publication authorization."
+  "notes": "Delivered local MP4 is genuine FFmpeg private final from actual 39 G90 clips with supplied audio. Native Remotion visual-only workflow is separately running; do not imply successful Remotion completion until GitHub workflow passes. No on-video text or overlay."
 }
