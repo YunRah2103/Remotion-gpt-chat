@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/porsche-agent-a-generation-source.yml'
       - 'production/videos/porsche-911-turbo-evolution-001/footage/discover_generation_duel.py'
+      - 'production/videos/porsche-911-turbo-evolution-001/footage/discover_generation_duel.py'
   workflow_dispatch:
 permissions:
   contents: read
