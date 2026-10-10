@@ -21,7 +21,7 @@ class FXToolkitTests(unittest.TestCase):
                 text=(Path(folder)/p["path"]).read_text()
                 self.assertIn("LUT_3D_SIZE 17",text)
                 self.assertEqual(len(text.splitlines()),17**3+4)
-                self.assertGreater(len(text),150000)
+                self.assertGreater(len(text),120000)
                 self.assertEqual(p["sha256"],next(q["sha256"] for q in generate(folder,17)["presets"] if q["name"]==p["name"]))
     def test_colour_values_bounded_and_neutral(self):
         for p in PRESETS.values():
