@@ -4,7 +4,7 @@ This directory is **research + an executable acquisition/QA system**, not a deli
 
 ### Confirmed research scope (2026-10-10)
 - 20 source-page candidates across E28, E34, E39, E60, F10, F90 and G90, primarily **BMW Group PressClub scene-specific masters**, plus a few verified original creator pages.
-- Nine direct official BMW PressClub high-resolution MOV URLs were identified by following the actual media download links. They have **not** been fetched/FFprobed: do not infer resolution from the filename.
+- Twelve mapped source entries with direct official BMW PressClub high-resolution MOV URLs were identified by following the actual media download links. They have **not** been fetched/FFprobed: do not infer resolution from the filename.
 - The 42-slot chronological `shot-board.json` is a *selection brief*, not footage. Actual timecodes/shot identities remain unknown until source bytes are reviewed.
 - Archived 2000–05 BMW footage is genuinely native 1024×576 or 720×576 even at official "high-res", making it unacceptable to invent 4K or crop to a full 1080×1920 close-up. Use editorial frame treatment or find independent recent 4K footage.
 - `E28/E34`: some PressClub group footage mixes all four eras. Never mislabel group video as exclusively one generation; manual per-frame inspection mandatory.
