@@ -35,16 +35,9 @@ SOURCES = [
      "https://video.wixstatic.com/video/ef7c1e_9bf925ada5ce445fb60a02a29fd3ce91/720p/mp4/file.mp4")
 ]
 
-# Six separately published native video candidates under LA Modz's explicitly
-# labelled "Lamborghini huracan STO tinted" blog entry.  Workshop detail footage
-# is expected; passing identity still does NOT prove driving motion.
-SOURCES += [
-    (
-        f"la-modz-sto-{number}", "LA Modz",
-        "https://lamodz.co.uk/blogs/",
-        f"https://lamodz.co.uk/wp-content/uploads/2021/12/IMG_{number}.mp4"
-    ) for number in (2882, 2881, 2880, 2891, 2892, 2893)
-]
+# Portrait-only 720x1280 LA Modz workshop videos were inspected previously.
+# Excluded from new acquisition because the user locked 16:9 LANDSCAPE source and output.
+# Historical candidate IDs: 2882, 2881, 2880, 2891, 2892, 2893.
 
 VALID_HOSTS = {"phantommedia.sgp1.cdn.digitaloceanspaces.com", "video.wixstatic.com", "lamodz.co.uk"}
 MAX_SOURCE_BYTES = 180 * 1024 * 1024
@@ -101,28 +94,39 @@ def inspect(src):
     dur = float(v.get("duration") or data["format"].get("duration") or 0)
     n, d = (v.get("avg_frame_rate") or "0/1").split("/")
     fps = float(n) / float(d) if float(d) else 0
-    cropw, croph = min(width, int(height * 9 / 16)), min(height, int(width * 16 / 9))
+    # Selected footage must be 16:9 LANDSCAPE, not portrait source forced to fit.
+    cropw, croph = min(width, int(height * 16 / 9)), min(height, int(width * 9 / 16))
     cropw -= cropw % 2
     croph -= croph % 2
+    if width < height:
+        landscape_quality = "REJECT_PORTRAIT_SOURCE"
+    elif cropw >= 1920 and croph >= 1080:
+        landscape_quality = "FULL_HD_LANDSCAPE_OR_BETTER"
+    elif cropw >= 1280 and croph >= 720:
+        landscape_quality = "BELOW_1080P_LANDSCAPE_REVIEW_ONLY"
+    else:
+        landscape_quality = "REJECT_LOW_RESOLUTION_SOURCE"
     return {
+        "output_canvas": [1920, 1080],
+        "output_aspect": "16:9 landscape",
         "actual_resolution": [width, height],
         "actual_fps": round(fps, 3),
         "actual_duration_seconds": round(dur, 3),
         "container_bitrate": int(data["format"].get("bit_rate") or 0),
         "codec": v.get("codec_name"),
-        "vertical_crop_source_pixels": [cropw, croph],
-        "crop_quality": "TRUE_1080x1920_CROP_AVAILABLE" if cropw >= 1080 and croph >= 1920
-                        else "UPSCALE_REQUIRED_DO_NOT_CERTIFY_1080p",
-        "technical_candidate": bool(dur >= 1 and fps >= 23 and width >= 720)
+        "landscape_crop_source_pixels": [cropw, croph],
+        "landscape_quality": landscape_quality,
+        "technical_candidate": bool(dur >= 1 and fps >= 23 and width >= 1280
+                                    and height >= 720 and width > height)
     }
 
 
 def frame(src, when, meta, crop, output):
     width, height = meta["actual_resolution"]
-    cw, ch = meta["vertical_crop_source_pixels"]
+    cw, ch = meta["landscape_crop_source_pixels"]
     x = {"left": 0, "center": (width - cw) // 2, "right": width - cw}[crop]
     y = (height - ch) // 2
-    filt = f"crop={cw}:{ch}:{x}:{y},scale=216:384:flags=lanczos"
+    filt = f"crop={cw}:{ch}:{x}:{y},scale=384:216:flags=lanczos"
     run(["ffmpeg", "-v", "error", "-y", "-ss", f"{when:.3f}",
          "-i", str(src), "-vf", filt, "-frames:v", "1", str(output)], 50)
 
@@ -131,7 +135,7 @@ def proof(src, meta, outpath, prefix):
     duration = meta["actual_duration_seconds"]
     timestamps = [round(max(.03, duration * q), 3) for q in (.10, .30, .50, .70, .90)]
     labels = ["left", "center", "right"]
-    contact = Image.new("RGB", (3 * 216, 5 * 410), "#101010")
+    contact = Image.new("RGB", (3 * 384, 5 * 242), "#101010")
     pen = ImageDraw.Draw(contact)
     centers = []
     for i, time in enumerate(timestamps):
@@ -140,14 +144,14 @@ def proof(src, meta, outpath, prefix):
             try:
                 frame(src, time, meta, position, filename)
                 with Image.open(filename) as im:
-                    contact.paste(im.convert("RGB"), (j * 216, i * 410 + 24))
+                    contact.paste(im.convert("RGB"), (j * 384, i * 242 + 24))
                     if position == "center":
-                        centers.append(im.convert("RGB").resize((80, 142)))
+                        centers.append(im.convert("RGB").resize((142, 80)))
             except Exception:
-                pen.text((j * 216 + 5, i * 410 + 60), "FRAME ERROR", fill="red")
+                pen.text((j * 384 + 5, i * 242 + 60), "FRAME ERROR", fill="red")
             finally:
                 filename.unlink(missing_ok=True)
-            pen.text((j * 216 + 6, i * 410 + 5), f"{time:.2f}s {position}", fill="white")
+            pen.text((j * 384 + 6, i * 242 + 5), f"{time:.2f}s {position}", fill="white")
     contact.save(outpath, optimize=True)
     changes = []
     for one, two in zip(centers, centers[1:]):
@@ -179,14 +183,15 @@ def main():
     report = {
         "project": "Huracan-STO-V10-001 Agent A",
         "created_utc": datetime.now(timezone.utc).isoformat(),
+        "required_final_format": "1920x1080 landscape 16:9, 30 fps, 316 frames",
         "status": "RESEARCH_ACQUISITION_UNVERIFIED",
         "identity_approved_angle_count": 0,
-        "purpose": "candidate acquisition and real FFprobe/crop QA, not final approval",
+        "purpose": "16:9 landscape candidate acquisition and real FFprobe QA, not final approval",
         "sources": [],
         "manual_gate_requirements": [
             "Inspect all frames; STO identification for every selected shot",
             "10 or more genuinely distinct moving camera angles",
-            "Frame the car in 9:16 without unintended clipping",
+            "Frame the car in 16:9 landscape without unintended clipping",
             "Verify original soundtrack is not mistaken for genuine STO engine audio",
             "Obtain publishing rights and confirm uploader authority separately"
         ],
@@ -231,7 +236,7 @@ def main():
     (ROOT / "manifest.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     (ROOT / "README.txt").write_text(
         "Huracan STO V10 Agent A source-research download.\n"
-        "Open previews/* and manifest.json BEFORE deciding which shots are usable.\n"
+        "Open LANDSCAPE previews/* and manifest.json BEFORE deciding which shots are usable.\n"
         "0 approved same-model distinct shots until manual visual inspection.\n"
         "The main user video/audio is not included. Do not call this a final film.\n",
         encoding="utf-8"
