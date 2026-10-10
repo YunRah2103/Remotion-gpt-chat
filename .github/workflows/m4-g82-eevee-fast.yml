@@ -1,0 +1,84 @@
+name: BMW M4 G82 - Eevee Fast Review Orbit
+on:
+  push:
+    branches: [experiments/bmw-m4-g82-blender-turntable]
+    paths: ['.github/workflows/m4-g82-eevee-fast.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  eevee-orbit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Blender Xvfb NumPy and FFmpeg
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq blender xvfb python3-numpy ffmpeg
+      - name: Download and verify CC BY BMW M4 model
+        run: |
+          set -euo pipefail
+          mkdir -p out/m4-eevee
+          curl -fsSL --retry 3 --connect-timeout 30 --max-time 180 https://raw.githubusercontent.com/coopercodes/bmwGLB/main/bmw_m4_competition_m_package.glb -o out/m4-eevee/car.glb
+          echo '913ac951ba2645777c91393b86aed2def2433a807e57e626b203908aa474b8fb  out/m4-eevee/car.glb' | sha256sum -c -
+      - name: Make an isolated Eevee implementation of the approved detailed studio model
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          src=Path('production/experiments/bmw-m4-g82/v2/source_model_scene.py').read_text()
+          assert 'sc.render.engine="CYCLES"' in src
+          src=src.replace('sc.render.engine="CYCLES"','sc.render.engine="BLENDER_EEVEE"')
+          src=src.replace('sc.cycles.samples=20 if MODE=="final" else 12','sc.eevee.taa_render_samples=12')
+          Path('/tmp/m4_eevee.py').write_text(src)
+          PY
+      - name: Four actual Eevee proof frames
+        env:
+          M4_MODEL: ${{ github.workspace }}/out/m4-eevee/car.glb
+          M4_OUTPUT: ${{ github.workspace }}/out/m4-eevee
+          M4_MODE: preview
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s '-screen 0 1920x1080x24' blender -b -t 4 --python /tmp/m4_eevee.py > eevee-proof.log 2>&1 || { tail -140 eevee-proof.log; exit 1; }
+          test "$(find out/m4-eevee/proof -name 'angle_*.png' | wc -l)" -eq 4
+          ffmpeg -hide_banner -loglevel error -y -framerate 1 -pattern_type glob -i 'out/m4-eevee/proof/angle_*.png' -filter_complex 'tile=2x2:padding=8:margin=8' -frames:v 1 out/m4-eevee/FOUR_ANGLE_EEVEE_QA.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: M4-G82-EEVEE-FAST-PROOF
+          path: |
+            out/m4-eevee/FOUR_ANGLE_EEVEE_QA.png
+            eevee-proof.log
+          retention-days: 30
+      - name: Native Blender Eevee 360 orbit
+        env:
+          M4_MODEL: ${{ github.workspace }}/out/m4-eevee/car.glb
+          M4_OUTPUT: ${{ github.workspace }}/out/m4-eevee
+          M4_MODE: final
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s '-screen 0 1920x1080x24' blender -b -t 4 --python /tmp/m4_eevee.py > eevee-final.log 2>&1 || { tail -140 eevee-final.log; exit 1; }
+          test "$(find out/m4-eevee/frames -name 'f_*.png' | wc -l)" -eq 144
+      - name: Encode validate and hash native Eevee MP4
+        run: |
+          set -euo pipefail
+          cd out/m4-eevee
+          ffmpeg -hide_banner -loglevel error -y -framerate 24 -start_number 1 -i frames/f_%04d.png -c:v libx264 -preset slow -crf 17 -pix_fmt yuv420p -movflags +faststart BMW_M4_G82_EEVEE_360.mp4
+          ffmpeg -v error -xerror -i BMW_M4_G82_EEVEE_360.mp4 -f null -
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of csv=p=0 BMW_M4_G82_EEVEE_360.mp4)" -eq 144
+          ffprobe -v error -show_entries stream=width,height,avg_frame_rate,nb_frames -of json BMW_M4_G82_EEVEE_360.mp4 > qa.json
+          sha256sum BMW_M4_G82_EEVEE_360.mp4 BMW_M4_G82_V2.blend > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: M4-G82-EEVEE-FAST-360-FINAL
+          path: |
+            out/m4-eevee/BMW_M4_G82_EEVEE_360.mp4
+            out/m4-eevee/BMW_M4_G82_V2.blend
+            out/m4-eevee/FOUR_ANGLE_EEVEE_QA.png
+            out/m4-eevee/qa.json
+            out/m4-eevee/SHA256SUMS.txt
+            eevee-final.log
+          if-no-files-found: warn
+          retention-days: 30
