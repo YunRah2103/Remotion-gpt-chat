@@ -9,7 +9,8 @@ from pathlib import Path
 URLS=["https://newsroom.porsche.com/en/products/911.html",
       "https://newsroom.porsche.com/en_US/2022/products/porsche-911-magazine-episode-21-tale-of-the-turbo-mark-webber-911-turbo-models-cayenne-turbo-gt-911-gt1-27314.html",
       "https://newsroom.porsche.com/en/2020/history/porsche-911-turbo-generations-walter-roehrl-23139.html",
-      "https://newsroom.porsche.com/en/2020/products/porsche-911-turbo-seven-generations-2020.html"]
+      "https://newsroom.porsche.com/en/2020/products/porsche-911-turbo-seven-generations-2020.html",
+      "https://newsroom.porsche.com/en/2024/scene-passion/porsche-turbo-transfagarasan-highway-romania-37323.html"]
 TARGET="A duel between the generations"
 def fetch(u):
     req=urllib.request.Request(u,headers={"User-Agent":"Mozilla/5.0 (compatible; Porsche source review)"})
