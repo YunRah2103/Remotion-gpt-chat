@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "project": "huracan-sto-v10-001",
-  "status": "REAL_FOOTAGE_ASSEMBLY_PENDING_GATE_A_APPROVAL",
+  "status": "CANDIDATE_V2_RETIMED_FOR_CAR_VISIBILITY_SOURCE_GATE_NOT_APPROVED",
   "output": {
     "width": 1920,
     "height": 1080,
@@ -127,14 +127,14 @@
       "movingAngleVerified": false
     },
     {
-      "id": "04-wheel",
+      "id": "04-headlight",
       "startFrame": 56,
       "endFrameExclusive": 78,
       "sourceOriginal": "phantom-sto-primary.mp4",
-      "sourceStartSeconds": 11.9,
-      "sourceEndSeconds": 12.633333,
+      "sourceStartSeconds": 13.98,
+      "sourceEndSeconds": 14.713333,
       "file": "shot-04.mp4",
-      "intendedSubject": "STO wheel and bodywork detail",
+      "intendedSubject": "STO left headlight and yellow livery macro; genuine source detail, not moving-car proof",
       "cutStyle": "punch",
       "plannedFocalX": 0.5,
       "plannedFocalY": 0.5,
@@ -143,13 +143,13 @@
           "frame": 0,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.055
+          "zoom": 1.065
         },
         {
           "frame": 21,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.095
+          "zoom": 1.1
         }
       ],
       "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
@@ -191,10 +191,10 @@
       "startFrame": 95,
       "endFrameExclusive": 113,
       "sourceOriginal": "phantom-sto-lambo.mp4",
-      "sourceStartSeconds": 22.26,
-      "sourceEndSeconds": 22.86,
+      "sourceStartSeconds": 1.28,
+      "sourceEndSeconds": 1.88,
       "file": "shot-06.mp4",
-      "intendedSubject": "STO approaching from low front camera",
+      "intendedSubject": "Oncoming blue STO near low roadside camera; a different take from the later approach shot",
       "cutStyle": "whip-right",
       "plannedFocalX": 0.5,
       "plannedFocalY": 0.5,
@@ -203,13 +203,13 @@
           "frame": 0,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.035
+          "zoom": 1.1
         },
         {
           "frame": 17,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.075
+          "zoom": 1.16
         }
       ],
       "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
@@ -251,10 +251,10 @@
       "startFrame": 134,
       "endFrameExclusive": 157,
       "sourceOriginal": "phantom-sto-lambo.mp4",
-      "sourceStartSeconds": 23.08,
-      "sourceEndSeconds": 23.846667,
+      "sourceStartSeconds": 23.25,
+      "sourceEndSeconds": 24.016667,
       "file": "shot-08.mp4",
-      "intendedSubject": "STO continued approach / passing camera",
+      "intendedSubject": "Blue STO approaching low road camera; car becomes larger toward cut",
       "cutStyle": "whip-left",
       "plannedFocalX": 0.5,
       "plannedFocalY": 0.5,
@@ -263,13 +263,13 @@
           "frame": 0,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.055
+          "zoom": 1.06
         },
         {
           "frame": 22,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.095
+          "zoom": 1.105
         }
       ],
       "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
@@ -340,11 +340,11 @@
       "id": "11-approach-low",
       "startFrame": 206,
       "endFrameExclusive": 232,
-      "sourceOriginal": "phantom-sto-lambo.mp4",
-      "sourceStartSeconds": 0.62,
-      "sourceEndSeconds": 1.486667,
+      "sourceOriginal": "phantom-sto-primary.mp4",
+      "sourceStartSeconds": 0.81,
+      "sourceEndSeconds": 1.676667,
       "file": "shot-11.mp4",
-      "intendedSubject": "STO front-quarter low camera",
+      "intendedSubject": "Fast STO side-to-rear rolling pass, less empty paving at the start",
       "cutStyle": "whip-right",
       "plannedFocalX": 0.5,
       "plannedFocalY": 0.5,
@@ -353,7 +353,7 @@
           "frame": 0,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.035
+          "zoom": 1.03
         },
         {
           "frame": 25,
@@ -401,10 +401,10 @@
       "startFrame": 256,
       "endFrameExclusive": 284,
       "sourceOriginal": "phantom-sto-lambo.mp4",
-      "sourceStartSeconds": 2.32,
-      "sourceEndSeconds": 3.253333,
+      "sourceStartSeconds": 14.55,
+      "sourceEndSeconds": 15.483333,
       "file": "shot-13.mp4",
-      "intendedSubject": "STO rear three-quarter camera",
+      "intendedSubject": "Large STO low rear-quarter/wing close shot, not the repeated wide rear-follow angle",
       "cutStyle": "whip-left",
       "plannedFocalX": 0.5,
       "plannedFocalY": 0.5,
@@ -413,13 +413,13 @@
           "frame": 0,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.025
+          "zoom": 1.035
         },
         {
           "frame": 27,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.065
+          "zoom": 1.08
         }
       ],
       "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
@@ -456,5 +456,6 @@
       "uniqueMovingAngleKey": null,
       "movingAngleVerified": false
     }
-  ]
+  ],
+  "editRevision": "v2-car-in-frame"
 }
