@@ -1,0 +1,43 @@
+name: Porsche Agent A - dedicated 930 and 992 video survey
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-dedicated-index.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  index-turbo-generation-source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    strategy:
+      fail-fast: false
+      matrix:
+        video_id: ['286726', '286727']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install native decoder and contact sheet tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install 'Pillow>=10,<12'
+      - name: Survey native Porsche video source across full length
+        env:
+          VIDEO_ID: ${{ matrix.video_id }}
+        run: |
+          python production/videos/porsche-911-turbo-evolution-001/footage/index_official_sources.py \
+            --media-id "$VIDEO_ID" --step 28 --max-samples 40 \
+            --out "out/dedicated-$VIDEO_ID"
+      - name: Save timecoded actual source review sheets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Porsche-Agent-A-dedicated-${{ matrix.video_id }}-${{ github.run_id }}
+          path: out/dedicated-${{ matrix.video_id }}/
+          retention-days: 7
+          if-no-files-found: warn
