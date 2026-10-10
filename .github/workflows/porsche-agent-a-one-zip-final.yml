@@ -5,6 +5,8 @@ on:
       - automotive-edits/porsche-911-turbo-evolution-001/a-footage
     paths:
       - '.github/workflows/porsche-agent-a-one-zip-final.yml'
+      - 'production/videos/porsche-911-turbo-evolution-001/footage/selected-30-native-shots.json'
+      - 'production/videos/porsche-911-turbo-evolution-001/footage/render_30_vertical_candidates.py'
   workflow_dispatch:
 permissions:
   contents: read
