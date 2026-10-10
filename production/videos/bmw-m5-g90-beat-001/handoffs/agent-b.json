@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "task": "bmw-m5-g90-beat-001-agent-b",
   "branch": "automotive-edits/bmw-m5-g90-001/b-editor-master",
-  "sourceSha": "c54105aeed777787ce5e35fda96649f4a3493675",
+  "sourceSha": "1ef4582aae86fdc08244de24dfbc077dafc798d8",
   "owner": "director",
-  "summary": "REAL BMW G90 private footage integrated: 39/39 source SHA verified; source MP4 format matches 1280x720 30fps H.264, 600 beat frames. No-text Remotion timeline implemented and compiled. Complete locally mixed FFmpeg private 20.000s final MP4 1080x1920 H.264 AAC available in conversation, 600-frame full decode + frame-by-frame motion QA passed; native Remotion Actions video-only render running as separate proof. Public publishing BLOCKED by rights.",
+  "summary": "COMPLETE PRIVATE REVIEW: actual native Remotion 20.000s 600-frame 1080x1920 picture master using 39 SHA-verified real moving green BMW M5 G90 saloon source clips, no text; Remotion Actions render SUCCESS. Original user audio muxed locally (AAC) into full synced 20s MP4; actual full decode and 39-shot moving-video inspection PASS. NOT approved for public music or BMW press video distribution.",
   "status": "review",
   "files": [
     "src/bmw-m5-g90-beat/BeatFilm.tsx",
@@ -19,12 +19,14 @@
     "Local private final MP4 /mnt/data/BMW_M5_G90_PRIVATE_REVIEW_20s.mp4 SHA256 6b7b5769841656f5998cd9efb2af7005efd35afeb3b961f468c7d2f4f8619684.",
     "Actual complete decode and FFprobe PASS: H.264 1080x1920 30fps 600 frames 20.000s; audio AAC 48 kHz 2 channel.",
     "Independent 39-shot review every scene median per-frame difference 2.98, min 1.166, nonblack 39/39; user video text-free.",
-    "GitHub Actions native Remotion visual master run https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38010694333 ; latest state must be checked separately.",
-    "GitHub planning and TypeScript CI passed on branch."
+    "GitHub planning and TypeScript CI passed on branch.",
+    "NATIVE REMOTION RENDER SUCCESS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38010694333 , exact verified source SHA 1ef4582aae86fdc08244de24dfbc077dafc798d8, artifact 11653571296 (G90-PRIVATE-REMOTION-VISUAL-20S).",
+    "RENDERED NATIVE PRIVATE REMOTION + LOCALLY MUXED AAC MP4 /mnt/data/BMW_M5_G90_REMOTION_PRIVATE_FINAL_20s.mp4 SHA256 15ed05c1df2fe5cddda990bfec65f5c50a54885edd4380d6abf71b1a4e7e6edb; 15,020,312 bytes, 20.000 sec.",
+    "Private Remotion master independent QA: full FFmpeg decode PASS, H.264 1080x1920 SAR 1:1 30fps 600 frames, AAC stereo 48kHz, 39/39 car-moving clips, min intra-shot frame-change 1.255, no captions/titles/text."
   ],
   "blockers": [
     "Public TikTok/social redistribution permissions for BMW PressClub sourced footage unverified.",
     "Uploaded music permission for public redistribution not established; only private local review video was muxed and no private user audio added to public repository."
   ],
-  "notes": "Delivered local MP4 is genuine FFmpeg private final from actual 39 G90 clips with supplied audio. Native Remotion visual-only workflow is separately running; do not imply successful Remotion completion until GitHub workflow passes. No on-video text or overlay."
+  "notes": "SUCCESS for personal private review only, both genuine source video and music included in locally muxed MP4, with native Remotion render validated on Actions. Do not publicly redistribute BMW footage or uploaded music without permissions."
 }
