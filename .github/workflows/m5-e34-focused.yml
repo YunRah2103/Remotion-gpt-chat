@@ -1,0 +1,31 @@
+name: M5 Agent A corrected E34 moving-shot study
+on:
+  push:
+    branches: ['automotive-edits/bmw-m5-evolution-001/a-footage']
+    paths: ['.github/workflows/m5-e34-focused.yml']
+permissions:
+  contents: read
+jobs:
+  e34:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Prepare native media tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          pip install 'Pillow>=11,<13'
+      - name: Download and verify BMW original E34 candidates
+        run: python production/videos/bmw-m5-evolution-001/footage/e34_focused.py
+      - name: Upload real E34 footage and review manifest without publishing
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: M5-E34-FOCUSED-${{ github.run_id }}
+          path: out/m5-e34-focused/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
