@@ -1,0 +1,37 @@
+name: Porsche Agent A - genuine seven-generation Turbo duel source survey
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-duel-index.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  discover-genuine-mid-era-turbo-scenes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install still/metadata QA tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install 'Pillow>=10,<12'
+      - name: Survey official 2020 seven-generation Turbo 1:46 film at 4s cadence
+        run: |
+          python production/videos/porsche-911-turbo-evolution-001/footage/index_official_sources.py \
+            --media-id 167585 --step 4 --max-samples 40 \
+            --out out/official-seven-gen-duel
+      - name: Upload actual source contact gallery and URL metadata
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Porsche-seven-gen-duel-native-survey-${{ github.run_id }}
+          path: out/official-seven-gen-duel/
+          retention-days: 7
+          if-no-files-found: warn
