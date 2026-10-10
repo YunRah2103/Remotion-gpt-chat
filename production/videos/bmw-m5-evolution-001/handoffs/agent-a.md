@@ -1,115 +1,45 @@
-# AGENT A — GENUINE FOOTAGE RESEARCH HANDOFF (BLOCKED)
+# Agent A — Real BMW M5 footage handoff (REVIEW, not READY)
 
-**Agent:** A · Automotive Footage Director  
-**Repository/branch:** `YunRah2103/Remotion-gpt-chat` / `automotive-edits/bmw-m5-evolution-001/a-footage`  
-**Actual code/source commit:** `a3b780fe6f64faac6c60054c4ab86c005eceeb13` (before this handoff document)  
-**Required final film:** 552 frames, 18.4 s, vertical 1080×1920, 30fps.  
-**Status:** **BLOCKED. Candidate source pages: 20. Actual acquired moving clips: 0/42. Human-verified BMW M5 clips: 0/42. Actual source SHA256 video digests: 0.**  
-**Do not use this handoff as license to mark footage READY or render with substitutions.**
+**Branch:** `automotive-edits/bmw-m5-evolution-001/a-footage`  
+**Research code source commit:** `d4663982a640ab1e913ef3a820502fab4a7fa826`  
+**Status:** `review`. Real moving 42 cuts are AVAILABLE as a GitHub artifact. **Not fully editorially approved.**
 
-## What was actually implemented
+## Actual deliverables
 
-- Read the exact source contract, `beat-map.json`, Agent A instructions, existing video-collage workflow, and existing schema/validator.
-- Researched 20 labelled source-page candidates covering E28, E34, E39, E60, F10, F90, G90, with official BMW Group PressClub scene provenance and select original-channel links. `footage/source-catalog.json` is a **page research catalog only**; it contains no real downloaded media. The twelve direct BMW PressClub URLs in the catalog are candidates, not confirmed accessible downloads.
-- `footage/shot-board.json` maps every beat to six unique camera-angle goals per generation, preserves all source-slot frames, explicitly marks every candidate `MISSING_VERIFIED_CLIP`.
-- `footage/prepare.py` provides guarded official-original acquisition (preserve MOV; FFprobe; SHA256), real JPEG frame samples/contact sheets, strict manual sedan-identity/distinct-shot approval, timed-source extraction QA, near-duplicate detection, and refuses to generate verified manifest until 42 **actual** video files/approved time ranges are present. Do not misuse the code's synthetic test clips as real M5 footage.
-- `footage/test_prepare.py` contains offline unit tests for boundary order, no false readiness, safe source URLs and native FFmpeg/FFprobe/probe/encoded-frame checks against a **synthetic** video fixture. `footage/validate_sources.py` now calls the test suite in the existing CI job. This validates the **machinery**, NOT a single BMW source video.
-- No central workflow, Remotion editing code, Agent B/C file, shared pipeline or separate YUNEX repository was changed.
+**[42 actual BMW M5 clips — GitHub Actions artifact 11668700332](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38047298176/artifacts/11668700332)**, run **[38047298176 (SUCCESS)](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38047298176)**. File names `e28-01.mp4` ... `g90-06.mp4`, with 42 original-segment timecodes, source/clip SHA256, actual native stream dimensions/FPS, all-source metadata, contact sheet and 42 full decode/motion checks. Retention initially 7 days. Nothing was committed as a public MP4 Git blob or release. Archive access is subject to GitHub permissions.
 
-## Results and evidence
+`footage/provisional-cuts.json` is the authoritative generation/slot/source timestamp mapping. `footage/build_review_bundle.py` reassembles these cuts directly from original sources. Asset production was performed by existing **isolated GitHub Actions** with real native media.
 
-- **PASS — initial GitHub Actions metadata/chronology CI**: [run 38014240348](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38014240348) at source `4aa7692b2ff508dfe7308353711da753e2ceda0a`; logs show 42 planned cuts, 552 frames, seven required generations, **actualVerifiedClips: 0**.
-- **PASS — current Actions native-source-tool QA:** [run 38014477573](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38014477573) at source `a3b780fe6f64faac6c60054c4ab86c005eceeb13` executed 4/4 unit tests, including FFmpeg/FFprobe and JPEG extraction of a **synthetic** test-pattern MP4. **Real M5 media inspections remain 0/42**.
-- [Research commit e1fe940](https://github.com/YunRah2103/Remotion-gpt-chat/commit/e1fe940dfde8817f485ca58887bda750e6461dd8) and [native test commit `a3b780fe6f64`](https://github.com/YunRah2103/Remotion-gpt-chat/commit/a3b780fe6f64faac6c60054c4ab86c005eceeb13).
-- There is no real contact sheet, MP4 source, video SHA256 list or private downloadable footage artifact. Evidence artifacts and private-audio content must **never** be invented.
+Research: BMW PressClub originals in [8-source artifact 11667643927](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38045881998/artifacts/11667643927), and dedicated authentic 1920×1080 **E28** driving MOV (not a still) in [artifact 11666924618](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38046928757/artifacts/11666924618).
 
-## BMW M5 identification and image quality
+## Source coverage
 
-BMW official generation sequence is E28 (1985), E34 (1988), E39 (1998), E60 (2005), F10 (2011), F90 (2017), G90 (2024). All footage must show genuine **M5 saloon**, not 520i/535i/M535i, ordinary 5 Series, M3/M4, a wagon/Touring, a race silhouette or CG. Confirm via generation-correct exterior, bumpers, wheel arches/wheels, era-specific trims and M5 badging, model/source description and angle continuity **on the moving frames themselves**. Separate timecodes from one long unchanging shot are NOT unique camera setups.
+| Generation | Year | Slots | Source native dimension | Primary real source | Editorial status |
+|---|---:|---:|---:|---|---|
+| E28 | 1985 | 1–6 | 1920×1080 | Dedicated authentic BMW Group 2016 driving master | Good candidate; camera variety to approve |
+| E34 | 1988 | 7–12 | 480×360 | Mixed 2005 BMW Group M5 formation/slalom footage | BLOCKER: other generations clearly appear |
+| E39 | 1998 | 13–18 | 480×360 | 2000 Nürburgring BMW Group historical film | Technically valid; low resolution |
+| E60 | 2005 | 19–24 | 480×360 | 2005 BMW Group country-road tracking footage | Technically valid; low resolution |
+| F10 | 2011 | 25–30 | 540×304 | 2011 BMW Group Ascari track footage | Technically valid; low resolution; HD upgrade job running |
+| F90 | 2017 | 31–36 | 1920×1080 | 2017 BMW Group Estoril master | Good visual variety |
+| G90 | 2024 | 37–42 | 3840×2160 | 2024 BMW Group M5 driving footage | 4K dimensions; source bitrate still matters |
 
-Research reveals that early official BMW archive master listings may be **720×576** (2005 archive group and E60) or **1024×576** (E39 historic). Even a 'HD' download button does not magically confer modern native 4K. Treat old images in deliberate editorial framing with honest sharpness, not full-height low-res portrait crop. F10/F90 BMW PressClub lists 1920×1080; for 1080×1920 centre crop expect limited pixels. Seek new native UHD 4K independent originals to make each generation strong. G90 official 2024 master is high-res but several GB and must be fetched using a runner with actual access and archive handling.
+Note: each extracted cut is 0.80s of genuine source video; beat-map clips are only about 0.4–0.5s after Agent B/C trim. Agent C must adjust source in/out to beat-map frames and independently verify there is no static/repeated shot or unsuitable frame at the final exact timing.
 
-**Source rights:** BMW Group and individual videographers retain rights; copyright status for external reuse is *unknown*. Research and private-review preparation do not imply public publishing permission. Keep originals, credit/source URLs, note restrictions. No prohibited logins, DRM bypass, or publication to a public Release.
+## Blocking issues
 
-## Exact 42 source slots — ZERO finished selections
+1. **E34 is not acceptable for final signoff:** the 2005 archival source is mixed-generation formation/slalom. Several clips show E28, E39 or E60 cars in addition to an E34. Prevent wrong-generation content dominating the frame. Obtain six isolated, genuinely distinct high-quality E34 shots or redesign its framing; do not label unrelated cars E34.
+2. **Archive sharpness:** E34, E39, E60 and F10 clips are real but native archive-preview resolution. They must not be stretched into a 1080×1920 centre crop with fake resolution. Use a deliberate framed vintage-treatment or improve by downloading the genuine native masters. Existing source quality upgrade job `38047365846` targets 1920×1080 F10 and 1024×576 E39 (pending/verify separately).
+3. **No public publishing rights are claimed** for the BMW or other footage and no final soundtrack is in this bundle. Only use for review while rights remain unresolved.
+4. Temporal motion > threshold and full FFmpeg decode tests passed all 42 **but do not certify creative uniqueness or correct generation in every frame**.
 
-**Important:** The camera setups below are **visual shot requests**, not verified available footage, accurate clip timecodes, or even proof the camera angle exists in any candidate. Agent C must not treat these as media. Each of these 42 rows is missing an actual file and trusted `sourceInSeconds`/`sourceOutSeconds`.
+## Master / Agent B handoff
 
-| Slot | Generation | Film frames (30fps) | Requested unique camera setup | Candidate source IDs — not yet selected |
-|---:|---|---:|---|---|
-| 01 | E28 (1985) | 0–5 | front three-quarter approach | E28-chris-harris, E28-btmedia, E28-2005-m5-parade, E28-heritage-2019 |
-| 02 | E28 (1985) | 6–17 | side-on moving tracking | E28-chris-harris, E28-btmedia, E28-2005-m5-parade, E28-heritage-2019 |
-| 03 | E28 (1985) | 18–30 | wheel visibly rotating close | E28-chris-harris, E28-btmedia, E28-2005-m5-parade, E28-heritage-2019 |
-| 04 | E28 (1985) | 31–44 | rear three-quarter pursuit | E28-chris-harris, E28-btmedia, E28-2005-m5-parade, E28-heritage-2019 |
-| 05 | E28 (1985) | 45–58 | dynamic pass-by | E28-chris-harris, E28-btmedia, E28-2005-m5-parade, E28-heritage-2019 |
-| 06 | E28 (1985) | 59–70 | environmental / hero motion | E28-chris-harris, E28-btmedia, E28-2005-m5-parade, E28-heritage-2019 |
-| 07 | E34 (1988) | 71–84 | front three-quarter approach | E34-2005-m5-parade, E34-bmw-generations-2017 |
-| 08 | E34 (1988) | 85–97 | side-on moving tracking | E34-2005-m5-parade, E34-bmw-generations-2017 |
-| 09 | E34 (1988) | 98–110 | wheel visibly rotating close | E34-2005-m5-parade, E34-bmw-generations-2017 |
-| 10 | E34 (1988) | 111–123 | rear three-quarter pursuit | E34-2005-m5-parade, E34-bmw-generations-2017 |
-| 11 | E34 (1988) | 124–137 | dynamic pass-by | E34-2005-m5-parade, E34-bmw-generations-2017 |
-| 12 | E34 (1988) | 138–150 | environmental / hero motion | E34-2005-m5-parade, E34-bmw-generations-2017 |
-| 13 | E39 (1998) | 151–163 | front three-quarter approach | E39-launch-nurburgring-2000, E39-launch-road-2000, E39-2005-parade |
-| 14 | E39 (1998) | 164–177 | side-on moving tracking | E39-launch-nurburgring-2000, E39-launch-road-2000, E39-2005-parade |
-| 15 | E39 (1998) | 178–190 | wheel visibly rotating close | E39-launch-nurburgring-2000, E39-launch-road-2000, E39-2005-parade |
-| 16 | E39 (1998) | 191–203 | rear three-quarter pursuit | E39-launch-nurburgring-2000, E39-launch-road-2000, E39-2005-parade |
-| 17 | E39 (1998) | 204–216 | dynamic pass-by | E39-launch-nurburgring-2000, E39-launch-road-2000, E39-2005-parade |
-| 18 | E39 (1998) | 217–230 | environmental / hero motion | E39-launch-nurburgring-2000, E39-launch-road-2000, E39-2005-parade |
-| 19 | E60 (2005) | 231–243 | front three-quarter approach | E60-country-2005, E60-tracking-2005, E60-helicopter-2005, E60-night-2005 |
-| 20 | E60 (2005) | 244–256 | side-on moving tracking | E60-country-2005, E60-tracking-2005, E60-helicopter-2005, E60-night-2005 |
-| 21 | E60 (2005) | 257–270 | wheel visibly rotating close | E60-country-2005, E60-tracking-2005, E60-helicopter-2005, E60-night-2005 |
-| 22 | E60 (2005) | 271–283 | rear three-quarter pursuit | E60-country-2005, E60-tracking-2005, E60-helicopter-2005, E60-night-2005 |
-| 23 | E60 (2005) | 284–296 | dynamic pass-by | E60-country-2005, E60-tracking-2005, E60-helicopter-2005, E60-night-2005 |
-| 24 | E60 (2005) | 297–310 | environmental / hero motion | E60-country-2005, E60-tracking-2005, E60-helicopter-2005, E60-night-2005 |
-| 25 | F10 (2011) | 311–323 | front three-quarter approach | F10-track-2011, F10-seville-2011 |
-| 26 | F10 (2011) | 324–336 | side-on moving tracking | F10-track-2011, F10-seville-2011 |
-| 27 | F10 (2011) | 337–349 | wheel visibly rotating close | F10-track-2011, F10-seville-2011 |
-| 28 | F10 (2011) | 350–363 | rear three-quarter pursuit | F10-track-2011, F10-seville-2011 |
-| 29 | F10 (2011) | 364–376 | dynamic pass-by | F10-track-2011, F10-seville-2011 |
-| 30 | F10 (2011) | 377–389 | environmental / hero motion | F10-track-2011, F10-seville-2011 |
-| 31 | F90 (2017) | 390–402 | front three-quarter approach | F90-country-2017, F90-track-2017 |
-| 32 | F90 (2017) | 403–416 | side-on moving tracking | F90-country-2017, F90-track-2017 |
-| 33 | F90 (2017) | 417–429 | wheel visibly rotating close | F90-country-2017, F90-track-2017 |
-| 34 | F90 (2017) | 430–442 | rear three-quarter pursuit | F90-country-2017, F90-track-2017 |
-| 35 | F90 (2017) | 443–456 | dynamic pass-by | F90-country-2017, F90-track-2017 |
-| 36 | F90 (2017) | 457–469 | environmental / hero motion | F90-country-2017, F90-track-2017 |
-| 37 | G90 (2024) | 470–482 | front three-quarter approach | G90-launch-2024, G90-automann-2025, G90-joeachilles-2024 |
-| 38 | G90 (2024) | 483–495 | side-on moving tracking | G90-launch-2024, G90-automann-2025, G90-joeachilles-2024 |
-| 39 | G90 (2024) | 496–509 | wheel visibly rotating close | G90-launch-2024, G90-automann-2025, G90-joeachilles-2024 |
-| 40 | G90 (2024) | 510–522 | rear three-quarter pursuit | G90-launch-2024, G90-automann-2025, G90-joeachilles-2024 |
-| 41 | G90 (2024) | 523–537 | dynamic pass-by | G90-launch-2024, G90-automann-2025, G90-joeachilles-2024 |
-| 42 | G90 (2024) | 538–551 | environmental / hero motion | G90-launch-2024, G90-automann-2025, G90-joeachilles-2024 |
+Read `provisional-cuts.json`, download artifact **11668700332** from run **38047298176**, unpack 42 individual MP4 files, validate SHA and contact sheet. Map strictly E28 slots 1–6, E34 slots 7–12, E39 13–18, E60 19–24, F10 25–30, F90 31–36, G90 37–42. Treat E34 as a block requiring editorial replacement; low-res sources as review-only. Preserve all original source rights provenance and never leak the private song into public GitHub releases.
 
-## Candidate primary sources and cited owner pages
+## QA evidence
 
-| Era | Evidence source | Candidate URL | Native specification / verified status |
-|---|---|---|---|
-| E28 | BMW Group — E28-heritage-2019 | https://www.press.bmwgroup.com/global/tv-footage/detail/PF0007062/90-years-of-bmw-automobiles | 1920×1080 (catalog page only); NOT FFprobed or inspected |
-| E28 | BMW Group — E28-2005-m5-parade | https://www.press.bmwgroup.com/asia/tv-footage/detail/PF0002439/the-bmw-m5/2 | 720×576 (catalog page only); NOT FFprobed or inspected |
-| E28 | The Drive / Chris Harris — E28-chris-harris | https://www.youtube.com/watch?v=FzOPR7STqrQ | unknown; NOT FFprobed or inspected |
-| E28 | BT Media — E28-btmedia | https://www.youtube.com/watch?v=eQ59Ptr0HwI | unknown; NOT FFprobed or inspected |
-| E34 | BMW Group — E34-2005-m5-parade | https://www.press.bmwgroup.com/asia/tv-footage/detail/PF0002439/the-bmw-m5/2 | 720×576 (catalog page only); NOT FFprobed or inspected |
-| E34 | BMW Group — E34-bmw-generations-2017 | https://www.press.bmwgroup.com/global/video/detail/PF0005757/clip-bmw-m5-generations | unknown; NOT FFprobed or inspected |
-| E39 | BMW Group — E39-launch-nurburgring-2000 | https://www.press.bmwgroup.com/global/tv-footage/detail/PF0003267/der-neue-bmw-m5?language=en | 1024×576 (catalog page only); NOT FFprobed or inspected |
-| E39 | BMW Group — E39-launch-road-2000 | https://www.press.bmwgroup.com/global/tv-footage/detail/PF0003267/der-neue-bmw-m5?language=en | 1024×576 (catalog page only); NOT FFprobed or inspected |
-| E39 | BMW Group — E39-2005-parade | https://www.press.bmwgroup.com/asia/tv-footage/detail/PF0002439/the-bmw-m5/2 | 720×576 (catalog page only); NOT FFprobed or inspected |
-| E60 | BMW Group — E60-country-2005 | https://www.press.bmwgroup.com/asia/tv-footage/detail/PF0002439/the-bmw-m5/2 | 720×576 (catalog page only); NOT FFprobed or inspected |
-| E60 | BMW Group — E60-tracking-2005 | https://www.press.bmwgroup.com/asia/tv-footage/detail/PF0002439/the-bmw-m5/2 | 720×576 (catalog page only); NOT FFprobed or inspected |
-| E60 | BMW Group — E60-helicopter-2005 | https://www.press.bmwgroup.com/asia/tv-footage/detail/PF0002439/the-bmw-m5/2 | 720×576 (catalog page only); NOT FFprobed or inspected |
-| E60 | BMW Group — E60-night-2005 | https://www.press.bmwgroup.com/asia/tv-footage/detail/PF0002439/the-bmw-m5/2 | 720×576 (catalog page only); NOT FFprobed or inspected |
-| F10 | BMW Group — F10-track-2011 | https://www.press.bmwgroup.com/global/tv-footage/detail/PF0003177/the-new-bmw-m5-model-year-2011/5?forceSitePreference=DESKTOP | 1920×1080 (catalog page only); NOT FFprobed or inspected |
-| F10 | BMW Group — F10-seville-2011 | https://www.press.bmwgroup.com/global/tv-footage/detail/PF0003177/the-new-bmw-m5-model-year-2011/5?forceSitePreference=DESKTOP | 1920×1080 (catalog page only); NOT FFprobed or inspected |
-| F90 | BMW Group — F90-country-2017 | https://www.press.bmwgroup.com/global/tv-footage/detail/PF0005589/the-new-bmw-m5-with-m-xdrive?forceSitePreference=DESKTOP | 1920×1080 (catalog page only); NOT FFprobed or inspected |
-| F90 | BMW Group — F90-track-2017 | https://www.press.bmwgroup.com/global/tv-footage/detail/PF0005589/the-new-bmw-m5-with-m-xdrive?forceSitePreference=DESKTOP | 1920×1080 (catalog page only); NOT FFprobed or inspected |
-| G90 | BMW Group — G90-launch-2024 | https://www.press.bmwgroup.com/global/tv-footage/detail/PF0009730/the-new-bmw-m5 | unknown; NOT FFprobed or inspected |
-| G90 | Automann-TV — G90-automann-2025 | https://www.youtube.com/watch?v=sEty8t1D0ek | unknown; NOT FFprobed or inspected |
-| G90 | Joe Achilles — G90-joeachilles-2024 | https://www.youtube.com/watch?v=cM1Dv5oRGVk | unknown; NOT FFprobed or inspected |
-
-## Remaining blockers — what Agent C must receive before integration
-
-1. Download at best authentic available quality (retain original file SHA, real FFprobe dimensions/FPS/duration) on a **network-enabled authorized workstation or private worker**. The present chat container cannot reach external media; the attached GitHub connector cannot transfer or host multi-GB originals; the repository's existing BMW workflow only validates text/contracts, and its generic media bridge is both restrictive and outside Agent A's allowed ownership.
-2. Visually inspect moving frames of **each** possible shot and ensure generation/vehicle identity is unmistakable. Document original source page, creator, native dimensions/FPS, temporal content, source in/out timestamps, and rights. Ensure 42 visually distinct moving shots — six per generation — with separate camera angle/content and no fake crops/looped footage. Fail hard on duplicates.
-3. Use `python production/videos/bmw-m5-evolution-001/footage/prepare.py fetch ...` for verified official direct MOV links; `probe`, `contact`, then `verify <approved-cuts.local.json>` for 42 real, manually approved records. Invoke `footage/validate_sources.py <generated_manifest> --require-ready` to confirm metadata. Do not mark ready until the actual playable footage has passed inspection.
-4. Deliver actual private bytes through an authenticated, bounded worker artifact or user-approved secure location with real artifact URL and SHA list. No public GitHub Release containing uncleared media. Agent C then combines with B and separately checks 552-frame final render with real private audio.
-
-**Do not claim the project is footage-ready.** Current Agent A contribution is reliable research/validation engineering and actionable source-page links, not the 42-clip deliverable.
+- Actual 42-cut native runner, GitHub Actions **38047298176**, completed SUCCESS; FFmpeg decoded all 42 cut MP4s, source/clip hashes produced, image-motion difference tested, real visual contact sheet output.
+- Historical source real footage download run **38045881998** and 1080p E28 archive run **38046928757** completed.
+- Earlier preparation 4/4 unit tests, run **38014477573**.
+- Initial incorrect generation matches during the first acquisition run **38045592362** were explicitly rejected after inspecting actual frames. Only the corrected later run should be used. The first run is NOT part of the final generation mapping.
