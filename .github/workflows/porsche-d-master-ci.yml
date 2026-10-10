@@ -38,6 +38,7 @@ jobs:
           python -m unittest discover -s production/videos/porsche-911-turbo-evolution-001/footage -p test_audit_footage.py -v
           python -m unittest discover -s production/videos/porsche-911-turbo-evolution-001/integration -p test_ingest_bridge.py -v
           python -m unittest discover -s production/videos/porsche-911-turbo-evolution-001/integration -p test_ingest_official_porsche.py -v
+          python -m unittest discover -s production/videos/porsche-911-turbo-evolution-001/integration -p test_verify_official_excerpts.py -v
           python -m unittest discover -s production/tests -p test_yt_dlp_ingest.py -v
           node production/videos/porsche-911-turbo-evolution-001/edit/test_timeline.mjs
           node production/videos/porsche-911-turbo-evolution-001/qa/test_polish.mjs
