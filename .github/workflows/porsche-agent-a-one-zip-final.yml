@@ -1,0 +1,93 @@
+name: Porsche A - one final 30 clip vertical ZIP render
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-one-zip-final.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        generation: ['930', '964', '993', '996', '997', '991', '992']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install native one-pass video pipeline
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install 'Pillow>=10,<12'
+      - name: Compile native video renderer
+        run: |
+          python -m py_compile production/videos/porsche-911-turbo-evolution-001/footage/render_30_vertical_candidates.py
+      - name: Render true source motion to 1080x1920 H264 CRF16 slow quality once
+        env:
+          GENERATION: ${{ matrix.generation }}
+        run: |
+          python production/videos/porsche-911-turbo-evolution-001/footage/render_30_vertical_candidates.py \
+            --mode render --generation "$GENERATION" \
+            --selections production/videos/porsche-911-turbo-evolution-001/footage/selected-30-native-shots.json \
+            --beat-map production/videos/porsche-911-turbo-evolution-001/beat-map.json \
+            --output "out/temp-$GENERATION"
+      - name: Make temporary artifacts accessible only to final joiner
+        uses: actions/upload-artifact@v4
+        with:
+          name: Porsche-A-internal-${{ matrix.generation }}-${{ github.run_id }}
+          path: out/temp-${{ matrix.generation }}/
+          compression-level: 0
+          retention-days: 1
+          if-no-files-found: error
+  package:
+    needs: render
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install final MP4/ZIP acceptance checker
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install 'Pillow>=10,<12'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: Porsche-A-internal-*-${{ github.run_id }}
+          path: out/all
+          merge-multiple: true
+      - name: Produce exactly ONE named ZIP with all thirty and full checksum QA
+        run: |
+          python production/videos/porsche-911-turbo-evolution-001/footage/render_30_vertical_candidates.py \
+            --mode assemble \
+            --selections production/videos/porsche-911-turbo-evolution-001/footage/selected-30-native-shots.json \
+            --beat-map production/videos/porsche-911-turbo-evolution-001/beat-map.json \
+            --input-root out/all --output out/final
+      - name: Publish small real FINAL frame sheet as run logs for visual approval
+        run: |
+          python - <<'PY'
+          import base64
+          from pathlib import Path
+          d=base64.b64encode(Path('out/final/contact-sheet.jpg').read_bytes()).decode()
+          print('FINAL_30_CONTACT_IMAGE_START')
+          for i in range(0,len(d),4000): print('FINAL_30_CONTACT_IMAGE_PART:'+d[i:i+4000])
+          print('FINAL_30_CONTACT_IMAGE_END')
+          PY
+      - name: Upload single complete FINAL inner ZIP (no split parts)
+        uses: actions/upload-artifact@v4
+        with:
+          name: PORSCHE_911_TURBO_EVOLUTION_ALL_30_CLIPS_1080P
+          path: out/final/PORSCHE_911_TURBO_EVOLUTION_ALL_30_CLIPS_1080P.zip
+          retention-days: 14
+          compression-level: 0
+          if-no-files-found: error
