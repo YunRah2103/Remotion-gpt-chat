@@ -1,0 +1,124 @@
+name: Automotive Footage Finder - Search and Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      car:
+        description: 'Car and style, e.g. Koenigsegg Jesko Attack cinematic driving'
+        required: true
+        type: string
+      providers:
+        description: 'Footage sources to search'
+        type: choice
+        default: 'both'
+        options: [both, Pexels, Pixabay]
+      download:
+        description: 'Download and analyse source candidates'
+        type: boolean
+        required: true
+        default: true
+      rights_confirmed:
+        description: 'I reviewed the source licences and may download this footage'
+        type: boolean
+        required: true
+        default: false
+      max_clips:
+        description: 'Maximum source videos to download'
+        type: choice
+        default: '6'
+        options: ['3', '6', '9', '12']
+  pull_request:
+    paths:
+      - 'production/footage_finder/**'
+      - 'production/tests/test_automotive_footage_finder.py'
+      - '.github/workflows/automotive-footage-finder.yml'
+  push:
+    branches: [main, feature/automotive-footage-finder-20261010]
+    paths:
+      - 'production/footage_finder/**'
+      - 'production/tests/test_automotive_footage_finder.py'
+      - '.github/workflows/automotive-footage-finder.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  footage-finder:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+      PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+      IS_MANUAL: ${{ github.event_name == 'workflow_dispatch' }}
+      CAR_QUERY: ${{ inputs.car }}
+      SELECTED_PROVIDERS: ${{ inputs.providers }}
+      DOWNLOAD: ${{ inputs.download }}
+      RIGHTS: ${{ inputs.rights_confirmed }}
+      MAX_CLIPS: ${{ inputs.max_clips }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install FFmpeg and footage analyser
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check -r production/footage_finder/requirements.txt
+      - name: Offline provider tests and native FFmpeg synthetic video QA
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s production/tests -p test_automotive_footage_finder.py -v
+          python -m compileall -q production/footage_finder
+      - name: Search permitted stock sources and analyse quality
+        id: finder
+        if: env.IS_MANUAL == 'true'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARGS=(--query "$CAR_QUERY" --providers "${SELECTED_PROVIDERS:-both}"
+                --max-clips "${MAX_CLIPS:-6}" --output out/automotive-footage-finder)
+          if [ "$DOWNLOAD" = "true" ]; then ARGS+=(--download); fi
+          if [ "$RIGHTS" = "true" ]; then ARGS+=(--rights-confirmed); fi
+          python production/footage_finder/finder.py "${ARGS[@]}"
+      - name: Report exact source search / actual download state
+        if: env.IS_MANUAL == 'true'
+        shell: bash
+        run: |
+          if [ -f out/automotive-footage-finder/manifest.json ]; then
+            python - <<'PY'
+          import json,os
+          from pathlib import Path
+          d=json.loads(Path('out/automotive-footage-finder/manifest.json').read_text())
+          lines=['## Automotive Footage Finder',
+                 '- Query: '+d['query'],
+                 '- Result: **'+d['status']+'**',
+                 '- Search candidates: '+str(d['candidateCount']),
+                 '- Actual downloaded sources: '+str(d['downloadedSourceCount']),
+                 '- Verified same-car shots: **0** until manual visual review',
+                 '- Source acknowledgements: [Pexels](https://www.pexels.com/) / [Pixabay](https://pixabay.com/)',
+                 '- ZIP is in the automotive-footage-finder-results artifact']
+          lines += ['- '+w for w in d['warnings']]
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f:f.write('\n'.join(lines)+'\n')
+          PY
+          else
+            echo 'No manifest was created; inspect previous step logs.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: env.IS_MANUAL == 'true'
+        with:
+          name: automotive-footage-finder-results
+          path: |
+            out/automotive-footage-finder.zip
+            out/automotive-footage-finder/manifest.json
+            out/automotive-footage-finder/index.html
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 3
+      - name: Report setup or search failures honestly
+        if: env.IS_MANUAL == 'true' && steps.finder.outcome != 'success'
+        run: |
+          echo 'Search did not complete. Check report/logs and API key configuration.' >&2
+          exit 1
