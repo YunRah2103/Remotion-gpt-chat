@@ -1,0 +1,155 @@
+name: Cinematic FX - native Remotion transitions, LUTs and high quality proof
+on:
+  push:
+    branches: ['feature/porsche-fx-toolkit-20261010', 'automotive-edits/porsche-911-turbo-evolution-001/contract']
+    paths:
+      - 'src/fx/**'
+      - 'src/Root.tsx'
+      - 'production/fx/**'
+      - 'production/tests/test_fx_toolkit.py'
+      - '.github/workflows/production-fx-ci.yml'
+      - 'package.json'
+      - 'package-lock.json'
+  pull_request:
+    paths:
+      - 'src/fx/**'
+      - 'src/Root.tsx'
+      - 'production/fx/**'
+      - 'production/tests/test_fx_toolkit.py'
+      - '.github/workflows/production-fx-ci.yml'
+      - 'package.json'
+      - 'package-lock.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  colour-speed-and-beats:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deterministic packages and FFmpeg
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Source code and frame-accuracy tests
+        run: |
+          set -euo pipefail
+          npm run check
+          python -m unittest discover -s production/tests -p 'test_fx_toolkit.py' -v
+          python -m compileall -q production/fx
+          mkdir -p out/fx
+          npx esbuild src/fx/beat.ts --bundle --platform=node --target=node22 --format=cjs --outfile=out/fx/beat.cjs
+          node production/fx/test_beat.cjs
+      - name: Generate five real 3D LUT presets and apply them to real encoded media
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/fx/source out/fx/processed out/fx-luts
+          python production/fx/make_luts.py --out out/fx-luts
+          ffmpeg -hide_banner -loglevel error -y -f lavfi -i 'testsrc2=size=640x360:rate=60:duration=2' \
+            -an -c:v libx264 -preset fast -crf 14 -pix_fmt yuv420p out/fx/source/original60fps.mp4
+          python production/fx/export_hq.py --input out/fx/source/original60fps.mp4 --output out/fx/processed/bitwise-copy.mp4
+          ffmpeg -v error -i out/fx/source/original60fps.mp4 -map 0:v:0 -c:v copy -f md5 out/fx/source/original-video.md5
+          ffmpeg -v error -i out/fx/processed/bitwise-copy.mp4 -map 0:v:0 -c:v copy -f md5 out/fx/processed/copied-video.md5
+          cmp out/fx/source/original-video.md5 out/fx/processed/copied-video.md5
+          for LOOK in natural-punch classic-archive warm-vintage titanium-modern night-circuit; do
+            python production/fx/export_hq.py --input out/fx/source/original60fps.mp4 \
+              --output "out/fx/processed/$LOOK.mp4" --lut "out/fx-luts/$LOOK.cube" --crf 16
+            ffmpeg -v error -xerror -i "out/fx/processed/$LOOK.mp4" -f null -
+            ffmpeg -hide_banner -v error -y -ss 0.55 -i "out/fx/processed/$LOOK.mp4" \
+              -frames:v 1 "out/fx/processed/$LOOK.jpg"
+          done
+          python production/fx/speed_ramp.py --input out/fx/source/original60fps.mp4 \
+            --output out/fx/processed/speed-ramp.mp4 --plan production/fx/plans/sample-ramp.json
+          ffmpeg -v error -xerror -i out/fx/processed/speed-ramp.mp4 -f null -
+          python - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          def frames(name):
+              data=json.loads(subprocess.run(['ffprobe','-v','error','-select_streams','v:0',
+                '-show_entries','stream=nb_frames,r_frame_rate','-of','json',str(name)],
+                capture_output=True,text=True,check=True).stdout)['streams'][0]
+              assert data['r_frame_rate'] in ('60/1','30/1')
+              return int(data['nb_frames'])
+          assert frames('out/fx/source/original60fps.mp4')==120
+          assert frames('out/fx/processed/bitwise-copy.mp4')==120
+          result=frames('out/fx/processed/speed-ramp.mp4')
+          assert 52<=result<=56, result
+          assert all(frames(p)==120 for p in Path('out/fx/processed').glob('*.mp4') if p.name not in ('speed-ramp.mp4',))
+          print('NATIVE_LUT_AND_VIDEO_BITSTREAM_COPY_AND_RAMP_PASS',result)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: automotive-fx-lut-and-ramp-native-${{ github.run_id }}
+          path: |
+            out/fx-luts/
+            out/fx/processed/*.jpg
+            out/fx/processed/speed-ramp.mp4
+            out/fx/processed/original-video.md5
+            out/fx/source/original-video.md5
+            out/fx/processed/copied-video.md5
+          retention-days: 14
+          if-no-files-found: warn
+  native-showcase:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 85
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Native Remotion 4.0.533 FX visual proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          npm ci --no-audit --no-fund
+          npm run check
+          mkdir -p out/fx-video
+          npx remotion render src/index.ts AutomotiveFXShowcase out/fx-video/automotive-fx-showcase.mp4 \
+            --gl=swangle --codec=h264 --pixel-format=yuv420p --scale=0.5 --concurrency=2
+          ffmpeg -v error -xerror -i out/fx-video/automotive-fx-showcase.mp4 -f null -
+          for FRAME in 6 42 65 84 110 126 150 168 190 219; do
+            npx remotion still src/index.ts AutomotiveFXShowcase "out/fx-video/frame-$FRAME.png" \
+              --frame="$FRAME" --gl=swangle --scale=0.5
+          done
+          python - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          file='out/fx-video/automotive-fx-showcase.mp4'
+          data=json.loads(subprocess.run(['ffprobe','-v','error','-select_streams','v:0',
+            '-show_entries','stream=codec_name,width,height,nb_frames,r_frame_rate','-of','json',file],
+            capture_output=True,text=True,check=True).stdout)['streams'][0]
+          assert data['codec_name']=='h264'
+          assert (int(data['width']),int(data['height']))==(540,960)
+          assert int(data['nb_frames'])==220
+          assert data['r_frame_rate']=='30/1'
+          assert len(list(Path('out/fx-video').glob('frame-*.png')))==10
+          Path('out/fx-video/QA.json').write_text(json.dumps({
+            'status':'PASS_TECHNICAL_ONLY','composition':'AutomotiveFXShowcase',
+            'verifiedFrames':220,'codec':'h264','fps':30,'proofWidth':540,'proofHeight':960,
+            'fullDecode':'PASS','nativeTransitions':['slide','wipe','fade','flip'],
+            'motionBlur':'sampled optical/exposure imitation CameraMotionBlur',
+            'note':'Real moving graphics effect demo, NOT real Porsche film or independent artistic review'
+          },indent=2)+'\n')
+          print('NATIVE_FX_TRANSITIONS_MOTION_BLUR_PASS')
+          PY
+          (cd out/fx-video && sha256sum *.mp4 > SHA256SUMS.txt)
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: automotive-fx-native-proof-${{ github.run_id }}
+          path: out/fx-video/
+          retention-days: 30
+          if-no-files-found: warn
