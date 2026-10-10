@@ -10,8 +10,8 @@ on:
     inputs:
       media_id:
         type: choice
-        options: ['286726', '286727', '286687']
-        default: '286727'
+        options: ['286726', '286687', '286687']
+        default: '286687'
 
 permissions:
   contents: read
@@ -31,7 +31,7 @@ jobs:
           python -m pip install 'Pillow>=10,<12'
       - name: Seek and copy small native excerpt without re-encoding
         env:
-          MEDIA_ID: ${{ inputs.media_id || '286727' }}
+          MEDIA_ID: ${{ inputs.media_id || '286687' }}
         run: |
           python production/videos/porsche-911-turbo-evolution-001/footage/sample_official_source.py --video-id "$MEDIA_ID" --start 60 --seconds 12 --out out/porsche-raw-excerpt
       - name: Store original-codec source excerpt, decode QA and contact sheet
