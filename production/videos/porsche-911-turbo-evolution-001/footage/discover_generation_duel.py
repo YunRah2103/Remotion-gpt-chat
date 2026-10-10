@@ -7,6 +7,7 @@ HTML inspection does NOT download or verify media bytes or licensing.
 import html,json,re,urllib.request
 from pathlib import Path
 URLS=["https://newsroom.porsche.com/en/products/911.html",
+      "https://newsroom.porsche.com/en_US/2022/products/porsche-911-magazine-episode-21-tale-of-the-turbo-mark-webber-911-turbo-models-cayenne-turbo-gt-911-gt1-27314.html",
       "https://newsroom.porsche.com/en/2020/history/porsche-911-turbo-generations-walter-roehrl-23139.html",
       "https://newsroom.porsche.com/en/2020/products/porsche-911-turbo-seven-generations-2020.html"]
 TARGET="A duel between the generations"
@@ -20,7 +21,7 @@ def discover(u):
     except Exception as e:
         result["errors"].append(str(e)[:350]);return result
     result.update({"statusCode":status,"htmlBytes":len(s)})
-    needles=[TARGET,"1975 to 2020","1:46","video-js","newstv.porsche.com","porschevideo","data-video","porschevideos"]
+    needles=[TARGET,"Eight generations","4:55","The tale of the Turbo","Episode 21 of 9:11 Magazine","1975 to 2020","1:46","video-js","newstv.porsche.com","porschevideo","data-video","porschevideos"]
     for needle in needles:
         spans=list(re.finditer(re.escape(needle),s,re.I))
         for m in spans[:8]:
