@@ -19,3 +19,14 @@ Own exclusively src/porsche-turbo-evolution/edit/**, production/videos/porsche-9
 Run real npm typecheck using actual repository packages; native Remotion proofs at representative 930, 993, 996, 997, 992 frames and a short moving segment. Demonstrate each slot visually changes. Provide typed integration exports and instructions for D. A native proof using labelled placeholders is just a diagnostic, not a Porsche film pass.
 
 Handoff: actual source code SHA, test commands and results, moving/still proofs, source manifest interface, unresolved issues, schema-valid handoffs/agent-b.json owner="director" and human-readable agent-b.md. Quality over quantity of gimmick transitions.
+
+
+## NEW: CINEMATIC FX TOOLKIT — ALREADY INSTALLED
+
+The tested toolkit now exists in this same base repository. First read:
+- `production/fx/README.md`
+- `src/fx/beat.ts`
+- `src/fx/FXComponents.tsx`
+- `src/fx/FXShowcase.tsx`
+
+Pinned `@remotion/transitions@4.0.533` and `@remotion/motion-blur@4.0.533` are already installed and locked. DO NOT reinstall or upgrade them. Reuse actual exports, do not invent undocumented APIs. Distinguish every-beat **shot changes** (B owns) from rare elaborate chapter transitions (Agent C owns). Connect the master timeline to C's optional frame-deterministic FX preset contract without editing C-owned code. Most cuts should remain sharp and clean. Fully respect clean BMW V2 text style. Master D owns actual full integration/render.
