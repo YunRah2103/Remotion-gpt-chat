@@ -1,4 +1,4 @@
-name: Porsche Agent A - 930 Turbo genuine preview
+name: Porsche Agent A - 992 Turbo genuine preview
 
 on:
   push:
@@ -10,16 +10,16 @@ permissions:
   contents: read
   actions: read
 jobs:
-  emit-930-image:
+  emit-992-image:
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     steps:
-      - name: Read genuinely copied 930 Porsche source JPEG proof
+      - name: Read genuinely copied 992 Porsche source JPEG proof
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh api repos/$GITHUB_REPOSITORY/actions/artifacts/11672811906/zip > /tmp/excerpt.zip
+          gh api repos/$GITHUB_REPOSITORY/actions/artifacts/11672168241/zip > /tmp/excerpt.zip
           ENTRY=$(unzip -Z1 /tmp/excerpt.zip | grep 'excerpt-contact-sheet.jpg' | head -1)
           test -n "$ENTRY"
           unzip -p /tmp/excerpt.zip "$ENTRY" > /tmp/proof.jpg
@@ -27,5 +27,5 @@ jobs:
           import base64
           from pathlib import Path
           d=base64.b64encode(Path('/tmp/proof.jpg').read_bytes()).decode()
-          for i in range(0,len(d),4000):print('PORSCHE930_BASE64_PART:'+d[i:i+4000])
+          for i in range(0,len(d),4000):print('PORSCHE992_BASE64_PART:'+d[i:i+4000])
           PY
