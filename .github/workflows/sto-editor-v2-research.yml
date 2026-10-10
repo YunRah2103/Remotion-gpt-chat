@@ -1,0 +1,52 @@
+name: STO V10 Agent A - cinematic full-HD landscape source scouting
+on:
+  push:
+    branches:
+      - automotive-edits/huracan-sto-v10-001/a-footage
+    paths:
+      - "production/videos/huracan-sto-v10-001/footage/acquire_editor_v2.py"
+      - ".github/workflows/sto-editor-v2-research.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 26
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check --upgrade yt-dlp Pillow
+          python -m py_compile production/videos/huracan-sto-v10-001/footage/acquire_editor_v2.py
+      - name: Download actual FullHD / 4K STO cinematic footage candidates
+        run: python production/videos/huracan-sto-v10-001/footage/acquire_editor_v2.py
+      - name: Show honest results
+        if: always()
+        run: |
+          python - <<'PY'
+          import json,pathlib,os
+          m=pathlib.Path('out/sto-editor-v2/manifest.json')
+          if m.exists():
+              x=json.loads(m.read_text())
+              lines=['## STO Agent A V2 landscape source scout','**Research only — individual STO shot identity / text overlay / movement / rights NOT automatically approved**']
+              for y in x['sources']:
+                  f=y.get('ffprobe',{})
+                  lines.append('- '+y['id']+': **'+y['status']+'** '+str(f.get('width','?'))+'x'+str(f.get('height','?'))+' '+str(round(f.get('duration',0),1))+'s '+y.get('error','')[:160])
+              with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as g:g.write('\n'.join(lines))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: HURACAN-STO-A-EDITOR-V2-LANDSCAPE-RESEARCH
+          path: |
+            out/HURACAN_STO_EDITOR_V2_RESEARCH.zip
+            out/sto-editor-v2/manifest.json
+          if-no-files-found: warn
+          retention-days: 5
+          compression-level: 0
