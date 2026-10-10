@@ -65,7 +65,7 @@ jobs:
             python production/fx/export_hq.py --input out/fx/source/original60fps.mp4 \
               --output "out/fx/processed/$LOOK.mp4" --lut "out/fx-luts/$LOOK.cube" --crf 16
             ffmpeg -v error -xerror -i "out/fx/processed/$LOOK.mp4" -f null -
-            ffmpeg -hide_banner -v error -y -ss .55 -i "out/fx/processed/$LOOK.mp4" \
+            ffmpeg -hide_banner -v error -y -ss 0.55 -i "out/fx/processed/$LOOK.mp4" \
               -frames:v 1 "out/fx/processed/$LOOK.jpg"
           done
           python production/fx/speed_ramp.py --input out/fx/source/original60fps.mp4 \
