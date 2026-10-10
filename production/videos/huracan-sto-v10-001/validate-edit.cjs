@@ -46,7 +46,7 @@ function validate(map,{final=false,repoRoot=path.resolve(__dirname,'../../..')}=
   const s=shot.source;
   requireValue(s&&typeof s==='object','source record missing '+label);
   if(s.file!==null){
-    requireValue(typeof s.file==='string'&&/^[a-zA-Z0-9][a-zA-Z0-9_.-]+\\.(mp4|mov|webm)$/i.test(s.file),'unsafe/invalid source filename '+label);
+    requireValue(typeof s.file==='string'&&/^[a-zA-Z0-9][a-zA-Z0-9_.-]+\.(mp4|mov|webm)$/i.test(s.file),'unsafe/invalid source filename '+label);
     const actual=path.join(repoRoot,map.mediaDirectory,s.file);
     if(final){
       requireValue(fs.existsSync(actual),'missing approved file '+actual);
