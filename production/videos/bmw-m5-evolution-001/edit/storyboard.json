@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "intent": "Creative sequence only; not an assertion of footage availability or rights.",
+  "frameLocks": "Do not change frames of production/videos/bmw-m5-evolution-001/beat-map.json.",
+  "chapterDirection": [
+    {
+      "generation": "E28",
+      "year": 1985,
+      "frames": "0–70",
+      "look": "analogue, silver/warm editorial, restrained; low resolution picture field",
+      "shots": [
+        "front approach",
+        "rolling wheel",
+        "sweeping profile",
+        "rear lamp retreat",
+        "cornering",
+        "hero drive-by"
+      ]
+    },
+    {
+      "generation": "E34",
+      "year": 1988,
+      "frames": "71–150",
+      "look": "cool brushed metal, sharper movement",
+      "shots": [
+        "grille tracking",
+        "wheel rotation",
+        "side pass",
+        "rear three-quarter",
+        "street tracking",
+        "hero pull-away"
+      ]
+    },
+    {
+      "generation": "E39",
+      "year": 1998,
+      "frames": "151–230",
+      "look": "transition to modernity, midnight blue",
+      "shots": [
+        "frontal chase",
+        "rim close-up",
+        "lateral road pass",
+        "rear follow",
+        "fast corner exit",
+        "hero reveal"
+      ]
+    },
+    {
+      "generation": "E60",
+      "year": 2005,
+      "frames": "231–310",
+      "look": "V10-era drama, cool silver-blue",
+      "shots": [
+        "front sprint",
+        "wheel detail",
+        "roadside pass",
+        "rear arc",
+        "rapid tracking",
+        "hero acceleration"
+      ]
+    },
+    {
+      "generation": "F10",
+      "year": 2011,
+      "frames": "311–389",
+      "look": "dense and muscular, deeper blacks",
+      "shots": [
+        "night nose",
+        "wheel tracking",
+        "side parallel",
+        "rear departure",
+        "rolling side shot",
+        "hero road"
+      ]
+    },
+    {
+      "generation": "F90",
+      "year": 2017,
+      "frames": "390–469",
+      "look": "technical modernity, blue-white highlights",
+      "shots": [
+        "front compression",
+        "rolling detail",
+        "side velocity",
+        "rear lamps",
+        "aggressive turn",
+        "hero"
+      ]
+    },
+    {
+      "generation": "G90",
+      "year": 2024,
+      "frames": "470–551",
+      "look": "sharpest contemporary footage, immersive high detail",
+      "shots": [
+        "nose hero approach",
+        "wheel close pass",
+        "side sweep",
+        "rear corner exit",
+        "rolling chase",
+        "hero finale"
+      ]
+    }
+  ],
+  "editorialSafeZones": "Place gen/year header above 213px within center; avoid right-edge TikTok controls and bottom-most caption zones.",
+  "graphicsRule": "Footage always changes exactly on mapped beat; grade/overlays do not replace shot; no recurring fake morph.",
+  "sourceUniqueness": "42 physically distinct camera-content shots verified by A, never just 42 crops of 7 movies.",
+  "permissions": "Private review only until media rights confirmed."
+}
