@@ -41,3 +41,6 @@ if __name__=="__main__":
     p=argparse.ArgumentParser();p.add_argument("manifest");p.add_argument("--require-ready",action="store_true")
     args=p.parse_args()
     print(json.dumps(check(json.loads(Path(args.manifest).read_text()),strict=args.require_ready),indent=2))
+    # CI audits the NEW Agent A research board as well as the preserved 42-slot template.
+    from prepare import validate_board
+    validate_board()
