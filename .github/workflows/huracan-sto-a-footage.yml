@@ -1,0 +1,91 @@
+name: STO V10 Agent A - real footage candidates
+
+on:
+  push:
+    branches:
+      - automotive-edits/huracan-sto-v10-001/a-footage
+    paths:
+      - "production/videos/huracan-sto-v10-001/footage/**"
+      - ".github/workflows/huracan-sto-a-footage.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  footage:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install native video and image QA tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check Pillow
+      - name: Compile and verify true vertical-pixel crop gate on native test media
+        run: |
+          set -euo pipefail
+          python -m py_compile production/videos/huracan-sto-v10-001/footage/acquire_sto.py
+          mkdir -p /tmp/sto-qa
+          ffmpeg -hide_banner -loglevel error -f lavfi -i testsrc2=size=1920x1080:rate=30 -t 1.2 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -y /tmp/sto-qa/landscape.mp4
+          python - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          src=Path('production/videos/huracan-sto-v10-001/footage/acquire_sto.py')
+          spec=importlib.util.spec_from_file_location('sto_a',src)
+          mod=importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(mod)
+          meta=mod.inspect(Path('/tmp/sto-qa/landscape.mp4'))
+          assert meta['actual_resolution']==[1920,1080], meta
+          assert meta['actual_fps']==30, meta
+          assert meta['crop_quality'].startswith('UPSCALE_REQUIRED'),meta
+          print('NATIVE_QA_PASS: FHD landscape is not certified as 1080p portrait')
+          PY
+      - name: Download actual publisher-hosted STO candidates and build one ZIP
+        id: acquire
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          python production/videos/huracan-sto-v10-001/footage/acquire_sto.py
+      - name: Summarise actual evidence (NO auto-approval)
+        if: always()
+        run: |
+          python - <<'PY'
+          import json,os,pathlib
+          f=pathlib.Path('out/sto-footage-a/manifest.json')
+          lines=['## Huracán STO Agent A acquisition',
+                 '- Native proof script and source URLs are committed',
+                 '- 0 manually approved unique STO angles until visual inspection']
+          if f.is_file():
+              m=json.loads(f.read_text())
+              lines.extend(['- State: **'+m['status']+'**',
+                            '- Actually acquired/probed video sources: **'+str(m['real_downloaded_source_count'])+'**',
+                            '- Source details/technical crop metrics: manifest.json in ZIP'])
+              for item in m['sources']:
+                  lines.append('- '+item['id']+': '+item['state']+
+                               ('; actual '+str(item['ffprobe']['actual_resolution'])+'; crop '+item['ffprobe']['crop_quality'] if 'ffprobe' in item else '; '+item.get('error','unknown')))
+          else:
+              lines.append('- Manifest missing: workflow/setup failed before acquisition.')
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as out:
+              out.write('\n'.join(lines)+'\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: HURACAN-STO-A-SINGLE-ZIP
+          path: |
+            out/HURACAN_STO_A_CANDIDATES_SINGLE_ZIP.zip
+            out/sto-footage-a/manifest.json
+          if-no-files-found: warn
+          retention-days: 3
+          compression-level: 0
+      - name: Report explicit lack of acquired source files
+        if: steps.acquire.outcome != 'success'
+        run: |
+          echo "::warning::Acquisition failed or did not return footage. Artifact/manifest may contain diagnostic details. Gate A remains FAIL."
+          exit 1
