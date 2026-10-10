@@ -51,11 +51,13 @@ for slug,url in SOURCES:
      if count>450_000_000:raise ValueError("File >450 MB")
      f.write(chunk)
   info=probe(path);row.update(ffprobe=info)
-  if info["width"]<1920 or info["height"]<1080 or info["width"]<=info["height"]:
-   row["gate"]="FAIL_BELOW_FULL_HD_LANDSCAPE";path.unlink()
+  if info["width"]<1920 or info["height"]<800 or info["width"]<=info["height"]:
+   row["gate"]="REJECT_NOT_USEFUL_LANDSCAPE";path.unlink()
   else:
    contact(path,info,slug)
-   row["gate"]="REAL_FULL_HD_MASTER_PENDING_VISUAL_SHOT_AND_OVERLAY_REVIEW"
+   row["gate"]=("FULL_HD_1920X1080_CANDIDATE" if info["height"]>=1080
+     else "OPTIONAL_1920X810_CINEMASCOPE_DOES_NOT_MEET_1920X1080_NATIVE_REQUIREMENT")
+   row["framing_note"]="Original 1920x810 can be letterboxed at 1920x1080 without upscaling; black bars 135px top/bottom. Not a true 1920x1080 source. Agent B may reject."
  except Exception as e:
   row.update(gate="SOURCE_NOT_DOWNLOADED",error=str(e));path.unlink(missing_ok=True)
  (ROOT/"manifest.json").write_text(json.dumps(results,indent=2))
