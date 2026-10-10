@@ -191,8 +191,25 @@
   "landmarkQuality": "RMS transition strong at approx 6.50 s; subsequent values are spectral-flux candidate transient times, not authenticated frame-accurate musical beats.",
   "footageGate": {
     "status": "FAIL",
-    "reason": "No approved original high-res one-new-car 11-angle footage pack; audio acquisition does not change video gate",
-    "mainHero": "Koenigsegg Jesko Attack scouting candidate, not locked production source",
-    "referenceVideoUsage": "ZERO frames, ZERO excerpts; previous user's Lamborghini clip may not be used"
+    "reason": "Original 32 source MP4s only available via free checkout and have not been delivered; 11 actual distinct moving angles and native 4K are not verified",
+    "mainHero": "ACTIVE SOURCE PROSPECT: orange McLaren 600LT, seller @unrxndered 32-clip free 4K60 vertical pack, original files not downloaded",
+    "referenceVideoUsage": "ZERO source frames used from old Lamborghini reference; a different McLaren 600LT hero",
+    "sourceProduct": "https://payhip.com/b/CaorX",
+    "senTTargetAbandoned": "Koenigsegg Jesko Attack no longer targeted by Agent A",
+    "nightVerified": false
+  },
+  "heroVehicle": {
+    "selection": "ORANGE McLAREN 600LT: ACTIVE SCOUTING TARGET, NOT FINAL VISUALLY APPROVED",
+    "source": "https://payhip.com/b/CaorX",
+    "originalFilesInspected": 0,
+    "originalSourceFormatClaims": {
+      "clips": 32,
+      "resolution": "4K vertical as advertised, not verified",
+      "frameRate": 60,
+      "codec": "H.265 as advertised, not verified"
+    },
+    "singleCarContinuityVerified": false,
+    "distinctMovingAnglesApproved": 0,
+    "notes": "Jesko, prior Lamborghini, and cross-car mixing abandoned."
   }
 }
