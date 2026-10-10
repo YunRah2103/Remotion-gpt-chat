@@ -45,8 +45,7 @@ def frame(media,t):
           "-f","image2pipe","-vcodec","mjpeg","-",timeout=70)
     with Image.open(BytesIO(p.stdout)) as im: return im.convert("RGB").copy()
 def motion_score(a,b):
-    import PIL.ImageChops
-    from PIL import ImageStat
+    from PIL import ImageChops, ImageStat
     # Same-size grayscale change. Camera can move while car is static; human check essential.
     import PIL.Image as PILImage
     x=a.resize((80,45)).convert("L")
@@ -92,7 +91,6 @@ def run(out):
     # 9 rows with three decoded frames; explicitly disclose user judgement remains.
     canvas=Image.new("RGB",(512*3,320*9),"#101010")
     drawer=ImageDraw.Draw(canvas)
-    for row,(slot,gen,_,_) in enumerate(CANDIDATES): pass
     rows={slot:i for i,(slot,_,_,_) in enumerate(CANDIDATES)}
     for slot,gen,num,img in cells:
         x=num*512; y=rows[slot]*320
