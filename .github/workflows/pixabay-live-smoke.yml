@@ -1,0 +1,59 @@
+name: Pixabay live API verification - one-time
+
+on:
+  push:
+    branches:
+      - feature/pixabay-live-smoke-20261010
+    paths:
+      - .github/workflows/pixabay-live-smoke.yml
+
+permissions:
+  contents: read
+
+jobs:
+  verify-pixabay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    env:
+      PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify secret by real provider search without revealing credential
+        run: |
+          python - <<'PY'
+          import json, os, sys
+          from pathlib import Path
+          sys.path.insert(0, "production/footage_finder")
+          from finder import search
+          key=os.environ.get("PIXABAY_API_KEY","")
+          if not key:
+              print("PIXABAY_SECRET_MISSING: Configure PIXABAY_API_KEY in repository Actions secrets")
+              raise SystemExit(2)
+          records=[]
+          for phrase in ["Koenigsegg Jesko Attack", "sports car"]:
+              items, warnings=search(phrase,"Pixabay","",key,10)
+              safe=[c.report() for c in items[:8]]
+              print("QUERY", repr(phrase), "CANDIDATES",len(items),"WARNINGS",warnings)
+              if warnings:
+                  print("PIXABAY_REAL_API_SEARCH_FAILED")
+                  raise SystemExit(3)
+              records.append({"query":phrase,"count":len(items),"examples":safe})
+          Path("pixabay-live-test.json").write_text(json.dumps({"provider":"Pixabay","keyPresent":True,"requestsSucceeded":True,"results":records,"downloadPerformed":False},indent=2))
+          with open(os.environ["GITHUB_STEP_SUMMARY"],"a") as f:
+              f.write("## Real Pixabay API check\n\n")
+              f.write("Repository secret was accessible to GitHub Actions and two real Pixabay video searches succeeded.\n\n")
+              for item in records:
+                  f.write("- "+item["query"]+": "+str(item["count"])+" matching results\n")
+              f.write("\nNo source downloads or licence approvals were asserted.\n")
+          print("PIXABAY_LIVE_SEARCH_SUCCESS")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pixabay-real-search-check
+          path: pixabay-live-test.json
+          if-no-files-found: ignore
+          retention-days: 1
