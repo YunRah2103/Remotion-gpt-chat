@@ -70,3 +70,19 @@ Further detailed review of Monaco Island's feature at 5-second intervals confirm
 - **Gate A final status: FAIL for premium edit release**. Hand off the package for research only. Do not declare a publish-ready footage set or request final render based on this dataset.
 
 Recommendation: acquire a single original 4K/vertical cinematic Huracán STO source with genuinely different road/track camera angles (creator-provided master/press package); inspect and approve individual frame ranges before promoting to Gate A PASS. If a premium licensed package is acceptable, creators have sold native 4K vertical STO angle sets; payment/user approval required, never implied.
+
+
+## Verified 16:9 landscape-only rerun (latest authoritative QA)
+
+**Workflow:** https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38090450253 — result **SUCCESS**, native 1920×1080 acceptance test PASS.
+**Single ZIP artifact:** https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38090450253/artifacts/11683169895 (GitHub artifact ID **11683169895**, outer ZIP 184,145,513 bytes).
+
+After download, I opened the actual outer archive and its manifest. It reports:
+- `required_final_format`: **1920x1080 landscape 16:9, 30 fps, 316 frames**.
+- **3 acquired and probed native 1920×1080 landscape Huracán STO video files**: `phantom-sto-primary`, `phantom-sto-lambo`, `phantom-sto-huracan`; each classified `FULL_HD_LANDSCAPE_OR_BETTER` without portrait crop.
+- **1 acquired and probed 1280×720 landscape research video**: `monaco-island-sto-720`; `BELOW_1080P_LANDSCAPE_REVIEW_ONLY`, includes potential non-STO race footage that must not be represented as STO.
+- Generic WhatsApp candidate failed technical gate.
+- Six prior 720×1280 portrait workshop clips were **not considered or included** in this landscape-only acquisition run.
+- **Four actual media sources** were downloaded and verified in the landscape run; **zero unique dynamic shot angles newly signed off**; still blocked for the 10+ distinct moving-shot goal.
+
+Earlier QA above calling native 1920×1080 landscape unsuitable was specific to the superseded portrait format, and is **NOT** the updated landscape resolution verdict. FHD landscape source quality PASS != 10+ moving-angle Gate A PASS.
