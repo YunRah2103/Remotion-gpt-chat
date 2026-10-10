@@ -48,4 +48,15 @@ npx remotion render src/bmw-m5-evolution/preview-entry.tsx M5EvolutionDiagnostic
 
 Diagnostic mode visibly says **UNVERIFIED / NO FOOTAGE**, uses purely generated moving graphics, and never implies BMW vehicles are featured. It is appropriate for timing/proof **only**. Native commands require repository npm dependencies and a browser. Do not publish diagnostic material as a completed automotive film.
 
+Before native movie assembly, run the additional **genuine-media** audit after staging clips privately:
+
+\`\`\`bash
+python production/videos/bmw-m5-evolution-001/edit/audit_shots.py \
+  --manifest /private/approved-render-shots.json \
+  --public-root /private/remotion-public \
+  --report /private/m5-motion-and-duplicates.json
+\`\`\`
+
+The audit FFprobes and SHA256-checks source bytes, decodes three source frames per shot, measures actual temporal motion, and flags low-resolution inputs and near-repeating camera frames. Report is private; do not commit source files or confidential media locations. A green report is not a substitute for a human visually confirming the exact M5 generation in each shot.
+
 For final QA: inspect every beat's first/middle/last frame and source quality, compare contact sheets with Agent A, verify H.264 1080x1920 30fps 552-frame exact decode, assess audio alignment by listening, and prefer CRF 16-18; only C handles delivery.
