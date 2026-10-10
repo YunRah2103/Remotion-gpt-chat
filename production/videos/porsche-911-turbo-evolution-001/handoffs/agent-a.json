@@ -15,6 +15,7 @@
     "production/videos/porsche-911-turbo-evolution-001/handoffs/agent-a.json"
   ],
   "evidence": [
+    "Local python3 -m unittest discover -s /mnt/data/porsche_a_work -p test_audit_footage.py -v: 5/5 PASS including real synthetic FFmpeg media decoding, path defence and missing-media rejection; explicitly NOT Porsche footage",
     "GitHub preproduction contract CI SUCCESS, run https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38055299705 (not real media QA)",
     "Local Python compile PASS; local native FFmpeg synthetic testsrc2 file 960x540 30fps probe SHA motion three JPEGs and contact-sheet 182563 bytes PASS",
     "Local deliberate 29-missing-slot scenario correctly returned BLOCKED/exit 2; only synthetic fixture slot decoded",
