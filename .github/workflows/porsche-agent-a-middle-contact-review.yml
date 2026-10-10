@@ -1,0 +1,48 @@
+name: Porsche Agent A - 202036 five-era footage visual review
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-middle-contact-review.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  review-source-per-era:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - gen: '964'
+            artifact: '11673377996'
+          - gen: '993'
+            artifact: '11673727287'
+          - gen: '996'
+            artifact: '11672869288'
+          - gen: '997'
+            artifact: '11672909006'
+          - gen: '991'
+            artifact: '11673512608'
+    steps:
+      - name: Surface actual 1.7s-sampled moving Turbo era footage previews
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GEN: ${{ matrix.gen }}
+          ARTIFACT_ID: ${{ matrix.artifact }}
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip" > /tmp/contact.zip
+          FILE=$(unzip -Z1 /tmp/contact.zip | grep 'source-202036-page-01.jpg' | head -1)
+          test -n "$FILE"
+          unzip -p /tmp/contact.zip "$FILE" > /tmp/page.jpg
+          python - <<'PY'
+          import base64
+          from pathlib import Path
+          b=base64.b64encode(Path('/tmp/page.jpg').read_bytes()).decode()
+          for i in range(0,len(b),4000):
+              print('SOURCE_CONTACT_PART:'+b[i:i+4000])
+          PY
