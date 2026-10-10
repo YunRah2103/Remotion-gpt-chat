@@ -1,5 +1,18 @@
 # Agent B — Actual landscape STO edit handoff (10 October 2026)
 
+## 11 October editing revision: retimed landscape candidate V2
+
+The original `HuracanSTOLandscapeCandidate` was reviewed at the start and midpoint of **every** shot. Five cuts needed stronger subject framing or had obvious repeated/empty-road content. Corrected at branch commit `2bdb1cc618bb3efc554083f3f4bfadc70be32f75`:
+- Slot 04: show genuine STO headlight/livery detail instead of unfocused interior-to-wing pan
+- Slot 06: begin a more legible low-front STO approach instead of distant empty paving
+- Slot 08: tighten the later approaching shot so the vehicle enters frame sooner
+- Slot 11: replace nearly empty brick ground with an actual close moving STO pass
+- Slot 13: close rear three-quarter/wing perspective rather than reusing another wide rear shot
+
+All edits retain actual STO source bytes, natural 16:9 geometry, exact 316-frame beat windows, SHA-pinned originals, no invented angles, no on-screen UI, no audio. Distinct approved moving-angle count remains **zero** until Agent A/D verification. V2 native visual QA will be reported separately; don't confuse this code edit with a passed film preview.
+
+**Critical for Agent C:** Your sound renderer currently hardcodes portrait geometry in three places: `sto_sound_render.py` line 62 `(1080,1920)`, line 133 `(1080,1920)`, and argparse help line 163. Update to **(1920,1080)** on your OWN branch and rerun your fixture tests against native landscape picture; the current C code will reject this valid user's 16:9 film.
+
 **Source branch:** `automotive-edits/huracan-sto-v10-001/b-edit`
 
 ## Verified edits — 16:9 user override
