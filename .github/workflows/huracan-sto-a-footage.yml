@@ -27,7 +27,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
           python -m pip install --disable-pip-version-check Pillow
-      - name: Compile and verify true vertical-pixel crop gate on native test media
+      - name: Compile and verify locked landscape full-HD source gate on native test media
         run: |
           set -euo pipefail
           python -m py_compile production/videos/huracan-sto-v10-001/footage/acquire_sto.py
@@ -43,8 +43,10 @@ jobs:
           meta=mod.inspect(Path('/tmp/sto-qa/landscape.mp4'))
           assert meta['actual_resolution']==[1920,1080], meta
           assert meta['actual_fps']==30, meta
-          assert meta['crop_quality'].startswith('UPSCALE_REQUIRED'),meta
-          print('NATIVE_QA_PASS: FHD landscape is not certified as 1080p portrait')
+          assert meta['landscape_quality']=='FULL_HD_LANDSCAPE_OR_BETTER',meta
+          assert meta['landscape_crop_source_pixels']==[1920,1080],meta
+          assert meta['output_canvas']==[1920,1080],meta
+          print('NATIVE_QA_PASS: 1920x1080 landscape qualifies natively for final output')
           PY
       - name: Download actual publisher-hosted STO candidates and build one ZIP
         id: acquire
@@ -65,10 +67,10 @@ jobs:
               m=json.loads(f.read_text())
               lines.extend(['- State: **'+m['status']+'**',
                             '- Actually acquired/probed video sources: **'+str(m['real_downloaded_source_count'])+'**',
-                            '- Source details/technical crop metrics: manifest.json in ZIP'])
+                            '- Source details/landscape framing and quality metrics: manifest.json in ZIP'])
               for item in m['sources']:
                   lines.append('- '+item['id']+': '+item['state']+
-                               ('; actual '+str(item['ffprobe']['actual_resolution'])+'; crop '+item['ffprobe']['crop_quality'] if 'ffprobe' in item else '; '+item.get('error','unknown')))
+                               ('; actual '+str(item['ffprobe']['actual_resolution'])+'; landscape quality '+item['ffprobe']['landscape_quality'] if 'ffprobe' in item else '; '+item.get('error','unknown')))
           else:
               lines.append('- Manifest missing: workflow/setup failed before acquisition.')
           with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as out:
