@@ -1,0 +1,59 @@
+name: BMW M5 Agent A Final Review Package V2
+on:
+  push:
+    branches: ['automotive-edits/bmw-m5-evolution-001/a-footage']
+    paths: ['.github/workflows/m5-agent-a-v2.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  assemble-verified-source-video:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download 42 verified-motion base video clips
+        uses: actions/download-artifact@v4
+        with:
+          name: M5-42-REAL-PROVISIONAL-38047298176
+          run-id: 38047298176
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: staging/baseline
+      - name: Download replacement E34 real-car candidates
+        uses: actions/download-artifact@v4
+        with:
+          name: M5-E34-FOCUSED-38048499011
+          run-id: 38048499011
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: staging/e34
+      - name: Download actual higher-quality E39 and E60 media
+        uses: actions/download-artifact@v4
+        with:
+          name: M5-LEGACY-NATIVE-MASTERS-38047591610
+          run-id: 38047591610
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: staging/legacy
+      - name: Download native HD F10 replacements
+        uses: actions/download-artifact@v4
+        with:
+          name: M5-HIGHRES-F10-E39-38047365846
+          run-id: 38047365846
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: staging/f10
+      - name: Install video metadata and preview tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check 'Pillow>=11,<13'
+      - name: Assemble final 42-clip review source package without intermediate transcoding
+        run: python production/videos/bmw-m5-evolution-001/footage/assemble_v2.py
+      - name: Publish ONLY ephemeral review originals, metadata and visual QA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: BMW-M5-42-UPGRADED-SOURCES-${{ github.run_id }}
+          path: out/m5-agent-a-v2/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
