@@ -1,0 +1,36 @@
+name: Porsche A - visual 964 Ascari full source evidence
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-a-964-ascari-visual.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  show-four-k-964-source-images:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        page: ['01','02']
+    steps:
+      - name: Extract real Porsche 964 source contact sheet and emit inspection pixels
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PAGE: ${{ matrix.page }}
+        run: |
+          set -euo pipefail
+          gh api repos/$GITHUB_REPOSITORY/actions/artifacts/11673938413/zip > /tmp/gallery.zip
+          NAME=$(unzip -Z1 /tmp/gallery.zip | grep "source-326868-page-${PAGE}.jpg" | head -1)
+          test -n "$NAME"
+          unzip -p /tmp/gallery.zip "$NAME" > /tmp/visual.jpg
+          python - <<'PY'
+          import base64
+          from pathlib import Path
+          b=base64.b64encode(Path('/tmp/visual.jpg').read_bytes()).decode()
+          for i in range(0,len(b),4000):print('ASCARI964_IMAGE_PART:'+b[i:i+4000])
+          PY
