@@ -1,0 +1,85 @@
+name: Porsche D - independent first genuine 4K source QA
+on:
+  push:
+    branches: [automotive-edits/porsche-911-turbo-evolution-001/d-master]
+    paths: ['.github/workflows/porsche-d-source-review.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify-and-review-original:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Porsche-Agent-A-official-source-38058522380
+          run-id: 38058522380
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/porsche-first
+      - name: Install FFmpeg/Pillow
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check 'Pillow>=10,<12'
+      - name: Independently re-hash A source and ffprobe exact unchanged video
+        run: |
+          set -euo pipefail
+          python production/videos/porsche-911-turbo-evolution-001/integration/ingest_official_porsche.py \
+            --source-root out/porsche-first \
+            --beat-map production/videos/porsche-911-turbo-evolution-001/beat-map.json \
+            --inventory-output out/porsche-first-review/inventory.json \
+            --selection-output out/porsche-first-review/shot-manifest.INCOMPLETE.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path('out/porsche-first/source-qa.json').read_text())
+          inv=json.loads(Path('out/porsche-first-review/inventory.json').read_text())
+          assert report['originalSha256']=='3dadbf0718f4ff0f54039be6a34252194f250fbe50cdda0b41b9b12df7839a52'
+          assert inv['importedSources']==1 and inv['verifiedUniquePorscheShots']==0
+          print('REAL_SOURCE_INDEPENDENT_CHECK_PASS',report['originalSha256'])
+          PY
+      - name: Generate 14-frame contact sheet from actual source without changing original
+        run: |
+          set -euo pipefail
+          mkdir -p out/porsche-first-review/frames
+          for sec in 1 5 9 13 17 21 25 29 33 37 41 45 49 53; do
+            ffmpeg -hide_banner -loglevel error -ss "$sec" \
+              -i out/porsche-first/porsche-newsroom-286306-original.mp4 \
+              -frames:v 1 -vf 'scale=400:225:flags=lanczos' -q:v 3 \
+              -y "out/porsche-first-review/frames/frame-${sec}.jpg"
+          done
+          python - <<'PY'
+          import base64
+          from pathlib import Path
+          from PIL import Image,ImageDraw
+          root=Path('out/porsche-first-review')
+          secs=[1,5,9,13,17,21,25,29,33,37,41,45,49,53]
+          sheet=Image.new('RGB',(1200,1250),'#111111')
+          draw=ImageDraw.Draw(sheet)
+          for i,sec in enumerate(secs):
+              with Image.open(root/'frames'/f'frame-{sec}.jpg') as im:
+                  sheet.paste(im.convert('RGB'),((i%3)*400,(i//3)*250))
+              draw.text(((i%3)*400+12,(i//3)*250+228),f'Original Porsche at {sec:02d}s',fill='#ffffff')
+          sheet.save(root/'contact-14-frames.jpg',quality=82)
+          sheet.resize((900,938)).save(root/'log-contact.jpg',quality=50,optimize=True)
+          encoded=base64.b64encode((root/'log-contact.jpg').read_bytes()).decode()
+          print('PORSCHE_VISUAL_CONTACT_BASE64_START')
+          for index in range(0,len(encoded),6000):print(encoded[index:index+6000])
+          print('PORSCHE_VISUAL_CONTACT_BASE64_END')
+          print('CONTACT_PREVIEW_BYTES',(root/'log-contact.jpg').stat().st_size)
+          PY
+      - name: Upload QA evidence without re-uploading the 412MB original
+        uses: actions/upload-artifact@v4
+        with:
+          name: Porsche-D-first-source-contact-${{ github.run_id }}
+          path: |
+            out/porsche-first-review/inventory.json
+            out/porsche-first-review/shot-manifest.INCOMPLETE.json
+            out/porsche-first-review/contact-14-frames.jpg
+            out/porsche-first-review/frames/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
