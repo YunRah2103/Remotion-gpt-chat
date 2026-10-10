@@ -1,8 +1,8 @@
 import React from 'react';
-import {AbsoluteFill,useCurrentFrame} from 'remotion';
+import {AbsoluteFill,useCurrentFrame,useVideoConfig} from 'remotion';
 import {CameraMotionBlur,Trail} from '@remotion/motion-blur';
 import type {BeatCut,BeatFrame} from './beat';
-import {evaluateBeatFx} from './beat';
+import {evaluateBeatFx,requiredOverscan} from './beat';
 
 export type GradePreset='natural'|'archive'|'titanium'|'night'|'warm-vintage';
 const look:Record<GradePreset,{brightness:number;contrast:number;saturation:number;hue:number}>={
@@ -15,7 +15,9 @@ const look:Record<GradePreset,{brightness:number;contrast:number;saturation:numb
 /** Nondestructive CSS preview grade. For final-quality exports use generated .cube LUT with FFmpeg. */
 export const Grade:React.FC<{preset?:GradePreset;strength?:number;children:React.ReactNode}> =
  ({preset='natural',strength=1,children})=>{
+  if(!Number.isFinite(strength))throw new Error('Invalid grade strength');
   const v=look[preset],s=Math.max(0,Math.min(1,strength));
+  if(!v)throw new Error('Unknown colour grade preset');
   const mix=(n:number)=>1+(n-1)*s;
   return <AbsoluteFill style={{filter:`brightness(${mix(v.brightness)}) contrast(${mix(v.contrast)}) saturate(${mix(v.saturation)}) hue-rotate(${v.hue*s}deg)`}}>
     {children}
@@ -26,8 +28,9 @@ export const BeatFxTransform:React.FC<{
    cuts:ReadonlyArray<BeatCut>;duration:number;strength?:number;children:React.ReactNode;
 }> = ({cuts,duration,strength=.52,children})=>{
   const frame=useCurrentFrame();
+  const {width,height}=useVideoConfig();
   const p=evaluateBeatFx(frame,cuts,duration,strength);
-  const overscan=Math.max(p.zoom,1+Math.abs(p.shiftX)/540+.01);
+  const overscan=requiredOverscan(width,height,p.shiftX,p.tilt,p.zoom);
   return <AbsoluteFill style={{overflow:'hidden'}}>
     <AbsoluteFill style={{transform:`translateX(${p.shiftX}px) rotate(${p.tilt}deg) scale(${overscan})`,
       transformOrigin:'50% 50%'}}>
@@ -45,6 +48,8 @@ export const BeatFxOverlay:React.FC<{state:BeatFrame}>=({state:s})=><AbsoluteFil
   {s.rgbOffset>0&&<AbsoluteFill style={{opacity:Math.min(.22,s.rgbOffset/15),
     background:'linear-gradient(90deg,rgba(243,42,65,.20),transparent 25%,transparent 75%,rgba(23,172,255,.22))',
     transform:`translateX(${s.rgbOffset}px)`,mixBlendMode:'screen'}}/>}
+  {s.leak>0&&<AbsoluteFill style={{opacity:s.leak,mixBlendMode:'screen',
+    background:'radial-gradient(ellipse 72% 96% at 92% 32%,rgba(255,204,117,.82),rgba(240,86,39,.38) 38%,transparent 75%)'}}/>}
   {s.shutter>0&&<AbsoluteFill style={{opacity:s.shutter,
     background:'repeating-linear-gradient(0deg,rgba(2,4,8,.7) 0px,rgba(2,4,8,.7) 8px,transparent 9px,transparent 26px)'}}/>}
 </AbsoluteFill>;
