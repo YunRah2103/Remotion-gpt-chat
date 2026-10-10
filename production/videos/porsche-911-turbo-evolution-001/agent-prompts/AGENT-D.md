@@ -25,3 +25,8 @@ Coordination:
 10. Record genuine provenance/usage status. No automatic publishing of unlicensed user music/source footage to public repo or public release. Public upload rights must be confirmed separately.
 
 Handoff owner="release", exact code SHA, source A+B+C SHAs, real tested artifact, QA results, remaining issues. Honor dedicated branch/folder ownership. DO ACTUAL PRODUCTION not just planning or reporting.
+
+
+## NEW: PRE-INSTALLED FX ENGINE AND VERIFIED INTEGRATION
+
+The FX engine was added on `feature/porsche-fx-toolkit-20261010` and merged into the common Porsche contract in GitHub PR #17. Both FX native jobs passed: official transition+blur Remotion rendering, five LUT/FFmpeg passes, true speed ramp, frame-accurate timeline. Project agents inherit this dependency lock from their shared branch; DO NOT rerun installation or duplicate the effects library. Read `production/fx/README.md` and the source module APIs. Use Agent C's approved presets sparingly on generation transitions, keep B's normal beat cuts unobscured, and render final footage with the shortest quality-preserving encoding path. A technically green effect demonstration using generated abstract shapes is NOT aesthetic approval of the final Porsche cut. Commission genuine A/B/C review of 30 real moving Turbo shots with original source quality, then final MP4 and synchronized private audio.
