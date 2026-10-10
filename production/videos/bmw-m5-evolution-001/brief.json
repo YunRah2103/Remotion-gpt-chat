@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "slug": "bmw-m5-evolution-001",
+  "title": "BMW M5: Seven Generations — Beat-Synchronised Evolution",
+  "status": "preproduction",
+  "sourceCompositionId": null,
+  "sourceBaseSha": "e8f17c9ef5cc48b143b21d3cc4d8007861097464",
+  "fps": 30,
+  "durationInFrames": 552,
+  "durationSeconds": 18.4,
+  "resolution": [
+    1080,
+    1920
+  ],
+  "generations": [
+    {
+      "generation": "E28",
+      "introduced": 1985,
+      "body": "sedan/saloon"
+    },
+    {
+      "generation": "E34",
+      "introduced": 1988,
+      "body": "sedan/saloon"
+    },
+    {
+      "generation": "E39",
+      "introduced": 1998,
+      "body": "sedan/saloon"
+    },
+    {
+      "generation": "E60",
+      "introduced": 2005,
+      "body": "sedan/saloon"
+    },
+    {
+      "generation": "F10",
+      "introduced": 2011,
+      "body": "sedan/saloon"
+    },
+    {
+      "generation": "F90",
+      "introduced": 2017,
+      "body": "sedan/saloon"
+    },
+    {
+      "generation": "G90",
+      "introduced": 2024,
+      "body": "sedan/saloon"
+    }
+  ],
+  "scope": "All SEVEN BMW M5 saloon generations in chronological order. No replicas, other BMWs, Touring/wagons or static zooms pretending to be moving video.",
+  "sound": "user-provided 18.47s MP3 trimmed to 18.4s and analysed; audio binary transferred privately to editor, not public repo",
+  "privacy": "private-review default; do not release publicly without rights",
+  "agents": {
+    "A": "automotive-edits/bmw-m5-evolution-001/a-footage",
+    "B": "automotive-edits/bmw-m5-evolution-001/b-creative",
+    "C": "automotive-edits/bmw-m5-evolution-001/c-master"
+  }
+}
