@@ -44,6 +44,10 @@ if __name__=="__main__":
     # CI audits the NEW Agent A research board as well as the preserved 42-slot template.
     from prepare import validate_board
     validate_board()
-    # Execute independent offline FFmpeg/FFprobe smoke tests in the same CI job.
-    import subprocess,sys
+    # The shared BMW CI job does not install FFmpeg; bootstrap it on Ubuntu Actions
+    # so native FFprobe/media fixtures are EXECUTED, not silently SKIPPED.
+    import os,shutil,subprocess,sys
+    if os.environ.get("GITHUB_ACTIONS")=="true" and not (shutil.which("ffmpeg") and shutil.which("ffprobe")):
+        subprocess.run(["sudo","apt-get","update","-qq"],check=True,timeout=180)
+        subprocess.run(["sudo","apt-get","install","-y","-qq","ffmpeg"],check=True,timeout=180)
     subprocess.run([sys.executable,str(Path(__file__).with_name("test_prepare.py"))],check=True)
