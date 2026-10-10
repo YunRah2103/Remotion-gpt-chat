@@ -1,3 +1,5 @@
+> **LATEST SOURCE DIRECTION — 10 OCTOBER 2026:** The user explicitly directed Agent A to STOP Koenigsegg Jesko research and move to another car. **Current hero SOURCE PROSPECT = ONE orange McLaren 600LT** (not McLaren Senna GTR), based on [a free 32-MP4 creator shot pack](https://payhip.com/b/CaorX), advertised native 4K/60fps vertical H.265. The actual source files require a free Payhip checkout and are NOT downloaded or approved yet. Same physical car, 11 genuinely separate moving camera setups, native footage quality and nighttime lighting remain UNVERIFIED. [Current authoritative acquisition status and unblock action](./ACTIVE_CAR_MCLAREN_600LT.md). Old Jesko, Lamborghini, Bugatti source stories below are historical and NOT current sourcing instructions. **Gate A FAIL (0/11 new-car shots).** New 27.14s audio and music drop around f195 remain valid.
+
 # AGENT A — expanded real-footage acquisition handoff (2026-10-10)
 
 **Repository:** YunRah2103/Remotion-gpt-chat
