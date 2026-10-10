@@ -1,3 +1,34 @@
+# EXOTIC AFTER DARK — most recent Agent E production check
+
+**Audit date:** 2026-10-10; latest Agent A commit 2026-10-10 19:53:16 UTC.  
+**Verdict:** **SOURCE GATE STILL FAILS** despite useful expanded acquisition. Final video is NOT ready.
+
+| Agent | Latest source SHA | Gate | Fresh evidence |
+|---|---|---|---|
+| A footage | `352594bf1ce4797402955705c1c378f31b3ba1f0` | **FAIL / expanded scouting** | New V2 handoff, QA, selection and manifest: **12 independent Pexels source IDs**, **8 short MP4 excerpts delivered**, 24 sample/crop JPGs, 19,193,437-byte ZIP, SHA256 `83233278b4c50763c8cb37b6a5f80d9c5b1b3b760fc25ce27bead2a10cb20450` (Agent A-reported post-upload full GET/rehash PASS). No approved 11-shot same-car full-quality asset pool. |
+| B edit | `dcc2661f2daad5654cf3a697bc68e63f84e1ad39` | **WAITING** | No new branch commits; no source-backed preview or B handoff. |
+| C look/sound | `dcc2661f2daad5654cf3a697bc68e63f84e1ad39` | **WAITING** | No new branch commits; no source-specific C handoff. |
+| D master | `dcc2661f2daad5654cf3a697bc68e63f84e1ad39` | **WAITING** | No new branch commits; no decoded final film or delivered MP4. |
+
+### Important distinction
+
+- Agent A's report says 12 full source streams were acquired and sampled but the delivered V2 bundle has **only 8 video-only 2–3-second excerpts**, not 12 full originals. Original 150 MB package reportedly could not be hosted because of storage limits.
+- Strongest two samples (`7727415` front and `7727416` side) show similar **black Aventador-like** cars, but physical car identity is not verified and source is **1920x1080 25fps landscape**: a standard centered 9:16 crop retains only ~607x1080 pixels, not native TikTok 1080x1920 sharpness.
+- Other sources have purple, orange, white, or red car identity and scene mismatches; no credible 11 independent angles of the same chosen high-end hypercar. The QA file itself explicitly states **Gate FAIL**.
+- Latest contract-only CI run for A: [38081571546](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38081571546) success; **0 workflow artifacts**. This checks the beat-grid and contract, **not** media quality.
+- Agent A reports an [external ZIP](https://378e0378-9dfe-48d4-9d9c-73912757403f.sandbox.floot.app/_cdn/static/midnight-v12-001/agent-a-expanded-scout-v2.zip). Independent external CDN fetch from Agent E failed DNS resolution, so ZIP content hashes/download are **not independently verified by E**. Its hash and re-download success remain **A-reported**.
+- Edit spec remains 316 frames @30fps / 1080x1920, main transition f77, 11 genuinely distinct moving shots, one EXOTIC and AGGRESSIVE hero. The soundtrack remains private.
+
+### Blocker and next immediate assignment
+
+**Blocker:** no rights-cleared, quality-approved, coherent **single exotic vehicle** 11-angle source pack. Do not confuse 12 sampled sources or 8 packaged excerpts with 11 approved shots. No final MP4 exists.
+
+**Next agent: A again.** Refocus on ONE verified car. Acquire the missing distinct, vertical-safe high-quality motion angles from a rights-cleared original multi-camera shoot or equivalent permitted multi-angle source, not random mixed-car stock clips. If impossible, present a concrete options decision (rights-cleared alternate exotic/car, sanctioned use of mismatched vehicles only if director relaxes one-hero continuity, or footage contribution) with costs/limits, not another misleading PASS. Supply independently retrievable archive and full SHA/visual QA. B can prepare generic components and C technical FX trials, but final source edit and D are NO GO.
+
+Agent B/C/D chats do not self-start from commits or Issue #22. User must launch them.
+
+---
+
 # EXOTIC AFTER DARK — Agent E live production status
 
 **Audit timestamp:** 2026-10-10 19:44 UTC (2026-10-10 20:44 Europe/London).  
