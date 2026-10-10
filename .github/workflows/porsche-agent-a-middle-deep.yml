@@ -1,0 +1,60 @@
+name: Porsche Agent A - deep middle generation video shot inspection
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-middle-deep.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect-native-source-per-generation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - generation: '964'
+            start: '67'
+            end: '110'
+          - generation: '993'
+            start: '110'
+            end: '153'
+          - generation: '996'
+            start: '148'
+            end: '191'
+          - generation: '997'
+            start: '190'
+            end: '220'
+          - generation: '991'
+            start: '217'
+            end: '251'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install frame scanner
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install 'Pillow>=10,<12'
+      - name: Inspect genuinely separate moving camera setups (actual decoded frames)
+        env:
+          START: ${{ matrix.start }}
+          END: ${{ matrix.end }}
+          GEN: ${{ matrix.generation }}
+        run: |
+          python production/videos/porsche-911-turbo-evolution-001/footage/index_official_sources.py \
+            --media-id 202036 --step 1.7 --start "$START" --end "$END" --max-samples 40 \
+            --out "out/era-$GEN"
+      - name: Preserve detailed timestamp contact sheets and real source metadata
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Porsche-Agent-A-202036-era-${{ matrix.generation }}-${{ github.run_id }}
+          path: out/era-${{ matrix.generation }}/
+          retention-days: 7
+          if-no-files-found: warn
