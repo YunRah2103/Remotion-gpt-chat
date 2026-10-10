@@ -103,7 +103,7 @@ export const validateM5Shots = (shots: ReadonlyArray<M5Shot>): TimelineShot[] =>
   const sourceSpans = new Map<string, Array<[number, number]>>();
   return BEATS.map((beat) => {
     const shot = bySlot.get(beat.slot);
-    if (!shot) fail('Missing slot ' + beat.slot);
+    if (!shot) { throw new Error('[M5Evolution] Missing slot ' + beat.slot); }
     if (shot.generation !== beat.generation || shot.identityVerified !== true ||
       shot.actualMotionVerified !== true) fail('Unverified/wrong generation at slot ' + beat.slot);
     if (!shot.shotKey || !shot.visualFingerprint || keys.has(shot.shotKey) ||
