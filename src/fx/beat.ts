@@ -30,7 +30,8 @@ export const validateCuts=(cuts:ReadonlyArray<BeatCut>,duration:number):void=>{
     const current=cuts[i].frame;
     if(!Number.isInteger(current)||current<0||current>=duration)throw new Error('Cut out of range');
     if(i>0&&current-cuts[i-1].frame<5)throw new Error('Too short for a clear moving clip');
-    if(cuts[i].style!==undefined&&!supportedStyles.has(cuts[i].style))throw new Error('Unsupported FX cut style');
+    const style=cuts[i].style;
+    if(style!==undefined&&!supportedStyles.has(style))throw new Error('Unsupported FX cut style');
   }
 };
 export const evaluateBeatFx=(frame:number,cuts:ReadonlyArray<BeatCut>,duration:number,strength=0.55):BeatFrame=>{
