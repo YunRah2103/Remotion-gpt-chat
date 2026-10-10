@@ -130,7 +130,7 @@ export const adaptAgentAManifest=(
     return {
       slot:a.slot,generation:a.generation as Generation,file:media.file,
       shotKey:a.shotKey??'',sourceId:a.sourceId??'',
-      visualFingerprint:a.visualFingerprint||a.angleAndMotion,
+      visualFingerprint:a.visualFingerprint||a.angleAndMotion||'',
       sourceSha256:a.sha256??'',sourceUrl:a.sourceUrl??'',
       originCreator:a.originCreator??'',sourceLicenseStatus:a.sourceLicenseStatus??'',
       sourceInSeconds:a.sourceInSeconds??NaN,sourceOutSeconds:a.sourceOutSeconds??NaN,
