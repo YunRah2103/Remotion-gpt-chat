@@ -1,0 +1,46 @@
+{
+  "status": "REVIEW_PENDING_NATIVE_AND_REAL_MEDIA",
+  "sourceSha": "15b5b98628e4b371d585ce06307308b1825a59e1",
+  "ci": {
+    "workflow": "Porsche beat & handoff planning",
+    "runId": 38055465013,
+    "result": "PASS_PLANNING_ONLY"
+  },
+  "liveSourceInspection": {
+    "result": "PASS",
+    "beats": 30,
+    "cuts": 29,
+    "frames": 510,
+    "chapters": 7,
+    "generationStartFrames": [
+      0,
+      67,
+      136,
+      205,
+      274,
+      343,
+      429
+    ]
+  },
+  "localAbstractDiagnostic": {
+    "result": "PASS_ABSTRACT_ONLY",
+    "codec": "h264",
+    "fps": 30,
+    "resolution": [
+      540,
+      960
+    ],
+    "frames": 510,
+    "durationSeconds": 17,
+    "fullDecode": true,
+    "boundariesChanged": 29,
+    "minBoundaryMAD": 21.99,
+    "sha256": "17e510ce2b5c12757d8f2fb4e6498493009930ab09fb2d2fe88b2d22efb53664"
+  },
+  "nativeRemotionProof": "NOT_EXECUTED_OFFLINE_DEPS_UNAVAILABLE",
+  "npmTypecheck": "NOT_EXECUTED_OFFLINE_DEPS_UNAVAILABLE",
+  "realFootageProof": "NOT_AVAILABLE_IN_AGENT_B",
+  "finalVideo": "MASTER_D_ONLY_NOT_DELIVERED_BY_B",
+  "sourceRights": "UNKNOWN",
+  "note": "Do not treat diagnostics or green contract CI as native car film QA."
+}

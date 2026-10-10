@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "task": "porsche-911-turbo-evolution-001",
+  "branch": "automotive-edits/porsche-911-turbo-evolution-001/b-creative",
+  "sourceSha": "15b5b98628e4b371d585ce06307308b1825a59e1",
+  "owner": "director",
+  "summary": "Native 510-frame 30-slot Porsche Turbo Remotion film, strict typed source adapter, clean white generation labels, chapter-only opt-in installed FX. Code implemented on owned B branch. Integration review required.",
+  "status": "review",
+  "files": [
+    "src/porsche-turbo-evolution/edit/timeline.ts",
+    "src/porsche-turbo-evolution/edit/PorscheTurboEvolutionFilm.tsx",
+    "src/porsche-turbo-evolution/edit/proof-entry.tsx",
+    "production/videos/porsche-911-turbo-evolution-001/edit/test_timeline.mjs",
+    "production/videos/porsche-911-turbo-evolution-001/edit/render_diagnostic_proofs.sh",
+    "production/videos/porsche-911-turbo-evolution-001/edit/README.md",
+    "production/videos/porsche-911-turbo-evolution-001/edit/QA.json",
+    "handoffs/agent-b.json",
+    "handoffs/agent-b.md"
+  ],
+  "evidence": [
+    "Actual source commit https://github.com/YunRah2103/Remotion-gpt-chat/commit/15b5b98628e4b371d585ce06307308b1825a59e1",
+    "Contract CI PASS (planning checks only): https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38055465013",
+    "Independent live GitHub beat-map and source inspection: 30 contiguous slots, chapter starts 0/67/136/205/274/343/429, frame 509 last",
+    "Locally rendered FFmpeg ABSTRACT diagnostic only, 510 frames / 17.000s / 30fps / 540x960 H.264, full decode PASS, SHA256 17e510ce2b5c12757d8f2fb4e6498493009930ab09fb2d2fe88b2d22efb53664 (conversation-only, not GitHub artifact)",
+    "Abstract diagnostic measured 29 boundary image changes, minimum mean RGB pixel difference 21.99; does NOT evaluate moving car scenes"
+  ],
+  "blockers": [
+    "Agent A source footage not staged in Agent B renderer. No 30 true Porsche moving clips available for actual visual verification.",
+    "Native npm ci / npm typecheck / Remotion executable unavailable to Agent B's isolated offline container; authored test and Remotion-native diagnostic script remain not run on pinned packages. Existing GitHub CI checks planning only.",
+    "Actual 1080x1920 final car film, private original soundtrack, visual source identities, camera uniqueness, source licences, audio sync, and final subjective QA all belong to Master D after obtaining A's artifact."
+  ]
+}
