@@ -1,0 +1,73 @@
+name: Huracan STO C - fail-closed sound and render QA
+
+on:
+  push:
+    branches:
+      - automotive-edits/huracan-sto-v10-001/c-sound-render
+    paths:
+      - production/videos/huracan-sto-v10-001/sound/**
+      - .github/workflows/huracan-sto-c.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sound-render-engineering:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Compile and check help
+        run: |
+          set -euo pipefail
+          python -m py_compile production/videos/huracan-sto-v10-001/sound/sto_sound_render.py
+          python production/videos/huracan-sto-v10-001/sound/sto_sound_render.py --help
+      - name: Verify exact source-song SHA gate rejects different audio
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/sto-c-fixture
+          ffmpeg -hide_banner -loglevel error -y -f lavfi \
+            -i 'sine=frequency=530:sample_rate=44100' -t 2 /tmp/sto-c-fixture/WRONG-music.mp3
+          ffmpeg -hide_banner -loglevel error -y -f lavfi \
+            -i 'sine=frequency=720:sample_rate=48000' -t 3 /tmp/sto-c-fixture/NOT-STO-engine.wav
+          printf 'not real video\n' > /tmp/sto-c-fixture/picture.mp4
+          python - <<'PY'
+          import json,hashlib,pathlib
+          p=pathlib.Path('/tmp/sto-c-fixture/NOT-STO-engine.wav')
+          manifest={
+            'vehicle':'SYNTHETIC_FIXTURE',
+            'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),
+            'events':[{'at':0,'source_in':0,'duration':1.2},
+                      {'at':2.6,'source_in':1.5,'duration':0.3}]
+          }
+          pathlib.Path('/tmp/sto-c-fixture/engine.json').write_text(json.dumps(manifest))
+          PY
+          if python production/videos/huracan-sto-v10-001/sound/sto_sound_render.py \
+            --music /tmp/sto-c-fixture/WRONG-music.mp3 \
+            --engine /tmp/sto-c-fixture/NOT-STO-engine.wav \
+            --engine-manifest /tmp/sto-c-fixture/engine.json \
+            --picture /tmp/sto-c-fixture/picture.mp4 \
+            --out /tmp/sto-c-fixture/output-fixture --test-fixture \
+            > /tmp/sto-c-fixture/stdout.txt 2> /tmp/sto-c-fixture/stderr.txt; then
+              echo "::error::Music SHA gate unexpectedly accepted the wrong song."
+              exit 1
+          fi
+          grep -q 'music SHA mismatch' /tmp/sto-c-fixture/stderr.txt
+          echo "PASS: incorrect soundtrack rejected before any rendering."
+      - name: Summary (not a finished film)
+        if: always()
+        run: |
+          {
+            echo "### Agent C engineering QA only"
+            echo "- Compiles on Python 3.12; verifies original-song SHA fail-closed check."
+            echo "- Does not contain the user's private song, verified STO sound, or Agent B's real edit."
+            echo "- Gate C remains BLOCKED until authentic media and real visual/audio review."
+          } >> "$GITHUB_STEP_SUMMARY"
