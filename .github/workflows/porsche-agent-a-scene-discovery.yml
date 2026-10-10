@@ -1,0 +1,52 @@
+name: Porsche Agent A - first 4K source scene discovery
+
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-scene-discovery.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+jobs:
+  identify-source-scene-boundaries:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Set up native FFmpeg and contact sheets
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg unzip
+          python -m pip install 'Pillow>=10,<12'
+      - name: Recover unchanged verified original source from prior artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api repos/$GITHUB_REPOSITORY/actions/artifacts/11672460900/zip > /tmp/porsche-source.zip
+          unzip -Z1 /tmp/porsche-source.zip | grep -E 'original\.mp4$'
+          SRC=$(unzip -Z1 /tmp/porsche-source.zip | grep -E 'original\.mp4$' | head -1)
+          test -n "$SRC"
+          unzip -p /tmp/porsche-source.zip "$SRC" > /tmp/porsche-original.mp4
+          test $(stat -c '%s' /tmp/porsche-original.mp4) -eq 411746613
+          sha256sum /tmp/porsche-original.mp4
+      - name: Discover real shot boundaries and generate native contact proofs
+        run: |
+          set -euo pipefail
+          python production/videos/porsche-911-turbo-evolution-001/footage/scene_candidates.py --input /tmp/porsche-original.mp4 --threshold 0.23 --out out/porsche-4k-scene-candidates
+          test -s out/porsche-4k-scene-candidates/candidate-scenes.json
+      - name: Publish editable source scene catalogue and review stills (no original MP4)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Porsche-Agent-A-4K-scene-candidates-${{ github.run_id }}
+          path: out/porsche-4k-scene-candidates/
+          retention-days: 7
+          if-no-files-found: warn
