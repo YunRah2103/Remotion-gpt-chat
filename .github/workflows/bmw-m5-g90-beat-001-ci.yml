@@ -1,14 +1,18 @@
-name: BMW M5 G90 001 - beat-grid and two-agent planning gates
+name: BMW M5 G90 001 - beat-grid and editorial TypeScript checks
 on:
   push:
     branches:
       - 'automotive-edits/bmw-m5-g90-001/**'
     paths:
       - 'production/videos/bmw-m5-g90-beat-001/**'
+      - 'src/bmw-m5-g90-beat/**'
+      - 'src/Root.tsx'
       - '.github/workflows/bmw-m5-g90-beat-001-ci.yml'
   pull_request:
     paths:
       - 'production/videos/bmw-m5-g90-beat-001/**'
+      - 'src/bmw-m5-g90-beat/**'
+      - 'src/Root.tsx'
       - '.github/workflows/bmw-m5-g90-beat-001-ci.yml'
   workflow_dispatch:
 permissions:
@@ -16,16 +20,28 @@ permissions:
 jobs:
   validate-contract:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Verify BMW M5 G90-only 39 beats / 600 frames / two real handoff schemas
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - name: Verify fixed G90 beat grid and both handoff schemas
         shell: bash
         run: |
           set -euo pipefail
           python production/videos/bmw-m5-g90-beat-001/validate_setup.py
+          python production/videos/bmw-m5-g90-beat-001/editor/validate_editor.py --phase planning
           python -m compileall -q production/videos/bmw-m5-g90-beat-001
-          echo "Verified **planning contract only**; no footage, licence, published music or rendered movie has yet been demonstrated." >> "$GITHUB_STEP_SUMMARY"
+      - name: Remotion composition TypeScript regression gate
+        run: |
+          npm ci --no-audit --no-fund
+          npm run check
+      - name: Truthful build report
+        run: |
+          echo "Editor composition and 39-cut planning contract checked." >> "$GITHUB_STEP_SUMMARY"
+          echo "Passing TypeScript does NOT establish G90 footage authenticity, source licences, audio public rights or a finished render." >> "$GITHUB_STEP_SUMMARY"
