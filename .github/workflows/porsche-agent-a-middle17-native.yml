@@ -1,0 +1,36 @@
+name: Porsche Agent A - 17 middle-era native motion candidate clips
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-middle17-native.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-17-genuine-porsche-motion-excerpts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare FFmpeg and image proof
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install 'Pillow>=10,<12'
+      - name: Get and decode actual 993 996 997 991 source-excerpt shots
+        run: |
+          python production/videos/porsche-911-turbo-evolution-001/footage/extract_middle_17.py --output out/middle-17
+      - name: Preserve actual source clips, hash manifest and actual contact sheet
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Porsche-A-17-middle-generation-native-source-candidates-${{ github.run_id }}
+          path: out/middle-17/
+          compression-level: 0
+          retention-days: 1
+          if-no-files-found: warn
