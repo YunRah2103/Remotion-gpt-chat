@@ -41,6 +41,7 @@ jobs:
           node production/videos/porsche-911-turbo-evolution-001/edit/test_timeline.mjs
           node production/videos/porsche-911-turbo-evolution-001/qa/test_polish.mjs
       - name: Probe live YouTube metadata (no video download; advisory only)
+        if: github.event_name == 'workflow_dispatch'
         continue-on-error: true
         shell: bash
         run: |
@@ -89,5 +90,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Porsche-D-DIAGNOSTIC-NOT-FINAL
-          path: out/porsche-d-proof/DIAGNOSTIC_frame-70.png
+          path: out/porsche-d-proof/
           retention-days: 7
