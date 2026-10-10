@@ -1,0 +1,30 @@
+name: M5 E28 official HD driving archive
+on:
+  push:
+    branches: ['automotive-edits/bmw-m5-evolution-001/a-footage']
+    paths: ['.github/workflows/m5-e28-hd.yml']
+permissions:
+  contents: read
+jobs:
+  research:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          pip install 'Pillow>=11,<13'
+      - name: Fetch and inspect genuine E28 HD video
+        run: python production/videos/bmw-m5-evolution-001/footage/e28_archive.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: M5-E28-HD-${{ github.run_id }}
+          path: out/m5-e28-hd/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
