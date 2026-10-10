@@ -16,7 +16,11 @@ def validate():
     grid=load("beat-map.json")
     assert b["slug"]=="bmw-m5-evolution-001"
     assert b["fps"]==30 and b["durationInFrames"]==552 and b["resolution"]==[1080,1920]
-    assert b["status"]=="preproduction" and b["sourceCompositionId"] is None
+    if b["status"]=="preproduction":
+        assert b["sourceCompositionId"] is None
+    else:
+        assert b["status"]=="existing-composition" and b["sourceCompositionId"]=="BmwM5Evolution001"
+        assert 'id="BmwM5Evolution001"' in (ROOT/"src/Root.tsx").read_text(), "Missing actual registered film"
     assert [g["generation"] for g in b["generations"]]==list(GENS)
     assert [g["introduced"] for g in b["generations"]]==list(YEARS)
     assert len(grid["cuts"])==42
