@@ -27,6 +27,13 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - name: Typecheck real registered scene and FX integration
         run: npm run check
+      - name: Real Agent A/B/C integration code tests (synthetic fixtures, not footage)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s production/videos/porsche-911-turbo-evolution-001/footage -p test_audit_footage.py -v
+          node production/videos/porsche-911-turbo-evolution-001/edit/test_timeline.mjs
+          node production/videos/porsche-911-turbo-evolution-001/qa/test_polish.mjs
       - name: Validate beat map and reject incomplete media release
         shell: bash
         run: |
@@ -44,7 +51,7 @@ jobs:
           mkdir -p out/porsche-d-proof
           npx remotion still src/index.ts PorscheTurboEvolution001 out/porsche-d-proof/DIAGNOSTIC_frame-70.png --frame=70 --scale=0.35 --gl=swangle
           test -s out/porsche-d-proof/DIAGNOSTIC_frame-70.png
-          echo "Diagnostic scene proof rendered. It is watermarked and has no source footage; do not distribute as movie." >> "$GITHUB_STEP_SUMMARY"
+          echo "A/B/C integrated diagnostic scene rendered. It is watermarked and has no source footage; do not distribute as movie." >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: Porsche-D-DIAGNOSTIC-NOT-FINAL
