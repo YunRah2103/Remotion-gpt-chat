@@ -1,0 +1,99 @@
+{
+  "schema": "midnight-v12-agent-a-scout-v1",
+  "date_utc": "2026-10-10",
+  "repository": "YunRah2103/Remotion-gpt-chat",
+  "branch": "automotive-edits/midnight-v12-001/a-footage",
+  "project": "midnight-v12-001",
+  "reference": "User-supplied 192907.mp4, reference only, NOT sublicensed or packed",
+  "director_scope_note": "Current repository contract requests an ultra-exotic high-energy single hypercar; user prompt specifically requests Lamborghini night references. A has not selected a hero because rights and usable 11-shot coverage are unproven.",
+  "source_license": {
+    "name": "Pexels License",
+    "url": "https://www.pexels.com/license/",
+    "permissions": "Free stock footage usage and modification including social media, subject to brand/endorsement/re-distribution restrictions; verify terms before release",
+    "third_party_music": "Removed from prepared assets"
+  },
+  "gate": "FAIL",
+  "approved_footage_for_11_slots": 0,
+  "approved_ready_shots": [],
+  "candidate_count": 2,
+  "required_distinct_slots": 11,
+  "archive": {
+    "url": "https://378e0378-9dfe-48d4-9d9c-73912757403f.sandbox.floot.app/_cdn/static/midnight-v12-001/agent-a-scout-partial.zip",
+    "sha256": "ea10b32c1923e23dfc01e1cb0f5472a68bafbd4144f22d676d20cda887dba791",
+    "bytes": 70399810,
+    "container": "ZIP",
+    "head_verified_status": 200,
+    "head_verified_bytes": 70399810,
+    "storage": "temporary cloud project asset, not a GitHub Actions artifact",
+    "github_actions_artifact_id": null
+  },
+  "technical_method": "Downloaded via official Pexels download redirects, stripped audio via FFmpeg H.264 video stream-copy, FFmpeg stream probing and sampled frame / center vertical crop exports. Frame-level visual checks from actual bytes, not metadata alone. Full-frame decode/perceptual duplicate analysis across final 11 shots not possible because pool incomplete.",
+  "candidates": [
+    {
+      "id": "PX-20153915",
+      "owner": "Andi Dautaj",
+      "url": "https://www.pexels.com/video/the-wheels-of-a-sports-car-in-the-sun-20153915/",
+      "direct_source": "https://videos.pexels.com/video-files/20153915/20153915-uhd_3840_2160_24fps.mp4",
+      "original_sha256": "84f5179393e475167b9fa17e8b94f16866f5be7bfb603875e60cb34b6298b06c",
+      "prepared_file": "footage/PX-20153915.mp4",
+      "prepared_sha256": "313f6fd517e0c31c2a8ef3e4958e5b8be218cb92ad839aa7185d43b8adf5d0b8",
+      "prepared_bytes": 11632262,
+      "width": 3840,
+      "height": 2160,
+      "fps": 24,
+      "duration_s": 7.17,
+      "bitrate_bps": 12984000,
+      "codec": "H.264",
+      "audio": "removed by stream-copy remux",
+      "vehicle": "Lamborghini crest visible on wheel; precise model and match to driving car unconfirmed",
+      "motion": "camera tracks around wheel, not acceleration",
+      "approved_for_final": false,
+      "possible_slot": "S01 or S10",
+      "qa": "CONDITIONAL detail shot; daytime diverges from intended night look",
+      "vertical_center_crop_width": 1215,
+      "crop": "macro detail plausibly fits 9:16, full-vehicle ID unavailable"
+    },
+    {
+      "id": "PX-20153917",
+      "owner": "Andi Dautaj",
+      "url": "https://www.pexels.com/video/a-car-is-driving-down-a-road-in-the-middle-of-the-day-20153917/",
+      "direct_source": "https://videos.pexels.com/video-files/20153917/20153917-uhd_3840_2160_24fps.mp4",
+      "original_sha256": "377ec43e9aec2e6e04d27a7cf83dc54e1db0b05d24878c276701cfc586f8ade3",
+      "prepared_file": "footage/PX-20153917.mp4",
+      "prepared_sha256": "550bbf03383989db84f5601e154f09fd9c45460403617c2a40a1e9e59959a954",
+      "prepared_bytes": 58702342,
+      "width": 3840,
+      "height": 2160,
+      "fps": 24,
+      "duration_s": 26.17,
+      "bitrate_bps": 17946000,
+      "codec": "H.264",
+      "audio": "removed by stream-copy remux",
+      "vehicle": "sports car from Lamborghini-tagged same uploader; exact model / identity not independently proven",
+      "motion": "genuine continuous daylight roadside drive in lateral wide angle",
+      "approved_for_final": false,
+      "possible_slot": null,
+      "qa": "FAIL: car is left of frame and too small for default central 9:16 crop; no tunnel/night",
+      "vertical_center_crop_width": 1215,
+      "crop": "car outside/near edge of central crop, user must not assume auto-reframe will rescue it"
+    }
+  ],
+  "alternatives": [
+    {
+      "model": "Ferrari F40-style red sports car",
+      "url": "https://www.pexels.com/video/speeding-red-sports-car-close-up-29498801/",
+      "status": "Inspected real MP4 4070x2160, but different vehicle, rejected for Lamborghini/hero continuity. Car exterior and true motion need further approval."
+    },
+    {
+      "model": "Unknown red coupe",
+      "url": "https://www.pexels.com/video/vibrant-sports-car-on-urban-street-40061116/",
+      "status": "Inspected 1440x2560 native vertical MP4, not established Lamborghini, daylight and visually less compelling."
+    },
+    {
+      "model": "Aventador/SVJ licensed commercial catalog",
+      "url": "https://www.pond5.com/search?kw=lamborghini-aventador-svj&media=footage",
+      "status": "Indexed sources, purchases/licences not obtained. NOT downloadable from this handoff."
+    }
+  ],
+  "next_action": "Obtain producer-supplied original 4K single-car B-roll or explicitly licensed commercial multi-angle hypercar footage; review at least 11 genuinely independent moving shots; then produce new QA-approved archive and hash. B/D must not start source-dependent final render from this partial package."
+}
