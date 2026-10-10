@@ -6,11 +6,11 @@ there is no Node package or Remotion lockfile change.
 
 ## Installed components
 
-- yt-dlp **2026.08.19** with its \`default\` extra (includes \`yt-dlp-ejs\`).
+- yt-dlp **2026.08.19** with its `default` extra (includes `yt-dlp-ejs`).
 - Node.js **22** for the YouTube JavaScript challenge runtime. The importer
-  explicitly passes \`--js-runtimes node\` (yt-dlp normally enables Deno only).
+  explicitly passes `--js-runtimes node` (yt-dlp normally enables Deno only).
 - FFmpeg/FFprobe for original-stream container merging, quality metadata, and a full decode check.
-- \`production/footage/yt_dlp_ingest.py\` with video-only URL validation,
+- `production/footage/yt_dlp_ingest.py` with video-only URL validation,
   1080p/24fps default quality gates, source SHA-256, and JSON metadata.
 
 **Source-quality policy:** Select yt-dlp's best available source streams.
@@ -26,7 +26,7 @@ transcoded by this importer.
 Install Python 3.11+, FFmpeg and Node 22 (or newer supported Node) first.
 From repository root:
 
-\`\`\`bash
+```bash
 python -m pip install -r production/footage/requirements.txt
 python -m yt_dlp --version
 ffmpeg -version
@@ -40,17 +40,17 @@ python production/footage/yt_dlp_ingest.py fetch \
   --max-mb 600 \
   --max-duration 1800 \
   --rights-confirmed
-\`\`\`
+```
 
 Downloads are intentionally **one video per command** (no playlists).
 The output includes the original-format video or remuxed MKV, yt-dlp's
-\`.info.json\` source information and an additional \`.qa.json\` containing
+`.info.json` source information and an additional `.qa.json` containing
 actual dimensions, FPS, codec, filesize, duration and SHA-256. Failed
 quality checks return a nonzero exit status instead of silently using low
-quality. For older 720p archive footage, specify \`--min-height 720\` and
+quality. For older 720p archive footage, specify `--min-height 720` and
 evaluate its real quality yourself.
 
-The \`--rights-confirmed\` switch requires that you own the footage or
+The `--rights-confirmed` switch requires that you own the footage or
 have permission to download and use it. Never use this tool to evade DRM,
 sign-in restrictions, or copyright protections. YouTube may rate-limit
 cloud-hosted GitHub runners; failed extraction doesn't mean footage does
@@ -58,17 +58,17 @@ not exist.
 
 ### Dry-run to inspect the exact command
 
-\`\`\`bash
+```bash
 python production/footage/yt_dlp_ingest.py fetch \
   --url "https://youtu.be/dQw4w9WgXcQ" \
   --rights-confirmed --dry-run
-\`\`\`
+```
 
 Dry-run prints the yt-dlp command without contacting YouTube.
 
 ## GitHub Actions usage
 
-Workflow: \`.github/workflows/youtube-footage-ingest.yml\`
+Workflow: `.github/workflows/youtube-footage-ingest.yml`
 
 - On commits / pull requests: installs official pinned yt-dlp package,
   Node 22, FFmpeg and runs real **offline synthetic video** QA; it does
@@ -90,18 +90,18 @@ video are supplied to the smoke tests.
 
 ## Verify an existing source without yt-dlp or a network connection
 
-\`\`\`bash
+```bash
 python production/footage/yt_dlp_ingest.py verify \
   --input path/to/authorised-source.mp4 \
   --min-height 1080 --min-fps 24 \
   --manifest out/footage-verification.json
-\`\`\`
+```
 
 ## CI tests
 
-\`\`\`bash
+```bash
 python -m unittest discover -s production/tests -p test_yt_dlp_ingest.py -v
-\`\`\`
+```
 
 The tests exercise URL-allowlisting, rejection of playlist/channel links,
 command argument safety, source path confinement, native FFmpeg probe and
