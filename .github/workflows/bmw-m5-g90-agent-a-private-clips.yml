@@ -1,0 +1,73 @@
+name: BMW G90 - Agent A 39 Real Footage Clips (Private Review)
+on:
+  push:
+    branches:
+      - 'automotive-edits/bmw-m5-g90-001/a-footage'
+    paths:
+      - 'production/videos/bmw-m5-g90-beat-001/footage/prepare_private_source.py'
+      - '.github/workflows/bmw-m5-g90-agent-a-private-clips.yml'
+permissions:
+  contents: write
+jobs:
+  prepare-39-genuine-moving-shots:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install real media QA tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check 'Pillow>=11,<13'
+      - name: Test beat map and fail-closed motion and rights gates
+        run: |
+          set -euo pipefail
+          python production/videos/bmw-m5-g90-beat-001/validate_setup.py
+          cd production/videos/bmw-m5-g90-beat-001/footage
+          python -m unittest -v test_audit
+      - name: Download actual official G90 driving footage and extract 39 MP4 clips
+        env:
+          G90_MEDIA_OUTPUT: ${{ github.workspace }}/out/bmw-m5-g90-agent-a
+        run: |
+          set -euo pipefail
+          python production/videos/bmw-m5-g90-beat-001/footage/prepare_private_source.py
+          test "$(find out/bmw-m5-g90-agent-a/clips -maxdepth 1 -name 'beat-*.mp4' | wc -l)" = 39
+      - name: Commit truthful verified source in-out mapping and SHA256
+        if: success()
+        env:
+          TARGET_BRANCH: automotive-edits/bmw-m5-g90-001/a-footage
+        run: |
+          set -euo pipefail
+          git config user.name 'Agent A footage QA'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add production/videos/bmw-m5-g90-beat-001/footage/shot-plan.json
+          git add production/videos/bmw-m5-g90-beat-001/footage/source-manifest.json
+          git add production/videos/bmw-m5-g90-beat-001/handoffs/agent-a.json
+          git add production/videos/bmw-m5-g90-beat-001/handoffs/agent-a.md
+          git commit -m 'Register 39 real moving BMW G90 excerpts and exact clip checksums'
+          git push origin "HEAD:refs/heads/$TARGET_BRANCH"
+      - name: Publish private-review 39-video source pack as Actions artifact (NOT release)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G90-PRIVATE-39-SHOTS
+          path: |
+            out/bmw-m5-g90-agent-a/clips/*.mp4
+            out/bmw-m5-g90-agent-a/original/*.mp4
+            out/bmw-m5-g90-agent-a/proofs/*.jpg
+            out/bmw-m5-g90-agent-a/manifest.json
+            out/bmw-m5-g90-agent-a/QA.txt
+          retention-days: 14
+          if-no-files-found: error
+      - name: Final handoff summary
+        if: success()
+        run: |
+          echo '## BMW M5 G90 Agent A - real footage ready for PRIVATE review' >> "$GITHUB_STEP_SUMMARY"
+          echo '39 true moving MP4 beat shots / 600 frames / original BMW PressClub scene #3 and contact sheet archived.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Not approved for public TikTok publishing until usage rights are verified.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Agent B: download G90-PRIVATE-39-SHOTS, inspect proof contact sheet, use shot-plan.json sourceIn/out and manifest SHA256.' >> "$GITHUB_STEP_SUMMARY"
