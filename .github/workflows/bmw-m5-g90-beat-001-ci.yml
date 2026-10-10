@@ -1,0 +1,31 @@
+name: BMW M5 G90 001 - beat-grid and two-agent planning gates
+on:
+  push:
+    branches:
+      - 'automotive-edits/bmw-m5-g90-001/**'
+    paths:
+      - 'production/videos/bmw-m5-g90-beat-001/**'
+      - '.github/workflows/bmw-m5-g90-beat-001-ci.yml'
+  pull_request:
+    paths:
+      - 'production/videos/bmw-m5-g90-beat-001/**'
+      - '.github/workflows/bmw-m5-g90-beat-001-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify BMW M5 G90-only 39 beats / 600 frames / two real handoff schemas
+        shell: bash
+        run: |
+          set -euo pipefail
+          python production/videos/bmw-m5-g90-beat-001/validate_setup.py
+          python -m compileall -q production/videos/bmw-m5-g90-beat-001
+          echo "Verified **planning contract only**; no footage, licence, published music or rendered movie has yet been demonstrated." >> "$GITHUB_STEP_SUMMARY"
