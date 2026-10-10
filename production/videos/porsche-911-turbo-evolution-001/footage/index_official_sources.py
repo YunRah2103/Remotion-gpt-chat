@@ -19,6 +19,7 @@ OFFICIAL = {
     "286726": "Porsche 930 Turbo dedicated footage",
     "286727": "Porsche 992 Turbo dedicated footage",
     "167585": "A duel between seven 911 Turbo generations from 1975 to 2020",
+    "295872": "Porsche Turbo Transfagarasan highway with 930, 964, 993 and 992 Turbo",
     "202036": "9:11 Magazine Episode 21 - Eight Porsche 911 Turbo generations",
 }
 PRESS_KIT = "https://newsroom.porsche.com/en/press-kits/50-years-porsche-turbo.html"
