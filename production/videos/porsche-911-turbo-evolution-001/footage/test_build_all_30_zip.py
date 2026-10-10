@@ -116,7 +116,7 @@ class PackageGateTests(unittest.TestCase):
                   'width':1280,'height':720,'fps':25,
                   'focusX':0.5,'focusY':0.5,'sourceInSeconds':0.20,
                   'sourceOutSeconds':2.50,'handleFrames':2,
-                  'sourceUrl':'test://local'}
+                  'sourceUrl':'test://local','humanReviewer':'synthetic fixture'}
             beat={'durationFrames':17,'slot':1}
             report=module.render_one(shot,beat,root,output)
             self.assertEqual(report['clipTotalFrames'],21)
