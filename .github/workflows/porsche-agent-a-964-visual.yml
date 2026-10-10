@@ -1,0 +1,37 @@
+name: Porsche Agent A - 964 Ascari visual source review
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-964-visual.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        page: ['01','02']
+    steps:
+      - name: Expose exact source contact frames for model and moving-scene inspection
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PAGE: ${{ matrix.page }}
+        run: |
+          set -euo pipefail
+          gh api repos/$GITHUB_REPOSITORY/actions/artifacts/11673938413/zip > /tmp/gallery.zip
+          SRC=$(unzip -Z1 /tmp/gallery.zip | grep "source-326868-page-${PAGE}.jpg" | head -1)
+          test -n "$SRC"
+          unzip -p /tmp/gallery.zip "$SRC" > /tmp/contact.jpg
+          python - <<'PY'
+          import base64
+          from pathlib import Path
+          value=base64.b64encode(Path('/tmp/contact.jpg').read_bytes()).decode()
+          print('GALLERY_B64_START')
+          for i in range(0,len(value),4000): print('GALLERY_PART:'+value[i:i+4000])
+          print('GALLERY_B64_END')
+          PY
