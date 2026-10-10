@@ -1,0 +1,30 @@
+name: M5 2000-2005 archive-quality restoration
+on:
+  push:
+    branches: ['automotive-edits/bmw-m5-evolution-001/a-footage']
+    paths: ['.github/workflows/m5-legacy-hd.yml']
+permissions:
+  contents: read
+jobs:
+  native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          pip install 'Pillow>=11,<13'
+      - name: Fetch real original BMW older archive masters and extract 18 native segment candidates
+        run: python production/videos/bmw-m5-evolution-001/footage/legacy_hd_upgrades.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: M5-LEGACY-NATIVE-MASTERS-${{ github.run_id }}
+          path: out/m5-legacy-hd/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
