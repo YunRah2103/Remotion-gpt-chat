@@ -1,0 +1,149 @@
+{
+  "project": "huracan-sto-v10-001",
+  "version": "night-v3-source-footage-audio-boosted-private-review",
+  "status": "PLAYABLE_MP4_TECHNICAL_QA_PASS_SFX_PROVENANCE_NOT_CERTIFIED",
+  "format": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "frames": 316,
+    "duration_seconds": 10.533333,
+    "video_codec": "H.264",
+    "audio_codec": "AAC stereo 48k 320kbps"
+  },
+  "source_edit": {
+    "file": "STO-B-V3-NIGHT-LANDSCAPE-REMOTION-SILENT.mp4",
+    "sha256": "1fc2c88cc387d2d17e5d2477c4913c9948dbeb94145ae14f5a2fcd9c61eaffac",
+    "agent_b_commit": "58a60ae1d89df6a605c4862f92faa578e70ff93f"
+  },
+  "music": {
+    "source": "original user's 10.553s music mp3 (stored privately; do NOT upload publicly)",
+    "sha256": "87a663860585e1714fd6fbb6a8006d19d655bda863db66cdaa75ba1830a2d678",
+    "time_stretch": false,
+    "decoder_padding_ms": 5.98
+  },
+  "audio_sources": [
+    {
+      "id": "primary",
+      "video_sha256": "dba560aea7cbdf0f64f7e7bb647ae2d43cabcf03a7af9a6a7a445122caa43f33"
+    },
+    {
+      "id": "lambo",
+      "video_sha256": "62deb84ce58be337c61402b8d1534b369d2d41c0b1797d0577cfdfe07365d502"
+    },
+    {
+      "id": "huracan",
+      "video_sha256": "d4d34a89be7b27f50e5f1a82a28521eae2fae9ac28e78613a847b0ef36564697"
+    }
+  ],
+  "events": [
+    {
+      "at": 0,
+      "source": "lambo",
+      "in": 14.22,
+      "duration": 0.83,
+      "cue": "exhaust-cold-open"
+    },
+    {
+      "at": 0.65,
+      "source": "primary",
+      "in": 16.4,
+      "duration": 1.72,
+      "cue": "startup-rev-rise"
+    },
+    {
+      "at": 1.93,
+      "source": "lambo",
+      "in": 22.7,
+      "duration": 0.77,
+      "cue": "pre-reveal-low-growl"
+    },
+    {
+      "at": 2.53,
+      "source": "lambo",
+      "in": 22.68,
+      "duration": 0.9,
+      "cue": "2.60s REVEAL hit"
+    },
+    {
+      "at": 3.18,
+      "source": "primary",
+      "in": 17.1,
+      "duration": 0.96,
+      "cue": "front-roll-drive-by"
+    },
+    {
+      "at": 4.42,
+      "source": "huracan",
+      "in": 9.1,
+      "duration": 0.93,
+      "cue": "side-passing-engine"
+    },
+    {
+      "at": 5.19,
+      "source": "lambo",
+      "in": 14.2,
+      "duration": 1.22,
+      "cue": "night-three-quarter"
+    },
+    {
+      "at": 6.2,
+      "source": "primary",
+      "in": 16.85,
+      "duration": 1.2,
+      "cue": "rear-rolling"
+    },
+    {
+      "at": 7.71,
+      "source": "huracan",
+      "in": 19,
+      "duration": 0.89,
+      "cue": "fast-pass"
+    },
+    {
+      "at": 8.52,
+      "source": "lambo",
+      "in": 23.1,
+      "duration": 0.78,
+      "cue": "downshift style accent"
+    },
+    {
+      "at": 9.43,
+      "source": "primary",
+      "in": 18,
+      "duration": 1.085,
+      "cue": "hero-finish"
+    }
+  ],
+  "mixing": {
+    "source_audio_filter": "190Hz highpass, 10.5kHz lowpass",
+    "source_audio_level": "2.12x base event gain, clip-specific",
+    "music_duck_centers_seconds": [
+      0.18,
+      2.62,
+      3.22,
+      5.24,
+      7.75,
+      9.48
+    ],
+    "stereo_movement": true,
+    "additional_fx": "Synthesised airy transitions at 2.55,4.46,7.71,9.43 seconds; not an engine replacement",
+    "mastering": "gentle tanh saturation, peak normalization, H.264 video stream-copy"
+  },
+  "actual_output": {
+    "filename": "HURACAN_STO_V3_NIGHT_ENGINE_BOOSTED_FINAL.mp4",
+    "sha256": "e00bb7dff209d76af503d8f917ae01f6ed3b292999446e7936edb17edbcc32e7",
+    "bytes": 16524027,
+    "integrated_lufs": -12.1,
+    "peak_db_tp": -1.9,
+    "decoded_frames": 316,
+    "blackdetect_intervals": 0,
+    "silencedetect_intervals": 0
+  },
+  "caveats": [
+    "Only visual STO video origin of the raw promotional source audio is supported. Tracks may include editorial music/sound design: do not certify isolated real engine audio.",
+    "User-supplied and publisher footage permission not established; private review only.",
+    "Gate A/B unique-moving-angle verification and Gate C isolated V10 engine / listening proof remain pending. Not release signoff."
+  ],
+  "provenance_note": "Original user music and raw source footage remain outside this public GitHub repository. User receives private runnable MP4 and WAV stem package in ChatGPT."
+}
