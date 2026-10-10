@@ -39,6 +39,34 @@ jobs:
           python -m unittest discover -s production/videos/porsche-911-turbo-evolution-001/integration -p test_ingest_bridge.py -v
           node production/videos/porsche-911-turbo-evolution-001/edit/test_timeline.mjs
           node production/videos/porsche-911-turbo-evolution-001/qa/test_polish.mjs
+      - name: Probe live YouTube metadata (no video download; advisory only)
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check 'yt-dlp[default]==2026.08.19'
+          mkdir -p out/porsche-d-proof
+          timeout 150s python -m yt_dlp --ignore-config --no-playlist \
+            --js-runtimes node --skip-download --dump-single-json --no-warnings \
+            'https://www.youtube.com/watch?v=gbnBo2Au-uA' \
+            > out/porsche-d-proof/source-metadata.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          path=Path('out/porsche-d-proof/source-metadata.json')
+          m=json.loads(path.read_text())
+          formats=[f for f in m.get('formats',[]) if f.get('vcodec','none') != 'none']
+          assert formats, 'No accessible video formats were reported'
+          heights=sorted({int(f.get('height') or 0) for f in formats})
+          summary={'probe':'PUBLIC_METADATA_ONLY_NO_DOWNLOAD',
+                   'videoFormats':len(formats),'heights':heights,
+                   'sourceAccess':'metadata-extract-PASS',
+                   'verifiedPorscheClips':0}
+          Path('out/porsche-d-proof/metadata-probe-summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+          path.unlink()
+          print(json.dumps(summary,indent=2))
+          PY
+          echo "Live YouTube formats were listed, but NO video was downloaded or copyrighted files committed." >> "$GITHUB_STEP_SUMMARY"
       - name: Validate beat map and reject incomplete media release
         shell: bash
         run: |
