@@ -1,0 +1,36 @@
+name: Porsche Agent A - Romania 964 993 source contact visual review
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-romania-visual.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  expose-source-gallery:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        page: ['01','02']
+    timeout-minutes: 12
+    steps:
+      - name: Reveal native 964 993 Porsche contact sheet
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PAGE: ${{ matrix.page }}
+        run: |
+          set -euo pipefail
+          gh api repos/$GITHUB_REPOSITORY/actions/artifacts/11673986130/zip > /tmp/romania.zip
+          NAME=$(unzip -Z1 /tmp/romania.zip | grep "source-295872-page-${PAGE}.jpg" | head -1)
+          test -n "$NAME"
+          unzip -p /tmp/romania.zip "$NAME" > /tmp/frame.jpg
+          python - <<'PY'
+          import base64
+          from pathlib import Path
+          raw=base64.b64encode(Path('/tmp/frame.jpg').read_bytes()).decode()
+          for i in range(0,len(raw),4000):
+              print('SOURCE_CONTACT_PART:'+raw[i:i+4000])
+          PY
