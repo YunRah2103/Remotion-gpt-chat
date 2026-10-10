@@ -1,0 +1,46 @@
+name: Porsche Agent A - official source visual proof export
+
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-review-artifact.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+jobs:
+  export-small-contact-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Fetch already verified 4K source artifact from prior completed run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p out/porsche-contact
+          gh api repos/$GITHUB_REPOSITORY/actions/artifacts/11672460900/zip > /tmp/porsche-source.zip
+          unzip -Z1 /tmp/porsche-source.zip > out/porsche-contact/archive-entries.txt
+          CONTACT=$(grep '/contact-sheet.jpg$' out/porsche-contact/archive-entries.txt | head -1)
+          QA=$(grep '/source-qa.json$' out/porsche-contact/archive-entries.txt | head -1)
+          test -n "$CONTACT" && test -n "$QA"
+          unzip -p /tmp/porsche-source.zip "$CONTACT" > out/porsche-contact/contact-sheet.jpg
+          unzip -p /tmp/porsche-source.zip "$QA" > out/porsche-contact/source-qa.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('out/porsche-contact/source-qa.json').read_text())
+          assert data['status']=='MEDIA_ACQUIRED_PENDING_MANUAL_SCENE_REVIEW'
+          assert data['fullDecode']=='PASS' and data['probe']['width']==3840
+          print(json.dumps({'id':data['mediaId'],'bytes':data['originalBytes'],'sha256':data['originalSha256'],'format':data['probe']},indent=2))
+          PY
+          du -h out/porsche-contact/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Porsche-Agent-A-286306-contact-sheet-${{ github.run_id }}
+          path: out/porsche-contact/
+          retention-days: 7
+          if-no-files-found: error
