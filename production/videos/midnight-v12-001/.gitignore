@@ -1,0 +1,13 @@
+# Never commit the user-supplied soundtrack or large third-party source footage
+*.mp3
+*.wav
+*.flac
+*.m4a
+*.mp4
+*.mov
+*.mkv
+*.webm
+*.zip
+*.7z
+*.tar
+*.gz
