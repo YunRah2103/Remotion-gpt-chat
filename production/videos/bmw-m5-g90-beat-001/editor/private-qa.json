@@ -44,9 +44,26 @@
   "nativeRemotion": {
     "repositoryWorkflow": ".github/workflows/bmw-m5-g90-private-render.yml",
     "runId": 38010694333,
-    "progressWhenReportWritten": "in progress",
+    "progressWhenReportWritten": "COMPLETED SUCCESS",
     "artifactName": "G90-PRIVATE-REMOTION-VISUAL-20S",
-    "containsCopyrightedAudio": false
+    "containsCopyrightedAudio": false,
+    "artifactId": 11653571296,
+    "visualOnlyArtifactDecoded": true,
+    "finalPrivateMaster": {
+      "filename": "BMW_M5_G90_REMOTION_PRIVATE_FINAL_20s.mp4",
+      "sha256": "15ed05c1df2fe5cddda990bfec65f5c50a54885edd4380d6abf71b1a4e7e6edb",
+      "sizeBytes": 15020312,
+      "width": 1080,
+      "height": 1920,
+      "frames": 600,
+      "fps": 30,
+      "durationSeconds": 20,
+      "audio": "AAC stereo 48000Hz locally muxed, no public music upload",
+      "fullDecode": "PASS",
+      "perShotMovingCarFrameAudit": "39/39 PASS",
+      "noTextOverlays": true,
+      "sampleAspectRatio": "1:1"
+    }
   },
   "rights": {
     "sourcePublicRedistribution": false,
