@@ -9,7 +9,7 @@
 
 ## What was actually implemented
 
-- Read the exact source contract, `beat-map.json`, Agent A instructions, existing video collage engineering, and existing schema/validator.
+- Read the exact source contract, `beat-map.json`, Agent A instructions, existing video-collage workflow, and existing schema/validator.
 - Researched 20 labelled source-page candidates covering E28, E34, E39, E60, F10, F90, G90, with official BMW Group PressClub scene provenance and select original-channel links. `footage/source-catalog.json` is a **page research catalog only**; it contains no real downloaded media. The twelve direct BMW PressClub URLs in the catalog are candidates, not confirmed accessible downloads.
 - `footage/shot-board.json` maps every beat to six unique camera-angle goals per generation, preserves all source-slot frames, explicitly marks every candidate `MISSING_VERIFIED_CLIP`.
 - `footage/prepare.py` provides guarded official-original acquisition (preserve MOV; FFprobe; SHA256), real JPEG frame samples/contact sheets, strict manual sedan-identity/distinct-shot approval, timed-source extraction QA, near-duplicate detection, and refuses to generate verified manifest until 42 **actual** video files/approved time ranges are present. Do not misuse the code's synthetic test clips as real M5 footage.
@@ -20,7 +20,7 @@
 
 - **PASS — initial GitHub Actions metadata/chronology CI**: [run 38014240348](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38014240348) at source `4aa7692b2ff508dfe7308353711da753e2ceda0a`; logs show 42 planned cuts, 552 frames, seven required generations, **actualVerifiedClips: 0**.
 - **PASS — current Actions native-source-tool QA:** [run 38014477573](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38014477573) at source `a3b780fe6f64faac6c60054c4ab86c005eceeb13` executed 4/4 unit tests, including FFmpeg/FFprobe and JPEG extraction of a **synthetic** test-pattern MP4. **Real M5 media inspections remain 0/42**.
-- [Research commit e1fe940](https://github.com/YunRah2103/Remotion-gpt-chat/commit/e1fe940dfde8817f485ca58887bda750e6461dd8) and [native test commit `174bd721c67e`](https://github.com/YunRah2103/Remotion-gpt-chat/commit/a3b780fe6f64faac6c60054c4ab86c005eceeb13).
+- [Research commit e1fe940](https://github.com/YunRah2103/Remotion-gpt-chat/commit/e1fe940dfde8817f485ca58887bda750e6461dd8) and [native test commit `a3b780fe6f64`](https://github.com/YunRah2103/Remotion-gpt-chat/commit/a3b780fe6f64faac6c60054c4ab86c005eceeb13).
 - There is no real contact sheet, MP4 source, video SHA256 list or private downloadable footage artifact. Evidence artifacts and private-audio content must **never** be invented.
 
 ## BMW M5 identification and image quality
