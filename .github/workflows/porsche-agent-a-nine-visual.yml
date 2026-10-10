@@ -1,0 +1,34 @@
+name: Porsche Agent A - nine extracted native shot motion visual inspection
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-nine-visual.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  emit-real-motion-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Read original nine-shot source-codec quality contact sheet
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api repos/$GITHUB_REPOSITORY/actions/artifacts/11672977035/zip > /tmp/nine-proof.zip
+          ASSET=$(unzip -Z1 /tmp/nine-proof.zip | grep 'nine-beat-contact-sheet.jpg' | head -1)
+          test -n "$ASSET"
+          unzip -p /tmp/nine-proof.zip "$ASSET" > /tmp/contact.jpg
+          python - <<'PY'
+          import base64
+          from pathlib import Path
+          s=base64.b64encode(Path('/tmp/contact.jpg').read_bytes()).decode()
+          print('NINE_SOURCE_CONTACT_START')
+          for i in range(0,len(s),4000):
+            print('NINE_SOURCE_CONTACT_PART:'+s[i:i+4000])
+          print('NINE_SOURCE_CONTACT_END')
+          PY
