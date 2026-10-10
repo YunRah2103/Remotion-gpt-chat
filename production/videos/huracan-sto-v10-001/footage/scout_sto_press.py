@@ -20,7 +20,11 @@ for key,url in PAGES.items():
   s=html.unescape(s).replace("\\/","/")
   (R/(key+".html")).write_text(s)
   matches=re.findall(r'''(?:https?:)?(?:\\/\\/|//)[^"'<>\\s]{8,380}?(?:\\.mp4|\\.m3u8|player\\.vimeo\\.com[^"'<>\\s]{0,80}|youtube\\.com/embed/[^"'<>\\s]+)''',s,re.I)
-  rec.update(html_bytes=len(s),media_links=list(dict.fromkeys(matches))[:70],vimeo_ids=list(set(re.findall(r'(?:vimeo.com/video/|vimeo.com/)(\\d{7,13})',s)))[:12])
+  candidate_urls=re.findall(r'https?://[^"\\s<>]{5,450}',s,re.I)
+  relevant=[x[:450] for x in candidate_urls if any(k in x.lower() for k in ("mp4","m3u8","vimeo","youtube","video/","lamborghini.com/original/"))]
+  embeds=re.findall(r'<(?:iframe|video|source)[^>]{0,500}>',s,re.I)
+  rec.update(html_bytes=len(s),media_links=list(dict.fromkeys(matches+relevant))[:100],
+             embed_tags=embeds[:35],vimeo_ids=list(set(re.findall(r'(?:vimeo.com/video/|vimeo.com/)(\\d{7,13})',s)))[:12])
  except Exception as e:rec["error"]=str(e)
  rows.append(rec)
 # An official Automobili Lamborghini snow-event publication with STO among multiple other models.
@@ -64,5 +68,5 @@ rows.append(record)
 (R/"manifest.json").write_text(json.dumps(rows,indent=2))
 with zipfile.ZipFile("out/STO_PRESS_SCOUT_RESEARCH.zip","w",zipfile.ZIP_STORED) as z:
  for p in R.rglob("*"):
-  if p.suffix.lower() in {".json",".mp4",".jpg"}:z.write(p,p.relative_to(R))
+  if p.suffix.lower() in {".json",".mp4",".jpg",".html"}:z.write(p,p.relative_to(R))
 for x in rows:print(x["id"],x.get("status","SCOUT"),len(x.get("media_links",[])),x.get("error","")[:120])
