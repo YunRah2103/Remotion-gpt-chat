@@ -1,0 +1,29 @@
+name: Porsche Agent A - discover 996 997 991 media
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-middle-scout.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  discover-official-archive-footage:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Read Porsche article-original video embeds
+        run: |
+          python production/videos/porsche-911-turbo-evolution-001/footage/discover_mid_era_sources.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Porsche-Mid-Era-Source-Discovery-${{ github.run_id }}
+          path: out/porsche-mid-era-scout/source-scout.json
+          retention-days: 7
+          if-no-files-found: warn
