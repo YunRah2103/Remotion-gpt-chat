@@ -2,14 +2,42 @@
   "schemaVersion": 1,
   "task": "bmw-m5-evolution-001-agent-a",
   "branch": "automotive-edits/bmw-m5-evolution-001/a-footage",
-  "sourceSha": "e8f17c9ef5cc48b143b21d3cc4d8007861097464",
+  "sourceSha": "174bd721c67e6b5ae4d18b038787e956450097e7",
   "owner": "research",
-  "summary": "UNSTARTED planning template only. This agent has not delivered footage/code or QA.",
+  "summary": "Twenty genuine BMW M5 source-page candidates and official scene-specific direct media URLs researched; exact 42-slot 552-frame selection board and strictly gated FFprobe/motion/identity ingestion tools implemented. NO media bytes acquired; 0 of 42 shots validated. Existing GitHub Actions contract CI passed for e1fe/4aa; native FFmpeg smoke test added for follow-up CI. Footage handoff is BLOCKED.",
   "status": "blocked",
-  "files": [],
-  "evidence": [],
-  "blockers": [
-    "Agent session has not started, no implementation commits or actual artifacts have been submitted."
+  "files": [
+    "production/videos/bmw-m5-evolution-001/footage/source-catalog.json",
+    "production/videos/bmw-m5-evolution-001/footage/shot-board.json",
+    "production/videos/bmw-m5-evolution-001/footage/prepare.py",
+    "production/videos/bmw-m5-evolution-001/footage/README.md",
+    "production/videos/bmw-m5-evolution-001/footage/.gitignore",
+    "production/videos/bmw-m5-evolution-001/footage/test_prepare.py",
+    "production/videos/bmw-m5-evolution-001/footage/validate_sources.py",
+    "production/videos/bmw-m5-evolution-001/handoffs/agent-a.json",
+    "production/videos/bmw-m5-evolution-001/handoffs/agent-a.md"
   ],
-  "notes": "This is a placeholder, base SHA is not a claimed completion SHA."
+  "evidence": [
+    "https://github.com/YunRah2103/Remotion-gpt-chat/commit/e1fe940dfde8817f485ca58887bda750e6461dd8",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/commit/174bd721c67e6b5ae4d18b038787e956450097e7",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38014240348",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-edits%2Fbmw-m5-evolution-001%2Fa-footage/production/videos/bmw-m5-evolution-001/footage/source-catalog.json",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-edits%2Fbmw-m5-evolution-001%2Fa-footage/production/videos/bmw-m5-evolution-001/footage/shot-board.json"
+  ],
+  "blockers": [
+    "0 of 42 actual moving video files have been downloaded, frame-sampled, SHA256-hashed or visually verified; there is NO footage ZIP or artifact ID to hand to Agent C.",
+    "Execution sandbox has no external DNS/media download access; the connected GitHub interface reads text/metadata, not multi-GB BMW original video master bytes. Existing BMW Actions job performs code/metadata checks, not real media acquisition or artifact upload.",
+    "Each of 42 slots still needs an observed, genuine, visibly different source in/out segment and human/vision verification of correct M5 sedan generation. The catalog and shot-board are candidates, never verified clips.",
+    "E28/E34 and other historic archives often have low native resolution (e.g. BMW 2005 footage 720x576); archival treatment or alternate sharp genuine footage is needed. No 4K/1080 portrait delivery claims can currently be substantiated.",
+    "Third-party/BMW source rights are not confirmed for public distribution; private-review research only. No GitHub Release or public MP4 has been produced."
+  ],
+  "extra": {
+    "plannedSlots": 42,
+    "verifiedSlots": 0,
+    "verifiedGenerations": 0,
+    "candidatePages": 20,
+    "actualVideoArtifacts": 0,
+    "ciPlanningMetadataRun": 38014240348,
+    "mediaMotionQA": "NOT RUN ON REAL BMW MEDIA"
+  }
 }
