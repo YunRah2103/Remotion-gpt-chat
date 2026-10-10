@@ -109,7 +109,7 @@ sc.view_settings.view_transform="Filmic"
 sc.view_settings.look="Medium High Contrast"
 for frame in range(1,145):
     a=math.radians(30)+2*math.pi*(frame-1)/144
-    cam.location=(9.8*math.cos(a),9.8*math.sin(a),3.7)
+    cam.location=(20.0*math.cos(a),20.0*math.sin(a),6.6)
     cam.rotation_euler=(Vector((0,0,.94))-cam.location).to_track_quat('-Z','Y').to_euler()
     # Animate field-of-view as well as camera position to keep the entire car visible in portrait.
     projected_width=4.795*abs(math.sin(a)) + 2.085*abs(math.cos(a))
