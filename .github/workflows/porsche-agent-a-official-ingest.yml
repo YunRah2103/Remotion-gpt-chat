@@ -1,0 +1,49 @@
+name: Porsche Agent A - official MP4 source acquisition
+
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - 'production/videos/porsche-911-turbo-evolution-001/footage/ingest_porsche_official.py'
+      - '.github/workflows/porsche-agent-a-official-ingest.yml'
+  workflow_dispatch:
+    inputs:
+      media_id:
+        description: 'Official Porsche Newsroom press kit video identifier'
+        type: choice
+        options: ['286306', '286687', '286726', '286727']
+        default: '286306'
+
+permissions:
+  contents: read
+jobs:
+  ingest-official-press-kit-video:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install quality-verification runtime
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check 'Pillow>=10,<12'
+      - name: Native synthetic-only ingest test
+        run: python production/videos/porsche-911-turbo-evolution-001/footage/ingest_porsche_official.py --self-test
+      - name: Acquire original public Porsche Newsroom media and build actual proof
+        env:
+          MEDIA_ID: ${{ inputs.media_id || '286306' }}
+        run: |
+          python production/videos/porsche-911-turbo-evolution-001/footage/ingest_porsche_official.py --video-id "$MEDIA_ID" --max-mb 900 --out out/porsche-official
+      - name: Upload real MP4, original hash, FFprobe report and actual contact sheet for private review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Porsche-Agent-A-official-source-${{ github.run_id }}
+          path: out/porsche-official/
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: warn
