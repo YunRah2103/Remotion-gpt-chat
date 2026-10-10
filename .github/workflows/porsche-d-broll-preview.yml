@@ -1,0 +1,42 @@
+name: Porsche D - range-sampled long B-roll visual QA
+on:
+  push:
+    branches: [automotive-edits/porsche-911-turbo-evolution-001/d-master]
+    paths:
+      - '.github/workflows/porsche-d-broll-preview.yml'
+  workflow_dispatch:
+    inputs:
+      media_id:
+        description: "Official Porsche Newsroom media ID"
+        type: choice
+        options: ['286687', '286726', '286727']
+        default: '286687'
+permissions:
+  contents: read
+jobs:
+  remote-contact-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 23
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install native FFmpeg and Pillow
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check 'Pillow>=10,<12'
+      - name: Seek official MP4 using HTTP Range and sample native moving footage
+        env:
+          MEDIA_ID: ${{ inputs.media_id || '286687' }}
+        run: |
+          set -euo pipefail
+          python production/videos/porsche-911-turbo-evolution-001/integration/sample_official_stream.py \
+            --media-id "$MEDIA_ID" \
+            --output out/porsche-broll-review
+      - name: Upload only low-resolution proof, never full copyrighted multi-GB source
+        uses: actions/upload-artifact@v4
+        with:
+          name: Porsche-D-B-roll-source-contact-${{ github.run_id }}
+          path: out/porsche-broll-review/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
