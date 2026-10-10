@@ -14,6 +14,7 @@
 ### Executed checks
 
 - Local `python -m py_compile audit_footage.py`: PASS.
+- Local `python3 -m unittest discover -s /mnt/data/porsche_a_work -p test_audit_footage.py -v`: **5/5 PASS**, including a real FFmpeg-generated synthetic moving-video probe, missing-media failure gate, path confinement, frozen-frame detection, and exact generation ordering (fixture code matches the committed tests).
 - Local synthetic 960×540/30fps FFmpeg-generated motion fixture: ffprobe/sha256, three sampled decodes, actual in/mid/out JPEG files, image contact sheet (182,563 bytes), motion delta 3.998: PASS. **This is original synthetic test footage, NOT A PORSCHE MODEL OR VIDEO.**
 - Local 30-shot plan with 1 synthetic local file and 29 intentionally missing paths: `status=BLOCKED`, `availableSlots=1`, **29 correct individual blockers**, return code 2: PASS (expected refusal).
 - Porsche preproduction CI run [38055299705](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38055299705): SUCCESS for planning contract and bytecode compilation. **The CI workflow does not run actual Porsche footage render or the new fixture unit test**.
