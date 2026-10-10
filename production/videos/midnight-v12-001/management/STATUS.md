@@ -1,88 +1,52 @@
-# EXOTIC AFTER DARK — most recent Agent E production check
+# EXOTIC AFTER DARK — Agent E current production status
 
-**Audit date:** 2026-10-10; latest Agent A commit 2026-10-10 19:53:16 UTC.  
-**Verdict:** **SOURCE GATE STILL FAILS** despite useful expanded acquisition. Final video is NOT ready.
+**Audit:** 10 October 2026, after Agent A's 20:35 UTC commits; GitHub branches, source handoffs, QA, manifest, workflow, issue rechecked.  
+**Status:** **NOT FILM-READY** — Gate A remains FAIL. Source acquisition is the production blocker.  
+**Creative vision:** A single coherent **EXOTIC, AGGRESSIVE** hypercar, real motion and 11 unique actual camera setups. Night optional. Target 316 frames, 1080×1920 @30 fps; music transition frame 77. Private audio stays out of git.
 
-| Agent | Latest source SHA | Gate | Fresh evidence |
+| Agent | Latest GitHub HEAD | State | Current verified production evidence |
 |---|---|---|---|
-| A footage | `352594bf1ce4797402955705c1c378f31b3ba1f0` | **FAIL / expanded scouting** | New V2 handoff, QA, selection and manifest: **12 independent Pexels source IDs**, **8 short MP4 excerpts delivered**, 24 sample/crop JPGs, 19,193,437-byte ZIP, SHA256 `83233278b4c50763c8cb37b6a5f80d9c5b1b3b760fc25ce27bead2a10cb20450` (Agent A-reported post-upload full GET/rehash PASS). No approved 11-shot same-car full-quality asset pool. |
-| B edit | `dcc2661f2daad5654cf3a697bc68e63f84e1ad39` | **WAITING** | No new branch commits; no source-backed preview or B handoff. |
-| C look/sound | `dcc2661f2daad5654cf3a697bc68e63f84e1ad39` | **WAITING** | No new branch commits; no source-specific C handoff. |
-| D master | `dcc2661f2daad5654cf3a697bc68e63f84e1ad39` | **WAITING** | No new branch commits; no decoded final film or delivered MP4. |
+| **A — footage** | `e7dee1acc1b68fd09873d1516259b39beedb10ab` | **BLOCKED / GATE FAIL** | New original-shoot scouting documents, 6 YouTube candidate sources and declared licence research. Top Jesko Attack film `PxSSCIdmEZ8` is *not downloaded*: cloud yt-dlp `--list-formats` rejected by YouTube sign-in anti-bot before stream metadata was returned. Actual native resolution, 11 camera angles, permission ownership and vertical crops remain unverified. Last deliverable remains old mixed-car V2 pool (12 source IDs, 8 partial MP4 excerpts, 0 approved same-hero 11-shot sets). |
+| **B — editor** | `dcc2661f2daad5654cf3a697bc68e63f84e1ad39` | **WAITING** | Contract-baseline branch. No source-backed editing commits, real proof video or accepted handoff. |
+| **C — look/sound** | `dcc2661f2daad5654cf3a697bc68e63f84e1ad39` | **WAITING** | Contract-baseline branch. No source-specific grade, FX, or sync visual proof. Independent technical tests may happen without claiming master readiness. |
+| **D — master** | `dcc2661f2daad5654cf3a697bc68e63f84e1ad39` | **WAITING** | Contract-baseline branch. No final 316-frame rendered MP4, decode QA or audio-matched artifact. |
 
-### Important distinction
+## Meaningful change since previous audit
 
-- Agent A's report says 12 full source streams were acquired and sampled but the delivered V2 bundle has **only 8 video-only 2–3-second excerpts**, not 12 full originals. Original 150 MB package reportedly could not be hosted because of storage limits.
-- Strongest two samples (`7727415` front and `7727416` side) show similar **black Aventador-like** cars, but physical car identity is not verified and source is **1920x1080 25fps landscape**: a standard centered 9:16 crop retains only ~607x1080 pixels, not native TikTok 1080x1920 sharpness.
-- Other sources have purple, orange, white, or red car identity and scene mismatches; no credible 11 independent angles of the same chosen high-end hypercar. The QA file itself explicitly states **Gate FAIL**.
-- Latest contract-only CI run for A: [38081571546](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38081571546) success; **0 workflow artifacts**. This checks the beat-grid and contract, **not** media quality.
-- Agent A reports an [external ZIP](https://378e0378-9dfe-48d4-9d9c-73912757403f.sandbox.floot.app/_cdn/static/midnight-v12-001/agent-a-expanded-scout-v2.zip). Independent external CDN fetch from Agent E failed DNS resolution, so ZIP content hashes/download are **not independently verified by E**. Its hash and re-download success remain **A-reported**.
-- Edit spec remains 316 frames @30fps / 1080x1920, main transition f77, 11 genuinely distinct moving shots, one EXOTIC and AGGRESSIVE hero. The soundtrack remains private.
+1. A added `YOUTUBE_ORIGINAL_SHOOT_SCOUT.md`, `youtube-candidate-manifest.json` and updated `FOOTAGE_QA.md`, `AGENT_A_HANDOFF.md`.
+2. Leading one-hero candidate: [Ricky Blackwell / Developed Films — Koenigsegg Jesko Attack USA Delivery](https://www.youtube.com/watch?v=PxSSCIdmEZ8), 48s. Film is labelled CC Attribution on watch page according to Agent A, but original ownership and all rights need independent confirmation; **no frames downloaded**.
+3. Backup: [gchrisfx Aventador Sony A7III Austin film](https://www.youtube.com/watch?v=mOSnX0QDdsE), 2:14; also uploader-claimed CC. Neither film has been decoded, proven 4K or shown to contain 11 unique moving angles.
+4. Agent A attempted authorised yt-dlp 2026.08.19 format listing on Jesko; YouTube returned `Sign in to confirm you're not a bot`. This is a true execution blocker, not CI failure.
+5. [Latest A Actions run 38084358935](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38084358935) was contract/beat-grid CI success with **0 GitHub media artifacts**. No new footage ZIP or verified SHA from YouTube exists.
+6. The older A [V2 Pexels scout ZIP](https://378e0378-9dfe-48d4-9d9c-73912757403f.sandbox.floot.app/_cdn/static/midnight-v12-001/agent-a-expanded-scout-v2.zip) is **agent-reported** as 19,193,437 bytes with SHA256 `83233278b4c50763c8cb37b6a5f80d9c5b1b3b760fc25ce27bead2a10cb20450`. It is NOT a coherent or approved final source package and could not be independently fetched by this manager.
 
-### Blocker and next immediate assignment
+**Primary blocker:** permitted actual source media bytes, verified native moving shots and same-car continuity—not a lack of instructions or GitHub Actions.
 
-**Blocker:** no rights-cleared, quality-approved, coherent **single exotic vehicle** 11-angle source pack. Do not confuse 12 sampled sources or 8 packaged excerpts with 11 approved shots. No final MP4 exists.
+**Next action:** Resume Agent A, prioritising permission plus original creator-delivered multi-angle video or an ordinary authorised local acquisition. If those cannot provide 11 native crop-safe moving angles, present clear creative concessions to the user rather than promoting incomplete samples. B and D remain source-dependent NO GO; C may do generic tests but no production pass.
 
-**Next agent: A again.** Refocus on ONE verified car. Acquire the missing distinct, vertical-safe high-quality motion angles from a rights-cleared original multi-camera shoot or equivalent permitted multi-angle source, not random mixed-car stock clips. If impossible, present a concrete options decision (rights-cleared alternate exotic/car, sanctioned use of mismatched vehicles only if director relaxes one-hero continuity, or footage contribution) with costs/limits, not another misleading PASS. Supply independently retrievable archive and full SHA/visual QA. B can prepare generic components and C technical FX trials, but final source edit and D are NO GO.
+**Film-ready? NO.** No final playable MP4; no final footage pack.
 
-Agent B/C/D chats do not self-start from commits or Issue #22. User must launch them.
-
----
-
-# EXOTIC AFTER DARK — Agent E live production status
-
-**Audit timestamp:** 2026-10-10 19:44 UTC (2026-10-10 20:44 Europe/London).  
-**Manager branch:** `automotive-edits/midnight-v12-001/e-progress-manager`  
-**Issue:** https://github.com/YunRah2103/Remotion-gpt-chat/issues/22  
-**Stage:** **GATE A BLOCKED; NO FILM-READY MP4**. Real-footage acquisition is the critical path.  
-**Director override:** ONE visually coherent, extremely exotic/aggressive car; real, high-energy moving footage. Night is optional; no generic Lamborghini fallback.
-
-## Verified branch state
-
-| Agent | HEAD (GitHub branches API, refreshed 2026-10-10) | Status | Verified facts and open acceptance gates |
-|---|---|---|---|
-| A — footage | `bd6bf35b4a07977608c0067b0260bf1232d066c4` (19:35:18Z) | **BLOCKED / Gate A FAIL** | Four documented handoff files found. `source-manifest.json` says **2 candidates, 0 approved of 11**. PX-20153915 is a daytime Lamborghini wheel macro (conditional only, model continuity not proven); PX-20153917 is off-frame for centered 9:16 and rejected. No consistent verified exotic hero; no 11 independent usable moving angles. |
-| B — edit | `dcc2661f2daad5654cf3a697bc68e63f84e1ad39` (director baseline, 19:25:17Z) | **WAITING** | No branch changes after creative contract; expected `edit/AGENT_B_HANDOFF.md` not found; no real-footage visual edit/preview or artifact. |
-| C — look/sound | `dcc2661f2daad5654cf3a697bc68e63f84e1ad39` | **WAITING** | No branch changes after baseline; expected `look/AGENT_C_HANDOFF.md` not found; no source-specific grade, sync or visual A/B evidence. May prototype independent tools with clearly labelled synthetic sources. |
-| D — master render | `dcc2661f2daad5654cf3a697bc68e63f84e1ad39` | **WAITING** | No branch changes after baseline; expected `final/MASTER_QA.md` not found; no final decoded MP4 or audio QA/artifact. Requires A/B/C gates and original private audio. |
-| E — progress | `a405defbdc04a2b904a9a392897f331ca6b02eb3` (before this audit commit) | **ACTIVE** | Independently refreshed branch refs, handoff text, manifest, CI jobs, artifacts and issue #22; this update supersedes manager setup snapshot. |
-
-## CI and media verification — separate checks
-
-- Agent A Actions [run 38080397793](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38080397793): **PASS** for checking the 316-frame shot partition, audio fingerprint and forbidden repo media. This job did **not** download/visually approve footage and has **0 GitHub workflow artifacts**.
-- B [run 38079739014](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38079739014), C [run 38079741608](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38079741608), D [run 38079743391](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38079743391): director contract-only success; **0 artifacts for each checked run**, not evidence of stage completion.
-- A's [source manifest](https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-edits/midnight-v12-001/a-footage/production/videos/midnight-v12-001/footage/source-manifest.json) reports a **temporary external ZIP**, 70,399,810 bytes, SHA-256 `ea10b32c1923e23dfc01e1cb0f5472a68bafbd4144f22d676d20cda887dba791`. This size/hash is **Agent A-reported, not independently re-downloaded/hashed by Agent E**. Attempt to reach the external host from the current execution environment failed DNS resolution. The ZIP is partial and not a GitHub Actions artifact.
-- A [footage QA](https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-edits/midnight-v12-001/a-footage/production/videos/midnight-v12-001/footage/FOOTAGE_QA.md) and [shot selection](https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-edits/midnight-v12-001/a-footage/production/videos/midnight-v12-001/footage/SHOT_SELECTION.md) explicitly record **FAIL**, not a usable 11-shot asset pool.
-- Locked contract: **316 frames, 1080x1920 9:16, 30fps; act change frame 77 (2.5667s); exact private user MP3 SHA256 `87a663860585e1714fd6fbb6a8006d19d655bda863db66cdaa75ba1830a2d678`**. Keep original audio out of GitHub. Older issue-body night-only language is overridden by the director's exotic/aggressive contract.
-
-## Production go/no-go order
-
-1. **A NEXT:** find and native-validate >=11 rights-cleared, genuinely distinct moving shots of **one exceptional exotic hypercar**; publish retrievable footage package, file hashes, crop/contact proof, confirmed identity, source permissions and Gate A PASS.
-2. **B after A PASS:** native visual proof of 316-frame edited source assembly; no shot repeat; accurate pivot.
-3. **C after coherent hero/look established:** finish source-specific grade/FX/audio-sync and image QA (independent tooling may proceed early).
-4. **D after A/B/C accepted and user-supplied private original MP3:** build and fully decode-check final H.264 1080x1920 30fps MP4 with 48kHz AAC, native QA + reachable artifact.
-
-**Film-ready? NO.** None of the actual source, visual edit, look or final-render acceptance gates has passed.
-
-## Copy-paste next agent instruction (A)
+## Exact copyable next assignment
 
 ```text
-You are GPT-6, Agent A — Elite Exotic Hypercar Footage Director. RESUME YOUR EXISTING WORK; DO NOT RESTART OR CLAIM SUCCESS FROM CI.
+Agent A — continue EXOTIC AFTER DARK from commit e7dee1acc1b68fd09873d1516259b39beedb10ab. You have documented a viable-looking original-film sourcing strategy, but the real footage gate is still FAIL.
 
-Repository: YunRah2103/Remotion-gpt-chat
-Branch: automotive-edits/midnight-v12-001/a-footage
-Current inspected HEAD: bd6bf35b4a07977608c0067b0260bf1232d066c4
-Read production/videos/midnight-v12-001/agent-prompts/AGENT-A-FOOTAGE-SCOUT.md, PRODUCTION_CONTRACT.md, beat-map.json, and your footage/AGENT_A_HANDOFF.md, FOOTAGE_QA.md, SHOT_SELECTION.md, source-manifest.json.
+Work on your existing branch automotive-edits/midnight-v12-001/a-footage in YunRah2103/Remotion-gpt-chat. Start by reading YOUTUBE_ORIGINAL_SHOOT_SCOUT.md, youtube-candidate-manifest.json, FOOTAGE_QA.md, source-manifest.json, AGENT_A_HANDOFF.md and the director contract.
 
-Manager audit on 10 Oct 2026: Gate A remains FAILED. Your current manifest reports two Pexels candidates, zero final-approved shots, one only conditional daylight wheel macro and one unusable crop. No GitHub Actions footage artifact exists (run 38080397793 is contract-only). Your reported external 70,399,810-byte ZIP has not been independently rehashed.
+Your latest cloud yt-dlp test for YouTube Jesko candidate PxSSCIdmEZ8 failed with "Sign in to confirm you're not a bot". Do not repeat cloud requests with access circumvention or claim that YouTube CC metadata proves delivered 4K footage. You have NO new downloaded Jesko media, format evidence, shot QA or source ZIP.
 
-PRIORITY: Actually source, acquire, inspect, and package rights-cleared moving footage of ONE genuinely EXOTIC and AGGRESSIVE recognisable hero car (Jesko Attack, Apollo IE, Huayra R, Senna GTR, Veneno, Sián or evidence-backed comparable). No generic luxury montage; dusk/track/day/night all acceptable if powerful. Supply 11 genuinely distinct, motion-rich camera angles for S01–S11, ideally 14–18 viable clips, high native detail and 9:16-safe real framing. No repeated extracts passed off as separate shots, static animations, fake car identities or weak 1080p landscape upscales.
+Prioritise obtaining permission and original media directly from the filmer/publisher for the Jesko Attack source or an equally fierce one-car exotic film; check permitted non-YouTube creator distribution routes. Only where authorised, use a normal local yt-dlp probe without bypasses, OR give the user an exact minimal request for a creator-supplied original upload if direct access is impossible. Do not ask for passwords/cookies or claim you can contact an owner without an actual outgoing message.
 
-DO THE REAL WORK: verify source permissions and hero identity, inspect native contact sheets and vertical crops, ffprobe each file, perform duplicate and visual QA, record full original/processed SHA256s, source URLs/licence evidence, shot IDs, source trim ranges and playback checks. Prefer original 4K or native 1080x1920+, preserve quality. Deliver ONE actually downloadable and SHA-verified authorised source ZIP or GitHub artifact with verified receipt and a complete Gate A PASS/FAIL handoff. Commit only footage documentation/manifests to your A branch; do not put third-party footage/audio into public Git.
+Before passing A: independently probe actual source bytes with FFprobe, confirm permissions/ownership, find 11 truly distinct moving camera setups of ONE car, inspect real frames and 9:16 framing, test native resolution/compression, supply trim map and manifests, SHA256s, contact sheets, and ONE genuinely downloadable ZIP/artifact. Lock 316 frames, 30fps, f77 music pivot. If any gate fails, record failed QA clearly, with concrete options and the smallest exact creative concession required. Preserve EXOTIC and AGGRESSIVE direction.
 
-Lock 316 frames at 30fps, pivot f77 (2.567s); the private soundtrack is not yours to publish. If obtaining 11 same-car authorised shots genuinely fails, report the exact blocking rights/sourcing issue and credible alternatives—not fictitious completion.
-
-Return exact new HEAD SHA, real artifact URL/ID and hash, all 11 distinct shot assignments, count of approved shots and visual QA proof. Do not edit B/C/D/E branches.
+Do not alter B/C/D/E files or publicise private music/third-party binaries in Git. Return exact commit, real verified artifact and PASS/FAIL; documentation or contract CI by itself never qualifies as a pass.
 ```
 
-Agent E is an on-demand GitHub auditor; a branch/issue cannot independently start a ChatGPT agent. The user should paste this prompt into the existing/new Agent A chat.
+## Links
+
+- [A first-party shoot sourcing and yt-dlp test](https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-edits/midnight-v12-001/a-footage/production/videos/midnight-v12-001/footage/YOUTUBE_ORIGINAL_SHOOT_SCOUT.md)
+- [A machine-readable YouTube candidate manifest](https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-edits/midnight-v12-001/a-footage/production/videos/midnight-v12-001/footage/youtube-candidate-manifest.json)
+- [A latest QA](https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-edits/midnight-v12-001/a-footage/production/videos/midnight-v12-001/footage/FOOTAGE_QA.md)
+- [Issue #22](https://github.com/YunRah2103/Remotion-gpt-chat/issues/22)
+
+Note: This manager checks on request; GitHub branches do not themselves launch independent ChatGPT agents. The user starts/resumes A in a ChatGPT chat.
