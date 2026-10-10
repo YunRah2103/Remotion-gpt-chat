@@ -1,0 +1,39 @@
+name: Porsche Agent A - seven-generation duel contact visual proof
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-duel-visual.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect-source-contact-sheet:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        page: ['01', '02']
+    steps:
+      - name: Emit authentic 2020 Turbo seven-generation frames
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PAGE: ${{ matrix.page }}
+        run: |
+          set -euo pipefail
+          gh api repos/$GITHUB_REPOSITORY/actions/artifacts/11673685384/zip > /tmp/gallery.zip
+          FILE=$(unzip -Z1 /tmp/gallery.zip | grep "source-167585-page-${PAGE}.jpg" | head -1)
+          test -n "$FILE"
+          unzip -p /tmp/gallery.zip "$FILE" > /tmp/contact.jpg
+          python - <<'PY'
+          import base64
+          from pathlib import Path
+          b=base64.b64encode(Path('/tmp/contact.jpg').read_bytes()).decode()
+          print('DUEL_CONTACT_START')
+          for i in range(0,len(b),4000):
+            print('DUEL_CONTACT_PART:'+b[i:i+4000])
+          print('DUEL_CONTACT_END')
+          PY
