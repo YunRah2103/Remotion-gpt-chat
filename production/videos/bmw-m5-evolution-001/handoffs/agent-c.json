@@ -2,28 +2,33 @@
   "schemaVersion": 1,
   "task": "bmw-m5-evolution-001-agent-c",
   "branch": "automotive-edits/bmw-m5-evolution-001/c-master",
-  "sourceSha": "43544ea43362f2acad3ccb3c51fe3bd783f03071",
+  "sourceSha": "a028946081fbf51e3433c8e29f80da86d4ec5c1d",
   "owner": "release",
-  "summary": "Private user-provided 18.4s WAV validated via SHA256 and FFprobe. Verified 42-slot consecutive beat-grid (552 frames) and generated local audio-sync QA MP4 (H.264 1080x1920 30fps 552 frames + AAC48k stereo). Committed reproducible FFprobe/full-decode final QA script and truthful audit. FINAL BMW M5 EDIT REMAINS BLOCKED: A/B have not handed off real media/editor.",
-  "status": "blocked",
+  "summary": "REAL private BMW M5 film rendered locally and verified: 18.4s, 552 H264 1080x1920 frames, 30fps, user-original WAV mixed to stereo AAC48k, 42 distinct source MP4s with individual SHA checks. Agent B's Remotion scene code merged into C with safe diagnostic registration. User-downloadable private V1 and 42-frame QA contact sheet. Not editorially READY: mixed-generation E34 and native SD E34/E39/E60.",
+  "status": "review",
   "files": [
     "production/videos/bmw-m5-evolution-001/master/MASTER_STATUS.md",
     "production/videos/bmw-m5-evolution-001/master/qa_final.py",
     "production/videos/bmw-m5-evolution-001/handoffs/agent-c.md",
-    "production/videos/bmw-m5-evolution-001/handoffs/agent-c.json"
+    "production/videos/bmw-m5-evolution-001/handoffs/agent-c.json",
+    "src/Root.tsx",
+    "src/bmw-m5-evolution/M5EvolutionFilm.tsx",
+    "src/bmw-m5-evolution/timeline.ts",
+    "src/bmw-m5-evolution/index.ts",
+    "src/bmw-m5-evolution/preview-entry.tsx",
+    "production/videos/bmw-m5-evolution-001/master/PRIVATE_REVIEW_V1_REPORT.md"
   ],
   "evidence": [
-    "User original WAV SHA256 verified: 47713ca53679b6011f7482232092daa4414e11a0e5c598007bf3fef31b5bb449, 18.400000s PCM24 stereo 48 kHz",
-    "Beat-map 42 consecutive slot starts and ends, zero gaps and overlaps, 552 total frames, proper chronology",
-    "Local private beat sync DIAGNOSTIC (no real cars) ffprobe showed video H264 1080x1920 30fps nb_read_frames=552, AAC48k stereo, FFmpeg full decode PASS; SHA256=127db5116c802dc2641fc1e0ff0265622fe13b0c5ac3ef27bce73193889f46d4",
-    "A branch e1fe940dfde8817f485ca58887bda750e6461dd8 no 42 real sources, handoff blocked",
-    "B branch cc8e49d78b1c575941db4297ce6f1b129aff5ff4 lacks scene code, handoff blocked",
-    "Committed standalone final MP4 QA script at master/qa_final.py; identical local codec/decode tests passed for private diagnostic, not actual BMW film"
+    "Actual private MP4 SHA256 8c06ee5a5bd720ad0e2c1e44de78088f872c340baa8abd738dca957cbb7f58ec, FFprobe 552 decoded frames @30fps 1080x1920 H264, 18.400s, full FFmpeg decode PASS, AAC48k stereo",
+    "Agent A 42 original MP4 source artifact 11668682025, run 38048763831 SHA 8cc2e07a0bfa10a3867b5972c49e4740f7778816; per-clip SHA256 checked",
+    "Real 42-beat center-frame contact sheet locally exported and visually checked; weakMotionSlots=[]; black intervals=[]; no obvious near-identical frames by quantitative screen metric",
+    "Agent B editor code merged in master 284371766e96a8507e3c31ede0399797f93b002e and registered in Root fd9371d6ca9eb09222fb67464418cf6638bff945 (native production Remotion not rendered)",
+    "Source audio SHA256 47713ca53679b6011f7482232092daa4414e11a0e5c598007bf3fef31b5bb449"
   ],
   "blockers": [
-    "Agent A verified real video footage 42 slots 01–42 not present or accessible (six each of seven generations)",
-    "Agent B actual Remotion composition/edit implementation not present",
-    "Final H264 BMW M5 car video cannot be produced, reviewed or declared approved without these distinct authenticated assets"
+    "E34 chapter includes mixed-generation BMW M5 formation footage; all six cannot be independently certified as solo E34, replacement recommended",
+    "Authentic original E34/E39/E60 sources are 720x576 SD; cannot be rendered as genuine native 4K or all-HD without sourcing different originals",
+    "Aesthetics and correct model dominance in every 0.4s cut require user approval; public distribution rights not established"
   ],
-  "notes": "The downloadable private audio diagnostic is NOT the final M5 cinematic film; user-supplied audio intentionally not uploaded to public repository. No GitHub Actions artifact/run ID fabricated."
+  "notes": "Technical-pass PRIVATE REVIEW V1 delivered in conversation; not a native Remotion render. Real FFmpeg CRF16 source-preserving per-generation encoder and stream-copy concat used; original user audio stays off public GitHub. No false fully-ready signoff."
 }
