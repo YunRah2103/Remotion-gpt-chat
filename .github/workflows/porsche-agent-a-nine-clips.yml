@@ -5,6 +5,7 @@ on:
       - automotive-edits/porsche-911-turbo-evolution-001/a-footage
     paths:
       - '.github/workflows/porsche-agent-a-nine-clips.yml'
+      - 'production/videos/porsche-911-turbo-evolution-001/footage/extract_nine_candidate_beats.py'
   workflow_dispatch:
 permissions:
   contents: read
