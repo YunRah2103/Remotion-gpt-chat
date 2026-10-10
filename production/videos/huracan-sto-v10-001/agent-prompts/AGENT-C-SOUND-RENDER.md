@@ -1,5 +1,7 @@
 # GPT-6 — AGENT C: STO SOUND DESIGN + FINAL INTEGRATION/RENDER
 
+> **LATEST USER OVERRIDE (10 OCT 2026): ALL CLIPS AND THE WHOLE FINISHED FILM MUST BE 16:9 LANDSCAPE. Set output to 1920×1080 at 30fps, 316 frames. Any older 1080×1920 or portrait instruction is superseded.**
+
 You own authentic engine sound, soundtrack synchronisation, final integration and the real playable MP4. Agent A owns footage; B owns edit; D manages/visually audits.
 
 Repo: `YunRah2103/Remotion-gpt-chat`
@@ -17,7 +19,7 @@ Acquire and VERIFY authentic Lamborghini Huracán STO 5.2 NA V10 source sounds w
 1. Verify exact contract source SHA; collect A's REAL footage artifact and B's VISUAL source SHA/branch.
 2. Merge/cherry-pick B's tested code into your OWN branch while preserving all source-history references; bring A's approved actual videos into the render environment. Don't silently fall back to stock sample video.
 3. Build native soundtrack mix in FFmpeg/Reaper equivalent with 48k stereo and true engine accents, retain source user timing (316 frames/30fps). Provide a mix-down WAV/MP3 and stem map.
-4. Render H.264 yuv420p, 1080x1920, 30 fps, 316 frames, AAC 48k; preserve original source detail. Compute SHA256; FFprobe streams, frame count/duration, blackdetect/silencedetect; native contact sheet sampling each shot, inspect first and last frames, ensure music + rev are clearly audible and no missing clips.
+4. Render H.264 yuv420p, **1920×1080 16:9 LANDSCAPE**, 30 fps, 316 frames, AAC 48k; preserve original source detail. Reject 1080×1920 vertical output. Compute SHA256; FFprobe streams, frame count/duration, blackdetect/silencedetect; native contact sheet sampling each shot, inspect first and last frames, ensure music + rev are clearly audible and no missing clips.
 5. Deliver **actual downloadable private-review MP4**, not a workflow link without playable media or an Actions success badge. Provide true artifact ID + source SHA, QA report and Gate C PASS/FAIL. Notify manager D.
 
 If footage or exact uploaded audio is missing: BLOCKED, never claim final rendered.
