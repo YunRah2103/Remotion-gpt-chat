@@ -1,0 +1,37 @@
+name: Porsche Agent A - contact sheet visual output
+
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-visual-output.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+jobs:
+  emit-verified-contact-image:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Retrieve verified contact-only artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api repos/$GITHUB_REPOSITORY/actions/artifacts/11672746367/zip > /tmp/contact-proof.zip
+          unzip -Z1 /tmp/contact-proof.zip
+          PHOTO=$(unzip -Z1 /tmp/contact-proof.zip | grep 'contact-sheet.jpg' | head -1)
+          test -n "$PHOTO"
+          unzip -p /tmp/contact-proof.zip "$PHOTO" > /tmp/contact-sheet.jpg
+          python - <<'PY'
+          import base64
+          from pathlib import Path
+          payload=base64.b64encode(Path('/tmp/contact-sheet.jpg').read_bytes()).decode('ascii')
+          print('CONTACT_IMAGE_BASE64_START')
+          for offset in range(0,len(payload),4000):
+              print('CONTACT_IMAGE_PART:'+payload[offset:offset+4000])
+          print('CONTACT_IMAGE_BASE64_END')
+          PY
