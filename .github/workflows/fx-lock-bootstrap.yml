@@ -1,0 +1,49 @@
+name: FX Toolkit - regenerate pinned npm lock once
+on:
+  push:
+    branches: ['feature/porsche-fx-toolkit-20261010']
+    paths:
+      - 'package.json'
+      - '.github/workflows/fx-lock-bootstrap.yml'
+permissions:
+  contents: write
+jobs:
+  lock:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve matching exact Remotion packages and regenerate package-lock
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          npm ci --no-audit --no-fund
+          npm ls @remotion/transitions @remotion/motion-blur remotion --depth=0
+          node - <<'JS'
+          const pkg=require('./package.json');
+          const lock=require('./package-lock.json');
+          for (const name of ['remotion','@remotion/cli','@remotion/three','@remotion/captions','@remotion/transitions','@remotion/motion-blur']) {
+            if (pkg.dependencies[name]!=='4.0.533') throw new Error('Version mismatch: '+name);
+          }
+          for (const name of ['@remotion/transitions','@remotion/motion-blur']) {
+            if (lock.packages['node_modules/'+name]?.version!=='4.0.533') throw new Error('Lock missing '+name);
+          }
+          JS
+      - name: Commit actual dependency-resolved lockfile
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          if ! git diff --quiet -- package-lock.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add package-lock.json
+            git commit -m "Lock official FX toolkit packages to Remotion 4.0.533"
+            git push origin HEAD:feature/porsche-fx-toolkit-20261010
+          fi
