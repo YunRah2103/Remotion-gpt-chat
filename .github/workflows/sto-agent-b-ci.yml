@@ -1,0 +1,38 @@
+name: STO Agent B provisional editor CI
+on:
+  push:
+    branches:
+      - automotive-edits/huracan-sto-v10-001/b-edit
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  provisional-edit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: TypeScript
+        run: npm run check
+      - name: Strict timeline tests
+        run: node --test production/videos/huracan-sto-v10-001/edit.test.cjs
+      - name: Provisional source-aware check
+        run: node production/videos/huracan-sto-v10-001/validate-edit.cjs
+      - name: Render 316-frame clearly labelled slate proof (NOT FINAL STO VIDEO)
+        run: |
+          mkdir -p out
+          npx remotion render src/index.ts HuracanSTOProvisional out/STO-AGENT-B-PROVISIONAL.mp4 --scale=0.35 --codec=h264 --pixel-format=yuv420p --concurrency=1
+          ffmpeg -v error -xerror -i out/STO-AGENT-B-PROVISIONAL.mp4 -f null -
+          ffmpeg -hide_banner -loglevel error -y -ss 2.60 -i out/STO-AGENT-B-PROVISIONAL.mp4 -frames:v 1 out/reveal-frame-78-PROVISIONAL.png
+          ffprobe -v error -show_entries stream=width,height,r_frame_rate,nb_frames -of json out/STO-AGENT-B-PROVISIONAL.mp4 > out/provisional-probe.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STO-AGENT-B-PROVISIONAL-NOT-FOOTAGE
+          path: out/
+          if-no-files-found: warn

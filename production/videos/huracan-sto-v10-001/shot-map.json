@@ -1,0 +1,461 @@
+{
+  "schemaVersion": 1,
+  "project": "huracan-sto-v10-001",
+  "status": "PROVISIONAL_NO_VERIFIED_VIDEO",
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "durationFrames": 316,
+  "revealFrame": 78,
+  "mediaDirectory": "public/sto-v10",
+  "shots": [
+    {
+      "id": "01-rev-tach",
+      "startFrame": 0,
+      "endFrameExclusive": 14,
+      "intendedSubject": "Tachometer / start-up V10 rev",
+      "desiredCameraAngle": "dashboard-macro",
+      "cutStyle": "cut",
+      "source": {
+        "file": null,
+        "sourceUrl": null,
+        "sourceStartSeconds": null,
+        "sourceEndSeconds": null,
+        "mediaSha256": null,
+        "stoIdentityVerified": false,
+        "uniqueAngleKey": null,
+        "probe": null
+      },
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.52,
+          "y": 0.48,
+          "zoom": 1.02
+        },
+        {
+          "frame": 13,
+          "x": 0.51,
+          "y": 0.49,
+          "zoom": 1.05
+        }
+      ]
+    },
+    {
+      "id": "02-exhaust",
+      "startFrame": 14,
+      "endFrameExclusive": 34,
+      "intendedSubject": "Exhaust / V10 hardware close-up",
+      "desiredCameraAngle": "exhaust-macro",
+      "cutStyle": "whip-right",
+      "source": {
+        "file": null,
+        "sourceUrl": null,
+        "sourceStartSeconds": null,
+        "sourceEndSeconds": null,
+        "mediaSha256": null,
+        "stoIdentityVerified": false,
+        "uniqueAngleKey": null,
+        "probe": null
+      },
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.54,
+          "zoom": 1.03
+        },
+        {
+          "frame": 19,
+          "x": 0.53,
+          "y": 0.52,
+          "zoom": 1.08
+        }
+      ]
+    },
+    {
+      "id": "03-wing",
+      "startFrame": 34,
+      "endFrameExclusive": 56,
+      "intendedSubject": "Real STO fixed wing detail",
+      "desiredCameraAngle": "wing-macro",
+      "cutStyle": "cut",
+      "source": {
+        "file": null,
+        "sourceUrl": null,
+        "sourceStartSeconds": null,
+        "sourceEndSeconds": null,
+        "mediaSha256": null,
+        "stoIdentityVerified": false,
+        "uniqueAngleKey": null,
+        "probe": null
+      },
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.52,
+          "y": 0.5,
+          "zoom": 1.03
+        },
+        {
+          "frame": 21,
+          "x": 0.52,
+          "y": 0.5,
+          "zoom": 1.06
+        }
+      ]
+    },
+    {
+      "id": "04-prelaunch",
+      "startFrame": 56,
+      "endFrameExclusive": 78,
+      "intendedSubject": "Wheel / pre-launch mechanical motion",
+      "desiredCameraAngle": "wheel-macro",
+      "cutStyle": "punch",
+      "source": {
+        "file": null,
+        "sourceUrl": null,
+        "sourceStartSeconds": null,
+        "sourceEndSeconds": null,
+        "mediaSha256": null,
+        "stoIdentityVerified": false,
+        "uniqueAngleKey": null,
+        "probe": null
+      },
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.49,
+          "y": 0.53,
+          "zoom": 1.01
+        },
+        {
+          "frame": 21,
+          "x": 0.5,
+          "y": 0.52,
+          "zoom": 1.07
+        }
+      ]
+    },
+    {
+      "id": "05-reveal",
+      "startFrame": 78,
+      "endFrameExclusive": 95,
+      "intendedSubject": "FULL STO moving, front three-quarter track reveal",
+      "desiredCameraAngle": "track-front-three-quarter",
+      "cutStyle": "flash",
+      "source": {
+        "file": null,
+        "sourceUrl": null,
+        "sourceStartSeconds": null,
+        "sourceEndSeconds": null,
+        "mediaSha256": null,
+        "stoIdentityVerified": false,
+        "uniqueAngleKey": null,
+        "probe": null
+      },
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.49,
+          "zoom": 1.02
+        },
+        {
+          "frame": 16,
+          "x": 0.5,
+          "y": 0.48,
+          "zoom": 1.05
+        }
+      ]
+    },
+    {
+      "id": "06-side-roll",
+      "startFrame": 95,
+      "endFrameExclusive": 113,
+      "intendedSubject": "STO moving side pursuit",
+      "desiredCameraAngle": "rolling-side",
+      "cutStyle": "whip-left",
+      "source": {
+        "file": null,
+        "sourceUrl": null,
+        "sourceStartSeconds": null,
+        "sourceEndSeconds": null,
+        "mediaSha256": null,
+        "stoIdentityVerified": false,
+        "uniqueAngleKey": null,
+        "probe": null
+      },
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.51,
+          "y": 0.49,
+          "zoom": 1.02
+        },
+        {
+          "frame": 17,
+          "x": 0.48,
+          "y": 0.48,
+          "zoom": 1.08
+        }
+      ]
+    },
+    {
+      "id": "07-head-on",
+      "startFrame": 113,
+      "endFrameExclusive": 134,
+      "intendedSubject": "STO moving approach / corner exit",
+      "desiredCameraAngle": "approach-head-on",
+      "cutStyle": "cut",
+      "source": {
+        "file": null,
+        "sourceUrl": null,
+        "sourceStartSeconds": null,
+        "sourceEndSeconds": null,
+        "mediaSha256": null,
+        "stoIdentityVerified": false,
+        "uniqueAngleKey": null,
+        "probe": null
+      },
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.49,
+          "zoom": 1.03
+        },
+        {
+          "frame": 20,
+          "x": 0.5,
+          "y": 0.49,
+          "zoom": 1.06
+        }
+      ]
+    },
+    {
+      "id": "08-rolling-wheel",
+      "startFrame": 134,
+      "endFrameExclusive": 157,
+      "intendedSubject": "STO wheel and bodywork in motion",
+      "desiredCameraAngle": "rolling-wheel-detail",
+      "cutStyle": "punch",
+      "source": {
+        "file": null,
+        "sourceUrl": null,
+        "sourceStartSeconds": null,
+        "sourceEndSeconds": null,
+        "mediaSha256": null,
+        "stoIdentityVerified": false,
+        "uniqueAngleKey": null,
+        "probe": null
+      },
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.52,
+          "y": 0.55,
+          "zoom": 1.02
+        },
+        {
+          "frame": 22,
+          "x": 0.49,
+          "y": 0.51,
+          "zoom": 1.07
+        }
+      ]
+    },
+    {
+      "id": "09-acceleration",
+      "startFrame": 157,
+      "endFrameExclusive": 182,
+      "intendedSubject": "Rear three-quarter hard acceleration",
+      "desiredCameraAngle": "rear-three-quarter-track",
+      "cutStyle": "whip-right",
+      "source": {
+        "file": null,
+        "sourceUrl": null,
+        "sourceStartSeconds": null,
+        "sourceEndSeconds": null,
+        "mediaSha256": null,
+        "stoIdentityVerified": false,
+        "uniqueAngleKey": null,
+        "probe": null
+      },
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.49,
+          "y": 0.52,
+          "zoom": 1.02
+        },
+        {
+          "frame": 24,
+          "x": 0.52,
+          "y": 0.5,
+          "zoom": 1.08
+        }
+      ]
+    },
+    {
+      "id": "10-high-angle",
+      "startFrame": 182,
+      "endFrameExclusive": 206,
+      "intendedSubject": "Distinct fast high-angle camera",
+      "desiredCameraAngle": "high-angle-track",
+      "cutStyle": "cut",
+      "source": {
+        "file": null,
+        "sourceUrl": null,
+        "sourceStartSeconds": null,
+        "sourceEndSeconds": null,
+        "mediaSha256": null,
+        "stoIdentityVerified": false,
+        "uniqueAngleKey": null,
+        "probe": null
+      },
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.48,
+          "zoom": 1.02
+        },
+        {
+          "frame": 23,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.05
+        }
+      ]
+    },
+    {
+      "id": "11-twilight",
+      "startFrame": 206,
+      "endFrameExclusive": 232,
+      "intendedSubject": "STO twilight/dark rolling only IF verified, otherwise track",
+      "desiredCameraAngle": "twilight-or-distinct-track",
+      "cutStyle": "rgb-edge",
+      "source": {
+        "file": null,
+        "sourceUrl": null,
+        "sourceStartSeconds": null,
+        "sourceEndSeconds": null,
+        "mediaSha256": null,
+        "stoIdentityVerified": false,
+        "uniqueAngleKey": null,
+        "probe": null
+      },
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.51,
+          "y": 0.49,
+          "zoom": 1.02
+        },
+        {
+          "frame": 25,
+          "x": 0.49,
+          "y": 0.49,
+          "zoom": 1.05
+        }
+      ]
+    },
+    {
+      "id": "12-corner",
+      "startFrame": 232,
+      "endFrameExclusive": 256,
+      "intendedSubject": "STO sweeping corner on track",
+      "desiredCameraAngle": "sweeping-corner",
+      "cutStyle": "whip-left",
+      "source": {
+        "file": null,
+        "sourceUrl": null,
+        "sourceStartSeconds": null,
+        "sourceEndSeconds": null,
+        "mediaSha256": null,
+        "stoIdentityVerified": false,
+        "uniqueAngleKey": null,
+        "probe": null
+      },
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.02
+        },
+        {
+          "frame": 23,
+          "x": 0.49,
+          "y": 0.5,
+          "zoom": 1.06
+        }
+      ]
+    },
+    {
+      "id": "13-chase",
+      "startFrame": 256,
+      "endFrameExclusive": 284,
+      "intendedSubject": "STO rear chase / low camera",
+      "desiredCameraAngle": "chase-rear-low",
+      "cutStyle": "punch",
+      "source": {
+        "file": null,
+        "sourceUrl": null,
+        "sourceStartSeconds": null,
+        "sourceEndSeconds": null,
+        "mediaSha256": null,
+        "stoIdentityVerified": false,
+        "uniqueAngleKey": null,
+        "probe": null
+      },
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.51,
+          "zoom": 1.02
+        },
+        {
+          "frame": 27,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.08
+        }
+      ]
+    },
+    {
+      "id": "14-payoff",
+      "startFrame": 284,
+      "endFrameExclusive": 316,
+      "intendedSubject": "Clean identifiable STO hero moving finish",
+      "desiredCameraAngle": "hero-moving",
+      "cutStyle": "cut",
+      "source": {
+        "file": null,
+        "sourceUrl": null,
+        "sourceStartSeconds": null,
+        "sourceEndSeconds": null,
+        "mediaSha256": null,
+        "stoIdentityVerified": false,
+        "uniqueAngleKey": null,
+        "probe": null
+      },
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.01
+        },
+        {
+          "frame": 31,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.03
+        }
+      ]
+    }
+  ]
+}
