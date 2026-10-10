@@ -1,0 +1,2 @@
+# Proven latest stable at integration time (2026-10-10). Includes yt-dlp-ejs.
+yt-dlp[default]==2026.08.19

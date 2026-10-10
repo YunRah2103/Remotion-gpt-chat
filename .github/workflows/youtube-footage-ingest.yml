@@ -1,0 +1,141 @@
+name: YouTube footage ingest - safe smoke and authorized import
+
+on:
+  push:
+    branches:
+      - main
+      - feature/youtube-footage-import-20261010
+    paths:
+      - 'production/footage/**'
+      - 'production/tests/test_yt_dlp_ingest.py'
+      - '.github/workflows/youtube-footage-ingest.yml'
+  pull_request:
+    paths:
+      - 'production/footage/**'
+      - 'production/tests/test_yt_dlp_ingest.py'
+      - '.github/workflows/youtube-footage-ingest.yml'
+  workflow_dispatch:
+    inputs:
+      youtube_url:
+        description: 'Single YouTube video URL you own or are permitted to download'
+        type: string
+        required: true
+      rights_confirmed:
+        description: 'I have rights or permission to download and use this footage'
+        type: boolean
+        required: true
+        default: false
+      minimum_height:
+        description: 'Reject lower resolution than'
+        type: choice
+        options: ['1080', '720', '480', '360']
+        default: '1080'
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-tests:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install downloader with JS challenge solver and FFmpeg
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check -r production/footage/requirements.txt
+          python -m yt_dlp --version
+          node --version
+          ffmpeg -version | head -1
+      - name: Python tests with real synthetic FFmpeg source
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s production/tests -p 'test_yt_dlp_ingest.py' -v
+          python -m compileall -q production/footage
+          mkdir -p out/footage-ingest-smoke
+          ffmpeg -hide_banner -loglevel error -y -f lavfi \
+            -i 'testsrc2=size=640x360:rate=30:duration=1' \
+            -c:v libx264 -preset fast -crf 17 -pix_fmt yuv420p \
+            out/footage-ingest-smoke/synthetic.mp4
+          python production/footage/yt_dlp_ingest.py verify \
+            --input out/footage-ingest-smoke/synthetic.mp4 \
+            --min-height 360 --min-fps 30 \
+            --manifest out/footage-ingest-smoke/QA.json
+          ffmpeg -v error -xerror -i out/footage-ingest-smoke/synthetic.mp4 \
+            -f null -
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('out/footage-ingest-smoke/QA.json').read_text())
+          assert data['status']=='PASS', data
+          assert data['probe']['width']==640 and data['probe']['height']==360
+          assert data['probe']['fps']==30
+          assert data['policy']['reencoded'] is False
+          print('YOUTUBE_INGEST_NATIVE_SMOKE_PASS',data['sourceFileSha256'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: youtube-ingest-synthetic-qa
+          path: out/footage-ingest-smoke/
+          retention-days: 7
+          if-no-files-found: warn
+
+  authorized-download:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify explicit download permission
+        env:
+          RIGHTS_CONFIRMED: ${{ inputs.rights_confirmed }}
+        run: |
+          if [ "$RIGHTS_CONFIRMED" != "true" ]; then
+            echo 'Error: permission confirmation is required.'
+            exit 1
+          fi
+      - name: Install pinned yt-dlp with EJS, Node 22 and FFmpeg
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check -r production/footage/requirements.txt
+          python -m yt_dlp --version
+          node --version
+      - name: Download one authorized video and enforce quality
+        env:
+          YOUTUBE_URL: ${{ inputs.youtube_url }}
+          MINIMUM_HEIGHT: ${{ inputs.minimum_height }}
+        run: |
+          set -euo pipefail
+          python production/footage/yt_dlp_ingest.py fetch \
+            --url "$YOUTUBE_URL" \
+            --output out/footage-import \
+            --min-height "$MINIMUM_HEIGHT" \
+            --min-fps 24 \
+            --max-mb 600 \
+            --max-duration 1800 \
+            --rights-confirmed
+      - uses: actions/upload-artifact@v4
+        with:
+          name: authorized-youtube-footage-${{ github.run_id }}
+          path: out/footage-import/
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
