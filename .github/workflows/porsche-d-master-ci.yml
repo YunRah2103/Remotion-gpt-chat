@@ -1,0 +1,52 @@
+name: Porsche Turbo Agent D - master code and diagnostic proof
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/d-master
+    paths:
+      - src/porsche-turbo-evolution/integration/**
+      - src/Root.tsx
+      - production/videos/porsche-911-turbo-evolution-001/integration/**
+      - .github/workflows/porsche-d-master-ci.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  master-code:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: npm ci --no-audit --no-fund
+      - name: Typecheck real registered scene and FX integration
+        run: npm run check
+      - name: Validate beat map and reject incomplete media release
+        shell: bash
+        run: |
+          set -euo pipefail
+          python production/videos/porsche-911-turbo-evolution-001/validate_setup.py
+          python -m compileall -q production/videos/porsche-911-turbo-evolution-001/integration
+          if python production/videos/porsche-911-turbo-evolution-001/integration/verify_master.py; then
+            echo "ERROR: Release gate falsely accepted missing source media" >&2
+            exit 1
+          fi
+          echo "Fail-closed release gate correctly rejects missing real media" >> "$GITHUB_STEP_SUMMARY"
+      - name: Native diagnostic proof frame — NOT FINAL PORSCHE FOOTAGE
+        shell: bash
+        run: |
+          mkdir -p out/porsche-d-proof
+          npx remotion still src/index.ts PorscheTurboEvolution001 out/porsche-d-proof/DIAGNOSTIC_frame-70.png --frame=70 --scale=0.35 --gl=swangle
+          test -s out/porsche-d-proof/DIAGNOSTIC_frame-70.png
+          echo "Diagnostic scene proof rendered. It is watermarked and has no source footage; do not distribute as movie." >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Porsche-D-DIAGNOSTIC-NOT-FINAL
+          path: out/porsche-d-proof/DIAGNOSTIC_frame-70.png
+          retention-days: 7
