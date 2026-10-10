@@ -35,3 +35,10 @@ This QA must not be interpreted as an approved YouTube footage download. See [or
 - **Rights metadata:** explicit YouTube Creative Commons Attribution label on uploader-created Jesko and Aventador films; independent footage ownership beyond uploader's declared licence remains unconfirmed. Standard-licence Fastrmedia, Hartnett Media and Remnant Media shoots need written permission to repurpose.
 - **No new artefact or SHA** for a YouTube media file. Source manifests are document evidence only; old V2 8-clip ZIP not a substitute.
 - **Gate decision:** **FAIL**, due actual unavailable bytes and eleven-shot quality gate not met.
+
+
+---
+
+## Current source-selection QA, McLaren 600LT Orange (2026-10-10)
+
+**A footage GATE: FAIL.** Abandoned Jesko source; no Jesko, Lamborghini reference or Bugatti preview clips can appear in new film. Original-film direction now [McLaren 600LT Orange from @unrxndered](https://payhip.com/b/CaorX): actual listing advertises a free 32-MP4 pack, 4K/60fps vertical H.265 captured on Sony A7SIII, stabilized. This is **listing evidence only**, NOT 32 validated footage files. Need user to collect via **free checkout** and share original MP4s/ZIP for real examination. Quality, duplicates, same vehicle continuity and night look UNKNOWN. **No new production ZIP and no MP4 source hash created**. [Current status and full gate](./ACTIVE_CAR_MCLAREN_600LT.md). New audio 27.14s/~f195 still authoritative.
