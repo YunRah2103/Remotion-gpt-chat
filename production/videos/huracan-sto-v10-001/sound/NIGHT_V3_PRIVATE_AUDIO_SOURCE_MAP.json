@@ -1,0 +1,157 @@
+{
+  "project": "huracan-sto-v10-001",
+  "variant": "night-v3-publisher-sound-private-review",
+  "status": "OUTPUT_RENDERED_TECHNICAL_QA_PASS_AUDIO_PROVENANCE_NOT_AUTHENTICATED",
+  "picture": {
+    "file": "STO-B-V3-NIGHT-LANDSCAPE-REMOTION-SILENT.mp4",
+    "sha256": "1fc2c88cc387d2d17e5d2477c4913c9948dbeb94145ae14f5a2fcd9c61eaffac",
+    "branch": "automotive-edits/huracan-sto-v10-001/b-edit",
+    "sourceCommit": "58a60ae1d89df6a605c4862f92faa578e70ff93f"
+  },
+  "music": {
+    "sha256": "87a663860585e1714fd6fbb6a8006d19d655bda863db66cdaa75ba1830a2d678",
+    "storedPublicly": false
+  },
+  "sources": {
+    "primary": {
+      "file": "phantom-sto-primary.mp4",
+      "sha256": "dba560aea7cbdf0f64f7e7bb647ae2d43cabcf03a7af9a6a7a445122caa43f33"
+    },
+    "lambo": {
+      "file": "phantom-sto-lambo.mp4",
+      "sha256": "62deb84ce58be337c61402b8d1534b369d2d41c0b1797d0577cfdfe07365d502"
+    },
+    "huracan": {
+      "file": "phantom-sto-huracan.mp4",
+      "sha256": "d4d34a89be7b27f50e5f1a82a28521eae2fae9ac28e78613a847b0ef36564697"
+    }
+  },
+  "events": [
+    {
+      "name": "ignition growl",
+      "source": "lambo",
+      "sourceInSec": 13.1,
+      "atSec": 0,
+      "durationSec": 0.64,
+      "gain": 0.73
+    },
+    {
+      "name": "dark exhaust rev",
+      "source": "huracan",
+      "sourceInSec": 4.82,
+      "atSec": 0.43,
+      "durationSec": 1.54,
+      "gain": 0.67
+    },
+    {
+      "name": "pre-reveal rev climb",
+      "source": "primary",
+      "sourceInSec": 16.08,
+      "atSec": 1.93,
+      "durationSec": 0.71,
+      "gain": 0.75
+    },
+    {
+      "name": "2.60s reveal throttle",
+      "source": "lambo",
+      "sourceInSec": 14.2,
+      "atSec": 2.6,
+      "durationSec": 0.72,
+      "gain": 0.95
+    },
+    {
+      "name": "front roll",
+      "source": "huracan",
+      "sourceInSec": 12.2,
+      "atSec": 3.17,
+      "durationSec": 0.7,
+      "gain": 0.6
+    },
+    {
+      "name": "side drive by",
+      "source": "primary",
+      "sourceInSec": 16.6,
+      "atSec": 3.76,
+      "durationSec": 0.77,
+      "gain": 0.77
+    },
+    {
+      "name": "gear surge",
+      "source": "lambo",
+      "sourceInSec": 22.69,
+      "atSec": 4.47,
+      "durationSec": 0.8,
+      "gain": 0.66
+    },
+    {
+      "name": "night acceleration",
+      "source": "huracan",
+      "sourceInSec": 7.84,
+      "atSec": 5.22,
+      "durationSec": 0.88,
+      "gain": 0.8
+    },
+    {
+      "name": "high rpm",
+      "source": "primary",
+      "sourceInSec": 17.38,
+      "atSec": 6.09,
+      "durationSec": 0.78,
+      "gain": 0.7
+    },
+    {
+      "name": "night audio layer",
+      "source": "huracan",
+      "sourceInSec": 11.1,
+      "atSec": 6.85,
+      "durationSec": 0.91,
+      "gain": 0.65
+    },
+    {
+      "name": "fast side pass",
+      "source": "lambo",
+      "sourceInSec": 20.45,
+      "atSec": 7.71,
+      "durationSec": 0.9,
+      "gain": 0.92
+    },
+    {
+      "name": "rear chase",
+      "source": "huracan",
+      "sourceInSec": 18.3,
+      "atSec": 8.54,
+      "durationSec": 0.99,
+      "gain": 0.77
+    },
+    {
+      "name": "final hero engine",
+      "source": "primary",
+      "sourceInSec": 17.91,
+      "atSec": 9.47,
+      "durationSec": 1.06,
+      "gain": 0.85
+    }
+  ],
+  "processing": "48k stereo PCM sources, HP 85Hz LP 5.5kHz, light tanh saturation, 55ms fades, stereo pass panning, musical ducker around major impacts, peak-safe audio mix, original film video bitstream copied.",
+  "delivery": {
+    "file": "HURACAN_STO_V10_NIGHT_V3_MUSIC_ENGINE_PRIVATE_REVIEW.mp4",
+    "sha256": "a7676beb93cf8978f130968a0c1d2fd808040094967b07cc9013a804425ca283",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "frames": 316,
+    "duration": 10.533333,
+    "codec": "h264 source-copy",
+    "audioCodec": "AAC 48k stereo 320k",
+    "peakDbTP": -0.9,
+    "integratedLufs": -10.4,
+    "fullDecoded": true,
+    "blackDetectIntervals": 0,
+    "silenceDetectIntervals": 0
+  },
+  "caveats": [
+    "Original source video audio is NOT independently verified to be isolated authentic STO engine sounds; promotional tracks may contain music/sound design.",
+    "Permissions for source publisher material remain unverified; private review only.",
+    "Gate A/B shot-angle diversity unpassed; Gate C real-engine-identity listening/provenance unpassed."
+  ]
+}
