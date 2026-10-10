@@ -2,7 +2,7 @@
 
 **Role:** Agent C, transitions, grade and independent QA.
 **Branch:** `automotive-edits/porsche-911-turbo-evolution-001/c-transitions`
-**Source + QA commit:** `442175a39b93ee5e1299f9e3de49ce35060703f0` — exact source SHA before handoff files; final branch HEAD after handoff is newer.
+**Final implementation source commit:** `a53eeeb4e77a3280ae06b4c94804bc7a33eb982b` — exact source SHA before handoff files; final branch HEAD after handoff is newer.
 **Status:** REVIEW. Implementation is integration-ready, but the private Porsche film has **NOT** been visually approved.
 
 ## Implementation (actual committed code)
@@ -42,7 +42,7 @@
 
 ## Integration recipe for Agent D
 
-1. Cherry-pick Agent C source commit `442175a39b93ee5e1299f9e3de49ce35060703f0` or merge this isolated branch, resolving only source branch conflicts. Do not overwrite A/B work.
+1. Cherry-pick Agent C source commit `a53eeeb4e77a3280ae06b4c94804bc7a33eb982b` or merge this isolated branch, resolving only source branch conflicts. Do not overwrite A/B work.
 2. Import `{PolishLayer}` from `src/porsche-turbo-evolution/polish/PolishLayer`. Wrap the master **video layer** (not the upper-left white model-code label), supplying `cuts={beatMap.cuts}`. Use `enabled={true}` only after the real source A/B review. If uncertain, `enabled={false}` wins.
 3. D is allowed to override `CHAPTER_PRESETS` using `overrides={{67:{style:'cut',frames:0,strength:0},...}}` after review. If D re-times beat-map ±1 frame, change C boundary constants and rerun test; the module currently fails closed when chapter frames move.
 4. Leave `gradeStrength={0}` as default unless real source frames justify a tiny match. Generate five LUTs with existing `production/fx/make_luts.py` only for reviewed final comparison, apply at most one in final export, no iterative lossy encodes.
