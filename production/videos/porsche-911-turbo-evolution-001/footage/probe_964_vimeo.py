@@ -9,6 +9,8 @@ from pathlib import Path
 URLS = (
  ("classicsracer-promo", "https://vimeo.com/112141699"),
  ("classicsracer-film", "https://vimeo.com/112689332"),
+ ("classicsracer-player-112141699","https://player.vimeo.com/video/112141699"),
+ ("classicsracer-player-112689332","https://player.vimeo.com/video/112689332"),
 )
 
 def get_info(id,url):
