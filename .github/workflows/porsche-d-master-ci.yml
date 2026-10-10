@@ -27,6 +27,10 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - name: Typecheck real registered scene and FX integration
         run: npm run check
+      - name: Install native FFmpeg for actual media probes
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
       - name: Real Agent A/B/C integration code tests (synthetic fixtures, not footage)
         shell: bash
         run: |
