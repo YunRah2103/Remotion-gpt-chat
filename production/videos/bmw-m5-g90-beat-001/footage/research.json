@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "assessedAtUtc": "2026-10-10",
+  "intendedPlatform": "TikTok public edited automotive film",
+  "approvedMediaCount": 0,
+  "approvedMediaSHA256": [],
+  "modelReference": {
+    "url": "https://www.press.bmwgroup.com/usa/article/detail/T0443395EN_US/the-all-new-2025-bmw-m5",
+    "scope": "Manufacturer G90 sedan identity reference; no reuse rights implied"
+  },
+  "research": [
+    {
+      "id": "BMW-PRESS-G90-DRIVE-PF0009730-SCENE3",
+      "category": "exact-vehicle-footage-candidate",
+      "sourcePage": "https://www.press.bmwgroup.com/global/tv-footage/detail/PF0009730/the-new-bmw-m5",
+      "creator": "BMW Group",
+      "modelMetadata": "G90 / Sedan / M5",
+      "filmedScene": "#3 The new BMW M5. Driving Shots. 6m30s; car-to-car, drone, FPV, fly-bys, slow motion",
+      "listedDownloadSizes": "LowRes 107 MB / HighRes 6 GB",
+      "termsUrl": "https://mediapool.bmwgroup.com/download/edown/common/info?actEvent=mediaRights",
+      "rightsStatus": "NOT APPROVED. BMW copyright; written permission for public edited social upload is required.",
+      "sourceDownloaded": false,
+      "sha256": null,
+      "ffprobe": null,
+      "frameIdentityVerified": false,
+      "priority": "first choice after explicit permission; metadata alone is not frame proof"
+    },
+    {
+      "id": "BMW-PRESS-G90-MUNICH-2024",
+      "category": "exact-vehicle-footage-candidate",
+      "sourcePage": "https://www.press.bmwgroup.com/global/article/detail/T0445922EN/the-all-new-bmw-m5-additional-media-assets",
+      "creator": "BMW Group",
+      "modelMetadata": "G90 M5 Sedan, Munich international media launch 2024",
+      "filmedScene": "On-location video; shot-level contents unreviewed",
+      "termsUrl": "https://mediapool.bmwgroup.com/download/edown/common/info?actEvent=mediaRights",
+      "rightsStatus": "NOT APPROVED. Public listing is not permission for a TikTok remix.",
+      "sourceDownloaded": false,
+      "sha256": null,
+      "ffprobe": null,
+      "frameIdentityVerified": false
+    },
+    {
+      "id": "POND5-M5-309455215",
+      "category": "purchase-candidate-generation-unverified",
+      "sourcePage": "https://www.pond5.com/stock-footage/item/309455215-bmw-m5-rolling-shot-front-lane-switch-editorial",
+      "creator": "HighEndEntertainment",
+      "modelMetadata": "BMW M5 only; G90 generation NOT established",
+      "filmedScene": "Rolling front lane-switch, listed editorial 1080x1920, $39 at research time",
+      "termsUrl": "https://www.pond5.com/",
+      "rightsStatus": "NOT APPROVED. Licence purchase absent; G90 identity must be verified and editorial scope checked.",
+      "sourceDownloaded": false,
+      "sha256": null,
+      "ffprobe": null,
+      "frameIdentityVerified": false
+    },
+    {
+      "id": "PEXELS-BMW-M5-G90-SEARCH",
+      "category": "search-only-no-confirmed-clip",
+      "sourcePage": "https://www.pexels.com/search/videos/BMW%20M5%20G90/",
+      "creator": "Various; no individual exact-G90 clip verified",
+      "modelMetadata": "Search ranking is not model identity proof",
+      "termsUrl": "https://www.pexels.com/license/",
+      "rightsStatus": "Potential licence for individual clips but zero demonstrated G90 footage in this result.",
+      "sourceDownloaded": false,
+      "sha256": null,
+      "ffprobe": null,
+      "frameIdentityVerified": false
+    },
+    {
+      "id": "PIXABAY-BMW-M5-SEARCH",
+      "category": "search-only-no-confirmed-clip",
+      "sourcePage": "https://pixabay.com/videos/search/bmw%20m5/",
+      "creator": "Various; no individual exact-G90 clip verified",
+      "modelMetadata": "Generic results include multiple generations",
+      "termsUrl": "https://pixabay.com/service/license-summary/",
+      "rightsStatus": "No exact G90 clip identified; additional brand/trademark restrictions may apply.",
+      "sourceDownloaded": false,
+      "sha256": null,
+      "ffprobe": null,
+      "frameIdentityVerified": false
+    }
+  ],
+  "excludedKnownWrongModel": [
+    {
+      "id": "old-collage-bmw-m4",
+      "sourceRepoAsset": "production/videos/car-video-collage-001/assets.json",
+      "pexelsId": 16532416,
+      "listedModel": "BMW M4",
+      "reason": "Reject; not BMW M5 G90 sedan"
+    }
+  ],
+  "unfulfilledEvidence": [
+    "No downloaded original G90 video",
+    "No source SHA256",
+    "No ffprobe dimensions/FPS/duration",
+    "No decoded 30fps/8fps motion sample or contact sheet",
+    "No human G90-frame identity confirmation",
+    "39 distinct real selections not yet assigned",
+    "No applicable acquired public-redistribution rights"
+  ]
+}
