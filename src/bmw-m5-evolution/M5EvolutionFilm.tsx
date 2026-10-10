@@ -69,7 +69,7 @@ const RealVideo: React.FC<{shot:M5Shot;beat:BeatSlot}> = ({shot,beat}) => {
   const zoom = 1.014 + (beat.withinChapter % 3) * .004 + phase(f,beat.durationFrames) * .027;
   const video = <OffthreadVideo
     src={staticFile(shot.file)}
-    startFrom={Math.round(shot.inSeconds*FPS)}
+    trimBefore={Math.round(shot.inSeconds*FPS)}
     muted
     style={{position:'absolute',inset:0,width:'100%',height:'100%',
       objectFit:'cover',objectPosition:String(shot.x??50)+'% '+String(shot.y??50)+'%',
