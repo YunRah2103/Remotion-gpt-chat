@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "task": "porsche-911-turbo-evolution-001-agent-d",
   "branch": "automotive-edits/porsche-911-turbo-evolution-001/d-master",
-  "sourceSha": "e2782a1e56fa960bbce580feb81b05c41f94ae72",
+  "sourceSha": "3549043b1668168d2b1c7931f84ff1befba8f06e",
   "owner": "release",
-  "summary": "Implemented and merged Agent A media auditor, Agent B 510-frame Remotion timeline, Agent C opt-in cinematic polish, fail-closed media/release QA, and a native diagnostic-only proof pipeline. Real Porsche footage has not been transferred; final private H264/AAC film not rendered.",
+  "summary": "Integrated A/B/C Remotion source, pinned merged yt-dlp importer and native source-to-manifest bridge; executed source-integrity/FFmpeg tests and live GitHub-hosted YouTube metadata format probe. Actual 30 original Turbo clips have not been downloaded or authenticated and no final 17s Porsche movie exists.",
   "status": "blocked",
   "files": [
     "src/porsche-turbo-evolution/integration/PorscheTurboMaster.tsx",
@@ -16,18 +16,27 @@
     "production/videos/porsche-911-turbo-evolution-001/integration/MASTER_RENDER.md",
     "src/Root.tsx",
     ".github/workflows/porsche-d-master-ci.yml",
-    "production/videos/porsche-911-turbo-evolution-001/handoffs/agent-d.json"
+    "production/videos/porsche-911-turbo-evolution-001/handoffs/agent-d.json",
+    "production/footage/yt_dlp_ingest.py",
+    "production/footage/requirements.txt",
+    "production/tests/test_yt_dlp_ingest.py",
+    "production/videos/porsche-911-turbo-evolution-001/integration/ingest_bridge.py",
+    "production/videos/porsche-911-turbo-evolution-001/integration/test_ingest_bridge.py",
+    "production/videos/porsche-911-turbo-evolution-001/integration/YTDLP_HANDOFF.md",
+    "production/videos/porsche-911-turbo-evolution-001/handoffs/agent-d.md"
   ],
   "evidence": [
     "GitHub Actions native master code/diagnostic source-gated workflow PASS at source SHA e2782a1e56fa960bbce580feb81b05c41f94ae72: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38055973460",
     "Merged Agent A/B/C integration source to master at commit 5fe0db9b368d2553102272813c96eb00143b9ff5",
     "Pure TypeScript Remotion scene is registered at exactly 1080x1920, 30 fps, 510 frames, 30 contiguous source-gated beat slots",
-    "Agent A delivered audit code but explicitly documented 0/30 real Porsche Turbo footage and blocked final footage handoff"
+    "Agent A delivered audit code but explicitly documented 0/30 real Porsche Turbo footage and blocked final footage handoff",
+    "Native Agent D CI passing source bridge SHA/tamper tests and A/B/C editing integration: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38057166841",
+    "Live YouTube metadata formats retrieved successfully in GitHub Actions, no copyrighted footage downloaded: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38057250242",
+    "yt-dlp pinned original importer and tests brought from main at Git commit a4f57c19b0fa6c78aa76fe4e37e39821b3115c48"
   ],
   "blockers": [
-    "0/30 native genuine unique Porsche 911 Turbo/Turbo S source clips acquired, independently authenticated, and transferred to master",
-    "No private 30-source binary footage artifact or verifiable camera-setup QA; source rights not cleared",
-    "No actual 17.0-second 510-frame Porsche Turbo MP4 with original approved audio exists; diagnostic native proof is NOT real Porsche footage",
-    "Final per-beat moving-shot comparison, real-footage clarity, audio beat review and independent Agent C final-film QA cannot be completed without the 30 actual source videos"
+    "30 genuine different moving Porsche Turbo/Turbo S source camera setups still missing, with identity, rights and original SHA validation required",
+    "No operator-authorized live yt-dlp footage download job completed; GitHub CI verified only YouTube metadata and synthetic input",
+    "No actual 510-frame Porsche final MP4 or private final moving footage review"
   ]
 }
