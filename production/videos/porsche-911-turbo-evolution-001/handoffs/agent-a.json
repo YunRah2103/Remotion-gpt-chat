@@ -2,29 +2,28 @@
   "schemaVersion": 1,
   "task": "porsche-911-turbo-evolution-001-agent-a",
   "branch": "automotive-edits/porsche-911-turbo-evolution-001/a-footage",
-  "sourceSha": "10caf93309db479e0d3108f764917f792f5efd7f",
+  "sourceSha": "45c9ef543a7ed5078875cf3279f4c00d54e36144",
   "owner": "research",
-  "summary": "Implemented and locally tested native FFprobe/SHA/motion/contact-sheet auditor; published researched Porsche/Carwow video candidate pages. No actual verified Porsche Turbo source clips have been retrieved or transferred.",
-  "status": "blocked",
+  "summary": "30 real Porsche Newsroom source-derived moving vertical clips across seven Turbo chassis eras have been visually reviewed, corrected in multiple native-source passes, FFmpeg-rendered as one final ZIP, and independently SHA/format/full-decode/core-continuity/ZIP verified. READY for Agent D private 17-second integration, not cleared for public redistribution.",
+  "status": "ready",
   "files": [
-    "production/videos/porsche-911-turbo-evolution-001/footage/audit_footage.py",
-    "production/videos/porsche-911-turbo-evolution-001/footage/test_audit_footage.py",
-    "production/videos/porsche-911-turbo-evolution-001/footage/source-candidates.json",
-    "production/videos/porsche-911-turbo-evolution-001/footage/AUDIT_README.md",
+    "production/videos/porsche-911-turbo-evolution-001/footage/selected-30-native-shots.json",
+    "production/videos/porsche-911-turbo-evolution-001/footage/render_30_vertical_candidates.py",
+    "production/videos/porsche-911-turbo-evolution-001/footage/VISUAL_SCREENING.md",
     "production/videos/porsche-911-turbo-evolution-001/handoffs/agent-a.md",
-    "production/videos/porsche-911-turbo-evolution-001/handoffs/agent-a.json"
+    "production/videos/porsche-911-turbo-evolution-001/handoffs/agent-a.json",
+    ".github/workflows/porsche-agent-a-one-zip-final.yml",
+    ".github/workflows/porsche-agent-a-native-source-scan.yml"
   ],
   "evidence": [
-    "Local python3 -m unittest discover -s /mnt/data/porsche_a_work -p test_audit_footage.py -v: 5/5 PASS including real synthetic FFmpeg media decoding, path defence and missing-media rejection; explicitly NOT Porsche footage",
-    "GitHub preproduction contract CI SUCCESS, run https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38055299705 (not real media QA)",
-    "Local Python compile PASS; local native FFmpeg synthetic testsrc2 file 960x540 30fps probe SHA motion three JPEGs and contact-sheet 182563 bytes PASS",
-    "Local deliberate 29-missing-slot scenario correctly returned BLOCKED/exit 2; only synthetic fixture slot decoded",
-    "Candidate source pages https://newsroom.porsche.com/en/press-kits/50-years-porsche-turbo.html and https://www.youtube.com/watch?v=gbnBo2Au-uA"
+    "GitHub Action run 38066068103 SUCCESS source SHA 45c9ef543a7ed5078875cf3279f4c00d54e36144; all seven generation rendering jobs and packaging finished: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38066068103",
+    "Final sole ZIP artifact id 11674818859, expires 2026-10-24T16:06:03Z, URL https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38066068103/artifacts/11674818859",
+    "Inner ZIP 38101581 bytes SHA256 4850197b1e264c6118c490602578233bd2fa9563b7ba4551b50f67e6fa72b4a0; GitHub wrapper 38101795 bytes; ZIP CRC/35 member count and extraction passed",
+    "30 MP4s 1080x1920 H264 yuv420p 30fps 30/30 full FFmpeg decode, 30/30 SHA/probe/frame checks passed; total video frames 750=510+240 handles",
+    "Independent 30-video frame-by-frame grayscale difference audit: 0 core editor cuts; 5 handle-only transitions in 993 slot11 and 997 slot19",
+    "Independent begin/mid/end AND core first/mid/end frame filmstrip review across 30 outputs; generation ordering 930(4),964(4),993(4),996(4),997(4),991(5),992(5), zero identical midpoint pixel hash pairs",
+    "Native 997/991 shot-source neighborhood gallery proof: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38065758462 ; corrected source locations 45c9ef543a7ed5078875cf3279f4c00d54e36144"
   ],
-  "blockers": [
-    "0/30 Porsche Turbo moving shots downloaded/verified or transferred; every slot lacks a real source video SHA, FFprobe proof and manually verified unique scene",
-    "No verified accessible private source-media binary artifact/contact sheet of real Porsche footage",
-    "Media acquisition unavailable in this execution environment and source reuse/redistribution rights require independent assessment"
-  ],
-  "notes": "The sourceSha records latest source/tooling commit before handoff-only updates, not fictitious Porsche footage. Tooling QA uses explicitly synthetic non-Porsche video only; hold Agent D integration."
+  "blockers": [],
+  "notes": "READY is for private Agent D integration only. Authenticity assessed from visually inspected Porsche Newsroom material; no right to public redistribution is implied. 993/996/997/991 original landscape 1920x1080 require cropped optical upscaling; some 964/993/996/991/992 portraits remain close details. Original entire remote media SHA not available; final encoded clip hashes and ZIP SHA validated. Five edge-handle frame changes should be trimmed away from beats. Final original/source render SHA 45c9ef543a7ed5078875cf3279f4c00d54e36144."
 }
