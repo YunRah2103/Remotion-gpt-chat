@@ -1,4 +1,4 @@
-# MIDNIGHT V12 001 — LOCKED PRODUCTION CONTRACT
+# EXOTIC AFTER DARK — LOCKED PRODUCTION CONTRACT (existing project slug: midnight-v12-001)
 
 **Director:** GPT-6 master (concept + approvals)
 **Date:** 2026-10-10
@@ -14,16 +14,23 @@
 - To render with music, Master Agent D must obtain the **same attachment via the user's private agent chat/private authorised transfer** and verify SHA-256. Never substitute another song.
 - User's reference video is **a style reference only** and never an assumed footage licence. Do not take its frames or audio as source by default.
 
+## DIRECTOR OVERRIDE — 10 October 2026: EXOTIC AND AGGRESSIVE
+The user explicitly corrected the direction: **NOT a subdued Lamborghini night documentary or luxury-car beauty film.** Build a 10.53s **ferocious, exotic hypercar edit**: extraordinary wing/active-aero silhouettes, raw acceleration, aggressive low tracking, brutal front and rear angles, clean speed ramps, precisely beat-hit whip/zoom crashes, impact highlights and continuous kinetic energy. The sung second act stays **aggressive**, not dreamy/slow.
+
+**Hero hypercar selection is OPEN until Agent A verifies genuine usable moving footage.** Scouting shortlist: **Koenigsegg Jesko Attack, Apollo Intensa Emozione, Pagani Huayra R, McLaren Senna GTR, Lamborghini Veneno / Sián**. These are creative candidates only, not claims of footage availability or usage rights. Choose **one consistent, recognisable hypercar** with best proven licensable footage, >=11 genuinely distinct motion angles and high-quality vertical framing. If dream car lacks footage, rank realistic ultra-exotic alternatives with evidence; never silently default to ordinary dark Aventador shots. Track, tunnel, urban night or dramatic dusk are all acceptable if the real footage looks incredible. No enforced V12 engine or night scene; historical project folder name is just a technical identifier.
+
+**Editing intensity:** decisive motion-matched cuts, selective 2–4-frame whips, brief zoom-crash transitions, expressive speed ramps, rare 1–2-frame impact flash, high contrast paint/wing highlights. Never obscure the car or resort to tacky HUD or incessant RGB glitches. Main transition at **frame 77** stays fixed to the user's soundtrack. Final hero hold only at end.
+
 ## Final creative specification
 - Format: 1080x1920, vertical 9:16, CFR 30fps; 316 video frames (10.533333...s).
 - Film duration aligns to effective 10.527s audio within final frame. No invented 29s music loop or padding more than one frame.
-- One visual identity: preferably **dark Lamborghini Aventador SVJ / Aventador V12**, but exact car/version only after visually verified footage. Do not label an uncertain model. Other dark exotic V12 as fallback only if coherent, correctly identified and approved in source handoff.
-- Look: midnight urban tunnel / industrial scene, high-contrast paint reflections, accurate highlights, visible car silhouette, detailed asphalt, low hero camera tracking, convincing real momentum.
+- One visual identity: **ultra-exotic, visually aggressive hypercar chosen by verified footage**; no mandatory model, make, colour or engine type. Exact identity must be visually established.
+- Look: fierce exotic aero, striking silhouette, real speed, photogenic surfaces and strong light; setting follows actual best footage rather than a mandatory dark tunnel.
 - Language: *no large captions, faux telemetry HUD, watermark overlay, random glitch pack, loud typography or motion-graphic clutter.* The car must dominate.
 - Sonic act I, 0–2.56s: aggressive distorted/noisy intro; reveal lights/engine, accelerate into punch.
-- Sonic act II, 2.56–10.53s: more melodic, dreamy, vocal-led rhythm; rolling highway cinematography then detail / final hero angle. Primary change near frame **77** is LOCKED.
+- Sonic act II, 2.56–10.53s: melodic/vocal audio but **relentless hypercar motion** and exciting angles, building to an explosive hero payoff. Primary change near frame **77** is LOCKED.
 - About **11 genuinely distinct shots**, no repeated source shot masquerading as a new angle, no static-image animation passed off as footage, no AI-faked source unless user explicitly agrees.
-- Transitions: mostly great matched cuts and camera moves, sparing directional whip, controlled motion blur, optical-style light bloom, short restrained impact smear around strong musical changes. Keep subject readable.
+- Transitions: punchy precision—matched velocity cuts, fast direction whips, controlled 2–4f smear, selective zoom crash and power ramps on real musical hits. Keep the exotic car crisp/readable; no cheap effect clutter.
 - Frame map: `beat-map.json` is the shot plan with half-open frame ranges [in, out). Frame ranges must partition 0..316 exactly, no gaps or overlaps.
 - Aim at visual quality matching the night Lamborghini reference: cinematic source image first, effects second.
 
