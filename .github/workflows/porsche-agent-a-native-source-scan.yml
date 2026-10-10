@@ -1,0 +1,64 @@
+name: Porsche A - native 997 and 991 shot boundary scan
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-native-source-scan.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  scan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare analysis tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install 'Pillow>=10,<12'
+      - name: Extract two native-shot neighborhoods for precise source timing
+        run: |
+          mkdir -p out/native
+          SRC="https://newstv.porsche.com/porschevideos/newstv.porsche.com_202036_en.mp4"
+          # Temporary inspection-only 960x540 proxies. These are never exported as final source renders.
+          ffmpeg -hide_banner -loglevel error -rw_timeout 40000000 -ss 207 -i "$SRC" -t 14 -map 0:v:0 -an -vf "scale=960:540" -r 25 -c:v libx264 -preset veryfast -crf 18 -pix_fmt yuv420p -y out/native/997_window_start_207s_PROXY.mp4
+          ffmpeg -hide_banner -loglevel error -rw_timeout 40000000 -ss 220 -i "$SRC" -t 30 -map 0:v:0 -an -vf "scale=960:540" -r 25 -c:v libx264 -preset veryfast -crf 18 -pix_fmt yuv420p -y out/native/991_window_start_220s_PROXY.mp4
+          ffmpeg -hide_banner -loglevel error -xerror -i out/native/997_window_start_207s_PROXY.mp4 -f null -
+          ffmpeg -hide_banner -loglevel error -xerror -i out/native/991_window_start_220s_PROXY.mp4 -f null -
+      - name: Build dense actual source contact galleries every half second
+        run: |
+          python - <<'PY'
+          from PIL import Image, ImageDraw
+          from pathlib import Path
+          import math,subprocess,json
+          root=Path("out/native")
+          for gen,start in [("997",207),("991",220)]:
+              movie=next(root.glob(f"{gen}_window*.mp4"))
+              folder=root/f"frames-{gen}";folder.mkdir()
+              subprocess.run(["ffmpeg","-v","error","-i",str(movie),"-vf","fps=2,scale=320:180","-q:v","3","-y",str(folder/"frame-%03d.jpg")],check=True)
+              pics=sorted(folder.glob("frame-*.jpg"))
+              board=Image.new("RGB",(6*320,math.ceil(len(pics)/6)*210),"#111111")
+              paint=ImageDraw.Draw(board)
+              for i,f in enumerate(pics):
+                  x=(i%6)*320;y=(i//6)*210
+                  with Image.open(f) as im:board.paste(im.convert("RGB"),(x,y))
+                  paint.text((x+9,y+184),f"{gen} source {start+i*.5:.1f}s",fill="white")
+              board.save(root/f"{gen}-source-gallery-half-second.jpg",quality=91,subsampling=0)
+              print(f"SOURCE_GALLERY_{gen}",len(pics),"frames",board.size,flush=True)
+              for f in pics:f.unlink()
+              folder.rmdir()
+          PY
+      - name: Upload authentic source motion scan for A approval
+        uses: actions/upload-artifact@v4
+        with:
+          name: Porsche-A-997-991-native-shot-boundary-scan
+          path: out/native/
+          compression-level: 0
+          retention-days: 3
+          if-no-files-found: error
