@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "task": "bmw-m5-g90-beat-001-agent-a",
   "branch": "automotive-edits/bmw-m5-g90-001/a-footage",
-  "sourceSha": "77df90dfb12b6cffa5ed84e7014e79a02e16d009",
+  "sourceSha": "23ad5d3663191a1c87a2bc0db8d50e9bd330a0ec",
   "owner": "research",
   "summary": "39 real 30fps unique moving MP4 excerpts cut from BMW G90 saloon PressClub Scene #3, all 600 beat frames covered. Private editing review ONLY; public distribution permission and human model frame approval not confirmed.",
   "status": "review",
@@ -15,7 +15,7 @@
     "Source download bytes 111691552 sha256 59947dad266e74d92843cd90c2b2c90a3e118b277898f001c30c51e4e9b428a9",
     "Real ffprobe: {'width': 3840, 'height': 2160, 'fps': 25.0, 'duration': 390.52, 'frames': '9763', 'codec': 'h264'}",
     "39 individual MP4 hashes, 39 delivered moving-decode checks and proof frames in source-manifest.json and GitHub Actions artifact",
-    "39-clip artifact from workflow 38009259190"
+    "39-clip artifact from workflow 38009881261"
   ],
   "blockers": [
     "Public social redistribution rights unverified.",

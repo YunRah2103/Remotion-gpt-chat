@@ -17,8 +17,8 @@
       "timelineOutSeconds": 0.533333,
       "desiredShot": "Low front three-quarter rolling reveal, camera tracking left to right",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 5.35,
-      "outSeconds": 6.02,
+      "inSeconds": 8.75,
+      "outSeconds": 9.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -26,8 +26,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-01.mp4",
-      "actualClipSha256": "7b7db95e31a796a1ff25e7a21f65e32a22b682e7b04b7bd5958c09fa155d6d67",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #2, source 5.350\u20136.020s"
+      "actualClipSha256": "ccd9a781e1ed3bbf3964099353fe0632b6ad4b62f310490ec7f5669bd89d24f7",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #2, source 8.750\u20139.420s"
     },
     {
       "index": 2,
@@ -37,8 +37,8 @@
       "timelineOutSeconds": 1.033333,
       "desiredShot": "Front LED signature push-in as sedan approaches with visible wheel rotation",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 375.935,
-      "outSeconds": 376.605,
+      "inSeconds": 54.75,
+      "outSeconds": 55.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -46,8 +46,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-02.mp4",
-      "actualClipSha256": "2daefcd27310a49a6e43353169488bfb74683cb43910290bfafb352761a9521e",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #49, source 375.935\u2013376.605s"
+      "actualClipSha256": "3282c3f2c063d9c61f6875a1419450baac5ab5ad516169728b07986e6ba304d8",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #7, source 54.750\u201355.420s"
     },
     {
       "index": 3,
@@ -57,8 +57,8 @@
       "timelineOutSeconds": 1.566667,
       "desiredShot": "Side parallel rolling shot revealing entire four-door saloon silhouette",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 25.798,
-      "outSeconds": 26.468,
+      "inSeconds": 101.75,
+      "outSeconds": 102.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -66,8 +66,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-03.mp4",
-      "actualClipSha256": "f0374fc940b5e8390c0f14a271045a2dfaeddf400dbd6fd346d432879967ecd4",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #4, source 25.798\u201326.468s"
+      "actualClipSha256": "0da504a13a6378e0836b1b11345e1733b32b21197592d613e8326e2733d5f550",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #10, source 101.750\u2013102.420s"
     },
     {
       "index": 4,
@@ -77,8 +77,8 @@
       "timelineOutSeconds": 2.066667,
       "desiredShot": "Rear three-quarter rolling exit revealing G90 quad exhaust",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 358.13,
-      "outSeconds": 358.8,
+      "inSeconds": 20.75,
+      "outSeconds": 21.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -86,8 +86,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-04.mp4",
-      "actualClipSha256": "89a2c62d5baefd2e5e94d8cd1a200d427c69ffc15f12079e3ff6a855607d87d4",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #47, source 358.130\u2013358.800s"
+      "actualClipSha256": "492717152222bb0456aeaab6b870eaaf603a232d61447388e295907ac267d7f2",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #4, source 20.750\u201321.420s"
     },
     {
       "index": 5,
@@ -97,8 +97,8 @@
       "timelineOutSeconds": 2.6,
       "desiredShot": "Front-on road-level moving approach under natural daylight",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 47.26,
-      "outSeconds": 47.93,
+      "inSeconds": 74.75,
+      "outSeconds": 75.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -106,8 +106,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-05.mp4",
-      "actualClipSha256": "8f0de27c035ceff47d333324b08007ef6404ad4fc96506cc1fe442c13477f8cc",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #6, source 47.260\u201347.930s"
+      "actualClipSha256": "c80a8e032cc0a69caf5d81fecf51161fe0d106a6bad152f687e7ecd9a45375c3",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #8, source 74.750\u201375.420s"
     },
     {
       "index": 6,
@@ -117,8 +117,8 @@
       "timelineOutSeconds": 3.1,
       "desiredShot": "Wide elevated bend entry with complete G90 saloon in frame",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 336.15,
-      "outSeconds": 336.82,
+      "inSeconds": 349.75,
+      "outSeconds": 350.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -126,8 +126,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-06.mp4",
-      "actualClipSha256": "8643f409b34eb74f4650d1023137693b4d01fdae4cbba5d5067e028ec52514bb",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #44, source 336.150\u2013336.820s"
+      "actualClipSha256": "02f89d0658db7b98ab98c911942abab0d3689c5a745ef4c072d4bfdd7e067421",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #46, source 349.750\u2013350.420s"
     },
     {
       "index": 7,
@@ -137,8 +137,8 @@
       "timelineOutSeconds": 3.633333,
       "desiredShot": "Right side rolling door-line tracking shot maintaining forward motion",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 63.443,
-      "outSeconds": 64.112,
+      "inSeconds": 12.75,
+      "outSeconds": 13.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -146,8 +146,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-07.mp4",
-      "actualClipSha256": "227a6ddc3e1363adeeadaf6d6cf8d3fdc2a1a09025c6170b36a86c0e4738914e",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #7, source 63.443\u201364.112s"
+      "actualClipSha256": "b1f2c70e81745e512d7231e065d96dbc5da44ca8e331de630e2f87d9d1c2f44c",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #3, source 12.750\u201313.420s"
     },
     {
       "index": 8,
@@ -157,8 +157,8 @@
       "timelineOutSeconds": 4.133333,
       "desiredShot": "Front wheel close-up during actual forward drive, spokes distinctly rotating",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 317.83,
-      "outSeconds": 318.5,
+      "inSeconds": 62.75,
+      "outSeconds": 63.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -166,8 +166,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-08.mp4",
-      "actualClipSha256": "4b56ee51b3d0753cfa463bbedeb43e22b65b99c0e9965dc4c54d6bb9ec93935b",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #40, source 317.830\u2013318.500s"
+      "actualClipSha256": "62d46b00bee0fc76e9cd73094a8f978b0746b0902fbe3a289767a75ece6b5a35",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #7, source 62.750\u201363.420s"
     },
     {
       "index": 9,
@@ -177,8 +177,8 @@
       "timelineOutSeconds": 4.633333,
       "desiredShot": "Close front bumper air intake while rolling past camera",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 82.865,
-      "outSeconds": 83.535,
+      "inSeconds": 104.75,
+      "outSeconds": 105.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -186,8 +186,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-09.mp4",
-      "actualClipSha256": "55309d7de9f13273d4e485341a03abdbd22c936d462fd3756f689de22aa8f8ca",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #9, source 82.865\u201383.535s"
+      "actualClipSha256": "8e90d4891ff7bcc32afe030d8addf623196f0f9432981ec9d7b1260e3ca2ee26",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #11, source 104.750\u2013105.420s"
     },
     {
       "index": 10,
@@ -197,8 +197,8 @@
       "timelineOutSeconds": 5.166667,
       "desiredShot": "Left rear quarter tracking the broad G90 fender as road scrolls",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 295.69,
-      "outSeconds": 296.36,
+      "inSeconds": 32.75,
+      "outSeconds": 33.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -206,8 +206,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-10.mp4",
-      "actualClipSha256": "7680132d0abaf6101941d65f892f23beebfed8979e711edf2771a4e25ae96b3c",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #37, source 295.690\u2013296.360s"
+      "actualClipSha256": "14e4ce590c720f17411f1cc61c03aa98d2eecbe45f3d5d1b8945413a9cfdcd3d",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #4, source 32.750\u201333.420s"
     },
     {
       "index": 11,
@@ -217,8 +217,8 @@
       "timelineOutSeconds": 5.7,
       "desiredShot": "Long lens front-three-quarter drive-by at moderate telephoto compression",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 100.3,
-      "outSeconds": 100.97,
+      "inSeconds": 82.75,
+      "outSeconds": 83.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -226,8 +226,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-11.mp4",
-      "actualClipSha256": "10b3783931b84179778fe16fd0d1fc66f8c8584362ce630d1dbba0107899e57a",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #10, source 100.300\u2013100.970s"
+      "actualClipSha256": "f433fda2611c850eb444638589bbb578b443ef1bfd9e12c78fd138015b6020c8",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #9, source 82.750\u201383.420s"
     },
     {
       "index": 12,
@@ -237,8 +237,8 @@
       "timelineOutSeconds": 6.233333,
       "desiredShot": "Rear straight chase with M5 badge and rear lamps visible",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 276.6,
-      "outSeconds": 277.27,
+      "inSeconds": 300.75,
+      "outSeconds": 301.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -246,8 +246,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-12.mp4",
-      "actualClipSha256": "960bf1277fd6b7d3ee0e17052f56ea14257aa5fef21bbff666f7ce94d9fd67cf",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #33, source 276.600\u2013277.270s"
+      "actualClipSha256": "5207eabb10b638aafb5b9f8683ccaf57a72de2e6b0f9d11703b998dcba2953b1",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #38, source 300.750\u2013301.420s"
     },
     {
       "index": 13,
@@ -257,8 +257,8 @@
       "timelineOutSeconds": 6.733333,
       "desiredShot": "Low tracking arc across grille into near-side headlight on moving car",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 143.997,
-      "outSeconds": 144.667,
+      "inSeconds": 48.75,
+      "outSeconds": 49.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -266,8 +266,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-13.mp4",
-      "actualClipSha256": "31751c0b4227a304d0d5faa5221599f960fdbdbf3ba65b339072fd0a59748131",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #17, source 143.997\u2013144.667s"
+      "actualClipSha256": "29e2879350f65a42aaaeacd66d46a571bd3ce06767c4870a16bb3d122f369605",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #6, source 48.750\u201349.420s"
     },
     {
       "index": 14,
@@ -277,8 +277,8 @@
       "timelineOutSeconds": 7.233333,
       "desiredShot": "Left-side profile acceleration along clear roadway",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 257.077,
-      "outSeconds": 257.748,
+      "inSeconds": 90.75,
+      "outSeconds": 91.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -286,8 +286,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-14.mp4",
-      "actualClipSha256": "0159c4043806222d538b6dcb60520f9e16c762901020455c6177b1de0eb469e9",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #32, source 257.077\u2013257.748s"
+      "actualClipSha256": "a82ac193913077c333d4d04dd418e3e8fdafb709d474ee06fc3fb93384a0fc06",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #9, source 90.750\u201391.420s"
     },
     {
       "index": 15,
@@ -297,8 +297,8 @@
       "timelineOutSeconds": 7.766667,
       "desiredShot": "Rear wheel rotating macro captured in continuous real motion",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 166.766,
-      "outSeconds": 167.436,
+      "inSeconds": 354.75,
+      "outSeconds": 355.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -306,8 +306,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-15.mp4",
-      "actualClipSha256": "ed300081f953088fc1f49b3f0fbba5db355dfdc3764b57e09d81e75a1802f177",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #20, source 166.766\u2013167.436s"
+      "actualClipSha256": "e6dc1aaa272075ff658a4a35be469d550f844e7d53d0bc3b76f8009a924df5d6",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #47, source 354.750\u2013355.420s"
     },
     {
       "index": 16,
@@ -317,8 +317,8 @@
       "timelineOutSeconds": 8.3,
       "desiredShot": "Front wide on road with a camera-side pullaway",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 236.963,
-      "outSeconds": 237.633,
+      "inSeconds": 28.75,
+      "outSeconds": 29.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -326,8 +326,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-16.mp4",
-      "actualClipSha256": "9dec50ffc3a582b2a5e74e5937589a7686aa6e768c38bd321abd5aef884c022a",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #29, source 236.963\u2013237.633s"
+      "actualClipSha256": "e0ffd67d802c1159ee335cf254cea44ec30b5d941dbf02f2307456740e81ce9d",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #4, source 28.750\u201329.420s"
     },
     {
       "index": 17,
@@ -337,8 +337,8 @@
       "timelineOutSeconds": 8.8,
       "desiredShot": "High tracking perspective above bonnet showing moving road environment",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 176.9,
-      "outSeconds": 177.57,
+      "inSeconds": 66.75,
+      "outSeconds": 67.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -346,8 +346,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-17.mp4",
-      "actualClipSha256": "1495ec16940fb7a2a95e00751f6ff736811a90d1291f9b3feed50a92abc0aff6",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #21, source 176.900\u2013177.570s"
+      "actualClipSha256": "bc0569f24895674a88154c909d2fe0dd80a65683b0e209ad31d7622115dc65de",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #7, source 66.750\u201367.420s"
     },
     {
       "index": 18,
@@ -357,8 +357,8 @@
       "timelineOutSeconds": 9.3,
       "desiredShot": "Side-rear parallax tracking beside G90 on open road",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 217.1,
-      "outSeconds": 217.77,
+      "inSeconds": 374.75,
+      "outSeconds": 375.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -366,8 +366,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-18.mp4",
-      "actualClipSha256": "2027631c0675345078e4d465c53b0ab45fffff3e4fc518652b83d4632b0f0a36",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #26, source 217.100\u2013217.770s"
+      "actualClipSha256": "3960ade59c98fb3b6aae3ad3fdfb598d361619a89116875e140ff7209f300ccd",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #49, source 374.750\u2013375.420s"
     },
     {
       "index": 19,
@@ -377,8 +377,8 @@
       "timelineOutSeconds": 9.833333,
       "desiredShot": "Quick front fly-by with distinct road-to-camera directional movement",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 198.09,
-      "outSeconds": 198.76,
+      "inSeconds": 4.75,
+      "outSeconds": 5.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -386,8 +386,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-19.mp4",
-      "actualClipSha256": "e7570212e7fda23c5efab8bcff590651e4874b47b353c3b3e5e58141a5d10e33",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #24, source 198.090\u2013198.760s"
+      "actualClipSha256": "4199e008f49794bb486426b8083b39a50efb62ace49240049b486c319d761e79",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #2, source 4.750\u20135.420s"
     },
     {
       "index": 20,
@@ -397,8 +397,8 @@
       "timelineOutSeconds": 10.366667,
       "desiredShot": "Exterior rear diffuser moving macro showing functional exhausts",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 207.43,
-      "outSeconds": 208.1,
+      "inSeconds": 58.75,
+      "outSeconds": 59.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -406,8 +406,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-20.mp4",
-      "actualClipSha256": "faf87225dcff1a56e3dccf4783bddfc1e54262e3b43545717a8b4f385ee68825",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #25, source 207.430\u2013208.100s"
+      "actualClipSha256": "7bf70659378b00653d1a8c9d6618da81000ca31587f786090c732f91edc53069",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #7, source 58.750\u201359.420s"
     },
     {
       "index": 21,
@@ -417,8 +417,8 @@
       "timelineOutSeconds": 10.866667,
       "desiredShot": "Front three-quarter low-angle approach on curve",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 214.67,
-      "outSeconds": 215.34,
+      "inSeconds": 98.75,
+      "outSeconds": 99.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -426,8 +426,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-21.mp4",
-      "actualClipSha256": "4efdc0f538c288cb297e4621d03020428a82febe6b229c1930b06a5394c1dfbb",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #26, source 214.670\u2013215.340s"
+      "actualClipSha256": "366566f7fa46e705aad345478e253344636a5c41c3ca615ae424724a1babf1cc",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #10, source 98.750\u201399.420s"
     },
     {
       "index": 22,
@@ -437,8 +437,8 @@
       "timelineOutSeconds": 11.366667,
       "desiredShot": "Wide centered road exit revealing G90 sedan proportions",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 185.84,
-      "outSeconds": 186.51,
+      "inSeconds": 36.75,
+      "outSeconds": 37.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -446,8 +446,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-22.mp4",
-      "actualClipSha256": "03f2f8d15e1c6b47c5d2977e4e028709742518d33199e6f14d2657e710ef6d9f",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #22, source 185.840\u2013186.510s"
+      "actualClipSha256": "035de830e044d568148e622d961cc3b9dce82c80a2ab8b0bd58e84813e58bc1d",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #5, source 36.750\u201337.420s"
     },
     {
       "index": 23,
@@ -457,8 +457,8 @@
       "timelineOutSeconds": 11.9,
       "desiredShot": "Left front wheel-to-body moving tilt, wheel actually turning",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 225.91,
-      "outSeconds": 226.58,
+      "inSeconds": 78.75,
+      "outSeconds": 79.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -466,8 +466,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-23.mp4",
-      "actualClipSha256": "22b7da8aea060cdfd3c3c9593a22f8c52acc438a47e2d0730201d0dcc1e5286d",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #28, source 225.910\u2013226.580s"
+      "actualClipSha256": "79e316dbc419017c54cac15be3d0ed1272137e67f9351f9a80e2c70e20e3a429",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #9, source 78.750\u201379.420s"
     },
     {
       "index": 24,
@@ -477,8 +477,8 @@
       "timelineOutSeconds": 12.433333,
       "desiredShot": "Rear light bar and badging follow-cam at matching driving speed",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 174.03,
-      "outSeconds": 174.7,
+      "inSeconds": 304.75,
+      "outSeconds": 305.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -486,8 +486,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-24.mp4",
-      "actualClipSha256": "5f8caaa845762fb4ca03c7145693a0778fa07376d959691e62c0dcf6048df7e9",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #21, source 174.030\u2013174.700s"
+      "actualClipSha256": "1c5939882ddfe6d877dff68d1a26bf9a4d136c8061932f28ff13e26e48899ccb",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #38, source 304.750\u2013305.420s"
     },
     {
       "index": 25,
@@ -497,8 +497,8 @@
       "timelineOutSeconds": 12.933333,
       "desiredShot": "Front close pass from driver side at road height",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 250.11,
-      "outSeconds": 250.78,
+      "inSeconds": 16.75,
+      "outSeconds": 17.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -506,8 +506,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-25.mp4",
-      "actualClipSha256": "32074900f5968634b9dadd5b0dfd7207ade491b336289cace9cdad1d7ee80a05",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #32, source 250.110\u2013250.780s"
+      "actualClipSha256": "c308bf49423bf01a8eb402e8fbcb344b1a8d6ff68cd9db9183233bc8741be3a8",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #3, source 16.750\u201317.420s"
     },
     {
       "index": 26,
@@ -517,8 +517,8 @@
       "timelineOutSeconds": 13.433333,
       "desiredShot": "High vantage lateral drive shot on sweeping road",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 156.45,
-      "outSeconds": 157.12,
+      "inSeconds": 86.75,
+      "outSeconds": 87.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -526,8 +526,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-26.mp4",
-      "actualClipSha256": "5b679bf63ebdcfe2c9c4d4f4dbcb04b45803d581ecf8b55561a3f13f1f61e4d4",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #19, source 156.450\u2013157.120s"
+      "actualClipSha256": "a4f912000183a1404d5e693a58de2285304fc6c0e66b17ef5ebe4c9c7ddbe828",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #9, source 86.750\u201387.420s"
     },
     {
       "index": 27,
@@ -537,8 +537,8 @@
       "timelineOutSeconds": 13.966667,
       "desiredShot": "Dynamic side tracking with foreground environment streaking",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 266.368,
-      "outSeconds": 267.038,
+      "inSeconds": 99.75,
+      "outSeconds": 100.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -546,8 +546,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-27.mp4",
-      "actualClipSha256": "11c026ab4066d43b21fa28c52bbf0ff95df25eb653467b9323ac20a152da04f5",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #32, source 266.368\u2013267.038s"
+      "actualClipSha256": "1cc2156f8b65d25635501d4a350b3e7f539496ef5409e16152993658cf39d702",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #10, source 99.750\u2013100.420s"
     },
     {
       "index": 28,
@@ -557,8 +557,8 @@
       "timelineOutSeconds": 14.5,
       "desiredShot": "Rear three-quarter low tracking with broad arches dominant",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 123.89,
-      "outSeconds": 124.56,
+      "inSeconds": 24.75,
+      "outSeconds": 25.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -566,8 +566,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-28.mp4",
-      "actualClipSha256": "ff39b49e7508c897cd0ca7847b4ef9ba728f539358210dbddde89593b8eb9f8c",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #14, source 123.890\u2013124.560s"
+      "actualClipSha256": "72dad7b96b4b480294c301c79704d16842ed42499f1fd935255fa4394f3a63d9",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #4, source 24.750\u201325.420s"
     },
     {
       "index": 29,
@@ -577,8 +577,8 @@
       "timelineOutSeconds": 15,
       "desiredShot": "Moving top-down three-quarter driving shot with clear road parallax",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 288.23,
-      "outSeconds": 288.9,
+      "inSeconds": 70.75,
+      "outSeconds": 71.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -586,8 +586,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-29.mp4",
-      "actualClipSha256": "e5813cd8772c4f598ed8e7755a23d4b67d2c29614bc7beac243326863cf1fa71",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #35, source 288.230\u2013288.900s"
+      "actualClipSha256": "250e08fb550794a8f3bd8ccf4085432977c49a447fb2f9383341585e28550868",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #8, source 70.750\u201371.420s"
     },
     {
       "index": 30,
@@ -597,8 +597,8 @@
       "timelineOutSeconds": 15.5,
       "desiredShot": "Front lamp/grille camera chase accelerating into curve",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 92.535,
-      "outSeconds": 93.205,
+      "inSeconds": 334.75,
+      "outSeconds": 335.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -606,8 +606,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-30.mp4",
-      "actualClipSha256": "fd2b32c3e4f0ba5fd00847e09cb93655b1ee4d2636854f5a526df17b9fb4b205",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #9, source 92.535\u201393.205s"
+      "actualClipSha256": "03926ffbd6aedbf4dd7ab012e53f891528eed6cde9f6583706e5016207f9074d",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #43, source 334.750\u2013335.420s"
     },
     {
       "index": 31,
@@ -617,8 +617,8 @@
       "timelineOutSeconds": 16.033333,
       "desiredShot": "Rear-to-side moving orbit captured during one continuous drive",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 306.337,
-      "outSeconds": 307.007,
+      "inSeconds": 44.75,
+      "outSeconds": 45.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -626,8 +626,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-31.mp4",
-      "actualClipSha256": "09bf46ce464678cea9cdd39a4c8664e00628435481df887f50fc3b46bc6fb5a0",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #38, source 306.337\u2013307.007s"
+      "actualClipSha256": "48f15a2ac6d7590b490938e15841e481aeeb3eacbdd5630f05f3341f7fc85cd0",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #6, source 44.750\u201345.420s"
     },
     {
       "index": 32,
@@ -637,8 +637,8 @@
       "timelineOutSeconds": 16.566667,
       "desiredShot": "Wide right-to-left track or road panning shot, location authentic",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 73.023,
-      "outSeconds": 73.693,
+      "inSeconds": 94.75,
+      "outSeconds": 95.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -646,8 +646,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-32.mp4",
-      "actualClipSha256": "df1b27e78574f34684fc8de5c18770d8adca7d1e0b3317537449e0b2f8072d8f",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #8, source 73.023\u201373.693s"
+      "actualClipSha256": "f34012275ae55b18f44fa168366b34618e9689c1fa4f568926c6b2af07944f3d",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #9, source 94.750\u201395.420s"
     },
     {
       "index": 33,
@@ -657,8 +657,8 @@
       "timelineOutSeconds": 17.066667,
       "desiredShot": "Fast low frontal rolling chase with central full-car composition",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 327.2,
-      "outSeconds": 327.87,
+      "inSeconds": 359.75,
+      "outSeconds": 360.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -666,8 +666,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-33.mp4",
-      "actualClipSha256": "f78dbcbc4c3eb7c39dd3ef3b75d076d646c07aa9b423e51a9f12de0b76784396",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #41, source 327.200\u2013327.870s"
+      "actualClipSha256": "eb493c28a727950bfdb7ca39b2eadb54d71950ec19600c5e21adb14ca8badb4a",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #47, source 359.750\u2013360.420s"
     },
     {
       "index": 34,
@@ -677,8 +677,8 @@
       "timelineOutSeconds": 17.566667,
       "desiredShot": "Distant approach blooming into close front three-quarter pass",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 56.715,
-      "outSeconds": 57.385,
+      "inSeconds": 40.75,
+      "outSeconds": 41.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -686,8 +686,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-34.mp4",
-      "actualClipSha256": "46e77ee05454ebb997ceef10ef9371c2a24508f13c465c0f6b8f38e2afa5823e",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #7, source 56.715\u201357.385s"
+      "actualClipSha256": "359d7e1358c49f72b1eb2aad69e80da07435da4c97d732f80e4e665e4cef26eb",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #5, source 40.750\u201341.420s"
     },
     {
       "index": 35,
@@ -697,8 +697,8 @@
       "timelineOutSeconds": 18.1,
       "desiredShot": "Near-side front fender and wheel moving detail of G90 bumper",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 348.583,
-      "outSeconds": 349.253,
+      "inSeconds": 164.75,
+      "outSeconds": 165.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -706,8 +706,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-35.mp4",
-      "actualClipSha256": "e20e309524b4b25e1735009b6a45c4b496511d4fdb977eeb94651d3df76e92e8",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #46, source 348.583\u2013349.253s"
+      "actualClipSha256": "52c0e061d928d791a3aa37ff0a2d1813ca160f1645baad4f72533f344219fc3c",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #20, source 164.750\u2013165.420s"
     },
     {
       "index": 36,
@@ -717,8 +717,8 @@
       "timelineOutSeconds": 18.633333,
       "desiredShot": "Cross-angle sedan side motion with backdrop demonstrating real speed",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 36.89,
-      "outSeconds": 37.56,
+      "inSeconds": 319.75,
+      "outSeconds": 320.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -726,8 +726,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-36.mp4",
-      "actualClipSha256": "431d5d1c6dc7766339eb344766f27284ee863dce28984323dd6df47fd00a874c",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #5, source 36.890\u201337.560s"
+      "actualClipSha256": "3f451533057f40aa91a5462652c796e8ba0e117e189081bbc3fac196ce834c54",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #40, source 319.750\u2013320.420s"
     },
     {
       "index": 37,
@@ -737,8 +737,8 @@
       "timelineOutSeconds": 19.133333,
       "desiredShot": "Rear low approach and departure with signature taillamps",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 367.75,
-      "outSeconds": 368.42,
+      "inSeconds": 50.75,
+      "outSeconds": 51.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -746,8 +746,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-37.mp4",
-      "actualClipSha256": "f77eabec6bc5fae5ff1503c4d2276ef733e6b191ddb592ce69b20368d243d806",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #48, source 367.750\u2013368.420s"
+      "actualClipSha256": "cc1a5e69294371beb6221e5f95eb383c8493c7227364ca3dda777d7a3e788077",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #6, source 50.750\u201351.420s"
     },
     {
       "index": 38,
@@ -757,8 +757,8 @@
       "timelineOutSeconds": 19.633333,
       "desiredShot": "Front three-quarter tracking grand finale on open roadway",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 17.35,
-      "outSeconds": 18.02,
+      "inSeconds": 139.55,
+      "outSeconds": 140.22,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -766,8 +766,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-38.mp4",
-      "actualClipSha256": "55761a2a5c13d01012dae534081aeed1984c0e1c0940abe0562be61377bb2d11",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #3, source 17.350\u201318.020s"
+      "actualClipSha256": "4d4db84b7632d6c8c81ef1f6bac2b1d9d9cdf495e63db68608276c23143a3903",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #16, source 139.550\u2013140.220s"
     },
     {
       "index": 39,
@@ -777,8 +777,8 @@
       "timelineOutSeconds": 20,
       "desiredShot": "Full-body moving saloon hero exit holding clean road parallax to frame 599",
       "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
-      "inSeconds": 385.425,
-      "outSeconds": 386.095,
+      "inSeconds": 381.75,
+      "outSeconds": 382.42,
       "speed": 1.0,
       "crop": "center",
       "selectionStatus": "actual-moving-G90-prepared-private-review",
@@ -786,8 +786,8 @@
       "identityProof": "Manufacturer video PF0009730 Scene #3 G90 sedan; human visual check still required",
       "rightsProof": "Personal edit only; public permission unverified",
       "actualClipFile": "clips/beat-39.mp4",
-      "actualClipSha256": "e2bb4762eef59824049fdba308ec5793b8894b46504ced7ef4eeefaa83f19ef6",
-      "selectedShotDescription": "BMW PressClub G90 driving moving take #49, source 385.425\u2013386.095s"
+      "actualClipSha256": "f37cf05fd261aacc04174ea33f5b447a61eb66789d9d5a62f59c9c332c405f7f",
+      "selectedShotDescription": "BMW PressClub G90 driving moving take #49, source 381.750\u2013382.420s"
     }
   ]
 }
