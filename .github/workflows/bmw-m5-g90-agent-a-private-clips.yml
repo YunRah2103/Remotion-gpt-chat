@@ -1,4 +1,5 @@
 name: BMW G90 - Agent A 39 Real Footage Clips (Private Review)
+# Curated shot pass: inspect visible G90 in each beat, not only motion scores.
 on:
   push:
     branches:
