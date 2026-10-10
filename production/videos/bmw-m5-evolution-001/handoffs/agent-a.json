@@ -2,46 +2,58 @@
   "schemaVersion": 1,
   "task": "bmw-m5-evolution-001-agent-a",
   "branch": "automotive-edits/bmw-m5-evolution-001/a-footage",
-  "sourceSha": "a3b780fe6f64faac6c60054c4ab86c005eceeb13",
+  "sourceSha": "d4663982a640ab1e913ef3a820502fab4a7fa826",
   "owner": "research",
-  "summary": "20 BMW M5 source-page candidates researched, exact 42-slot mapping and strict FFmpeg/source SHA/duplicate-check pipeline committed. Latest Actions 38014477573 PASSED all 4 unit tests including native FFmpeg/FFprobe against a synthetic fixture. No genuine clips acquired or verified (0/42), no private video artifact; source handoff remains BLOCKED.",
-  "status": "blocked",
+  "status": "review",
+  "summary": "42 actual 0.8-second moving BMW M5 candidate files sourced from real BMW Group footage, six per E28/E34/E39/E60/F10/F90/G90; all 42 passed full FFmpeg decode and measured motion. Artifact M5-42-REAL-PROVISIONAL-38047298176 (ID 11668700332), GitHub Actions run 38047298176 SUCCESS. Not READY: E34 mixed-generation visuals and native low-resolution old archives; unique-angle human review and public reuse rights remain unresolved.",
   "files": [
     "production/videos/bmw-m5-evolution-001/footage/source-catalog.json",
     "production/videos/bmw-m5-evolution-001/footage/shot-board.json",
+    "production/videos/bmw-m5-evolution-001/footage/provisional-cuts.json",
+    "production/videos/bmw-m5-evolution-001/footage/build_review_bundle.py",
+    "production/videos/bmw-m5-evolution-001/footage/cloud_acquire.py",
+    "production/videos/bmw-m5-evolution-001/footage/e28_archive.py",
+    "production/videos/bmw-m5-evolution-001/footage/highres_upgrades.py",
     "production/videos/bmw-m5-evolution-001/footage/prepare.py",
-    "production/videos/bmw-m5-evolution-001/footage/README.md",
-    "production/videos/bmw-m5-evolution-001/footage/.gitignore",
     "production/videos/bmw-m5-evolution-001/footage/test_prepare.py",
     "production/videos/bmw-m5-evolution-001/footage/validate_sources.py",
     "production/videos/bmw-m5-evolution-001/handoffs/agent-a.json",
     "production/videos/bmw-m5-evolution-001/handoffs/agent-a.md"
   ],
   "evidence": [
-    "https://github.com/YunRah2103/Remotion-gpt-chat/commit/e1fe940dfde8817f485ca58887bda750e6461dd8",
-    "https://github.com/YunRah2103/Remotion-gpt-chat/commit/174bd721c67e6b5ae4d18b038787e956450097e7",
-    "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38014240348",
-    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-edits%2Fbmw-m5-evolution-001%2Fa-footage/production/videos/bmw-m5-evolution-001/footage/source-catalog.json",
-    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-edits%2Fbmw-m5-evolution-001%2Fa-footage/production/videos/bmw-m5-evolution-001/footage/shot-board.json",
-    "https://github.com/YunRah2103/Remotion-gpt-chat/commit/a3b780fe6f64faac6c60054c4ab86c005eceeb13",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38047298176",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38047298176/artifacts/11668700332",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38046928757/artifacts/11666924618",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38045881998/artifacts/11667643927",
     "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38014477573"
   ],
   "blockers": [
-    "0 of 42 actual moving video files have been downloaded, frame-sampled, SHA256-hashed or visually verified; there is NO footage ZIP or artifact ID to hand to Agent C.",
-    "Execution sandbox has no external DNS/media download access; the connected GitHub interface reads text/metadata, not multi-GB BMW original video master bytes. Existing BMW Actions job performs code/metadata checks, not real media acquisition or artifact upload.",
-    "Each of 42 slots still needs an observed, genuine, visibly different source in/out segment and human/vision verification of correct M5 sedan generation. The catalog and shot-board are candidates, never verified clips.",
-    "E28/E34 and other historic archives often have low native resolution (e.g. BMW 2005 footage 720x576); archival treatment or alternate sharp genuine footage is needed. No 4K/1080 portrait delivery claims can currently be substantiated.",
-    "Third-party/BMW source rights are not confirmed for public distribution; private-review research only. No GitHub Release or public MP4 has been produced."
+    "E34 six provisional clips come from a mixed E28/E34/E39/E60 multi-vehicle archival master. Some E34 clips visibly include wrong BMW M5 generations, and the six distinct camera setups have NOT been independently certified. Replace/isolate E34 before final cut.",
+    "E34/E39/E60/F10 initial candidate video source files are archive preview quality 480x360 or 540x304; high-resolution upgrades underway and no 4K claims are justified for historic media.",
+    "Public video/music distribution rights are not verified; do not publish these BMW Group originals or third-party audio publicly.",
+    "The 42 clips passed temporal motion and native video decode, but not comprehensive independent human visual QA for no repeated camera shots."
   ],
-  "extra": {
-    "plannedSlots": 42,
-    "verifiedSlots": 0,
-    "verifiedGenerations": 0,
-    "candidatePages": 20,
-    "actualVideoArtifacts": 0,
-    "ciPlanningMetadataRun": 38014240348,
-    "mediaMotionQA": "NOT RUN ON REAL BMW MEDIA",
-    "nativeSyntheticUnitTests": "PASS 4/4, run 38014477573",
-    "realSourceFrameInspection": "NOT RUN"
-  }
+  "qa": {
+    "sourceOriginalsDownloaded": 9,
+    "footageClipsGenerated": 42,
+    "uniqueChronologicalGenerations": 7,
+    "perGeneration": 6,
+    "fullDecodePass": 42,
+    "measuredMotionPass": 42,
+    "independentEditorialUniquenessApproval": false,
+    "identityApprovalForE34": false,
+    "artifactId": 11668700332,
+    "artifactRun": 38047298176,
+    "artifactRetentionDays": 7,
+    "currentResolutions": {
+      "E28": "1920x1080",
+      "E34": "480x360 mixed footage",
+      "E39": "480x360",
+      "E60": "480x360",
+      "F10": "540x304",
+      "F90": "1920x1080",
+      "G90": "3840x2160"
+    }
+  },
+  "notes": "Review-level handoff only. Agent C may retrieve actual bytes from the GitHub Actions artifact and edit a private evaluation candidate, but MUST not mark a 42-shot final pass without fixing mixed-generation E34 and low-resolution archive sources."
 }
