@@ -29,7 +29,7 @@ export const BeatFxTransform:React.FC<{
   const p=evaluateBeatFx(frame,cuts,duration,strength);
   const overscan=Math.max(p.zoom,1+Math.abs(p.shiftX)/540+.01);
   return <AbsoluteFill style={{overflow:'hidden'}}>
-    <AbsoluteFill style={{transform:`translateX(${p.shiftX}px) rotate(${p.tilt}deg) scale(${Math.max(1.035,p.zoom)})`,
+    <AbsoluteFill style={{transform:`translateX(${p.shiftX}px) rotate(${p.tilt}deg) scale(${overscan})`,
       transformOrigin:'50% 50%'}}>
       {children}
     </AbsoluteFill>
