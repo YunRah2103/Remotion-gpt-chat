@@ -33,6 +33,7 @@ jobs:
         run: |
           set -euo pipefail
           blender -b -t 4 --python production/experiments/bmw-m4-g82/v2/source_model_scene.py > proof.log 2>&1 || { tail -100 proof.log; exit 1; }
+          tail -100 proof.log
           grep -E 'CAR_ASSET_MESHES|RAW_BOUNDS|NORMALIZED_BOUNDS|PROOF_FRAME|SAVED_EDITABLE_SCENE' proof.log
           test -s out/m4-v2/BMW_M4_G82_V2.blend
           test "$(find out/m4-v2/proof -name 'angle_*.png' | wc -l)" -eq 4
