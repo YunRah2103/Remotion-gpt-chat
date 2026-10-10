@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "task": "bmw-m5-evolution-001-agent-a",
   "branch": "automotive-edits/bmw-m5-evolution-001/a-footage",
-  "sourceSha": "174bd721c67e6b5ae4d18b038787e956450097e7",
+  "sourceSha": "a3b780fe6f64faac6c60054c4ab86c005eceeb13",
   "owner": "research",
-  "summary": "Twenty genuine BMW M5 source-page candidates and official scene-specific direct media URLs researched; exact 42-slot 552-frame selection board and strictly gated FFprobe/motion/identity ingestion tools implemented. NO media bytes acquired; 0 of 42 shots validated. Existing GitHub Actions contract CI passed for e1fe/4aa; native FFmpeg smoke test added for follow-up CI. Footage handoff is BLOCKED.",
+  "summary": "20 BMW M5 source-page candidates researched, exact 42-slot mapping and strict FFmpeg/source SHA/duplicate-check pipeline committed. Latest Actions 38014477573 PASSED all 4 unit tests including native FFmpeg/FFprobe against a synthetic fixture. No genuine clips acquired or verified (0/42), no private video artifact; source handoff remains BLOCKED.",
   "status": "blocked",
   "files": [
     "production/videos/bmw-m5-evolution-001/footage/source-catalog.json",
@@ -22,7 +22,9 @@
     "https://github.com/YunRah2103/Remotion-gpt-chat/commit/174bd721c67e6b5ae4d18b038787e956450097e7",
     "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38014240348",
     "https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-edits%2Fbmw-m5-evolution-001%2Fa-footage/production/videos/bmw-m5-evolution-001/footage/source-catalog.json",
-    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-edits%2Fbmw-m5-evolution-001%2Fa-footage/production/videos/bmw-m5-evolution-001/footage/shot-board.json"
+    "https://github.com/YunRah2103/Remotion-gpt-chat/blob/automotive-edits%2Fbmw-m5-evolution-001%2Fa-footage/production/videos/bmw-m5-evolution-001/footage/shot-board.json",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/commit/a3b780fe6f64faac6c60054c4ab86c005eceeb13",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38014477573"
   ],
   "blockers": [
     "0 of 42 actual moving video files have been downloaded, frame-sampled, SHA256-hashed or visually verified; there is NO footage ZIP or artifact ID to hand to Agent C.",
@@ -38,6 +40,8 @@
     "candidatePages": 20,
     "actualVideoArtifacts": 0,
     "ciPlanningMetadataRun": 38014240348,
-    "mediaMotionQA": "NOT RUN ON REAL BMW MEDIA"
+    "mediaMotionQA": "NOT RUN ON REAL BMW MEDIA",
+    "nativeSyntheticUnitTests": "PASS 4/4, run 38014477573",
+    "realSourceFrameInspection": "NOT RUN"
   }
 }

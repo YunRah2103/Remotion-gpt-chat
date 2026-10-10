@@ -2,7 +2,7 @@
 
 **Agent:** A · Automotive Footage Director  
 **Repository/branch:** `YunRah2103/Remotion-gpt-chat` / `automotive-edits/bmw-m5-evolution-001/a-footage`  
-**Actual code/source commit:** `174bd721c67e6b5ae4d18b038787e956450097e7` (before this handoff document)  
+**Actual code/source commit:** `a3b780fe6f64faac6c60054c4ab86c005eceeb13` (before this handoff document)  
 **Required final film:** 552 frames, 18.4 s, vertical 1080×1920, 30fps.  
 **Status:** **BLOCKED. Candidate source pages: 20. Actual acquired moving clips: 0/42. Human-verified BMW M5 clips: 0/42. Actual source SHA256 video digests: 0.**  
 **Do not use this handoff as license to mark footage READY or render with substitutions.**
@@ -10,7 +10,7 @@
 ## What was actually implemented
 
 - Read the exact source contract, `beat-map.json`, Agent A instructions, existing video collage engineering, and existing schema/validator.
-- Researched 20 labelled source-page candidates covering E28, E34, E39, E60, F10, F90, G90, with official BMW Group PressClub scene provenance and select original-channel links. `footage/source-catalog.json` is a **page research catalog only**; it contains no real downloaded media. The 12 direct BMW PressClub URLs in the catalog are candidates, not confirmed accessible downloads.
+- Researched 20 labelled source-page candidates covering E28, E34, E39, E60, F10, F90, G90, with official BMW Group PressClub scene provenance and select original-channel links. `footage/source-catalog.json` is a **page research catalog only**; it contains no real downloaded media. The twelve direct BMW PressClub URLs in the catalog are candidates, not confirmed accessible downloads.
 - `footage/shot-board.json` maps every beat to six unique camera-angle goals per generation, preserves all source-slot frames, explicitly marks every candidate `MISSING_VERIFIED_CLIP`.
 - `footage/prepare.py` provides guarded official-original acquisition (preserve MOV; FFprobe; SHA256), real JPEG frame samples/contact sheets, strict manual sedan-identity/distinct-shot approval, timed-source extraction QA, near-duplicate detection, and refuses to generate verified manifest until 42 **actual** video files/approved time ranges are present. Do not misuse the code's synthetic test clips as real M5 footage.
 - `footage/test_prepare.py` contains offline unit tests for boundary order, no false readiness, safe source URLs and native FFmpeg/FFprobe/probe/encoded-frame checks against a **synthetic** video fixture. `footage/validate_sources.py` now calls the test suite in the existing CI job. This validates the **machinery**, NOT a single BMW source video.
@@ -19,8 +19,8 @@
 ## Results and evidence
 
 - **PASS — initial GitHub Actions metadata/chronology CI**: [run 38014240348](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38014240348) at source `4aa7692b2ff508dfe7308353711da753e2ceda0a`; logs show 42 planned cuts, 552 frames, seven required generations, **actualVerifiedClips: 0**.
-- **Added after initial run:** new dedicated synthetic FFprobe tests at `174bd721c67e6b5ae4d18b038787e956450097e7`; confirm an Actions green run for this subsequent commit separately. Do NOT describe any native real-footage validation as passing.
-- [Research commit e1fe940](https://github.com/YunRah2103/Remotion-gpt-chat/commit/e1fe940dfde8817f485ca58887bda750e6461dd8) and [native test commit `174bd721c67e`](https://github.com/YunRah2103/Remotion-gpt-chat/commit/174bd721c67e6b5ae4d18b038787e956450097e7).
+- **PASS — current Actions native-source-tool QA:** [run 38014477573](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38014477573) at source `a3b780fe6f64faac6c60054c4ab86c005eceeb13` executed 4/4 unit tests, including FFmpeg/FFprobe and JPEG extraction of a **synthetic** test-pattern MP4. **Real M5 media inspections remain 0/42**.
+- [Research commit e1fe940](https://github.com/YunRah2103/Remotion-gpt-chat/commit/e1fe940dfde8817f485ca58887bda750e6461dd8) and [native test commit `174bd721c67e`](https://github.com/YunRah2103/Remotion-gpt-chat/commit/a3b780fe6f64faac6c60054c4ab86c005eceeb13).
 - There is no real contact sheet, MP4 source, video SHA256 list or private downloadable footage artifact. Evidence artifacts and private-audio content must **never** be invented.
 
 ## BMW M5 identification and image quality
