@@ -1,0 +1,43 @@
+name: Porsche Agent A - yt-dlp source probe (metadata only)
+
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - 'production/videos/porsche-911-turbo-evolution-001/footage/probe_youtube_sources.py'
+      - '.github/workflows/porsche-agent-a-source-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+jobs:
+  probe-real-public-source-formats:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install yt-dlp and JavaScript challenge support
+        run: |
+          python -m pip install --disable-pip-version-check 'yt-dlp[default]==2026.08.19'
+          python -m yt_dlp --version
+          node --version
+      - name: Prove local metadata validator
+        run: python production/videos/porsche-911-turbo-evolution-001/footage/probe_youtube_sources.py --self-test
+      - name: Query actual source format metadata (NO video bytes)
+        continue-on-error: true
+        run: python production/videos/porsche-911-turbo-evolution-001/footage/probe_youtube_sources.py --output out/porsche-a-source-probe.json
+      - name: Preserve source metadata evidence and honest failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: porsche-a-yt-dlp-metadata-${{ github.run_id }}
+          path: out/porsche-a-source-probe.json
+          retention-days: 7
+          if-no-files-found: warn
