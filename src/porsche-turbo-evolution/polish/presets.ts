@@ -48,7 +48,7 @@ export const evaluatePolish=(frame:number,cuts:ReadonlyArray<BeatSlot>,
  const previous=cuts[beat.slot-2];
  const chapterStart=!!previous&&previous.generation!==beat.generation;
  if(chapterStart&&!Object.prototype.hasOwnProperty.call(CHAPTER_STARTS,beat.startFrame))throw new Error('Unknown chapter');
- const preset=chapterStart?(overrides[beat.startFrame]??{style:'cut' as const,frames:0,strength:0}):
+ const preset:ChapterPreset=chapterStart?(overrides[beat.startFrame]??{style:'cut' as const,frames:0,strength:0}):
   {style:'cut' as const,frames:0,strength:0};
  if(!['cut','micro-punch','match-shift','soft-luma'].includes(preset.style)||
   !Number.isInteger(preset.frames)||preset.frames<0||preset.frames>3||
