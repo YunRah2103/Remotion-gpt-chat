@@ -1,0 +1,49 @@
+name: Midnight V12 - contract and beat-grid QA
+
+on:
+  push:
+    branches:
+      - 'automotive-edits/midnight-v12-001/**'
+    paths:
+      - 'production/videos/midnight-v12-001/**'
+      - 'production/tests/test_midnight_v12_contract.py'
+      - '.github/workflows/midnight-v12-contract-ci.yml'
+  pull_request:
+    paths:
+      - 'production/videos/midnight-v12-001/**'
+      - 'production/tests/test_midnight_v12_contract.py'
+      - '.github/workflows/midnight-v12-contract-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Lock 316-frame shot partition, audio fingerprint and agent ownership
+        run: |
+          python -m unittest discover -s production/tests \
+            -p 'test_midnight_v12_contract.py' -v
+          python -m json.tool production/videos/midnight-v12-001/beat-map.json \
+            > /dev/null
+      - name: Assert no original private audio / source video was committed in project
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path("production/videos/midnight-v12-001")
+          forbidden={".mp3",".wav",".flac",".m4a",".mp4",".mov",".mkv",".webm",".zip"}
+          # Reject *tracked* binaries. Agents may unpack downloaded
+          # authorized binaries into transient CI workspace paths.
+          import subprocess
+          files=subprocess.check_output(["git","ls-files","--",str(p)],text=True).splitlines()
+          unsafe=[f for f in files if Path(f).suffix.lower() in forbidden]
+          assert not unsafe, f"Public project must not commit media: {unsafe}"
+          print("NO_PUBLIC_MEDIA_PASS")
+          PY
