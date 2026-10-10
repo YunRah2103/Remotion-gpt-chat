@@ -30,3 +30,16 @@ Agent D: **do not render the claimed high-quality final** with these mismatched,
 Pixabay 4K60 night candidate showed access-blocked 403 and was **not acquired**; Shutterstock nighttime black Huracán / Pond5 catalog are commercially licensed listings, **not purchased or delivered**. User visual reference `192907.mp4` is inspiration only; no direct reuse assumed. Original 10.53 second audio stays private and unmodified.
 
 **Final decision: A footage scouting improved substantially; complete approved footage requirement not met.**
+
+
+---
+
+## YouTube single-car original shoot follow-up (21:30 UK, 2026-10-10)
+
+The user confirmed **yt-dlp is installed**, enabling local retrieval tests. Stopped mixed-stock scouting and found original single-hero shoots with explicit CC Attribution licence labels. The strongest **rare hypercar** is [Ricky Blackwell and Developed Films / Koenigsegg Jesko Attack USA Delivery](https://www.youtube.com/watch?v=PxSSCIdmEZ8), 48 seconds; creator describes film crew. [gchrisfx / Lamborghini Aventador original Austin shoot](https://www.youtube.com/watch?v=mOSnX0QDdsE), 2:14, is a second original-filmmaker CC-labelled option. However, actual uploaded stream resolution, 11 distinct angles, portrait-safe framing and same exact car continuity are still NOT verified.
+
+**Actual execution:** Installed yt-dlp ARM64 2026.08.19 in cloud inspector and attempted `--list-formats` on the Jesko source. YouTube explicitly refused before returning formats: `Sign in to confirm you’re not a bot`. No video was acquired this pass; no playable file, SHA or new ZIP may be asserted. Do not attempt access-protection workarounds. Original YouTube CC licence/ownership still requires source confirmation; soundtrack rights separately.
+
+**Final source evidence, ranked originals, local exact yt-dlp probe/acquisition commands, and trade-offs:** [YOUTUBE_ORIGINAL_SHOOT_SCOUT.md](./YOUTUBE_ORIGINAL_SHOOT_SCOUT.md) plus machine-readable [youtube-candidate-manifest.json](./youtube-candidate-manifest.json). User can locally run yt-dlp -F on the two original CC-labelled sources without pasting any credentials; only upload a media file they have download/adaptation permission for. Follow up with actual FFprobe and 11-angle QA on true files.
+
+**Gate A remains FAIL.** The 12-source Pexels V2 scout ZIP is still a separate, incomplete, mixed-car source pool and must not be promoted to final footage. B/D integration remains blocked. A's next meaningful action requires actual local or creator-provided source bytes, permission and high-res evidence.
