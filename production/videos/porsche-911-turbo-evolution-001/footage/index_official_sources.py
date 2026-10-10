@@ -73,7 +73,7 @@ def main():
     ap.add_argument("--max-samples",type=int,default=40)
     ap.add_argument("--out",type=Path,default=Path("out/porsche-official-sparse-index"))
     a=ap.parse_args()
-    if not 5<=a.step<=120 or not 1<=a.max_samples<=80:
+    if not 2<=a.step<=120 or not 1<=a.max_samples<=80:
         ap.error("Invalid sample interval or count")
     a.out.mkdir(parents=True,exist_ok=True)
     url=f"https://newstv.porsche.com/porschevideos/newstv.porsche.com_{a.media_id}_en.mp4"
