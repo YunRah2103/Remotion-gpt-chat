@@ -64,11 +64,11 @@ jobs:
           npx remotion render src/index.ts HuracanSTOLandscapeCandidate out/STO-B-V3-NIGHT-LANDSCAPE-REMOTION-SILENT.mp4 --codec=h264 --pixel-format=yuv420p --concurrency=2
       - name: Native complete decode and 316-frame / 16:9 QA
         run: |
-          ffmpeg -hide_banner -v error -xerror -i out/STO-B-NATIVE-REAL-LANDSCAPE-CANDIDATE-SILENT.mp4 -f null -
+          ffmpeg -hide_banner -v error -xerror -i out/STO-B-V3-NIGHT-LANDSCAPE-REMOTION-SILENT.mp4 -f null -
           python - <<'PY'
           import subprocess,json,hashlib
           from pathlib import Path
-          p=Path('out/STO-B-NATIVE-REAL-LANDSCAPE-CANDIDATE-SILENT.mp4')
+          p=Path('out/STO-B-V3-NIGHT-LANDSCAPE-REMOTION-SILENT.mp4')
           result=json.loads(subprocess.check_output(['ffprobe','-v','error','-count_frames','-show_entries','stream=codec_name,width,height,avg_frame_rate,nb_read_frames:format=duration','-of','json',str(p)]))
           stream=result['streams'][0]
           assert (stream['width'],stream['height'],stream['avg_frame_rate'],int(stream['nb_read_frames']))==(1920,1080,'30/1',316),result
@@ -77,14 +77,14 @@ jobs:
           Path('out/night-v3-landscape-QA.json').write_text(json.dumps(result,indent=2))
           print('NATIVE_REAL_PREVIEW_PASS_NOT_GATE_A',result['SHA256'])
           PY
-          ffmpeg -v error -y -ss 2.6 -i out/STO-B-NATIVE-REAL-LANDSCAPE-CANDIDATE-SILENT.mp4 -frames:v 1 out/night-v3-frame78-STO-reveal.jpg
+          ffmpeg -v error -y -ss 2.6 -i out/STO-B-V3-NIGHT-LANDSCAPE-REMOTION-SILENT.mp4 -frames:v 1 out/night-v3-frame78-STO-reveal.jpg
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: STO-B-V3-NIGHT-REAL-1920x1080-NOT-FINAL
           path: |
-            out/STO-B-NATIVE-REAL-LANDSCAPE-CANDIDATE-SILENT.mp4
-            out/native-real-landscape-QA.json
-            out/frame78-real-STO-reveal.jpg
+            out/STO-B-V3-NIGHT-LANDSCAPE-REMOTION-SILENT.mp4
+            out/night-v3-landscape-QA.json
+            out/night-v3-frame78-STO-reveal.jpg
           retention-days: 3
           if-no-files-found: warn
