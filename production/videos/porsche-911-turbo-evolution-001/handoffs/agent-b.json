@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "task": "porsche-911-turbo-evolution-001-agent-b",
+  "branch": "automotive-edits/porsche-911-turbo-evolution-001/b-creative",
+  "sourceSha": "e8f31e0872f6adef3796963a99078b6a8b21bdd6",
+  "owner": "director",
+  "summary": "UNSTARTED planning-only handoff placeholder: this agent has not produced real implementation or footage yet.",
+  "status": "blocked",
+  "files": [],
+  "evidence": [],
+  "blockers": [
+    "The user has not started this specialist in a separate ChatGPT session; no code, actual video or QA deliverable has been submitted."
+  ],
+  "notes": "Placeholder source SHA is the baseline from approved BMW M5 V2, NOT proof of this agent's work. Agent replaces it with their own source SHA after actual implementation."
+}
