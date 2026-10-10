@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -94,6 +95,8 @@ class FootageFinderTests(unittest.TestCase):
             self.assertNotIn("videos.pexels.com", (root / "manifest.json").read_text())
             self.assertIn("Jesko &lt;Attack&gt;", (root / "index.html").read_text())
 
+    @unittest.skipUnless(shutil.which("ffmpeg") and shutil.which("ffprobe"),
+                         "FFmpeg native video test runs in dedicated footage-finder CI")
     def test_real_ffmpeg_file_probe_video_only_copy_and_proof(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
