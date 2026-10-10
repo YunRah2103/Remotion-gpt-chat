@@ -1,0 +1,1121 @@
+{
+  "schemaVersion": 1,
+  "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+  "vehicle": "BMW M5 G90 saloon",
+  "sourcePage": "https://www.press.bmwgroup.com/global/tv-footage/detail/PF0009730/the-new-bmw-m5",
+  "creator": "BMW Group",
+  "sourceDownloadUrl": "https://mediapool.bmwgroup.com/download/edown/tvFootageDownload?filmSceneId=19101&actEvent=tvFootageScenePreviewH264&attachment=1",
+  "pressSourceIdentity": "Scene #3 'The new BMW M5. Driving Shots.' \u2014 G90 Sedan",
+  "licenceStatus": "PERSONAL REVIEW ONLY; no verified permission for public TikTok redistribution",
+  "publicPublishingApproved": false,
+  "privateEditRequestedByUser": true,
+  "sourceFilename": "BMW-G90-Driving-Scene3-PF0009730.mp4",
+  "originalSha256": "59947dad266e74d92843cd90c2b2c90a3e118b277898f001c30c51e4e9b428a9",
+  "originalBytes": 111691552,
+  "sourceProbe": {
+    "width": 3840,
+    "height": 2160,
+    "fps": 25.0,
+    "duration": 390.52,
+    "frames": "9763",
+    "codec": "h264"
+  },
+  "identifiedSceneCuts": 50,
+  "actualExtractedVideoClips": 39,
+  "humanG90FrameReview": "not yet signed off",
+  "sourceSelections": [
+    {
+      "scene": 2,
+      "sourceIn": 5.35,
+      "sourceOut": 6.02,
+      "sceneStart": 5.0,
+      "sceneEnd": 11.76,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 6.2591,
+        "moving": true
+      },
+      "index": 1,
+      "file": "clips/beat-01.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 0,
+      "timelineFrameEnd": 15,
+      "exportFrames": 16,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "7b7db95e31a796a1ff25e7a21f65e32a22b682e7b04b7bd5958c09fa155d6d67",
+      "clipBytes": 293809,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 6.6777,
+        "moving": true
+      }
+    },
+    {
+      "scene": 49,
+      "sourceIn": 375.935,
+      "sourceOut": 376.605,
+      "sceneStart": 370.84,
+      "sceneEnd": 390.52,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 4.5601,
+        "moving": true
+      },
+      "index": 2,
+      "file": "clips/beat-02.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 16,
+      "timelineFrameEnd": 30,
+      "exportFrames": 15,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "2daefcd27310a49a6e43353169488bfb74683cb43910290bfafb352761a9521e",
+      "clipBytes": 193031,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 4.5255,
+        "moving": true
+      }
+    },
+    {
+      "scene": 4,
+      "sourceIn": 25.798,
+      "sourceOut": 26.468,
+      "sceneStart": 20.32,
+      "sceneEnd": 33.84,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 6.2032,
+        "moving": true
+      },
+      "index": 3,
+      "file": "clips/beat-03.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 31,
+      "timelineFrameEnd": 46,
+      "exportFrames": 16,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "f0374fc940b5e8390c0f14a271045a2dfaeddf400dbd6fd346d432879967ecd4",
+      "clipBytes": 211620,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 6.2052,
+        "moving": true
+      }
+    },
+    {
+      "scene": 47,
+      "sourceIn": 358.13,
+      "sourceOut": 358.8,
+      "sceneStart": 353.32,
+      "sceneEnd": 367.4,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 13.0454,
+        "moving": true
+      },
+      "index": 4,
+      "file": "clips/beat-04.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 47,
+      "timelineFrameEnd": 61,
+      "exportFrames": 15,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "89a2c62d5baefd2e5e94d8cd1a200d427c69ffc15f12079e3ff6a855607d87d4",
+      "clipBytes": 184183,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 13.069,
+        "moving": true
+      }
+    },
+    {
+      "scene": 6,
+      "sourceIn": 47.26,
+      "sourceOut": 47.93,
+      "sceneStart": 42.64,
+      "sceneEnd": 51.88,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 6.3424,
+        "moving": true
+      },
+      "index": 5,
+      "file": "clips/beat-05.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 62,
+      "timelineFrameEnd": 77,
+      "exportFrames": 16,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "8f0de27c035ceff47d333324b08007ef6404ad4fc96506cc1fe442c13477f8cc",
+      "clipBytes": 233194,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 7.0998,
+        "moving": true
+      }
+    },
+    {
+      "scene": 44,
+      "sourceIn": 336.15,
+      "sourceOut": 336.82,
+      "sceneStart": 335.8,
+      "sceneEnd": 339.84,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 10.0187,
+        "moving": true
+      },
+      "index": 6,
+      "file": "clips/beat-06.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 78,
+      "timelineFrameEnd": 92,
+      "exportFrames": 15,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "8643f409b34eb74f4650d1023137693b4d01fdae4cbba5d5067e028ec52514bb",
+      "clipBytes": 216619,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 10.28,
+        "moving": true
+      }
+    },
+    {
+      "scene": 7,
+      "sourceIn": 63.443,
+      "sourceOut": 64.112,
+      "sceneStart": 51.88,
+      "sceneEnd": 70.52,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 4.1712,
+        "moving": true
+      },
+      "index": 7,
+      "file": "clips/beat-07.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 93,
+      "timelineFrameEnd": 108,
+      "exportFrames": 16,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "227a6ddc3e1363adeeadaf6d6cf8d3fdc2a1a09025c6170b36a86c0e4738914e",
+      "clipBytes": 184541,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 4.1118,
+        "moving": true
+      }
+    },
+    {
+      "scene": 40,
+      "sourceIn": 317.83,
+      "sourceOut": 318.5,
+      "sceneStart": 317.48,
+      "sceneEnd": 324.48,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 10.8779,
+        "moving": true
+      },
+      "index": 8,
+      "file": "clips/beat-08.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 109,
+      "timelineFrameEnd": 123,
+      "exportFrames": 15,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "4b56ee51b3d0753cfa463bbedeb43e22b65b99c0e9965dc4c54d6bb9ec93935b",
+      "clipBytes": 224835,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 11.5685,
+        "moving": true
+      }
+    },
+    {
+      "scene": 9,
+      "sourceIn": 82.865,
+      "sourceOut": 83.535,
+      "sceneStart": 77.68,
+      "sceneEnd": 97.72,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 3.2181,
+        "moving": true
+      },
+      "index": 9,
+      "file": "clips/beat-09.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 124,
+      "timelineFrameEnd": 138,
+      "exportFrames": 15,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "55309d7de9f13273d4e485341a03abdbd22c936d462fd3756f689de22aa8f8ca",
+      "clipBytes": 127725,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 3.4558,
+        "moving": true
+      }
+    },
+    {
+      "scene": 37,
+      "sourceIn": 295.69,
+      "sourceOut": 296.36,
+      "sceneStart": 292.92,
+      "sceneEnd": 300.88,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 8.9738,
+        "moving": true
+      },
+      "index": 10,
+      "file": "clips/beat-10.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 139,
+      "timelineFrameEnd": 154,
+      "exportFrames": 16,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "7680132d0abaf6101941d65f892f23beebfed8979e711edf2771a4e25ae96b3c",
+      "clipBytes": 345053,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 8.5896,
+        "moving": true
+      }
+    },
+    {
+      "scene": 10,
+      "sourceIn": 100.3,
+      "sourceOut": 100.97,
+      "sceneStart": 97.72,
+      "sceneEnd": 102.88,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 7.4735,
+        "moving": true
+      },
+      "index": 11,
+      "file": "clips/beat-11.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 155,
+      "timelineFrameEnd": 170,
+      "exportFrames": 16,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "10b3783931b84179778fe16fd0d1fc66f8c8584362ce630d1dbba0107899e57a",
+      "clipBytes": 282454,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 8.393,
+        "moving": true
+      }
+    },
+    {
+      "scene": 33,
+      "sourceIn": 276.6,
+      "sourceOut": 277.27,
+      "sceneStart": 269.04,
+      "sceneEnd": 284.16,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 12.6641,
+        "moving": true
+      },
+      "index": 12,
+      "file": "clips/beat-12.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 171,
+      "timelineFrameEnd": 186,
+      "exportFrames": 16,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "960bf1277fd6b7d3ee0e17052f56ea14257aa5fef21bbff666f7ce94d9fd67cf",
+      "clipBytes": 317296,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 12.7195,
+        "moving": true
+      }
+    },
+    {
+      "scene": 17,
+      "sourceIn": 143.997,
+      "sourceOut": 144.667,
+      "sceneStart": 141.16,
+      "sceneEnd": 149.32,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 3.0388,
+        "moving": true
+      },
+      "index": 13,
+      "file": "clips/beat-13.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 187,
+      "timelineFrameEnd": 201,
+      "exportFrames": 15,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "31751c0b4227a304d0d5faa5221599f960fdbdbf3ba65b339072fd0a59748131",
+      "clipBytes": 112946,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 3.3407,
+        "moving": true
+      }
+    },
+    {
+      "scene": 32,
+      "sourceIn": 257.077,
+      "sourceOut": 257.748,
+      "sceneStart": 249.76,
+      "sceneEnd": 269.04,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 9.5342,
+        "moving": true
+      },
+      "index": 14,
+      "file": "clips/beat-14.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 202,
+      "timelineFrameEnd": 216,
+      "exportFrames": 15,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "0159c4043806222d538b6dcb60520f9e16c762901020455c6177b1de0eb469e9",
+      "clipBytes": 440369,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 9.5116,
+        "moving": true
+      }
+    },
+    {
+      "scene": 20,
+      "sourceIn": 166.766,
+      "sourceOut": 167.436,
+      "sceneStart": 162.04,
+      "sceneEnd": 173.68,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 5.3393,
+        "moving": true
+      },
+      "index": 15,
+      "file": "clips/beat-15.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 217,
+      "timelineFrameEnd": 232,
+      "exportFrames": 16,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "ed300081f953088fc1f49b3f0fbba5db355dfdc3764b57e09d81e75a1802f177",
+      "clipBytes": 176033,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 5.5941,
+        "moving": true
+      }
+    },
+    {
+      "scene": 29,
+      "sourceIn": 236.963,
+      "sourceOut": 237.633,
+      "sceneStart": 231.72,
+      "sceneEnd": 239.76,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 3.5734,
+        "moving": true
+      },
+      "index": 16,
+      "file": "clips/beat-16.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 233,
+      "timelineFrameEnd": 248,
+      "exportFrames": 16,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "9dec50ffc3a582b2a5e74e5937589a7686aa6e768c38bd321abd5aef884c022a",
+      "clipBytes": 250094,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 3.6311,
+        "moving": true
+      }
+    },
+    {
+      "scene": 21,
+      "sourceIn": 176.9,
+      "sourceOut": 177.57,
+      "sceneStart": 173.68,
+      "sceneEnd": 180.12,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 8.8433,
+        "moving": true
+      },
+      "index": 17,
+      "file": "clips/beat-17.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 249,
+      "timelineFrameEnd": 263,
+      "exportFrames": 15,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "1495ec16940fb7a2a95e00751f6ff736811a90d1291f9b3feed50a92abc0aff6",
+      "clipBytes": 374044,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 9.5752,
+        "moving": true
+      }
+    },
+    {
+      "scene": 26,
+      "sourceIn": 217.1,
+      "sourceOut": 217.77,
+      "sceneStart": 214.32,
+      "sceneEnd": 219.88,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 5.4903,
+        "moving": true
+      },
+      "index": 18,
+      "file": "clips/beat-18.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 264,
+      "timelineFrameEnd": 278,
+      "exportFrames": 15,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "2027631c0675345078e4d465c53b0ab45fffff3e4fc518652b83d4632b0f0a36",
+      "clipBytes": 187565,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 5.6875,
+        "moving": true
+      }
+    },
+    {
+      "scene": 24,
+      "sourceIn": 198.09,
+      "sourceOut": 198.76,
+      "sceneStart": 195.6,
+      "sceneEnd": 202.72,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 3.6709,
+        "moving": true
+      },
+      "index": 19,
+      "file": "clips/beat-19.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 279,
+      "timelineFrameEnd": 294,
+      "exportFrames": 16,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "e7570212e7fda23c5efab8bcff590651e4874b47b353c3b3e5e58141a5d10e33",
+      "clipBytes": 391574,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 3.6496,
+        "moving": true
+      }
+    },
+    {
+      "scene": 25,
+      "sourceIn": 207.43,
+      "sourceOut": 208.1,
+      "sceneStart": 202.72,
+      "sceneEnd": 214.32,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 5.672,
+        "moving": true
+      },
+      "index": 20,
+      "file": "clips/beat-20.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 295,
+      "timelineFrameEnd": 310,
+      "exportFrames": 16,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "faf87225dcff1a56e3dccf4783bddfc1e54262e3b43545717a8b4f385ee68825",
+      "clipBytes": 251711,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 6.0554,
+        "moving": true
+      }
+    },
+    {
+      "scene": 26,
+      "sourceIn": 214.67,
+      "sourceOut": 215.34,
+      "sceneStart": 214.32,
+      "sceneEnd": 219.88,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 3.5767,
+        "moving": true
+      },
+      "index": 21,
+      "file": "clips/beat-21.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 311,
+      "timelineFrameEnd": 325,
+      "exportFrames": 15,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "4efdc0f538c288cb297e4621d03020428a82febe6b229c1930b06a5394c1dfbb",
+      "clipBytes": 245867,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 3.8142,
+        "moving": true
+      }
+    },
+    {
+      "scene": 22,
+      "sourceIn": 185.84,
+      "sourceOut": 186.51,
+      "sceneStart": 180.12,
+      "sceneEnd": 191.56,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 13.7947,
+        "moving": true
+      },
+      "index": 22,
+      "file": "clips/beat-22.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 326,
+      "timelineFrameEnd": 340,
+      "exportFrames": 15,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "03f2f8d15e1c6b47c5d2977e4e028709742518d33199e6f14d2657e710ef6d9f",
+      "clipBytes": 223307,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 13.4485,
+        "moving": true
+      }
+    },
+    {
+      "scene": 28,
+      "sourceIn": 225.91,
+      "sourceOut": 226.58,
+      "sceneStart": 225.56,
+      "sceneEnd": 231.72,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 9.3825,
+        "moving": true
+      },
+      "index": 23,
+      "file": "clips/beat-23.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 341,
+      "timelineFrameEnd": 356,
+      "exportFrames": 16,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "22b7da8aea060cdfd3c3c9593a22f8c52acc438a47e2d0730201d0dcc1e5286d",
+      "clipBytes": 304833,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 9.2484,
+        "moving": true
+      }
+    },
+    {
+      "scene": 21,
+      "sourceIn": 174.03,
+      "sourceOut": 174.7,
+      "sceneStart": 173.68,
+      "sceneEnd": 180.12,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 9.1765,
+        "moving": true
+      },
+      "index": 24,
+      "file": "clips/beat-24.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 357,
+      "timelineFrameEnd": 372,
+      "exportFrames": 16,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "5f8caaa845762fb4ca03c7145693a0778fa07376d959691e62c0dcf6048df7e9",
+      "clipBytes": 453159,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 9.9928,
+        "moving": true
+      }
+    },
+    {
+      "scene": 32,
+      "sourceIn": 250.11,
+      "sourceOut": 250.78,
+      "sceneStart": 249.76,
+      "sceneEnd": 269.04,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 8.8382,
+        "moving": true
+      },
+      "index": 25,
+      "file": "clips/beat-25.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 373,
+      "timelineFrameEnd": 387,
+      "exportFrames": 15,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "32074900f5968634b9dadd5b0dfd7207ade491b336289cace9cdad1d7ee80a05",
+      "clipBytes": 415999,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 8.8131,
+        "moving": true
+      }
+    },
+    {
+      "scene": 19,
+      "sourceIn": 156.45,
+      "sourceOut": 157.12,
+      "sceneStart": 153.48,
+      "sceneEnd": 162.04,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 1.4586,
+        "moving": true
+      },
+      "index": 26,
+      "file": "clips/beat-26.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 388,
+      "timelineFrameEnd": 402,
+      "exportFrames": 15,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "5b679bf63ebdcfe2c9c4d4f4dbcb04b45803d581ecf8b55561a3f13f1f61e4d4",
+      "clipBytes": 149359,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 1.409,
+        "moving": true
+      }
+    },
+    {
+      "scene": 32,
+      "sourceIn": 266.368,
+      "sourceOut": 267.038,
+      "sceneStart": 249.76,
+      "sceneEnd": 269.04,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 19.7221,
+        "moving": true
+      },
+      "index": 27,
+      "file": "clips/beat-27.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 403,
+      "timelineFrameEnd": 418,
+      "exportFrames": 16,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "11c026ab4066d43b21fa28c52bbf0ff95df25eb653467b9323ac20a152da04f5",
+      "clipBytes": 362612,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 20.1476,
+        "moving": true
+      }
+    },
+    {
+      "scene": 14,
+      "sourceIn": 123.89,
+      "sourceOut": 124.56,
+      "sceneStart": 120.8,
+      "sceneEnd": 129.72,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 1.6381,
+        "moving": true
+      },
+      "index": 28,
+      "file": "clips/beat-28.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 419,
+      "timelineFrameEnd": 434,
+      "exportFrames": 16,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "ff39b49e7508c897cd0ca7847b4ef9ba728f539358210dbddde89593b8eb9f8c",
+      "clipBytes": 186560,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 1.6177,
+        "moving": true
+      }
+    },
+    {
+      "scene": 35,
+      "sourceIn": 288.23,
+      "sourceOut": 288.9,
+      "sceneStart": 287.88,
+      "sceneEnd": 289.88,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 8.0295,
+        "moving": true
+      },
+      "index": 29,
+      "file": "clips/beat-29.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 435,
+      "timelineFrameEnd": 449,
+      "exportFrames": 15,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "e5813cd8772c4f598ed8e7755a23d4b67d2c29614bc7beac243326863cf1fa71",
+      "clipBytes": 115144,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 7.8234,
+        "moving": true
+      }
+    },
+    {
+      "scene": 9,
+      "sourceIn": 92.535,
+      "sourceOut": 93.205,
+      "sceneStart": 77.68,
+      "sceneEnd": 97.72,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 5.5216,
+        "moving": true
+      },
+      "index": 30,
+      "file": "clips/beat-30.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 450,
+      "timelineFrameEnd": 464,
+      "exportFrames": 15,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "fd2b32c3e4f0ba5fd00847e09cb93655b1ee4d2636854f5a526df17b9fb4b205",
+      "clipBytes": 114659,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 5.7336,
+        "moving": true
+      }
+    },
+    {
+      "scene": 38,
+      "sourceIn": 306.337,
+      "sourceOut": 307.007,
+      "sceneStart": 300.88,
+      "sceneEnd": 309.24,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 6.6273,
+        "moving": true
+      },
+      "index": 31,
+      "file": "clips/beat-31.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 465,
+      "timelineFrameEnd": 480,
+      "exportFrames": 16,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "09bf46ce464678cea9cdd39a4c8664e00628435481df887f50fc3b46bc6fb5a0",
+      "clipBytes": 280257,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 6.8074,
+        "moving": true
+      }
+    },
+    {
+      "scene": 8,
+      "sourceIn": 73.023,
+      "sourceOut": 73.693,
+      "sceneStart": 70.52,
+      "sceneEnd": 77.68,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 6.3948,
+        "moving": true
+      },
+      "index": 32,
+      "file": "clips/beat-32.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 481,
+      "timelineFrameEnd": 496,
+      "exportFrames": 16,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "df1b27e78574f34684fc8de5c18770d8adca7d1e0b3317537449e0b2f8072d8f",
+      "clipBytes": 216197,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 6.1876,
+        "moving": true
+      }
+    },
+    {
+      "scene": 41,
+      "sourceIn": 327.2,
+      "sourceOut": 327.87,
+      "sceneStart": 324.48,
+      "sceneEnd": 329.92,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 6.6441,
+        "moving": true
+      },
+      "index": 33,
+      "file": "clips/beat-33.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 497,
+      "timelineFrameEnd": 511,
+      "exportFrames": 15,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "f78dbcbc4c3eb7c39dd3ef3b75d076d646c07aa9b423e51a9f12de0b76784396",
+      "clipBytes": 249155,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 6.9877,
+        "moving": true
+      }
+    },
+    {
+      "scene": 7,
+      "sourceIn": 56.715,
+      "sourceOut": 57.385,
+      "sceneStart": 51.88,
+      "sceneEnd": 70.52,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 4.3895,
+        "moving": true
+      },
+      "index": 34,
+      "file": "clips/beat-34.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 512,
+      "timelineFrameEnd": 526,
+      "exportFrames": 15,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "46e77ee05454ebb997ceef10ef9371c2a24508f13c465c0f6b8f38e2afa5823e",
+      "clipBytes": 177092,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 4.6263,
+        "moving": true
+      }
+    },
+    {
+      "scene": 46,
+      "sourceIn": 348.583,
+      "sourceOut": 349.253,
+      "sceneStart": 346.04,
+      "sceneEnd": 353.32,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 11.3383,
+        "moving": true
+      },
+      "index": 35,
+      "file": "clips/beat-35.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 527,
+      "timelineFrameEnd": 542,
+      "exportFrames": 16,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "e20e309524b4b25e1735009b6a45c4b496511d4fdb977eeb94651d3df76e92e8",
+      "clipBytes": 237389,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 11.4415,
+        "moving": true
+      }
+    },
+    {
+      "scene": 5,
+      "sourceIn": 36.89,
+      "sourceOut": 37.56,
+      "sceneStart": 33.84,
+      "sceneEnd": 42.64,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 4.0953,
+        "moving": true
+      },
+      "index": 36,
+      "file": "clips/beat-36.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 543,
+      "timelineFrameEnd": 558,
+      "exportFrames": 16,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "431d5d1c6dc7766339eb344766f27284ee863dce28984323dd6df47fd00a874c",
+      "clipBytes": 268424,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 4.4316,
+        "moving": true
+      }
+    },
+    {
+      "scene": 48,
+      "sourceIn": 367.75,
+      "sourceOut": 368.42,
+      "sceneStart": 367.4,
+      "sceneEnd": 370.84,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 2.3638,
+        "moving": true
+      },
+      "index": 37,
+      "file": "clips/beat-37.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 559,
+      "timelineFrameEnd": 573,
+      "exportFrames": 15,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "f77eabec6bc5fae5ff1503c4d2276ef733e6b191ddb592ce69b20368d243d806",
+      "clipBytes": 181235,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 2.3568,
+        "moving": true
+      }
+    },
+    {
+      "scene": 3,
+      "sourceIn": 17.35,
+      "sourceOut": 18.02,
+      "sceneStart": 11.76,
+      "sceneEnd": 20.32,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 6.4597,
+        "moving": true
+      },
+      "index": 38,
+      "file": "clips/beat-38.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 574,
+      "timelineFrameEnd": 588,
+      "exportFrames": 15,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "55761a2a5c13d01012dae534081aeed1984c0e1c0940abe0562be61377bb2d11",
+      "clipBytes": 215064,
+      "deliveredMotion": {
+        "decodedFrames": 4,
+        "avgLumaDifference": 6.6843,
+        "moving": true
+      }
+    },
+    {
+      "scene": 49,
+      "sourceIn": 385.425,
+      "sourceOut": 386.095,
+      "sceneStart": 370.84,
+      "sceneEnd": 390.52,
+      "motion": {
+        "decodedFrames": 5,
+        "avgLumaDifference": 1.636,
+        "moving": true
+      },
+      "index": 39,
+      "file": "clips/beat-39.mp4",
+      "sourceId": "bmw-pressclub-pf0009730-scene3-g90-sedan",
+      "timelineFrameStart": 589,
+      "timelineFrameEnd": 599,
+      "exportFrames": 11,
+      "exportFPS": 30.0,
+      "exportWidth": 1280,
+      "exportHeight": 720,
+      "clipSha256": "e2bb4762eef59824049fdba308ec5793b8894b46504ced7ef4eeefaa83f19ef6",
+      "clipBytes": 128829,
+      "deliveredMotion": {
+        "decodedFrames": 3,
+        "avgLumaDifference": 1.784,
+        "moving": true
+      }
+    }
+  ],
+  "workflowRunUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38009259190"
+}
