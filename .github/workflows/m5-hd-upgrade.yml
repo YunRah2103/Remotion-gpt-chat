@@ -1,0 +1,30 @@
+name: M5 archive HD upgrades F10 and E39
+on:
+  push:
+    branches: ['automotive-edits/bmw-m5-evolution-001/a-footage']
+    paths: ['.github/workflows/m5-hd-upgrade.yml']
+permissions:
+  contents: read
+jobs:
+  download-and-extract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          pip install 'Pillow>=11,<13'
+      - name: Extract six clips each from official native video masters
+        run: python production/videos/bmw-m5-evolution-001/footage/highres_upgrades.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: M5-HIGHRES-F10-E39-${{ github.run_id }}
+          path: out/m5-upscaled-no/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
