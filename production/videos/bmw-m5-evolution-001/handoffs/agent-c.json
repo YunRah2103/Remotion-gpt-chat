@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "task": "bmw-m5-evolution-001-agent-c",
+  "branch": "automotive-edits/bmw-m5-evolution-001/c-master",
+  "sourceSha": "e8f17c9ef5cc48b143b21d3cc4d8007861097464",
+  "owner": "release",
+  "summary": "UNSTARTED planning template only. This agent has not delivered footage/code or QA.",
+  "status": "blocked",
+  "files": [],
+  "evidence": [],
+  "blockers": [
+    "Agent session has not started, no implementation commits or actual artifacts have been submitted."
+  ],
+  "notes": "This is a placeholder, base SHA is not a claimed completion SHA."
+}
