@@ -1,0 +1,26 @@
+name: Porsche Agent A - discover official all-generation source
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-generation-source.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect-newsroom-media-html:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read real Porsche HTML media references
+        run: |
+          python production/videos/porsche-911-turbo-evolution-001/footage/discover_generation_duel.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Porsche-Generation-Duel-source-discovery-${{ github.run_id }}
+          path: out/porsche-generation-duel-discovery/
+          retention-days: 7
+          if-no-files-found: warn
