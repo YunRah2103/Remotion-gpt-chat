@@ -1,0 +1,37 @@
+name: Porsche A - native 964 Turbo S full source review
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-a-964-ascari-index.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-source-964-review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install FFprobe FFmpeg Pillow
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install 'Pillow>=10,<12'
+      - name: Index Porsche Ascari 964 Turbo S source (no transcoding)
+        run: |
+          python production/videos/porsche-911-turbo-evolution-001/footage/index_official_sources.py \
+            --media-id 326868 --step 6 --max-samples 35 \
+            --out out/porsche-964-ascari
+      - name: Store original source metadata plus real preview contact sheets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Porsche-A-964-Ascari-source-frames-${{ github.run_id }}
+          path: out/porsche-964-ascari/
+          retention-days: 7
+          if-no-files-found: warn
