@@ -7,12 +7,14 @@ R=Path("out/m5-agent-a");(R/"source").mkdir(parents=True,exist_ok=True);(R/"cont
 P="https://mediapool.bmwgroup.com/download/edown/tvFootageDownload"
 def preview(n): return P+"?"+urllib.parse.urlencode(dict(actEvent="tvFootageScenePreviewH264",attachment="1",filmSceneId=str(n)))
 SOURCES=[
- {"id":"mixed-e28-e34-e39-e60","generation":"MIXED","link":preview(7909),"page":"https://www.press.bmwgroup.com/asia/tv-footage/detail/PF0002439/the-bmw-m5/2"},
- {"id":"e60-driving-alongside","generation":"E60","link":preview(7903),"page":"https://www.press.bmwgroup.com/asia/tv-footage/detail/PF0002439/the-bmw-m5/2"},
+ {"id":"mixed-e28-e34-e39-e60","generation":"MIXED","scene":9,"page":"https://www.press.bmwgroup.com/asia/tv-footage/detail/PF0002439/the-bmw-m5/2"},
+ {"id":"e60-driving-alongside","generation":"E60","scene":3,"page":"https://www.press.bmwgroup.com/asia/tv-footage/detail/PF0002439/the-bmw-m5/2"},
  {"id":"f10-ascari","generation":"F10","link":preview(42),"page":"https://www.press.bmwgroup.com/global/tv-footage/detail/PF0003177/the-new-bmw-m5-model-year-2011/5"},
- {"id":"f90-racetrack","generation":"F90","link":preview(15730),"page":"https://www.press.bmwgroup.com/usa/tv-footage/detail/PF0005589/the-new-bmw-m5-with-m-xdrive"},
+ {"id":"f90-racetrack","generation":"F90","scene":4,"page":"https://www.press.bmwgroup.com/usa/tv-footage/detail/PF0005589/the-new-bmw-m5-with-m-xdrive"},
  {"id":"g90-driving","generation":"G90","page":"https://www.press.bmwgroup.com/global/tv-footage/detail/PF0009730/the-new-bmw-m5","scene":3},
  {"id":"e39-historic","generation":"E39","page":"https://www.press.bmwgroup.com/global/tv-footage/detail/PF0003267/der-neue-bmw-m5?language=en","scene":10}
+ ,{"id":"all-m5-generations-2017","generation":"MIXED","page":"https://www.press.bmwgroup.com/global/video/detail/PF0005757/clip-bmw-m5-generations","link":"https://mediapool.bmwgroup.com/download/edown/tvFootageDownload.mov?actEvent=tvFootageMovHd&attachment=1&dokNo=PF0005757"},
+ {"id":"f90-estoril-2017","generation":"F90","page":"https://www.press.bmwgroup.com/global/video/detail/PF0005756/clip-bmw-m5-estoril","link":"https://mediapool.bmwgroup.com/download/edown/tvFootageDownload.mov?actEvent=tvFootageMovHd&attachment=1&dokNo=PF0005756"}
 ]
 YOUTUBE=[
  {"id":"e28-chris-harris","generation":"E28","link":"https://www.youtube.com/watch?v=FzOPR7STqrQ"},
@@ -34,7 +36,7 @@ def get_page_url(item):
         if m and m.group(1) not in seen:seen.add(m.group(1));ordered.append(url)
     if len(ordered)<item["scene"]:raise RuntimeError("PressClub scene not available; found "+str(len(ordered))+" links")
     return ordered[item["scene"]-1]
-def download(url,path,limit=180_000_000):
+def download(url,path,limit=290_000_000):
     if urllib.parse.urlsplit(url).hostname!="mediapool.bmwgroup.com":raise RuntimeError("unapproved media host")
     req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0"})
     size=0
@@ -98,12 +100,15 @@ def process(item,youtube=False):
         else:
             link=item.get("link") or get_page_url(item)
             entry["downloadLink"]=link
-            p=R/"source"/(id+".mp4")
+            p=R/"source"/(id+(".mov" if ".mov?" in link else ".mp4"))
             download(link,p)
         info=ffprobe(p);entry.update(info)
         entry.update(contact(p,id,info["durationSeconds"]))
         entry["status"]="ACTUAL_VIDEO_DOWNLOADED_IDENTITY_NOT_APPROVED"
-    except Exception as e:entry["error"]=repr(e)[:550]; print("FAIL",id,entry["error"],flush=True)
+    except Exception as e:
+        entry["error"]=repr(e)[:550]
+        if hasattr(e,"stderr") and e.stderr:entry["errorDetail"]=str(e.stderr)[-1000:]
+        print("FAIL",id,entry["error"],entry.get("errorDetail",""),flush=True)
     report["sources"].append(entry)
     (R/"acquisition-report.json").write_text(json.dumps(report,indent=2)+"\n")
     print("DONE",id,entry["status"],flush=True)
