@@ -4,7 +4,7 @@ on:
     branches:
       - automotive-edits/porsche-911-turbo-evolution-001/d-master
     paths:
-      - src/porsche-turbo-evolution/integration/**
+      - src/porsche-turbo-evolution/**
       - src/Root.tsx
       - production/videos/porsche-911-turbo-evolution-001/integration/**
       - .github/workflows/porsche-d-master-ci.yml
