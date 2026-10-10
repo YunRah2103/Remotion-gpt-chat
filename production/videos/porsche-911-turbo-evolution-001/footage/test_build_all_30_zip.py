@@ -99,6 +99,36 @@ class PackageGateTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 module.safe_path(Path(root),"missing.mp4")
 
+    def test_native_one_pass_vertical_render_with_synthetic_video_only(self):
+        import shutil
+        import subprocess
+        if not shutil.which('ffmpeg') or not shutil.which('ffprobe'):
+            self.skipTest('native FFmpeg unavailable')
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            source=root/'SYNTHETIC_TEST_NOT_PORSCHE.mp4'
+            subprocess.run(['ffmpeg','-hide_banner','-loglevel','error','-f','lavfi',
+                            '-i','testsrc2=size=1280x720:rate=25:duration=3',
+                            '-c:v','mpeg4','-q:v','4','-y',str(source)],
+                           check=True,timeout=60)
+            output=root/'test-only-vertical-1080p.mp4'
+            shot={'localPath':source.name,'sha256':module.sha(source),
+                  'width':1280,'height':720,'fps':25,
+                  'focusX':0.5,'focusY':0.5,'sourceInSeconds':0.20,
+                  'sourceOutSeconds':2.50,'handleFrames':2,
+                  'sourceUrl':'test://local'}
+            beat={'durationFrames':17,'slot':1}
+            report=module.render_one(shot,beat,root,output)
+            self.assertEqual(report['clipTotalFrames'],21)
+            self.assertEqual(report['clipVideo']['width'],1080)
+            self.assertEqual(report['clipVideo']['height'],1920)
+            self.assertEqual(report['clipVideo']['fps'],30.0)
+            self.assertEqual(report['clipVideo']['codec'],'h264')
+            self.assertEqual(report['clipVideo']['videoFrames'],21)
+            self.assertTrue(output.is_file())
+            motion=module.motion_check(output,21)
+            self.assertEqual(len(motion),2)
+
     def test_final_zip_is_single_named_archive(self):
         self.assertEqual(module.TARGET_ZIP,"PORSCHE_911_TURBO_EVOLUTION_ALL_30_CLIPS_1080P.zip")
 
