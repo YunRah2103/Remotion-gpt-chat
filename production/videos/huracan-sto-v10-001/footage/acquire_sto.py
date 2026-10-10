@@ -34,7 +34,19 @@ SOURCES = [
      "https://www.monacoisland.io/post/lamborghini-hurac%C3%A1n-sto-super-trofeo-omologata",
      "https://video.wixstatic.com/video/ef7c1e_9bf925ada5ce445fb60a02a29fd3ce91/720p/mp4/file.mp4")
 ]
-VALID_HOSTS = {"phantommedia.sgp1.cdn.digitaloceanspaces.com", "video.wixstatic.com"}
+
+# Six separately published native video candidates under LA Modz's explicitly
+# labelled "Lamborghini huracan STO tinted" blog entry.  Workshop detail footage
+# is expected; passing identity still does NOT prove driving motion.
+SOURCES += [
+    (
+        f"la-modz-sto-{number}", "LA Modz",
+        "https://lamodz.co.uk/blogs/",
+        f"https://lamodz.co.uk/wp-content/uploads/2021/12/IMG_{number}.mp4"
+    ) for number in (2882, 2881, 2880, 2891, 2892, 2893)
+]
+
+VALID_HOSTS = {"phantommedia.sgp1.cdn.digitaloceanspaces.com", "video.wixstatic.com", "lamodz.co.uk"}
 MAX_SOURCE_BYTES = 180 * 1024 * 1024
 MAX_TOTAL_BYTES = 480 * 1024 * 1024
 
