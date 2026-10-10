@@ -1,0 +1,120 @@
+{
+  "project": "EXOTIC AFTER DARK",
+  "date": "2026-10-10",
+  "branch": "automotive-edits/midnight-v12-001/a-footage",
+  "round": "Agent A single-hero acquisition after 27.14s soundtrack override",
+  "gate": "FAIL",
+  "newApprovedVideoAssets": 0,
+  "sourceReferenceNotUsed": true,
+  "primaryCreativeCandidate": {
+    "car": "Koenigsegg Jesko Attack",
+    "singleCarRule": true,
+    "acquisition": "BLOCKED",
+    "causes": [
+      "Original filmmakers/Koenigsegg official pages examined; original 11-angle video rush package not published as direct downloadable source",
+      "YouTube yt-dlp format listing blocked by sign-in verification on remote VM",
+      "Vimeo player/original source retrieval refused with 401/403",
+      "No source original, 11-angle visually inspected media files acquired"
+    ],
+    "verifiedOriginalStream": false
+  },
+  "fallbackCandidate": {
+    "car": "One-of-one bespoke Bugatti Chiron Super Sport Hermès",
+    "source": "3003 Official — Hermès Royalty Drop 02",
+    "sourceUrl": "https://3003official.com/",
+    "priceEUR": 14,
+    "publicPageAdvertises": "38 4K 9:16 component clips across three driving runs, including driveby, parking and rolling",
+    "paidOriginalPurchased": false,
+    "original4KVerified": false,
+    "genuinelyDistinct11ViewsVerified": false,
+    "previewFilesDownloaded": 3,
+    "previewFullDecodePass": 3,
+    "previewNativePortrait": true,
+    "previewProvedDimensions": [
+      540,
+      960
+    ],
+    "previewFPS": 30,
+    "sameIndividualCar": "Seller claims same bespoke vehicle; visually likely, independent model/color continuity audit pending full originals",
+    "night": "Not verified; Puerto Banús city location, not guaranteed night",
+    "aggressiveMotion": "Unverified. Three drives can contain repeated views; generic cinematic footage must be assessed against 27s aggressive soundtrack before any commitment."
+  },
+  "previewHashes": [
+    {
+      "name": "SEG1_promo_540.mp4",
+      "url": "https://3003official.com/images/drop02content/SEG1_promo_540.mp4",
+      "bytes": 443094,
+      "sha256": "3df3e2e3959a9a2977db54da69ce789feb377b68d82f84b61f79ff3236c477ad",
+      "durationSeconds": 5,
+      "width": 540,
+      "height": 960,
+      "fps": 30,
+      "videoBitrateKbps": 569,
+      "decode": "PASS"
+    },
+    {
+      "name": "SEG2_promo_540.mp4",
+      "url": "https://3003official.com/images/drop02content/SEG2_promo_540.mp4",
+      "bytes": 1028044,
+      "sha256": "4cfd019c192b3de2277a628974d1e2c37aef19a3d9296f3ecf1d0f09fc5516eb",
+      "durationSeconds": 5,
+      "width": 540,
+      "height": 960,
+      "fps": 30,
+      "videoBitrateKbps": 1504,
+      "decode": "PASS"
+    },
+    {
+      "name": "SEG3_promo_540.mp4",
+      "url": "https://3003official.com/images/drop02content/SEG3_promo_540.mp4",
+      "bytes": 1163113,
+      "sha256": "87f46d93babd80db76c53d122f0b2f6db7e2209b8802de32d6400b9a26f5c5a7",
+      "durationSeconds": 5,
+      "width": 540,
+      "height": 960,
+      "fps": 30,
+      "videoBitrateKbps": 1721,
+      "decode": "PASS"
+    }
+  ],
+  "sourceQAArtifact": {
+    "kind": "Public-preview inspection evidence only, NOT original footage source pack",
+    "url": "https://378e0378-9dfe-48d4-9d9c-73912757403f.sandbox.floot.app/_cdn/static/midnight-v12-001/agent-a-jesko-blocker-bugatti-alternate-QA.zip",
+    "sha256": "353b6c0b85414d3fa257f5412899648c2bf7119e2f96c49a2db176946c7f0af8",
+    "bytes": 161596,
+    "entries": 8,
+    "files": [
+      "Six contact / 9:16 JPGs",
+      "BUGATTI_CANDIDATE_QA.json",
+      "READ_ME_FIRST.md"
+    ],
+    "downloadAndHashVerified": true
+  },
+  "videoContract": {
+    "durationSeconds": 27.1333,
+    "frames": 814,
+    "mainAudioDropSecondsApprox": 6.5,
+    "mainAudioDropFrameApprox": 195,
+    "exactUserAudioSha256": "cac310f3d76709d5bbdd13a7d8015b1bcc4e5152cde6587838b2ebae76826592",
+    "sourceReferenceFootageUsage": "ZERO",
+    "singleNewVehicle": true,
+    "minimumGenuinelyDifferentMotionShots": 11,
+    "minimumUsefulImageQuality": "Native 1080x1920 9:16 or 4K landscape with crop safe actual car",
+    "approval": "NO"
+  },
+  "userDecisionNeeded": "Provide independently obtained original source pack ZIP from rights holder (e.g. user purchases €14 paid Bugatti pack) OR deliver a permitted Jesko source to inspect. No paid purchase can be executed without user's checkout. Buying is not guaranteed to pass 11-angle QA.",
+  "failReasons": [
+    "No downloaded original 4K source footage",
+    "11 genuinely different moving camera angles of one car unverified",
+    "All three provided promo files low-res compressed 540x960",
+    "Promotional clips are edited and cannot establish number of real original camera setups",
+    "Source seller's city footage does not prove aggressive action, night look or coherent grade"
+  ],
+  "viableCreativeRelaxations": [
+    "Allow 3 distinct genuine driving camera setups plus multiple non-moving macro/car details, while retaining ~11 beat cuts (would violate 11 unique moving-angles rule)",
+    "Relax no-repeat source-shot rule to allow deliberate repeats and split-run edits, with honest documentation of source duplicates; never masquerade as 11 unique perspectives",
+    "Relax night or aggressive track driving if new single-car Bugatti urban/dusk footage is the chosen priority",
+    "Relax strict one-car constraint to enable cross-car montage; not recommended due user direction",
+    "Switch to authorized/locally-rendered 3D cinematic capture of one exotic car; changes real-footage rule"
+  ]
+}
