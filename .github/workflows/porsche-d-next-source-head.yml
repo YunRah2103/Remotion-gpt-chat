@@ -1,0 +1,48 @@
+name: Porsche D - probe official B-roll source size safely
+on:
+  push:
+    branches: [automotive-edits/porsche-911-turbo-evolution-001/d-master]
+    paths: ['.github/workflows/porsche-d-next-source-head.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check-media-length-without-downloading:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Read official Porsche Newsroom MP4 response headers only
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,urllib.request
+          from urllib.error import HTTPError,URLError
+          choices={'286306':'55-sec Turbo 50 promo - already acquired',
+                   '286687':'13-min B-roll',
+                   '286726':'930 Turbo feature',
+                   '286727':'992 Turbo feature'}
+          result=[]
+          for mid,title in choices.items():
+              url='https://newstv.porsche.com/porschevideos/newstv.porsche.com_'+mid+'_en.mp4'
+              item={'id':mid,'title':title,'url':url}
+              try:
+                  req=urllib.request.Request(url,method='HEAD',headers={'User-Agent':'Mozilla/5.0'})
+                  with urllib.request.urlopen(req,timeout=20) as res:
+                      size=int(res.headers.get('Content-Length') or 0)
+                      item.update(status=res.status,bytes=size,
+                                  sizeGiB=round(size/1073741824,2) if size else None,
+                                  contentType=res.headers.get('Content-Type'),
+                                  acceptRanges=res.headers.get('Accept-Ranges'))
+              except (HTTPError,URLError,TimeoutError) as error:
+                  item.update(status='ERROR',errorType=type(error).__name__,
+                              detail=str(error)[:140])
+              result.append(item)
+          print('OFFICIAL_HEAD_PROBE_JSON_START')
+          print(json.dumps(result,indent=2))
+          print('OFFICIAL_HEAD_PROBE_JSON_END')
+          with open('/dev/stdout','a') as f:
+              f.write('### Official Porsche source sizes (HEAD only, no media downloaded)\n\n')
+              f.write('| Video ID | HTTP | Size (GiB) | Description |\n|---|---|---:|---|\n')
+              for item in result:
+                  f.write(f"| {item['id']} | {item['status']} | {item.get('sizeGiB') or '?'} | {item['title']} |\n")
+          PY
