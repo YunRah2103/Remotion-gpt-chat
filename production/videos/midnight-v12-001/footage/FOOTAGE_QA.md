@@ -22,3 +22,16 @@
 4. [Pixabay 4K60 night Lamborghini lead](https://pixabay.com/videos/car-automobile-vehicle-lamborghini-152184/) — promising indexed listing; remote acquisition got **403**. Not downloaded or QA-approved.
 
 Cloud URL is temporary project-hosted storage, **not** a GitHub Actions artifact (no artifact ID). Download and hash promptly.
+
+
+---
+
+## Native original YouTube / yt-dlp continuation
+
+This QA must not be interpreted as an approved YouTube footage download. See [original-source licence and extractor report](./YOUTUBE_ORIGINAL_SHOOT_SCOUT.md).
+
+- **Cloud runtime:** ARM64 yt-dlp 2026.08.19 executable installed/tested. `--list-formats` attempted for Creative Commons-labelled [Jesko USA Delivery](https://www.youtube.com/watch?v=PxSSCIdmEZ8).
+- **Result:** YouTube bot-sign-in block before format listing. No video downloaded; actual 4K / bitrate / 9:16 / continuous motion / 11 truly different camera setups cannot be verified.
+- **Rights metadata:** explicit YouTube Creative Commons Attribution label on uploader-created Jesko and Aventador films; independent footage ownership beyond uploader's declared licence remains unconfirmed. Standard-licence Fastrmedia, Hartnett Media and Remnant Media shoots need written permission to repurpose.
+- **No new artefact or SHA** for a YouTube media file. Source manifests are document evidence only; old V2 8-clip ZIP not a substitute.
+- **Gate decision:** **FAIL**, due actual unavailable bytes and eleven-shot quality gate not met.
