@@ -1,0 +1,66 @@
+name: M5 Agent A split authentic source evidence
+on:
+  push:
+    branches: ['automotive-edits/bmw-m5-evolution-001/a-footage']
+    paths: ['.github/workflows/bmw-m5-agent-a-split.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  split:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: M5-A-SOURCES-38045881998
+          run-id: 38045881998
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: staging
+      - name: Inspect actual source sizes
+        run: |
+          find staging -type f -printf '%p %s bytes\n' | sort
+          du -sh staging
+      - name: Upload lightweight true-frame previews and FFprobe provenance
+        uses: actions/upload-artifact@v4
+        with:
+          name: BMW-M5-A-CONTACT-${{ github.run_id }}
+          path: |
+            staging/contact/
+            staging/acquisition-report.json
+          retention-days: 7
+          if-no-files-found: error
+      - name: Deliver early-generation archives
+        uses: actions/upload-artifact@v4
+        with:
+          name: BMW-M5-A-OLD-${{ github.run_id }}
+          path: |
+            staging/source/mixed-e28-e34-e39-e60.*
+            staging/source/e39-historic.*
+            staging/source/e60-driving-alongside.*
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
+      - name: Deliver F10 / F90 / G90 previews
+        uses: actions/upload-artifact@v4
+        with:
+          name: BMW-M5-A-MODERN-${{ github.run_id }}
+          path: |
+            staging/source/f10-ascari.*
+            staging/source/f90-racetrack.*
+            staging/source/g90-driving.*
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
+      - name: Deliver dedicated multi-generation and F90 original masters
+        uses: actions/upload-artifact@v4
+        with:
+          name: BMW-M5-A-MASTERS-${{ github.run_id }}
+          path: |
+            staging/source/all-m5-generations-2017.*
+            staging/source/f90-estoril-2017.*
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
