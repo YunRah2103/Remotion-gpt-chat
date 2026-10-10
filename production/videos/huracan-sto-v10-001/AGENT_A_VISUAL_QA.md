@@ -48,3 +48,22 @@ These ranges are only for **research and editor scouting**. Shot-by-shot model i
 2. Apply source-ID + true pixel-crop checks to each selected timestamp.
 3. Exclude branded end cards, overlays, static shots pretending to be racing.
 4. Agent D should review the actual ZIP images, not only this report or CI.
+
+
+## Final second-pass results (independently reviewed)
+
+GitHub [run 38089913965](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38089913965), [artifact 11683039237](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38089913965/artifacts/11683039237), delivered **10 actually downloaded MP4 source files**, one inner source ZIP of **219,502,368 bytes**. All ten files were FFprobed and SHA-256 hashed and their generated real frame contact sheets reviewed. A further (eleventh) Phantom URL was technically rejected, not counted.
+
+The added **six** LA Modz STO workshop videos are all **720×1280 portrait, ~3.0–15.0 seconds, ~29.6–30 fps**. Visual review confirms a genuine dark grey/black STO, wing and brake/bodywork details and a tinting demonstration, but they contain installer/person/text/brand overlays and nearly all portray a **stationary** car. They cannot be counted as six premium racing/rolling shots. They are not true 1080×1920 footage.
+
+Further detailed review of Monaco Island's feature at 5-second intervals confirms that most apparent high-speed race clips depict racing-spec Huracáns with racing liveries, **not demonstrably the road-going STO**. Therefore none of those are certified as STO track-driving clips.
+
+### Final Agent A sign-off
+
+- Download/package functionality: **PASS (10 real MP4s, ZIP, native checks, actual preview images)**.
+- Car-specific technical QA: **partial**; the initial three Phantom videos and six LA Modz clips depict genuine road STOs; the Monaco source mixes models and cannot be approved wholesale.
+- Sharp 1080×1920 footage: **FAIL: 0/10 native or crop-resolution qualified**.
+- 10 distinct high-quality moving **road STO** shots: **FAIL / UNVERIFIED**. Scene cuts, installer camera moves and repeated slow drive-bys are not automatically different dynamic driving shots.
+- **Gate A final status: FAIL for premium edit release**. Hand off the package for research only. Do not declare a publish-ready footage set or request final render based on this dataset.
+
+Recommendation: acquire a single original 4K/vertical cinematic Huracán STO source with genuinely different road/track camera angles (creator-provided master/press package); inspect and approve individual frame ranges before promoting to Gate A PASS. If a premium licensed package is acceptable, creators have sold native 4K vertical STO angle sets; payment/user approval required, never implied.
