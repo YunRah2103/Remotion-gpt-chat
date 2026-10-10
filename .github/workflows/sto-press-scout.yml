@@ -1,0 +1,37 @@
+name: STO V10 Agent A - manufacturer press original probe
+on:
+  push:
+    branches: [automotive-edits/huracan-sto-v10-001/a-footage]
+    paths:
+      - production/videos/huracan-sto-v10-001/footage/scout_sto_press.py
+      - .github/workflows/sto-press-scout.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install native video QA tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          pip install Pillow
+          python -m py_compile production/videos/huracan-sto-v10-001/footage/scout_sto_press.py
+      - name: Inspect actual press links and published MP4
+        run: python production/videos/huracan-sto-v10-001/footage/scout_sto_press.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STO-MANUFACTURER-PRESS-SCOUT
+          path: |
+            out/STO_PRESS_SCOUT_RESEARCH.zip
+            out/sto-press-scout/manifest.json
+          retention-days: 5
+          if-no-files-found: warn
+          compression-level: 0
