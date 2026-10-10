@@ -18,7 +18,7 @@ The artifact has been downloaded in Agent B's working environment. **All 39 MP4 
 
 `.github/workflows/bmw-m5-g90-private-render.yml` downloads the original 39-shot media artifact during Actions run, independently verifies all source hashes and formats, installs FFmpeg and Remotion, renders 600 frames, and validates H.264 1080x1920 30fps by FFprobe + complete FFmpeg decode. It uploads only a short-lived, **visual-only** 20-second MP4 for personal review, never the raw music. The private user-uploaded soundtrack is muxed **locally outside public GitHub** with FFmpeg.
 
-GitHub Actions run:
+GitHub Actions Remotion native 600-frame render: **SUCCESS**. Original source rendered at commit `1ef4582aae86fdc08244de24dfbc077dafc798d8`. Visual-only artifact `11653571296` downloaded, user audio locally muxed, actual final native Remotion MP4 `/mnt/data/BMW_M5_G90_REMOTION_PRIVATE_FINAL_20s.mp4` validated: H.264 1080×1920, 30fps, 600 frames, 20.000s, AAC stereo 48 kHz, full FFmpeg decode and 39-beat moving-footage visual QA PASS; SHA256 `15ed05c1df2fe5cddda990bfec65f5c50a54885edd4380d6abf71b1a4e7e6edb`.
 https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38010694333
 
 ## Alternative independent offline proof
