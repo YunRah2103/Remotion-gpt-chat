@@ -20,8 +20,16 @@ def plan(base,candidate,changed):
     if any(p.startswith(("src/TurboDocumentary","src/turbo/")) for p in paths):add("TurboDocumentary")
     if "src/ProductionCaptions.tsx" in paths:
         selected.update(k for k in b if k.endswith("Captioned"))
-    if any(p in {"src/Root.tsx","package.json","package-lock.json"} or p.startswith("src/mechanics/") for p in paths):
-        selected.update(b.keys())
+    # Registry additions/changes can be reviewed precisely instead of rendering
+    # unrelated media-only compositions whose images are intentionally not in git.
+    if "src/Root.tsx" in paths:
+        selected.update(k for k in b if k not in a or b[k]!=a[k])
+    if any(p.startswith("src/fx/") or p.startswith("production/fx/") for p in paths):
+        add("AutomotiveFXShowcase")
+    if any(p in {"package.json","package-lock.json"} or p.startswith("src/mechanics/") for p in paths):
+        # Representative existing native regression, plus newly added scene.
+        # This is a bounded smoke, NOT a claim every legacy film was reviewed.
+        add("GpuDriveFilm")
     for p in paths:
         m=re.fullmatch(r"production/videos/([^/]+)/.*",p)
         if m:
@@ -40,7 +48,7 @@ def plan(base,candidate,changed):
         output.append({"composition":comp,"duration":n,"frames":frames,
                        "baselineExists":comp in a and a[comp]==n,
                        "movieStart":middle,"movieEnd":min(n-1,middle+7)})
-    return {"selection":"source-aware","targets":output,"changedFiles":sorted(paths),
+    return {"selection":"source-aware bounded; includes registered composition additions and representative dependency smoke", "targets":output,"changedFiles":sorted(paths),
             "warning":"Rendered pixels and motion are evidence, not a quality verdict."}
 
 if __name__=="__main__":
