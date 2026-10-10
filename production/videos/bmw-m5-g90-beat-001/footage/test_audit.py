@@ -17,7 +17,7 @@ class FootageAuditTest(unittest.TestCase):
         result = audit(PLAN, [], 'plan')
         self.assertEqual(result['slots'], 39)
         self.assertEqual(result['frames'], 600)
-        self.assertEqual(result['assignedSlots'], 0)
+        self.assertEqual(result['assignedSlots'], sum(s.get('sourceId') is not None for s in PLAN['slots']))
         self.assertFalse(result['footageReady'])
 
     def test_reject_frame_gap(self):
