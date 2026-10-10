@@ -1,4 +1,5 @@
 import React from 'react';
+import {M5EvolutionFilm} from './bmw-m5-evolution/M5EvolutionFilm';
 import {Composition} from 'remotion';
 import {GpuDriveFilm} from './GpuDriveFilm';
 import {TurboDocumentary} from './TurboDocumentary';
@@ -17,4 +18,5 @@ export const VideoRoot=()=> <>
   <Composition id="EngineeringDualVersion" component={TwoVersionFilm} width={1080} height={1920} fps={30} durationInFrames={750} defaultProps={{variant:"studio" as const}}/>
   <Composition id="AutomotivePhotoCollage001" component={AutomotivePhotoCollage001} width={1080} height={1920} fps={30} durationInFrames={600}/>
   <Composition id="AutomotiveVideoCollage001" component={AutomotiveVideoCollage001} width={1080} height={1920} fps={30} durationInFrames={600}/>
+  <Composition id="M5EvolutionPrivate" component={M5EvolutionFilm} width={1080} height={1920} fps={30} durationInFrames={552} defaultProps={{mode:"diagnostic" as const,shots:[]}}/>
 </>;
