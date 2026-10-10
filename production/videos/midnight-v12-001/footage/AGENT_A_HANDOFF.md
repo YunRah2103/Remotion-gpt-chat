@@ -43,3 +43,20 @@ The user confirmed **yt-dlp is installed**, enabling local retrieval tests. Stop
 **Final source evidence, ranked originals, local exact yt-dlp probe/acquisition commands, and trade-offs:** [YOUTUBE_ORIGINAL_SHOOT_SCOUT.md](./YOUTUBE_ORIGINAL_SHOOT_SCOUT.md) plus machine-readable [youtube-candidate-manifest.json](./youtube-candidate-manifest.json). User can locally run yt-dlp -F on the two original CC-labelled sources without pasting any credentials; only upload a media file they have download/adaptation permission for. Follow up with actual FFprobe and 11-angle QA on true files.
 
 **Gate A remains FAIL.** The 12-source Pexels V2 scout ZIP is still a separate, incomplete, mixed-car source pool and must not be promoted to final footage. B/D integration remains blocked. A's next meaningful action requires actual local or creator-provided source bytes, permission and high-res evidence.
+
+
+---
+
+## REQUIRED NEW AUDIO HANDOFF — 2026-10-10 USER OVERRIDE
+
+**Old track and 10.53-second/316-frame/f77 timing are cancelled**. The user supplied a different MP3 and explicitly rejected copying any video footage from the previous Lamborghini reference. **The new MP3 is attached in the user's current chat, not in GitHub.**
+
+- File: `｜18_00｜｜Spider man discovers what's hypergamy ｜ #edit #fyp #viral #hy... [7694012207188790546].mp3`
+- Actual MP3 container: **27.141224 seconds**; decoded PCM **27.115102 seconds**; 44,100Hz stereo; 462,547 bytes.
+- Actual user-upload SHA256: `cac310f3d76709d5bbdd13a7d8015b1bcc4e5152cde6587838b2ebae76826592`.
+- Intro: spoken confrontation/tension approx **0–6.5s**; strong rhythmic/musical drop approx **6.50s/frame 195** (calculated via real audio RMS & spectral transients, validate by listening).
+- Draft target: **814 frames** @30fps / **27.133s** (final handling of MP3 encoder delay requires native mux check), 1080×1920.
+- Source film: completely **new** extreme exotic car and actual moving scenes, no frames from uploaded Lamborghini reference, no recycled BMW/Porsche/previous project clips.
+- Source/video **Gate A remains FAIL**, original single-car ≥11 unique-angle 4K package still not acquired; neither soundtrack selection nor documentation clears it.
+
+**B/D: pull audio changes explicitly** from this Agent A branch's `beat-map.json` and superseding contract header before editing or rendering; do not mistakenly retain f77 or 316f. The private MP3 must be transferred to the render agent and SHA-verified outside public Git. Any old 10.53s audiovisual output is stale.
