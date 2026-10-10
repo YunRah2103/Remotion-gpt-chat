@@ -1,0 +1,32 @@
+name: BMW M5 Evolution - 42-beat seven-generation three-agent contract
+on:
+  push:
+    branches:
+      - 'automotive-edits/bmw-m5-evolution-001/**'
+    paths:
+      - 'production/videos/bmw-m5-evolution-001/**'
+      - '.github/workflows/bmw-m5-evolution-001-ci.yml'
+  pull_request:
+    paths:
+      - 'production/videos/bmw-m5-evolution-001/**'
+      - '.github/workflows/bmw-m5-evolution-001-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  production-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate 42 real beat boundaries, seven actual M5 generations, proper agent roles and blocked/ready handoffs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python production/videos/bmw-m5-evolution-001/validate_setup.py
+          python production/videos/bmw-m5-evolution-001/footage/validate_sources.py production/videos/bmw-m5-evolution-001/footage/source-manifest.template.json
+          python -m compileall -q production/videos/bmw-m5-evolution-001
+          echo "Planning contract checked. Footage availability, rights, user audio and a finished MP4 are NOT yet established." >> "$GITHUB_STEP_SUMMARY"
