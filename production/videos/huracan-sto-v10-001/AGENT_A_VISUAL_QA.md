@@ -86,3 +86,25 @@ After download, I opened the actual outer archive and its manifest. It reports:
 - **Four actual media sources** were downloaded and verified in the landscape run; **zero unique dynamic shot angles newly signed off**; still blocked for the 10+ distinct moving-shot goal.
 
 Earlier QA above calling native 1920×1080 landscape unsuitable was specific to the superseded portrait format, and is **NOT** the updated landscape resolution verdict. FHD landscape source quality PASS != 10+ moving-angle Gate A PASS.
+
+
+## Third acquisition: native cinematic NIGHT Huracán STO film — REAL FILE, optional only (10 October 2026)
+
+**Film:** FORMAT67's “Sound Up The Darkness” / “Huracán STO Titanium Exhaust”, originally published by FORMAT67 for Lamborghini Nürnberg.
+**Original URL:** https://format67.net/wp-content/uploads/2024/08/STO_FORMAT.mp4
+**Filmmaker portfolio:** https://format67.net/portfolio/lamborghini-huracan-sto-car-commercial/
+**Verified GitHub acquisition:** run https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38092803493
+**Actual artifact:** https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38092803493/artifacts/11685215350 (ID **11685215350**, ~114MB).
+
+Downloaded the actual original, FFprobed it, checked SHA256, generated and **visually inspected** 24-shot and 50-shot film-wide contact sheets. Real media data:
+- **1920×810 cinematic 2.37:1, 25fps, 75.720 seconds, H.264, ~12Mbps, 113,939,885 bytes**.
+- SHA256 `4c47e642babedfce0c7bd1cf60fa15a397b60679d430c534f5def4792738bfa3`.
+- Real Lamborghini Huracán STO: moody red and white cars in wet night industrial/container-terminal scenes; illuminated front LEDs, low side profile, rear red lighting, wheels, cockpit/steering, exhaust and several genuine exterior rolling/tracking shots.
+- Titles `SOUND UP THE DARKNESS` approximately 1–3s; human/swimmer intercuts approximately 17–23s, 36–39s, 45–47s, 58s, 64–66s; final `HURACÁN STO TITANIUM EXHAUST` and branding from ~71s to end. **Exclude these; no extraneous text is visible in most selected car-only internal shots**.
+- Reasonable provisional shot-scout candidates include ~4.5–6.1, 9–15.5, 24–25.5, 27–29.5, 33–35.5, 39–43, 43–44.5, 48–50, 51–56, 59–64, 68–71s. Each needs editor's frame-exact car-only verification; DO NOT claim 14 independently verified driving angles.
+- **Strict 1920×1080 minimum: FAIL**. This is native 1920×810, not 1080 high, despite useful native width, real cinematic bitrate and absence of vertical cropping. It can be placed in a 1920×1080 output with 135px letterboxing without upscaling, but native shot remains below brief. It is OPTIONAL to Agent B.
+- Publisher availability is not legal authorization for reuse. Rights/permissions **NOT VERIFIED**. Obtain clearance before posting.
+
+Further acquisition investigation also tested six premium Vimeo films, but none of those original downloads succeeded because of site login restrictions; official thenewsmarket press original inaccessible. Do not invent or count those sources.
+
+**Agent A additional night-film handoff status:** REAL asset packaged; useful optional exterior/car-macro footage; **Gate A stays NOT PASSED for required 10–14 DISTINCT high-quality moving STO camera angles at native full 1920×1080 / 4K.** The user can provide filmmaker's 1080p/4K original or commission/license the high-resolution master.
