@@ -1,0 +1,45 @@
+name: Porsche Agent A - official Turbo native excerpt proof
+
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-native-excerpts.yml'
+  workflow_dispatch:
+    inputs:
+      media_id:
+        type: choice
+        options: ['286726', '286727', '286687']
+        default: '286726'
+
+permissions:
+  contents: read
+jobs:
+  stream-copy-native-porsche-clip:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install native decoder and still renderer
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install 'Pillow>=10,<12'
+      - name: Seek and copy small native excerpt without re-encoding
+        env:
+          MEDIA_ID: ${{ inputs.media_id || '286726' }}
+        run: |
+          python production/videos/porsche-911-turbo-evolution-001/footage/sample_official_source.py --video-id "$MEDIA_ID" --start 60 --seconds 12 --out out/porsche-raw-excerpt
+      - name: Store original-codec source excerpt, decode QA and contact sheet
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Porsche-Agent-A-real-Turbo-excerpt-${{ github.run_id }}
+          path: out/porsche-raw-excerpt/
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: warn
