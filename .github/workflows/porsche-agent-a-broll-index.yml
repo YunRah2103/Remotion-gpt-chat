@@ -1,0 +1,38 @@
+name: Porsche Agent A - sparse genuine Newsroom source index
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-broll-index.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sparse-official-source-index:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install native preview tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install 'Pillow>=10,<12'
+      - name: Scan genuine Porsche 13-minute B-roll MP4 without downloading entire 4K original
+        run: |
+          set -euo pipefail
+          python production/videos/porsche-911-turbo-evolution-001/footage/index_official_sources.py \
+            --media-id 286687 --step 24 --max-samples 40 \
+            --out out/porsche-broll-index
+      - name: Preserve contact sheets and source time-index proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Porsche-Agent-A-broll-index-${{ github.run_id }}
+          path: out/porsche-broll-index/
+          retention-days: 7
+          if-no-files-found: warn
