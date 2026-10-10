@@ -22,6 +22,12 @@ This report is grounded in **actual native video frames returned by successful G
 - GitHub run [38059700708](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38059700708), official source 60–72 s, native copy excerpt 12.12 s at 3840×2160 25fps H.264, **16,360,436 bytes**, SHA256 `88f021459292782c721d928095bad69f3ecf72a5690fe02637e552fdcf6f7b27`, full excerpt decode PASS.
 - Human review of 9 native excerpt frames shows a real grey 992 Turbo with rear 911 turbo badge, several macro badge frames, static interior frames, and one exterior rear-road driving shot late in excerpt. **Only the exterior driving section is an initial moving-car timeline candidate**. Do not use the macro text/interior as repeated full-car beats.
 
+
+## Original Porsche Turbo 50-year B-roll — media ID 286687, excerpt
+
+- GitHub run [38059812967](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38059812967), official B-roll source 60–72 s, native stream copy 12.08 s at **3840×2160 / 25fps H.264**, 26,365,479 bytes, SHA256 `74791d83b6ac0c985cb842c9c1d8e6de3faac62639bd2e40c0af24922e8be9ab`, full decode PASS. Source artifact ID 11672842287, expires after 1 day.
+- Nine actual native stills show a **real moving convoy of historic Porsches** across a grassy landscape and two distinct traveling camera angles at different positions. Some silhouettes may not be 911 coupes; the right-hand white long-nose coupe has not been authenticated as a 911 Turbo. This footage is a useful **lead for further scene selection**, NOT seven fully verified 911 Turbo generations and not 30 independent shots. Reject shots whose 911/Turbo identity cannot be confirmed.
+
 ## Release and handoff status
 
 **BLOCKED** for Master D's final 30-slot Porsche Turbo chronology. These real video source artifacts prove the download/format/decode pipeline, not the required four-by-four/five-by-five distinct moving Porsche 911 Turbo coupe shots. Strict QA has **not** certified 30 unique, same-era, genuinely moving setups. For 964, 993, 996, 997 and 991 especially, authentic independent source scenes remain to be acquired and reviewed.
