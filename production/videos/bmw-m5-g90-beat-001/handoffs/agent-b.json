@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "task": "bmw-m5-g90-beat-001-agent-b",
+  "branch": "automotive-edits/bmw-m5-g90-001/b-editor-master",
+  "sourceSha": "e8f17c9ef5cc48b143b21d3cc4d8007861097464",
+  "owner": "director",
+  "summary": "UNSTARTED: role assigned; no real footage, edit, render or final QA claimed.",
+  "status": "blocked",
+  "files": [],
+  "evidence": [],
+  "blockers": [
+    "This agent has not begun implementation and has not supplied verified source or media proof."
+  ],
+  "notes": "Planning placeholder. Source SHA is the previous real collage base; replace with actual work SHA before READY."
+}
