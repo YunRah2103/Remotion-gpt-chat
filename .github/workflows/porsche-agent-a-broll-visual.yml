@@ -1,0 +1,39 @@
+name: Porsche Agent A - visualize genuine 13 minute Turbo B-roll survey
+on:
+  push:
+    branches:
+      - automotive-edits/porsche-911-turbo-evolution-001/a-footage
+    paths:
+      - '.github/workflows/porsche-agent-a-broll-visual.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect-source-gallery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        page: ['01', '02']
+    steps:
+      - name: Output exact source contact frames from verified 4K GitHub Actions artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PAGE: ${{ matrix.page }}
+        run: |
+          set -euo pipefail
+          gh api repos/$GITHUB_REPOSITORY/actions/artifacts/11672926340/zip > /tmp/gallery.zip
+          ASSET=$(unzip -Z1 /tmp/gallery.zip | grep "source-286687-page-${PAGE}.jpg" | head -1)
+          test -n "$ASSET"
+          unzip -p /tmp/gallery.zip "$ASSET" > /tmp/contact.jpg
+          python - <<'PY'
+          import base64
+          from pathlib import Path
+          b=base64.b64encode(Path('/tmp/contact.jpg').read_bytes()).decode()
+          print('SOURCE_CONTACT_START')
+          for i in range(0,len(b),4000):
+            print('SOURCE_CONTACT_PART:'+b[i:i+4000])
+          print('SOURCE_CONTACT_END')
+          PY
