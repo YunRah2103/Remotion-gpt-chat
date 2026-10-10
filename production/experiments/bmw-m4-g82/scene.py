@@ -190,7 +190,7 @@ for frame in range(1,145):
 if camera.animation_data and camera.animation_data.action:
     for fc in camera.animation_data.action.fcurves:
         for point in fc.keyframe_points:point.interpolation="LINEAR"
-sc.render.engine="CYCLES";sc.cycles.samples=12;sc.cycles.use_denoising=True
+sc.render.engine="CYCLES";sc.cycles.samples=12;sc.cycles.use_denoising=False
 sc.render.image_settings.file_format="PNG"
 sc.render.filepath=os.path.join(O,"frames","frame_")
 os.makedirs(os.path.join(O,"frames"),exist_ok=True)
