@@ -8,13 +8,15 @@ Recreate the kinetic rhythm and mechanical-to-driving reveal of the user's suppl
 - Original music: `TikTok video #7690925557919403294 [7690925557919403294].mp3`, ~10.553 s, SHA256 `87a663860585e1714fd6fbb6a8006d19d655bda863db66cdaa75ba1830a2d678`. The MP3 is only in the original user chat; do NOT pretend it is committed. Request it from the director or use the supplied media pack artifact when available. Do not render a "finished" video with substituted music.
 - Visual analysis of reference: starts with rev-counter, physical exhaust/mechanical macro close-ups and tyre motion; later title and real track driving. User wants more aggressive editing than the reference, with genuinely distinct moving angles and engine audio mixed over music.
 
-## Locked film format
-- Exactly 316 frames at 30 fps = 10.533 s (the last 0.02 s of the supplied MP3 may be trimmed); 1080x1920 9:16.
+## Locked film format — OVERRIDES THE ORIGINAL PORTRAIT BRIEF
+**User's latest instruction: landscape sources AND the final movie must be landscape throughout. Do not build a vertical TikTok composition.**
+
+- Exactly 316 frames at 30 fps = 10.533 s (the last 0.02 s of the supplied MP3 may be trimmed); **1920×1080 16:9 LANDSCAPE for the entire finished video**. The user explicitly changed the original portrait brief on 10 October 2026.
 - Car: Lamborghini Huracán STO, 5.2L naturally aspirated V10. The STO ONLY. Avoid substituting standard Huracán, EVO, Super Trofeo, Tecnica or Sterrato.
 - Delivery: H.264 MP4, yuv420p, high-quality CRF 16–18 / slow or equivalent, AAC stereo 48 kHz, actual audio/music present.
 - Key reveal around 2.60 s; select precise shots from waveform and native visual test, not guess-based automated beats.
 - 10+ genuinely distinct *camera-angle* moving shots where footage permits; target 11–14. No fake angle by slicing one long stationary shot into different ranges.
-- Prioritise true vertical crop detail (native 9:16 or ≥3840x2160 landscape preferred). A 1920x1080 landscape crop has only ~608x1080 useful pixels: do not mislabel upscaled footage as native 1080x1920.
+- Every selected clip must display LANDSCAPE (16:9). Prefer native 4K landscape (3840×2160) or 1920×1080 landscape originals. **1920×1080 landscape is fully acceptable at native resolution**, without any forced vertical crop. Lower-resolution 1280×720 landscape is an explicit quality warning, not full-HD. Do not stretch/rotate portrait sources or disguise low-resolution portrait-to-landscape cropping as 1080p. Frame the car as the hero across the full widescreen composition.
 - Style: mechanical tension → decisive full-car reveal → fast track rolling, rear-wing details, night reflections if available → hero finish. No large HUD, stats panel, glitch spam, copied Lexus branding or tacky text. Car ALWAYS hero.
 - Music + authentic STO engine: real rev/start/acceleration/shift/downshift/cabin or exterior recordings; source/rights tracked. Start with punchy V10 rev and blend music without masking song; reintroduce engine transient at 2.6 s and key visual shifts. NEVER use another model engine and call it the STO.
 - Existing tooling: Remotion 4.x, FFmpeg/FFprobe, existing Cinematic FX Toolkit (inspect actual integrated paths), footage-finder workflow. Do not write an alternative FX engine unless necessary.
@@ -37,9 +39,9 @@ Recreate the kinetic rhythm and mechanical-to-driving reveal of the user's suppl
 If no same-variant night footage, use distinctive twilight or dark-grade track footage instead; never claim daylight is night, never substitute the wrong model.
 
 ## Gates
-**Gate A — footage**: 10+ genuine distinct moving angles, 4K or native vertical where possible; a real manifest identifying model, source URL, permission, exact in/out, FFprobe actual format and crop test. Packaging and preview contact sheets. FAIL if fewer than 8 usable distinct angles or obvious mismatch.
+**Gate A — footage**: 10+ genuinely distinct moving Huracán STO camera angles, each selected for a 16:9 LANDSCAPE frame; prefer original 4K or native 1920×1080 landscape. Real manifest identifying model, source URL, permission, in/out, FFprobe actual format and landscape framing test, single ZIP and preview contact sheets. Flag lower-resolution shots; exclude portrait-only workshop footage from production. FAIL if fewer than 8 usable distinct angles or obvious model mismatch. A prior portrait-resolution failure is not grounds to reject a native 1920×1080 landscape clip.
 **Gate B — edit**: validated shot map, actual native frames/proof, transitions/music timing; no low-quality source, repeated angle or visual clutter. FAIL if only code/CI.
-**Gate C — sound & output**: actual source WAV/MP3 and verified real STO engine, audible stems, rendered 1080x1920/30 H.264/AAC MP4, full-film decoded contact sheet, blackframe and silence inspection, unique shots. FAIL without playable media.
+**Gate C — sound & output**: actual source WAV/MP3 and verified real STO engine, audible stems, rendered **1920×1080 16:9 LANDSCAPE at 30fps** H.264/AAC MP4, full-film decoded landscape contact sheet, blackframe and silence inspection, unique shots. FAIL without playable media.
 **Gate D — independent QA**: manager validates A/B/C artifacts and final playable film. Green CI alone proves neither quality nor completion. Report BLOCKED, NOT STARTED, IN PROGRESS, PASS honestly.
 
 ## Team
