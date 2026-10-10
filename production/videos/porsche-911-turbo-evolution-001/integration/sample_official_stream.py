@@ -28,17 +28,30 @@ def sample(mid: str, output: Path, local_source: Path | None=None) -> dict:
     frames=[]
     for second in times:
         path=output/f"frame-{second:04d}.jpg"
-        command=["ffmpeg","-hide_banner","-nostdin","-loglevel","error","-rw_timeout","15000000",
-                 "-ss",str(second),"-i",url,
-                 "-frames:v","1","-vf","scale=320:180:flags=lanczos",
-                 "-q:v","3","-y",str(path)]
+        clip=output/f"native-{second:04d}.mp4"
+        # Use exactly the source-preserving method already successfully tested by Agent A:
+        # native codec stream-copy over HTTP Range first, then JPEG from LOCAL short excerpt.
+        command=["ffmpeg","-hide_banner","-nostdin","-loglevel","error",
+                 "-rw_timeout","25000000","-ss",str(second),"-i",url,
+                 "-t","2.0","-map","0:v:0","-c:v","copy",
+                 "-movflags","+faststart","-y",str(clip)]
         try:
-            subprocess.run(command,check=True,timeout=75,stdout=subprocess.DEVNULL,capture_output=True)
+            result=subprocess.run(command,check=True,timeout=120,
+                                  stdout=subprocess.DEVNULL,capture_output=True)
+            if not clip.is_file() or clip.stat().st_size < 15000:
+                raise ValueError("native stream-copy excerpt unexpectedly empty")
+            render=subprocess.run(["ffmpeg","-hide_banner","-nostdin","-loglevel","error",
+                 "-ss","0.2","-i",str(clip),"-frames:v","1",
+                 "-vf","scale=320:180:flags=lanczos","-q:v","3","-y",str(path)],
+                 check=True,timeout=30,stdout=subprocess.DEVNULL,capture_output=True)
             if not path.is_file() or path.stat().st_size < 1000:
-                raise ValueError("missing output frame")
+                raise ValueError("JPEG thumbnail not produced from native excerpt")
             frames.append((second,path))
         except (subprocess.TimeoutExpired,subprocess.CalledProcessError,ValueError) as exc:
-            print("SAMPLE_FRAME_FAILED",mid,second,type(exc).__name__,flush=True)
+            snippet=(exc.stderr.decode(errors="replace")[-240:] if isinstance(exc,subprocess.CalledProcessError) and exc.stderr else str(exc))
+            print("SAMPLE_FRAME_FAILED",mid,second,type(exc).__name__,snippet,flush=True)
+        finally:
+            clip.unlink(missing_ok=True)
     if len(frames) < 8:
         raise ValueError(f"only {len(frames)}/{len(times)} source frames accessible")
     columns=3
