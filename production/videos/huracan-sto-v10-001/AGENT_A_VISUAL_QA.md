@@ -1,0 +1,50 @@
+# Huracán STO V10 — Agent A native visual QA (10 October 2026)
+
+## Audited deliverable
+
+**Run:** https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38089620500
+
+**Single-ZIP artifact:** https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38089620500/artifacts/11683553050
+
+**Artifact ID:** 11683553050 · **artifact bytes:** 183,984,200 · **ZIP inside artifact:** 183,975,615 bytes. The ZIP includes original downloaded sources, manifest JSON, and LEFT/CENTRE/RIGHT preview contact sheets. It was downloaded from Actions and opened locally for independent visual review; not merely inferred from the workflow's success.
+
+All actual video files were FFprobed, SHA-256 hashed, and each preview opened. Additional 1 fps shot boards for the three Phantom sources were rendered and reviewed independently.
+
+## Actual media assets
+
+| Publisher ID | SHA256 | Actual video | Source crop pixels for vertical 9:16 | Visual findings |
+|---|---|---|---|---|
+| phantom-sto-primary | dba560aea7cbdf0f64f7e7bb647ae2d43cabcf03a7af9a6a7a445122caa43f33 | 1920×1080, 25 fps, 21.24 s | **606×1080** | Blue/yellow STO, front and rear angles, aero, wheels, exhaust, cabin, a little genuine street motion. Branded throughout + black logo end card. |
+| phantom-sto-lambo | 62deb84ce58be337c61402b8d1534b369d2d41c0b1797d0577cfdfe07365d502 | 1920×1080, 60 fps, 29.65 s | **606×1080** | Same blue/yellow STO; front/rear 3/4s, low side, aero and some slow movement on paved road. Publisher watermarks and end card. |
+| phantom-sto-huracan | d4d34a89be7b27f50e5f1a82a28521eae2fae9ac28e78613a847b0ef36564697 | 1920×1080, 60 fps, 31.40 s | **606×1080** | Same STO at indoor static display, camera pans/drone high angle, wing macro. Mostly stationary car and distracting rope barrier/shoppers. |
+| monaco-island-sto-720 | 6ca76917c22a153af448e942ec070d5151eff10c83364d7bf6d5d2607832bd56 | 1280×720, 25 fps, 225.48 s | **404×720** | Mixed feature/marketing video with verified studio shots of pale-blue/orange STO plus presenter and track footage. Racing shots need *individual* verification; don't mislabel Huracán Super Trofeo racing model as STO. |
+
+**Fifth source:** generic Phantom WhatsApp video technically rejected as too short/slow; exclude.
+
+**Resolution note:** 1920×1080 landscape yields only 606×1080 actual center-crop pixels. Scaling that to 1080×1920 is upscaling, not preserving native 1080p TikTok detail. Monaco only supplies 404×720 crop pixels. No acquired video qualifies as sharp native 1080×1920 vertical or 4K-landscape. This is an important premium-quality blocker.
+
+## Provisional usable source ranges — *not* approved 10 shots
+
+Timings are visual frame-board samples, not certified source in/out points. Candidate seconds:
+
+- Primary: 0–1.4 low front 3/4; 3–4 STO badge; 4–5 rear wing; 6–7 exhaust macro; 7–11 cockpit/dashboard/interior; 12–13 bodywork/wheel; 14–16 low rear shot; 17–19 **real vehicle movement**. Do not count end-logo seconds 19–21.
+- Lambo: 0–3 first exterior shot/front and rear; 4–10 headlight, side and aero details; 11–13 wheel close-up; 14–16 low rear angle; 17–27 several **slow exterior moving/car-moving views**. Exclude logo end card.
+- Huracan: 3–13 indoor showroom car angles; 13–20 overhead shot of mostly stationary car; 21–27 wing/body close-ups. Do not claim these are fast track-driving footage.
+- Monaco: ~22 seconds studio STO profile, ~67 seconds studio 3/4, ~112 seconds interior, ~157 seconds circuit footage requiring exact model/identity verification, ~202 seconds street/presenter. Some footage is visibly lower quality and not suited to sharp TikTok crop.
+
+These ranges are only for **research and editor scouting**. Shot-by-shot model identity, car motion, camera-angle distinctness, crop safety and duplicates must be independently approved. Distinct *scene cuts* are not necessarily distinct *camera angles*.
+
+## Gate result
+
+**Gate A: NOT PASSED (premium delivery quality BLOCKED).** Four acquired sources, several genuine moving segments, but **zero approved 1080p-portrait crop sources** and no certified 10 distinct moving-car angles. Do not overstate 15+ detected scene cuts as validated shots.
+
+## Second acquisition pass
+
+[Commit 6887f2e](https://github.com/YunRah2103/Remotion-gpt-chat/commit/6887f2ecd1eed1fd187d25eb56fb465775e6cf2d) adds six STO-tagged workshop video files officially embedded in LA Modz's 2021 STO tinting blog. These may supply native portrait detail footage but likely little genuine driving. Their download/FFprobe/manual status is separate from the initial successful artifact.
+
+## Priority before final B handoff
+
+1. Obtain genuine 4K/portrait **driving** shots of the Huracán STO, not an EVO or racecar substitute.
+2. Apply source-ID + true pixel-crop checks to each selected timestamp.
+3. Exclude branded end cards, overlays, static shots pretending to be racing.
+4. Agent D should review the actual ZIP images, not only this report or CI.
