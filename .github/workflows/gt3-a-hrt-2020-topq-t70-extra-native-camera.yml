@@ -1,0 +1,37 @@
+name: GT3 Agent A Native Nürburgring Top Q New Full HD 70s Camera Proof
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-hrt-2020-topq-t70-extra-native-camera.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify-actual-new-camera:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Native H.264 source video verification tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q Pillow
+      - name: Download full source original as recently SHA-verified
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/hrt_full82_real
+          gh run download 38164007797 --repo YunRah2103/Remotion-gpt-chat --name GT3-AGENT-A-HRT-NBR-FULL-TOPQUALIFYING-REAL-NATIVE-1080-AND-54FRAME-QA --dir inputs/hrt_full82_real
+      - name: Extract source t70-74 race camera and show exact 16 1080 frames
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/extract_hrt_nbr_topqual_t70_unique_camera_hd.py
+      - name: Publish real extra native HD camera movie and physical identity frames
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-NBR-TOPQ-REAL-EXTRA-LATE-TRACKSIDE-1080-CAMERA-REVIEW
+          path: out/gt3-a-hrt-extra70-74-nbr-camera-original/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
