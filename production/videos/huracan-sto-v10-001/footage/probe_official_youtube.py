@@ -3,7 +3,7 @@
 Native decoded proof required; no auth circumvention. Do not package low-res.
 """
 from pathlib import Path
-import json,subprocess,hashlib,zipfile
+import json,subprocess,hashlib,zipfile,os
 from PIL import Image,ImageDraw
 R=Path('out/sto-youtube-hd'); R.mkdir(parents=True,exist_ok=True)
 MEDIA=R/'videos';MEDIA.mkdir(exist_ok=True)
@@ -12,17 +12,25 @@ VIDS=[
   ('lamborghini-accademia-vallelunga-2024','https://www.youtube.com/watch?v=egjLBe6lMXU','Lamborghini official verified video: STO track at Vallelunga'),
   ('sto-first-test-2021','https://www.youtube.com/watch?v=jMOdF_wLAfU','The Wheel Network native 2021 STO track driving press film')
 ]
+cookies_path = os.environ.get("YOUTUBE_COOKIES_FILE", "").strip()
+cookies_file = Path(cookies_path) if cookies_path else None
+cookies_ready = bool(cookies_file and cookies_file.is_file())
+print("Cookie authentication: " + ("configured" if cookies_ready else "missing GitHub secret; skipping video downloads"))
 rows=[]
 for slug,url,desc in VIDS:
   row={'id':slug,'page':url,'title':desc,'status':'NOT_DOWNLOADED','manually_approved_moving_angles':0}
   rows.append(row)
   dest=MEDIA/(slug+'.mp4')
+  if not cookies_ready:
+    row["status"] = "COOKIE_SECRET_NOT_CONFIGURED"
+    continue
   try:
-    p=subprocess.run(['yt-dlp','-f','bv[height>=1080]+ba/b[height>=1080]/bv+ba/b','--merge-output-format','mp4',
+    p=subprocess.run(['yt-dlp','--cookies',str(cookies_file),'-f','bv[height>=1080]+ba/b[height>=1080]/bv+ba/b','--merge-output-format','mp4',
        '--remux-video','mp4','--no-playlist','--no-progress','--retries','1','--fragment-retries','1','--socket-timeout','15',
        '--max-filesize','200M','--output',str(dest),url],capture_output=True,text=True,timeout=190)
     if p.returncode or not dest.exists():
-      row.update(status='PUBLIC_VIDEO_DOWNLOAD_FAILED',error=(p.stderr+'\n'+p.stdout)[-650:]);continue
+      row.update(status='COOKIE_AUTH_DOWNLOAD_FAILED',error="YouTube still denied the source or the video is inaccessible; see yt-dlp guidance.")
+      continue
     meta=subprocess.run(['ffprobe','-v','error','-show_format','-show_streams','-of','json',str(dest)],text=True,capture_output=True,timeout=30,check=True)
     x=json.loads(meta.stdout);vid=next(s for s in x['streams'] if s['codec_type']=='video')
     info={'width':vid['width'],'height':vid['height'],'duration':float(x['format']['duration']),
