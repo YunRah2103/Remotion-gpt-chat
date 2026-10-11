@@ -1,0 +1,48 @@
+name: FR Legends Agent A - French Classics Dailymotion HD Source Gate
+
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - '.github/workflows/fr-legends-a-dm-probe.yml'
+      - 'production/videos/french-icons-001/agent_a_dm_formats.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-source-resolution:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install current yt-dlp Dailymotion extractor
+        run: python -m pip install --disable-pip-version-check -U yt-dlp
+      - name: Reject non-HD source formats before wasting bandwidth
+        run: python production/videos/french-icons-001/agent_a_dm_formats.py
+      - name: Summarize real formats and unsupported sources
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, pathlib,os
+          p=pathlib.Path("out/fr-legends-a-dm-formats/report.json")
+          d=json.loads(p.read_text()) if p.exists() else []
+          r=["## French Classics Dailymotion source gate",
+             "- This is **format discovery only**, not footage or a passed clip.",
+             f"- 1080p+ candidate streams: {sum(x.get('possible_hd',False) for x in d)}"]
+          for x in d:r.append(f"- {x['id']}: {x.get('highest_width')}×{x.get('highest_height')} {x['status']} {x.get('error','')[:120]}")
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(r))
+          print('\n'.join(r))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-agent-a-format-evidence-only
+          path: out/fr-legends-a-dm-formats/report.json
+          if-no-files-found: warn
+          retention-days: 3
