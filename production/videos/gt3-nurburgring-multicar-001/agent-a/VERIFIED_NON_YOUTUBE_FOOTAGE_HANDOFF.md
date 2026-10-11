@@ -61,3 +61,16 @@ Two identifiable makes are now backed by actual downloaded native 4K race footag
 **Local curated handoff** prepared separately: `YUNEX_GT3_PARTIAL_NATIVE_4K_CURATED.zip` (~123.2 MB), SHA256 `1c0e0dbb01e19789792ea1ea5378928453ed0f0a9d1f588b56bf5d5ad3e5fe60`. Contains copied native 4K Porsche+Mercedes 2018 race clips, a separately flagged 2026 Porsche Nürburgring footage candidate (car class verification pending), 2 contact sheets, source/time/hash manifest and README. B and D can use existing GitHub media archives above; no claim this partial package covers 24 shot quota.
 
 **Gate still BLOCKED:** GT3 marque coverage 2/6, independently selected different GT3 race shots fewer than 24. 
+
+
+### Critical 2018 Falken car-make correction — independent close-up review (supersedes source filenames)
+
+The 42-frame scan [GitHub run 38142178896](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38142178896) [artifact 11703670460](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38142178896/artifacts/11703670460) extracted **38 valid full-film review frames** from actual native 4K source (the last four timestamps exceeded original runtime). Wide 420-pixel contact sheet at t≈219s appeared to show a blue/teal BMW.
+
+To check, Agent A actually downloaded **two further 3840×2160 source excerpts**, source t=195 and t=214 seconds, [GitHub run 38142537320](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38142537320), [artifact 11703780406](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38142537320/artifacts/11703780406), 120,030,403 bytes, both FFprobe native HDR 4K, independently inspected 6-frame close-up.
+
+**Definitive visual correction**: the teal/blue/green cars at source t=195–201 are **Porsche 911 GT3 racing cars, NOT BMW M6 GT3**. The t=214 clip is an aerial shot of a race incident whose car model is not visually confirmed followed by a Porsche onboard. The filenames `falken_bmw_gt3_195s.mkv` / `falken_bmw_gt3_214s.mkv` in immutable artifact are **misleading acquisition candidate names** and MUST NOT be used as GT3 identification proof. Agent A rejected BMW maker credit after close-up.
+
+**Verified GT3 manufacturer count remains exactly TWO: Porsche and Mercedes-AMG.** Additional 4K footage was delivered, but it does not establish BMW or the six-make source gate.
+
+**Updated curated local V2 ZIP**: `YUNEX_GT3_PARTIAL_NATIVE_4K_CURATED_V2.zip`, **243,238,214 bytes**, SHA256 `163589b8168603815215db797ccad2f0de7dd3fa29b2cf3b8e67b506bbfbf958`, re-labelled clips `falken_2018_porsche_gt3r_trackside_4k.mkv` / `falken_2018_multicar_crash_aerial_CANDIDATE_4k.mkv`, retains previous two manufacturer GT3 footage and unverified Porsche 2026 clip, all original 4K source stream copy, contact sheets and correct source identities. Provide to Agent B/D as a **partial** footage package only.
