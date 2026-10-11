@@ -1,0 +1,52 @@
+name: YUNEX A2 racingTV Ferrari 296 GT3 Nürburgring Originals
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a2-ferrari-aston-mclaren
+    paths:
+      - .github/workflows/gt3-a2-racingtv-ferrari-native-highlights.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-ferrari-source-acquisition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Chromium public player inspector, yt-dlp and FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q playwright requests yt-dlp pillow
+          python -m playwright install chromium
+      - name: Download and validate only genuine native 1080 Ferrari Nürburgring films
+        run: |
+          python -u production/videos/gt3-nurburgring-multicar-001/agent-a2/racingtv_publisher_ferrari_video_probe.py
+      - name: Verify ZIP CRC and actual source media SHA
+        if: always()
+        run: |
+          python - <<'PY'
+          import hashlib,json,zipfile,pathlib
+          p=pathlib.Path('out/gt3-a2-racingtv-native-probe/GT3_A2_BROWSER_ORIGINALS_AND_QA.zip')
+          if not p.exists():print('NO ARCHIVE - NO FOOTAGE');raise SystemExit(0)
+          with zipfile.ZipFile(p) as z:
+            assert z.testzip() is None
+            m=json.loads(z.read('SOURCE_MANIFEST.json'))
+            n=0
+            for v in m['sources']:
+              if v['status']=='REAL_NATIVE_HD_FULL_DECODE_MODEL_REVIEW_PENDING':
+                assert hashlib.sha256(z.read(v['file'])).hexdigest()==v['sha256']
+                n+=1
+          assert n==m['native_hd_media_file_count']
+          print('ORIGINAL_REAL_NATIVE_1080_FILMS',n,'MAKE_VISUAL_ID_PENDING')
+          PY
+      - name: Upload only real media or clearly labelled source diagnostic ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-A2-RACINGTV-REAL-NATIVE-2023-FERRARI-N24-NLS-REVIEW
+          path: out/gt3-a2-racingtv-native-probe/GT3_A2_BROWSER_ORIGINALS_AND_QA.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
