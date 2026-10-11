@@ -41,6 +41,7 @@ for q in searches:
  try:
   a=search_commons(q); report["commons"][q]={"count":len(a),"1080_candidates":sum(x["height_ok"] for x in a),"items":a}
   print("COMMONS",q,"video_count",len(a),"hd",sum(x["height_ok"] for x in a),flush=True)
+  for item in a:print("MEDIA_ITEM",q,repr(item["title"]),item["width"],item["height"],item["url"],flush=True)
  except Exception as ex:
   report["commons"][q]={"error":str(ex)};print("COMMONS_FAILED",q,str(ex),flush=True)
 for name,url in press:
