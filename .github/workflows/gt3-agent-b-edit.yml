@@ -1,0 +1,60 @@
+name: GT3 Multi-Car Agent B - layout and edit QA
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/b-cinematic
+    paths:
+      - "src/gt3/**"
+      - "src/Root.tsx"
+      - "production/videos/gt3-nurburgring-multicar-001/edit/**"
+      - ".github/workflows/gt3-agent-b-edit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-layout-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install exact production dependencies
+        run: npm ci
+      - name: TypeScript compile
+        run: npm run check
+      - name: Structural + strict rejection tests
+        run: |
+          node --test production/videos/gt3-nurburgring-multicar-001/edit/validate-shotmap.test.mjs
+          mkdir -p out/gt3-agent-b
+          node production/videos/gt3-nurburgring-multicar-001/edit/validate-shotmap.mjs --plan | tee out/gt3-agent-b/plan-check.json
+      - name: Native 1920x1080 timing frames at real audio anchor cuts
+        run: |
+          for F in 0 45 78 158 240 315; do
+            npx remotion still src/index.ts Gt3MultiCar001LayoutProof "out/gt3-agent-b/layout-frame-$F.png" --frame="$F" --log=error
+          done
+      - name: Native moving technical previsualization (not GT3 footage)
+        run: |
+          npx remotion render src/index.ts Gt3MultiCar001LayoutProof out/gt3-agent-b/LAYOUT-ONLY-95FRAMES.mp4 --frames=0-94 --codec=h264 --pixel-format=yuv420p --crf=18 --concurrency=2 --log=error
+          ffprobe -v error -show_entries stream=codec_name,width,height,r_frame_rate,nb_frames -show_entries format=duration -of json out/gt3-agent-b/LAYOUT-ONLY-95FRAMES.mp4 >out/gt3-agent-b/layout-ffprobe.json
+          ffmpeg -v error -i out/gt3-agent-b/LAYOUT-ONLY-95FRAMES.mp4 -f null -
+          sha256sum out/gt3-agent-b/* >out/gt3-agent-b/SHA256SUMS.txt
+      - name: Explicit status note
+        run: |
+          printf '%s\n' \
+            'AGENT B: STRUCTURAL/LAYOUT PROOF ONLY' \
+            'Synthetic slates are not actual Nürburgring car footage.' \
+            'GATE B: BLOCKED pending verified real footage from Agent A and source native film QA.' \
+            'NEVER pass final edit based on this artifact.' \
+            >out/gt3-agent-b/IMPORTANT-NOT-A-FINAL-EDIT.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: GT3-B-TIMING-PROOF-NOT-FOOTAGE
+          path: out/gt3-agent-b/
+          if-no-files-found: warn
+          retention-days: 7
