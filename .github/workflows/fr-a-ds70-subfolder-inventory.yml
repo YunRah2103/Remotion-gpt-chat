@@ -1,0 +1,32 @@
+name: FR Legends A - Citroen DS Official Anniversary Video Folder Inventory
+on:
+  push:
+    branches: [automotive-edits/french-icons-001/a-classics-footage]
+    paths:
+      - '.github/workflows/fr-a-ds70-subfolder-inventory.yml'
+      - 'production/videos/french-icons-001/agent_a_ds70_open_subfolders.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual-public-press-folder-list:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Chromium
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Open Stellantis DS 70th folder and enumerate real public videos
+        run: python production/videos/french-icons-001/agent_a_ds70_open_subfolders.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-a-official-ds-70-anniversary-real-video-folder-inventory
+          path: out/fr-a-ds70-video-folder-audit/
+          retention-days: 7
+          if-no-files-found: warn
