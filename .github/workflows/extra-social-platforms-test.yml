@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       max-parallel: 8
       matrix:
-        sample: [facebook, facebook2, twitter, reddit, snapchat, pinterest, twitch, bluesky]
+        sample: [twitter2, twitter3]
         mode: [yt-dlp, chrome]
     name: "${{ matrix.sample }} / ${{ matrix.mode }}"
     steps:
