@@ -28,6 +28,10 @@ jobs:
             host: inv.nadeko.net
           - mode: invidious
             host: invidious.tiekoetter.com
+          - mode: invidious
+            host: invidious.nerdvpn.de
+          - mode: invidious
+            host: yt.chocolatemoo53.com
     steps:
       - uses: actions/checkout@v4
       - name: Install video validation tools
