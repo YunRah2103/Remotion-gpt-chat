@@ -1,0 +1,44 @@
+name: FR Legends A - Alpine Official Public Embed Native HD
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - '.github/workflows/fr-legends-a-alpine-embed.yml'
+      - 'production/videos/french-icons-001/agent_a_alpine_public_embed.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-public-alpine:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install FFmpeg/Pillow
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install pillow
+      - name: Probe only public press player, direct MP4 if accessible, decode QA
+        run: |
+          python production/videos/french-icons-001/agent_a_alpine_public_embed.py
+      - name: Publish exact status
+        run: |
+          python - <<'PY'
+          import pathlib,json,os
+          d=json.loads(pathlib.Path('out/alpine-press-player-a110/manifest.json').read_text())
+          s=['## Public Alpine legacy A110 HD press source',f"- Full-HD actual MP4 fetched: **{d['verified_original_full_hd']}**",f"- Status: {d['status']}",f"- Probe: {d.get('probe')}",f"- Error: {d.get('error','None')}","- Gate A remains CLOSED until actual visually verified footage."]
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(s))
+          print('\n'.join(s))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fr-legends-a-alpine-official-public-embed-source-zip
+          path: out/fr-legends-agent-a-official-alpine-public-embed.zip
+          retention-days: 7
+          if-no-files-found: error
+          compression-level: 0
