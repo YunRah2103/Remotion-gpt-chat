@@ -1,0 +1,44 @@
+name: Social downloader second-sample verification
+on:
+  push:
+    branches: [feature/footage-rescue-multisource-20261011]
+    paths:
+      - 'production/footage_rescue/diagnose_social_second_sample.py'
+      - '.github/workflows/social-second-sample.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  independent-post:
+    name: ${{ matrix.site }} / ${{ matrix.method }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    strategy:
+      fail-fast: false
+      matrix:
+        site: [instagram, tiktok]
+        method: [yt-dlp, yt-dlp-chrome]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install video extraction dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q 'yt-dlp[default,curl-cffi]==2026.08.19' gallery-dl
+      - name: Try a second video and verify actual bytes
+        run: |
+          python production/footage_rescue/diagnose_social_second_sample.py \
+            --site '${{ matrix.site }}' --method '${{ matrix.method }}' --out out/second
+      - name: Publish diagnostic evidence without third-party footage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: second-${{ matrix.site }}-${{ matrix.method }}
+          path: out/second/
+          retention-days: 3
+          if-no-files-found: warn
