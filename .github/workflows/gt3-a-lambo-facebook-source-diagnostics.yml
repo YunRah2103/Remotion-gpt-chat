@@ -1,0 +1,33 @@
+name: Agent A Lamborghini Public Race Player Diagnostic Deep Dive
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-lambo-facebook-source-diagnostics.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent-retrieval-diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install public video metadata tools
+        run: python -m pip install --break-system-packages -q yt-dlp
+      - name: Get physically verified prior failed browser evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/lamborghini-browser
+          gh run download 38155441694 --repo YunRah2103/Remotion-gpt-chat --name GT3-AGENT-A-LAMBORGHINI-ACTUAL-NATIVE-RACE-MEDIA-OR-DIAGNOSTICS --dir inputs/lamborghini-browser
+          find inputs/lamborghini-browser -maxdepth 2 -type f -printf '%P %s bytes\n'
+      - name: Inspect why actual 12 public Lamborghini GT3 CDN endpoints were all rejected
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/diagnose_lambo_browser_source.py
+      - name: Upload transparent diagnoses only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-LAMBO-CDN-DIAGNOSTIC-ONLY
+          path: out/gt3-a-lambo-diagnostic/
+          retention-days: 7
