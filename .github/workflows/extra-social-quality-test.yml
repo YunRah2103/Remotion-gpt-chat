@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       max-parallel: 5
       matrix:
-        sample: [snapchat, pinterest, twitch, bluesky, twitter3]
+        sample: [snapchat_gt3rs, snapchat_gt3rs2, snapchat_porsche, pinterest_gt3rs, pinterest_gt3rs2, pinterest_gt3rs3]
     name: "native quality - ${{ matrix.sample }}"
     steps:
       - uses: actions/checkout@v4
