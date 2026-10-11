@@ -1,0 +1,59 @@
+name: STO Agent C — official publisher 8D audio scout
+on:
+  push:
+    branches: [automotive-edits/huracan-sto-v10-001/c-sound-render]
+    paths: [.github/workflows/sto-c-official-engine-scout.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  locate-direct-audio:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Inspect published HTML audio references
+        run: |
+          mkdir -p out/sto-audio-scout
+          python - <<'PY'
+          import urllib.request,re,json,html,os,urllib.parse,pathlib
+          dst=pathlib.Path('out/sto-audio-scout')
+          pages={
+           'lamborghini-sto':'https://www.lamborghini.com/en-en/models/huracan/huracan-sto',
+           'lamborghini-8d':'https://www.lamborghini.com/en-en/news/8d-the-roar-of-lamborghini-engines',
+           'topgear-sto-rev':'https://www.topgear.com/videos/supercars/listen-631bhp-lamborghini-huracan-sto-start-and-rev',
+           'format67-sto':'https://format67.net/portfolio/lamborghini-huracan-sto-car-commercial/'
+          }
+          manifest={}
+          for label,url in pages.items():
+           entry={'page':url,'status':'not_fetched'}
+           try:
+            req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'})
+            with urllib.request.urlopen(req,timeout=25) as res: data=res.read(4_000_000).decode('utf-8','replace')
+            entry['status']='fetched'
+            entry['html_size']=len(data)
+            # Keep matches only for disclosed audio/video and embedded stream URLs.
+            data=data.replace('\\/','/').replace('\\u0026','&').replace('&amp;','&')
+            urlmatches=re.findall(r'(?:https?:)?//[^\s"\'<>\\]+',data)
+            med=[u for u in urlmatches if re.search(r'\.(?:mp3|wav|ogg|aac|m4a|mp4|webm|m3u8)(?:\?|$)',u,re.I)]
+            jsonpaths=re.findall(r'(?:"|\')([^"\']+\.(?:mp3|wav|ogg|aac|m4a|mp4|webm|m3u8)(?:\?[^"\' ]*)?)(?:"|\')',data,re.I)
+            entry['media_urls']=list(dict.fromkeys([html.unescape(u) for u in med+jsonpaths]))[:80]
+            entry['media_matches']=len(med)
+            words=re.findall(r'.{0,190}(?:feel.the.engine|\\b8d\\b|brightcove|jwplayer|videojs|\\.mp3|\\.wav).{0,250}',data,re.I)
+            entry['context_matches']=words[:70]
+            (dst/f'{label}-html-excerpt.txt').write_text('\n'.join(words)[:15000])
+           except Exception as e:entry['diagnostic']=str(e)
+           manifest[label]=entry
+           print(label,entry['status'],len(entry.get('media_urls',[])))
+          (dst/'manifest.json').write_text(json.dumps(manifest,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STO-C-OFFICIAL-DIRECT-AUDIO-LEADS
+          path: out/sto-audio-scout/
+          if-no-files-found: warn
+          retention-days: 2
