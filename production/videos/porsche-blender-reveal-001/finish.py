@@ -26,7 +26,7 @@ def main():
         assert (frames/('frame_%04d.png'%f)).is_file(),f
     movie=out/'YUNEX_PORSCHE_BLENDER_REVEAL_1080P.mp4'
     visual=out/'visual-only.mp4'
-    vf="drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:text='BUILT IN BLENDER':fontsize=27:fontcolor=white@0.85:x=(w-tw)/2:y=220:enable='lt(n,214)',drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:text='YUNEX':fontsize=19:fontcolor=white@0.6:x=(w-tw)/2:y=h-260"
+    vf="drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:text='BUILT IN BLENDER':fontsize=27:fontcolor=white@0.85:x=(w-tw)/2:y=220:enable='lt(n,214)',drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:text='YUNEX':fontsize=19:fontcolor=white@0.6:x=(w-tw)/2:y=h-260,scale=in_range=full:out_range=tv:out_color_matrix=bt709"
     run('ffmpeg','-v','error','-y','-framerate','30','-start_number','0',
         '-i',str(frames/'frame_%04d.png'),
         '-frames:v','479','-vf',vf,

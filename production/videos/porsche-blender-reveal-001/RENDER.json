@@ -1,0 +1,11 @@
+{
+  "frames": 479,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "cycles_samples": 32,
+  "reveal_frame": 214,
+  "approved_proof_run": 38183212744,
+  "approved_scene_commit": "6b322519db42e66ac2f7690cb1f1ec43970ba098",
+  "audio": "exact uploaded reference AAC, no re-encoding"
+}
