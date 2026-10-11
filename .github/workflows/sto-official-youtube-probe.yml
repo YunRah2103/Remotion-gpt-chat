@@ -23,8 +23,42 @@ jobs:
           sudo apt-get install -y -qq ffmpeg
           python -m pip install --disable-pip-version-check -U Pillow yt-dlp
           python -m py_compile production/videos/huracan-sto-v10-001/footage/probe_official_youtube.py
+      - name: Load optional YouTube session cookies securely
+        env:
+          YOUTUBE_COOKIES_B64: ${{ secrets.YOUTUBE_COOKIES_B64 }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64, binascii, os, pathlib, stat
+          encoded = os.environ.get('YOUTUBE_COOKIES_B64', '').strip()
+          if not encoded:
+              print('YOUTUBE_COOKIES_B64 secret missing; YouTube downloads will be skipped.')
+          else:
+              try:
+                  raw = base64.b64decode(encoded, validate=True)
+              except (ValueError, binascii.Error):
+                  raise SystemExit('Invalid base64 in YOUTUBE_COOKIES_B64')
+              raw = raw.replace(b'\r\n', b'\n').replace(b'\r', b'\n')
+              header = raw.split(b'\n', 1)[0].strip()
+              if header not in (b'# Netscape HTTP Cookie File', b'# HTTP Cookie File'):
+                  raise SystemExit('Invalid cookies.txt header; use Netscape/Mozilla format.')
+              if b'youtube.com' not in raw.lower():
+                  raise SystemExit('Cookie file must contain YouTube cookies.')
+              if len(raw) > 250000:
+                  raise SystemExit('Cookie file too large; export only YouTube cookies.')
+              target = pathlib.Path(os.environ['RUNNER_TEMP']) / 'sto-youtube-cookies.txt'
+              target.write_bytes(raw)
+              target.chmod(stat.S_IRUSR | stat.S_IWUSR)
+              with open(os.environ['GITHUB_ENV'], 'a') as env:
+                  env.write('YOUTUBE_COOKIES_FILE=' + str(target) + '\n')
+              print('YouTube cookie file loaded in temporary runner directory; not logged or uploaded.')
+          PY
       - name: Probe native FullHD playable versions of original STO driving films
         run: python production/videos/huracan-sto-v10-001/footage/probe_official_youtube.py
+      - name: Delete temporary YouTube cookie file
+        if: always()
+        run: |
+          rm -f -- "$RUNNER_TEMP/sto-youtube-cookies.txt"
       - name: Report actual acquired source quality
         if: always()
         run: |
