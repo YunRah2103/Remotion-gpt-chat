@@ -19,19 +19,22 @@ jobs:
       - name: Install native Blender and encoder
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq blender ffmpeg xvfb python3-pil python3-numpy
+          sudo apt-get install -y -qq ffmpeg xvfb python3-pil libxi6 libxrender1 libgl1 libxkbcommon0
+          curl -fLsS --retry 2 https://download.blender.org/release/Blender4.0/blender-4.0.2-linux-x64.tar.xz -o /tmp/blender.tar.xz
+          mkdir -p /tmp/blender
+          tar -xf /tmp/blender.tar.xz -C /tmp/blender --strip-components=1
       - name: Download the approved Porsche without editing its repository
         run: |
           mkdir -p /tmp/porsche out/proof
           curl -fLsS --retry 2 https://raw.githubusercontent.com/YunRah2103/yunus-video-lab/main/cars/porsche-911-gt3-rs-992/model.glb -o /tmp/porsche/model.glb
           echo '1c73fcb138c31e2b1d5ed126a2412074bb17f8e960b355436f28139bf518e1eb  /tmp/porsche/model.glb' | sha256sum -c -
-          blender --version > out/proof/blender-version.txt
+          /tmp/blender/blender --version > out/proof/blender-version.txt
           echo '${{ github.sha }}' > out/proof/source-sha.txt
       - name: Native quick visual proofs
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
         run: |
-          xvfb-run -a blender -b -t 4 --python-exit-code 1 --python production/videos/porsche-blender-reveal-001/scene.py -- --model /tmp/porsche/model.glb --out out/proof --frames 0,213,214,319,418 --samples 16 --scale 0.5 > out/proof/render.log 2>&1
+          xvfb-run -a /tmp/blender/blender -b -t 4 --python-exit-code 1 --python production/videos/porsche-blender-reveal-001/scene.py -- --model /tmp/porsche/model.glb --out out/proof --frames 0,213,214,319,418 --samples 16 --scale 0.5 > out/proof/render.log 2>&1
       - name: Generate review contact sheet
         run: |
           python3 - <<'PY'
