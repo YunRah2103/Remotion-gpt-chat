@@ -1,0 +1,48 @@
+name: YUNEX GT3 A2 McLaren Original 1916 by 1078 Real Source QA
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a2-ferrari-aston-mclaren
+    paths:
+      - .github/workflows/gt3-a2-mclaren-native-near1080-actual.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  recover-original-actual-race:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Native source instrumentation
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q --break-system-packages playwright requests pillow
+          python -m playwright install chromium
+      - name: Actual McLaren race source MP4 bytes and 12 native contact sheets
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a2/mclaren_near1080_source_video.py
+      - name: Verify native original resolution and source SHA
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import zipfile,json,hashlib
+          p=Path('out/gt3-a2-mclaren-1916-source/GT3_A2_MCLAREN_NEAR_1080_REAL_RACE_FILM_QA.zip')
+          with zipfile.ZipFile(p) as z:
+            assert z.testzip() is None
+            d=json.loads(z.read('manifest.json'))
+            for row in d['publisher_sources']:
+              print(row['id'],row['status'],row.get('native_pixels'),row.get('bytes'),row.get('rejections'))
+              if row['status'].startswith('NATIVE'):
+                assert hashlib.sha256(z.read(row['real_file'])).hexdigest()==row['sha256']
+            print('ACTUAL_DECODABLE_NEAR_1080_ORIGINALS',d['actual_decoded_native_landscape_source_count'])
+          PY
+      - name: Publish native McLaren race video or diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-A2-MCLAREN-REAL-NATIVE-1916x1078-VIDEO-PROOF
+          path: out/gt3-a2-mclaren-1916-source/GT3_A2_MCLAREN_NEAR_1080_REAL_RACE_FILM_QA.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
