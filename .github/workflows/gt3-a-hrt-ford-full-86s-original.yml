@@ -1,0 +1,49 @@
+name: GT3 Agent A HRT Ford 86s Original Full Native-HD Video Acquisition
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-hrt-ford-full-86s-original.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-86s-race-video:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install actual video extraction, Chromium and independent FFprobe tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q playwright pillow yt-dlp requests
+          python -m playwright install chromium
+      - name: Acquire entire 86-sec physical actual HRT Ford 1080 original from public real player
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_hrt_ford_86sec_full_video.py
+      - name: Verify physical SHA and actual source duration
+        if: always()
+        run: |
+          python - <<'PY'
+          import zipfile,pathlib,json,hashlib
+          a=pathlib.Path('out/gt3-a-hrt-ford-86seconds/GT3_A_FORD_86SEC_FULL_HD_ORIGINAL_WITH_FRAMES.zip')
+          if a.exists():
+            with zipfile.ZipFile(a) as z:
+              assert z.testzip() is None
+              j=json.loads(z.read('SOURCE_MANIFEST.json'))
+              for src in j['sources']:
+                if src['status']=='REAL_NATIVE_HD_FULL_DECODE_MODEL_REVIEW_PENDING':
+                  assert hashlib.sha256(z.read(src['file'])).hexdigest()==src['sha256']
+                  assert src['resolution']==[1920,1080]
+                  print('FULL_86S_ORIGINAL_SHA_PASS',src['source_id'],src['duration'],src['sha256'])
+              print('REAL_VIDEOS',j['native_hd_media_file_count'])
+          else:print('No acquired source media; cannot claim')
+          PY
+      - name: Deliver real native full-length original or honest failure diagnostic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-HRT-FORD-2026-FULL86-1080-ORIGINAL-REVIEW
+          path: out/gt3-a-hrt-ford-86seconds/GT3_A_FORD_86SEC_FULL_HD_ORIGINAL_WITH_FRAMES.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
