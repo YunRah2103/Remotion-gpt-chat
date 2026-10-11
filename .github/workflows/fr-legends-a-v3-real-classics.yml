@@ -1,0 +1,76 @@
+name: FR Legends Agent A - Real French Classic Footage 13 Shot ZIP
+
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - 'production/videos/french-icons-001/agent_a_curate_v3.py'
+      - '.github/workflows/fr-legends-a-v3-real-classics.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  compile-actual-mixed-classic-car-originals:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 38
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Retrieve previously verified original 4K and 1080p Citroen 2CV clips
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p out/v2
+          gh run download 38150193335 \
+            --repo YunRah2103/Remotion-gpt-chat \
+            --name fr-legends-a-four-authentic-classic-2cv-shots-one-zip \
+            --dir out/v2
+          ls -lh out/v2
+      - name: Retrieve original real 1080p official Alpine A110 press video
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p out/alpine
+          gh run download 38150444309 \
+            --repo YunRah2103/Remotion-gpt-chat \
+            --name fr-legends-a-alpine-native1080-real-media-one-zip \
+            --dir out/alpine
+          ls -lh out/alpine
+      - name: FFmpeg, FFprobe and visual proof dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install pillow
+      - name: Actual source SHA check, nine separate Alpine clips, fully decoded native-resolution QA
+        run: python production/videos/french-icons-001/agent_a_curate_v3.py
+      - name: Report actual counts and honest gate
+        run: |
+          python - <<'PY'
+          import json,pathlib,os
+          d=json.loads(pathlib.Path('out/fr-legends-agent-a-v3/manifest.json').read_text())
+          z=pathlib.Path('out/FR-LEGENDS-AGENT-A-CLASSICS-13-REAL-MOVING-SHOTS.zip')
+          text=["## FR Legends Agent A native French Classics evidence V3",
+                f"- **Actual FFprobe + FFmpeg decoded original-res moving clips: {d['true_native_video_clips']}**",
+                f"- Classic models: **{d['models_count']}** — {', '.join(d['models'])}",
+                f"- Premium driving shots: **{d['premium_dramatic_shots']}**",
+                f"- Event/supporting driving shots: **{d['supporting_real_motion_shots']}**",
+                f"- Actual ZIP bytes: **{z.stat().st_size:,}**",
+                "- All originals, MP4s, sources, contact sheets and hashes included.",
+                "- **GATE A: BLOCKED — 18 distinct shots / 5 models not yet achieved.**",
+                "- Alpine footage social-posting rights unresolved. No claim of license rights."]
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(text)+'\n')
+          print('\n'.join(text))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FR-LEGENDS-AGENT-A-CLASSICS-13-SHOTS-ONE-ZIP
+          path: out/FR-LEGENDS-AGENT-A-CLASSICS-13-REAL-MOVING-SHOTS.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
