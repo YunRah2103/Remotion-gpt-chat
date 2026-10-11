@@ -15,39 +15,39 @@ FILES=OUT/"originals_for_visual_review"; SHEETS=OUT/"contact_sheets"
 for p in (OUT,FILES,SHEETS):p.mkdir(parents=True,exist_ok=True)
 SOURCES=[
   [
-    "n24_2023_porsche_official_review",
-    "Ferrari 296 GT3 possible among Nürburgring N24 opponents; must visually verify",
-    "https://newsroom.porsche.com/en/2023/motorsports/porsche-24-hours-race-nuerburgring-2023-32368.html"
+    "ferrari_nls9_win_twitter_video",
+    "Ferrari 296 GT3 2025 NLS9 winning drive, verify frames",
+    "https://www.caranddriver.gr/formula%201/arthro/o_max_verstappen_kerdise_me_ferrari_video-7846673/"
   ],
   [
-    "n24_2023_porsche_video_archive",
-    "Ferrari 296 GT3 possible in 2023 field, model unverified",
-    "https://newsroom.porsche.com/es/imagenes-videos.html"
+    "ferrari_frikadelli_n24_champion_twitter",
+    "Ferrari 296 GT3 2023 N24 win, verify movement",
+    "https://auto.everyeye.it/notizie/ferrari-regina-nurburgring-296-gt3-frikadelli-trionfa-24-ore-650862.html"
   ],
   [
-    "frikadelli_2023_ferrari_official",
-    "Ferrari 296 GT3 Frikadelli Racing #30",
-    "https://www.frikadelli-racing-team.de/uk/aktuell/A-dream-comes-true-Frikadelli-Racing-wins-the-24h-Nuerburgring"
+    "ferrari_nls_2023_qualifiers_article",
+    "Ferrari 296 GT3 2023 N24 qualifier win",
+    "https://www.endurance-info.com/auto/article/106799-nurburgring-endurance-series-premiere-victoire-au-general-pour-la-ferrari-296"
   ],
   [
-    "gtwc_nurburgring2026_race_video",
-    "McLaren 720S GT3 EVO #23, #58, #59 from 2026 Nürburgring event; visual QA",
-    "https://www.gt-world-challenge-europe.com/event/252/n%C3%BCrburgring"
+    "ferrari_frikadelli_2023_italian_embeds",
+    "Ferrari 296 GT3 N24 2023",
+    "https://www.formulapassion.it/motorsport/gt/storica-vittoria-ferrari-24-ore-nurburgring-296-gt3-marciello"
   ],
   [
-    "gtwc_nurburgring2026_video_library",
-    "McLaren 720S GT3 EVO race 2026",
-    "https://www.gt-world-challenge-europe.com/videos"
+    "ferrari_frikadelli_gt_report",
+    "Ferrari 296 GT3 2023 N24",
+    "https://www.gt-report.com/2023/05/21/nurburgring-24-hours-frikadelli-ferrari-takes-historic-win/"
   ],
   [
-    "dtm_nurburgring2025_official",
-    "Ferrari 296 GT3 #14 and McLaren 720S GT3 EVO #25 2025 Nürburgring",
-    "https://dtm.com/q/events/nuerburgring-2025"
+    "ferrari_nls9_2025_embedded_driver_tweet",
+    "Ferrari 296 GT3 2025 NLS9",
+    "https://www.overtake.gg/news/nls-9-livestream-watch-max-verstappens-nordschleife-gt3-debut-for-free.3680/?page=1"
   ],
   [
-    "mclaren_doerr_nls_official",
-    "McLaren 720S GT3 EVO NLS Nordschleife",
-    "https://www.doerrgroup.com/doerr-motorsport/nls/"
+    "ferrari_max_test_2025",
+    "Ferrari 296 GT3 NLS Nürburgring testing non-race reject unless real race action",
+    "https://sport.sky.it/formula-1/2025/05/15/verstappen-ferrari-test-nurburgring-foto"
   ]
 ]
 rows=[]
