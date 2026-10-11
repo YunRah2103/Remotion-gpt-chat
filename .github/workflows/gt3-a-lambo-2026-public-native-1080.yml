@@ -1,0 +1,45 @@
+name: Agent A Real Lamborghini 2026 Native 1080 Portrait GT3 Source
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-lambo-2026-public-native-1080.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-actual-hd-original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install physical native video acquisition and full decoder
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q yt-dlp pillow
+      - name: Download public FULL 1080x1920 Lamborghini GT3 original, FFprobe and full decode
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_lamborghini_2026_fb_native_1080_portrait.py
+      - name: Prove ZIP integrity and bytes of original video
+        run: |
+          python - <<'PY'
+          import pathlib,zipfile,json,hashlib
+          root=pathlib.Path('out/gt3-a-lambo-2026-genuine-1080-portrait')
+          pack=root/'LAMBORGHINI_GT3_2026_PUBLIC_PORTRAIT_ORIGINAL_REVIEW.zip'
+          with zipfile.ZipFile(pack) as z:
+            assert z.testzip() is None
+            record=json.loads(z.read('SOURCE_MANIFEST.json'))
+            if record['status'].startswith('ACTUAL_1080_NATIVE'):
+              assert hashlib.sha256(z.read(record['original_file'])).hexdigest()==record['sha256']
+              assert record['native_resolution']==[1080,1920]
+              print('TRUE_1080_PORTRAIT_GT3_ORIGINAL_HASH_PASS',record['sha256'],record['bytes'])
+            else:print('NO_QUALIFYING_MEDIA',record.get('error',''))
+          PY
+      - name: Upload actual video original plus review frames or transparent failure evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-ABT-LAMBO-2026-ACTUAL-ORIGINAL-1080-PORTRAIT-REVIEW
+          path: out/gt3-a-lambo-2026-genuine-1080-portrait/LAMBORGHINI_GT3_2026_PUBLIC_PORTRAIT_ORIGINAL_REVIEW.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
