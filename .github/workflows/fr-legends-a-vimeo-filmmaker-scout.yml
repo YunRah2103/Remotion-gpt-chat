@@ -1,0 +1,38 @@
+name: FR Legends A - Original Classic Filmmakers Public Video Quality
+on:
+  push:
+    branches: [automotive-edits/french-icons-001/a-classics-footage]
+    paths:
+      - 'production/videos/french-icons-001/agent_a_public_filmmaker_formats.py'
+      - '.github/workflows/fr-legends-a-vimeo-filmmaker-scout.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  discover-original-source-native-full-hd:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assess public filmmaker streams without login or artificial upscaling
+        run: |
+          python production/videos/french-icons-001/agent_a_public_filmmaker_formats.py
+      - name: Report video vs. just links
+        run: |
+          python - <<'PY'
+          import json,os,pathlib
+          d=json.loads(pathlib.Path('out/agent-a-classic-artist-formats/manifest.json').read_text())
+          lines=['## Agent A — full-HD real-car public embedded source gate',
+            f"- Attempted film owners: {len(d)}",
+            f"- Public manifests showing native 1080p+: {sum(x.get('has_native_1080',False) for x in d)}",
+            "- No angle/car acceptance without actual downloads and independent visual QA."]
+          lines += [f"- {x['slug']}: {x.get('video_title')} / native heights {x.get('available_heights')} / {x.get('error','')[:85]}" for x in d]
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(lines))
+          print('\n'.join(lines))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fr-legends-classics-filmmaker-original-video-quality-evidence
+          path: out/agent-a-classic-artist-formats/manifest.json
+          retention-days: 7
+          if-no-files-found: error
