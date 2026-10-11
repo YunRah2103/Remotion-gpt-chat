@@ -1,0 +1,35 @@
+name: French Classics A - Cinematic 2CV Pixabay Original Footage QA
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - 'production/videos/french-icons-001/agent_a_cinematic_2cv_stock_probe.py'
+      - '.github/workflows/fr-legends-a-cinematic-2cv-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cinematic-native-video-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare high-quality footage downloader and decoded frame sampler
+        run: |
+          python -m pip install -U yt-dlp Pillow
+          which ffprobe && which ffmpeg
+      - name: Physically acquire full-HD real Citroen 2CV stock film and sample all 24 positions
+        run: python production/videos/french-icons-001/agent_a_cinematic_2cv_stock_probe.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-agent-a-cinematic-two-cv-license-original-qa
+          path: |
+            out/fr-a-2cv-cinematic-pixabay-test/manifest.json
+            out/fr-a-2cv-cinematic-pixabay-test/pixabay-125177-real-source-24-frame-contact.jpg
+          retention-days: 7
+          if-no-files-found: warn
