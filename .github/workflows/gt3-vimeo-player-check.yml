@@ -1,0 +1,42 @@
+name: YUNEX GT3 Public Vimeo Player 1080p Source Check
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a-footage
+    paths:
+      - .github/workflows/gt3-vimeo-player-check.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check public video player config/native renditions
+        run: |
+          mkdir -p out/gt3-vimeo-public-player
+          python - <<'PY'
+          import requests,json
+          from pathlib import Path
+          ids={"374029404":"Team75 Bernhard 2018 N24","326596303":"Nürburgring 2016 multicar highlight","1178201469":"Giti Racing 2025 N24","1074240368":"Pirelli N24 event edit"}
+          out=[]
+          for key,name in ids.items():
+            url="https://player.vimeo.com/video/"+key+"/config"
+            try:
+              r=requests.get(url,timeout=10,headers={"User-Agent":"Mozilla/5.0","Referer":"https://vimeo.com/"+key})
+              data=r.json() if r.status_code==200 else {}
+              progressive=(data.get("request",{}).get("files",{}).get("progressive") or []) if isinstance(data,dict) else []
+              formats=[{"width":v.get("width"),"height":v.get("height"),"quality":v.get("quality"),"url":v.get("url")} for v in progressive]
+              out.append({"vimeo_id":key,"title":name,"http":r.status_code,"progressive_formats":formats,"error":r.text[:170] if r.status_code!=200 else ""})
+              print(key,name,"HTTP",r.status_code,"formats",[(v["width"],v["height"]) for v in formats],flush=True)
+            except Exception as e:out.append({"vimeo_id":key,"error":str(e)})
+          Path("out/gt3-vimeo-public-player/formats.json").write_text(json.dumps(out,indent=2)+"\n")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: GT3-VIMEO-PLAYER-1080P-PUBLIC-FORMATS
+          path: out/gt3-vimeo-public-player/formats.json
+          retention-days: 7
