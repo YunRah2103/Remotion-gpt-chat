@@ -1,0 +1,25 @@
+name: GT3 Agent A HRT Physical 1080 Media Visual Identity Audit
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-hrt-actual-contact-visual.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect-real-originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install image validation
+        run: python -m pip install --break-system-packages -q pillow
+      - name: Download byte-verified full-HD HRT Ford and N24 original footage artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/hrt_2025_media
+          gh run download 38160120679 --repo YunRah2103/Remotion-gpt-chat --name GT3-AGENT-A-HRT-FORD-NURBURGRING-ACTUAL-NATIVE-1080-OR-DIAGNOSTICS --dir inputs/hrt_2025_media
+      - name: Independently review all five publisher original GT3 source frame sheets and exact movie bytes
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/inspect_HRT_ford_five_verified_video_contact_sheets.py
