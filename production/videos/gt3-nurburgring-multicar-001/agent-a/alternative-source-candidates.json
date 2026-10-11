@@ -1,0 +1,162 @@
+{
+  "source_notes": "Actual Dailymotion public video URLs found by web retrieval on 2026-10-11; these are leads, not confirmed download or 1080p. Check footage, identities, source originality and watermark. Do not include generic street cars or simulated racing.",
+  "seconds_per_candidate": 8,
+  "sources": [
+    {
+      "id": "dm-mercedes-n24-2020",
+      "url": "https://www.dailymotion.com/video/x7wirh7",
+      "publisher": "Dailymotion public video / original uploader credited on page",
+      "method": "yt-dlp-webpage",
+      "type": "Mercedes-AMG race-report Nürburgring start",
+      "model": "Mercedes-AMG GT3",
+      "make": "Mercedes-AMG",
+      "event": "2020 ADAC Nürburgring 24h",
+      "starts": [
+        0,
+        12
+      ],
+      "need_visual_verification": true
+    },
+    {
+      "id": "dm-porsche-estre-2024",
+      "url": "https://www.dailymotion.com/video/x8zgvkk",
+      "publisher": "Dailymotion public video / original uploader credited on page",
+      "method": "yt-dlp-webpage",
+      "type": "Kevin Estre first-lap onboard",
+      "model": "Porsche 911 GT3 R",
+      "make": "Porsche",
+      "event": "2024 Nürburgring 24h",
+      "starts": [
+        0,
+        12
+      ],
+      "need_visual_verification": true
+    },
+    {
+      "id": "dm-porsche-vanthoor-2025",
+      "url": "https://www.dailymotion.com/video/x9lnluu",
+      "publisher": "Dailymotion public video / original uploader credited on page",
+      "method": "yt-dlp-webpage",
+      "type": "Vanthoor GT3 racing qualifying incident",
+      "model": "Porsche 911 GT3 R candidate",
+      "make": "Porsche",
+      "event": "2025 Nürburgring 24h",
+      "starts": [
+        0,
+        12
+      ],
+      "need_visual_verification": true
+    },
+    {
+      "id": "dm-bmw-2024",
+      "url": "https://www.dailymotion.com/video/x8zh8py",
+      "publisher": "Dailymotion public video / original uploader credited on page",
+      "method": "yt-dlp-webpage",
+      "type": "BMW race onboard/crash, verify true SP9 GT3 model",
+      "model": "BMW GT3 candidate - verify model",
+      "make": "UNVERIFIED",
+      "event": "2024 Nürburgring 24h",
+      "starts": [
+        0,
+        12
+      ],
+      "need_visual_verification": true
+    },
+    {
+      "id": "dm-mercedes-n24-contact-2024",
+      "url": "https://www.dailymotion.com/video/x8zh5do",
+      "publisher": "Dailymotion public video / original uploader credited on page",
+      "method": "yt-dlp-webpage",
+      "type": "Kolb/Schiller race contact",
+      "model": "Mercedes-AMG GT3 candidate",
+      "make": "Mercedes-AMG",
+      "event": "2024 Nürburgring 24h",
+      "starts": [
+        0,
+        12
+      ],
+      "need_visual_verification": true
+    },
+    {
+      "id": "dm-n24-qualifying-rain-2024",
+      "url": "https://www.dailymotion.com/video/x91o6rs",
+      "publisher": "Dailymotion public video / original uploader credited on page",
+      "method": "yt-dlp-webpage",
+      "type": "Christodoulou onboard, GT3 candidate",
+      "model": "Mercedes-AMG GT3 candidate",
+      "make": "Mercedes-AMG",
+      "event": "2024 Nürburgring 24h qualifiers",
+      "starts": [
+        0,
+        12
+      ],
+      "need_visual_verification": true
+    },
+    {
+      "id": "dm-lamborghini-gt3-2016",
+      "url": "https://www.dailymotion.com/video/x4n08nv",
+      "publisher": "Dailymotion public video / original uploader credited on page",
+      "method": "yt-dlp-webpage",
+      "type": "RingDrive trackside GT3",
+      "model": "Lamborghini Huracán GT3",
+      "make": "Lamborghini",
+      "event": "2016 Nürburgring 24h",
+      "starts": [
+        0,
+        12
+      ],
+      "need_visual_verification": true
+    },
+    {
+      "id": "dm-mclaren-gt3-2014",
+      "url": "https://www.dailymotion.com/video/x27gjl7",
+      "publisher": "Dailymotion public video / original uploader credited on page",
+      "method": "yt-dlp-webpage",
+      "type": "Doerr Motorsport Nordschleife GT3 lap",
+      "model": "McLaren 12C GT3",
+      "make": "McLaren",
+      "event": "2014 Nürburgring 24h",
+      "starts": [
+        0,
+        12
+      ],
+      "need_visual_verification": true
+    },
+    {
+      "id": "dm-n24-2025-onboard",
+      "url": "https://www.dailymotion.com/video/x9lp7zu",
+      "publisher": "Dailymotion public video / original uploader credited on page",
+      "method": "yt-dlp-webpage",
+      "type": "2025 race onboard GT3, confirm model from native frames",
+      "model": "GT3 race car unknown",
+      "make": "UNVERIFIED",
+      "event": "2025 Nürburgring 24h",
+      "starts": [
+        0,
+        12
+      ],
+      "need_visual_verification": true
+    },
+    {
+      "id": "dm-bmw-n24-2024-collision",
+      "url": "https://www.dailymotion.com/video/x8zh7lw",
+      "publisher": "Dailymotion public video / original uploader credited on page",
+      "method": "yt-dlp-webpage",
+      "type": "potential NON-SP9; use only if GT3 confirmed",
+      "model": "BMW M4 GT4, NOT GT3 unless verified contrary",
+      "make": "UNVERIFIED",
+      "event": "2024 Nürburgring 24h",
+      "starts": [
+        0,
+        12
+      ],
+      "need_visual_verification": true
+    }
+  ],
+  "social_discovery_accounts": [
+    "https://www.tiktok.com/@24hnbr",
+    "https://www.instagram.com/24hnbr/reels/",
+    "https://www.tiktok.com/@nuerburgring",
+    "https://www.instagram.com/nuerburgring/reels/"
+  ]
+}
