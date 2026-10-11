@@ -1,0 +1,33 @@
+name: YUNEX GT3 Real Vimeo 1080p Nürburgring Footage Acquisition
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a-footage
+    paths:
+      - .github/workflows/gt3-vimeo-source.yml
+      - production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_vimeo.py
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install native FFmpeg and Vimeo extractor
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q -U "yt-dlp[default]" pillow
+      - name: Download only real full-HD moving source candidates
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_vimeo.py
+      - name: One ZIP with verified source samples or failure report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-VIMEO-REAL-NATIVE-SOURCE-SAMPLES
+          path: out/gt3-vimeo-actual/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
