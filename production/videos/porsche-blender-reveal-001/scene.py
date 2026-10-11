@@ -48,18 +48,18 @@ s.render.threads_mode = 'FIXED'
 s.render.threads = 4
 s.view_settings.view_transform = 'AgX'
 s.view_settings.look = 'AgX - Medium High Contrast'
-s.view_settings.exposure = 0.4
+s.view_settings.exposure = 0.1
 s.world.use_nodes = True
 w = s.world.node_tree
 w.nodes.clear()
 bg = w.nodes.new('ShaderNodeBackground')
-bg.inputs['Strength'].default_value = 0.3
+bg.inputs['Strength'].default_value = 0.22
 sky = w.nodes.new('ShaderNodeTexSky')
 sky.sky_type = 'NISHITA'
-sky.sun_elevation = math.radians(16)
+sky.sun_elevation = math.radians(35)
 sky.sun_rotation = math.radians(120)
-sky.air_density = 1.3
-sky.dust_density = 1.4
+sky.air_density = 1.0
+sky.dust_density = 0.2
 wo = w.nodes.new('ShaderNodeOutputWorld')
 w.links.new(sky.outputs['Color'], bg.inputs['Color'])
 w.links.new(bg.outputs['Background'], wo.inputs['Surface'])
@@ -76,6 +76,8 @@ def material(name, color, rough=0.6, noise=False, scale=10, bump=0.08):
         tex = nt.nodes.new('ShaderNodeTexNoise')
         tex.inputs['Scale'].default_value = scale
         tex.inputs['Detail'].default_value = 3
+        geo = nt.nodes.new('ShaderNodeNewGeometry')
+        nt.links.new(geo.outputs['Position'],tex.inputs['Vector'])
         ramp = nt.nodes.new('ShaderNodeValToRGB')
         ramp.color_ramp.elements[0].color = (*[v * 0.45 for v in color], 1)
         ramp.color_ramp.elements[1].color = (*[min(v * 1.7, 1) for v in color], 1)
@@ -83,7 +85,7 @@ def material(name, color, rough=0.6, noise=False, scale=10, bump=0.08):
         nt.links.new(ramp.outputs[0], p.inputs['Base Color'])
         bn = nt.nodes.new('ShaderNodeBump')
         bn.inputs['Strength'].default_value = bump
-        bn.inputs['Distance'].default_value = 0.025
+        bn.inputs['Distance'].default_value = 0.006 if 'asphalt' in name else 0.025
         nt.links.new(tex.outputs['Fac'], bn.inputs['Height'])
         nt.links.new(bn.outputs[0], p.inputs['Normal'])
     return m
@@ -135,10 +137,9 @@ for x in [-3.65, 3.65]:
     box('continuous road edge', (x,-160,0.005), (0.085,720,0.007), paint)
 for y in range(-500,201,8):
     box('broken centre line', (0,y,0.009), (0.095,3.1,0.007), paint)
-for x in [-4.65,4.65]:
-    box('steel roadside barrier', (x,-160,0.62), (0.065,720,0.25), metal)
-    for y in range(-490,201,8):
-        box('guardrail post', (x,y,0.34), (0.09,0.12,0.67), metal)
+for x in [-4.5,4.5]:
+    for y in range(-490,201,20):
+        box('roadside delineator', (x,y,0.4), (0.085,0.1,0.8), paint)
 
 # Leaf clusters use thousands of actual small bent leaf polygons; linked meshes preserve memory.
 cluster_meshes = []
@@ -166,9 +167,9 @@ for k in range(3):
     cluster_meshes.append(mesh)
 
 for side in [-1,1]:
-    for i in range(135):
-        y = -470 + i*5 + rng.uniform(-2,2)
-        x = side*rng.uniform(7,33)
+    for i in range(210):
+        y = -320 + i*2.65 + rng.uniform(-1,1)
+        x = side*rng.uniform(6.5,22)
         h = rng.uniform(7.5,15)
         r = rng.uniform(0.13,0.27)
         cylinder('tree trunk', (x,y,0), (x+0.18,y,h*0.75), r, bark)
@@ -215,9 +216,9 @@ s.collection.objects.link(sun)
 sun.location = (10,-20,16)
 sun.name = 'late afternoon filtered sunlight'
 sun.rotation_euler = (math.radians(57),math.radians(-17),math.radians(-35))
-sun.data.energy = 2.3
+sun.data.energy = 1.35
 sun.data.angle = math.radians(8)
-sun.data.color = (1,0.87,0.70)
+sun.data.color = (0.92,0.96,1)
 
 def area(name, loc, energy, size, color):
     l = bpy.data.objects.new(name,bpy.data.lights.new(name,'AREA'))
@@ -228,8 +229,8 @@ def area(name, loc, energy, size, color):
     l.data.size = size
     l.data.color = color
     return l
-fill = area('open sky soft fill', (-4,-3,7), 1400, 9, (0.74,0.85,1))
-rim = area('forest clearing warm edge', (5,2,5), 1000, 7, (1,0.9,0.72))
+fill = area('open sky soft fill', (-4,-3,7), 1000, 9, (0.74,0.85,1))
+rim = area('forest clearing soft edge', (5,2,5), 700, 7, (0.92,0.96,1))
 
 cam = bpy.data.objects.new('camera',bpy.data.cameras.new('camera'))
 s.collection.objects.link(cam)
@@ -307,7 +308,7 @@ def frame_state(f, apply_render=True):
     s.world.color = (0.065,0.065,0.065)
     s.view_settings.view_transform = 'Standard' if f < 214 else 'AgX'
     s.view_settings.look = 'None' if f < 214 else 'AgX - Medium High Contrast'
-    s.view_settings.exposure = 0 if f < 214 else 0.4
+    s.view_settings.exposure = 0 if f < 214 else 0.1
     s.render.use_motion_blur = f >= 214 and not any(abs(f-c) <= 1 for c in cuts if c != 214)
     s.render.motion_blur_shutter = 0.3
     bpy.context.view_layer.update()
