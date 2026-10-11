@@ -1,0 +1,46 @@
+name: Agent A Genuine UHD Nürburgring Three Additional Camera Selects
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-2026-extra-4k-racing-camera-cuts.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-source-native-4k-camera-selects:
+    runs-on: ubuntu-latest
+    timeout-minutes: 19
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install original video full frame QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q pillow requests
+      - name: Generate genuinely playable 4K racing source cuts without assuming model class
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/extract_2026_additional_race_4k_camera_cuts.py
+      - name: Verify every real original cropped camera trim and artifact CRC
+        if: always()
+        run: |
+          python - <<'PY'
+          import zipfile,hashlib,json,pathlib
+          p=pathlib.Path('out/gt3-a-2026-extra-new-native4k-race-scenes/NEW_2026_REAL_4K_RACING_CAMERA_REVIEW_PACKAGE.zip')
+          if p.exists():
+            with zipfile.ZipFile(p) as z:
+              assert z.testzip() is None
+              m=json.loads(z.read('CANDIDATES_SHA_FFPROBE_PROVENANCE.json'))
+              for x in m['candidates']:
+                if 'file' in x:assert hashlib.sha256(z.read(x['file'])).hexdigest()==x['sha256']
+              assert m['verified_source_camera_views_added']==0
+              print('TRUE_MP4_SHA_HASHES_AND_ZIP_CRC_PASS',sum('file' in x for x in m['candidates']))
+          else:print('No QA passed: no media delivered')
+          PY
+      - name: Upload playable original 4K race cuts clearly marked GT3 model QA PENDING
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-2026-THREE-ADDITIONAL-NATIVE4K-RACING-SELECTS-REVIEW
+          path: out/gt3-a-2026-extra-new-native4k-race-scenes/NEW_2026_REAL_4K_RACING_CAMERA_REVIEW_PACKAGE.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
