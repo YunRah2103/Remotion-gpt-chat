@@ -53,3 +53,36 @@ Other social tools: [social extractor matrix](https://github.com/YunRah2103/Remo
 
 ### Integration status
 The new workflow and tests are on branch `feature/footage-rescue-multisource-20261011`. PR #29 was observed **closed and not merged** on 11 October; the new workflow is **not available from main's standard Actions manual-run UI**. Nothing in this audit merges or edits main or existing production movies.
+
+## Additional social-platform extension (11 October 2026)
+
+Proof: [16-entry social extractor matrix](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38160397393), [second X video-post probe](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38160498526), [best-quality tests](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38160590802), [Porsche-specific six-post best-quality test](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38162011170).
+
+| Source | Media transport verdict | Best native resolution observed | Notes |
+| --- | --- | --- | --- |
+| **Twitch** | PASS real native video | **1920x1080 ~60fps** | Landscape, source was a gaming clip, not a cinematic car source |
+| **X / Twitter** | PASS on two videos | 720x1280 ~30fps, and 1280x720 ~30fps (different posts) | An old Periscope video failed (not a general X block) |
+| **Pinterest** | PASS on four video Pins | **720x1280 ~24-30fps** | Three independent Porsche GT3 RS Pins all passed at 720x1280; not native 1080 portrait |
+| **Snapchat Spotlight** | PASS on three public samples | **540x960**, 540x302 on different posts | Two GT3 RS examples passed, another Porsche link was unavailable (HTTP 404); low native source quality |
+| **Bluesky** | PASS small video, FAIL best stream retry | 1280x720 30fps on small sample | Best-quality attempt encountered broken/prematurely terminated stream; treat as inconsistent |
+| **Reddit** | FAILED tested URL | None | Account authentication required / HTTP 403 from GitHub-hosted runner |
+| **Facebook Reels** | FAILED two tested URLs | None | yt-dlp reports `Cannot parse data` in both normal and Chrome mode |
+
+Detailed Porsche test: [native-best trial](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38162011170):
+- Pinterest GT3RS `615726580336703478`: 720x1280 30fps PASS.
+- Pinterest GT3RS `304626362315584186`: 720x1280 ~29fps PASS.
+- Pinterest GT3RS `874261346424811017`: 720x1280 ~25fps PASS.
+- Snapchat GT3RS `W7_EDlXWTBiXAEEniNoMPwAAYb256dGtjdG9zAZRXQhLHAZRXQgtdAAAAAQ`: 540x960 24fps PASS.
+- Snapchat GT3RS `W7_EDlXWTBiXAEEniNoMPwAAYZmJ6b2d0dGtkAZ5fX2njAZ5fX2nLAAAAAQ`: 540x302 30fps PASS.
+- Snapchat Porsche Cup `W7_EDlXWTBiXAEEniNoMPwAAYc2RzaWh6bHByAZ3_WlezAZ3_WleDAAAAAQ`: FAIL HTTP 404.
+
+The feature branch code now explicitly accepts individual Snapchat, Pinterest, Twitch, X and Bluesky video URLs and runs browser-impersonation fallback. It uses bounded extraction retries. [Relevant smoke CI](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38162130435) passed after expanding the URL allowlist.
+
+### Recommendation for 9:16 real-car edits
+
+**Tier 1:** TikTok and Instagram (verified genuine 1080x1920 or 1088x1936 videos and real automotive sources); native creator/manufacturer downloadable MP4.
+**Tier 2:** X/Twitter and Pinterest (verified download and automotive video content, but chosen samples maxed at 720 portrait); Twitch for *landscape* full-HD or gaming/racing video.
+**Tier 3:** Snapchat (verified but 540-pixel width), Bluesky (inconsistent), PeerTube/Dailymotion (sample-dependent low resolution).
+**Blocked in tested hosted environment:** YouTube, Reddit, Facebook Reels and Vimeo.
+
+**Operational caveat:** Source tests used short samples and temporary video files, not redistribution of third-party media; the release branch PR #29 is closed/unmerged. Do not claim the new workflows are available on main.
