@@ -1,0 +1,48 @@
+name: FR Legends Agent A - Direct Media Discovery
+
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - 'production/videos/french-icons-001/agent_a_direct_discovery.py'
+      - '.github/workflows/fr-legends-classics-direct.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publisher-and-archive-discovery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Probe video metadata and direct press assets
+        run: |
+          python production/videos/french-icons-001/agent_a_direct_discovery.py
+      - name: Report actual findings
+        if: always()
+        run: |
+          python - <<'PY'
+          import pathlib,json,os
+          path=pathlib.Path('out/fr-legends-a-direct-discovery/report.json')
+          if not path.exists():
+           print("NO_REPORT");raise SystemExit(0)
+          d=json.loads(path.read_text())
+          f=open(os.environ['GITHUB_STEP_SUMMARY'],'w')
+          print("## Agent A - Direct HD archive/media discovery",file=f)
+          for q,v in d['commons'].items():print(f"- {q}: {v.get('count',0)} video results, {v.get('1080_candidates',0)} at HD+; {v.get('error','')}",file=f)
+          for q,v in d['press'].items():print(f"- Publisher {q}: {len(v.get('direct_links',[]))} direct video links; {v.get('error','')}",file=f)
+          f.close()
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-classics-direct-source-discovery
+          path: out/fr-legends-a-direct-discovery/
+          retention-days: 7
+          if-no-files-found: warn
