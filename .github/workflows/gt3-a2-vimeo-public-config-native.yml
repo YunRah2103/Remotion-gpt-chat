@@ -1,0 +1,53 @@
+name: YUNEX A2 Vimeo Official Public Embed Original Source Rescue
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a2-ferrari-aston-mclaren
+    paths:
+      - .github/workflows/gt3-a2-vimeo-public-config-native.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public-originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install full decoder and public player metadata client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q --break-system-packages requests Pillow
+      - name: Fetch only publicly published original progressive/HLS streams, full-decode and fingerprint
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a2/vimeo_public_embed_rescue.py
+      - name: Audit ZIP actual source hashes and native dimensions
+        if: always()
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import zipfile,hashlib,json
+          p=Path('out/gt3-a2-vimeo-public-embed/GT3_A2_VIMEO_PUBLIC_EMBED_ACTUAL_MEDIA_OR_DIAGNOSTICS.zip')
+          if not p.is_file():print('NO_ZIP_NO_MEDIA');raise SystemExit(0)
+          with zipfile.ZipFile(p) as z:
+            assert z.testzip() is None
+            m=json.loads(z.read('manifest.json'))
+            n=0
+            for r in m['sources']:
+              if r['status'].startswith('PUBLIC_PLAYER_ACTUAL'):
+                b=z.read(r['media_file'])
+                assert hashlib.sha256(b).hexdigest()==r['sha256']
+                assert r['source_resolution'][0]>=1920 and r['source_resolution'][1]>=1080
+                n+=1
+            assert n==m['original_native_films']
+            print('REAL_NATIVE_FULLY_DECODED_VIDEO_FILES',n,'GT3_IDENTITY_VISUAL_QA_PENDING')
+          PY
+      - name: Publish SINGLE actual media ZIP or diagnostic report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-A2-VIMEO-PUBLIC-EMBED-ORIGINAL-HD-REVIEW
+          path: out/gt3-a2-vimeo-public-embed/GT3_A2_VIMEO_PUBLIC_EMBED_ACTUAL_MEDIA_OR_DIAGNOSTICS.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
