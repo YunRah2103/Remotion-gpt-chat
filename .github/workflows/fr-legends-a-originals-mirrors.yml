@@ -1,0 +1,49 @@
+name: FR Legends A - Retry Original 205 GTI DS Clio V6 Film Mirrors
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - 'production/videos/french-icons-001/agent_a_archive_retry.py'
+      - '.github/workflows/fr-legends-a-originals-mirrors.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-1080-recovery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 44
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install image/video source QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install pillow
+      - name: Fetch actual original historic French motorcar MP4s from public mirrors
+        run: python production/videos/french-icons-001/agent_a_archive_retry.py
+      - name: Exact original video evidence
+        run: |
+          python - <<'PY'
+          import json,pathlib,os
+          d=json.loads(pathlib.Path('out/fr-a-priority-model-originals/manifest.json').read_text())
+          ok=[x for x in d if x['status'].startswith('REAL_NATIVE')]
+          s=['## Original French missing models native 1080 acquisition',
+             f"- Actual original real 1080p decoded films: **{len(ok)}**",
+             '- Source model visual identity, logo and licence QA pending.',
+             '- NO claim that Archive availability proves reuse rights.']
+          s += [f"- {x['id']}: {x['status']}, probe={x.get('probe')} errors={x.get('errors',[])[:3]}" for x in d]
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(s)+'\n')
+          print('\n'.join(s))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-a-more-original-classic-real-1080-media-single-zip
+          path: out/FR-LEGENDS-A-MISSING-MODELS-ORIGINAL-FILES.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
