@@ -1,0 +1,25 @@
+name: FR Legends A - Alpine Press Asset Endpoint Research
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - '.github/workflows/fr-legends-a-alpine-press.yml'
+      - 'production/videos/french-icons-001/agent_a_alpine_press_debug.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect-download-endpoints:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect publicly published HD press video embeds
+        run: python production/videos/french-icons-001/agent_a_alpine_press_debug.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-a-press-asset-path-report
+          path: out/fr-classics-alpine-press/report.json
+          retention-days: 7
