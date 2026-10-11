@@ -1,0 +1,64 @@
+name: YouTube extraction strategy matrix (live tiny proof)
+on:
+  push:
+    branches: [feature/footage-rescue-multisource-20261011]
+    paths:
+      - 'production/footage_rescue/diagnose_youtube.py'
+      - '.github/workflows/youtube-strategy-matrix.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-extractor-probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 9
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        method:
+          - default
+          - web_embedded
+          - android_vr
+          - tv
+          - web_safari
+          - ios
+          - impersonate
+          - embedded_combined
+          - nightly
+          - pytubefix
+          - you-get
+          - direct-control
+    name: source bytes / ${{ matrix.method }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Install downloaders and real video validation tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q 'yt-dlp[default,curl-cffi]==2026.08.19' pytubefix you-get
+          if [ "${{ matrix.method }}" = "nightly" ]; then
+            python -m pip install -q --upgrade --pre 'yt-dlp[default,curl-cffi]'
+          fi
+          python -m yt_dlp --version
+          deno --version
+      - name: Acquire real video bytes or record bounded failure
+        run: |
+          python production/footage_rescue/diagnose_youtube.py \
+            --method '${{ matrix.method }}' --out 'out/proof'
+      - name: Upload actual evidence (never invent success)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-method-${{ matrix.method }}
+          path: out/proof/
+          retention-days: 3
+          if-no-files-found: warn
