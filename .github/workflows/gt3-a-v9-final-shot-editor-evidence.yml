@@ -1,0 +1,26 @@
+name: GT3 Agent A V9 25 Shots Independent Final Actual Movie QA
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-v9-final-shot-editor-evidence.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  byte-accurate-editor-final-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare image inspection
+        run: python -m pip install --break-system-packages -q Pillow
+      - name: Download full unmodified actual V9 physical 597 MB race video footage
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/v9_real_source
+          gh run download 38163232775 --repo YunRah2103/Remotion-gpt-chat --name GT3-MULTICAR-V9-SIX-MAKES-25-IDENTIFIED-REAL-NATIVE-1080-4K-SOURCE-MEDIA --dir inputs/v9_real_source
+          find inputs/v9_real_source -name COMBINED_GLOBAL_MANIFEST_V9.json -print
+      - name: Independently verify 4 added GT3 cameras and output source frames for actual visual review
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/independent_v9_four_new_hd_camera_qa.py
