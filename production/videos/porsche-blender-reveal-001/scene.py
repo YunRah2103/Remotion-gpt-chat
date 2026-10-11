@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 import bpy
+import numpy as np  # Fail early if the Blender GLB import dependency is missing.
 from bpy_extras.object_utils import world_to_camera_view
 from mathutils import Vector
 
@@ -35,6 +36,8 @@ s.render.film_transparent = False
 s.render.engine = 'CYCLES'
 s.cycles.samples = opt.samples
 s.cycles.use_denoising = True
+s.cycles.adaptive_threshold = 0.04
+s.cycles.adaptive_min_samples = 8
 s.cycles.max_bounces = 6
 s.cycles.diffuse_bounces = 2
 s.cycles.glossy_bounces = 3
@@ -99,9 +102,13 @@ metal = material('guardrail brushed galvanized steel', (0.3, 0.34, 0.37), 0.4)
 metal.node_tree.nodes.get('Principled BSDF').inputs['Metallic'].default_value = 0.7
 
 def box(name, loc, scale, mat):
-    bpy.ops.mesh.primitive_cube_add(size=1, location=loc)
-    o = bpy.context.object
-    o.name = name
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata([(-0.5,-0.5,-0.5),(0.5,-0.5,-0.5),(0.5,0.5,-0.5),(-0.5,0.5,-0.5),
+                     (-0.5,-0.5,0.5),(0.5,-0.5,0.5),(0.5,0.5,0.5),(-0.5,0.5,0.5)],[],
+                    [(0,3,2,1),(4,5,6,7),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7)])
+    o = bpy.data.objects.new(name,mesh)
+    s.collection.objects.link(o)
+    o.location = loc
     o.scale = scale
     if mat:
         o.data.materials.append(mat)
@@ -109,9 +116,15 @@ def box(name, loc, scale, mat):
 
 def cylinder(name, a, b, radius, mat, vertices=8):
     d = Vector(b)-Vector(a)
-    bpy.ops.mesh.primitive_cylinder_add(vertices=vertices, radius=radius, depth=d.length, location=(Vector(a)+Vector(b))/2)
-    o = bpy.context.object
-    o.name = name
+    mesh = bpy.data.meshes.new(name)
+    verts=[(radius*math.cos(i*math.tau/vertices),radius*math.sin(i*math.tau/vertices),z)
+           for z in [-d.length/2,d.length/2] for i in range(vertices)]
+    faces=[(i,(i+1)%vertices,(i+1)%vertices+vertices,i+vertices) for i in range(vertices)]
+    faces += [tuple(reversed(range(vertices))),tuple(range(vertices,2*vertices))]
+    mesh.from_pydata(verts,[],faces)
+    o = bpy.data.objects.new(name,mesh)
+    s.collection.objects.link(o)
+    o.location = (Vector(a)+Vector(b))/2
     o.rotation_euler = d.to_track_quat('Z', 'Y').to_euler()
     o.data.materials.append(mat)
     return o
@@ -191,10 +204,15 @@ for o in car_objs:
 # Preserve all approved source materials and livery. No recolouring/rebuilding the car.
 spin = [bpy.data.objects.get('Spin_'+x) for x in ['FL','FR','RL','RR']]
 assert all(spin), 'canonical wheel rigs missing'
+for o in spin:
+    local_rotation = o.matrix_basis.to_euler('XYZ')
+    o.rotation_mode = 'XYZ'
+    o.rotation_euler = local_rotation
 base_rotations = [o.rotation_euler.copy() for o in spin]
 
-bpy.ops.object.light_add(type='SUN', location=(10,-20,16))
-sun = bpy.context.object
+sun = bpy.data.objects.new('sun',bpy.data.lights.new('sun','SUN'))
+s.collection.objects.link(sun)
+sun.location = (10,-20,16)
 sun.name = 'late afternoon filtered sunlight'
 sun.rotation_euler = (math.radians(57),math.radians(-17),math.radians(-35))
 sun.data.energy = 2.3
@@ -202,9 +220,9 @@ sun.data.angle = math.radians(8)
 sun.data.color = (1,0.87,0.70)
 
 def area(name, loc, energy, size, color):
-    bpy.ops.object.light_add(type='AREA', location=loc)
-    l = bpy.context.object
-    l.name = name
+    l = bpy.data.objects.new(name,bpy.data.lights.new(name,'AREA'))
+    s.collection.objects.link(l)
+    l.location = loc
     l.data.energy = energy
     l.data.shape = 'DISK'
     l.data.size = size
@@ -213,8 +231,8 @@ def area(name, loc, energy, size, color):
 fill = area('open sky soft fill', (-4,-3,7), 1400, 9, (0.74,0.85,1))
 rim = area('forest clearing warm edge', (5,2,5), 1000, 7, (1,0.9,0.72))
 
-bpy.ops.object.camera_add()
-cam = bpy.context.object
+cam = bpy.data.objects.new('camera',bpy.data.cameras.new('camera'))
+s.collection.objects.link(cam)
 cam.name = 'tracked cinematic camera'
 s.camera = cam
 cam.data.sensor_width = 36
@@ -262,11 +280,12 @@ def frame_state(f):
     # Frame the complete approved silhouette in portrait, including the rear wing.
     bpy.context.view_layer.update()
     bounds = [o.matrix_world @ Vector(v) for o in car_objs if o.type == 'MESH' for v in o.bound_box]
-    for attempt in range(16):
+    for attempt in range(8):
         screen = [world_to_camera_view(s,cam,v) for v in bounds]
         if all(0.055 < v.x < 0.945 and 0.12 < v.y < 0.88 and v.z > 0 for v in screen):
             break
-        cam.location = target + (cam.location-target)*1.075
+        factor = max(max(abs(v.x-0.5)/0.445,abs(v.y-0.5)/0.38) for v in screen)*1.01
+        cam.location = target + (cam.location-target)*max(factor,1.01)
         bpy.context.view_layer.update()
     for l,offset in [(fill,(-4,-3,7)),(rim,(5,2,5))]:
         l.location = pos+Vector(offset)
@@ -287,6 +306,8 @@ def frame_state(f):
     s.view_settings.view_transform = 'Standard' if f < 214 else 'AgX'
     s.view_settings.look = 'None' if f < 214 else 'AgX - Medium High Contrast'
     s.view_settings.exposure = 0 if f < 214 else 0.4
+    s.render.use_motion_blur = f >= 214 and not any(abs(f-c) <= 1 for c in cuts if c != 214)
+    s.render.motion_blur_shutter = 0.3
     bpy.context.view_layer.update()
 
 if ':' in opt.frames:
@@ -294,6 +315,19 @@ if ':' in opt.frames:
     frames = range(a,b+1)
 else:
     frames = list(map(int,opt.frames.split(',')))
+# Bake the real camera/car/wheel motion before rendering so Cycles samples motion blur.
+for f in range(479):
+    s.frame_set(f)
+    frame_state(f)
+    for o in [root,cam,focus,fill,rim]+spin:
+        o.keyframe_insert('location', frame=f)
+        o.keyframe_insert('rotation_euler', frame=f)
+    cam.data.keyframe_insert('lens',frame=f)
+for o in [root,cam,focus,fill,rim]+spin:
+    if o.animation_data and o.animation_data.action:
+        for curve in o.animation_data.action.fcurves:
+            for key in curve.keyframe_points:
+                key.interpolation = 'LINEAR'
 for f in frames:
     assert 0 <= f < 479
     s.frame_set(f)
@@ -302,13 +336,6 @@ for f in frames:
     bpy.ops.render.render(write_still=True)
     print('FRAME_PASS', f, flush=True)
 if opt.save:
-    # Store deterministic baked keyframes and camera cuts in the editable scene.
-    for f in range(479):
-        frame_state(f)
-        for o in [root,cam,focus,fill,rim]+spin:
-            o.keyframe_insert('location', frame=f)
-            o.keyframe_insert('rotation_euler', frame=f)
-        cam.data.keyframe_insert('lens',frame=f)
     frame_state(214)
     s.frame_set(214)
     bpy.ops.wm.save_as_mainfile(filepath=str(out/'Porsche_Blender_Reveal.blend'))

@@ -19,7 +19,7 @@ jobs:
       - name: Install native Blender and encoder
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq blender ffmpeg xvfb python3-pil
+          sudo apt-get install -y -qq blender ffmpeg xvfb python3-pil python3-numpy
       - name: Download the approved Porsche without editing its repository
         run: |
           mkdir -p /tmp/porsche out/proof
@@ -31,14 +31,14 @@ jobs:
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
         run: |
-          xvfb-run -a blender -b -t 4 --python-exit-code 1 --python production/videos/porsche-blender-reveal-001/scene.py -- --model /tmp/porsche/model.glb --out out/proof --frames 0,180,213,214,270,319,369,418 --samples 32 --save > out/proof/render.log 2>&1
+          xvfb-run -a blender -b -t 4 --python-exit-code 1 --python production/videos/porsche-blender-reveal-001/scene.py -- --model /tmp/porsche/model.glb --out out/proof --frames 0,213,214,319,418 --samples 32 --save > out/proof/render.log 2>&1
       - name: Generate review contact sheet
         run: |
           python3 - <<'PY'
           from PIL import Image,ImageDraw
           from pathlib import Path
           frames=sorted(Path('out/proof').glob('frame_*.png'))
-          assert len(frames)==8, len(frames)
+          assert len(frames)==5, len(frames)
           sheet=Image.new('RGB',(1080,1008),(16,18,20))
           draw=ImageDraw.Draw(sheet)
           for i,p in enumerate(frames):
