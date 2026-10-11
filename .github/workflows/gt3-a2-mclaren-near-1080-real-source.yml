@@ -1,0 +1,53 @@
+name: YUNEX A2 McLaren 1916x1078 Real GTWC Nürburgring Source
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a2-ferrari-aston-mclaren
+    paths:
+      - .github/workflows/gt3-a2-mclaren-near-1080-real-source.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquire-real-mclaren:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Chromium browser and FFmpeg source QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q playwright requests pillow
+          python -m playwright install chromium
+      - name: Acquire specific original GTWC McLaren video at 1916x1078+ and inspect frames
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a2/quality_review_mclaren_1916.py
+      - name: Integrity check original source bytes, not a metadata-only ZIP
+        if: always()
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,zipfile,hashlib
+          p=Path("out/gt3-a2-mclaren-1916-native/GT3_A2_MCLAREN_1916x1078_NATIVE_MOTION_QA.zip")
+          if not p.exists():print("ZIP NOT WRITTEN");raise SystemExit(0)
+          with zipfile.ZipFile(p) as z:
+            assert z.testzip() is None
+            m=json.loads(z.read("manifest.json"))
+            n=0
+            for row in m["publisher_sources"]:
+              if row["status"].startswith("NEAR_NATIVE"):
+                assert hashlib.sha256(z.read(row["real_file"])).hexdigest()==row["sha256"]
+                assert row["native_pixels"][0]>=1916 and row["native_pixels"][1]>=1078
+                n+=1
+          assert n==m["actual_decoded_near_native_landscape_source_count"]
+          print("REAL_NEAR_NATIVE_MCLAREN_SOURCE_FILES",n,"VISUAL_ID_REVIEW_PENDING")
+          PY
+      - name: One actual video plus contact sheet ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-A2-MCLAREN-NURBURGRING-1916-NATIVE-ORIGINAL-SOURCE
+          path: out/gt3-a2-mclaren-1916-native/GT3_A2_MCLAREN_1916x1078_NATIVE_MOTION_QA.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
