@@ -1,0 +1,25 @@
+name: GT3 Agent A Actual Lamborghini 20 Frame Independent Visual QA
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-lambo-2026-contact-independent-qa.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  image-review-verified-actual-clip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install image review
+        run: python -m pip install --break-system-packages -q Pillow
+      - name: Download previous physically acquired real Lamborghini video
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/lamborghini_actual
+          gh run download 38155950601 --repo YunRah2103/Remotion-gpt-chat --name GT3-AGENT-A-ABT-LAMBO-2026-ACTUAL-ORIGINAL-1080-PORTRAIT-REVIEW --dir inputs/lamborghini_actual
+      - name: Emit SHA-tested actual original 20-frame contact visualization
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/inspect_lambo_2026_actual_contact_sheet.py
