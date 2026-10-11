@@ -161,11 +161,12 @@ def main():
     ap.add_argument("--output", default="out/gt3-multicar-agent-a")
     ap.add_argument("--max-attempts", type=int, default=48)
     ap.add_argument("--max-minutes", type=int, default=65)
+    ap.add_argument("--candidates", default="source-candidates.json", help="JSON file in agent-a directory; default legacy sources")
     args = ap.parse_args()
     output = Path(args.output).resolve()
     for part in ("clips", "contact_sheets"):
         (output / part).mkdir(parents=True, exist_ok=True)
-    conf = json.loads((ROOT / "source-candidates.json").read_text())
+    conf = json.loads((ROOT / Path(args.candidates).name).read_text())
     ok, fails, attempted, observed = [], [], 0, set()
     deadline = time.monotonic() + 60 * args.max_minutes
     providers_failed = Counter()
