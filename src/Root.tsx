@@ -5,6 +5,7 @@ import {TurboDocumentary} from './TurboDocumentary';
 import {CaptionedGpuDriveFilm, CaptionedTurboDocumentary} from './ProductionCaptions';
 import {StudioMaterialProof} from './studio/StudioMaterialProof';
 import {TwoVersionFilm} from './advanced/TwoVersionFilm';
+import {Gt3MultiCarMontage} from './gt3/Gt3MultiCarMontage';
 
 export const VideoRoot=()=> <>
   <Composition id="GpuDriveFilm" component={GpuDriveFilm} width={1080} height={1920} fps={30} durationInFrames={180}/>
@@ -13,4 +14,6 @@ export const VideoRoot=()=> <>
   <Composition id="TurboDocumentaryCaptioned" component={CaptionedTurboDocumentary} defaultProps={{words: [], enabled:true}} width={1080} height={1920} fps={30} durationInFrames={840}/>
   <Composition id="StudioMaterialProof" component={StudioMaterialProof} width={1080} height={1920} fps={30} durationInFrames={150}/>
   <Composition id="EngineeringDualVersion" component={TwoVersionFilm} width={1080} height={1920} fps={30} durationInFrames={750} defaultProps={{variant:"studio" as const}}/>
+  <Composition id="Gt3MultiCar001" component={Gt3MultiCarMontage} width={1920} height={1080} fps={30} durationInFrames={316} defaultProps={{planningPreview:false}}/>
+  <Composition id="Gt3MultiCar001LayoutProof" component={Gt3MultiCarMontage} width={1920} height={1080} fps={30} durationInFrames={316} defaultProps={{planningPreview:true}}/>
 </>;
