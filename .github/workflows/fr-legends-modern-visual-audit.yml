@@ -87,6 +87,53 @@ jobs:
           (out/'review.json').write_text(json.dumps(result,indent=2,ensure_ascii=False))
           print(json.dumps({'clip_count':len(shots),'model_families':result['model_family_count'],'near_duplicate_candidates':len(similarities)},indent=2))
           PY
+      - name: Sample eight timed decoded frames from EVERY original video
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,zipfile,subprocess,tempfile,os,math
+          from pathlib import Path
+          from PIL import Image,ImageDraw
+          outer=Path(os.environ['QA_DIR'])
+          z=zipfile.ZipFile('/tmp/modern-review/sources.zip')
+          mf=json.loads(next(Path('/tmp/modern-review/unpacked').rglob('manifest.json')).read_text())
+          sampling=[]
+          rows=[]
+          with tempfile.TemporaryDirectory() as temp:
+            tdir=Path(temp)
+            for i,rec in enumerate(mf):
+              src=rec['file']
+              try:
+                with z.open(src) as stream,(tdir/'input.mp4').open('wb') as output:
+                  while data:=stream.read(1048576):output.write(data)
+                dur=float(rec['duration'])
+                times=sorted(set(round(min(dur-.3,t),2) for t in [2.,5.,10.,dur*.2,dur*.35,dur*.5,dur*.7,dur*.9] if t<dur-.1))
+                tiles=[]
+                for n,t in enumerate(times):
+                  dest=tdir/('snap'+str(n)+'.jpg')
+                  r=subprocess.run(['ffmpeg','-hide_banner','-nostdin','-loglevel','error','-y','-ss',str(t),'-i',str(tdir/'input.mp4'),'-frames:v','1','-vf','scale=320:180:force_original_aspect_ratio=decrease,pad=320:180:(ow-iw)/2:(oh-ih)/2',str(dest)],capture_output=True,timeout=25)
+                  if r.returncode or not dest.exists():continue
+                  im=Image.open(dest).convert('RGB')
+                  tiles.append((t,im.copy()));dest.unlink()
+                panel=Image.new('RGB',(1280,440),(13,16,18))
+                draw=ImageDraw.Draw(panel)
+                draw.text((10,5),Path(src).name+'  |  '+rec['model']+'  |  '+str(round(dur,1))+' s',fill='white')
+                for n,(t,im) in enumerate(tiles[:8]):
+                  x=(n%4)*320;y=35+(n//4)*200
+                  panel.paste(im,(x,y))
+                  draw.text((x+8,y+182),str(t)+' s',fill='#abdfff')
+                rows.append(panel)
+                sampling.append({'file':src,'times_sec':[x[0] for x in tiles]})
+              except Exception as exc: sampling.append({'file':src,'error':str(exc)[:170]})
+              finally:(tdir/'input.mp4').unlink(missing_ok=True)
+          for k in range(math.ceil(len(rows)/4)):
+            sample=Image.new('RGB',(1280,1760),(18,19,23))
+            for p,im in enumerate(rows[k*4:k*4+4]):sample.paste(im,(0,p*440))
+            sample.save(outer/f'timed-page-{k+1:02d}.jpg',quality=81,optimize=True)
+          (outer/'timed-sampling.json').write_text(json.dumps(sampling,indent=2))
+          print('SAMPLED',len(rows),'originals into',math.ceil(len(rows)/4),'timed pages')
+          PY
       - name: Commit lightweight real contact-sheet preview only
         shell: bash
         run: |
