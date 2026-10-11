@@ -1,0 +1,61 @@
+name: FR Legends Agent A - Fourteen Authentic French Classics Combined ZIP
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - 'production/videos/french-icons-001/agent_a_curate_v4.py'
+      - '.github/workflows/fr-legends-a-approved-v4.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify-create-one-zip:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Retrieve approved original 13 clips without redownloading archival media
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p out/source-v3
+          gh run download 38150949435 --repo YunRah2103/Remotion-gpt-chat \
+            --name FR-LEGENDS-AGENT-A-CLASSICS-13-SHOTS-ONE-ZIP \
+            --dir out/source-v3
+          ls -lh out/source-v3
+      - name: Install video and frame-proof checkers
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install pillow
+      - name: Acquire clean full original Renault 5 Turbo 2 and rebuild combined 14 clip ZIP
+        run: python production/videos/french-icons-001/agent_a_curate_v4.py
+      - name: Verify exact new MP4, SHA and conservative source gate
+        run: |
+          python - <<'PY'
+          import os,json,pathlib
+          d=json.loads(pathlib.Path('out/fr-legends-agent-a-v4/manifest.json').read_text())
+          z=pathlib.Path('out/FR-LEGENDS-AGENT-A-CLASSICS-14-REAL-MOVING-SHOTS.zip')
+          lines=['## YUNEX Agent A - actual deliverable native video V4',
+            f"- True real native-HD moving clips: **{d['true_native_video_clips']}**",
+            f"- Distinct classic models: **{d['models_count']}**",
+            f"- Premium/supporting footage: {d['premium_dramatic_shots']} / {d['supporting_real_motion_shots']}",
+            f"- Delivered real media ONE combined ZIP: **{z.stat().st_size:,} bytes**",
+            '- Includes existing 13 SHA verified videos and new FFmpeg decoded 1920x1080 Renault 5 Turbo 2 rolling tracking shot.',
+            '- Includes three original source videos + new original R5 film, manifest, contact sheets and SHA.',
+            '- GATE A: BLOCKED (18 shots / 5 models required). Reuse rights for original publisher film not established.']
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(lines)+'\n')
+          print('\n'.join(lines))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FR-LEGENDS-AGENT-A-FOURTEEN-REAL-CLASSICS-ONE-ZIP
+          path: out/FR-LEGENDS-AGENT-A-CLASSICS-14-REAL-MOVING-SHOTS.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
