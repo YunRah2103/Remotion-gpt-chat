@@ -1,0 +1,30 @@
+name: YUNEX N24 GT3 Publisher Embedded HD Stream Discovery
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths:
+      - .github/workflows/gt3-publisher-embedded-mp4.yml
+      - production/videos/gt3-nurburgring-multicar-001/agent-a/hunt_embedded_publisher_mp4.py
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  discover-and-native-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install video and HTML inspection packages
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q -U "yt-dlp[default]" requests beautifulsoup4
+      - name: Probe original publisher nested embeds for MP4/HLS media
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/hunt_embedded_publisher_mp4.py
+      - name: Publish actual embedded MP4 candidates and quality diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-N24-PUBLISHER-EMBEDDED-DIRECT-HD-SOURCES
+          path: out/gt3-n24-publisher-html-embedded/
+          if-no-files-found: error
+          retention-days: 7
