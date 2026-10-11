@@ -1,0 +1,43 @@
+name: GT3 Agent A Red Bull DTM Nürburgring 2025 Native 1080 Race Originals
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-redbull-nurburgring-2025-originals.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  hd-originals-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install real stream/scene QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q yt-dlp pillow requests
+      - name: Scrape original Red Bull 2025 Nurburgring DTM race replay links and physically acquire native 1080 streams
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_redbull_2025_dtm_gt3_real_1080.py
+      - name: Upload real media only if QA passes, else diagnostic source report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-REDBULL-DTM-NURBURGRING-2025-NATIVE1080-OR-DIAG
+          path: out/gt3-a-redbull-dtm-2025-source-probe/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Ensure accurate approval status
+        if: always()
+        run: |
+          python - <<'PY'
+          import json,pathlib,os
+          p=pathlib.Path('out/gt3-a-redbull-dtm-2025-source-probe/SOURCE_REPORT.json')
+          if p.is_file():
+            j=json.loads(p.read_text());passlist=[x for x in j['probed_urls'] if x['status'].startswith('REAL_NATIVE')]
+            result='Actually recovered playable 1080 originals: '+str(len(passlist))+'; GT3 model and camera QA pending.\n'
+            result+='\n'.join(x['url']+' '+x['status'] for x in j['probed_urls'])
+          else:result='No physical video sources or report; acquisition attempt unsuccessful.'
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(result)
+          PY
