@@ -1,0 +1,18 @@
+{
+  "project": "gt3-nurburgring-multicar-001",
+  "agent": "C",
+  "date": "2026-10-11",
+  "gate": "BLOCKED_UPSTREAM",
+  "original_song_sha256": "87a663860585e1714fd6fbb6a8006d19d655bda863db66cdaa75ba1830a2d678",
+  "original_song_sha_validated": true,
+  "music_wav_sha256": "236421c8548fa34040adab926334999be3d869978af5e71a012e3828fb651012",
+  "wav_duration_s": 10.533333333333333,
+  "wav_sample_rate_hz": 48000,
+  "wav_samples_per_channel": 505600,
+  "tests_passed": 5,
+  "tests_total": 5,
+  "final_mp4_present": false,
+  "real_vehicle_engine_stems_present": false,
+  "blocker": "Agent A verified source footage and Agent B production visual master / shotmap not yet handed off",
+  "music_package_sha256": "1dfc7822deadbb712fee838e66f15eb47e72bf5329374e0d4dfbb651dd8e83a4"
+}
