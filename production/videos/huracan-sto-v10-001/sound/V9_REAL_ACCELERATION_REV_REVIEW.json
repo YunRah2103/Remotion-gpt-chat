@@ -1,0 +1,95 @@
+{
+  "project": "huracan-sto-v10-001",
+  "edition": "V9 REAL V10 REV + NATURAL RACING ACCELERATION",
+  "state": "PLAYABLE_PRIVATE_REVIEW_TECHNICAL_QA_PASS",
+  "renderedFile": "HURACAN_STO_V9_REAL_V10_REV_PLUS_ACCELERATION.mp4",
+  "renderedSha256": "6ba53246a32863b13ee0d3589818c77700877440061fcff6feddea0a0045a2b3",
+  "renderedBytes": 15657947,
+  "video": {
+    "source": "STO-B-V4-NO-WATERMARK-LANDSCAPE-SILENT.mp4",
+    "sha256": "ec6a4b1eff39dc1bfde00e9615fb2b20b64c6660703895b8f32542d7d2954818",
+    "outputWidth": 1920,
+    "outputHeight": 1080,
+    "frameRate": 30,
+    "decodedFrames": 316,
+    "videoStreamCopy": true
+  },
+  "song": {
+    "description": "The original user-supplied TikTok MP3, unchanged beat positions",
+    "sha256": "87a663860585e1714fd6fbb6a8006d19d655bda863db66cdaa75ba1830a2d678",
+    "committedToGitHub": false
+  },
+  "soundSources": [
+    {
+      "role": "Short Huracan V10 rev 1",
+      "vehicle": "Lamborghini Huracan, generally 5.2L V10",
+      "sourceUrl": "https://github.com/sathyaram/exhaustnotes/blob/master/public/sounds/huracan.m4a",
+      "fileSha256": "70b8a245614c9a917a824b2dc14357a467ffb44ace033c1a33a901be584f714a",
+      "editorialRights": "Creator redistribution rights unverified"
+    },
+    {
+      "role": "Short Audi R8 V10 rev 2",
+      "vehicle": "Audi R8 5.2 V10",
+      "sourceUrl": "https://github.com/sathyaram/exhaustnotes/blob/master/public/sounds/audir8.m4a",
+      "fileSha256": "927b37b8ce70a768ccfc2496639be00cd01cc7ed77b38fc20c953c31f2d18f5e",
+      "editorialRights": "Creator redistribution rights unverified"
+    },
+    {
+      "role": "Two independent naturally rising acceleration/drive-by field recordings",
+      "vehicle": "Audi R8 racing at Zolder; exact model engine variant not independently certified",
+      "sourceUrl": "https://freesound.org/people/ikbenraar/sounds/429099/",
+      "author": "ikbenraar",
+      "license": "Creative Commons Attribution 4.0",
+      "originalRecordingDescription": "Audi R8 racing on the Zolder circuit. Multiple pass-bys and engine start, mid-side stereo field recording.",
+      "previewMediaSha256": "2b604d74dd39593261580f78d5aa13ad182f18ed22e4c51084ee53cee277766f",
+      "sourceAudioSeconds": 246.672
+    }
+  ],
+  "shotGate": {
+    "engineOnlyMovingFrames": "95..283 inclusive",
+    "onAtSec": 3.1666666666666665,
+    "offAtSec": 9.466666666666667,
+    "exactZeroOutside": true
+  },
+  "events": [
+    {
+      "type": "Rev",
+      "atSeconds": 3.23,
+      "durationSeconds": 0.77,
+      "source": "ExhaustNotes Huracan V10",
+      "sourceStartSeconds": 5.42
+    },
+    {
+      "type": "Natural acceleration",
+      "atSeconds": 4.03,
+      "durationSeconds": 2.05,
+      "source": "Zolder Audi R8 racetrack recording",
+      "sourceStartSeconds": 140.18
+    },
+    {
+      "type": "Short gear transition rev",
+      "atSeconds": 6.16,
+      "durationSeconds": 0.4,
+      "source": "ExhaustNotes Audi R8 V10",
+      "sourceStartSeconds": 10.43
+    },
+    {
+      "type": "Distinct second natural acceleration/pass",
+      "atSeconds": 6.78,
+      "durationSeconds": 2.57,
+      "source": "Zolder Audi R8 racetrack recording",
+      "sourceStartSeconds": 207.85
+    }
+  ],
+  "audioTreatment": "Original song lightly ducked only around four distinct car moments; real source clips EQ 95-11k Hz, short fades, relative RMS alignment; no synthetic engine or music from commercial car promos.",
+  "qa": {
+    "ffmpegFullDecode": true,
+    "decodedFrames": 316,
+    "decodedAudio": "AAC 48000Hz stereo 320kbps",
+    "durationSeconds": 10.533333333333333,
+    "longBlackFrameIntervals": 0,
+    "silentIntervals": 0,
+    "sourceAndOutputVideoBitstreamHashesIdentical": true
+  },
+  "limitations": "Audio comes from real Huracan/Audi R8 and R8 race circuit recordings, not a synchronized soundtrack from the pictured STO. Race-car engine specific V10 trim not proven and background ambient noise is possible. This is private review; rights to user video and song not independently established."
+}
