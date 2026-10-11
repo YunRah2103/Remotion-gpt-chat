@@ -1,0 +1,26 @@
+name: FR Legends A - Official Manufacturer Heritage Source Search
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - 'production/videos/french-icons-001/agent_a_heritage_press_discover.py'
+      - '.github/workflows/fr-legends-a-heritage-scout.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  find-public-clips:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect first-party historical motoring press media
+        run: python production/videos/french-icons-001/agent_a_heritage_press_discover.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-a-official-media-discovery-report
+          path: out/fr-legends-a-official-heritage/manifest.json
+          retention-days: 7
+          if-no-files-found: warn
