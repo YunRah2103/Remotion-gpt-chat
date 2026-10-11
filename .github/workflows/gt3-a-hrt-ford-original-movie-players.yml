@@ -1,0 +1,48 @@
+name: GT3 Agent A HRT Ford Nürburgring Native GT3 Producer Footage
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-hrt-ford-original-movie-players.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  attempt-real-native-ford-gt3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install media stream/Chromium independent visual QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q playwright pillow yt-dlp requests
+          python -m playwright install chromium
+      - name: Play six real HRT Racing publisher videos and attempt actual full-HD original retrieval
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_hrt_ford_nurburgring_real_native_media.py
+      - name: Verify physically packaged video CRC, source native pixel dimensions and exact original SHA values
+        if: always()
+        run: |
+          python - <<'PY'
+          import zipfile,json,hashlib,pathlib
+          z=pathlib.Path('out/gt3-a-hrt-ford-browser/GT3_A_HRT_GT3_BROWSER_ORIGINALS_AND_QA.zip')
+          if not z.exists():print('NO SOURCE MEDIA ZIP')
+          else:
+            with zipfile.ZipFile(z) as f:
+              assert f.testzip() is None
+              manifest=json.loads(f.read('SOURCE_MANIFEST.json'))
+              for v in manifest['sources']:
+                if v['status']=='REAL_NATIVE_HD_FULL_DECODE_MODEL_REVIEW_PENDING':
+                  assert hashlib.sha256(f.read(v['file'])).hexdigest()==v['sha256']
+                  print('REAL_ORIGINAL_VERIFIED',v['source_id'],v['resolution'],v['sha256'])
+              print('SOURCE_MEDIA_COUNT',manifest['native_hd_media_file_count'])
+          PY
+      - name: Deliver all actually acquired source originals and review frames, or transparent failure evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-HRT-FORD-NURBURGRING-ACTUAL-NATIVE-1080-OR-DIAGNOSTICS
+          path: out/gt3-a-hrt-ford-browser/GT3_A_HRT_GT3_BROWSER_ORIGINALS_AND_QA.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
