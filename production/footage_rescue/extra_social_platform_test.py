@@ -24,15 +24,16 @@ p=argparse.ArgumentParser()
 p.add_argument("--sample",choices=SAMPLES.keys(),required=True)
 p.add_argument("--mode",choices=("yt-dlp","chrome"),required=True)
 p.add_argument("--out",required=True)
+p.add_argument("--quality",choices=["small","best"],default="small")
 a=p.parse_args()
 out=Path(a.out)
 tmp=out/"originals";tmp.mkdir(parents=True,exist_ok=True)
-report={"platform":a.sample,"method":a.mode,"url":SAMPLES[a.sample],"status":"FAILED"}
+report={"platform":a.sample,"method":a.mode,"quality":a.quality,"url":SAMPLES[a.sample],"status":"FAILED"}
 base=[sys.executable,"-m","yt_dlp","--ignore-config","--no-playlist","--no-progress",
       "--socket-timeout","14","--retries","0","--fragment-retries","0","--max-filesize","30M"]
 if a.mode=="chrome":base+=["--impersonate","chrome"]
 # Limit traffic by downloading the first 3 seconds; only actual playable bytes count.
-cmd=base+["--download-sections","*0-3","-f","best[height<=720]/worst",
+cmd=base+["--download-sections","*0-3","-f",("bv*+ba/b" if a.quality=="best" else "best[height<=720]/worst"),
           "-o",str(tmp/"clip.%(ext)s"),SAMPLES[a.sample]]
 try:
     result=subprocess.run(cmd,text=True,capture_output=True,timeout=110,stdin=subprocess.DEVNULL)
