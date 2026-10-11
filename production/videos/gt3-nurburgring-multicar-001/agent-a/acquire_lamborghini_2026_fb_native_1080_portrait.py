@@ -47,7 +47,7 @@ try:
   t=duration*(i+.4)/20
   tmp=PREVIEW/f"frame_{i:02d}.jpg"
   cmd(["ffmpeg","-nostdin","-v","error","-y","-ss",str(t),"-i",str(p),"-frames:v","1",
-       "-vf","scale=230:409:force_original_aspect_ratio=decrease,pad=230:409:(ow-iw)/2:(oh-ih)/2",str(tmp)],30)
+       "-vf","scale=222:394,pad=230:409:(ow-iw)/2:(oh-ih)/2",str(tmp)],30)
   with Image.open(tmp) as im:canvas.paste(im.convert("RGB"),((i%5)*240,(i//5)*445+22))
   tmp.unlink(missing_ok=True)
   draw.text(((i%5)*240+3,(i//5)*445+3),f"{t:.1f}s",fill="white")
