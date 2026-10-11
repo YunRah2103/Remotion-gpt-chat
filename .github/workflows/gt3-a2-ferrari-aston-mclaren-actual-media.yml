@@ -22,7 +22,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
-          python -m pip install -q --disable-pip-version-check --break-system-packages requests beautifulsoup4 pillow yt-dlp
+          python -m pip install -q --disable-pip-version-check --break-system-packages requests beautifulsoup4 pillow yt-dlp gallery-dl instaloader
       - name: Acquire, decode, fingerprint and visually sample genuine video files
         run: |
           python -u production/videos/gt3-nurburgring-multicar-001/agent-a2/acquire_real_media.py
