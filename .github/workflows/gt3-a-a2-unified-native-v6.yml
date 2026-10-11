@@ -1,0 +1,57 @@
+name: GT3 Agent A+A2 Unified V6 Real Native Footage Package
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-a2-unified-native-v6.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  validate-and-deliver-single-real-footage-zip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 19
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download actual 415MB A V5 original/native-4K footage
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 38154006731
+          github-token: ${{ github.token }}
+          name: GT3-MULTICAR-AGENT-A-ORIGINAL-NATIVE-V5-ONE-ZIP-4K-PORSCHE-AUDI-BMW-AMG
+          path: inputs/agent-a-v5
+      - name: Download actual 48MB A2 corrected Aston Vantage GT3 original
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 38153173855
+          github-token: ${{ github.token }}
+          name: GT3-MULTICAR-AGENT-A2-ASTON-QA-CORRECTED-NATIVE-1080-V2
+          path: inputs/agent-a2-aston-corrected
+      - name: Set up strict original video SHA / full-decode QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Physically combine and re-decode all seven Aston GT3 shots and preserve every A original
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/build_v6_integrated_real_footage.py
+      - name: Upload ONE entire combined fully verified video library package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-MULTICAR-REAL-NATIVE-V6-ONE-ZIP-FIVE-MAKES-19-CAMERAS-PARTIAL
+          path: out/gt3-multicar-a-and-a2-native-original-v6/
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Cumulative factual source status
+        if: always()
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os
+          path=Path('out/gt3-multicar-a-and-a2-native-original-v6/COMBINED_GLOBAL_MANIFEST_V6.json')
+          if path.exists():
+            j=json.loads(path.read_text())
+            msg=f"ONE actual media ZIP verified and uploaded. {j['makes_verified']}/6 GT3 makes; {j['distinct_source_camera_sections_verified']}/24 independent on-track cameras. Gate BLOCKED.\n"
+          else:msg="Combined V6 source-media QA FAILED. No completed merged-media guarantee; check job logs."
+          Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(msg)
+          PY
