@@ -70,7 +70,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: GT3-MULTICAR-FOOTAGE-AGENT-A
+          name: ${{ env.QA_GATE == 'NEEDS_VISUAL_REVIEW' && 'GT3-MULTICAR-FOOTAGE-30PLUS' || 'GT3-MULTICAR-ACQUISITION-DIAGNOSTICS' }}
           path: |
             out/gt3-multicar-agent-a/GT3_MULTICAR_AGENT_A_ACTUAL_MEDIA.zip
             out/gt3-multicar-agent-a/QA_SUMMARY.json
