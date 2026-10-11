@@ -1,0 +1,26 @@
+name: Agent A Inspect Five Actual HRT Ford Original Full HD Videos
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-hrt-ford-5-real-movies-visual-qa.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent-human-scene-identity-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install actual video contact sheet viewer
+        run: python -m pip install --break-system-packages -q pillow
+      - name: Retrieve exact five-source original video artifact and contact proofs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/hrt_actual_origin
+          gh run download 38160120679 --repo YunRah2103/Remotion-gpt-chat --name GT3-AGENT-A-HRT-FORD-NURBURGRING-ACTUAL-NATIVE-1080-OR-DIAGNOSTICS --dir inputs/hrt_actual_origin
+          find inputs/hrt_actual_origin -type f -printf '%p %s bytes\n'
+      - name: Decode manifests CRC and physical SHA and display true-original images for review
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/independent_hrt_ford_5_fullhd_video_visual_qa.py
