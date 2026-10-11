@@ -70,6 +70,29 @@ def contact_sheet(path,id,dur):
     return str(out.relative_to(OUT)),times
 
 def real_download(url,dest):
+    if "instagram.com/" in url or "tiktok.com/" in url:
+        directory=dest.parent/(dest.stem+"_exact_post")
+        directory.mkdir(exist_ok=True)
+        logs=[]
+        attempts=[
+          ["gallery-dl","--no-part","--directory",str(directory.resolve()),url],
+        ]
+        if "instagram.com/" in url:
+            shortcode=url.rstrip("/").split("/")[-1]
+            attempts.append(["instaloader","--dirname-pattern",str(directory.resolve()),
+                             "--no-captions","--no-video-thumbnails",
+                             "--no-metadata-json","--","-"+shortcode])
+        for cmdline in attempts:
+            try:
+                stdout,code=sh(cmdline,timeout=48,check=False)
+                logs.append(cmdline[0]+":"+str(code)+" "+stdout[-110:])
+                videos=[p for p in directory.rglob("*") if p.is_file() and
+                        p.suffix.lower() in (".mp4",".mkv",".webm",".mov") and
+                        p.stat().st_size>100*1024]
+                if videos:
+                    return "exact-post-"+cmdline[0],max(videos,key=lambda p:p.stat().st_size)
+            except Exception as e:logs.append(cmdline[0]+":"+str(e)[:180])
+        raise RuntimeError("SOCIAL_NO_REAL_VIDEO "+str(logs)[-280:])
     if re.search(r"\.(mp4|mov|mkv|webm)(?:\?|$)",url,re.I):
         try:
             with S.get(url,stream=True,timeout=(8,18)) as r:
