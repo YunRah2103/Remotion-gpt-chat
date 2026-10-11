@@ -25,7 +25,19 @@ PAGES=[
  ("bugatti-veyron","Bugatti Veyron","https://newsroom.bugatti.com/en/models/veyron"),
  ("peugeot-9x8","Peugeot 9X8","https://www.media.stellantis.com/fr-fr/peugeot/press/la-peugeot-9x8-2024-devoile-une-nouvelle-silhouette-soulignee-par-une-livree-exceptionnelle"),
  ("peugeot-9x8-2","Peugeot 9X8","https://www.media.stellantis.com/fr-fr/peugeot-sport/press/peugeot-9x8-d-abord-un-projet-virtuel-de-15-267-fichiers-numeriques"),
- ("alpine-miami","Alpine A110","https://media.renault.ch/fr/article/21554")
+ ("alpine-miami","Alpine A110","https://media.renault.ch/fr/article/21554"),
+ ("alpine-a290-rallye","Alpine A290 Rallye","https://media.renault.ch/fr/10537/article/22049"),
+ ("alpine-a290-test","Alpine A290","https://media.renault.ch/fr/10658/article/21918"),
+ ("alpine-a290-cold","Alpine A290","https://media.renault.ch/fr/article/21830"),
+ ("alpine-a290-rallye-release","Alpine A290 Rallye","https://media.renault.ch/fr/10596/article/22012"),
+ ("renault-r5-turbo-3e","Renault R5 Turbo 3E","https://media.renault.ch/fr/article/21622"),
+ ("bugatti-chiron-super-sport","Bugatti Chiron Super Sport","https://newsroom.bugatti.com/en/models/chiron-super-sport"),
+ ("bugatti-chiron-pur-sport","Bugatti Chiron Pur Sport","https://newsroom.bugatti.com/en/models/chiron-pur-sport"),
+ ("bugatti-chiron-300","Bugatti Chiron Super Sport 300+","https://newsroom.bugatti.com/en/models/chiron-super-sport-300"),
+ ("bugatti-mistral","Bugatti W16 Mistral","https://newsroom.bugatti.com/en/models/w16-mistral"),
+ ("peugeot-9x8-medialibrary","Peugeot 9X8","https://medialibrary.stellantis.com/peugeot/sharedBasket;jsessionid=898DDB447E227EF106E12FA65B88B8ED.10?token=baDILraQg"),
+ ("peugeot-rcz-r","Peugeot RCZ R","https://www.media.stellantis.com/em-en/peugeot/press/the-peugeot-rcz-r")
+
 ]
 def cmd(args,timeout=50):
  p=subprocess.run(args,capture_output=True,text=True,timeout=timeout)
@@ -104,7 +116,7 @@ for ident,model,page in PAGES:
  # Limit to video URLs discovered directly on publisher page; do not blindly download unrelated media.
  candidates=[link for link in links if re.search(r"\.(mp4|m3u8|mov|webm)(?:[?&#]|$)",link["url"],re.I)]
  for index,entry in enumerate(candidates[:6]):
-  if len(records)>=20:break
+  if len(records)>=35:break
   src=entry["url"];host=urlparse(src).hostname or ""
   if src in seen_urls:continue
   seen_urls.add(src)
@@ -148,4 +160,4 @@ gate="PARTIAL — provisional clips, human review required" if records else "BLO
 (OUT/"README.md").write_text("# FR Legends Agent B — Actual Media Acquisition\n\n"
  +f"Gate B: **{gate}**. Decoded original videos: {len(records)}; covered labelled models: {len(counts)}. Strict PASS not established until 18 distinct reviewed moving shots over >=5 models.\n\n"
  +"All media in clips/ were downloaded from actual URLs; no generated or upscaled placeholder media. Exact SHA256, source and media properties in manifest files. Contact sheets derive from actual decoded frames. Discovery diagnostics list failed attempts. Source licensing and visual identity/watermark checks still require human review.\n")
-print(json.dumps({"gate":gate,"downloaded":len(records),"models":dict(counts),"sources_checked":len(diagnostics)},indent=2))
+for item in diagnostics:\n print("PAGE_DIAGNOSTIC",item["id"],"links",len(item["links"]),"success",sum("DOWNLOADED" in s for s in item["notes"]),"candidate_urls",[z["url"][:100] for z in item["links"][:3]],"issues",item["notes"][:3])\nprint(json.dumps({"gate":gate,"downloaded":len(records),"models":dict(counts),"sources_checked":len(diagnostics)},indent=2))
