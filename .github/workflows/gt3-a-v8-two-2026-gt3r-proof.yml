@@ -64,3 +64,5 @@ jobs:
           else:msg='No valid V8 media package delivered; source execution failed.\n'
           pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(msg)
           PY
+
+# Recheck unapproved third original against immutable V7 provenance instead of superseded issue summary.
