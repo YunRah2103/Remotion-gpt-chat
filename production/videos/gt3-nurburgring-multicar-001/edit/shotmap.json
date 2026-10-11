@@ -1,0 +1,678 @@
+{
+  "project": "YUNEX GT3 Multi-Car 001",
+  "status": "PLANNING_ONLY_PENDING_AGENT_A_REAL_MEDIA",
+  "contract": "Multi-car Nürburgring edit; do not substitute reference frames, upscaled 720p or non-GT3 footage.",
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "durationInFrames": 316,
+  "mediaRoot": "public/gt3-multicar-001/",
+  "soundtrackSha256": "87a663860585e1714fd6fbb6a8006d19d655bda863db66cdaa75ba1830a2d678",
+  "impactFrames": [
+    78,
+    158,
+    240
+  ],
+  "shots": [
+    {
+      "id": "GT3-01",
+      "from": 0,
+      "to": 10,
+      "targetMake": "Porsche",
+      "targetModel": "911 GT3 R (992)",
+      "targetAngle": "trackside hard flyby",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "hard",
+        "frames": 0,
+        "direction": "left"
+      },
+      "edit": {
+        "speed": 1,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": -16,
+        "push": 0.028,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-02",
+      "from": 10,
+      "to": 23,
+      "targetMake": "BMW",
+      "targetModel": "M4 GT3 EVO",
+      "targetAngle": "nose-on kerb attack",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "cut",
+        "frames": 1,
+        "direction": "right"
+      },
+      "edit": {
+        "speed": 1.12,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": 19,
+        "push": 0.022,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-03",
+      "from": 23,
+      "to": 34,
+      "targetMake": "Mercedes-AMG",
+      "targetModel": "GT3 EVO",
+      "targetAngle": "pack battle",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "cut",
+        "frames": 1,
+        "direction": "left"
+      },
+      "edit": {
+        "speed": 1.18,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": -23,
+        "push": 0.038,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-04",
+      "from": 34,
+      "to": 45,
+      "targetMake": "Lamborghini",
+      "targetModel": "Huracán GT3 EVO2",
+      "targetAngle": "low side pass",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "cut",
+        "frames": 1,
+        "direction": "right"
+      },
+      "edit": {
+        "speed": 0.95,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": 13,
+        "push": 0.019,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-05",
+      "from": 45,
+      "to": 63,
+      "targetMake": "Audi",
+      "targetModel": "R8 LMS GT3 evo II",
+      "targetAngle": "headlights or cockpit",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "cut",
+        "frames": 1,
+        "direction": "left"
+      },
+      "edit": {
+        "speed": 1.24,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": -9,
+        "push": 0.028,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-06",
+      "from": 63,
+      "to": 78,
+      "targetMake": "Ferrari",
+      "targetModel": "296 GT3",
+      "targetAngle": "pit acceleration",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "whip",
+        "frames": 2,
+        "direction": "right"
+      },
+      "edit": {
+        "speed": 1.06,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": 18,
+        "push": 0.022,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-07",
+      "from": 78,
+      "to": 90,
+      "targetMake": "Porsche",
+      "targetModel": "911 GT3 R (992)",
+      "targetAngle": "big full-car impact reveal",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "impact",
+        "frames": 0,
+        "direction": "left"
+      },
+      "edit": {
+        "speed": 1,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": -16,
+        "push": 0.038,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-08",
+      "from": 90,
+      "to": 103,
+      "targetMake": "Aston Martin",
+      "targetModel": "Vantage GT3",
+      "targetAngle": "long-lens corner exit",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "mono",
+        "frames": 1,
+        "direction": "right"
+      },
+      "edit": {
+        "speed": 1.12,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": 19,
+        "push": 0.019,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-09",
+      "from": 103,
+      "to": 115,
+      "targetMake": "BMW",
+      "targetModel": "M4 GT3 EVO",
+      "targetAngle": "close overtake",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "cut",
+        "frames": 1,
+        "direction": "left"
+      },
+      "edit": {
+        "speed": 1.18,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": -23,
+        "push": 0.028,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-10",
+      "from": 115,
+      "to": 132,
+      "targetMake": "McLaren",
+      "targetModel": "720S GT3 EVO",
+      "targetAngle": "camera whip",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "cut",
+        "frames": 1,
+        "direction": "right"
+      },
+      "edit": {
+        "speed": 0.95,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": 13,
+        "push": 0.022,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-11",
+      "from": 132,
+      "to": 140,
+      "targetMake": "Mercedes-AMG",
+      "targetModel": "GT3 EVO",
+      "targetAngle": "rear three-quarter chase",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "whip",
+        "frames": 2,
+        "direction": "left"
+      },
+      "edit": {
+        "speed": 1.24,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": -9,
+        "push": 0.038,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-12",
+      "from": 140,
+      "to": 158,
+      "targetMake": "Ferrari",
+      "targetModel": "296 GT3",
+      "targetAngle": "sunset side pan",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "cut",
+        "frames": 1,
+        "direction": "right"
+      },
+      "edit": {
+        "speed": 1.06,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": 18,
+        "push": 0.019,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-13",
+      "from": 158,
+      "to": 170,
+      "targetMake": "Lamborghini",
+      "targetModel": "Huracán GT3 EVO2",
+      "targetAngle": "overtake / curb hit",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "impact",
+        "frames": 0,
+        "direction": "left"
+      },
+      "edit": {
+        "speed": 1,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": -16,
+        "push": 0.028,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-14",
+      "from": 170,
+      "to": 187,
+      "targetMake": "Porsche",
+      "targetModel": "911 GT3 R (992)",
+      "targetAngle": "onboard or mirrors",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "cut",
+        "frames": 1,
+        "direction": "right"
+      },
+      "edit": {
+        "speed": 1.12,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": 19,
+        "push": 0.022,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-15",
+      "from": 187,
+      "to": 201,
+      "targetMake": "Audi",
+      "targetModel": "R8 LMS GT3 evo II",
+      "targetAngle": "night headlights",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "mono",
+        "frames": 1,
+        "direction": "left"
+      },
+      "edit": {
+        "speed": 1.18,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": -23,
+        "push": 0.038,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-16",
+      "from": 201,
+      "to": 212,
+      "targetMake": "BMW",
+      "targetModel": "M4 GT3 EVO",
+      "targetAngle": "fast chicane",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "whip",
+        "frames": 2,
+        "direction": "right"
+      },
+      "edit": {
+        "speed": 0.95,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": 13,
+        "push": 0.019,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-17",
+      "from": 212,
+      "to": 224,
+      "targetMake": "Mercedes-AMG",
+      "targetModel": "GT3 EVO",
+      "targetAngle": "trackside flyby",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "cut",
+        "frames": 1,
+        "direction": "left"
+      },
+      "edit": {
+        "speed": 1.24,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": -9,
+        "push": 0.028,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-18",
+      "from": 224,
+      "to": 240,
+      "targetMake": "McLaren",
+      "targetModel": "720S GT3 EVO",
+      "targetAngle": "wet track or night pass",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "cut",
+        "frames": 1,
+        "direction": "right"
+      },
+      "edit": {
+        "speed": 1.06,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": 18,
+        "push": 0.022,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-19",
+      "from": 240,
+      "to": 254,
+      "targetMake": "Aston Martin",
+      "targetModel": "Vantage GT3",
+      "targetAngle": "tight pack action",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "impact",
+        "frames": 0,
+        "direction": "left"
+      },
+      "edit": {
+        "speed": 1,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": -16,
+        "push": 0.038,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-20",
+      "from": 254,
+      "to": 275,
+      "targetMake": "Ferrari",
+      "targetModel": "296 GT3",
+      "targetAngle": "fast sweeping turn",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "cut",
+        "frames": 1,
+        "direction": "right"
+      },
+      "edit": {
+        "speed": 1.12,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": 19,
+        "push": 0.019,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-21",
+      "from": 275,
+      "to": 291,
+      "targetMake": "Porsche",
+      "targetModel": "911 GT3 R (992)",
+      "targetAngle": "raw aggressive exit",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "whip",
+        "frames": 2,
+        "direction": "left"
+      },
+      "edit": {
+        "speed": 1.18,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": -23,
+        "push": 0.028,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    },
+    {
+      "id": "GT3-22",
+      "from": 291,
+      "to": 316,
+      "targetMake": "BMW",
+      "targetModel": "M4 GT3 EVO",
+      "targetAngle": "clean full-car end shot",
+      "source": null,
+      "sourceInFrame": null,
+      "sourceFilmId": null,
+      "verifiedMake": null,
+      "verifiedModel": null,
+      "camera": null,
+      "sourceSha256": null,
+      "transition": {
+        "kind": "mono",
+        "frames": 1,
+        "direction": "right"
+      },
+      "edit": {
+        "speed": 0.95,
+        "cropX": 50,
+        "cropY": 50,
+        "driftX": 13,
+        "push": 0.022,
+        "contrast": 1.065,
+        "saturation": 1.06,
+        "brightness": 1.01
+      }
+    }
+  ]
+}
