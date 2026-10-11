@@ -14,7 +14,7 @@ Evidence:
 | Pinterest video pins | **YES**, standard yt-dlp and Chrome | 720x1280 at 23.98 fps from Lamborghini video pin | Best sample quality 720x1280, below vertical native 1080 |
 | Twitch clips | **YES**, standard yt-dlp and Chrome | 1280x720 source segment; **1920x1080** at ~60 fps using best-quality stream | Example is streamed gaming content, not real-world cinematic car footage; 1080p landscape not enough for native portrait crop |
 | Bluesky posts | **YES**, standard yt-dlp and Chrome using 720p selection | 1280x720 at 30 fps | Higher-quality best-stream segmented remux failed on same test with premature stream end. Only the 720p test is proven reliable |
-| X/Twitter posts | **YES**, standard yt-dlp and Chrome on 2 separate native-video posts | 1280x720 at ~30 fps on one post; 320x568 on a second | An older X post linking to expired Periscope video failed. Per-post differences matter |
+| X/Twitter posts | **YES**, standard yt-dlp and Chrome on 2 separate native-video posts | 1280x720 at ~30 fps on one post; **720x1280** at ~30.6 fps from best-format test on the second | An older X post linking to expired Periscope video failed. Per-post differences matter |
 | Facebook Reels | **NO** | No video | Two separate public Reel URLs, yt-dlp and Chrome modes both failed with 'Cannot parse data' |
 | Reddit self-hosted video | **NO** | No video | Tested public OC dashcam post rejected anonymous GitHub session with HTTP 403 / account authentication required |
 
