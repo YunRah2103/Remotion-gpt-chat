@@ -2,6 +2,10 @@
 
 Last checked: 2026-10-11. Applies to **future automotive projects**; do not rewrite active production footage assignments merely by adding this documentation.
 
+## Production sequencing — five footage agents first
+
+For new YUNEX films, default to **five independent footage-acquisition workers**, each sourcing real native-HD/4K media for a disjoint assignment. **Do not start the editor, audio engineer or independent final manager until their five packages are verified and consolidated into a master footage ZIP.** Complete procedure, stage gates, artifact naming, de-duplication, chat titles and fallback behaviour: [FIVE_AGENT_FOOTAGE_FIRST_WORKFLOW.md](FIVE_AGENT_FOOTAGE_FIRST_WORKFLOW.md). The user may still opt for fewer agents on an active or simpler project. This does not alter agents already in progress.
+
 ## Objective
 
 Obtain actual moving original car footage in **native >=1920x1080 landscape or >=1080x1920 portrait**, up to 3840x2160 / 2160x3840 as requested. The fact that video downloads successfully does not mean it meets these quality gates. Verify native decoded dimensions, framing, visual identity, sharpness, uniqueness, duration and cinematic suitability before marking a clip PASS. Full-size originals only: no fake 1080p by upscaling lower-res sources, no black bars, no stills posed as moving video. Model/track specifics depend on each project's contract.
