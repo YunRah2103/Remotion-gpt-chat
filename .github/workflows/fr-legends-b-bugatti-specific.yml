@@ -1,0 +1,35 @@
+name: FR Legends B - Correct Bugatti Model Videos
+on:
+  push:
+    branches: [automotive-edits/french-icons-001/b-modern-footage]
+    paths: 
+      - production/videos/french-icons-001/agent-b/bugatti_model_video.py
+      - .github/workflows/fr-legends-b-bugatti-specific.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-video:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install source probe and image validation tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          pip install Pillow requests
+          python -m py_compile production/videos/french-icons-001/agent-b/bugatti_model_video.py
+      - name: Acquire correct native 1080p+ Bugatti Chiron and Bolide real video
+        run: python production/videos/french-icons-001/agent-b/bugatti_model_video.py
+      - name: Save one original source clips and frames archive
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: FR-LEGENDS-B-MODEL-SPECIFIC-BUGATTI-MEDIA
+          path: out/fr-legends-b-bugatti-model-films/
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn
