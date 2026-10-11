@@ -1,0 +1,35 @@
+name: YUNEX GT3 Nürburgring TV Original Native 1080p Racing Films
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths:
+      - .github/workflows/gt3-nurburgring-tv-native-originals.yml
+      - production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_nuerburgring_tv_native.py
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquire-real-racing-originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install original-video decode and preview tools
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q requests pillow
+      - name: Download publisher's native 1080p original MP4s and generate contact sheets
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_nuerburgring_tv_native.py
+      - name: Bundle one downloadable native-media ZIP, FFprobe, hashes, contact sheets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-NURBURGRING-TV-ACTUAL-1080P-RACING-ORIGINALS
+          path: out/gt3-nurburgring-tv-real-1080/
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 7
+      - name: Ensure original files exist before reporting success
+        run: |
+          test -s out/gt3-nurburgring-tv-real-1080/source_manifest.json
+          ls -lh out/gt3-nurburgring-tv-real-1080/native_original_mp4/
