@@ -1,0 +1,37 @@
+name: GT3 Agent A Independent Real HRT Five HD Videos Actual Frame QA
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-hrt-five-hd-source-frame-review.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect-real-native-hd-cars:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare native video frame decoder
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q pillow
+      - name: Retrieve the five ACTUAL published HRT 1080 original videos
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/hrt-real-media
+          gh run download 38160120679 --repo YunRah2103/Remotion-gpt-chat --name GT3-AGENT-A-HRT-FORD-NURBURGRING-ACTUAL-NATIVE-1080-OR-DIAGNOSTICS --dir inputs/hrt-real-media
+          find inputs/hrt-real-media -type f -printf '%p %s bytes\n'
+      - name: Reinspect all original SHA-confirmed videos with 16 actual 1080 frames each
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/inspect_real_hrt_ford_five_hd_video_frames.py
+      - name: Publish real HRT clip contact proof and notes (no invented approval)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-HRT-FORD-FIVE-TRUE-HD-ORIGINALS-80-REAL-FRAME-PROOF
+          path: out/gt3-hrt-five-video-actual-frame-qa/
+          retention-days: 7
+          if-no-files-found: warn
