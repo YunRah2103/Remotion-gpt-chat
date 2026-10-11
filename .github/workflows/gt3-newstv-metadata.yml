@@ -1,0 +1,26 @@
+name: YUNEX GT3 NewsTV Official Film Metadata Audit
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a-footage
+    paths:
+      - .github/workflows/gt3-newstv-metadata.yml
+      - production/videos/gt3-nurburgring-multicar-001/agent-a/inspect_newstv.py
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: python -m pip install -q requests beautifulsoup4
+      - name: Inspect live official video article metadata
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/inspect_newstv.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: GT3-NEWSTV-ARTICLE-METADATA
+          path: out/gt3-newstv-inspect/structure.json
+          retention-days: 7
