@@ -1,0 +1,75 @@
+name: YUNEX GT3 Agent A2 Ferrari Aston McLaren Real Footage
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a2-ferrari-aston-mclaren
+    paths:
+      - .github/workflows/gt3-a2-ferrari-aston-mclaren-actual-media.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquire-real-footage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      A2_RUNTIME_SECONDS: "360"
+      A2_MAX_ASSETS: "12"
+    steps:
+      - name: Checkout dedicated A2 branch
+        uses: actions/checkout@v4
+      - name: Install real acquisition and FFmpeg quality tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q --disable-pip-version-check --break-system-packages requests beautifulsoup4 pillow yt-dlp
+      - name: Acquire, decode, fingerprint and visually sample genuine video files
+        run: |
+          python -u production/videos/gt3-nurburgring-multicar-001/agent-a2/acquire_real_media.py
+      - name: Validate ZIP integrity and video manifest
+        if: always()
+        run: |
+          python - <<'PY'
+          import pathlib, zipfile, json, hashlib
+          out=pathlib.Path("out/gt3-a2")
+          z=out/"YUNEX_GT3_AGENT_A2_NATIVE_FERRARI_ASTON_MCLAREN_REVIEW.zip"
+          if not z.exists():
+              print("No packaged media: acquisition did not complete.")
+              raise SystemExit(0)
+          with zipfile.ZipFile(z) as f:
+              assert f.testzip() is None
+              m=json.loads(f.read("SOURCE_MANIFEST_FFPROBE.json"))
+              n=0
+              for e in m["download_results"]:
+                  if e["status"]!="NATIVE_HD_DECODED_REVIEW_PENDING":continue
+                  raw=f.read(e["original_media_file"])
+                  assert hashlib.sha256(raw).hexdigest()==e["sha256"]
+                  n+=1
+          print("Actual native HD files and SHA-256 verified:",n)
+          assert n==m["native_hd_decoded_media_count"]
+          PY
+      - name: Upload ONE A2 actual footage and evidence ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-MULTICAR-AGENT-A2-NATIVE-MEDIA-REVIEW
+          path: out/gt3-a2/YUNEX_GT3_AGENT_A2_NATIVE_FERRARI_ASTON_MCLAREN_REVIEW.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
+      - name: Report strictly evidence-backed status
+        if: always()
+        run: |
+          python - <<'PY'
+          import pathlib,json,os
+          p=pathlib.Path("out/gt3-a2/SOURCE_MANIFEST_FFPROBE.json")
+          if not p.exists():msg="Agent A2: acquisition script incomplete, no verified video package.\n"
+          else:
+              d=json.loads(p.read_text())
+              msg=f"## Agent A2 native video acquisition\nDownloaded and fully decoded at native >=1080p: **{d['native_hd_decoded_media_count']}**.\n"
+              msg+="Verified unique Nürburgring GT3 shots: **0 pending independent visual review**. Footage gate BLOCKED.\n"
+              for x in d["download_results"]:
+                  msg+=f"- {x['asset_id']}: {x['status']}, {x.get('native_resolution','')} {x.get('error','')[:150]}\n"
+          pathlib.Path(os.environ["GITHUB_STEP_SUMMARY"]).write_text(msg)
+          print(msg)
+          PY
