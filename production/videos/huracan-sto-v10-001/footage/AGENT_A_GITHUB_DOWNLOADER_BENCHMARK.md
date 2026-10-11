@@ -40,3 +40,20 @@ Nothing was upscaled. All portrait originals were excluded from deliverable.
 5. For this user's specific 16:9 FullHD/4K no-watermark STO film, switch source strategy to **native filmmaker masters/direct production clips**, not social vertical reuploads.
 
 **STRICT GATE A: FAIL.** No independent verified 14 moving distinct road STO angles. No false claim that successful CI or downloader access equals delivered footage. Agent B and D should keep this block visible.
+
+## Additional independent Cobalt filmmaker-film test — 11 October 2026
+
+Run: [GitHub Action 38133084904](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38133084904); artifact ID **11699937668** (manifest-only).
+
+Four genuine STO filmmaker productions tested via a properly started local Cobalt 11 instance:
+
+| Filmmaker video | Vimeo video ID | Result |
+| --- | --- | --- |
+| Clint Davis / John Schumacher Huracán STO | 566128123 | Cobalt API HTTP 400; no media downloaded |
+| Elias Maria Lamborghini STO | 808787211 | Cobalt API HTTP 400; no media downloaded |
+| Movie Magic / Mark Jenkinson STO Daytona | 529262404 | Cobalt API HTTP 400; no media downloaded |
+| Lamborghini Behind the Story STO (Movie Magic) | 513872033 | Cobalt API HTTP 400; no media downloaded |
+
+Implementation: `production/videos/huracan-sto-v10-001/footage/test_cobalt_vimeo_sto.py` and `.github/workflows/sto-cobalt-vimeo-originals.yml`. This explicitly verifies native FullHD and SHA256 before inclusion, but produced zero accepted files. The API's HTTP 400 is not proof about the source film's actual resolution or whether its owner has a downloadable master.
+
+**Summary:** Cobalt is a working independent downloader for TikTok/Instagram on GitHub but yielded no upgrade for the two tested portrait social posts and could not access these four Vimeo projects. Gate A remains failed; users' 1920×1080 landscape source requirement is not met.
