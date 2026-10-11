@@ -1,0 +1,54 @@
+name: GT3 Agent A Independent Native 4K Contact Sheet Review
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-new-native4k-contact-review.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independently-view-real-movie-stills:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download actual 2018 original video artwork
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 38153462359
+          github-token: ${{ github.token }}
+          name: GT3-AGENT-A-FALKEN2018-MORE-NATIVE-4K-VIDEO-SOURCE-ANGLES
+          path: /tmp/gt3-new-falken18
+      - name: Download actual 2026 original video artwork
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 38153571340
+          github-token: ${{ github.token }}
+          name: GT3-AGENT-A-PORSCHE-2026-N24-NATIVE-4K-RACE-SQUARE-CROPS
+          path: /tmp/gt3-new-porsche26
+      - name: Setup JPEG image processing
+        run: python -m pip install --break-system-packages -q pillow
+      - name: Present authenticated real-source frame contact sheets in readable job output
+        run: |
+          python - <<'PY'
+          import base64,json
+          from io import BytesIO
+          from pathlib import Path
+          from PIL import Image
+          sources=[('/tmp/gt3-new-falken18','F18'),('/tmp/gt3-new-porsche26','P26')]
+          for folder,prefix in sources:
+            candidates=[p for p in Path(folder).rglob('*') if p.is_file() and p.suffix.lower() in ('.jpg','.jpeg') and ('FRAME' in p.stem.upper())]
+            candidates=sorted(candidates)
+            print('IMAGE_SOURCE',prefix,len(candidates),flush=True)
+            for i,p in enumerate(candidates):
+              with Image.open(p) as frame:
+                im=frame.convert('RGB');im.thumbnail((1260,670))
+                buff=BytesIO();im.save(buff,format='JPEG',quality=73,optimize=True)
+              token=base64.b64encode(buff.getvalue()).decode()
+              key=f'{prefix}_{i}'
+              print('PROOF_IMAGE_META:'+key+':'+p.name+':'+str(len(token)),flush=True)
+              for pos in range(0,len(token),2500):
+                print('PROOF_IMAGE_DATA:'+key+':'+token[pos:pos+2500],flush=True)
+              print('PROOF_IMAGE_END:'+key,flush=True)
+          PY
