@@ -22,8 +22,7 @@ jobs:
       - name: Install decode/remux and verification tools
         run: |
           set -euo pipefail
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg
+          command -v ffmpeg >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
           python -m pip install --disable-pip-version-check Pillow
           python -m py_compile production/videos/french-icons-001/agent-b/combine_premium_v4.py
       - name: Get two genuine approved/provisional source artifacts
