@@ -189,8 +189,19 @@ for side in [-1,1]:
         if i % 2 == 0:
             o = bpy.data.objects.new('understory fern canopy', cluster_meshes[i%3])
             s.collection.objects.link(o)
-            o.location = (side*rng.uniform(5.2,8),y,0.4)
+            o.location = (side*rng.uniform(10,14),y,0.4)
             o.scale = (0.8,0.8,0.8)
+
+# Layered undergrowth closes the artificial empty horizon behind the hero trees.
+for side in [-1,1]:
+    for y in range(-360,261,3):
+        for layer in range(2):
+            o = bpy.data.objects.new('deep forest undergrowth',cluster_meshes[rng.randrange(2)])
+            s.collection.objects.link(o)
+            o.location = (side*(23+layer*4+rng.uniform(-1,1)),y+rng.uniform(-1,1),rng.uniform(1.1,2.6))
+            size = rng.uniform(1.7,2.7)
+            o.scale = (size,size,size)
+            o.rotation_euler = (rng.random(),rng.random(),rng.random()*6)
 
 bpy.ops.import_scene.gltf(filepath=str(Path(opt.model).resolve()))
 root = bpy.data.objects.get('YUNEX_Porsche_911_GT3_RS_992')

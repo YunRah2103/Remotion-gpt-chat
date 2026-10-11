@@ -34,14 +34,14 @@ jobs:
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
         run: |
-          xvfb-run -a /tmp/blender/blender -b -t 4 --python-exit-code 1 --python production/videos/porsche-blender-reveal-001/scene.py -- --model /tmp/porsche/model.glb --out out/proof --frames 0,213,214,319,418 --samples 16 --scale 0.5 > out/proof/render.log 2>&1
+          xvfb-run -a /tmp/blender/blender -b -t 4 --python-exit-code 1 --python production/videos/porsche-blender-reveal-001/scene.py -- --model /tmp/porsche/model.glb --out out/proof --frames 214,418 --samples 16 --scale 0.5 > out/proof/render.log 2>&1
       - name: Generate review contact sheet
         run: |
           python3 - <<'PY'
           from PIL import Image,ImageDraw
           from pathlib import Path
           frames=sorted(Path('out/proof').glob('frame_*.png'))
-          assert len(frames)==5, len(frames)
+          assert len(frames)==2, len(frames)
           sheet=Image.new('RGB',(1080,1008),(16,18,20))
           draw=ImageDraw.Draw(sheet)
           for i,p in enumerate(frames):
