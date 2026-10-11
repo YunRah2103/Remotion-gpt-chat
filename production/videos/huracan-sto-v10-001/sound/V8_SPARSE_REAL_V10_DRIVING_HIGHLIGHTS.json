@@ -1,0 +1,67 @@
+{
+  "title": "STO V8 — sparse 5.2L V10 driving-only highlights",
+  "status": "private review rendered, full technical QA passed",
+  "video": {
+    "name": "HURACAN_STO_V8_SPARSE_REAL_V10_NO_REPETITION.mp4",
+    "sha256": "004a63ce72d689b0d0d2411c957ecbf4e2dcb0f7f79d927a59f8d88e7a3751bd",
+    "bytes": 15657738,
+    "frames": 316,
+    "fps": 30,
+    "resolution": "1920x1080",
+    "duration_seconds": 10.533333,
+    "video_stream_unchanged": true,
+    "picture_sha256": "ec6a4b1eff39dc1bfde00e9615fb2b20b64c6660703895b8f32542d7d2954818",
+    "audio_codec": "AAC 48 kHz stereo"
+  },
+  "music": {
+    "source": "Original user MP3, never committed publicly",
+    "sha256": "87a663860585e1714fd6fbb6a8006d19d655bda863db66cdaa75ba1830a2d678",
+    "timeline_unchanged": true,
+    "ducks": "Only under two short highlights"
+  },
+  "real_audio_sources": [
+    {
+      "vehicle": "Lamborghini Huracán 5.2 V10, not necessarily STO",
+      "source": "https://github.com/sathyaram/exhaustnotes/blob/master/public/sounds/huracan.m4a",
+      "sha256": "70b8a245614c9a917a824b2dc14357a467ffb44ace033c1a33a901be584f714a"
+    },
+    {
+      "vehicle": "Audi R8 5.2 V10, same family",
+      "source": "https://github.com/sathyaram/exhaustnotes/blob/master/public/sounds/audir8.m4a",
+      "sha256": "927b37b8ce70a768ccfc2496639be00cd01cc7ed77b38fc20c953c31f2d18f5e"
+    }
+  ],
+  "gate": {
+    "driving_shots_frames": [
+      95,
+      284
+    ],
+    "start_seconds": 3.166667,
+    "end_seconds": 9.466667,
+    "engine_silent_on_stationary_shots": true,
+    "engine_silent_between_highlights": true
+  },
+  "highlights": [
+    {
+      "start_seconds": 3.23,
+      "length_seconds": 1,
+      "kind": "Huracán V10 brief rev",
+      "music_dip": ".87 max during cue"
+    },
+    {
+      "start_seconds": 7.79,
+      "length_seconds": 0.69,
+      "kind": "R8 V10 short pass",
+      "music_dip": ".87 max during cue"
+    }
+  ],
+  "technical_qa": {
+    "full_decode": true,
+    "decoded_frames": 316,
+    "video_bitstream_original_match": true,
+    "blackdetect_intervals": 0,
+    "silencedetect_intervals": 0,
+    "engine_active_seconds": 1.689625
+  },
+  "caveats": "Underlying samples are real 5.2L V10 recordings but not independently certified completely free of ambient sound/voices or rights cleared for public use. Audio on a photographed STO is recreated with similar V10-family cars, not recorded synchronously on set."
+}
