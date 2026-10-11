@@ -1,0 +1,25 @@
+name: GT3 Agent A Independent 54 Real HRT Nürburgring Camera Frames
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-hrt-full82-independent-frame-review.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect-exact-video-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install frame QA
+        run: python -m pip install --break-system-packages -q Pillow
+      - name: Download original full 82s native 1080 GT3 source and contact frames
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/hrt_nbr_topqual_82_sec
+          gh run download 38164007797 --repo YunRah2103/Remotion-gpt-chat --name GT3-AGENT-A-HRT-NBR-FULL-TOPQUALIFYING-REAL-NATIVE-1080-AND-54FRAME-QA --dir inputs/hrt_nbr_topqual_82_sec
+      - name: Independently SHA-prove real movie and view all 54 source video camera frames
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/independent_hrt_full_topq_54frame_image_review.py
