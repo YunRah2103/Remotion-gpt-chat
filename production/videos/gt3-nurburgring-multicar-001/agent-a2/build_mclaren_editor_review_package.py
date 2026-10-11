@@ -19,7 +19,10 @@ def run(cmd):
  r=subprocess.run(cmd,capture_output=True,text=True,timeout=95)
  if r.returncode:raise RuntimeError(r.stderr[-1000:])
  return r.stdout
-assert SRC.is_file() and sha(SRC)==EXPECTED, "Must use actual previously verified public source original bytes"
+print("ACTUAL_REVIEW_SRC",str(SRC.resolve()),"exists",SRC.is_file(),flush=True)
+source_hash=sha(SRC) if SRC.is_file() else None
+print("SOURCE_HASH_MATCH",source_hash,EXPECTED,source_hash==EXPECTED,flush=True)
+assert SRC.is_file() and source_hash==EXPECTED, "Must use actual previously verified public source original bytes"
 d=json.loads(run(["ffprobe","-v","error","-of","json","-show_streams","-show_format",str(SRC)]))
 v=next(s for s in d["streams"] if s["codec_type"]=="video")
 assert (int(v["width"]),int(v["height"]))==(1916,1078), "Original cannot be passed as native 1920x1080"
