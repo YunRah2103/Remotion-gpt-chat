@@ -1,0 +1,35 @@
+name: FR Legends A - Genuine 205 GTI Stellantis Publisher Video
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - 'production/videos/french-icons-001/agent_a_peugeot_stellantis_media.py'
+      - '.github/workflows/fr-legends-a-peugeot-media.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-205-gti-quality:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install genuine video verification tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install pillow
+      - name: Probe directly linked Peugeot historic GTI original archives
+        run: python production/videos/french-icons-001/agent_a_peugeot_stellantis_media.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-a-original-peugeot-205-stellantis-media
+          path: out/FR-LEGENDS-A-PEUGEOT-205-STELLANTIS-TECHNICAL.zip
+          retention-days: 7
+          if-no-files-found: error
+          compression-level: 0
