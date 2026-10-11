@@ -1,0 +1,26 @@
+name: FR Legends A - Internet Archive Classic Original Video Search
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - 'production/videos/french-icons-001/agent_a_archive_public_footage.py'
+      - '.github/workflows/fr-legends-a-archive-original.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  vintage-original-source-search:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Search archived motion film originals and filenames
+        run: python production/videos/french-icons-001/agent_a_archive_public_footage.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-a-public-archive-car-video-results
+          path: out/fr-a-archive-motoring/manifest.json
+          retention-days: 7
+          if-no-files-found: warn
