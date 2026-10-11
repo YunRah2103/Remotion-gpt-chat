@@ -1,0 +1,37 @@
+name: Agent A Verify Real 2025 Ford Nürburgring 76s Original Film - 60 Actual Frames
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-2025-ford-nbr-76s-60-frame-qa.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  real-nuerburgring-ford-source-frame-verification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare native 1080 video evidence extraction
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q pillow
+      - name: Download 2025 Ford Nürburgring manufacturer full-HD original (already SHA verified by publisher run)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/hrt-2025-dtm-nbr-full-original
+          gh run download 38162309081 --repo YunRah2103/Remotion-gpt-chat --name GT3-AGENT-A-NURBURGRING-DTM-2025-FORD-FULL76S-1080-ORIGINAL --dir inputs/hrt-2025-dtm-nbr-full-original
+      - name: Decode and review 60 source frames for actual Ford Nürburgring DTM on-track GT3 make
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/visual_full_2025_hrt_ford_nbr_60_1080_frames.py
+      - name: Publish independent real source frame evidence, not title-only manufacturer confirmation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-2025-FORD-NURBURGRING-60-ACTUAL-1080-SOURCE-FRAMES
+          path: out/gt3-a-hrt-ford-nbr-2025-60frame-review/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
