@@ -89,7 +89,11 @@ def diagnose(s):
  if "login required" in t or "login_required" in t or "cookies" in t and "login" in t:return "LOGIN_REQUIRED"
  if "http error 403" in t or "403 forbidden" in t:return "HTTP_403"
  if "http error 429" in t or "too many requests" in t:return "RATE_LIMIT"
- if "unable to extract universal" in t or "unable to extract webpage" in t:return "PLATFORM_EXTRACTOR_BROKEN"
+ if "unable to extract universal" in t or "unable to extract webpage" in t or "unable to extract data" in t or "unexpected response from webpage" in t:return "PLATFORM_EXTRACTOR_BROKEN"
+ if "unable to download webpage" in t or "ssl" in t or "connection" in t:return "WEBPAGE_CONNECTION_FAILURE"
+ if "login" in t or "log in" in t or "rate limit" in t:return "LOGIN_OR_RATE_GATE"
+ if "no video formats" in t or "no formats found" in t:return "NO_VIDEO_FORMATS"
+ if "404" in t:return "NOT_FOUND_404"
  if "not found" in t or "http error 404" in t:return "POST_NOT_FOUND"
  if "unsupported url" in t:return "UNSUPPORTED_URL"
  if "private" in t:return "PRIVATE_MEDIA"
@@ -126,9 +130,17 @@ def main():
    p=subprocess.run(argv,capture_output=True,text=True,timeout=110)
    files=sorted(x for x in VIDEOS.glob(prefix+".*") if x.suffix.lower() in (".mp4",".mkv",".webm",".mov"))
    if p.returncode!=0 or not files:
-    safe.update(status="UNAVAILABLE",reason_code=diagnose((p.stderr or "")+"\n"+(p.stdout or "")))
-    for f in files:f.unlink(missing_ok=True)
-    continue
+    first_reason=diagnose((p.stderr or "")+"\n"+(p.stdout or ""))
+    # TikTok and Instagram can reject Python's TLS/browser fingerprint;
+    # retry once with curl_cffi's browser impersonation if available.
+    p2=subprocess.run(argv[:1]+["--impersonate","chrome"]+argv[1:],
+      capture_output=True,text=True,timeout=115)
+    files=sorted(x for x in VIDEOS.glob(prefix+".*") if x.suffix.lower() in (".mp4",".mkv",".webm",".mov"))
+    if p2.returncode!=0 or not files:
+     reason=diagnose((p2.stderr or "")+"\n"+(p2.stdout or ""))
+     safe.update(status="UNAVAILABLE_WITH_CHROME_IMPERSONATION",first_reason=first_reason,reason_code=reason)
+     for f in files:f.unlink(missing_ok=True)
+     continue
    file=max(files,key=lambda f:f.stat().st_size)
    m=probe(file);safe["probe"]=m
    if m["width"]<1920 or m["height"]<1080 or m["width"]<=m["height"]:
