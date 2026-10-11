@@ -6,8 +6,8 @@ fully decoded, hashed and contact-sheet inspected. No login/CAPTCHA bypass,
 fake GT3 claim, YouTube mirrors, simulation, or synthetic video.
 """
 from pathlib import Path
-from urllib.parse import urlparse
-import hashlib,json,re,subprocess,time,zipfile
+from urllib.parse import urlparse,parse_qsl,urlencode,urlunparse
+import hashlib,json,re,subprocess,time,zipfile,requests
 from playwright.sync_api import sync_playwright
 from PIL import Image,ImageDraw
 OUT=Path("out/gt3-a2-browser")
@@ -97,6 +97,34 @@ def browser_discover(ctx,pageurl):
  finally:page.close()
  return list(dict.fromkeys(links))[:12],signals[:40],title
 def download_candidate(url,tag):
+ if "fbcdn.net" in url and ".mp4" in url:
+  # Player emitted HTTP byte-chunk URLs for audio and video separately.
+  # Recover only the origin-hosted publicly accessible complete video file.
+  if "/m78/" in url:raise RuntimeError("FB_AUDIO_ONLY_RENDITION_SKIPPED")
+  from html import unescape
+  url=unescape(url.replace("\\/","/"))
+  parsed=urlparse(url)
+  query=[(k,v) for k,v in parse_qsl(parsed.query,keep_blank_values=True)
+         if k not in ("bytestart","byteend")]
+  full=urlunparse(parsed._replace(query=urlencode(query)))
+  target=FILES/(tag+".mp4")
+  with requests.get(full,headers={
+        "User-Agent":"Mozilla/5.0 (X11; Linux x86_64) Chrome/126 Safari/537.36",
+        "Referer":"https://www.facebook.com/",
+        "Range":"bytes=0-"},
+        stream=True,timeout=(8,18)) as res:
+   res.raise_for_status()
+   ctype=res.headers.get("content-type","")
+   if "html" in ctype:raise RuntimeError("FB_CDN_GOT_HTML")
+   count=0
+   with target.open("wb") as f:
+    for b in res.iter_content(1024*1024):
+     if b:
+      count+=len(b)
+      if count>150*1024*1024:raise RuntimeError("FB_CDN_TOO_LARGE")
+      f.write(b)
+  if target.stat().st_size<100000:raise RuntimeError("FB_ORIGINAL_TOO_SMALL")
+  return target
  # yt-dlp explicitly requests real >=1080p original rendition.
  stem=FILES/(tag+"_%(ext)s")
  opts=["yt-dlp","--ignore-config","--no-playlist","--no-warnings",
@@ -127,7 +155,9 @@ with sync_playwright() as pw:
    links,signals,title=browser_discover(ctx,page)
    row.update(browser_page_title=title,video_requests=signals,detected_media_links=links)
    print("BROWSER VIDEO ENDPOINTS",id,len(links),title,flush=True)
-   for i,u in enumerate(links[:3]):
+   if "facebook.com" in page:
+    links=sorted(links,key=lambda u:(0 if "fbcdn.net" in u and "/m367/" in u else 1 if "fbcdn.net" in u and "/m78/" not in u else 2))
+   for i,u in enumerate(links[:6] if "facebook.com" in page else links[:3]):
     path=None
     try:
      path=download_candidate(u,id+str(i))
