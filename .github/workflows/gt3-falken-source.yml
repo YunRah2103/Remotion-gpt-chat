@@ -1,0 +1,33 @@
+name: YUNEX GT3 Falken Authentic 4K Nürburgring Publisher MP4
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a-footage
+    paths:
+      - .github/workflows/gt3-falken-source.yml
+      - production/videos/gt3-nurburgring-multicar-001/agent-a/probe_falken_originals.py
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-direct:
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install actual FFmpeg and Pillow native-video inspectors
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q requests pillow
+      - name: Probe publisher MP4 and sample actual 1080+ source bytes
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/probe_falken_originals.py
+      - name: Package only actual samples with source metadata
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-FALKEN-AUTHENTIC-NATIVE-RACE-FOOTAGE-SAMPLES
+          path: out/gt3-falken-original-direct/
+          if-no-files-found: warn
+          retention-days: 7
+          compression-level: 0
