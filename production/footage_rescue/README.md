@@ -7,11 +7,23 @@ This optional component is isolated from current YUNEX films, the older yt-dlp i
 | Site | First engine | Alternative engines |
 | --- | --- | --- |
 | YouTube / Shorts | yt-dlp with Deno and yt-dlp-ejs | pytubefix; optional Cobalt |
-| Instagram Reels | yt-dlp | gallery-dl; optional Cobalt |
-| TikTok | yt-dlp | gallery-dl; optional Cobalt |
+| Instagram Reels | yt-dlp | yt-dlp Chrome impersonation; gallery-dl; optional Cobalt |
+| TikTok | yt-dlp | yt-dlp Chrome impersonation; gallery-dl; optional Cobalt |
 | Dailymotion | yt-dlp | optional Cobalt |
 
 **Reality:** GitHub-hosted runners share cloud datacentre IP ranges. Alternative extractors are useful for extractor-specific failures but may all encounter the same source access restrictions. No downloader here bypasses sign-in controls, DRM, or private content. gallery-dl supports Instagram and TikTok URLs, but access can still require cookies; this tool deliberately does not pass account sessions or credentials.
+
+## Verified live platform results (11 October 2026)
+
+Evidence: [social extraction matrix](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38157969479) and [YouTube matrix](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38157590842). These tests used small example videos, checked real bytes using FFprobe and decoded two seconds; no third-party footage was redistributed.
+
+- **Instagram**: verified real 5,819,622-byte Reel, 716x1274 and 80.04 seconds; both yt-dlp and yt-dlp Chrome impersonation succeeded. gallery-dl timed out on the tested Reel.
+- **TikTok**: verified real 3,904,071-byte video, 576x1024 and 25.93 seconds; yt-dlp, Chrome impersonation and gallery-dl succeeded.
+- **YouTube**: 11 extractor/clients failed with bot verification, including stable/nightly yt-dlp, several player clients, Pytubefix and You-Get. Direct open MP4 succeeded (5,635,415 bytes, 720x480), proving GitHub can download video files, but **not** that YouTube itself works.
+- **Piped/Invidious**: four public API instances failed (HTTP 403, 502, 526); no real YouTube media was obtained.
+- Those particular social examples are **below native 1080x1920**. Another source may have higher native resolution, but no downloader can restore pixels the source doesn't provide.
+
+Agents should use **yt-dlp -> yt-dlp Chrome -> gallery-dl (where supported)** and move to a different source if the selected post blocks/has inadequate native resolution. Successful extraction of one test post does not guarantee every post works.
 
 ### Optional Cobalt
 
@@ -32,7 +44,7 @@ Its address must resolve publicly; the tool accepts only same-host tunnel result
 Local usage:
 
 ```bash
-python -m pip install -r production/footage/requirements.txt gallery-dl pytubefix
+python -m pip install -r production/footage/requirements.txt gallery-dl pytubefix curl-cffi
 # Also install Deno 2.x and FFmpeg + FFprobe.
 python production/footage_rescue/acquire.py \
   --url "https://www.youtube.com/watch?v=VIDEO_ID" \
