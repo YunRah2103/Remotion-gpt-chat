@@ -1,0 +1,69 @@
+name: YUNEX French Legends - ONE ZIP Agent A and Agent B
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - 'production/videos/french-icons-001/agent_a_b_combined_42.py'
+      - '.github/workflows/fr-legends-a-b-one-huge-42-zip.yml'
+  workflow_dispatch:
+permissions:
+  actions: read
+  contents: read
+jobs:
+  combine-verified-footage:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download Agent A V7 original ZIP, 20 classics
+        uses: actions/download-artifact@v4
+        with:
+          repository: YunRah2103/Remotion-gpt-chat
+          run-id: 38163880872
+          name: FR-LEGENDS-AGENT-A-V7-20-REAL-CLASSIC-CAR-CLIPS-5-MODELS-ONE-ZIP
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/fr-legends-merge-input/agent-a
+      - name: Download Agent B FINAL original video media, 22 modern clips
+        uses: actions/download-artifact@v4
+        with:
+          repository: YunRah2103/Remotion-gpt-chat
+          run-id: 38153509740
+          name: FR-LEGENDS-001-AGENT-B-MODERN-22-APPROVED-NATIVE
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/fr-legends-merge-input/agent-b
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Combine every source, preserve individual manifests and SHA-check 42 actual MP4s
+        run: python production/videos/french-icons-001/agent_a_b_combined_42.py
+      - name: Show exactly what is inside the single ZIP
+        run: |
+          python - <<'PY'
+          import zipfile,json,hashlib,os,pathlib
+          p=pathlib.Path('out/fr-legends-combined-42/YUNEX_FRENCH_LEGENDS_AGENT_A_AND_B_ALL_42_CLIPS.zip')
+          with zipfile.ZipFile(p) as z:
+              d=json.loads(z.read('combined_manifest.json'))
+              a=[n for n in z.namelist() if n.startswith('Agent_A_Classics/clips/') and n.endswith('.mp4')]
+              b=[n for n in z.namelist() if n.startswith('Agent_B_Modern/clips/') and n.endswith('.mp4')]
+              assert len(a)==20 and len(b)==22
+              sha=hashlib.file_digest(p.open('rb'),'sha256').hexdigest()
+              msg=['## YUNEX French Legends Agent A + Agent B — one ZIP',
+                   '- Agent A: **20 original classic clips** and all retained source files/manifests',
+                   '- Agent B: **22 modern performance clips** and all original contact sheets/manifests',
+                   '- All 42 individual MP4s SHA-verified; full ZIP CRC PASSED',
+                   f'- Single ZIP: **{p.stat().st_size:,} bytes**',
+                   f'- ZIP SHA256: \`{sha}\`',
+                   '- Original clips were NOT changed or re-encoded. Elegant cinematic edit creative direction.',
+                   '- Filmmaker/press reuse permissions remain subject to verification.']
+              pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(msg)+'\n')
+              print('\n'.join(msg))
+          PY
+      - name: Upload ONE combined ZIP for mobile download
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-FRENCH-LEGENDS-ALL-42-AGENT-A-AND-B-CLIPS-ONE-ZIP
+          path: out/fr-legends-combined-42/YUNEX_FRENCH_LEGENDS_AGENT_A_AND_B_ALL_42_CLIPS.zip
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
