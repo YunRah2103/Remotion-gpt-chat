@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         site: [vimeo, dailymotion, peertube]
-    name: ${{ matrix.site }} CC film: 5s actual media
+    name: "${{ matrix.site }} - CC film 5s actual media"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
