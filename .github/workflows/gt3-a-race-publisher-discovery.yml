@@ -1,0 +1,25 @@
+name: GT3 Agent A N24 Publisher Original Video Discovery
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-race-publisher-discovery.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  find-original-publisher-media:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install HTTP source discovery tools
+        run: python -m pip install --break-system-packages -q requests
+      - name: Discover original MP4 links in actual publisher HTML
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/scout_2026_race_direct_publishers.py
+      - name: Upload source URLs and page failures, no fake footage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-DIRECT-RACING-MEDIA-LEADS-NOT-FOOTAGE
+          path: out/gt3-a-new-race-publisher-direct-links/
+          retention-days: 7
