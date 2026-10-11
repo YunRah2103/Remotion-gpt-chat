@@ -300,7 +300,7 @@ def frame_state(f):
     s.display.shading.cavity_type = 'BOTH'
     s.display.shading.show_specular_highlight = True
     s.display.shading.background_type = 'WORLD'
-    s.display.shading.show_outline = False
+    s.display.shading.show_object_outline = False
     s.display.render_aa = '32'
     s.world.color = (0.065,0.065,0.065)
     s.view_settings.view_transform = 'Standard' if f < 214 else 'AgX'
