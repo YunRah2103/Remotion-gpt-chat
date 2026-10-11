@@ -1,0 +1,78 @@
+name: YUNEX Agent A Verified Native Partial Source Bundle
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-verified-native-partial.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  native-source-collection:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download source artifact bytes from verified earlier runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p inputs/2018 inputs/2024 inputs/audi
+          for pair in 11703283097:2018 11703681795:2024 11704042208:audi; do
+            IFS=: read -r id folder <<< "$pair"
+            curl -fsSL --retry 3 -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$id/zip" -o "/tmp/$id.zip"
+            unzip -oq "/tmp/$id.zip" -d "inputs/$folder"
+          done
+      - name: Select and validate actual native HD media
+        run: |
+          set -euo pipefail
+          mkdir -p out/gt3-partial/clips out/gt3-partial/contact_sheets
+          cp inputs/2018/falken2018_4k_hdr_02.mkv out/gt3-partial/clips/FALKEN18_PORSCHE_GT3R_4K_HDR.mkv
+          cp inputs/2018/falken2018_4k_hdr_04.mkv out/gt3-partial/clips/FALKEN18_MERCEDES_AMG_GT3_4K_HDR.mkv
+          cp inputs/2024/native_hd_sources/falken_japan_2024_n24.mp4 out/gt3-partial/clips/FALKEN24_PORSCHE_GT3R_1080.mp4
+          cp inputs/audi/native_hd_sources/audi_sport_timescope_2018_n24.mp4 out/gt3-partial/clips/AUDI_2018_N24_REVIEW_1080.mp4
+          cp inputs/2018/*.jpg inputs/2024/review_sheets/falken_japan_2024_n24_8FRAME.jpg inputs/audi/review_sheets/audi_sport_timescope_2018_n24_12FRAME.jpg out/gt3-partial/contact_sheets/
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess,hashlib,json
+          root=Path('out/gt3-partial')
+          spec=[
+            ('FALKEN18_PORSCHE_GT3R_4K_HDR.mkv','Porsche','911 GT3 R','onboard',34,'https://www.falkentyre.com/_storage/asset/77989/storage/master/file/317009/download/FALKEN-HDR-h264-10Bit-56MBit.mp4','CONFIRMED_GT3'),
+            ('FALKEN18_MERCEDES_AMG_GT3_4K_HDR.mkv','Mercedes-AMG','AMG GT3 Black Falcon','onboard/trackside',150,'https://www.falkentyre.com/_storage/asset/77989/storage/master/file/317009/download/FALKEN-HDR-h264-10Bit-56MBit.mp4','CONFIRMED_GT3'),
+            ('FALKEN24_PORSCHE_GT3R_1080.mp4','Porsche','911 GT3 R (992)','trackside corner around 16-18 seconds',16,'https://skmt.info/wp-content/uploads/2024/09/FALKEN_-HP%E7%94%A8.mp4','CONFIRMED_BRIEF_GT3'),
+            ('AUDI_2018_N24_REVIEW_1080.mp4','Audi (publisher attribution)','R8 LMS moving GT3 class NOT yet visually verified','night on-track/aerial',33,'https://player.vimeo.com/video/277958760?app_id=122963','GT3_CAR_IDENTIFICATION_PENDING'),
+          ]
+          entries=[]
+          for name,make,model,angle,timecode,url,status in spec:
+            path=root/'clips'/name
+            h=hashlib.sha256()
+            with path.open('rb') as f:
+              for chunk in iter(lambda:f.read(1048576),b''):h.update(chunk)
+            ff=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(path)]))
+            v=next(s for s in ff['streams'] if s['codec_type']=='video')
+            assert int(v['width'])>=1920 and int(v['height'])>=1080
+            entries.append(dict(file='clips/'+name,sha256=h.hexdigest(),bytes=path.stat().st_size,make=make,model=model,angle=angle,source_time_seconds=timecode,url=url,status=status,ffprobe=ff))
+          assert len(entries)==4 and len(set(x['sha256'] for x in entries))==4
+          (root/'SOURCE_MANIFEST_FFPROBE.json').write_text(json.dumps(dict(footage_gate='BLOCKED',confirmed_gt3_makes=['Porsche','Mercedes-AMG'],confirmed_distinct_gt3_source_sections=3,required_distinct_shots=24,required_makes=6,duplicate_note='2024 Falken second filename contains identical source SHA and is deliberately excluded',sources=entries),indent=2,ensure_ascii=False)+'\n')
+          PY
+          cat > out/gt3-partial/README_FIRST.md <<'EOF'
+          # Agent A multi-car Nürburgring SOURCE PARTIAL
+          Real native 1080p/4K video bytes and contact sheets, not filenames-only.
+          Gate BLOCKED: three confirmed on-track GT3 source sections across two model-confirmed makes, not 24 across six.
+          Audi Sport 2018 original has genuine Nürburgring night racing but on-track car GT3 model not conclusively identified. Do not count yet.
+          Falken 2024 20s source contains brief Porsche GT3 R racing at 16–18s and much crew/pit material. Duplicate source alias excluded.
+          Falken 2018 4K excerpts are PQ HDR: tone-map to SDR for final delivery.
+          Some publisher watermarks/logos and interview content require editorial exclusion. Original sources, hashes, FFprobe and camera/angle notes are in SOURCE_MANIFEST_FFPROBE.json.
+          EOF
+      - name: Publish a single actual-source-media Actions ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-MULTICAR-AGENT-A-NATIVE-PARTIAL
+          path: out/gt3-partial/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
+      - name: Report truthful gate status
+        run: |
+          echo '**Gate BLOCKED: 3/24 source sections, 2/6 visually confirmed makes.**' >> "$GITHUB_STEP_SUMMARY"
