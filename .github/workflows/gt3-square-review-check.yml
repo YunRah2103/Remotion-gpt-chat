@@ -1,0 +1,62 @@
+name: YUNEX GT3 Review Square-to-Landscape Crop Visual Proof
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a-footage
+    paths:
+      - .github/workflows/gt3-square-review-check.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg PIL for contact sheet
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q pillow
+      - name: Download actual 2026 race review and sample centered full-width 16:9 crop
+        run: |
+          mkdir -p out/gt3-square-review/frames
+          curl -fLsS --retry 2 --max-time 170 'https://newstv.porsche.com/porschevideos/newstv.porsche.com_334359_en.mp4' -o out/gt3-square-review/original_square.mp4
+          ffprobe -v error -show_streams -show_format -of json out/gt3-square-review/original_square.mp4 > out/gt3-square-review/ffprobe.json
+          sha256sum out/gt3-square-review/original_square.mp4 > out/gt3-square-review/original.sha256
+          python - <<'PY'
+          import json,subprocess
+          from PIL import Image,ImageDraw
+          from pathlib import Path
+          d=json.load(open('out/gt3-square-review/ffprobe.json'))
+          p=next(s for s in d['streams'] if s['codec_type']=='video')
+          w,h=p['width'],p['height'];dur=float(d['format']['duration'])
+          assert w==3840 and h==3840,(w,h)
+          root=Path('out/gt3-square-review')
+          page=Image.new('RGB',(480*4,300*4),'#222222')
+          draw=ImageDraw.Draw(page)
+          for i in range(16):
+            t=dur*(i+.5)/16
+            frame=root/'frames'/f'{i:02d}.jpg'
+            subprocess.run(['ffmpeg','-v','error','-y','-ss',f'{t:.2f}','-i',str(root/'original_square.mp4'),'-vf','crop=3840:2160:0:840,scale=480:270','-frames:v','1',str(frame)],check=True,timeout=30)
+            with Image.open(frame) as im:
+              x=(i%4)*480;y=(i//4)*300
+              page.paste(im,(x,y+28))
+              draw.text((x+8,y+6),f'{t:.1f}s, crop 16:9',fill='white')
+          page.save(root/'16frame_landscape_crop.jpg',quality=88)
+          (root/'QA.txt').write_text(f'Original 3840x3840 square. Sampled 3840x2160 full-width center-crop, original duration {dur:.3f}s; still requires GT3 model and scene review.\n')
+          PY
+          rm out/gt3-square-review/original_square.mp4
+      - name: Upload lightweight frame-by-frame independent QA artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-2026-RACE-REVIEW-16BY9-VISUAL-QA
+          path: |
+            out/gt3-square-review/16frame_landscape_crop.jpg
+            out/gt3-square-review/ffprobe.json
+            out/gt3-square-review/original.sha256
+            out/gt3-square-review/QA.txt
+          if-no-files-found: warn
+          retention-days: 7
