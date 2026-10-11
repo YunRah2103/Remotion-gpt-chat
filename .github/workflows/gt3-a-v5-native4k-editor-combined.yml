@@ -1,0 +1,65 @@
+name: GT3 Agent A V5 ONE ZIP Original-HD Media and Verified 4K Racing Selects
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-v5-native4k-editor-combined.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original-media-v5:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve original verified V4 source archive bytes
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 38150659146
+          github-token: ${{ github.token }}
+          name: GT3-MULTICAR-AGENT-A-NATIVE-PARTIAL-V4-AUDI-CONFIRMED
+          path: inputs/v4
+      - name: Retrieve four new full 4K original Falken race excerpts
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 38153462359
+          github-token: ${{ github.token }}
+          name: GT3-AGENT-A-FALKEN2018-MORE-NATIVE-4K-VIDEO-SOURCE-ANGLES
+          path: inputs/falken2018
+      - name: Retrieve 2026 4K original Porsche race film and native crops
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 38153571340
+          github-token: ${{ github.token }}
+          name: GT3-AGENT-A-PORSCHE-2026-N24-NATIVE-4K-RACE-SQUARE-CROPS
+          path: inputs/porsche2026
+      - name: Install actual 4K video and frame QA stack
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q pillow
+      - name: Reconstruct all V4 original video bytes and render high quality verified 4K GT3 editor cuts
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/build_verified_editor_source_v5.py
+      - name: Publish ONE physical V5 racing video ZIP with original SHA and frame evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-MULTICAR-AGENT-A-ORIGINAL-NATIVE-V5-ONE-ZIP-4K-PORSCHE-AUDI-BMW-AMG
+          path: out/gt3-a-v5-native-verified-source-library/
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Final GT3 editor gate proof
+        if: always()
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path('out/gt3-a-v5-native-verified-source-library/SOURCE_MANIFEST_FFPROBE_V5.json')
+          if p.exists():
+            j=json.loads(p.read_text())
+            s=f"**MEDIA REAL** V5; new independently verified 4K on-track source scenes: {j['new_additional_verified_4k_gt3_shots']}; total identified {j['confirmed_distinct_source_sections_after_curated_QA']}/24; confirmed manufacturers {len(j['confirmed_makes'])}/6. Gate BLOCKED.\n"
+          else:s='V5 combined package incomplete; do not claim footage gate PASS.'
+          Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(s)
+          PY
