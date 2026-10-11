@@ -1,0 +1,49 @@
+name: GT3 Agent A HRT Ford 2025 DTM Nürburgring Exact Original Source Hunt
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-hrt-ford-2025-nbr-exact-publisher.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual-ford-nbr-native-1080:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare Chromium, FFprobe and actual video source QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q playwright pillow yt-dlp requests
+          python -m playwright install chromium
+      - name: Retrieve genuine manufacturer Ford 2025 DTM Nürburgring moving video original source
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_hrt_2025_ford_dtm_nurburgring_exact_original.py
+      - name: Verify any full-HD physical original SHA bytes and ZIP CRC
+        if: always()
+        run: |
+          python - <<'PY'
+          import zipfile,pathlib,json,hashlib
+          p=pathlib.Path('out/gt3-a-ford-nurburgring-specific/GT3_A_FORD_NURBURGRING_SPECIFIC_ORIGINALS_QA.zip')
+          if not p.exists():print('NO MEDIA OR DIAGNOSTICS ZIP')
+          else:
+            with zipfile.ZipFile(p) as z:
+              assert z.testzip() is None
+              j=json.loads(z.read('SOURCE_MANIFEST.json'))
+              for x in j['sources']:
+                if x.get('status')=='REAL_NATIVE_HD_FULL_DECODE_MODEL_REVIEW_PENDING':
+                  assert hashlib.sha256(z.read(x['file'])).hexdigest()==x['sha256']
+                  assert x['resolution']==[1920,1080]
+                  print('REAL_HRT_FORD_1080_SOURCE_VERIFIED',x['source_id'],x['sha256'])
+              print('ACTUAL_NATIVE_HD_FILES',j['native_hd_media_file_count'])
+          PY
+      - name: Deliver original source files or transparent failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-2025-DTM-NBR-FORD-ACTUAL-HD-MEDIA-OR-DIAGNOSTICS
+          path: out/gt3-a-ford-nurburgring-specific/GT3_A_FORD_NURBURGRING_SPECIFIC_ORIGINALS_QA.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
