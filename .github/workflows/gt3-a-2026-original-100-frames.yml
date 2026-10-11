@@ -1,0 +1,36 @@
+name: GT3 Agent A 2026 Original 4K Full Race Manufacturer Survey
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-2026-original-100-frames.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  actual-4k-frames-manual-identity-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Video decode dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q Pillow
+      - name: Reuse exact SHA-verified physical 2026 4K producer original from previous acquisition
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/2026-video
+          gh run download 38153571340 --repo YunRah2103/Remotion-gpt-chat --name GT3-AGENT-A-PORSCHE-2026-N24-NATIVE-4K-RACE-SQUARE-CROPS --dir inputs/2026-video
+      - name: Decode 100 4K original source frames and build four proof boards
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/visual_audit_all_2026_n24_original_race_frames.py
+      - name: Upload independent original-source frame QA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-N24-2026-4K-MULTI-MAKE-100-FRAME-IDENTIFICATION
+          path: out/gt3-a-2026-4k-make-survey/
+          retention-days: 7
+          compression-level: 0
