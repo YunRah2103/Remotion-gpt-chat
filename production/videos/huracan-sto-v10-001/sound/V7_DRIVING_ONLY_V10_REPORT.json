@@ -1,0 +1,75 @@
+{
+  "project": "huracan-sto-v10-001",
+  "version": "V7_DRIVING_SCENES_ONLY",
+  "status": "PRIVATE_REVIEW_RENDERED_TECHNICAL_QA_PASS_NOT_STO_EXACT_SOURCE",
+  "date": "2026-10-11",
+  "video": {
+    "file": "HURACAN_STO_V7_V10_DRIVING_SCENES_ONLY.mp4",
+    "sha256": "0d231a4d904e455c0efc8e7d4dd70e17a1849036e0f64ae9885e124e72af83eb",
+    "source_file": "STO-B-V4-NO-WATERMARK-LANDSCAPE-SILENT.mp4",
+    "source_sha256": "ec6a4b1eff39dc1bfde00e9615fb2b20b64c6660703895b8f32542d7d2954818",
+    "dimensions": "1920x1080",
+    "fps": 30,
+    "frames": 316,
+    "duration": 10.533333,
+    "video_codec": "H.264 stream copy",
+    "audio_codec": "AAC 48kHz stereo 320kbps"
+  },
+  "music": {
+    "sha256": "87a663860585e1714fd6fbb6a8006d19d655bda863db66cdaa75ba1830a2d678",
+    "source_type": "original private user music",
+    "song_timings_unchanged": true,
+    "published_to_repo": false
+  },
+  "sourceEngineSamples": [
+    {
+      "model": "Lamborghini Huracan 5.2L naturally aspirated V10, not STO",
+      "source_url": "https://github.com/sathyaram/exhaustnotes/blob/master/public/sounds/huracan.m4a",
+      "source_credit": "ExhaustNotes credits @carlifestyle",
+      "sha256": "70b8a245614c9a917a824b2dc14357a467ffb44ace033c1a33a901be584f714a"
+    },
+    {
+      "model": "Audi R8 5.2L naturally aspirated V10, same engine family",
+      "source_url": "https://github.com/sathyaram/exhaustnotes/blob/master/public/sounds/audir8.m4a",
+      "source_credit": "ExhaustNotes credits @carlifestyle",
+      "sha256": "927b37b8ce70a768ccfc2496639be00cd01cc7ed77b38fc20c953c31f2d18f5e"
+    }
+  ],
+  "gate": {
+    "driving_from_frame_inclusive": 95,
+    "driving_to_frame_exclusive": 284,
+    "driving_seconds": [
+      3.1666666667,
+      9.4666666667
+    ],
+    "all_engine_samples_strictly_zero_outside_driving": true,
+    "music_present_full_video": true
+  },
+  "mix": {
+    "no_synthetic_engine": true,
+    "no_former_promotional_phantom_audio": true,
+    "no_previous_official_slow_engine_bed": true,
+    "accents_at_seconds": [
+      3.76,
+      4.48,
+      5.28,
+      6.1,
+      7.8,
+      8.62
+    ],
+    "engine_rms_target_relative_to_music": 1.35,
+    "master_peak_approx": 0.92,
+    "measured_integrated_lufs": -13.72
+  },
+  "verification": {
+    "frames_decoded": 316,
+    "black_intervals": 0,
+    "silence_intervals": 0,
+    "full_ffmpeg_decode": true
+  },
+  "caveats": [
+    "General naturally aspirated 5.2L V10 Huracan and Audi R8 recordings, not audio captured from the exact pictured STO.",
+    "No independent human listening confirmation of absence of background music/voices in these two files; no publishing-rights clearance for originating creator samples. Private review only.",
+    "Video native source stream was copied without recompression."
+  ]
+}
