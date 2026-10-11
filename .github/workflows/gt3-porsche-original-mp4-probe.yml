@@ -14,6 +14,10 @@ jobs:
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
+      - name: Install FFmpeg native resolution/decode tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
       - name: Download exact original linked by Porsche Newsroom
         shell: bash
         run: |
