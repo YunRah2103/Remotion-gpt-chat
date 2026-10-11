@@ -1,0 +1,44 @@
+name: Agent A ADAC 2025 Lamborghini Official JS-Enabled 1080 Onboard Test
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-2025-adac-lambo-youtube-native-js.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-lamborghini-n24-2025-landscape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install current original-stream video tools and JS engine
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q -U yt-dlp yt-dlp-ejs pillow
+          node --version
+          python -m yt_dlp --version
+      - name: Actually retrieve native full-HD original 2025 Nürburgring #27 Lamborghini 13sec onboard
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/probe_adac_2025_lamborghini_onboard_with_js.py
+      - name: Upload actual original native 1080 landscape race video plus frame QA (or transparent diagnostic)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-ADAC-2025-LAMBORGHINI-27-FHD-ORIGINAL-OR-DIAG
+          path: out/gt3-a-lambo27-official-2025-original/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Strict video-source QA status
+        if: always()
+        run: |
+          python - <<'PY'
+          import json,pathlib,os
+          p=pathlib.Path('out/gt3-a-lambo27-official-2025-original/SOURCE_MANIFEST.json')
+          if p.exists():
+            d=json.loads(p.read_text())
+            message=d['status']+'; native full-HD media bytes: '+str(d.get('bytes',0))+'; reason: '+d.get('reason','')+'; visual model confirmation required before GT3 sixth-make count.'
+          else:message='No original video source recovered and no manifest produced.'
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(message+'\n')
+          PY
