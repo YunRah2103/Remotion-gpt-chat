@@ -1,0 +1,33 @@
+name: FR Legends A - Fast Peugeot 205 GTI Original 1080 Motion Segments
+on:
+  push:
+    branches: [automotive-edits/french-icons-001/a-classics-footage]
+    paths:
+      - 'production/videos/french-icons-001/agent_a_peugeot_fast_range.py'
+      - '.github/workflows/fr-a-peugeot-fast-range.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-original-205-movie-ranges:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install source video FFmpeg and visual checks
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install Pillow
+      - name: Seek original remote full-HD Harry's Garage source to real 205 GTI exterior angles
+        run: python production/videos/french-icons-001/agent_a_peugeot_fast_range.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-a-205-gti-native-1080-exterior-fast-source-qa
+          path: out/FR-A-PEUGEOT-205-REAL-1080-EXTERIOR-RANGE-QA.zip
+          retention-days: 7
+          if-no-files-found: warn
