@@ -1,0 +1,76 @@
+name: STO Agent C — acquire genuine pure-engine recording
+on:
+  push:
+    branches:
+      - automotive-edits/huracan-sto-v10-001/c-sound-render
+    paths:
+      - .github/workflows/sto-c-pure-real-engine.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install extraction and media diagnostics
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q --disable-pip-version-check --upgrade yt-dlp
+      - name: Download source-declared PURE STO engine audio (no source images, no stock music)
+        run: |
+          mkdir -p out/sto-real-engine
+          python - <<'PY'
+          import pathlib,subprocess,json,hashlib
+          p=pathlib.Path('out/sto-real-engine')
+          src=[
+           ('novitec-sto-8000rpm-pure','https://www.youtube.com/watch?v=RslWWzXj1Zg','NOVITEC Official: POV Lamborghini Huracan STO 8000rpm Autobahn PURE SOUND'),
+           ('gumbal-sto-track-pure','https://www.youtube.com/watch?v=oMT0MgugEn0','Gumbal: Lamborghini Huracan STO launch accelerations PURE SOUND'),
+           ('exoticcarspotters-sto','https://www.youtube.com/watch?v=CCfXeA2V8ts','ExoticCarspotters STO accelerations revs startups'),
+           ('topgear-sto-rev','https://www.topgear.com/videos/supercars/listen-631bhp-lamborghini-huracan-sto-start-and-rev','Top Gear: listen STO start and rev')
+          ]
+          result=[]
+          for key,url,label in src:
+           meta={'id':key,'source':url,'claim':label,'status':'not_downloaded','audio_authenticated':False,'no_vocals_confirmed':False}
+           output=p/f'{key}.m4a'
+           cmd=['yt-dlp','--no-playlist','--no-part','--socket-timeout','12','--retries','1','--extractor-retries','1','--format','bestaudio[ext=m4a]/bestaudio','--output',str(p/f'{key}.%(ext)s'),'--max-filesize','120M',url]
+           try:
+            proc=subprocess.run(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,timeout=75)
+            meta['exitCode']=proc.returncode
+            meta['diagnostic']=proc.stderr[-1500:]
+            if proc.returncode == 0:
+             candidates=[x for x in p.glob(key+'.*') if x.suffix not in ('.json','.part')]
+             if candidates:
+              source=candidates[0]
+              probe=subprocess.run(['ffprobe','-v','error','-show_entries','format=duration:stream=codec_type,codec_name,sample_rate,channels','-of','json',str(source)],stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+              if probe.returncode==0:
+               meta['status']='downloaded_audio_candidate'
+               meta['filename']=source.name
+               meta['probe']=json.loads(probe.stdout)
+               meta['sha256']=hashlib.sha256(source.read_bytes()).hexdigest()
+               # Produce max 45 seconds of native source for a listening candidate.
+               trimmed=p/f'{key}-candidate-45s.wav'
+               cv=subprocess.run(['ffmpeg','-y','-hide_banner','-loglevel','error','-i',str(source),'-t','45','-vn','-ar','48000','-ac','2','-c:a','pcm_s16le',str(trimmed)],capture_output=True)
+               if cv.returncode==0:meta['listening_candidate']=trimmed.name
+           except Exception as e:meta['diagnostic']=str(e)[:500]
+           result.append(meta)
+           (p/'manifest.json').write_text(json.dumps({'source_label_warning':'A PURE SOUND title is only a sourcing hint, not verified clean audio; independently listen for lyrics, music, people, and correct Huracan STO vehicle. No release rights asserted.','results':result},indent=2))
+           print(key,meta['status'],meta.get('diagnostic','')[-200:])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STO-C-REAL-ENGINE-SOURCE-CANDIDATES
+          path: out/sto-real-engine/
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 2
+      - name: Gate never auto passes
+        run: |
+          echo "PURE SOUND candidates are not independently certified clean. Agent C must listen and check before use." >> "$GITHUB_STEP_SUMMARY"
