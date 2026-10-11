@@ -1,0 +1,63 @@
+name: STO Agent C — official Lamborghini engine audio
+on:
+  push:
+    branches: [automotive-edits/huracan-sto-v10-001/c-sound-render]
+    paths: [.github/workflows/sto-c-lamborghini-official-m4a.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquire-real-sto:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Acquire and ffprobe exact official STO Feel-the-engine recording
+        run: |
+          set -euo pipefail
+          mkdir -p out/real-lamborghini-sto
+          python - <<'PY'
+          import pathlib,json,urllib.request,urllib.parse,re,hashlib,subprocess
+          out=pathlib.Path('out/real-lamborghini-sto')
+          product='https://www.lamborghini.com/en-en/models/huracan/huracan-sto'
+          request=urllib.request.Request(product,headers={'User-Agent':'Mozilla/5.0'})
+          with urllib.request.urlopen(request,timeout=30) as r: html=r.read(5_000_000).decode('utf-8','replace')
+          m=re.search(r'[^"\\ ]*Huracan_STO\.m4a',html,re.I)
+          if not m:
+             (out/'manifest.json').write_text(json.dumps({'status':'BLOCKED_NO_OFFICIAL_ASSET_IN_PAGE'},indent=2))
+             raise RuntimeError('Official engine asset not found in page')
+          found=m.group().replace('\\/','/')
+          if '://' in found:
+             asset=found
+          else:
+             asset=urllib.parse.urljoin(product,found)
+          print('Official site asset',asset)
+          result={'vehicle':'Lamborghini Huracan STO','publisher':'Automobili Lamborghini official model page','product_page':product,'media_url':asset,'status':'not_downloaded','claim':'Official manufacturer Feel the engine recording; playback needs manual no-vocal/engine confirmation'}
+          try:
+             req=urllib.request.Request(asset,headers={'User-Agent':'Mozilla/5.0','Referer':product})
+             with urllib.request.urlopen(req,timeout=35) as r:
+                b=r.read(25_000_000)
+                result['http_content_type']=r.headers.get('Content-Type')
+                result['http_status']=r.status
+             output=out/'LAMBORGHINI_OFFICIAL_HURACAN_STO_FEEL_THE_ENGINE.m4a'
+             output.write_bytes(b)
+             result['bytes']=len(b)
+             result['sha256']=hashlib.sha256(b).hexdigest()
+             ff=subprocess.run(['ffprobe','-v','error','-show_entries','format=duration,format_name:stream=codec_type,codec_name,sample_rate,channels','-of','json',str(output)],capture_output=True,text=True)
+             result['probe']=json.loads(ff.stdout) if ff.returncode==0 else ff.stderr[-1500:]
+             result['status']='downloaded_ffprobe_pass' if ff.returncode==0 and any(s.get('codec_type')=='audio' for s in result['probe'].get('streams',[])) else 'bad_media'
+          except Exception as e:
+             result['error']=str(e)
+          (out/'manifest.json').write_text(json.dumps(result,indent=2))
+          print(result)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STO-C-OFFICIAL-LAMBORGHINI-ENGINE-RECORDING
+          path: out/real-lamborghini-sto/
+          if-no-files-found: warn
+          retention-days: 2
+          compression-level: 0
