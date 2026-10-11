@@ -20,6 +20,11 @@ DOMAINS = {
     "instagram": ("instagram.com",),
     "tiktok": ("tiktok.com",),
     "dailymotion": ("dailymotion.com", "dai.ly"),
+    "snapchat": ("snapchat.com",),
+    "pinterest": ("pinterest.com",),
+    "twitch": ("twitch.tv", "clips.twitch.tv"),
+    "x": ("x.com", "twitter.com"),
+    "bluesky": ("bsky.app",),
 }
 
 def site_for(url):
@@ -39,8 +44,20 @@ def site_for(url):
             elif name == "tiktok":
                 valid = host in ("vm.tiktok.com", "vt.tiktok.com") or (
                     len(parts) >= 3 and parts[0].startswith("@") and parts[1] == "video")
-            else:
+            elif name == "dailymotion":
                 valid = host.endswith("dai.ly") or path.startswith("video/")
+            elif name == "snapchat":
+                valid = len(parts) >= 3 and parts[-2] == "spotlight" and bool(parts[-1]) and (
+                    parts[0].startswith("%40") or parts[0].startswith("@") or parts[0] == "spotlight")
+            elif name == "pinterest":
+                valid = len(parts) == 2 and parts[0] == "pin" and parts[1].isdigit()
+            elif name == "twitch":
+                valid = (host == "clips.twitch.tv" and len(parts) == 1 and bool(parts[0])
+                    or len(parts) >= 3 and parts[-2] == "clip" and bool(parts[-1]))
+            elif name == "x":
+                valid = len(parts) >= 3 and parts[1] == "status" and parts[2].isdigit()
+            elif name == "bluesky":
+                valid = len(parts) == 4 and parts[0] == "profile" and parts[2] == "post" and bool(parts[3])
             if not valid:
                 raise ValueError("Use a single video/post URL, not a creator profile or playlist")
             return name
@@ -52,6 +69,11 @@ def engines_for(site, engine, cobalt_available=False):
         "instagram": ["yt-dlp", "yt-dlp-chrome", "gallery-dl", "cobalt"],
         "tiktok": ["yt-dlp", "yt-dlp-chrome", "gallery-dl", "cobalt"],
         "dailymotion": ["yt-dlp", "cobalt"],
+        "snapchat": ["yt-dlp", "yt-dlp-chrome"],
+        "pinterest": ["yt-dlp", "yt-dlp-chrome"],
+        "twitch": ["yt-dlp", "yt-dlp-chrome"],
+        "x": ["yt-dlp", "yt-dlp-chrome"],
+        "bluesky": ["yt-dlp", "yt-dlp-chrome"],
     }[site]
     if engine != "auto":
         if engine not in choices or engine == "cobalt" and not cobalt_available:
