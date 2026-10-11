@@ -1,0 +1,39 @@
+name: GT3 Agent A Original Falken 2024 Full Film Acquisition
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-falken2024-original.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-falken-film:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install video and inspection tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q pillow requests
+      - name: Download and FFprobe actual 2024 Nürburgring race source
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_falken2024_publisher_original.py
+      - name: Upload physical original media and 30-frame scene identity review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-FALKEN2024-FULL-ORIGINAL-NATIVE-MEDIA-QA
+          path: out/gt3-a-publisher-falken2024/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Scene gate status
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, pathlib,os
+          p=pathlib.Path('out/gt3-a-publisher-falken2024/SOURCE_MANIFEST.json')
+          j=json.loads(p.read_text()) if p.exists() else {'status':'NO_MANIFEST'}
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(f'Footage acquisition: {j["status"]}; resolution {j.get("width")}x{j.get("height")}; bytes {j.get("retrieved_bytes",0)}; independent GT3 camera QA pending.\n')
+          PY
