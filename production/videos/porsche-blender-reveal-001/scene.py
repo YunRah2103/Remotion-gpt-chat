@@ -258,7 +258,7 @@ poses = [
     ((-5.4,3.3,1.4),(-4.6,-2.2,1.1),43),
 ]
 
-def frame_state(f):
+def frame_state(f, apply_render=True):
     # The viewport and first cinematic shot share one camera path, then beat-cut shots.
     idx = next(i for i in range(len(cuts)-1) if cuts[i] <= f < cuts[i+1])
     lo, hi = cuts[idx], cuts[idx+1]
@@ -290,6 +290,8 @@ def frame_state(f):
     for l,offset in [(fill,(-4,-3,7)),(rim,(5,2,5))]:
         l.location = pos+Vector(offset)
         l.rotation_euler = (target-l.location).to_track_quat('-Z','Y').to_euler()
+    if not apply_render:
+        return
     s.render.engine = 'BLENDER_WORKBENCH' if f < 214 else 'CYCLES'
     s.display.shading.light = 'STUDIO'
     s.display.shading.studiolight_rotate_z = 0.5
@@ -318,7 +320,7 @@ else:
 # Bake the real camera/car/wheel motion before rendering so Cycles samples motion blur.
 for f in range(479):
     s.frame_set(f)
-    frame_state(f)
+    frame_state(f,apply_render=False)
     for o in [root,cam,focus,fill,rim]+spin:
         o.keyframe_insert('location', frame=f)
         o.keyframe_insert('rotation_euler', frame=f)

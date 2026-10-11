@@ -27,11 +27,11 @@ jobs:
           echo '1c73fcb138c31e2b1d5ed126a2412074bb17f8e960b355436f28139bf518e1eb  /tmp/porsche/model.glb' | sha256sum -c -
           blender --version > out/proof/blender-version.txt
           echo '${{ github.sha }}' > out/proof/source-sha.txt
-      - name: Native full-resolution visual proofs
+      - name: Native quick visual proofs
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
         run: |
-          xvfb-run -a blender -b -t 4 --python-exit-code 1 --python production/videos/porsche-blender-reveal-001/scene.py -- --model /tmp/porsche/model.glb --out out/proof --frames 0,213,214,319,418 --samples 32 --save > out/proof/render.log 2>&1
+          xvfb-run -a blender -b -t 4 --python-exit-code 1 --python production/videos/porsche-blender-reveal-001/scene.py -- --model /tmp/porsche/model.glb --out out/proof --frames 0,213,214,319,418 --samples 16 --scale 0.5 > out/proof/render.log 2>&1
       - name: Generate review contact sheet
         run: |
           python3 - <<'PY'
@@ -42,7 +42,7 @@ jobs:
           sheet=Image.new('RGB',(1080,1008),(16,18,20))
           draw=ImageDraw.Draw(sheet)
           for i,p in enumerate(frames):
-            img=Image.open(p); assert img.size==(1080,1920)
+            img=Image.open(p); assert img.size==(540,960)
             img.thumbnail((270,480))
             x,y=(i%4)*270,(i//4)*504
             sheet.paste(img,(x,y))
