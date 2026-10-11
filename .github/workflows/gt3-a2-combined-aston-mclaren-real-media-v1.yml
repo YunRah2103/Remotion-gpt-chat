@@ -1,0 +1,91 @@
+name: YUNEX A2 Combined Real Aston Plus McLaren Source ZIP
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a2-ferrari-aston-mclaren
+    paths:
+      - .github/workflows/gt3-a2-combined-aston-mclaren-real-media-v1.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  combine-actually-verified-video:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch real corrected Aston source bytes and real McLaren movie bytes
+        run: |
+          mkdir -p staged/aston staged/mclaren out/gt3-a2-combined
+          gh run download 38153173855 -R "$GITHUB_REPOSITORY" -n "GT3-MULTICAR-AGENT-A2-ASTON-QA-CORRECTED-NATIVE-1080-V2" -D staged/aston
+          gh run download 38161451066 -R "$GITHUB_REPOSITORY" -n "GT3-A2-MCLAREN-REAL-2026-NURBURGRING-ORIGINAL-AND-EDIT-REVIEW-ONLY" -D staged/mclaren
+          find staged -maxdepth 2 -type f -printf '%s %p\n'
+      - name: Validate every playable original, cut, and SHA; combine in one archive
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import zipfile,io,json,hashlib
+          a=next(Path('staged/aston').glob('*.zip'))
+          m=next(Path('staged/mclaren').glob('*.zip'))
+          with zipfile.ZipFile(a) as outer:
+            assert outer.testzip() is None
+            inner=next(n for n in outer.namelist() if n.endswith('.zip'))
+            source=io.BytesIO(outer.read(inner))
+          with zipfile.ZipFile(source) as ast:
+            assert ast.testzip() is None
+            astmanifest=json.loads(ast.read('SOURCE_MANIFEST_FFPROBE_SHA256.json'))
+            assert len(astmanifest['shots'])==7
+            assert 'source_shots_1920x1080/ASTON21_03_REAR_TRACK_APPROACH.mp4' in ast.namelist()
+            names=[n for n in ast.namelist() if n.startswith('source_shots_1920x1080/') and n.endswith('.mp4')]
+            assert len(names)==7
+          with zipfile.ZipFile(m) as mac:
+            assert mac.testzip() is None
+            mcmanifest=json.loads(mac.read('MANIFEST_SHA_QA.json'))
+            assert mcmanifest['original_native_width']==1916 and mcmanifest['original_native_height']==1078
+            assert mcmanifest['allowed_gt3_native_shot_count']==0
+            for row in mcmanifest['files']:
+              assert hashlib.sha256(mac.read(row['name'])).hexdigest()==row['sha256']
+          dst=Path('out/gt3-a2-combined/YUNEX_A2_ASTON_7_MCLAREN_REVIEW_REAL_MOVIES_ONE_ZIP.zip')
+          manifest={'project':'YUNEX GT3 Multi-Car 001','branch':'a2-ferrari-aston-mclaren','global_6_make_24_camera_gate':'BLOCKED',
+            'aston_nls8_approved_1080_camera_cuts':7,'mclaren_2026_nearHD_editorial_review_shots':1,
+            'mclaren_strict_1080_gt3_camera_count':0,'ferrari_296_gt3_source_count':0,
+            'verified_actions_artifacts':{'aston_v2':11707506666,'mclaren_review':11710611410},
+            'source_sha256':{}}
+          with zipfile.ZipFile(dst,'w',compression=zipfile.ZIP_STORED,allowZip64=True) as merged:
+            merged.writestr('README_FIRST.txt',
+              'A2 PARTIAL actual video source package. Aston NLS8 #21 approved: 7 corrected real native 1920x1080 clips, original 1920x1088.\n'
+              'McLaren GTWC Nürburgring 2026: real original 1916x1078 footage, one scene; editor H264 padded 2px sides + 1px vertically; native >=1920x1080 gate FAILED, REVIEW ONLY. Broadcast graphics remain.\n'
+              'Ferrari 296 GT3: NOT ACQUIRED. Global acceptance 6 makes/24 independent cameras BLOCKED.\n')
+            with zipfile.ZipFile(source) as ast:
+              for name in ast.namelist():
+                if name.endswith('/'): continue
+                blob=ast.read(name);key='ASTON_APPROVED_V2/'+name
+                merged.writestr(key,blob,compress_type=zipfile.ZIP_STORED)
+                if name.endswith('.mp4'):manifest['source_sha256'][key]=hashlib.sha256(blob).hexdigest()
+            with zipfile.ZipFile(m) as mac:
+              for name in mac.namelist():
+                if name.endswith('/'):continue
+                blob=mac.read(name);key='MCLAREN_REVIEW_ONLY/'+name
+                merged.writestr(key,blob,compress_type=zipfile.ZIP_STORED)
+                if name.endswith('.mp4'):manifest['source_sha256'][key]=hashlib.sha256(blob).hexdigest()
+            merged.writestr('A2_COMBINED_SOURCE_SHA256_MANIFEST.json',json.dumps(manifest,indent=2))
+          with zipfile.ZipFile(dst) as archive:
+            assert archive.testzip() is None
+            for name,h in manifest['source_sha256'].items():
+              assert hashlib.sha256(archive.read(name)).hexdigest()==h
+          assert len(manifest['source_sha256'])==10
+          print('REAL_PLAYABLE_MOVIE_COUNT',len(manifest['source_sha256']))
+          print('REAL_ARCHIVE_BYTES',dst.stat().st_size,'SHA256',hashlib.sha256(dst.read_bytes()).hexdigest())
+          print('FERRARI_296_AVAILABLE',False,'MCLAREN_NATIVE_MINIMUM_PASS',False)
+          PY
+      - name: Publish canonical single real A2 media package
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-GT3-A2-REAL-ASTON-AND-MCLAREN-ONE-ZIP-QUALITY-DISCLOSED
+          path: out/gt3-a2-combined/YUNEX_A2_ASTON_7_MCLAREN_REVIEW_REAL_MOVIES_ONE_ZIP.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
