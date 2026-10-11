@@ -21,7 +21,9 @@ jobs:
       - name: Prepare high-quality footage downloader and decoded frame sampler
         run: |
           python -m pip install -U yt-dlp Pillow
-          which ffprobe && which ffmpeg
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          ffprobe -version | head -1
       - name: Physically acquire full-HD real Citroen 2CV stock film and sample all 24 positions
         run: python production/videos/french-icons-001/agent_a_cinematic_2cv_stock_probe.py
       - uses: actions/upload-artifact@v4
