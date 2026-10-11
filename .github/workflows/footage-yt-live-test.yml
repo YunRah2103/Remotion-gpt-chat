@@ -1,0 +1,109 @@
+name: One-off YouTube live acquisition proof (small CC BY sample)
+on:
+  push:
+    branches:
+      - feature/footage-rescue-multisource-20261011
+    paths:
+      - '.github/workflows/footage-yt-live-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-small-youtube-video:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Install download engines and FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check -r production/footage/requirements.txt pytubefix
+          python -m yt_dlp --version
+          deno --version
+      - name: Attempt actual YouTube download; produce proof or diagnostics
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p out/youtube-live-proof/raw
+          # Big Buck Bunny (c) 2008 Blender Foundation, CC BY 3.0:
+          # https://peach.blender.org/about/
+          URL="https://www.youtube.com/watch?v=YE7VzlLtp-4"
+          export YT_SAMPLE_URL="$URL"
+          echo "SOURCE: $URL" > out/youtube-live-proof/details.txt
+          echo "LICENCE: CC BY 3.0, (c) 2008 Blender Foundation" >> out/youtube-live-proof/details.txt
+          python -m yt_dlp --ignore-config --no-playlist --no-progress --js-runtimes deno \
+            -f "bv[height<=240]/b[height<=240]/worst" \
+            --max-filesize 45M -o "out/youtube-live-proof/raw/test.%(ext)s" \
+            "$URL" > out/youtube-live-proof/yt-dlp.log 2>&1
+          RC=$?
+          echo "YT_DLP_EXIT_CODE: $RC" >> out/youtube-live-proof/details.txt
+          if [ "$RC" -ne 0 ]; then
+            echo "FIRST_DOWNLOAD_BLOCKED: trying pytubefix as independent extractor" >> out/youtube-live-proof/details.txt
+            python - <<'PY' > out/youtube-live-proof/pytubefix.log 2>&1
+          from pytubefix import YouTube
+          import os
+          yt=YouTube(os.environ["YT_SAMPLE_URL"])
+          streams=[s for s in yt.streams.filter(only_video=True) if s.resolution and int(s.resolution.rstrip("p"))<=360]
+          streams.sort(key=lambda x:int(x.resolution.rstrip("p")))
+          if not streams: raise RuntimeError("No low-resolution video stream available")
+          print("SELECTED_STREAM",streams[0])
+          streams[0].download(output_path="out/youtube-live-proof/raw",filename="pytubefix-test.mp4")
+          PY
+            echo "PYTUBEFIX_EXIT_CODE: $?" >> out/youtube-live-proof/details.txt
+          fi
+          echo "Inspecting actual media bytes via FFprobe and creating a short proof clip"
+          python - <<'PY'
+          import json, subprocess, pathlib, hashlib, os
+          folder=pathlib.Path('out/youtube-live-proof')
+          candidates=[f for f in (folder/'raw').iterdir() if f.suffix.lower() in ('.mp4','.webm','.mkv') and f.stat().st_size>1024]
+          report={"url":os.environ["YT_SAMPLE_URL"],"sources":[{"path":str(x),"bytes":x.stat().st_size} for x in candidates],"status":"FAILED"}
+          if candidates:
+              file=candidates[0]
+              try:
+                  result=subprocess.run(["ffprobe","-v","error","-show_streams","-show_format","-of","json",str(file)],check=True,capture_output=True,text=True)
+                  info=json.loads(result.stdout)
+                  streams=[s for s in info.get("streams",[]) if s.get("codec_type")=="video"]
+                  if not streams: raise RuntimeError("No video stream")
+                  report["codec"]=streams[0].get("codec_name")
+                  report["width"]=streams[0].get("width")
+                  report["height"]=streams[0].get("height")
+                  report["sha256"]=hashlib.sha256(file.read_bytes()).hexdigest()
+                  result=subprocess.run(["ffmpeg","-hide_banner","-loglevel","error","-y","-i",str(file),"-t","8","-an","-c:v","libx264","-preset","fast","-crf","24","-pix_fmt","yuv420p",str(folder/"youtube-8-second-proof.mp4")],capture_output=True,text=True)
+                  if result.returncode or not (folder/"youtube-8-second-proof.mp4").is_file():
+                      raise RuntimeError("FFmpeg proof extraction failed: "+result.stderr[-500:])
+                  report["status"]="REAL_YOUTUBE_VIDEO_PASS"
+                  report["sampleBytes"]=(folder/"youtube-8-second-proof.mp4").stat().st_size
+              except Exception as exc:
+                  report["reason"]=str(exc)
+          else:
+              report["reason"]="Neither YouTube extractor returned video bytes. See extraction logs."
+          (folder/"report.json").write_text(json.dumps(report,indent=2)+"\n")
+          print(json.dumps(report,indent=2))
+          PY
+          rm -rf out/youtube-live-proof/raw
+          # Always allow the artifact to upload; status is independently proved by report.json
+      - name: Upload real video proof (or failed extraction logs)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: small-youtube-live-proof
+          path: out/youtube-live-proof/
+          retention-days: 3
+          if-no-files-found: error
+      - name: Fail if no real YouTube video was acquired
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path("out/youtube-live-proof/report.json").read_text())
+          assert data["status"] == "REAL_YOUTUBE_VIDEO_PASS", data
+          PY
