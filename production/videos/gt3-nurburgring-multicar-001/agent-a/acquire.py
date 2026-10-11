@@ -90,6 +90,33 @@ def visuals(path, clip_id, duration, folder):
             "decodable_sample_frames": 3}
 
 def extract(source, start, clip_id, target, duration):
+    if source.get("method") == "direct-mp4":
+        # Official publisher's direct file, cached once on the runner. Preserve
+        # source bytes and stream-copy only a bounded excerpt without upscaling.
+        cache = target / "_source_cache"
+        cache.mkdir(parents=True, exist_ok=True)
+        raw = cache / (source["id"] + ".mp4")
+        if not raw.is_file() or raw.stat().st_size < 100000:
+            proc = command(["curl", "-fL", "--retry", "2", "--max-time", "150",
+                            "--user-agent", "Mozilla/5.0",
+                            "-o", str(raw), source["url"]], timeout=175)
+            if proc.returncode:
+                raw.unlink(missing_ok=True)
+                raise ValueError("Direct MP4 HTTP fetch failed: " + proc.stderr[-500:])
+        # ffprobe the full file before editing to avoid treating HTML as video.
+        original = command(["ffprobe", "-v", "error", "-select_streams",
+                            "v:0", "-show_entries", "stream=width,height",
+                            "-of", "csv=p=0", str(raw)], timeout=30)
+        if original.returncode or not original.stdout.strip():
+            raise ValueError("Fetched publisher URL does not decode as MP4")
+        output = target / (clip_id + ".mkv")
+        proc = command(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+                        "-ss", str(start), "-i", str(raw), "-t", str(duration),
+                        "-map", "0:v:0", "-map", "0:a?", "-c", "copy",
+                        "-avoid_negative_ts", "make_zero", str(output)], timeout=120)
+        if proc.returncode or not output.exists() or output.stat().st_size < 75000:
+            raise ValueError("Direct publisher trim failed: " + proc.stderr[-350:])
+        return output
     # This is a normal, unauthenticated extraction. No CAPTCHA/cookie bypass.
     # FFmpeg copies the downloaded compressed stream (no upscaling).
     outtmpl = str(target / (clip_id + ".%(ext)s"))
