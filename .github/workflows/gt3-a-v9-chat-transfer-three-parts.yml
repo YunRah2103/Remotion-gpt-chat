@@ -1,0 +1,49 @@
+name: YUNEX A V9 Verified Large ZIP Transfer to Chat
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a2-ferrari-aston-mclaren
+    paths:
+      - .github/workflows/gt3-a-v9-chat-transfer-three-parts.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  split-original-zip-without-changing-bytes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install requests
+        run: python -m pip install -q requests
+      - name: Fetch original V9 from Actions and write checksum-verified transport chunks
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a2/split_a_v9_for_chat_transport.py
+      - name: Upload verified original ZIP chunk 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-AGENT-A-V9-CHAT-PART-01
+          path: |
+            out/gt3-a-v9-chat-transport/GT3_AGENT_A_V9_PART_01.bin
+            out/gt3-a-v9-chat-transport/PARTS_SHA256.json
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
+      - name: Upload verified original ZIP chunk 2
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-AGENT-A-V9-CHAT-PART-02
+          path: out/gt3-a-v9-chat-transport/GT3_AGENT_A_V9_PART_02.bin
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
+      - name: Upload verified original ZIP chunk 3
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-AGENT-A-V9-CHAT-PART-03
+          path: out/gt3-a-v9-chat-transport/GT3_AGENT_A_V9_PART_03.bin
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
