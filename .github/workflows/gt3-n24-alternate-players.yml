@@ -1,0 +1,31 @@
+name: YUNEX N24 Ferrari Lamborghini Alternate Real Video Players
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths:
+      - .github/workflows/gt3-n24-alternate-players.yml
+      - production/videos/gt3-nurburgring-multicar-001/agent-a/hunt_publisher_race_players.py
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  video-player-source-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 23
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install native video extraction and QA
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q -U "yt-dlp[default]" pillow requests beautifulsoup4
+      - name: Physically extract and verify accessible non-YouTube Ferrari Lamborghini motorsport player streams
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/hunt_publisher_race_players.py
+      - name: Deliver actual source clips, SHA and frame proof or honest failure report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-N24-FERRARI-LAMBORGHINI-ORIGINAL-SOURCE-PROBE
+          path: out/gt3-alt-race-player-media/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
