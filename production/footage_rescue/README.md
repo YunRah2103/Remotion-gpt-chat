@@ -10,6 +10,11 @@ This optional component is isolated from current YUNEX films, the older yt-dlp i
 | Instagram Reels | yt-dlp | yt-dlp Chrome impersonation; gallery-dl; optional Cobalt |
 | TikTok | yt-dlp | yt-dlp Chrome impersonation; gallery-dl; optional Cobalt |
 | Dailymotion | yt-dlp | optional Cobalt |
+| Snapchat Spotlight | yt-dlp | yt-dlp Chrome |
+| Pinterest video Pins | yt-dlp | yt-dlp Chrome |
+| Twitch clips | yt-dlp | yt-dlp Chrome |
+| X / Twitter video posts | yt-dlp | yt-dlp Chrome |
+| Bluesky video posts | yt-dlp | yt-dlp Chrome |
 
 **Reality:** GitHub-hosted runners share cloud datacentre IP ranges. Alternative extractors are useful for extractor-specific failures but may all encounter the same source access restrictions. No downloader here bypasses sign-in controls, DRM, or private content. gallery-dl supports Instagram and TikTok URLs, but access can still require cookies; this tool deliberately does not pass account sessions or credentials.
 
@@ -25,6 +30,20 @@ Evidence: [social extraction matrix](https://github.com/YunRah2103/Remotion-gpt-
 
 Agents should use **yt-dlp -> yt-dlp Chrome -> gallery-dl (where supported)** and move to a different source if the selected post blocks/has inadequate native resolution. Successful extraction of one test post does not guarantee every post works.
 
+### Additional native-quality evidence (11 October 2026)
+
+[New social live matrix](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38160397393):
+- **Snapchat Spotlight**: public Porsche clip downloaded. Source only 540x960. Two additional GT3RS links downloaded; one more link was unavailable.
+- **Pinterest**: download successful. [Three independent Porsche car Pins](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38162011170) were all 720x1280 at their best available tested quality; not native 1080x1920.
+- **Twitch clips**: downloaded a verified **1920x1080 ~60fps** clip via [best-quality test](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38160590802); landscape aspect ratio means not full native 1080x1920 crop.
+- **X / Twitter**: [two independent native video posts](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38160498526) downloaded; one best-quality test was 720x1280. An old Periscope-linked post did not work.
+- **Bluesky**: 1280x720 sample downloaded in first test; best-quality retry failed to decode the stream. Treat as inconsistent.
+- **Reddit**: tested public Reddit URL returned HTTP 403 / account authentication, no media.
+- **Facebook Reels**: two tested Reel URLs failed `Cannot parse data`; no video retrieved.
+- A downloader PASS alone does not guarantee rights, absence of watermarks or that the linked content is genuine moving car footage. Test URLs are merely samples, not curated YUNEX picks.
+
+Prioritise TikTok and Instagram for vertical automotive footage, with X and Pinterest useful secondary sources. For native vertical 1080, verify actual `width>=1080` and `height>=1920`. Snapchat is not currently a quality substitute. Try high-quality direct MP4 sources when social streams are insufficient.
+
 ### Optional Cobalt
 
 Cobalt can act as a further engine **only with your own or an explicitly authorised HTTPS instance**. No public cobalt.tools API is used. In repository **Settings → Secrets and variables → Actions** configure:
@@ -38,7 +57,7 @@ Its address must resolve publicly; the tool accepts only same-host tunnel result
 
 1. Merge the proposed changes into **main** when ready. GitHub Actions cannot display a new manual workflow on the Actions page until the workflow has landed on the default branch.
 2. Choose **Actions → Footage Rescue - multi-engine source acquisition → Run workflow**.
-3. Enter one YouTube, TikTok, Instagram, or Dailymotion video URL, select **auto**, and select the minimum real pixel height. Confirm you have permission to acquire and use it.
+3. Enter one supported YouTube, TikTok, Instagram, Dailymotion, Snapchat, Pinterest, Twitch, X or Bluesky video URL, select **auto**, and select the minimum real pixel height. Confirm you have permission to acquire and use it.
 4. Download the **footage-rescue-RUN_ID** artifact (available for three days). It holds **footage-rescue.zip**. When successful that ZIP contains original video bytes, three sampled JPEG video frames and **manifest.json** with genuine FFprobe/FFmpeg checks; on failure it contains the diagnostic manifest explaining each attempt. The Actions run will fail if no usable source was retrieved.
 
 Local usage:
