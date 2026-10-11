@@ -17,11 +17,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
       - name: Install FFmpeg + updated extractor
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
-          python -m pip install --disable-pip-version-check -U Pillow yt-dlp
+          python -m pip install --disable-pip-version-check -U Pillow "yt-dlp[default]"
+          deno --version
+          python -m yt_dlp --version
           python -m py_compile production/videos/huracan-sto-v10-001/footage/probe_official_youtube.py
       - name: Load optional YouTube session cookies securely
         env:
