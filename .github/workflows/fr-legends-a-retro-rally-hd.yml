@@ -1,0 +1,27 @@
+name: FR Legends A - Retro 306 Maxi and R5 Turbo 2 Video HD Probe
+on:
+  push:
+    branches: [automotive-edits/french-icons-001/a-classics-footage]
+    paths:
+      - '.github/workflows/fr-legends-a-retro-rally-hd.yml'
+      - 'production/videos/french-icons-001/agent_a_r5_306_rally_dm_probe.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-resolution:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -U yt-dlp
+      - run: python production/videos/french-icons-001/agent_a_r5_306_rally_dm_probe.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-a-real-classic-rally-r5-306-technical-probe
+          path: out/fr-a-missing-rally-film-probe/manifest.json
+          retention-days: 5
