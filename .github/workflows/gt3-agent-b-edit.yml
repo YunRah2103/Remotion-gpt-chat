@@ -25,6 +25,11 @@ jobs:
           cache: npm
       - name: Install exact production dependencies
         run: npm ci
+      - name: Install media decoding and QA tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          ffprobe -version | head -1
       - name: TypeScript compile
         run: npm run check
       - name: Structural + strict rejection tests
