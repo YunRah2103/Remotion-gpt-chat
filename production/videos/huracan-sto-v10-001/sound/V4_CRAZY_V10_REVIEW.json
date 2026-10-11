@@ -1,0 +1,92 @@
+{
+  "project": "huracan-sto-v10-001",
+  "version": "V4 clean no-watermark, engine-dominant audio mix",
+  "date": "2026-10-11",
+  "status": "PLAYABLE_PRIVATE_REVIEW_ENGINE_FOOTAGE_AUDIO_NOT_AUTHENTICATED_ISOLATED",
+  "picture": {
+    "original": "STO-B-V4-NO-WATERMARK-LANDSCAPE-SILENT.mp4",
+    "sha256": "ec6a4b1eff39dc1bfde00e9615fb2b20b64c6660703895b8f32542d7d2954818",
+    "sourceCommit": "cfdea43dd3eaf619e85b47877ecb94412208eca9",
+    "source": "Agent B: 14 FORMAT67-only selections, V4 replaces all 4 Phantom-watermarked slots"
+  },
+  "music": {
+    "original": "TikTok video #7690925557919403294 [7690925557919403294].mp3",
+    "sha256": "87a663860585e1714fd6fbb6a8006d19d655bda863db66cdaa75ba1830a2d678",
+    "timing": "Untouched, gain automated only; no beat warping",
+    "publiclyCommitted": false
+  },
+  "carAudio": {
+    "recordingType": "Audio tracks from actual STO-labelled publisher promotional videos, not independently authenticated isolated engine-only recordings; may contain musical overlays and promotional FX",
+    "sourceRecordings": [
+      {
+        "id": "primary",
+        "sha256": "dba560aea7cbdf0f64f7e7bb647ae2d43cabcf03a7af9a6a7a445122caa43f33"
+      },
+      {
+        "id": "lambo",
+        "sha256": "62deb84ce58be337c61402b8d1534b369d2d41c0b1797d0577cfdfe07365d502"
+      },
+      {
+        "id": "huracan",
+        "sha256": "d4d34a89be7b27f50e5f1a82a28521eae2fae9ac28e78613a847b0ef36564697"
+      }
+    ],
+    "arrangement": "Continuous 10.533-second sound bed crossfaded from source recordings plus 14 individual rev/pull/downshift/pass-by accents; no synthetic engine oscillator",
+    "eventsSeconds": [
+      0,
+      0.66,
+      1.94,
+      2.51,
+      3.23,
+      3.8,
+      4.51,
+      5.25,
+      6.12,
+      7.01,
+      7.75,
+      8.58,
+      8.97,
+      9.53
+    ],
+    "prominentRevealSeconds": 2.6,
+    "mixLevels": {
+      "musicRms": 0.09171939,
+      "sourceCarSoundRms": 0.31790385,
+      "engineVsMusicRmsDb": 10.8
+    },
+    "processing": "Source-derived stereo panning, mild speed/pitch, bandpass, parallel saturated low-mid harmonic bite, musical ducking and a final smooth 45ms tail. Master peak-safety applied."
+  },
+  "deliverable": {
+    "file": "HURACAN_STO_V4_CRAZY_V10_NO_WATERMARK.mp4",
+    "sha256": "04f159b6741d5d642ff0f6fd51f2fe721d4dbcec0088642c948e4d6a13eaae67",
+    "sizeBytes": 15662550,
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "frames": 316,
+    "durationSeconds": 10.533333,
+    "videoCodec": "h264 original source stream copied, no additional picture compression",
+    "audioCodec": "AAC 48kHz stereo 320 kbps",
+    "loudness": {
+      "integratedLufs": -7.84,
+      "truePeakDbTP": -1.35,
+      "dynamicLra": 1.5
+    },
+    "qa": {
+      "fullDecode": true,
+      "blackIntervals": 0,
+      "silenceIntervals": 0,
+      "contactSheetFrames": 17
+    },
+    "outputs": [
+      "V4-original-music-ducked.wav",
+      "V4-source-recording-engine-bed.wav",
+      "V4-source-recording-rev-accents.wav",
+      "V4-processed-car-audio.wav",
+      "V4-CINEMATIC-FINAL-MIX.wav",
+      "V4_CRAZY_V10_QA.json",
+      "V4-NATIVE-17-FRAME-CONTACT.jpg"
+    ]
+  },
+  "caution": "Private review only; actual footage publishing rights, raw STO engine recording identity and distinct moving source-shot diversity have not been independently signed off."
+}
