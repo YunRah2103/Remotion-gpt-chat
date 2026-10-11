@@ -1,0 +1,36 @@
+name: FR Legends B - Direct Bugatti Peugeot HQ Probe
+on:
+  push:
+    branches: [automotive-edits/french-icons-001/b-modern-footage]
+    paths:
+      - production/videos/french-icons-001/agent-b/probe_direct.py
+      - .github/workflows/fr-legends-b-direct-probe.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install decoder
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check requests Pillow
+          python -m py_compile production/videos/french-icons-001/agent-b/probe_direct.py
+      - name: Fetch direct source MP4, FFprobe and decode real-frame storyboards
+        run: python production/videos/french-icons-001/agent-b/probe_direct.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: FR-LEGENDS-AGENT-B-MISSING-MODELS-DIRECT-PROBE
+          path: out/fr-b-direct-probe/
+          retention-days: 14
+          compression-level: 0
+          if-no-files-found: warn
