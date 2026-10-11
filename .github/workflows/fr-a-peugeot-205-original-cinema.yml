@@ -1,0 +1,47 @@
+name: FR Legends A - Clean Peugeot 205 GTI Original Film Real Full HD QA
+on:
+  push:
+    branches: [automotive-edits/french-icons-001/a-classics-footage]
+    paths:
+      - '.github/workflows/fr-a-peugeot-205-original-cinema.yml'
+      - 'production/videos/french-icons-001/agent_a_harry_205_gti_quality.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  true-hd-peugeot-cinema-acquisition:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install actual source-media QA tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install pillow
+      - name: Fetch original Harry's Garage 205 GTI and motorsport source video, fully decode, screenshot at actual source times
+        run: python production/videos/french-icons-001/agent_a_harry_205_gti_quality.py
+      - name: Attach visual-quality and 1080 native summary
+        run: |
+          python - <<'PY'
+          import pathlib,json,os
+          d=json.loads(pathlib.Path("out/fr-a-peugeot-clean-hero-qa/manifest.json").read_text())
+          ok=[x for x in d if x['status'].startswith("REAL_NATIVE")]
+          lines=['## Peugeot 205 GTI genuine cinema source footage inspection',
+            f'- True source 1080p films downloaded, decoded and visually sampled: **{len(ok)}**',
+            '- Film quality, authentic model, clean exterior driving angles and permissions still require review.',
+            '- Original source SHA and 16–48 independently decoded frames per film in ZIP.']
+          lines += [f'- {x["id"]}: {x["status"]}, probe {x.get("probe")}, reason {x.get("error","")}' for x in d]
+          pathlib.Path(os.environ["GITHUB_STEP_SUMMARY"]).write_text('\n'.join(lines)+'\n')
+          print('\n'.join(lines))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-a-peugeot205-gti-harrys-garage-real-hd-source-QA
+          path: out/FR-A-PEUGEOT-HERO-SOURCE-VIDEO-QA.zip
+          retention-days: 7
+          if-no-files-found: warn
