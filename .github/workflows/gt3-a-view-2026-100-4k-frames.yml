@@ -1,0 +1,25 @@
+name: Agent A View Real 2026 Nürburgring 100 4K Frames
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-view-2026-100-4k-frames.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  prove-original-film-car-identity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install image display library
+        run: python -m pip install --break-system-packages -q Pillow
+      - name: Reuse already original-SHA-checked 100-frame scan artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/actual_2026_100frame_panels
+          gh run download 38158301192 --repo YunRah2103/Remotion-gpt-chat --name GT3-AGENT-A-N24-2026-4K-MULTI-MAKE-100-FRAME-IDENTIFICATION --dir inputs/actual_2026_100frame_panels
+      - name: Output actual camera source contact sheets for independent human visual QA
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/display_verified_2026_100frames.py
