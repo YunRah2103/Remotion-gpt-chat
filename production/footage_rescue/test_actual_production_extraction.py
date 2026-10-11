@@ -6,7 +6,9 @@ ROOT=pathlib.Path(__file__).parent
 spec=importlib.util.spec_from_file_location("rescue",ROOT/"acquire.py")
 rescue=importlib.util.module_from_spec(spec);spec.loader.exec_module(rescue)
 POSTS={"instagram":"https://www.instagram.com/reel/DZdOSuOyu2E/",
-       "tiktok":"https://www.tiktok.com/@emaanch30/video/7676146052470230294"}
+       "tiktok":"https://www.tiktok.com/@emaanch30/video/7676146052470230294",
+ "instagram-car":"https://www.instagram.com/reel/CwsgJPbMhBL/",
+ "tiktok-car":"https://www.tiktok.com/@luxury.speed/video/7407202646785920287"}
 ap=argparse.ArgumentParser()
 ap.add_argument("--site",choices=POSTS.keys(),required=True)
 ap.add_argument("--method",choices=["yt-dlp","yt-dlp-chrome"],required=True)
