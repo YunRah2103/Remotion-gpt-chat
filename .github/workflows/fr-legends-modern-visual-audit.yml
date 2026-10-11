@@ -1,0 +1,99 @@
+name: FR Legends B - Visual Evidence Review
+
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/b-modern-footage
+    paths:
+      - .github/workflows/fr-legends-modern-visual-audit.yml
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  inspect-source-artifact:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      GH_TOKEN: ${{ github.token }}
+      ARTIFACT_ID: "11705780426"
+      QA_DIR: production/videos/french-icons-001/agent-b-qa
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download actual latest source ZIP for independent visual audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet Pillow
+          mkdir -p /tmp/modern-review
+          curl -fLsS --retry 2 --retry-delay 3 -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID/zip" -o /tmp/modern-review/sources.zip
+          python - <<'PY'
+          import zipfile
+          with zipfile.ZipFile('/tmp/modern-review/sources.zip') as z:
+            members=z.namelist()
+            print("ARTIFACT ZIP:",len(members),"members")
+            print("\n".join(members[:50]))
+            z.extractall('/tmp/modern-review/unpacked',members=[x for x in members if x.endswith(('.json','.csv','.jpg','.md'))])
+          PY
+      - name: Build human-review mosaics plus integrity and near-duplicate report
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,zipfile,math,hashlib
+          from pathlib import Path
+          from PIL import Image,ImageDraw,ImageFont,ImageFilter,ImageStat
+          out=Path(os.environ['QA_DIR']);out.mkdir(parents=True,exist_ok=True)
+          root=Path('/tmp/modern-review/unpacked')
+          manifest=json.loads(next(root.rglob('manifest.json')).read_text())
+          shots=[]
+          for item in manifest:
+            stem=Path(item['file']).stem
+            choices=list(root.rglob(stem+'_sheet.jpg'))
+            if not choices:
+              print("MISSING SHEET",stem);continue
+            f=choices[0]
+            sheet=Image.open(f).convert('RGB')
+            mid=sheet.crop((0,32+sheet.height//3,480,32+2*sheet.height//3))
+            mid=mid.resize((160,90))
+            gray=mid.convert('L').resize((9,8))
+            pix=list(gray.getdata())
+            d=''.join('1' if pix[y*9+x]>pix[y*9+x+1] else '0' for y in range(8) for x in range(8))
+            sharp=ImageStat.Stat(mid.filter(ImageFilter.FIND_EDGES)).stddev[0]
+            shots.append((item,sheet,int(d,2),sharp))
+          similarities=[]
+          for i in range(len(shots)):
+            for j in range(i+1,len(shots)):
+              h=(shots[i][2]^shots[j][2]).bit_count()
+              if h<=12: similarities.append({'a':shots[i][0]['file'],'b':shots[j][0]['file'],'dhash_distance':h})
+          for page in range(math.ceil(len(shots)/4)):
+            selected=shots[page*4:page*4+4]
+            canvas=Image.new('RGB',(1920,970),(18,20,23))
+            draw=ImageDraw.Draw(canvas)
+            for index,(item,im,dhash,sharp) in enumerate(selected):
+              x=index*480
+              draw.text((x+9,7),Path(item['file']).stem[:30],fill='white')
+              draw.text((x+9,25),item['model'][:36],fill='#9fe5f8')
+              draw.text((x+9,42),str(item.get('width'))+'x'+str(item.get('height'))+'  '+str(round(item.get('duration',0),1))+'s',fill='#cacaca')
+              im=im.resize((480,900))
+              canvas.paste(im,(x,65))
+            canvas.save(out/f'contact-page-{page+1:02d}.jpg',quality=84,optimize=True)
+          result={'source_run_id':38148017025,'source_artifact_id':11705780426,'source_sha':'76858903742f5559cb3325c1371d916d437df229','clip_count':len(shots),'models':[x[0]['model'] for x in shots], 'model_family_count':len(set(('Alpine A110' if 'A110' in x[0]['model'] else 'Alpine A290' if 'A290' in x[0]['model'] else 'Renault Megane RS' if 'Megane' in x[0]['model'] else 'Bugatti Bolide' if 'Bolide' in x[0]['model'] else x[0]['model']) for x in shots)), 'pixel_similarity_candidates':similarities,'per_clip':[{'file':x[0]['file'],'model':x[0]['model'],'width':x[0]['width'],'height':x[0]['height'],'duration':x[0]['duration'],'bitrate':x[0]['bitrate'],'motion_score':x[0].get('motion_score'),'sharpness_proxy':round(x[3],2),'source_url':x[0].get('source_url')} for x in shots], 'warning':'Image perceptual similarity is preliminary; decoded-frame human scene/identity/composition review required. Resolution does not independently prove native optical detail.'}
+          (out/'review.json').write_text(json.dumps(result,indent=2,ensure_ascii=False))
+          print(json.dumps({'clip_count':len(shots),'model_families':result['model_family_count'],'near_duplicate_candidates':len(similarities)},indent=2))
+          PY
+      - name: Commit lightweight real contact-sheet preview only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$QA_DIR"
+          if git diff --cached --quiet; then echo "No new QA artifacts"; exit 0; fi
+          git commit -m "Agent B: publish decoded visual proof and preliminary duplicate check"
+          git push origin "HEAD:${{ github.ref_name }}"
