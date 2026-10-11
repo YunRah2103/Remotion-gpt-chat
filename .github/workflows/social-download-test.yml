@@ -1,0 +1,45 @@
+name: Instagram and TikTok real download smoke matrix
+on:
+  push:
+    branches: [feature/footage-rescue-multisource-20261011]
+    paths:
+      - 'production/footage_rescue/diagnose_social.py'
+      - '.github/workflows/social-download-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  social-smoke:
+    name: ${{ matrix.site }} / ${{ matrix.method }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        site: [instagram, tiktok]
+        method: [yt-dlp, yt-dlp-chrome, gallery-dl, page-http]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install downloaders and FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q 'yt-dlp[default,curl-cffi]==2026.08.19' gallery-dl
+      - name: Attempt real download and native decode
+        run: |
+          python production/footage_rescue/diagnose_social.py \
+            --site '${{ matrix.site }}' --method '${{ matrix.method }}' --out out/diagnostic
+      - name: Upload logs and validated metadata; never source media
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: social-${{ matrix.site }}-${{ matrix.method }}
+          path: out/diagnostic/
+          retention-days: 3
+          if-no-files-found: warn
