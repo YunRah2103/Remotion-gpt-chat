@@ -1,4 +1,4 @@
-name: STO Agent B NIGHT V3 native landscape candidate
+name: STO Agent B V4 clean night landscape Remotion
 on:
   push:
     branches:
@@ -29,7 +29,7 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
       - run: npm ci --no-audit --no-fund
       - run: npm run check
-      - name: Acquire SHA-pinned Agent A and new FORMAT67 original source videos
+      - name: Acquire SHA-pinned original FORMAT67 night film, no Phantom source video
         run: |
           mkdir -p out
           python - <<'PY'
@@ -61,30 +61,30 @@ jobs:
           node production/videos/huracan-sto-v10-001/validate-landscape-edit.cjs --assembly
       - name: Render REAL native 1920x1080 silent Remotion candidate (not final)
         run: |
-          npx remotion render src/index.ts HuracanSTOLandscapeCandidate out/STO-B-V3-NIGHT-LANDSCAPE-REMOTION-SILENT.mp4 --codec=h264 --pixel-format=yuv420p --concurrency=2
+          npx remotion render src/index.ts HuracanSTOLandscapeCandidate out/STO-B-V4-NO-WATERMARK-LANDSCAPE-SILENT.mp4 --codec=h264 --pixel-format=yuv420p --concurrency=2
       - name: Native complete decode and 316-frame / 16:9 QA
         run: |
-          ffmpeg -hide_banner -v error -xerror -i out/STO-B-V3-NIGHT-LANDSCAPE-REMOTION-SILENT.mp4 -f null -
+          ffmpeg -hide_banner -v error -xerror -i out/STO-B-V4-NO-WATERMARK-LANDSCAPE-SILENT.mp4 -f null -
           python - <<'PY'
           import subprocess,json,hashlib
           from pathlib import Path
-          p=Path('out/STO-B-V3-NIGHT-LANDSCAPE-REMOTION-SILENT.mp4')
+          p=Path('out/STO-B-V4-NO-WATERMARK-LANDSCAPE-SILENT.mp4')
           result=json.loads(subprocess.check_output(['ffprobe','-v','error','-count_frames','-show_entries','stream=codec_name,width,height,avg_frame_rate,nb_read_frames:format=duration','-of','json',str(p)]))
           stream=result['streams'][0]
           assert (stream['width'],stream['height'],stream['avg_frame_rate'],int(stream['nb_read_frames']))==(1920,1080,'30/1',316),result
           result['candidate_only']=True;result['gate_A_passed']=False
           result['SHA256']=hashlib.sha256(p.read_bytes()).hexdigest()
-          Path('out/night-v3-landscape-QA.json').write_text(json.dumps(result,indent=2))
+          Path('out/night-v4-clean-landscape-QA.json').write_text(json.dumps(result,indent=2))
           print('NATIVE_REAL_PREVIEW_PASS_NOT_GATE_A',result['SHA256'])
           PY
-          ffmpeg -v error -y -ss 2.6 -i out/STO-B-V3-NIGHT-LANDSCAPE-REMOTION-SILENT.mp4 -frames:v 1 out/night-v3-frame78-STO-reveal.jpg
+          ffmpeg -v error -y -ss 2.6 -i out/STO-B-V4-NO-WATERMARK-LANDSCAPE-SILENT.mp4 -frames:v 1 out/night-v4-frame78-STO-reveal.jpg
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: STO-B-V3-NIGHT-REAL-1920x1080-NOT-FINAL
+          name: STO-B-V4-NO-PHANTOM-LANDSCAPE-NOT-FINAL
           path: |
-            out/STO-B-V3-NIGHT-LANDSCAPE-REMOTION-SILENT.mp4
-            out/night-v3-landscape-QA.json
-            out/night-v3-frame78-STO-reveal.jpg
+            out/STO-B-V4-NO-WATERMARK-LANDSCAPE-SILENT.mp4
+            out/night-v4-clean-landscape-QA.json
+            out/night-v4-frame78-STO-reveal.jpg
           retention-days: 3
           if-no-files-found: warn
