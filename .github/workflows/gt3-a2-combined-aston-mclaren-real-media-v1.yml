@@ -40,10 +40,9 @@ jobs:
             assert 'source_shots_1920x1080/ASTON21_03_REAR_TRACK_APPROACH.mp4' in ast.namelist()
             names=[n for n in ast.namelist() if n.startswith('source_shots_1920x1080/') and n.endswith('.mp4')]
             assert len(names)==7
-          with zipfile.ZipFile(m) as mc_outer:
-            assert mc_outer.testzip() is None
-            mc_inner=next(n for n in mc_outer.namelist() if n.endswith('.zip'))
-            mcdata=io.BytesIO(mc_outer.read(mc_inner))
+          with zipfile.ZipFile(m) as mc_original:
+            assert mc_original.testzip() is None
+          mcdata=io.BytesIO(m.read_bytes())
           with zipfile.ZipFile(mcdata) as mac:
             assert mac.testzip() is None
             mcmanifest=json.loads(mac.read('SOURCE_AND_VISUAL_QA.json'))
