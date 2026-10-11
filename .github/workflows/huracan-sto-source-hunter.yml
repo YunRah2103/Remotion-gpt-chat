@@ -1,0 +1,53 @@
+name: Huracan STO source hunter - only native HD widescreen
+on:
+  push:
+    branches:
+      - automotive-edits/huracan-sto-v10-001/a-footage
+    paths:
+      - production/videos/huracan-sto-v10-001/footage/hunt_unwatermarked_sto.py
+      - .github/workflows/huracan-sto-source-hunter.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  scout:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install media validation dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install Pillow
+          python -m py_compile production/videos/huracan-sto-v10-001/footage/hunt_unwatermarked_sto.py
+      - name: Locate and verify original public unwatermarked candidates
+        run: python production/videos/huracan-sto-v10-001/footage/hunt_unwatermarked_sto.py
+      - name: Show actual results
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, pathlib, os
+          f=pathlib.Path('out/sto-public-master-hunt/manifest.json')
+          if not f.exists():quit()
+          m=json.loads(f.read_text())
+          lines=['## STO native HD source discovery — explicit research only']
+          for x in m['pages']: lines.append('- page '+x['page']+': '+x['status']+' mp4 links '+str(x.get('mp4_count',0)))
+          for x in m['actual_downloads']:
+            p=x.get('ffprobe',{})
+            lines.append('- media '+x['page']+': '+x['state']+': '+str(p.get('width','?'))+'x'+str(p.get('height','?')))
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as o:o.write('\n'.join(lines))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STO-NATIVE-FHD-UNWATERMARKED-HUNT
+          path: |
+            out/HURACAN_STO_NATIVE_HD_DISCOVERY.zip
+            out/sto-public-master-hunt/manifest.json
+          retention-days: 5
+          if-no-files-found: warn
+          compression-level: 0
