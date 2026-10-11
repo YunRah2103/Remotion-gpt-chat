@@ -1,0 +1,50 @@
+name: GT3 Agent A HRT Full Original Nürburgring Top Qualifying 1080 Acquisition
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-hrt-nbr-topqualifying-full1080-original.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  retrieve-entire-original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Native source original acquisition and decoder
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q -U yt-dlp pillow
+      - name: Recover proven publisher source URL from actual 14-second native-HD HRT preview
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/hrt_14s_source_manifest
+          gh run download 38160120679 --repo YunRah2103/Remotion-gpt-chat --name GT3-AGENT-A-HRT-FORD-NURBURGRING-ACTUAL-NATIVE-1080-OR-DIAGNOSTICS --dir inputs/hrt_14s_source_manifest
+      - name: Download full native source movie and generate 54 actual source frame contact proofs
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_hrt_topqualifying_2020_entire_native1080_and_54frame_qa.py
+      - name: Upload actually downloaded original full HD film or transparent failure manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-HRT-NBR-FULL-TOPQUALIFYING-REAL-NATIVE-1080-AND-54FRAME-QA
+          path: out/gt3-a-hrt-full-n24-topqualifying-actual1080/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Keep actual GT3 shot approvals strictly evidence-gated
+        if: always()
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os
+          f=Path('out/gt3-a-hrt-full-n24-topqualifying-actual1080/SOURCE_MANIFEST.json')
+          if f.exists():
+            j=json.loads(f.read_text())
+            m=j['status']+' | bytes '+str(j.get('original_bytes',0))+' | true native '+str(j.get('native_pixels'))+' | GT3 camera identities require visual review'
+          else:m='No source video acquired, or source script failed.'
+          Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(m+'\n')
+          PY
