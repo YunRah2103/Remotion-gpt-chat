@@ -5,7 +5,7 @@ on:
     branches:
       - automotive-edits/french-icons-001/b-modern-footage
     paths:
-      - production/videos/french-icons-001/agent-b/**
+      - production/videos/french-icons-001/agent-b/acquire_modern.py
       - .github/workflows/fr-legends-modern-footage.yml
   workflow_dispatch:
 
