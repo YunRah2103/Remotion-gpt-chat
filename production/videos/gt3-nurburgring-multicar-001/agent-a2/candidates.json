@@ -4,6 +4,38 @@
   "notes": "Publisher pages are discovery candidates, NOT acquired GT3 race shots. Agent A handles Audi/Lamborghini. No assumptions about model, format, class, or watermark until reviewed.",
   "sources": [
     {
+      "id": "ferrari-nls9-instagram-race",
+      "make": "Ferrari",
+      "model": "296 GT3",
+      "event": "2025 NLS9 Nürburgring; visual verification required",
+      "url": "https://www.instagram.com/p/DPGTj5_jRdD/",
+      "priority": 0.1
+    },
+    {
+      "id": "ferrari-nls9-instagram-livery",
+      "make": "Ferrari",
+      "model": "296 GT3",
+      "event": "2025 NLS9 Nürburgring",
+      "url": "https://www.instagram.com/p/DO_SQVKCkMy/",
+      "priority": 0.2
+    },
+    {
+      "id": "ferrari-aston-nls9-start-video",
+      "make": "Ferrari/Aston Martin",
+      "model": "Ferrari 296 GT3 & Aston Martin Vantage GT3",
+      "event": "2025 NLS9 opening battle",
+      "url": "https://nl.motorsport.com/vln/news/video-max-verstappen-grijpt-leiding-nls9/10762909/",
+      "priority": 0.3
+    },
+    {
+      "id": "ferrari-nls9-report-video",
+      "make": "Ferrari",
+      "model": "296 GT3",
+      "event": "2025 NLS9 Nürburgring",
+      "url": "https://news.verstappen.nl/nl/article/13798/",
+      "priority": 0.4
+    },
+    {
       "id": "ferrari-nls9-official",
       "make": "Ferrari",
       "model": "296 GT3",
