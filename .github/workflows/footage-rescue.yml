@@ -1,0 +1,103 @@
+name: Footage Rescue - multi-engine source acquisition
+
+on:
+  push:
+    branches: [feature/footage-rescue-multisource-20261011]
+    paths:
+      - 'production/footage_rescue/**'
+      - 'production/tests/test_footage_rescue.py'
+      - '.github/workflows/footage-rescue.yml'
+  pull_request:
+    paths:
+      - 'production/footage_rescue/**'
+      - 'production/tests/test_footage_rescue.py'
+      - '.github/workflows/footage-rescue.yml'
+  workflow_dispatch:
+    inputs:
+      source_url:
+        description: 'Single authorised YouTube, Instagram, TikTok or Dailymotion video URL'
+        required: true
+        type: string
+      engine:
+        description: 'Auto tries independent extractors (Cobalt requires your own instance)'
+        type: choice
+        default: auto
+        options: [auto, yt-dlp, gallery-dl, pytubefix, cobalt]
+      minimum_height:
+        description: 'Reject lower video resolution'
+        type: choice
+        default: '1080'
+        options: ['2160', '1920', '1080', '720']
+      rights_confirmed:
+        description: 'I own the footage or have permission to download and use it'
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-test:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run native FFmpeg and fallback tests
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m unittest discover -s production/tests -p test_footage_rescue.py -v
+          python -m compileall -q production/footage_rescue
+
+  acquire:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Confirm permission to use footage
+        env:
+          RIGHTS: ${{ inputs.rights_confirmed }}
+        run: |
+          test "$RIGHTS" = 'true' || { echo 'Permission required' >&2; exit 1; }
+      - name: Install yt-dlp EJS, gallery-dl, pytubefix and FFmpeg
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -r production/footage/requirements.txt gallery-dl pytubefix
+          python -m yt_dlp --version
+          python -m gallery_dl --version
+          deno --version
+      - name: Download, check, and package footage or failure diagnostics
+        env:
+          SOURCE_URL: ${{ inputs.source_url }}
+          ENGINE: ${{ inputs.engine }}
+          MIN_HEIGHT: ${{ inputs.minimum_height }}
+          COBALT_API_URL: ${{ vars.COBALT_API_URL }}
+          COBALT_API_KEY: ${{ secrets.COBALT_API_KEY }}
+        run: |
+          python production/footage_rescue/acquire.py \
+            --url "$SOURCE_URL" --engine "$ENGINE" \
+            --output out/footage-rescue --min-height "$MIN_HEIGHT" \
+            --max-mb 600 --max-duration 1200 --rights-confirmed
+      - name: Preserve result or reason-code diagnostics ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: footage-rescue-${{ github.run_id }}
+          path: out/footage-rescue/footage-rescue.zip
+          retention-days: 3
+          compression-level: 0
+          if-no-files-found: warn
