@@ -1,0 +1,78 @@
+name: FR Legends Agent A - Classics real footage acquisition
+
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - 'production/videos/french-icons-001/agent_a_classics_acquire.py'
+      - '.github/workflows/fr-legends-classics.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fr-legends-classics-agent-a
+  cancel-in-progress: false
+
+jobs:
+  source-verify-package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - name: Checkout exact Agent A source branch
+        uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install FFmpeg, yt-dlp and PIL
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check -U 'yt-dlp[default]' pillow
+          python -m yt_dlp --version
+          ffmpeg -version | head -1
+      - name: Acquire actual source bytes, reject sub-1080p, FFmpeg decode and create ONE ZIP
+        id: acquire
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          python production/videos/french-icons-001/agent_a_classics_acquire.py
+      - name: Report actual counts and failures honestly
+        if: always()
+        run: |
+          python - <<'PY'
+          import json,os,pathlib
+          manifest=pathlib.Path('out/fr-legends-a/manifest.json')
+          rows=json.loads(manifest.read_text()) if manifest.exists() else []
+          ok=[r for r in rows if r.get('status','').startswith('TECHNICAL_')]
+          lines=['## FR Legends | Agent A — Classics','',
+                 f'- Actual native HD playable candidates: **{len(ok)}**',
+                 '- Human-confirmed unique French classic driving angles: **0, pending review**',
+                 '- Gate A PASS: **NO** until 18 distinct visually confirmed angles / 5 classic models',
+                 '- One inner ZIP: fr-legends-agent-a-classics.zip (if creation succeeded)',
+                 '- Vimeo/press-source usage rights remain unverified until granted.', '']
+          lines += [f"- {r['id']}: {r['status']}"+(' — '+r.get('reason','')[:180] if r.get('reason') else '') for r in rows]
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(lines)+'\n')
+          print('\n'.join(lines))
+          PY
+      - name: Upload a SINGLE candidate media ZIP artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-agent-a-classics-one-zip
+          path: out/fr-legends-agent-a-classics.zip
+          if-no-files-found: warn
+          retention-days: 7
+          compression-level: 0
+      - name: Preserve manifest if media transport not created
+        uses: actions/upload-artifact@v4
+        if: always() && hashFiles('out/fr-legends-agent-a-classics.zip') == ''
+        with:
+          name: fr-legends-agent-a-diagnostics-only
+          path: out/fr-legends-a/manifest.*
+          if-no-files-found: warn
+          retention-days: 7
