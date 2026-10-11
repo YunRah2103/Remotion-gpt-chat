@@ -1,0 +1,28 @@
+name: FR Legends A - Rare French Classics Native Video Discovery
+on:
+  push:
+    branches: [automotive-edits/french-icons-001/a-classics-footage]
+    paths:
+      - 'production/videos/french-icons-001/agent_a_rare_classics_commons_search.py'
+      - '.github/workflows/fr-legends-a-rare-commons.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  rare-hd-footage-search:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Query all indexed original Commons video assets across missing classic models
+        run: python production/videos/french-icons-001/agent_a_rare_classics_commons_search.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-a-rare-original-commons-hd-video-results
+          path: out/fr-legends-a-commons-rare-model/report.json
+          retention-days: 7
+          if-no-files-found: warn
