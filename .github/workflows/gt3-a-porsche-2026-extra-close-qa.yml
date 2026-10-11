@@ -1,0 +1,28 @@
+name: GT3 Agent A Extra 2026 N24 UHD Racing Close Camera QC
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-porsche-2026-extra-close-qa.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  new-gt3-scene-close-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install native UHD source tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q requests pillow
+      - name: Physically inspect 15 native 4K race source frames for new GT3 cameras
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/inspect_close_porsche_2026_extra_gt3_cameras.py
+      - name: Upload independently reproducible original UHD contact and SHA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-ADDITIONAL-PORSCHE-15-NATIVE-4K-CAMERA-REVIEW
+          path: out/gt3-a-n24-porsche-extra-4k-close-qa/
+          retention-days: 7
