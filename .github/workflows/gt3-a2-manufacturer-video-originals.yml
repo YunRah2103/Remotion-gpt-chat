@@ -1,0 +1,54 @@
+name: YUNEX A2 Ferrari McLaren Manufacturer Native Video Scout
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a2-ferrari-aston-mclaren
+    paths:
+      - .github/workflows/gt3-a2-manufacturer-video-originals.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-scout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install browser and media QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q --break-system-packages playwright yt-dlp requests pillow
+          python -m playwright install chromium
+      - name: Acquire actual manufacturer video media and perform independent native-HD decode
+        run: |
+          python -u production/videos/gt3-nurburgring-multicar-001/agent-a2/acquire_manufacturer_public_media.py
+      - name: Check physical ZIP integrity, movie hashes and verified source pixels
+        if: always()
+        run: |
+          python - <<'PY'
+          import pathlib,zipfile,json,hashlib
+          file=pathlib.Path("out/gt3-a2-manufacturer-official/GT3_A2_BROWSER_ORIGINALS_AND_QA.zip")
+          if not file.exists():
+            print("No real-media archive created")
+            raise SystemExit(0)
+          with zipfile.ZipFile(file) as z:
+            assert z.testzip() is None
+            report=json.loads(z.read("SOURCE_MANIFEST.json"))
+            n=0
+            for item in report['sources']:
+              if item['status']=='REAL_NATIVE_HD_FULL_DECODE_MODEL_REVIEW_PENDING':
+                assert hashlib.sha256(z.read(item['file'])).hexdigest()==item['sha256']
+                n+=1
+          assert n==report['native_hd_media_file_count']
+          print("ACTUAL_NATIVE_MEDIA_FILES",n,"MODELS_VISUAL_QA_PENDING")
+          PY
+      - name: Publish single media-or-diagnostic package, no premature GT3 approval
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-A2-MANUFACTURER-ORIGINALS-NATIVE-FERRARI-MCLAREN-QA
+          path: out/gt3-a2-manufacturer-official/GT3_A2_BROWSER_ORIGINALS_AND_QA.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
