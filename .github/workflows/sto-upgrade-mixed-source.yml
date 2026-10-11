@@ -1,0 +1,73 @@
+name: STO source HD upgrade native-resolution test
+on:
+  push:
+    branches: [automotive-edits/huracan-sto-v10-001/a-footage]
+    paths: [.github/workflows/sto-upgrade-mixed-source.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install native tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install Pillow
+      - name: Verify if publisher offers actual full HD source original
+        run: |
+          python - <<'PY'
+          import urllib.request,subprocess,hashlib,json,zipfile
+          from pathlib import Path
+          from PIL import Image,ImageDraw
+          d=Path('out/sto-wix-upgrade');d.mkdir(parents=True,exist_ok=True)
+          prefix='https://video.wixstatic.com/video/ef7c1e_9bf925ada5ce445fb60a02a29fd3ce91/'
+          report=[]
+          for tier in ('1080p/mp4/file.mp4','2160p/mp4/file.mp4'):
+           row={'url':prefix+tier,'source':'Monaco Island 2023 STO mixed-feature','rights':'NOT_CLEARED','model_mixture_warning':'Track segments may show Huracan Super Trofeo EVO/GT3 EVO instead of road STO','status':'NOT_ACQUIRED'}
+           report.append(row);f=d/('monaco_original_'+tier.split('/')[0]+'.mp4')
+           try:
+            req=urllib.request.Request(row['url'],headers={'User-Agent':'Mozilla/5.0'})
+            with urllib.request.urlopen(req,timeout=25) as resp:
+             if int(resp.headers.get('Content-Length') or 0)>350000000:raise ValueError('over size limit')
+             n=0
+             with f.open('wb') as out:
+              while True:
+               b=resp.read(1024*1024)
+               if not b:break
+               n+=len(b)
+               if n>350000000:raise ValueError('size limit exceeded')
+               out.write(b)
+            meta=json.loads(subprocess.run(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(f)],capture_output=True,text=True,timeout=50,check=True).stdout)
+            v=next(x for x in meta['streams'] if x['codec_type']=='video')
+            row.update(actual_resolution=[v['width'],v['height']],codec=v['codec_name'],duration=meta['format'].get('duration'),bytes=n,sha256=hashlib.sha256(f.read_bytes()).hexdigest())
+            if v['width']<1920 or v['height']<1080 or v['width']<=v['height']:
+             row['status']='FAILED_NATIVE_1080P';f.unlink();continue
+            row['status']='ORIGINAL_FHD_REQUIRES_PER_SHOT_CORRECT_STO_VARIANT_REVIEW'
+            sh=Image.new('RGB',(960,6*155),'#141414');draw=ImageDraw.Draw(sh)
+            for i in range(24):
+             dur=float(row['duration']);t=max(.05,min(dur-.05,dur*(i+.5)/24));p=d/'.tmp.jpg'
+             subprocess.run(['ffmpeg','-v','error','-y','-ss',str(t),'-i',str(f),'-vf','scale=240:135','-frames:v','1',str(p)],capture_output=True,timeout=40)
+             if p.exists():
+              with Image.open(p) as fr:sh.paste(fr.convert('RGB'),((i%4)*240,(i//4)*155+17))
+              p.unlink()
+             draw.text(((i%4)*240+2,(i//4)*155+2),str(round(t,1)),fill='white')
+            sh.save(d/(f.stem+'_contact.jpg'),quality=85)
+            break
+           except Exception as e:row.update(status='FAILED',error=str(e)[:200]);f.unlink(missing_ok=True)
+          (d/'manifest.json').write_text(json.dumps(report,indent=2))
+          with zipfile.ZipFile('out/STO_WIX_ACTUAL_ORIGINAL_FHD.zip','w',zipfile.ZIP_STORED,allowZip64=True) as z:
+           for f in d.rglob('*'):
+            if f.is_file():z.write(f,f.relative_to(d))
+          print('VERIFIED',report)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STO-NATIVE-1080P-PUBLISHER-MASTER-TEST
+          path: out/STO_WIX_ACTUAL_ORIGINAL_FHD.zip
+          retention-days: 5
+          compression-level: 0
