@@ -1,0 +1,44 @@
+name: Seven extra social platforms - native video audit
+on:
+  push:
+    branches: [feature/footage-rescue-multisource-20261011]
+    paths:
+      - 'production/footage_rescue/extra_social_platform_test.py'
+      - '.github/workflows/extra-social-platforms-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+jobs:
+  video-source-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        sample: [facebook, facebook2, twitter, reddit, snapchat, pinterest, twitch, bluesky]
+        mode: [yt-dlp, chrome]
+    name: "${{ matrix.sample }} / ${{ matrix.mode }}"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install video extraction and probing
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q 'yt-dlp[default,curl-cffi]==2026.08.19'
+      - name: Try video extraction and verify actual bytes
+        run: |
+          python production/footage_rescue/extra_social_platform_test.py \
+            --sample '${{ matrix.sample }}' --mode '${{ matrix.mode }}' --out out/report
+      - name: Upload report and failure log (no reposted media)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extra-social-${{ matrix.sample }}-${{ matrix.mode }}
+          path: out/report/
+          retention-days: 3
+          if-no-files-found: warn
