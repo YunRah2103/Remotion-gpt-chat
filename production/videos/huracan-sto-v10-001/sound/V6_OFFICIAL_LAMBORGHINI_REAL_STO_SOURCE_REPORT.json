@@ -1,0 +1,110 @@
+{
+  "project": "huracan-sto-v10-001",
+  "editor": "Agent C",
+  "edition": "V6 OFFICIAL REAL STO V10 AUDIO / V4 CLEAN FILM",
+  "date": "2026-10-11",
+  "media": {
+    "sourceVideo": {
+      "filename": "STO-B-V4-NO-WATERMARK-LANDSCAPE-SILENT.mp4",
+      "sha256": "ec6a4b1eff39dc1bfde00e9615fb2b20b64c6660703895b8f32542d7d2954818",
+      "origin": "Agent B clean V4, no further video transcode"
+    },
+    "originalSong": {
+      "filename": "TikTok video #7690925557919403294 [7690925557919403294].mp3",
+      "sha256": "87a663860585e1714fd6fbb6a8006d19d655bda863db66cdaa75ba1830a2d678",
+      "publicRepoStored": false
+    },
+    "genuineSTOEngine": {
+      "publisher": "Automobili Lamborghini — official Huracán STO product page",
+      "model": "Lamborghini Huracán STO",
+      "officialSourcePage": "https://www.lamborghini.com/en-en/models/huracan/huracan-sto",
+      "mediaUrl": "https://www.lamborghini.com/sites/it-en/files/DAM/lamborghini/facelift_2019/model_detail/motor-sound/huracan/Huracan_STO.m4a",
+      "githubAcquisitionWorkflowRun": 38098767384,
+      "githubArtifactId": 11686108261,
+      "sourceFile": "LAMBORGHINI_OFFICIAL_HURACAN_STO_FEEL_THE_ENGINE.m4a",
+      "sha256": "1aaf7f5b7e3328ce0e6c91ae76f93f0511862697bcbefeffa5b2b74299c3e848",
+      "originalProbe": {
+        "format": "AAC stereo in M4A container",
+        "sampleRate": 44100,
+        "durationSeconds": 35.89805,
+        "bytes": 1506454
+      },
+      "authenticity": "Official manufacturer-published Huracán STO model-specific motor-sound track, not another model / synthetic V10 / Phantom or FORMAT67 promotional song"
+    }
+  },
+  "audioDesign": {
+    "durationSeconds": 10.533333333333333,
+    "renderRateHz": 48000,
+    "sourceSongUnshifted": true,
+    "officialSTOOnlyEngineWindows": [
+      {
+        "filmSecStart": 0,
+        "filmSecEnd": 2.65,
+        "engineSourceSecStart": 17.7,
+        "engineSourceGain": 0.84
+      },
+      {
+        "filmSecStart": 2.6,
+        "filmSecEnd": 5.37,
+        "engineSourceSecStart": 9.63,
+        "engineSourceGain": 1.25
+      },
+      {
+        "filmSecStart": 5.31,
+        "filmSecEnd": 7.85,
+        "engineSourceSecStart": 23.5,
+        "engineSourceGain": 1.12
+      },
+      {
+        "filmSecStart": 7.77,
+        "filmSecEnd": 10.533333333333333,
+        "engineSourceSecStart": 26.35,
+        "engineSourceGain": 1.27
+      }
+    ],
+    "supplementaryOfficialEngineAccents": [
+      {
+        "filmSecStart": 4.54,
+        "engineSourceSecStart": 3,
+        "duration": 0.43,
+        "gain": 0.24
+      },
+      {
+        "filmSecStart": 8.6,
+        "engineSourceSecStart": 10.7,
+        "duration": 0.55,
+        "gain": 0.23
+      }
+    ],
+    "originalMusicMix": {
+      "baseGain": 0.53,
+      "duckAroundEngineReveals": true,
+      "noBeatReTiming": true
+    },
+    "otherAudioSources": [],
+    "syntheticEngine": false,
+    "publisherPromoAudio": false,
+    "addedLyrics": false
+  },
+  "render": {
+    "filename": "HURACAN_STO_V4_OFFICIAL_REAL_V10_AUDIO.mp4",
+    "sha256": "7af26162f5026ded3f42cc141ad3307d80ff9033f43eaac02e3d56b1335da9cf",
+    "fileSizeBytes": 15656576,
+    "width": 1920,
+    "height": 1080,
+    "frames": 316,
+    "fps": 30,
+    "durationSeconds": 10.533333,
+    "videoCodec": "H264 original V4 bitstream copied",
+    "audioCodec": "AAC stereo 48 kHz 320 kbps",
+    "fullVideoAudioDecode": true,
+    "detectedBlackIntervals": [],
+    "detectedSilenceIntervals": [],
+    "originalMusicRms": 0.07821952551603317,
+    "realEngineRms": 0.15621744096279144,
+    "masterSamplePeak": 0.82
+  },
+  "status": "PRIVATE_REVIEW_MP4_RENDERED_TECHNICAL_QA_PASS",
+  "restrictions": "Public distribution rights for manufacturer recording, music and footage not established; publication approval not asserted.",
+  "warning": "The Lamborghini 8D manufacturer sound is processed/spatialized by Lamborghini, rather than claimed unprocessed standalone microphone WAV. Model identification is grounded in its official STO product page and direct file named Huracan_STO.m4a."
+}
