@@ -1,0 +1,48 @@
+name: FR Legends A - Direct Historic Rally MP4 Acquisition
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - 'production/videos/french-icons-001/agent_a_ds_event_acquire.py'
+      - '.github/workflows/fr-legends-a-event-acquire.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  direct-event-source-ingest:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 27
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install FFmpeg and Pillow
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check pillow
+      - name: Acquire actual historic French-classic candidate footage and native quality probe
+        run: python production/videos/french-icons-001/agent_a_ds_event_acquire.py
+      - name: Report truthful results
+        run: |
+          python - <<'PY'
+          import pathlib,json,os
+          m=json.loads(pathlib.Path('out/fr-a-ds-direct/manifest.json').read_text())
+          good=[x for x in m if x['automated_technical_status'].startswith('NATIVE_HD')]
+          summary=["## Historic rally source MP4 audit",f"- Actual source downloads attempted: {len(m)}",
+                  f"- Native 1080+ decode accepted as technical candidates: {len(good)}",
+                  "- Verified on-screen Citroen DS driving angles: **0 pending real frame review**",
+                  "- Gate A: blocked"]
+          summary += [f"- {x['id']}: {x['automated_technical_status']} {x.get('reason','')}" for x in m]
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(summary))
+          print('\n'.join(summary))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fr-legends-a-direct-rally-video-originals-one-zip
+          path: out/fr-legends-a-direct-event-candidates.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
