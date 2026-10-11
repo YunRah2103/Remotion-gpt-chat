@@ -1,0 +1,46 @@
+name: FR Legends A - Eight Original Classic Films Parallel HD Retry
+on:
+  push:
+    branches: [automotive-edits/french-icons-001/a-classics-footage]
+    paths:
+      - 'production/videos/french-icons-001/agent_a_archive_hd_parallel.py'
+      - '.github/workflows/fr-legends-a-parallel-classics.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  parallel-native-originals:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 21
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install codecs for native media quality gate
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install pillow
+      - name: Fetch real original film bytes in parallel and sample decoded source frames
+        run: python production/videos/french-icons-001/agent_a_archive_hd_parallel.py
+      - name: Report native-HD and no false approved clips
+        run: |
+          python - <<'PY'
+          import pathlib,json,os
+          m=json.loads(pathlib.Path("out/fr-legends-a-priority-hd-retry/manifest.json").read_text())
+          n=sum(x["status"].startswith("NATIVE_HD") for x in m)
+          lines=["## French classic missing model real original 1080p acquisition",f"- Real original true-HD files acquired/fully decoded: **{n}** / 8",
+                 "- Source frame contact sheets, SHA256 and accurate fail reasons in attached ZIP.",
+                 "- None counted to final Gate A before human visual/model and logo checks."]
+          lines += [f"- {x['id']}: {x['status']} / {x.get('probe')}" for x in m]
+          pathlib.Path(os.environ["GITHUB_STEP_SUMMARY"]).write_text('\n'.join(lines)+'\n')
+          print('\n'.join(lines))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-a-eight-original-video-technical-qa-proof
+          path: out/FR-LEGENDS-A-PRIORITY-HD-CAR-REVIEW.zip
+          retention-days: 7
+          if-no-files-found: warn
