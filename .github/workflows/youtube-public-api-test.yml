@@ -1,0 +1,48 @@
+name: YouTube Piped and Invidious external playback API test
+on:
+  push:
+    branches: [feature/footage-rescue-multisource-20261011]
+    paths:
+      - 'production/footage_rescue/diagnose_public_apis.py'
+      - '.github/workflows/youtube-public-api-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  external-api-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    name: ${{ matrix.mode }} / ${{ matrix.host }}
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        include:
+          - mode: piped
+            host: pipedapi.kavin.rocks
+          - mode: piped
+            host: pipedapi.leptons.xyz
+          - mode: invidious
+            host: inv.nadeko.net
+          - mode: invidious
+            host: invidious.tiekoetter.com
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install video validation tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Probe external API and attempt real short video download
+        run: |
+          python3 production/footage_rescue/diagnose_public_apis.py \
+            --mode '${{ matrix.mode }}' --host '${{ matrix.host }}' --out out/api
+      - name: Upload public video API evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-${{ matrix.mode }}-${{ matrix.host }}
+          path: out/api/
+          retention-days: 3
+          if-no-files-found: warn
