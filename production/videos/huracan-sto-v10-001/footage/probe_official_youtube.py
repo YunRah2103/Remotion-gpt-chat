@@ -26,11 +26,28 @@ for slug,url,desc in VIDS:
     row["status"] = "COOKIE_SECRET_NOT_CONFIGURED"
     continue
   try:
-    p=subprocess.run(['yt-dlp','--cookies',str(cookies_file),'-f','bv[height>=1080]+ba/b[height>=1080]/bv+ba/b','--merge-output-format','mp4',
+    p=subprocess.run(['yt-dlp','--cookies',str(cookies_file),'--js-runtimes','deno','-f','bv[height>=1080]+ba/b[height>=1080]/bv+ba/b','--merge-output-format','mp4',
        '--remux-video','mp4','--no-playlist','--no-progress','--retries','1','--fragment-retries','1','--socket-timeout','15',
        '--max-filesize','200M','--output',str(dest),url],capture_output=True,text=True,timeout=190)
     if p.returncode or not dest.exists():
-      row.update(status='COOKIE_AUTH_DOWNLOAD_FAILED',error="YouTube still denied the source or the video is inaccessible; see yt-dlp guidance.")
+      diagnostic = (p.stderr + '\\n' + p.stdout).lower()
+      if 'sign in to confirm' in diagnostic or 'not a bot' in diagnostic:
+        code = 'BOT_CHECK_DESPITE_COOKIES'
+      elif 'http error 403' in diagnostic or '403 forbidden' in diagnostic:
+        code = 'HTTP_403_DESPITE_COOKIES'
+      elif 'http error 429' in diagnostic or 'too many requests' in diagnostic:
+        code = 'RATE_LIMITED_429'
+      elif 'requested format is not available' in diagnostic:
+        code = 'NO_1080P_FORMAT_AVAILABLE'
+      elif 'video unavailable' in diagnostic or 'this video is unavailable' in diagnostic:
+        code = 'VIDEO_UNAVAILABLE'
+      elif 'javascript runtime' in diagnostic or 'challenge solving' in diagnostic:
+        code = 'JAVASCRIPT_CHALLENGE_FAILURE'
+      elif 'remote end closed connection' in diagnostic:
+        code = 'NETWORK_TERMINATED'
+      else:
+        code = 'OTHER_DOWNLOAD_FAILURE'
+      row.update(status='COOKIE_AUTH_DOWNLOAD_FAILED',safe_diagnostic=code,error='See safe_diagnostic; full stderr not stored in artifacts.')
       continue
     meta=subprocess.run(['ffprobe','-v','error','-show_format','-show_streams','-of','json',str(dest)],text=True,capture_output=True,timeout=30,check=True)
     x=json.loads(meta.stdout);vid=next(s for s in x['streams'] if s['codec_type']=='video')
