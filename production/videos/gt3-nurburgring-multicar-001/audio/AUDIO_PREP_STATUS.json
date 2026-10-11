@@ -9,10 +9,16 @@
   "wav_duration_s": 10.533333333333333,
   "wav_sample_rate_hz": 48000,
   "wav_samples_per_channel": 505600,
-  "tests_passed": 5,
-  "tests_total": 5,
+  "tests_passed": 7,
+  "tests_total": 7,
   "final_mp4_present": false,
   "real_vehicle_engine_stems_present": false,
   "blocker": "Agent A verified source footage and Agent B production visual master / shotmap not yet handed off",
-  "music_package_sha256": "1dfc7822deadbb712fee838e66f15eb47e72bf5329374e0d4dfbb651dd8e83a4"
+  "music_package_sha256": "1dfc7822deadbb712fee838e66f15eb47e72bf5329374e0d4dfbb651dd8e83a4",
+  "ci_run_id": 38138658779,
+  "ci_artifact_id": 11701893382,
+  "ci_artifact_name": "GT3-C-PRELIMINARY-AUDIO-QA-NOT-FINAL",
+  "ci_conclusion": "success",
+  "source_video_artifact_present": false,
+  "ci_is_final_pass": false
 }
