@@ -1,0 +1,65 @@
+name: FR Legends A - V7 Twenty Distinct Genuine Classics One ZIP
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - production/videos/french-icons-001/agent_a_curate_v7.py
+      - .github/workflows/fr-legends-a-v7-twenty-genuine-shots.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  final-20-video-frames:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 23
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install native video integrity and visual QA dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install Pillow
+      - name: Download exact previous 19 authentic classic sources from artifact
+        uses: actions/download-artifact@v4
+        with:
+          repository: YunRah2103/Remotion-gpt-chat
+          run-id: 38163038777
+          name: FR-LEGENDS-AGENT-A-19-GENUINE-MOVING-CLASSIC-SHOTS-5-MODELS-ONE-ZIP
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/source-v6
+      - name: Verify source SHA, preserve 19 originals, cut one distinct historic DS frontal rally car
+        run: python production/videos/french-icons-001/agent_a_curate_v7.py
+      - name: Published-source QA transparency and archive checksum
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,os
+          file=Path('out/FR-LEGENDS-AGENT-A-CLASSICS-V7-20-GENUINE-DRIVING-SHOTS.zip')
+          m=json.loads(Path('out/fr-a-v7-20-verified-shots/manifest.json').read_text())
+          hash=hashlib.file_digest(file.open('rb'),'sha256').hexdigest()
+          items=[
+           '## YUNEX French Legends Agent A: V7 20 true moving classic car shots',
+           f'- `{len(m["clips"])}` independently decoded and hashed MP4 clips, **{m["models_count"]} classic model families**.',
+           '- Existing 19 V6 source clips preserved byte-for-byte with exact original SHA256 checks.',
+           '- 20th clip: 1920x1080 @24fps historic DS frontal rally car moving under Paris archway, original source physically included.',
+           '- Distinct classic DS side-black, side-red, rear-black and new front-black camera setups.',
+           f'- ZIP size: {file.stat().st_size} bytes; file SHA256: `{hash}`.',
+           '- Short DS clips (<1sec) intended for sharp fast cuts, not full scenes. Some other shots are low intensity.',
+           '- Rights and commercial/social redistribution approval are not established by public download.',
+           f'- Gate: **{m["gate"]}**.'
+          ]
+          Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(items)+'\n')
+          print('\n'.join(items))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FR-LEGENDS-AGENT-A-V7-20-REAL-CLASSIC-CAR-CLIPS-5-MODELS-ONE-ZIP
+          path: out/FR-LEGENDS-AGENT-A-CLASSICS-V7-20-GENUINE-DRIVING-SHOTS.zip
+          retention-days: 7
+          if-no-files-found: error
+          compression-level: 0
