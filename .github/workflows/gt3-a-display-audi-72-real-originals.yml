@@ -1,0 +1,25 @@
+name: GT3 Agent A Inspect 72 Real Audi 2018 Original Race Frames
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-display-audi-72-real-originals.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify-actual-audi-video-scenes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Image inspection dependency
+        run: python -m pip install --break-system-packages -q pillow
+      - name: Download previously SHA/full-decoded 72 frame Audi original visual QA
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/audi_72_source_proof
+          gh run download 38160017020 --repo YunRah2103/Remotion-gpt-chat --name GT3-AGENT-A-AUDI-2018-72-REAL-HD-FRAMES-GT3-IDENTITY-QA --dir inputs/audi_72_source_proof
+      - name: Display real original Audi Nürburgring movie camera strips at readable resolution
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/display_audi_2018_72_actual_source_frames.py
