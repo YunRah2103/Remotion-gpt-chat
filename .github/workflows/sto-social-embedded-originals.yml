@@ -1,0 +1,38 @@
+name: STO social direct MP4 embed quality audit
+on:
+  push:
+    branches: [automotive-edits/huracan-sto-v10-001/a-footage]
+    paths:
+      - production/videos/huracan-sto-v10-001/footage/check_embedded_social_sto.py
+      - .github/workflows/sto-social-embedded-originals.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  direct-media:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install tools for verifying original public embeds
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          pip install Pillow
+          python -m py_compile production/videos/huracan-sto-v10-001/footage/check_embedded_social_sto.py
+      - name: Inspect direct STO social video embed media originals
+        run: python production/videos/huracan-sto-v10-001/footage/check_embedded_social_sto.py
+      - name: Publish actual direct media audit (not watermarked previews)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: STO-SOCIAL-REAL-MP4-EMBED-AUDIT
+          path: |
+            out/STO_SOCIAL_EMBEDDED_ORIGINALS.zip
+            out/sto-social-embed/manifest.json
+          if-no-files-found: warn
+          retention-days: 5
+          compression-level: 0
