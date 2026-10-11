@@ -108,8 +108,11 @@ def extract_links(url,html):
  for match in re.findall(r'["\']([^"\']+(?:\.mp4|\.m3u8|\.webm)(?:\?[^"\']*)?)["\']',html,re.I):add(match,"html_string")
  # Capture candidate JS snippets for later inspection; never claim footage from these.
  return found,{"video_nodes":len(soup.select("video")),"iframes":[x.get("src","")[:200] for x in soup.select("iframe")][:12],"video_context":[x.get_text(" ",strip=True)[:150] for x in soup.find_all(string=re.compile("Video|Télécharger|Download"))][:10]}
+# Film-first acquisition: discard known CGI/low-impact/misidentified lead pages.
+EXCLUDE_PAGE_IDS={"alpine-miami","alpine-a290-test","alpine-a290-cold","bugatti-bolide","bugatti-chiron","bugatti-veyron","bugatti-chiron-super-sport","bugatti-chiron-pur-sport","bugatti-chiron-300","bugatti-mistral","renault-megane-2"}
 diagnostics=[]; records=[]; seen_sha=set();seen_urls=set()
 for ident,model,page in PAGES:
+ if ident in EXCLUDE_PAGE_IDS:continue
  info={"source":page,"model":model,"id":ident,"links":[],"notes":[]}
  try:
   resp=session.get(page,timeout=20);resp.raise_for_status()
@@ -118,17 +121,37 @@ for ident,model,page in PAGES:
  except Exception as exc: info["notes"].append("Page read error: "+str(exc)[:220]);diagnostics.append(info);continue
  # Limit to video URLs discovered directly on publisher page; do not blindly download unrelated media.
  candidates=[link for link in links if re.search(r"\.(mp4|m3u8|mov|webm)(?:[?&#]|$)",link["url"],re.I)]
- for index,entry in enumerate(candidates[:6]):
+ # Prefer publisher originals; 'web-' files are 720p previews; model-only names prevent global Bugatti media mislabel.
+ candidates=[link for link in candidates if "_web-" not in urlparse(link["url"]).path.lower()]
+ if ident.startswith("bugatti"):
+  candidates=[link for link in candidates if re.search("chiron|bolide|veyron",urlparse(link["url"]).path,re.I)]
+ unique_links={}
+ for link in candidates:
+  key=urlparse(link["url"]).path.lower()
+  if key not in unique_links:unique_links[key]=link
+ candidates=list(unique_links.values())
+ for index,entry in enumerate(candidates[:12]):
   if len(records)>=35:break
   src=entry["url"];host=urlparse(src).hostname or ""
-  if src in seen_urls:continue
-  seen_urls.add(src)
+  canonical=urlparse(src).path.lower()
+  if canonical in seen_urls:continue
+  seen_urls.add(canonical)
   if not src.startswith("https://"):continue
   name=ident+"_"+str(index+1);dest=CLIPS/(name+".mp4"); temp=dest.with_suffix(".part")
   try:
-   response=session.get(src,stream=True,timeout=(10,35))
-   response.raise_for_status()
-   if re.search("m3u8",src,re.I) or "mpegurl" in response.headers.get("Content-Type","").lower():
+   head=session.head(src,timeout=20,allow_redirects=True)
+   remote_bytes=int(head.headers.get("Content-Length") or 0)
+   partial_original=False
+   if remote_bytes>350*1024*1024 and not re.search("m3u8",src,re.I):
+    cmd(["ffmpeg","-hide_banner","-loglevel","error","-nostdin","-y","-i",src,"-t","75","-map","0:v:0","-map","0:a?","-c","copy",str(dest)],220)
+    partial_original=True
+    response=None
+   else:
+    response=session.get(src,stream=True,timeout=(10,35))
+    response.raise_for_status()
+   if partial_original:
+    pass
+   elif re.search("m3u8",src,re.I) or "mpegurl" in response.headers.get("Content-Type","").lower():
     response.close();cmd(["ffmpeg","-y","-hide_banner","-loglevel","error","-i",src,"-t","90","-c","copy",str(dest)],180)
    else:
     total=0
@@ -146,7 +169,7 @@ for ident,model,page in PAGES:
    seen_sha.add(digest)
    visual=visual_report(dest,meta,name)
    if visual["motion_score"]<2.0:raise RuntimeError("rejected: nearly static source frames "+str(visual["motion_score"]))
-   record={"file":"clips/"+dest.name,"model":model,"creator":"Press media linked from "+urlparse(page).hostname,"source_page":page,"source_url":src,"sha256":digest,"source_original":True,"scene":"pending human angle/model review","year":"pending","variant":model,"in_seconds":0,"out_seconds":meta["duration"],"orientation":"landscape" if meta["width"]>=meta["height"] else "portrait","engine_audio_available":meta["has_audio"],"license":"publisher terms require review; download does not itself grant reuse rights","visual_review":"PROVISIONAL — manual car, bars, watermark and source originality review pending",**meta,**visual}
+   record={"file":"clips/"+dest.name,"model":model,"creator":"Press media linked from "+urlparse(page).hostname,"source_page":page,"source_url":src,"sha256":digest,"source_original":not partial_original,"source_resolution_original":True,"source_cut_without_reencode":partial_original,"scene":"pending human angle/model review","year":"pending","variant":model,"in_seconds":0,"out_seconds":meta["duration"],"orientation":"landscape" if meta["width"]>=meta["height"] else "portrait","engine_audio_available":meta["has_audio"],"license":"publisher terms require review; download does not itself grant reuse rights","visual_review":"PROVISIONAL — manual car, bars, watermark and source originality review pending",**meta,**visual}
    records.append(record);info["notes"].append("DOWNLOADED verified video "+str(dest.name)+" "+str(meta["width"])+"x"+str(meta["height"]))
   except Exception as exc:
    info["notes"].append("Candidate "+str(index)+" "+src[:120]+" failed: "+str(exc)[:220])
