@@ -1,0 +1,18 @@
+name: FR Legends B - Original Media Discovery
+on:
+  push:
+    branches: [automotive-edits/french-icons-001/b-modern-footage]
+    paths: [production/videos/french-icons-001/agent-b/inspect_other_media.py, .github/workflows/fr-legends-b-media-discovery.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  discover:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install requests beautifulsoup4
+      - run: python production/videos/french-icons-001/agent-b/inspect_other_media.py
