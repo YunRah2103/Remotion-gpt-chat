@@ -3,6 +3,51 @@
   "seconds_per_candidate": 9,
   "sources": [
     {
+      "id": "porsche-n24-2024-qualifying-a",
+      "publisher": "Porsche Newsroom original MP4",
+      "url": "https://newstv.porsche.com/porschevideos/277424_en_3000000.mp4",
+      "method": "direct-mp4",
+      "type": "race-highlights, visually inspect",
+      "model": "Porsche 911 GT3 R (992) candidate",
+      "make": "Porsche",
+      "starts": [
+        3,
+        20,
+        37
+      ],
+      "event": "2024 ADAC Nürburgring 24h qualifying"
+    },
+    {
+      "id": "porsche-n24-2024-qualifying-b",
+      "publisher": "Porsche Newsroom original MP4",
+      "url": "https://newstv.porsche.com/porschevideos/277399_en_3000000.mp4",
+      "method": "direct-mp4",
+      "type": "race-highlights, visually inspect",
+      "model": "Porsche 911 GT3 R (992) candidate",
+      "make": "Porsche",
+      "starts": [
+        3,
+        20,
+        37
+      ],
+      "event": "2024 ADAC Nürburgring 24h qualifying"
+    },
+    {
+      "id": "porsche-n24-2024-race",
+      "publisher": "Porsche Newsroom original MP4",
+      "url": "https://newstv.porsche.com/porschevideos/282517_en_3000000.mp4",
+      "method": "direct-mp4",
+      "type": "race-highlights, visually inspect",
+      "model": "Porsche 911 GT3 R (992) candidate",
+      "make": "Porsche",
+      "starts": [
+        3,
+        20,
+        37
+      ],
+      "event": "2024 ADAC Nürburgring 24h race"
+    },
+    {
       "id": "gtworld-2025-extended",
       "publisher": "GTWorld / SRO Motorsports",
       "url": "https://www.youtube.com/watch?v=JSYrh3FFsJI",
