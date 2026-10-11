@@ -49,8 +49,8 @@ def site_for(url):
 def engines_for(site, engine, cobalt_available=False):
     choices = {
         "youtube": ["yt-dlp", "pytubefix", "cobalt"],
-        "instagram": ["yt-dlp", "gallery-dl", "cobalt"],
-        "tiktok": ["yt-dlp", "gallery-dl", "cobalt"],
+        "instagram": ["yt-dlp", "yt-dlp-chrome", "gallery-dl", "cobalt"],
+        "tiktok": ["yt-dlp", "yt-dlp-chrome", "gallery-dl", "cobalt"],
         "dailymotion": ["yt-dlp", "cobalt"],
     }[site]
     if engine != "auto":
@@ -85,6 +85,14 @@ def ytdlp(url, out, limit):
          "--no-progress", "--js-runtimes", "deno", "--format", "bv*+ba/b",
          "--merge-output-format", "mkv", "--max-filesize", str(limit)+"M",
          "--paths", str(out), "--output", "%(id)s.%(ext)s", url])
+
+def ytdlp_chrome(url, out, limit):
+    run([sys.executable, "-m", "yt_dlp", "--ignore-config", "--no-playlist",
+         "--no-progress", "--impersonate", "chrome", "--js-runtimes", "deno",
+         "--format", "bv*+ba/b", "--merge-output-format", "mkv",
+         "--max-filesize", str(limit)+"M", "--paths", str(out),
+         "--output", "%(id)s.%(ext)s", url])
+
 
 def gallerydl(url, out, limit):
     run([sys.executable, "-m", "gallery_dl", "--directory", str(out), "--no-mtime", url])
@@ -185,7 +193,7 @@ def acquire(url, out, engine="auto", minheight=1080, limit=600,
     out.mkdir(parents=True, exist_ok=True)
     report = {"status": "FAILED", "source": url, "site": site,
               "enginePlan": plan, "attempts": []}
-    runners = {"yt-dlp": ytdlp, "gallery-dl": gallerydl,
+    runners = {"yt-dlp": ytdlp, "yt-dlp-chrome": ytdlp_chrome, "gallery-dl": gallerydl,
                "pytubefix": pytubefix, "cobalt": cobalt}
     try:
         for index, name in enumerate(plan):
@@ -246,7 +254,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--url", required=True)
     p.add_argument("--output", default="out/footage-rescue")
-    p.add_argument("--engine", choices=["auto", "yt-dlp", "gallery-dl", "pytubefix", "cobalt"], default="auto")
+    p.add_argument("--engine", choices=["auto", "yt-dlp", "yt-dlp-chrome", "gallery-dl", "pytubefix", "cobalt"], default="auto")
     p.add_argument("--min-height", type=int, default=1080)
     p.add_argument("--max-mb", type=int, default=600)
     p.add_argument("--max-duration", type=int, default=1200)
