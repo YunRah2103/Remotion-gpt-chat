@@ -43,7 +43,12 @@ jobs:
         id: acquire
         continue-on-error: true
         run: |
-          python production/videos/gt3-nurburgring-multicar-001/agent-a/acquire.py --output out/gt3-multicar-agent-a --max-attempts 48 --max-minutes 61
+          python production/videos/gt3-nurburgring-multicar-001/agent-a/acquire.py --candidates alternative-source-candidates.json --output out/gt3-multicar-agent-a --max-attempts 22 --max-minutes 22
+      - name: Discover TikTok and Instagram official racing posts (metadata only)
+        if: always()
+        continue-on-error: true
+        run: |
+          python production/videos/gt3-nurburgring-multicar-001/agent-a/discover_social.py out/gt3-multicar-agent-a
       - name: Show actual native-footage count and gate
         if: always()
         shell: bash
@@ -74,6 +79,7 @@ jobs:
           path: |
             out/gt3-multicar-agent-a/GT3_MULTICAR_AGENT_A_ACTUAL_MEDIA.zip
             out/gt3-multicar-agent-a/QA_SUMMARY.json
+            out/gt3-multicar-agent-a/social-discovery.json
           if-no-files-found: warn
           retention-days: 7
           compression-level: 0
