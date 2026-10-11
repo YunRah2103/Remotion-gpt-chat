@@ -1,0 +1,87 @@
+name: GT3 Agent A V9 Six GT3 Manufacturers Twenty Five Native Racing Cameras
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-v9-six-makes-25-real-video-cameras.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  actual-fhd-original-footage-master-delivery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare original physical video FFprobe and six-frame identity evidence
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q Pillow
+      - name: Fetch physically verified complete real V8 source movie archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/v8_real_native
+          gh run download 38159185840 --repo YunRah2103/Remotion-gpt-chat --name GT3-MULTICAR-REAL-NATIVE-V8-ONE-ZIP-5-MAKES-21-PROVEN-CAMERAS --dir inputs/v8_real_native
+          test -f inputs/v8_real_native/COMBINED_GLOBAL_MANIFEST_V8.json
+      - name: Fetch physical true 84s HRT Ford Mustang 1920x1080 original source ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/ford_84sec_real
+          gh run download 38161427589 --repo YunRah2103/Remotion-gpt-chat --name GT3-AGENT-A-HRT-FORD-2026-FULL86-1080-ORIGINAL-REVIEW --dir inputs/ford_84sec_real
+          find inputs/ford_84sec_real -maxdepth 2 -type f -printf '%P %s bytes\n'
+      - name: Fetch 5 publisher-original 1080 Nürburgring HRT race videos, independently hash and decode
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/hrt_five_real
+          gh run download 38160120679 --repo YunRah2103/Remotion-gpt-chat --name GT3-AGENT-A-HRT-FORD-NURBURGRING-ACTUAL-NATIVE-1080-OR-DIAGNOSTICS --dir inputs/hrt_five_real
+          find inputs/hrt_five_real -maxdepth 2 -type f -printf '%P %s bytes\n'
+      - name: Build single physically preserved all-source V9 and decoded 4 added full-HD GT3 race angles
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/build_v9_real_six_makes_25_original_gt3_camera_sources.py
+      - name: Recheck exact 4 original camera clip SHA and qualifying-source arithmetic
+        run: |
+          python - <<'PY'
+          import json,hashlib,pathlib
+          root=pathlib.Path('out/gt3-multicar-native-real-v9-six-makes-25-cameras')
+          manifest=json.loads((root/'COMBINED_GLOBAL_MANIFEST_V9.json').read_text())
+          assert manifest['baseline_v8_verified_unique_camera_views']==21
+          assert manifest['baseline_v8_verified_makes']==5
+          assert manifest['approved_new_GT3_makes']==['Ford']
+          assert manifest['approved_new_GT3_source_camera_views']==4
+          assert manifest['qualifying_makes_total']==6
+          assert manifest['qualifying_distinct_camera_views_total']==25
+          assert manifest['footage_gate'].startswith('PASS_MINIMUMS')
+          for x in manifest['approved_additional_cameras']:
+            file=root/x['physical_editor_clip']
+            assert file.is_file() and file.stat().st_size>200000
+            h=hashlib.sha256(file.read_bytes()).hexdigest()
+            assert h==x['editor_clip_SHA256'],(x['id'],h)
+            assert x['editor_clip_native_resolution']==[1920,1080]
+            assert x['full_video_decode']=='PASS'
+            assert (root/x['visual_proof_contact_sheet']).is_file()
+            print('ORIGINAL_HD_SHOT_SHA_PASS',x['id'],x['editor_clip_bytes'],h)
+          print('SOURCE_A_GT3_ACQUISITION_AT_LEAST_6_MAKES_25_DISTINCT_REAL_CAMERAS')
+          PY
+      - name: Upload ONE actual native-original audio-independent full GT3 source package
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-MULTICAR-V9-SIX-MAKES-25-IDENTIFIED-REAL-NATIVE-1080-4K-SOURCE-MEDIA
+          path: out/gt3-multicar-native-real-v9-six-makes-25-cameras/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
+      - name: Source gate result independent of edit and audio gates
+        if: always()
+        run: |
+          python - <<'PY'
+          import pathlib,json,os
+          p=pathlib.Path('out/gt3-multicar-native-real-v9-six-makes-25-cameras/COMBINED_GLOBAL_MANIFEST_V9.json')
+          if p.exists():
+            m=json.loads(p.read_text())
+            msg=f"ACTUAL original media V9: {m['qualifying_makes_total']} source GT3 makes / {m['qualifying_distinct_camera_views_total']} separate decoded native landscape 1080/4K camera views. Footage gate {m['footage_gate']}. Final Remotion/video+user exact music not rendered here.\n"
+          else:msg='V9 media construction failed; no GT3 make/angle approvals here.\n'
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(msg)
+          PY
