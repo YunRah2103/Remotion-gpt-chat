@@ -1,0 +1,81 @@
+name: STO self-hosted Cobalt 11 real social master test
+on:
+  push:
+    branches:
+      - automotive-edits/huracan-sto-v10-001/a-footage
+    paths:
+      - production/videos/huracan-sto-v10-001/footage/test_cobalt_selfhosted.py
+      - .github/workflows/sto-cobalt-selfhosted-test.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual-master-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install native media and image inspection
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          pip install Pillow
+          python -m py_compile production/videos/huracan-sto-v10-001/footage/test_cobalt_selfhosted.py
+      - name: Start private local official Cobalt Docker instance
+        run: |
+          set -euo pipefail
+          docker pull ghcr.io/imputnet/cobalt:11
+          docker run --detach --name sto-cobalt --init --read-only --memory 1500m --cpus 2 \
+            --publish 127.0.0.1:9000:9000 \
+            --env API_URL=http://127.0.0.1:9000/ \
+            --env API_LISTEN_ADDRESS=0.0.0.0 \
+            ghcr.io/imputnet/cobalt:11
+          ok=0
+          for _ in $(seq 1 25); do
+            if curl -fsS --connect-timeout 2 --max-time 4 http://127.0.0.1:9000/ > /dev/null; then ok=1; break; fi
+            sleep 3
+          done
+          if [ "$ok" != 1 ]; then
+            echo "Local Cobalt service did not become reachable."
+            docker ps -a --filter name=sto-cobalt
+            exit 1
+          fi
+          echo "Cobalt started on runner-local port only."
+      - name: Request original STO videos from TikTok Instagram and YouTube
+        run: python production/videos/huracan-sto-v10-001/footage/test_cobalt_selfhosted.py
+      - name: Show actual original source outcomes
+        if: always()
+        run: |
+          python - <<'PY'
+          import pathlib,json,os
+          path=pathlib.Path('out/sto-cobalt-v1/manifest.json')
+          if not path.is_file():
+              print('No manifest - Cobalt startup or test failed.')
+          else:
+              j=json.loads(path.read_text())
+              rows=['## Cobalt self-hosted STO actual source-quality audit',
+                    'Cobalt API success is not verified FullHD real footage.']
+              for a in j['sources']:
+                  p=a.get('probe') or {}
+                  rows.append('- '+a['id']+': **'+a['status']+'** '+str(p.get('width','?'))+'×'+str(p.get('height','?'))+' '+str(a.get('safe_error_code','')))
+              rows.append('Verified native FullHD candidate files: '+str(j['actual_native_1920x1080_plus_landscape_mp4_count']))
+              with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f:f.write('\n'.join(rows))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STO-COBALT-SELFHOSTED-REAL-MASTER-QA
+          path: |
+            out/STO_COBALT_DIRECT_ORIGINALS.zip
+            out/sto-cobalt-v1/manifest.json
+          retention-days: 5
+          compression-level: 0
+          if-no-files-found: warn
+      - name: Stop and remove isolated Cobalt instance
+        if: always()
+        run: |
+          docker rm -f sto-cobalt >/dev/null 2>&1 || true
