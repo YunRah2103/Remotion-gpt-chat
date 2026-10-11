@@ -1,0 +1,45 @@
+name: GT3 Agent A 2026 N24 Direct Race Report Native Video
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-2026-direct-race-mp4.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-racing-footage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare true decoded media QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q requests pillow
+      - name: Physically download native race videos and generate manifest + contact sheets
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_2026_n24_direct_report_mp4.py
+      - name: Publish actual accepted native HD media (or honest diagnostic manifest)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-2026-N24-DIRECT-MP4-STREAMS-AND-QA
+          path: out/gt3-a-race-report-2026-originals/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Report honest source gate status
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, pathlib,os
+          p=pathlib.Path('out/gt3-a-race-report-2026-originals/SOURCE_MANIFEST.json')
+          if p.exists():
+            data=json.loads(p.read_text())
+            entries=data['actual_media']
+            verified=[x for x in entries if x['status'].startswith('FULLY_DECODED_NATIVE_HD')]
+            out=f'Actual native-HD video byte files: {len(verified)}; model/shot proof pending.\n'
+            out+='\n'.join(f'- {x["id"]}: {x.get("width")}x{x.get("height")} {x["status"]}' for x in entries)
+          else:out='No manifest or media delivered.'
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(out+'\n')
+          PY
