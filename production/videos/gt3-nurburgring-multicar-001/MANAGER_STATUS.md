@@ -49,3 +49,20 @@ No footage bundle, actual native source-contact sheets, mixed WAV or playable GT
 - **D SHA db91946822d9668caeefeb38804f08e47d97f624**: installed FFmpeg on GitHub runner, fixed initial test-runtime failure and passed all manager test steps in [run 38138675180](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38138675180). Uploaded **actual audit evidence**, [artifact 11701238560 / GT3-D-MANAGER-BLOCKED-EVIDENCE](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38138675180/artifacts/11701238560): unit-test log, SHA, dashboard and JSON release gate. This is not footage or finished film.
 
 **Final independent release decision is still BLOCKED**, because no verified native 1080p footage/complete visual/audio master has been supplied to the manager. B/C schema is now patched in C; do NOT keep citing the original schema mismatch as an outstanding C-code blocker, but do insist on populated verifiedMake and actual original footage before mix/render.
+
+## Agent D updated live audit — 2026-10-11 ~18:29 UTC
+
+**Important correction to all earlier BLOCKED Agent A entries: A has since reached its minimum native landscape footage acquisition milestone. The earlier 0-source status is historical, NOT current.** Final release is still BLOCKED due to B/C integration.
+
+| Agent | Current verified evidence | Gate |
+| --- | --- | --- |
+| A FOOTAGE | V9 [run 38163232775 / artifact 11711435862](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38163232775/artifacts/11711435862): **596,755,655 bytes** of source ZIP, GitHub Action success. A's independent V9 movie QA [run 38163766256](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38163766256) success; its issue #26 evidence reports **six class-identified native landscape GT3 makes** (Porsche, BMW, Mercedes-AMG, Audi, Aston Martin, Ford) and **25 independently identified on-track angles**, original FFprobe and checksums. Source producer was still exploring more shots at A head `0ed50a49957a66c19235c50f97da18c579844ae1`. | **A MINIMUM EVIDENCE PASS / awaiting B's actual integration** |
+| B CINEMATIC | Head `7ba4ecc93a66a421e4ece3ff489c20c9cc1b58e8` remains from 12:18:59 UTC. Latest [run 38138796465 / artifact 11702188162](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38138796465/artifacts/11702188162) marked `GT3-B-TIMING-PROOF-NOT-FOOTAGE`. No verified native render of V9 real sources submitted. | **BLOCKED for real visual PASS** |
+| C AUDIO/RENDER | Head `ee549b7b5780d32f78797bcf8ebeaaa8062c551f` remains from 12:18:06 UTC. Latest [run 38138742417 / artifact 11701973447](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38138742417/artifacts/11701973447) named `GT3-C-PRELIMINARY-AUDIO-QA-NOT-FINAL`. Exact-song preparatory evidence exists; no verified V9-source matched GT3 SFX or downloadable final real-footage MP4. | **BLOCKED for full film/audio PASS** |
+| D MANAGER | Source QA scripts/tests and independently successful [run 38138675180 / artifact 11701238560](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38138675180/artifacts/11701238560). This update verifies latest B/C/A commits and Actions artifact inventory; cannot sign off on final movie without actual 316-frame H.264/AAC output. | **FINAL RELEASE BLOCKED** |
+
+**Immediate handoff sequence:** B must import A's 597MB genuine 1080/4K V9 source archive, inspect/select 18–26 genuinely unique shots and deliver an actual 1920x1080 316-frame visual MP4, source-backed shotmap, contact sheet, decode/black-frame tests. C must then align the EXACT MP3 SHA with real vehicle-matched engine stems and mux final H.264 AAC 48k MP4. D can only release after independent real-frame and audio review.
+
+The separate A2 McLaren source is **1916x1078**, just shy of the strict 1920x1080 minimum; it is review-only unless director explicitly permits a source-resolution exception. The official V9 six-make gate uses Ford as the sixth marque; it is not a Lamborghini/Ferrari/McLaren-inclusive eight-marque film.
+
+**Verified final file as of this audit:** NONE; latest B and C artifacts are explicitly provisional.
