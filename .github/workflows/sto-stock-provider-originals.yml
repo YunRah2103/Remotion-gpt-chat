@@ -1,0 +1,112 @@
+name: STO Agent A free landscape source probe
+on:
+  push:
+    branches: [automotive-edits/huracan-sto-v10-001/a-footage]
+    paths: [.github/workflows/sto-stock-provider-originals.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+      PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install native media inspection
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          pip install Pillow
+      - name: Download verified original 1080p candidates (no stock previews)
+        run: |
+          python - <<'PY'
+          import os,json,urllib.request,urllib.parse,subprocess,hashlib,zipfile
+          from pathlib import Path
+          from PIL import Image,ImageDraw
+          d=Path('out/sto-stock-test');d.mkdir(parents=True,exist_ok=True)
+          qs=['lamborghini huracan sto','lamborghini sto','lamborghini huracan']
+          results=[];found=[];done=[]
+          def getj(url,headers={}):
+           with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0',**headers}),timeout=25) as r:return json.loads(r.read(4000000))
+          pix=os.getenv('PIXABAY_API_KEY')
+          if pix:
+           for q in qs:
+            try:
+             j=getj('https://pixabay.com/api/videos/?'+urllib.parse.urlencode({'key':pix,'q':q,'per_page':25}))
+             results.append({'service':'pixabay','q':q,'hits':j.get('totalHits')})
+             for h in j.get('hits',[]):
+              v=max([x for x in h.get('videos',{}).values() if x.get('url') and x.get('width',0)>=1920 and x.get('height',0)>=1080],key=lambda v:v.get('width',0)*v.get('height',0),default=None)
+              if v:found.append({'provider':'pixabay','id':h['id'],'tags':h.get('tags',''),'page':h.get('pageURL'),'url':v['url'],'width':v['width'],'height':v['height']})
+            except Exception as e:results.append({'service':'pixabay','q':q,'error':str(e)[:150]})
+          else:results.append({'service':'pixabay','status':'NO_API_SECRET'})
+          pex=os.getenv('PEXELS_API_KEY')
+          if pex:
+           for q in qs:
+            try:
+             j=getj('https://api.pexels.com/videos/search?'+urllib.parse.urlencode({'query':q,'per_page':25,'orientation':'landscape'}),{'Authorization':pex})
+             results.append({'service':'pexels','q':q,'hits':j.get('total_results')})
+             for h in j.get('videos',[]):
+              v=max([x for x in h.get('video_files',[]) if x.get('link') and x.get('width',0)>=1920 and x.get('height',0)>=1080],key=lambda v:v.get('width',0)*v.get('height',0),default=None)
+              if v:found.append({'provider':'pexels','id':h['id'],'page':h.get('url'),'url':v['link'],'width':v['width'],'height':v['height']})
+            except Exception as e:results.append({'service':'pexels','q':q,'error':str(e)[:150]})
+          else:results.append({'service':'pexels','status':'NO_API_SECRET'})
+          seen=set()
+          found.sort(key=lambda x:('sto' not in x.get('tags','').lower(),-x['width']*x['height']))
+          for h in found:
+           key=(h['provider'],h['id'])
+           if key in seen:continue
+           seen.add(key)
+           if len(done)>=3:break
+           item={k:v for k,v in h.items() if k!='url'};item['state']='FAILED';done.append(item)
+           f=d/(h['provider']+'_'+str(h['id'])+'.mp4')
+           try:
+            req=urllib.request.Request(h['url'],headers={'User-Agent':'Mozilla/5.0'})
+            with urllib.request.urlopen(req,timeout=30) as r:
+             if int(r.headers.get('Content-Length') or 0)>110000000:raise RuntimeError('too large')
+             n=0
+             with f.open('wb') as output:
+              while True:
+               data=r.read(1024*1024)
+               if not data:break
+               n+=len(data)
+               if n>110000000:raise RuntimeError('oversized')
+               output.write(data)
+            meta=json.loads(subprocess.run(['ffprobe','-v','error','-show_format','-show_streams','-of','json',str(f)],capture_output=True,text=True,timeout=40,check=True).stdout)
+            v=next(x for x in meta['streams'] if x['codec_type']=='video')
+            item.update(actual=[v['width'],v['height']],duration=float(meta['format']['duration']),bytes=n,sha256=hashlib.sha256(f.read_bytes()).hexdigest())
+            if v['width']<1920 or v['height']<1080 or v['width']<=v['height']:item['state']='LOW_RES_REJECT';f.unlink();continue
+            item['state']='DOWNLOADED_UNVERIFIED_STO_AND_WATERMARK'
+            sheet=Image.new('RGB',(960,4*155),'#111');draw=ImageDraw.Draw(sheet)
+            for i in range(16):
+             t=max(.05,item['duration']*(i+.5)/16);tmp=d/'.tmp.jpg'
+             subprocess.run(['ffmpeg','-nostdin','-v','error','-y','-ss',str(t),'-i',str(f),'-vf','scale=240:135','-frames:v','1',str(tmp)],capture_output=True,timeout=45)
+             if tmp.exists():
+              with Image.open(tmp) as pic:sheet.paste(pic.convert('RGB'),((i%4)*240,(i//4)*155+17))
+              tmp.unlink()
+             draw.text(((i%4)*240+3,(i//4)*155+2),str(round(t,1)),fill='white')
+            sheet.save(d/(f.stem+'_contact.jpg'),quality=80)
+           except Exception as e:item['error']=str(e)[:180];f.unlink(missing_ok=True)
+          manifest={'searches':results,'found_candidates':[{k:v for k,v in x.items() if k!='url'} for x in found],'downloads':done,'approved_road_sto_angles':0}
+          (d/'manifest.json').write_text(json.dumps(manifest,indent=2))
+          with zipfile.ZipFile('out/STO_ORIGINAL_STOCK_PROBE.zip','w',zipfile.ZIP_STORED,allowZip64=True) as z:
+           for f in d.rglob('*'):
+            if f.is_file():z.write(f,f.relative_to(d))
+          print('STOCK_RESEARCH',results)
+          print('REAL_DOWNLOADS',done)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STO-PUBLIC-STOCK-ORIGINALS
+          path: |
+            out/STO_ORIGINAL_STOCK_PROBE.zip
+            out/sto-stock-test/manifest.json
+          retention-days: 5
+          if-no-files-found: warn
+          compression-level: 0
