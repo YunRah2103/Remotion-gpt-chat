@@ -1,0 +1,24 @@
+name: FR Legends A - Official Alpine Actual Manifest Resolution
+on:
+  push:
+    branches: [automotive-edits/french-icons-001/a-classics-footage]
+    paths:
+      - '.github/workflows/fr-legends-a-alpine-quality.yml'
+      - 'production/videos/french-icons-001/agent_a_alpine_check_res.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  resolution-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify the CDN master playlist native video formats
+        run: python production/videos/french-icons-001/agent_a_alpine_check_res.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fr-legends-alpine-publisher-native-res-evidence
+          path: out/official-alpine-variants/manifest.json
+          retention-days: 3
+          if-no-files-found: error
