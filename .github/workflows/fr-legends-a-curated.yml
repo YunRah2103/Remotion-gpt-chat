@@ -1,0 +1,63 @@
+name: FR Legends Agent A - Curated Verified Classic ZIP
+
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - '.github/workflows/fr-legends-a-curated.yml'
+      - 'production/videos/french-icons-001/agent_a_curate_verified.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  make-curated-real-media:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Acquire prior run real original-video artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p out/previous-real-source
+          gh run download 38147473826 \
+            --repo YunRah2103/Remotion-gpt-chat \
+            --name fr-legends-a-classics-real-media-zip \
+            --dir out/previous-real-source
+          ls -lh out/previous-real-source
+      - name: Install ffmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Re-check original SHA256 and verify decoded moving 4K source
+        run: |
+          python production/videos/french-icons-001/agent_a_curate_verified.py \
+            --input out/previous-real-source/fr-legends-a-classics-real-sources.zip
+      - name: Report honest final gate
+        run: |
+          python - <<'PY'
+          import os,pathlib,json
+          d=json.loads(pathlib.Path('out/fr-legends-a-approved/manifest.json').read_text())
+          p=pathlib.Path('out/fr-legends-agent-a-classics-CURATED.zip')
+          s=("## Agent A — curated original native 4K package\n\n"
+             f"- Real approved supporting shots: **{d['verified_editor_supporting_shots']}**\n"
+             f"- Premium hero shots: **{d['verified_editor_premium_hero_shots']}**\n"
+             f"- Models: {', '.join(d['verified_models'])}\n"
+             f"- ZIP physically verified: **{p.stat().st_size:,} bytes**\n"
+             "- Gate A: **BLOCKED** (need 18 unique true-HD clips of 5 classics)\n"
+             "- Original source and 4K moving 2CV extract included. Rejected source clips EXCLUDED.\n")
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(s)
+          print(s)
+          PY
+      - name: Upload exactly ONE curated native-footage ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: fr-legends-a-classics-approved-one-zip
+          path: out/fr-legends-agent-a-classics-CURATED.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
