@@ -17,10 +17,10 @@ This optional component is isolated from current YUNEX films, the older yt-dlp i
 
 Evidence: [social extraction matrix](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38157969479) and [YouTube matrix](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38157590842). These tests used small example videos, checked real bytes using FFprobe and decoded two seconds; no third-party footage was redistributed.
 
-- **Instagram**: verified real 5,819,622-byte Reel, 716x1274 and 80.04 seconds; both yt-dlp and yt-dlp Chrome impersonation succeeded. gallery-dl timed out on the tested Reel.
-- **TikTok**: verified real 3,904,071-byte video, 576x1024 and 25.93 seconds; yt-dlp, Chrome impersonation and gallery-dl succeeded.
-- **YouTube**: 11 extractor/clients failed with bot verification, including stable/nightly yt-dlp, several player clients, Pytubefix and You-Get. Direct open MP4 succeeded (5,635,415 bytes, 720x480), proving GitHub can download video files, but **not** that YouTube itself works.
-- **Piped/Invidious**: four public API instances failed (HTTP 403, 502, 526); no real YouTube media was obtained.
+- **Instagram**: verified real 5,819,622-byte Reel, 716x1274 and 80.04 seconds; both yt-dlp and yt-dlp Chrome impersonation succeeded. gallery-dl timed out on the tested Reel. A second Instagram Reel returned an empty-media/login-access response for both yt-dlp methods.
+- **TikTok**: verified real 3,904,071-byte video, 576x1024 and 25.93 seconds; yt-dlp, Chrome impersonation and gallery-dl succeeded. A second, different TikTok post also passed yt-dlp and Chrome impersonation (724,390 bytes, 576x1024, 8 seconds).
+- **YouTube**: 11 extractor/clients failed with bot verification, including stable/nightly yt-dlp, several player clients, Pytubefix and You-Get. [Windows and macOS GitHub runners](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38158355197) also received bot verification on the same authorised test video. Direct open MP4 succeeded (5,635,415 bytes, 720x480), proving GitHub can download video files, but **not** that YouTube itself works.
+- **Piped/Invidious**: six public API instances failed (HTTP 403, 502, 526 or similar); no real YouTube media was obtained.
 - Those particular social examples are **below native 1080x1920**. Another source may have higher native resolution, but no downloader can restore pixels the source doesn't provide.
 
 Agents should use **yt-dlp -> yt-dlp Chrome -> gallery-dl (where supported)** and move to a different source if the selected post blocks/has inadequate native resolution. Successful extraction of one test post does not guarantee every post works.
