@@ -97,20 +97,22 @@ def classify(message):
         return "NETWORK_FAILURE"
     return "EXTRACTION_FAILED"
 
-def run(cmd, timeout=1200):
+def run(cmd, timeout=180):
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
     if result.returncode:
         raise RuntimeError((result.stderr or result.stdout or "Command failed")[-1000:])
 
 def ytdlp(url, out, limit):
     run([sys.executable, "-m", "yt_dlp", "--ignore-config", "--no-playlist",
-         "--no-progress", "--js-runtimes", "deno", "--format", "bv*+ba/b",
+         "--no-progress", "--js-runtimes", "deno", "--socket-timeout", "20",
+         "--retries", "1", "--fragment-retries", "1", "--format", "bv*+ba/b",
          "--merge-output-format", "mkv", "--max-filesize", str(limit)+"M",
          "--paths", str(out), "--output", "%(id)s.%(ext)s", url])
 
 def ytdlp_chrome(url, out, limit):
     run([sys.executable, "-m", "yt_dlp", "--ignore-config", "--no-playlist",
          "--no-progress", "--impersonate", "chrome", "--js-runtimes", "deno",
+         "--socket-timeout", "20", "--retries", "1", "--fragment-retries", "1",
          "--format", "bv*+ba/b", "--merge-output-format", "mkv",
          "--max-filesize", str(limit)+"M", "--paths", str(out),
          "--output", "%(id)s.%(ext)s", url])
