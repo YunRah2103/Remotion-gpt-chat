@@ -1,0 +1,47 @@
+name: FR Legends Agent A - Real Native 1080 Alpine Historical
+on:
+  push:
+    branches: [automotive-edits/french-icons-001/a-classics-footage]
+    paths:
+      - 'production/videos/french-icons-001/agent_a_alpine_native1080.py'
+      - '.github/workflows/fr-legends-a-alpine-real1080.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-1080-alpine:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install FFmpeg and Pillow
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install pillow
+      - name: Acquire genuine original 1080p Alpine historic rally using correct public CDN variant
+        run: python production/videos/french-icons-001/agent_a_alpine_native1080.py
+      - name: Report actual car film native HD and visual QA pending
+        run: |
+          python - <<'PY'
+          import json,pathlib,os
+          r=json.loads(pathlib.Path('out/agent-a-alpine-real1080/manifest.json').read_text())
+          lines=['## French legends Agent A - real 1080p Alpine historical original',
+                 f"- Original native full-HD actual decoded: **{r['real_1080_decoded']}**",
+                 f"- Status: {r['status']}",
+                 f"- Probe: {r.get('probe')}",
+                 f"- Blocker: {r.get('error','none')}",
+                 "- Model identification, full-bleed footage and cinematography need manual contact-sheet approval."]
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(lines)+'\n')
+          print('\n'.join(lines))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fr-legends-a-alpine-native1080-real-media-one-zip
+          path: out/FR-LEGENDS-A-ALPINE-HISTORIC-REAL-1080.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
