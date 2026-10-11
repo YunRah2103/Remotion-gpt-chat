@@ -1,0 +1,43 @@
+name: GT3 Agent A Further Original 4K Nürburgring Racing Angles
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-further-4k-race-angles.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual-4k-race-media:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up original media and image QA tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q pillow
+      - name: Download additional 4K original race footage at unique source offsets
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_additional_falken_2018_native_4k.py
+      - name: Upload actual 4K original race excerpts and 6-frame HDR contact sheets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-FALKEN2018-MORE-NATIVE-4K-VIDEO-SOURCE-ANGLES
+          path: out/gt3-a-falken-2018-unseen-race-angles/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Honest editor footage status
+        if: always()
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os
+          p=Path('out/gt3-a-falken-2018-unseen-race-angles/SOURCE_MANIFEST.json')
+          rows=json.loads(p.read_text())['candidate_sections'] if p.is_file() else []
+          ok=[x for x in rows if x['status'].startswith('REAL_NATIVE')]
+          summary=f'Physical 4K full-decoded original video source sections: {len(ok)}, distinct camera / GT3 make must be reviewed.\n'
+          summary+='\n'.join(f'- {x["id"]}: {x["status"]} {x.get("bytes",0)} bytes' for x in rows)
+          Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(summary+'\n')
+          PY
