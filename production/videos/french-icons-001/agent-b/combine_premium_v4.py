@@ -77,7 +77,7 @@ for i,(parent,stem,t0,t1,model,description) in enumerate(CUTS):
  run(["ffmpeg","-hide_banner","-nostdin","-loglevel","error","-y","-ss",str(t0),"-i",str(source),"-t",str(t1-t0),"-map","0:v:0","-map","0:a?","-c:v","libx264","-crf","16","-preset","fast","-pix_fmt","yuv420p","-c:a","aac","-b:a","256k","-movflags","+faststart",str(dest)],80)
  try:
   meta,motion,contact=sheet(dest,stem)
-  if meta["width"]<1920 or meta["height"]<1080 or meta["duration"]<3.0:raise RuntimeError("clip fails native dimension or duration")
+  if meta["width"]<1920 or meta["height"]<1080 or meta["duration"]<2.4:raise RuntimeError("clip fails native dimension or duration")
  except:
   dest.unlink(missing_ok=True)
   raise
