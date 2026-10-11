@@ -1,68 +1,95 @@
 #!/usr/bin/env python3
-"""GT3 non-YouTube Vimeo source acquisition and true 1080p gate."""
-import json,subprocess,sys,hashlib
+"""Download and rigorously probe the original Audi Sport 2018 N24 embedded film.
+
+No manufacture/GT3/shot PASS is inferred from uploader metadata or source format.
+"""
+import hashlib, json, subprocess, sys
 from pathlib import Path
-from PIL import Image,ImageDraw
-O=Path("out/gt3-vimeo-actual");V=O/"clips";V.mkdir(parents=True,exist_ok=True)
-SOURCES=[
- {"id":"vimeo_team75_2018","url":"https://vimeo.com/374029404","event":"2018 Nürburgring 24h","identity":"Porsche Team75 Bernhard aftermovie","make_hint":"Porsche"},
- {"id":"vimeo_highlight_2016","url":"https://vimeo.com/326596303","event":"2016 Nürburgring 24h","identity":"KIEFERWORX multi-car highlight film","make_hint":"MULTI_GT3_UNVERIFIED"},
- {"id":"vimeo_giti_2025","url":"https://vimeo.com/1178201469","event":"2025 Nürburgring 24h","identity":"Giti Rennsport / VS Racing","make_hint":"UNVERIFIED"},
- {"id":"vimeo_pirelli_n24","url":"https://vimeo.com/1074240368","event":"Nürburgring 24h","identity":"Pirelli official event edit","make_hint":"MULTI_GT3_UNVERIFIED"},
- {"id":"vimeo_redbull_drift","url":"https://vimeo.com/455315028","event":"2020 Nürburgring","identity":"Red Bull Driftbrothers - NOT GT3; diagnostic reject","make_hint":"NOT_GT3_EXCLUDE"}
-]
-def cmd(args,t=160):
- p=subprocess.run(args,capture_output=True,text=True,timeout=t)
- return p
-def sha(path):
- h=hashlib.sha256()
- with path.open("rb") as f:
-  for b in iter(lambda:f.read(1024*1024),b""):h.update(b)
- return h.hexdigest()
-results=[]
-for src in SOURCES:
- info={**src,"status":"NOT_ACQUIRED"}
- fmt=cmd([sys.executable,"-m","yt_dlp","--ignore-config","--no-playlist","-J","--skip-download",
-          "--socket-timeout","12","--retries","1",src["url"]],65)
- if fmt.returncode:
-  info["error"]=fmt.stderr[-800:]
-  print("REJECTED metadata",src["id"],info["error"][-180:],flush=True)
- else:
-  try:
-   j=json.loads(fmt.stdout)
-   listed=[{"format_id":x.get("format_id"),"height":x.get("height"),"width":x.get("width"),
-            "ext":x.get("ext"),"tbr":x.get("tbr")} for x in j.get("formats",[]) if x.get("height")]
-   info["available_native_formats"]=listed
-   best=max((x.get("height",0) for x in listed),default=0)
-   info["best_listed_height"]=best
-   print("FORMAT",src["id"],best,flush=True)
-   if best<1080:raise ValueError("Source does not publish 1080p native format")
-   if src["make_hint"]=="NOT_GT3_EXCLUDE":raise ValueError("Not GT3 racing; excluded")
-   template=str(V/(src["id"]+".%(ext)s"))
-   d=cmd([sys.executable,"-m","yt_dlp","--ignore-config","--no-playlist",
-          "--no-progress","--no-warnings","--socket-timeout","12","--retries","1",
-          "--format","bv*[height>=1080]+ba/b[height>=1080]",
-          "--merge-output-format","mp4","--download-sections","*2-12",
-          "--output",template,src["url"]],210)
-   files=list(V.glob(src["id"]+".*"))
-   if d.returncode or not files:raise ValueError("Download failed: "+d.stderr[-500:])
-   path=max(files,key=lambda x:x.stat().st_size)
-   p=cmd(["ffprobe","-v","error","-show_streams","-show_format","-of","json",str(path)],30)
-   if p.returncode:raise ValueError("ffprobe rejected bytes: "+p.stderr[-200:])
-   j=json.loads(p.stdout)
-   v=next(x for x in j["streams"] if x["codec_type"]=="video")
-   w=int(v["width"]);h=int(v["height"])
-   if not ((w>=1920 and h>=1080 and w>h) or (w>=1080 and h>=1920 and h>w)):raise ValueError(f"Native less than landscape 1080p: {w}x{h}")
-   frame=O/(src["id"]+"_contact.jpg")
-   f=cmd(["ffmpeg","-v","error","-y","-ss","3","-i",str(path),"-frames:v","1","-vf","scale=720:-2",str(frame)],30)
-   if f.returncode:raise ValueError("Frame decode failed: "+f.stderr[-200:])
-   info.update(status="NATIVE_HD_SAMPLE_DOWNLOADED_VISUAL_QA_PENDING",bytes=path.stat().st_size,
-      sha256=sha(path),probe={"width":w,"height":h,"duration":j["format"].get("duration"),
-      "fps":v.get("avg_frame_rate")},file=str(path.relative_to(O)),frame=frame.name)
-   print("ACQUIRED",src["id"],w,h,info["bytes"],flush=True)
-  except Exception as e:
-   info["status"]="REJECTED";info["error"]=str(e)
-   print("REJECTED",src["id"],str(e)[-220:],flush=True)
- results.append(info)
-(O/"manifest.json").write_text(json.dumps({"sources":results,"gate":"VISUAL_REVIEW_REQUIRED","note":"Vimeo sample clips are provisional source candidates; verify GT3 race cars, camera uniqueness, watermark before qualifying."},indent=2)+"\n")
-(O/"README.md").write_text("# Vimeo native GT3 Nurburgring source samples\n\nOnly actual files passing FFprobe native 1080p are bundled. Film IDs are true unique original films, not 30 independent camera angles. Models must be visually verified before editing.\n")
+
+ROOT = Path("out/gt3-vimeo-actual")
+MEDIA = ROOT/"native_hd_sources"
+SHEETS = ROOT/"review_sheets"
+MEDIA.mkdir(parents=True, exist_ok=True)
+SHEETS.mkdir(parents=True, exist_ok=True)
+URL = "https://player.vimeo.com/video/277958760?app_id=122963"
+PUBLISHER = "https://timescopefilms.com/work/audisport/"
+ID = "audi_sport_timescope_2018_n24"
+report = dict(id=ID, url=URL, publisher=PUBLISHER, publisher_claim="Audi Sport, 24H Nuerburgring 2018, Rene Rast", status="NOT_ACQUIRED", verified_manufacturers=[], verified_distinct_gt3_shots=0, gate="BLOCKED_PENDING_VISUAL_QA")
+
+def call(args,timeout=220):
+    try:
+        return subprocess.run(args,capture_output=True,text=True,timeout=timeout)
+    except subprocess.TimeoutExpired:
+        return subprocess.CompletedProcess(args,124,"","timed out")
+
+def sha(p):
+    h=hashlib.sha256()
+    with p.open("rb") as f:
+        for b in iter(lambda:f.read(4*1024*1024),b""): h.update(b)
+    return h.hexdigest()
+
+metadata=call([sys.executable,"-m","yt_dlp","--ignore-config","--no-playlist","-J","--socket-timeout","15","--retries","1",URL],80)
+formats=[]
+if metadata.returncode==0:
+    try:
+        jd=json.loads(metadata.stdout)
+        formats=[{k:f.get(k) for k in ("format_id","width","height","ext","protocol")}
+                 for f in jd.get("formats",[]) if (f.get("height") or 0)>=1080]
+        report.update(title=jd.get("title"), duration_claimed=jd.get("duration"), formats_1080plus=formats)
+    except Exception as e:
+        report["format_parse_error"]=repr(e)
+else:
+    report["metadata_error"]=metadata.stderr[-1100:]
+
+errors=[]
+if formats:
+    for quality in ("http-1080p","hls-fastly_skyfire-4833","bestvideo[height>=1080]/best[height>=1080]"):
+        output=str(MEDIA/(ID+".%(ext)s"))
+        dl=call([sys.executable,"-m","yt_dlp","--ignore-config","--no-playlist","--no-progress","--no-warnings",
+                 "--socket-timeout","20","--retries","1","-f",quality,"-o",output,URL],230)
+        files=[p for p in MEDIA.glob(ID+".*") if p.stat().st_size>100000]
+        if dl.returncode!=0 or not files:
+            errors.append(dict(format=quality,error=dl.stderr[-650:]))
+            continue
+        file=max(files,key=lambda p:p.stat().st_size)
+        probe=call(["ffprobe","-v","error","-show_streams","-show_format","-of","json",str(file)],35)
+        if probe.returncode:
+            errors.append(dict(format=quality,error="ffprobe: "+probe.stderr[-400:]));file.unlink();continue
+        j=json.loads(probe.stdout)
+        stream=next((s for s in j["streams"] if s["codec_type"]=="video"),{})
+        w,h=int(stream.get("width",0)),int(stream.get("height",0))
+        if w<1920 or h<1080:
+            errors.append(dict(format=quality,error=f"sub-HD source {w}x{h}"));file.unlink();continue
+        decode=call(["ffmpeg","-v","error","-i",str(file),"-f","null","-"],180)
+        if decode.returncode:
+            errors.append(dict(format=quality,error="full decode failed: "+decode.stderr[-300:]));file.unlink();continue
+        from PIL import Image,ImageDraw
+        duration=float(j["format"].get("duration") or 0)
+        times=[round(duration*(i+0.5)/12,2) for i in range(12)]
+        sheet=Image.new("RGB",(480*3,292*4),(10,10,12))
+        draw=ImageDraw.Draw(sheet)
+        for i,t in enumerate(times):
+            tmp=SHEETS/(f"{ID}_{i:02d}.jpg")
+            x,y=(i%3)*480,(i//3)*292
+            f=call(["ffmpeg","-v","error","-y","-ss",str(t),"-i",str(file),
+                    "-frames:v","1","-vf","scale=480:270",str(tmp)],35)
+            if f.returncode==0 and tmp.exists():
+                with Image.open(tmp) as im:sheet.paste(im.convert("RGB"),(x,y+19))
+                tmp.unlink()
+            draw.text((x+6,y+2),f"t={t:.2f}s",fill="white")
+        sheetfile=SHEETS/(ID+"_12FRAME.jpg")
+        sheet.save(sheetfile,quality=90)
+        report.update(status="NATIVE_HD_ACQUIRED_VISUAL_QA_PENDING",quality_used=quality,
+                      native_width=w,native_height=h,source_fps=stream.get("avg_frame_rate"),
+                      bytes=file.stat().st_size,sha256=sha(file),duration_seconds=duration,
+                      media_file=str(file.relative_to(ROOT)),contact_sheet=str(sheetfile.relative_to(ROOT)),
+                      sampled_times=times,ffprobe=j)
+        break
+report["attempt_errors"]=errors
+if not formats:
+    report["rejection_reason"]="1080p rendition not accessible from current runner; no qualifying media"
+(ROOT/"manifest.json").write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n")
+(ROOT/"README.md").write_text("# Audi Sport 2018 Nürburgring source inspection\n\nSource: "+URL+
+"\nPublisher: "+PUBLISHER+"\nAny actual original media is in native_hd_sources, frames in review_sheets.\n"+
+"Maker, exact model, race action, camera uniqueness and track must be independently visually verified. Gate remains BLOCKED pending verification.\n")
+print(json.dumps({k:v for k,v in report.items() if k not in ("ffprobe","formats_1080plus")},indent=2,ensure_ascii=False),flush=True)
