@@ -1,0 +1,53 @@
+name: YUNEX GT3 A2 Official DTM Ferrari McLaren Stream Search
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a2-ferrari-aston-mclaren
+    paths:
+      - .github/workflows/gt3-a2-official-dtm-mclaren-source.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-source-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare browser and original-media technical tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check --break-system-packages -q playwright pillow requests yt-dlp
+          python -m playwright install chromium
+      - name: Try public official Joyn and ADAC race video streams; reject low-res or protected media
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a2/joyn_official_video_acquire.py
+      - name: ZIP decode and hash verification
+        if: always()
+        run: |
+          python - <<'PY'
+          import pathlib,zipfile,json,hashlib
+          p=pathlib.Path('out/gt3-a2-joyn-official/GT3_A2_BROWSER_ORIGINALS_AND_QA.zip')
+          if not p.is_file():
+              print('No archive: workflow FAILED; zero media credited.')
+              raise SystemExit()
+          with zipfile.ZipFile(p) as z:
+              assert z.testzip() is None
+              m=json.loads(z.read('SOURCE_MANIFEST.json'))
+              n=0
+              for x in m['sources']:
+                  if x.get('status')=='REAL_NATIVE_HD_FULL_DECODE_MODEL_REVIEW_PENDING':
+                      assert hashlib.sha256(z.read(x['file'])).hexdigest()==x['sha256']
+                      n+=1
+          assert n==m['native_hd_media_file_count']
+          print('REAL_NATIVE_HQ_FILES_HASHED',n,'GT3_VISUAL_QA_PENDING')
+          PY
+      - name: Upload ONLY actual evidence archive
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-A2-OFFICIAL-DTM-SOURCE-REVIEW-NOT-AUTOMATIC-PASS
+          path: out/gt3-a2-joyn-official/GT3_A2_BROWSER_ORIGINALS_AND_QA.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
