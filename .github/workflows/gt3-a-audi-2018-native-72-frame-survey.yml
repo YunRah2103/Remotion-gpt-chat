@@ -23,7 +23,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p inputs/audi2018_actual
-          gh run download 38143817077 --repo YunRah2103/Remotion-gpt-chat --name GT3-AUDI-TIMESCOPE-2018-FULL-HD-FILM --dir inputs/audi2018_actual || gh api repos/YunRah2103/Remotion-gpt-chat/actions/artifacts/11704042208/zip > inputs/audi2018_actual/prior_audi_original.zip
+          gh run download 38143817077 --repo YunRah2103/Remotion-gpt-chat --name GT3-VIMEO-REAL-NATIVE-SOURCE-SAMPLES --dir inputs/audi2018_actual || gh api repos/YunRah2103/Remotion-gpt-chat/actions/artifacts/11704042208/zip > inputs/audi2018_actual/prior_audi_original.zip
           find inputs/audi2018_actual -type f -printf '%p %s bytes\n'
       - name: Independently SHA-verify full film and decode 72 source frames
         run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/scan_audi2018_real_72_native_frames.py
