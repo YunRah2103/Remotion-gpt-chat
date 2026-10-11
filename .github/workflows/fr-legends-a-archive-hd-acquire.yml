@@ -1,0 +1,50 @@
+name: FR Legends A - Acquire Eight Original Archived HD Classic Car Films
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - 'production/videos/french-icons-001/agent_a_archive_hd_acquire.py'
+      - '.github/workflows/fr-legends-a-archive-hd-acquire.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual-original-mp4-ingest:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install original media format reader and storyboard generator
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install pillow
+      - name: Fetch eight ACTUAL original classic car films and verify native resolution + contact sheets
+        run: python production/videos/french-icons-001/agent_a_archive_hd_acquire.py
+      - name: Record technical candidate count
+        run: |
+          python - <<'PY'
+          import pathlib,json,os
+          items=json.loads(pathlib.Path("out/fr-a-archive-hd-ingest/manifest.json").read_text())
+          good=[x for x in items if x["status"].startswith("TRUE_NATIVE_HD")]
+          lines=["## French classics actual archived original HD footage proof",
+             f"- Actual native 1080+ original MP4 films fetched: **{len(good)}** of {len(items)}",
+             "- Each real video inspected with ffprobe and 16 source-frame contact sheet.",
+             "- **Model identification and clean moving shot gate not yet approved**.",
+             "- Publication and reuse permission needs separate verification."]
+          lines += [f"- {x['target']} ({x['id']}): {x['status']} / {x.get('probe')} / {x.get('error','')}" for x in items]
+          pathlib.Path(os.environ["GITHUB_STEP_SUMMARY"]).write_text('\n'.join(lines)+'\n')
+          print('\n'.join(lines))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-agent-a-missing-classics-real-film-qa-proof-one-zip
+          path: out/FR-LEGENDS-A-ARCHIVE-MISSING-CLASSICS-REAL-QA.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
