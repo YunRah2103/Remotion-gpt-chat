@@ -1,0 +1,24 @@
+name: FR Legends A - Official Citroen DS 70th Anniversary Press Source Discovery
+on:
+  push:
+    branches: [automotive-edits/french-icons-001/a-classics-footage]
+    paths:
+      - '.github/workflows/fr-a-ds70-stellantis-video.yml'
+      - 'production/videos/french-icons-001/agent_a_ds70_public_press_assets.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ds-original-motion-discover:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect official historic Citroen DS 200-car parade media share for actual public video
+        run: python production/videos/french-icons-001/agent_a_ds70_public_press_assets.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-agent-a-ds-70th-press-historic-video-discovery
+          path: out/fr-a-citroen-ds70-press/manifest.json
+          retention-days: 7
