@@ -1,0 +1,32 @@
+name: YUNEX GT3 Falken 2018 Full Film 4K Multi-Make Visual Scan
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a-footage
+    paths:
+      - .github/workflows/gt3-falken-full-scan.yml
+      - production/videos/gt3-nurburgring-multicar-001/agent-a/scan_falken_fullfilm.py
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 19
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg (zscale HDR preview) and Pillow
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q pillow
+      - name: Inspect 42 full-bleed native 4K frames across source runtime
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/scan_falken_fullfilm.py
+      - name: Upload sampled contact proof and QA log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-FALKEN-2018-42FRAME-REAL-4K-RACE-CAR-SCAN
+          path: out/gt3-falken-2018-global-scan/
+          if-no-files-found: warn
+          retention-days: 7
