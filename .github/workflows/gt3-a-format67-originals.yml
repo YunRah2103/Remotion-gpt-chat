@@ -1,0 +1,42 @@
+name: GT3 Agent A FORMAT67 2026 Original Nürburgring Film Retrieval
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-format67-originals.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  physical-publisher-footage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install original-video verification stack
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q requests pillow
+      - name: Fetch literal publisher linked MP4 bytes and generate 12-frame scene boards
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_format67_n24_originals.py
+      - name: Deliver actual native video clips and transparent rejection reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-FORMAT67-ORIGINAL-RACING-VIDEO-AND-QA
+          path: out/gt3-a-format67-real-film/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Real-media gate result
+        if: always()
+        run: |
+          python - <<'PY'
+          import json,pathlib,os
+          p=pathlib.Path('out/gt3-a-format67-real-film/SOURCE_MANIFEST.json')
+          rows=json.loads(p.read_text())['source_records'] if p.exists() else []
+          verified=[r for r in rows if r['status'].startswith('REAL_NATIVE')]
+          msg=f'Actual physically downloaded native-HD publisher films: {len(verified)}. Manufacturer identity and shot-count gate still awaiting frame-by-frame approval.\n'
+          msg+='\n'.join(f'- {r["original_url"]} -> {r["status"]} {r.get("native_width","")}x{r.get("native_height","")}' for r in rows)
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(msg+'\n')
+          PY
