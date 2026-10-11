@@ -1,0 +1,69 @@
+name: YUNEX GT3 A2 Dynamic Motorsport Player Source Rescue
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a2-ferrari-aston-mclaren
+    paths:
+      - .github/workflows/gt3-a2-browser-video-capture.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  player-capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install video acquisition and Chromium
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages --disable-pip-version-check -q playwright pillow yt-dlp
+          python -m playwright install chromium
+      - name: Inspect real publicly playable embedded videos and download originals
+        run: |
+          python -u production/videos/gt3-nurburgring-multicar-001/agent-a2/browser_media_capture.py
+      - name: Validate ZIP evidence and SHA hashes
+        if: always()
+        run: |
+          python - <<'PY'
+          import pathlib,zipfile,json,hashlib
+          p=pathlib.Path('out/gt3-a2-browser/GT3_A2_BROWSER_ORIGINALS_AND_QA.zip')
+          if not p.exists():
+              print('No zip: failed source run.')
+              raise SystemExit(0)
+          with zipfile.ZipFile(p) as z:
+              assert z.testzip() is None
+              m=json.loads(z.read('SOURCE_MANIFEST.json'))
+              verified=0
+              for x in m['sources']:
+                  if x.get('status')=='REAL_NATIVE_HD_FULL_DECODE_MODEL_REVIEW_PENDING':
+                      assert hashlib.sha256(z.read(x['file'])).hexdigest()==x['sha256']
+                      verified+=1
+          assert verified==m['native_hd_media_file_count']
+          print('FULLY_HASH_VERIFIED_NATIVE_VIDEOS', verified)
+          PY
+      - name: Publish ONE physical source/media diagnostic ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-MULTICAR-A2-DYNAMIC-PLAYER-NATIVE-SOURCE-REVIEW
+          path: out/gt3-a2-browser/GT3_A2_BROWSER_ORIGINALS_AND_QA.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Summarise without falsely approving shots
+        if: always()
+        run: |
+          if test -f out/gt3-a2-browser/SOURCE_MANIFEST.json; then
+            python - <<'PY'
+          import json,os
+          x=json.load(open('out/gt3-a2-browser/SOURCE_MANIFEST.json'))
+          msg=f"Agent A2: actual native-HD decoded files **{x['native_hd_media_file_count']}**; independently approved GT3 racing shots **0** (visual audit pending).\n"
+          for i in x['sources']:msg+=f"- {i['source_id']}: {i['status']}; network video endpoints={len(i.get('detected_media_links',[]))}\n"
+          open(os.environ['GITHUB_STEP_SUMMARY'],'w').write(msg)
+          print(msg)
+          PY
+          else
+            echo 'A2 browser source probe failed; no footage claimed.' >> "$GITHUB_STEP_SUMMARY"
+          fi
