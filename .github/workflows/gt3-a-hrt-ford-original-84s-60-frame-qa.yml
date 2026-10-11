@@ -1,0 +1,37 @@
+name: Agent A HRT Ford Genuine Native 1080 84s 60-Frame Multicircuit Identity Audit
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-hrt-ford-original-84s-60-frame-qa.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  actual-racing-car-film:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install original video decoder and picture audit
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q pillow
+      - name: Download complete actual original 1920x1080 HRT Ford manufacturer video artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/hrt-2026-full-original
+          gh run download 38161427589 --repo YunRah2103/Remotion-gpt-chat --name GT3-AGENT-A-HRT-FORD-2026-FULL86-1080-ORIGINAL-REVIEW --dir inputs/hrt-2026-full-original
+      - name: SHA-verify 84 second HRT Ford original and decode 60 true full-resolution racing source frames
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/visually_inspect_full_2026_hrt_ford_60_frames.py
+      - name: Publish full-film 60-frame manual Ford at Nürburgring GT3 race camera survey
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-HRT-FORD-FULL-84S-60-REAL-NATIVE1080-FRAMES
+          path: out/gt3-a-hrt-ford-fullfilm-60-frame-visual-qa/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
