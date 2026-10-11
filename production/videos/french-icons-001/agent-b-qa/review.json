@@ -1,0 +1,221 @@
+{
+  "source_run_id": 38148017025,
+  "source_artifact_id": 11705780426,
+  "source_sha": "76858903742f5559cb3325c1371d916d437df229",
+  "clip_count": 16,
+  "models": [
+    "Alpine A110 R Le Mans",
+    "Renault Megane RS Trophy",
+    "Alpine A110",
+    "Alpine A110",
+    "Renault Megane RS Trophy-R",
+    "Renault Megane RS Trophy-R",
+    "Bugatti Bolide",
+    "Bugatti Bolide",
+    "Bugatti Bolide",
+    "Bugatti Bolide",
+    "Alpine A110",
+    "Alpine A110",
+    "Alpine A290",
+    "Alpine A290",
+    "Alpine A290 Rallye",
+    "Alpine A290 Rallye"
+  ],
+  "model_family_count": 4,
+  "pixel_similarity_candidates": [
+    {
+      "a": "clips/bugatti-bolide_1.mp4",
+      "b": "clips/bugatti-bolide_2.mp4",
+      "dhash_distance": 2
+    },
+    {
+      "a": "clips/bugatti-bolide_5.mp4",
+      "b": "clips/bugatti-bolide_6.mp4",
+      "dhash_distance": 1
+    },
+    {
+      "a": "clips/alpine-miami_4.mp4",
+      "b": "clips/alpine-miami_5.mp4",
+      "dhash_distance": 4
+    }
+  ],
+  "per_clip": [
+    {
+      "file": "clips/alpine-a110-le-mans_6.mp4",
+      "model": "Alpine A110 R Le Mans",
+      "width": 1920,
+      "height": 1080,
+      "duration": 49.56,
+      "bitrate": 5414345,
+      "motion_score": 37.32,
+      "sharpness_proxy": 59.71,
+      "source_url": "https://media.renault.ch/video-cdn/165632-alpine-a110-r-le-mans-2023.mp4"
+    },
+    {
+      "file": "clips/renault-megane-trophy_2.mp4",
+      "model": "Renault Megane RS Trophy",
+      "width": 1920,
+      "height": 1080,
+      "duration": 47.92,
+      "bitrate": 4036311,
+      "motion_score": 51.82,
+      "sharpness_proxy": 66.26,
+      "source_url": "https://download.screen9.com/rldGwzgRQBJPb8LyCq0zcehxe4go5pUS3u6GP7PSY2twmFbK7OijPl3K00g_QJ3hxLUR6dOxXGXIR78q6xkONvlmf63CeANiddLQwBzGlagGZdIibiNsKeToDuemmHCtEWhX6Mg2XcsN-ialVUCPM468xLGcE-U66IFzlt-Y7C1HlroTrkzDXhqqIfnA3pKFwryjsJFRUXflVTVRe4NxWkqH4RUH1_GfmzrIYHQWjv_WCxDyT62deThqfL0ElBlc.mp4"
+    },
+    {
+      "file": "clips/alpine-a110_5.mp4",
+      "model": "Alpine A110",
+      "width": 1920,
+      "height": 1080,
+      "duration": 15.0,
+      "bitrate": 4116376,
+      "motion_score": 43.76,
+      "sharpness_proxy": 59.33,
+      "source_url": "https://media.renault.ch/video-cdn/165819-alpine-a110-range.mp4"
+    },
+    {
+      "file": "clips/alpine-a110_6.mp4",
+      "model": "Alpine A110",
+      "width": 1920,
+      "height": 1080,
+      "duration": 54.28,
+      "bitrate": 3444586,
+      "motion_score": 88.46,
+      "sharpness_proxy": 57.29,
+      "source_url": "https://media.renault.ch/video-cdn/165818-alpine-a110-range.mp4"
+    },
+    {
+      "file": "clips/renault-megane_2.mp4",
+      "model": "Renault Megane RS Trophy-R",
+      "width": 1920,
+      "height": 1080,
+      "duration": 58.6,
+      "bitrate": 5251508,
+      "motion_score": 54.72,
+      "sharpness_proxy": 60.62,
+      "source_url": "https://media.renault.ch/video-cdn/166123-new-renault-megane-rs-trophy-r-2019.mp4"
+    },
+    {
+      "file": "clips/renault-megane-2_6.mp4",
+      "model": "Renault Megane RS Trophy-R",
+      "width": 1920,
+      "height": 1080,
+      "duration": 487.6,
+      "bitrate": 5569151,
+      "motion_score": 28.01,
+      "sharpness_proxy": 60.48,
+      "source_url": "https://media.renault.ch/video-cdn/166187-renault-megane-rs-trophy-r-2019.mp4"
+    },
+    {
+      "file": "clips/bugatti-bolide_1.mp4",
+      "model": "Bugatti Bolide",
+      "width": 1920,
+      "height": 1080,
+      "duration": 14.84,
+      "bitrate": 4398590,
+      "motion_score": 20.45,
+      "sharpness_proxy": 35.5,
+      "source_url": "https://bugatti-newsroom.imgix.net/f309d700-5deb-4ce4-b11b-17f928b04d53/high-13.mp4"
+    },
+    {
+      "file": "clips/bugatti-bolide_2.mp4",
+      "model": "Bugatti Bolide",
+      "width": 1920,
+      "height": 1080,
+      "duration": 14.92,
+      "bitrate": 1332904,
+      "motion_score": 20.48,
+      "sharpness_proxy": 35.71,
+      "source_url": "https://bugatti-newsroom.imgix.net/f309d700-5deb-4ce4-b11b-17f928b04d53/high-13.mp4?fm=mp4"
+    },
+    {
+      "file": "clips/bugatti-bolide_5.mp4",
+      "model": "Bugatti Bolide",
+      "width": 1920,
+      "height": 1080,
+      "duration": 11.5,
+      "bitrate": 6049634,
+      "motion_score": 10.64,
+      "sharpness_proxy": 25.14,
+      "source_url": "https://bugatti-newsroom.imgix.net/667516958f9399fbd36b30c2/240603_BUGATTI_LAUNCH_V16_EX_16x9-Moodcut-002.mp4"
+    },
+    {
+      "file": "clips/bugatti-bolide_6.mp4",
+      "model": "Bugatti Bolide",
+      "width": 1920,
+      "height": 1080,
+      "duration": 11.5,
+      "bitrate": 2295373,
+      "motion_score": 10.64,
+      "sharpness_proxy": 25.08,
+      "source_url": "https://bugatti-newsroom.imgix.net/667516958f9399fbd36b30c2/240603_BUGATTI_LAUNCH_V16_EX_16x9-Moodcut-002.mp4?fm=mp4"
+    },
+    {
+      "file": "clips/alpine-miami_4.mp4",
+      "model": "Alpine A110",
+      "width": 1920,
+      "height": 1080,
+      "duration": 14.541667,
+      "bitrate": 4873710,
+      "motion_score": 15.36,
+      "sharpness_proxy": 69.73,
+      "source_url": "https://media.renault.ch/video-cdn/165756-alpine-a110-miami.mp4"
+    },
+    {
+      "file": "clips/alpine-miami_5.mp4",
+      "model": "Alpine A110",
+      "width": 1920,
+      "height": 1080,
+      "duration": 14.541667,
+      "bitrate": 4804714,
+      "motion_score": 14.27,
+      "sharpness_proxy": 69.14,
+      "source_url": "https://media.renault.ch/video-cdn/165757-alpine-a110-miami.mp4"
+    },
+    {
+      "file": "clips/alpine-a290-test_3.mp4",
+      "model": "Alpine A290",
+      "width": 1920,
+      "height": 1080,
+      "duration": 506.56,
+      "bitrate": 4540922,
+      "motion_score": 59.1,
+      "sharpness_proxy": 45.52,
+      "source_url": "https://media.renault.ch/video-cdn/165501-alpine-a290-2024.mp4"
+    },
+    {
+      "file": "clips/alpine-a290-test_4.mp4",
+      "model": "Alpine A290",
+      "width": 1920,
+      "height": 1080,
+      "duration": 527.2,
+      "bitrate": 4627443,
+      "motion_score": 48.34,
+      "sharpness_proxy": 46.84,
+      "source_url": "https://media.renault.ch/video-cdn/165500-alpine-a290-2024.mp4"
+    },
+    {
+      "file": "clips/alpine-a290-rallye-release_5.mp4",
+      "model": "Alpine A290 Rallye",
+      "width": 3840,
+      "height": 2160,
+      "duration": 55.96,
+      "bitrate": 23369955,
+      "motion_score": 48.29,
+      "sharpness_proxy": 48.68,
+      "source_url": "https://media.renault.ch/video-cdn/165426-alpine-a290-rallye-2025.mp4"
+    },
+    {
+      "file": "clips/alpine-a290-rallye-release_6.mp4",
+      "model": "Alpine A290 Rallye",
+      "width": 3840,
+      "height": 2160,
+      "duration": 29.8,
+      "bitrate": 18094909,
+      "motion_score": 68.66,
+      "sharpness_proxy": 64.53,
+      "source_url": "https://media.renault.ch/video-cdn/165425-alpine-a290-rallye-2025.mp4"
+    }
+  ],
+  "warning": "Image perceptual similarity is preliminary; decoded-frame human scene/identity/composition review required. Resolution does not independently prove native optical detail."
+}
