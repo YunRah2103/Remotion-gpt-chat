@@ -145,7 +145,9 @@ def package(folder, report):
     with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_STORED, allowZip64=True) as z:
         for sub in ("clips", "contact_sheets"):
             for p in sorted((folder / sub).glob("*")):
-                if p.is_file() and ("_CONTACT" in p.name or sub == "clips"):
+                accepted = {clip["file"] for clip in json.loads((folder / "manifest.json").read_text())["clips"]}
+                accepted_contact = {clip["contact_sheet"] for clip in json.loads((folder / "manifest.json").read_text())["clips"]}
+                if p.is_file() and str(p.relative_to(folder)) in (accepted if sub == "clips" else accepted_contact):
                     z.write(p, p.relative_to(folder))
         for p in ("manifest.json", "README.md", "acquisition-log.json"):
             z.write(folder / p, p)
