@@ -1,0 +1,50 @@
+name: GT3 Agent A 2018 Falken Frame Contact Sheet Visual QA
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-falken18-image-qa.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  show-real-nurburgring-contact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download existing original 4K 42-frame contact sheet
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 38142178896
+          github-token: ${{ github.token }}
+          name: GT3-FALKEN-2018-42FRAME-REAL-4K-RACE-CAR-SCAN
+          path: /tmp/gt3-original-contact
+      - name: Show actual frame sheet files
+        run: find /tmp/gt3-original-contact -maxdepth 4 -type f -printf '%p %s bytes\n'
+      - name: Install image QA tools
+        run: python -m pip install --break-system-packages -q pillow
+      - name: Emit self-contained contact-sheet image panels for inspection
+        run: |
+          python - <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          from io import BytesIO
+          import base64
+          pics=[p for p in Path('/tmp/gt3-original-contact').rglob('*') if p.is_file() and p.suffix.lower() in ('.jpg','.jpeg','.png')]
+          if not pics:raise RuntimeError("Missing actual real-frame contact image")
+          p=max(pics,key=lambda p:p.stat().st_size)
+          img=Image.open(p).convert('RGB')
+          print('TRUE_4K_FRAME_SHEET_SOURCE',p,img.size,flush=True)
+          count=3
+          for part in range(count):
+            top=(img.height*part)//count
+            bot=(img.height*(part+1))//count
+            panel=img.crop((0,top,img.width,bot))
+            output=BytesIO();panel.save(output,format='JPEG',quality=72,optimize=True)
+            enc=base64.b64encode(output.getvalue()).decode()
+            print('FRAME_PANEL_START:'+str(part),flush=True)
+            for i in range(0,len(enc),2500):
+              print('FRAME_PANEL_DATA:'+str(part)+':'+enc[i:i+2500],flush=True)
+            print('FRAME_PANEL_END:'+str(part),flush=True)
+          PY
