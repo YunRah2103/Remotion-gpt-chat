@@ -2,6 +2,7 @@
 """Try unprotected official Huracan STO original YouTube playback variants.
 Native decoded proof required; no auth circumvention. Do not package low-res.
 """
+# Re-run with GitHub secret if present; never log or export authentication cookies.
 from pathlib import Path
 import json,subprocess,hashlib,zipfile,os
 from PIL import Image,ImageDraw
