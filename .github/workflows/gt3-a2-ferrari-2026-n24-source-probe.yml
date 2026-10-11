@@ -1,0 +1,49 @@
+name: YUNEX GT3 A2 Ferrari 2026 2023 Actual Race Films
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a2-ferrari-aston-mclaren
+    paths:
+      - .github/workflows/gt3-a2-ferrari-2026-n24-source-probe.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ferrari-film-source-acquisition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up FFmpeg and real-video browser
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check --break-system-packages -q playwright pillow yt-dlp requests
+          python -m playwright install chromium
+      - name: Download actual Ferrari Nürburgring race media and native contact sheets
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a2/ferrari_new_event_clean_source.py
+      - name: Fail-closed source manifest verification
+        if: always()
+        run: |
+          python - <<'PY'
+          import pathlib,zipfile,json,hashlib
+          p=pathlib.Path("out/gt3-a2-ferrari-2026-2023-new/GT3_A2_BROWSER_ORIGINALS_AND_QA.zip")
+          if not p.exists():print('NO_ZIP: no footage claimed');raise SystemExit()
+          with zipfile.ZipFile(p) as z:
+            assert z.testzip() is None
+            m=json.loads(z.read('SOURCE_MANIFEST.json'))
+            for s in m['sources']:
+              if s['status']=='REAL_NATIVE_HD_FULL_DECODE_MODEL_REVIEW_PENDING':
+                assert hashlib.sha256(z.read(s['file'])).hexdigest()==s['sha256']
+                print("ACTUAL_VIDEO",s['source_id'],s['resolution'],s['sha256'])
+          print('NATIVE_HD_FILES',m['native_hd_media_file_count'],'VISUAL_GT3_QA_PENDING')
+          PY
+      - name: Upload ONE source-video archive or diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-A2-FERRARI-N24-2026-2023-RACE-SOURCE-REVIEW
+          path: out/gt3-a2-ferrari-2026-2023-new/GT3_A2_BROWSER_ORIGINALS_AND_QA.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
