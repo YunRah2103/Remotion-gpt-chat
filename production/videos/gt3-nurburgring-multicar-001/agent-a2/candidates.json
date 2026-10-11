@@ -1,0 +1,111 @@
+{
+  "project": "YUNEX GT3 Multi-Car 001",
+  "agent": "A2",
+  "notes": "Publisher pages are discovery candidates, NOT acquired GT3 race shots. Agent A handles Audi/Lamborghini. No assumptions about model, format, class, or watermark until reviewed.",
+  "sources": [
+    {
+      "id": "ferrari-nls9-official",
+      "make": "Ferrari",
+      "model": "296 GT3",
+      "event": "2025 NLS9 Nürburgring Nordschleife",
+      "url": "https://www.nuerburgring-langstrecken-serie.de/language/en/2025/09/27/max-verstappen-and-chris-lulham-make-history-at-nls9/",
+      "priority": 1
+    },
+    {
+      "id": "ferrari-2025-n24-report",
+      "make": "Ferrari",
+      "model": "296 GT3",
+      "event": "2025 N24",
+      "url": "https://www.ferrari.com/en-LV/competizioni-gt/articles/weekend-preview-the-stage-is-set-for-the-24-hours-of-nrburgring-alongside-cigt-and-british-gt",
+      "priority": 2
+    },
+    {
+      "id": "ferrari-nls9-coverage",
+      "make": "Ferrari",
+      "model": "296 GT3",
+      "event": "2025 NLS9",
+      "url": "https://www.autosport.com/f1/news/verstappen-wins-on-nls-gt3-debut-at-the-nordschleife/10763002/",
+      "priority": 3
+    },
+    {
+      "id": "ferrari-nls9-fan-film",
+      "make": "Ferrari",
+      "model": "296 GT3",
+      "event": "2025 NLS9",
+      "url": "https://www.f1-fansite.com/f1-videos/footage-from-max-verstappens-gt3-win-at-the-nordschleife/",
+      "priority": 4
+    },
+    {
+      "id": "ferrari-gp2025-report",
+      "make": "Ferrari",
+      "model": "296 GT3",
+      "event": "2025 GTWC Nürburgring GP",
+      "url": "https://www.ferrari.com/en-EN/competizioni-gt/articles/unlucky-weekend-for-ferrari-at-nurburgring",
+      "priority": 5
+    },
+    {
+      "id": "aston-n24-press-film",
+      "make": "Aston Martin",
+      "model": "Vantage GT3",
+      "event": "2025 24 Hours Nürburgring",
+      "url": "https://media.astonmartin.com/vantage-gt3-shines-as-it-breaks-new-ground-in-imsa-british-gts-nurburgring-24-hours-and-pikes-peak/?album=true&lang=eng",
+      "priority": 6
+    },
+    {
+      "id": "aston-n24-press-preview",
+      "make": "Aston Martin",
+      "model": "Vantage GT3",
+      "event": "2025 Nürburgring 24 Hours",
+      "url": "https://media.astonmartin.com/aston-martin-vantage-gt3-primed-to-chase-overall-glory-at-nurburgring-24-hours/?lang=eng",
+      "priority": 7
+    },
+    {
+      "id": "aston-walkenhorst",
+      "make": "Aston Martin",
+      "model": "Vantage GT3",
+      "event": "2025 Nürburgring NLS",
+      "url": "https://www.walkenhorst-motorsport.de/",
+      "priority": 8
+    },
+    {
+      "id": "mclaren-doerr",
+      "make": "McLaren",
+      "model": "720S GT3 EVO",
+      "event": "NLS Nürburgring, check footage not GT4",
+      "url": "https://www.doerrgroup.com/doerr-motorsport/",
+      "priority": 9
+    },
+    {
+      "id": "mclaren-nuerburgring-2025",
+      "make": "McLaren",
+      "model": "720S GT3 EVO",
+      "event": "NLS Nürburgring",
+      "url": "https://nuerburgring.de/news/mit-vollgas-in-die-neue-nls-saison?locale=en",
+      "priority": 10
+    },
+    {
+      "id": "mclaren-gtwc",
+      "make": "McLaren",
+      "model": "720S GT3 EVO",
+      "event": "2026 Nürburgring GTWC GP",
+      "url": "https://www.gt-world-challenge-europe.com//team/790/team-rjn",
+      "priority": 11
+    },
+    {
+      "id": "aston-team-report",
+      "make": "Aston Martin",
+      "model": "Vantage GT3",
+      "event": "2025 Nürburgring N24",
+      "url": "https://www.astonmartin.com/en-gb/our-world/brand-stories/aston-martin-vantage-gt3-24-hours-spa",
+      "priority": 12
+    },
+    {
+      "id": "ferrari-nls9-newsauto",
+      "make": "Ferrari",
+      "model": "296 GT3",
+      "event": "2025 NLS9 Nürburgring",
+      "url": "https://www.newsauto.gr/formula1-3/ferstapen-katektise-ke-tin-norntslaife-video/",
+      "priority": 13
+    }
+  ]
+}
