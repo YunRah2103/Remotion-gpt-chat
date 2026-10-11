@@ -1,0 +1,79 @@
+name: YUNEX GT3 A2 Aston NLS Authentic Racing Package
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a2-ferrari-aston-mclaren
+    paths:
+      - .github/workflows/gt3-a2-aston-actual-native-package.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  build-nurburg-aston-race-originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up FFmpeg and Pillow
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check --break-system-packages -q Pillow
+      - name: Download actual 1920x1088 previously proven media, not source URLs
+        run: |
+          mkdir -p out/gt3-a2-aston-source
+          gh run download 38152393636 \
+            --repo "$GITHUB_REPOSITORY" \
+            --name "GT3-MULTICAR-A2-DYNAMIC-PLAYER-NATIVE-SOURCE-REVIEW" \
+            --dir out/gt3-a2-aston-source
+          test -s out/gt3-a2-aston-source/GT3_A2_BROWSER_ORIGINALS_AND_QA.zip
+          ls -lh out/gt3-a2-aston-source
+      - name: Full-decode Aston source, build unique HD race shots, source QA + ZIP
+        run: |
+          python -u production/videos/gt3-nurburgring-multicar-001/agent-a2/build_aston_native_qa_package.py
+      - name: Validate real ZIP content and hash integrity
+        run: |
+          python - <<'PY'
+          import pathlib,zipfile,json,hashlib
+          out=pathlib.Path("out/gt3-a2-aston-approved")
+          p=out/"GT3_MULTICAR_A2_ASTON_RACING_NATIVE_1080_VERIFIED_PARTIAL.zip"
+          assert p.is_file() and p.stat().st_size>5_000_000, "Zero actual video bytes"
+          with zipfile.ZipFile(p) as z:
+            assert z.testzip() is None
+            m=json.loads(z.read("SOURCE_MANIFEST_FFPROBE_SHA256.json"))
+            assert m["native_approved_gt3_camera_shots"]==7
+            assert m["approved_original_source_films"]==1
+            original=m["original"]
+            assert hashlib.sha256(z.read(original["file"])).hexdigest()==original["sha256"]
+            for shot in m["shots"]:
+              b=z.read(shot["clip_file"])
+              assert hashlib.sha256(b).hexdigest()==shot["clip_sha256"]
+              assert len(b)>100_000
+          print("FULL_MEDIA_ZIP_VALIDATED",p.stat().st_size,"one original and seven genuine cuts")
+          PY
+      - name: Upload ONE downloadable actual native racing package
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-MULTICAR-AGENT-A2-ASTON-ACTUAL-NATIVE-1080-RACE-SHOTS
+          path: out/gt3-a2-aston-approved/GT3_MULTICAR_A2_ASTON_RACING_NATIVE_1080_VERIFIED_PARTIAL.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
+      - name: Publish evidence to workflow summary
+        if: always()
+        run: |
+          if test -f out/gt3-a2-aston-approved/SOURCE_MANIFEST_FFPROBE_SHA256.json; then
+            python - <<'PY'
+          import json,pathlib,os
+          d=json.load(open("out/gt3-a2-aston-approved/SOURCE_MANIFEST_FFPROBE_SHA256.json"))
+          msg=f"## Real Aston Nürburgring GT3 footage shipped\n**Original producer films:** 1\n**Physically decoded visually curated clips:** {d['native_approved_gt3_camera_shots']}\n**Native crop:** 1920x1088 to 1920x1080, no upscaling\n**Overall 6-make/24-shot gate:** BLOCKED, PARTIAL\n"
+          for s in d['shots']:
+            msg+=f"- {s['id']}: source {s['start']}–{s['end']}s; {s['camera_id']}\n"
+          pathlib.Path(os.environ["GITHUB_STEP_SUMMARY"]).write_text(msg)
+          PY
+          else
+            echo "No output: package failed and MUST NOT be claimed." >> "$GITHUB_STEP_SUMMARY"
+          fi
