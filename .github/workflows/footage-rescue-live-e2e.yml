@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        site: [instagram, tiktok]
+        site: [instagram-car, tiktok-car]
         method: [yt-dlp, yt-dlp-chrome]
     name: "real engine - ${{ matrix.site }} - ${{ matrix.method }}"
     steps:
