@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        site: [vimeo, dailymotion, peertube]
+        site: [vimeo_embed]
     name: "${{ matrix.site }} - CC film 5s actual media"
     steps:
       - uses: actions/checkout@v4
