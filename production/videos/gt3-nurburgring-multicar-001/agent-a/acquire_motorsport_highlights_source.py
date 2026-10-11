@@ -1,0 +1,95 @@
+#!/usr/bin/env python3
+"""Targeted real motorsport.com 2023 N24 and 2025 DTM movie feeds.
+
+Acquire actual video bytes in native 1080p+ at bounded source time.
+No car identities or qualifying shot counts until manual enlarged-frame QA.
+No YouTube requests. Reject simulator, sub-HD, non-race and wrong-circuit content.
+"""
+import hashlib,json,subprocess,sys,time,traceback
+from pathlib import Path
+from PIL import Image,ImageDraw
+
+ROOT=Path("out/gt3-a-motorsport-highlights")
+V=ROOT/"native_unapproved"
+S=ROOT/"contact_sheets"
+for p in [ROOT,V,S]:p.mkdir(parents=True,exist_ok=True)
+TARGETS=[
+ {"id":"motorsport_n24_2023_full_highlights","url":"https://www.motorsport.com/endurance/video/24h-nurburgring-full-race-highlights/596435/","title_hint":"2023 N24 full 13 minute race highlights multi-car","make_hint":"multi-make Porsche Ferrari Lamborghini Audi Aston etc unverified","note":"Only actual on-track GT3, not titles or simulation"},
+ {"id":"motorsport_lambo_n24_2023","url":"https://www.motorsport.com/endurance/video/24h-nurburgring-konrad-lamborghini-crashes-out-in-qualifying-2/596152/","title_hint":"2023 Konrad Lamborghini real N24 qualifying incident","make_hint":"Lamborghini Huracan GT3 team Konrad, unconfirmed visual","note":"Reject crashes if unsafe presentation? racing edit only brief action"},
+ {"id":"motorsport_dtm_nurburgring_2025","url":"https://www.motorsport.com/dtm/video/2025-dtm-round-5-nurburgring-race-1-highlights/663636/","title_hint":"DTM 2025 Nurburgring GP race highlights","make_hint":"Lamborghini, Ferrari, Aston McLaren possible","note":"GP course not Nordschleife; if acquired mark alternate track"}
+]
+def call(a,t):
+ try:return subprocess.run(a,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,timeout=t)
+ except subprocess.TimeoutExpired:return subprocess.CompletedProcess(a,124,"","PER_SOURCE_TIMEOUT")
+ except Exception as e:return subprocess.CompletedProcess(a,125,"",str(e))
+def sha(p):
+ h=hashlib.sha256()
+ with p.open("rb") as f:
+  for b in iter(lambda:f.read(1024*1024),b""):h.update(b)
+ return h.hexdigest()
+def ff(a,t=40):
+ p=call(a,t)
+ if p.returncode:raise RuntimeError((p.stderr or p.stdout)[-600:])
+ return p.stdout
+for x in TARGETS:
+ started=time.monotonic()
+ x['status']='NO_ACCEPTED_MEDIA'
+ p=call([sys.executable,"-m","yt_dlp","--ignore-config","--no-playlist","--no-warnings","--socket-timeout","12","--retries","0","--fragment-retries","0","--skip-download","--dump-single-json",x['url']],45)
+ if p.returncode:
+  x['failure']='METADATA_'+(p.stderr or p.stdout)[-600:]
+  x['duration_seconds']=round(time.monotonic()-started,1)
+  print("META REJECTED",x["id"],x["failure"][-220:],flush=True)
+  continue
+ try:
+  j=json.loads(p.stdout)
+  x["resolved_title"]=j.get("title");x["uploader"]=j.get("uploader")
+  x["listed_duration_seconds"]=j.get("duration")
+  accepted=[f for f in j.get("formats",[]) if (f.get("width") or 0)>=1920 and (f.get("height") or 0)>=1080]
+  x["hd_formats"]=[{k:f.get(k) for k in ("format_id","ext","width","height","protocol","vcodec")} for f in accepted][-12:]
+  if not accepted:raise RuntimeError("NO_ADVERTISED_NATIVE_LANDSCAPE_1080P")
+  # Avoid full 1h downloads. Download first 24 seconds, max about 200MB.
+  cmd=[sys.executable,"-m","yt_dlp","--ignore-config","--no-playlist",
+    "--no-warnings","--socket-timeout","13","--retries","0","--fragment-retries","0",
+    "--max-filesize","200M","--download-sections","*0-24",
+    "-f","bv*[width>=1920][height>=1080]/b[width>=1920][height>=1080]",
+    "--merge-output-format","mp4","--force-overwrites",
+    "-o",str(V/(x["id"]+".%(ext)s")),x['url']]
+  z=call(cmd,120)
+  x["download_stderr_tail"]=z.stderr[-850:];x["download_stdout_tail"]=z.stdout[-600:]
+  files=[f for f in V.glob(x["id"]+".*") if f.is_file() and f.stat().st_size>100000]
+  if z.returncode or not files:raise RuntimeError("NO_PLAYABLE_SOURCE_ACQUIRED "+z.stderr[-220:])
+  target=max(files,key=lambda f:f.stat().st_size)
+  raw=json.loads(ff(["ffprobe","-v","error","-show_streams","-show_format","-of","json",str(target)]))
+  video=next(v for v in raw["streams"] if v["codec_type"]=="video")
+  w,h=int(video["width"]),int(video["height"])
+  if w<1920 or h<1080 or w<=h:raise RuntimeError("ACTUAL_SOURCE_BELOW_1080P_OR_PORTRAIT")
+  duration=float(raw["format"].get("duration") or 0)
+  if duration<2:raise RuntimeError("SOURCE_TOO_SHORT")
+  ff(["ffmpeg","-nostdin","-loglevel","error","-i",str(target),"-f","null","-"],80)
+  pic=Image.new("RGB",(4*460,3*280),(8,8,8));d=ImageDraw.Draw(pic)
+  for k in range(12):
+   sec=round(duration*(k+.45)/12,3)
+   tmp=S/(x["id"]+"_"+str(k)+".jpg")
+   ret=call(["ffmpeg","-nostdin","-loglevel","error","-y","-ss",str(sec),
+      "-i",str(target),"-frames:v","1","-vf",
+      "scale=460:260:force_original_aspect_ratio=decrease,pad=460:260:(ow-iw)/2:(oh-ih)/2",
+      "-q:v","5",str(tmp)],25)
+   if ret.returncode==0 and tmp.exists():
+    with Image.open(tmp) as img:pic.paste(img.convert("RGB"),((k%4)*460,(k//4)*280+20))
+    tmp.unlink()
+   d.text(((k%4)*460+5,(k//4)*280+2),f"{sec:.1f}s {w}x{h}",fill="white")
+  sheet=S/(x["id"]+"_12frames.jpg");pic.save(sheet,quality=89)
+  x.update(status="ACTUAL_NATIVE_HD_FULL_DECODE_GT3_MODEL_AND_RACE_QA_PENDING",
+      bytes=target.stat().st_size,sha256=sha(target),file=str(target.relative_to(ROOT)),
+      dimensions=[w,h],actual_duration_seconds=duration,ffprobe=raw,
+      contact_sheet=str(sheet.relative_to(ROOT)),
+      full_decode="PASS",editor_status="REVIEW_ONLY_NO_QUALIFYING_SHOT_YET")
+  print("REAL VIDEO",x["id"],w,h,x["bytes"],x["sha256"],flush=True)
+ except Exception as exc:
+  x["status"]="REJECTED_OR_BLOCKED";x["failure"]=str(exc)[-900:]
+  for f in V.glob(x["id"]+".*"):f.unlink(missing_ok=True)
+  print("REJECTED",x["id"],x["failure"][-350:],flush=True)
+ x['elapsed_seconds']=round(time.monotonic()-started,1)
+(ROOT/"SOURCE_MANIFEST.json").write_text(json.dumps({"gate":"BLOCKED_PENDING_VISUAL_REAL_GT3_MAKE_VERIFY","sources":TARGETS,"qa_note":"Motorsport website titles and HLS format information alone are NOT scene qualification. Each extracted frame must be visually verified."},indent=2,ensure_ascii=False)+"\n")
+(ROOT/"README_FIRST.md").write_text("# Motorsport 2023 N24 and 2025 DTM verified test\nThis is an UNAPPROVED footage scout, not a GT3 montage release. See SOURCE_MANIFEST.json, physical native_video files and 12-frame contact sheets. Identical filmed camera angles must not be counted repeatedly.\n")
+print("ACTUAL_NATIVE_VIDEO_COUNT",sum(x["status"].startswith("ACTUAL_NATIVE_HD") for x in TARGETS),flush=True)
