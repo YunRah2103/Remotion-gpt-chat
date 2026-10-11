@@ -9,7 +9,7 @@ SRC=pathlib.Path("out/gt3-a2-mclaren-pad-source/mclaren_nurburgring_two_car_batt
 OUT=pathlib.Path("out/gt3-a2-mclaren-editor-review")
 OUT.mkdir(parents=True,exist_ok=True)
 DEST=OUT/"MC_720S_GT3_EVO_GTWCE_2026_NURBURGRING_01_CONTACT_1916_SOURCE_PADDED_1920_REVIEW.mp4"
-EXPECTED="5e8790bd607971836b312ed43015d823b5e6ef072f8a6dc01587aec41"
+EXPECTED="5e8790bd607971836b312ed43015d823b5fbd35b5e6ef072f8a6dc01587aec41"
 def sha(p):
  h=hashlib.sha256()
  with p.open("rb") as f:
