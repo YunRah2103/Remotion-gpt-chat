@@ -78,9 +78,9 @@ print("V5_DS_ORIGINAL_CONFIRMED",json.dumps({"size":original.stat().st_size,"sha
 # and 4-7s source shot storyboard; do not include parked press arrival, city monuments
 # without cars, or unrelated modern DS brand SUV shots.
 SHOTS=[
- ("ds-paris-black-side-night-pass",5.76,6.71,"Black classic Citroen DS crosses frame along Arc de Triomphe illuminated at night, broad side view.","premium"),
- ("ds-paris-red-side-night-pass",6.96,7.69,"Red classic Citroen DS drives by Arc de Triomphe, different car and tracking moment, broad side view.","premium"),
- ("ds-paris-black-rear-night-drive",7.78,8.62,"Classic black Citroen DS drives away on illuminated Paris road; tail-and-rear three-quarter view.","supporting")
+ ("ds-paris-black-side-night-pass",5.82,6.58,"Black classic Citroen DS crosses frame along Arc de Triomphe illuminated at night, broad side view; source edit boundary before 6.625 seconds.","premium"),
+ ("ds-paris-red-side-night-pass",6.68,7.37,"Red classic Citroen DS drives by Arc de Triomphe, different car; contiguous source shot between 6.625 and 7.416 seconds.","premium"),
+ ("ds-paris-black-rear-night-drive",7.48,8.19,"Classic black Citroen DS drives away on illuminated Paris road; source shot isolated between 7.416 and 8.25 seconds.","supporting")
 ]
 for slug,start,end,description,grade in SHOTS:
  clip=ROOT/"clips"/(slug+".mp4")
@@ -109,6 +109,7 @@ for slug,start,end,description,grade in SHOTS:
   "sha256":sha(clip),"original_sha256":DS_SHA,"source_in":start,"source_out":end,
   "probe":stream,"original_probe":source_probe,"contact_sheet":"contact_sheets/"+p.name,
   "camera_grade":grade,"actual_car_motion":True,"qa_description":description,
+  "single_angle_no_intra_clip_cut":True,"scene_boundaries_verified":[5.75,6.625,7.416667,8.25,9.041667],
   "rights_notes":"Manufacturer shared with public 'View and download' press permissions, but social reposting/distribution rights not expressly confirmed. Verify rights before TikTok/Reels posting."}
  manifest["clips"].append(info)
  print("V5_ACTUAL_CITROEN_DS_SHOT",slug,json.dumps(stream),"sha",info["sha256"],flush=True)
@@ -116,7 +117,7 @@ for slug,start,end,description,grade in SHOTS:
 manifest.update({"true_native_video_clips":len(manifest["clips"]),"models":["Citroen 2CV","original Alpine A110","Renault 5 Turbo 2","classic Citroen DS"],"models_count":4,
  "premium_dramatic_shots":sum(x["camera_grade"]=="premium" for x in manifest["clips"]),
  "supporting_real_motion_shots":sum(x["camera_grade"]=="supporting" for x in manifest["clips"]),
- "gate":"BLOCKED_PARTIAL","last_new_video":"Three inspected real historic Citroen DS night driving clips, source full native 1920x1080 24fps official publisher film.",
+ "gate":"BLOCKED_PARTIAL","last_new_video":"Three source-cut-boundary-verified classic Citroen DS night-driving clips from 1080p official press film, no embedded edits in each.",
  "contract_min_shots":18,"contract_min_models":5,
  "licence_warning":"2CV CC attribution; Alpine/R5/DS publisher and archived creator reuse rights not fully independently cleared; request rights verification before publication."})
 assert len(manifest["clips"])==17 and manifest["models_count"]==4
