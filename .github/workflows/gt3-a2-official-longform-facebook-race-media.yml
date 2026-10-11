@@ -1,0 +1,52 @@
+name: YUNEX A2 Official GTWC Full Resolution Longform Racing Original Scout
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a2-ferrari-aston-mclaren
+    paths:
+      - .github/workflows/gt3-a2-official-longform-facebook-race-media.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-race-footage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Chromium source capture and verified native FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q --break-system-packages playwright pillow yt-dlp requests
+          python -m playwright install chromium
+      - name: Acquire official public racing source video and extract true native HD
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a2/facebook_official_longform.py
+      - name: Independently verify source ZIP hashes and actual file bytes
+        if: always()
+        run: |
+          python - <<'PY'
+          import zipfile,pathlib,json,hashlib
+          p=pathlib.Path('out/gt3-a2-official-longform-fb/GT3_A2_BROWSER_ORIGINALS_AND_QA.zip')
+          if not p.exists():print('NO_ZIP_SOURCE_FAILED');raise SystemExit(0)
+          with zipfile.ZipFile(p) as z:
+            assert z.testzip() is None
+            manifest=json.loads(z.read('SOURCE_MANIFEST.json'))
+            count=0
+            for s in manifest['sources']:
+              if s['status']=='REAL_NATIVE_HD_FULL_DECODE_MODEL_REVIEW_PENDING':
+                actual=z.read(s['file'])
+                assert hashlib.sha256(actual).hexdigest()==s['sha256'] and len(actual)>=100000
+                count+=1
+          assert count==manifest['native_hd_media_file_count']
+          print('ACTUAL_NATIVE_HD_VIDEOS_PRESENT',count,'GT3_MANUFACTURER_REVIEW_PENDING')
+          PY
+      - name: Upload ONE real-video-or-diagnostic ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-A2-OFFICIAL-GTWC-REAL-LANDSCAPE-NATIVE-FERRARI-MCLAREN-REVIEW
+          path: out/gt3-a2-official-longform-fb/GT3_A2_BROWSER_ORIGINALS_AND_QA.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
