@@ -1,0 +1,44 @@
+name: GT3 Agent A Nürburgring Producer Original Second Wave
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-nbrtv-second-wave.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe-producer-originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install real-video QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q requests beautifulsoup4 pillow
+      - name: Resolve original links and download native videos
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/nbrtv_discover_remaining_producer_media.py
+      - name: Upload media with proof, no unverified make approval
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-A-NBRTV-PRODUCER-SECOND-WAVE-NATIVE-REVIEW
+          path: out/gt3-nbrtv-second-wave/
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 7
+      - name: Report actual native media count
+        if: always()
+        run: |
+          python - <<'PY'
+          import pathlib,json,os
+          p=pathlib.Path('out/gt3-nbrtv-second-wave/result.json')
+          if p.exists():
+            d=json.loads(p.read_text())
+            good=[x for x in d['results'] if x['status'].startswith('NATIVE_HD')]
+            t=f'Acquired actual new producer original HD files: {len(good)}. Pending independent scene/model QA.\n'
+            t+='\n'.join(f'- {x["name"]}: {x["native_pixels"]} SHA {x["sha256"]}' for x in good)
+          else:t='No completed media manifest: run failed.'
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(t+'\n')
+          PY
