@@ -3,6 +3,9 @@ import requests,re,json,html
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin,urlparse,unquote
 urls=[
+"https://www.peugeot.co.uk/models/categories/sport/peugeot-9x8.html",
+"https://www.peugeot.com/en/brand/peugeot-sport/",
+"https://www.peugeot-sport.com/2026/09/peugeot-9x8-hypercar/",
 "https://newsroom.bugatti.com/en/models/bolide",
 "https://newsroom.bugatti.com/en/models/chiron-pur-sport",
 "https://newsroom.bugatti.com/en/press-releases/feeling-the-track-bugatti-bolide-owners-take-on-circuit-paul-ricard",
