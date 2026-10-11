@@ -15,6 +15,9 @@ for p in [OUT,CLIPS,SHEETS]:p.mkdir(parents=True,exist_ok=True)
 session=requests.Session()
 session.headers.update({"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126.0 Safari/537.36","Accept-Language":"en-GB,en;q=0.9"})
 PAGES=[
+ ("renault-r5-turbo-3e-2025","Renault 5 Turbo 3E","https://media.renault.ch/fr/10696/article/21972"),
+ ("alpine-a110-le-mans","Alpine A110 R Le Mans","https://media.renault.ch/fr/article/21736"),
+ ("renault-megane-trophy","Renault Megane RS Trophy","https://www.mynewsdesk.com/se/renault/videos/nya-megane-rs-trophy-video-38516"),
  ("alpine-a110-r","Alpine A110 R","https://media.renault.ch/fr/article/21682"),
  ("alpine-a110-ultime","Alpine A110 R Ultime","https://media.renault.ch/fr/article/22057"),
  ("alpine-a110","Alpine A110","https://media.renault.ch/fr/10610/article/21473"),
