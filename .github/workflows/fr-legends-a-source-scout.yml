@@ -1,0 +1,39 @@
+name: FR Legends A - Official Archive and Stock Scout
+
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - '.github/workflows/fr-legends-a-source-scout.yml'
+      - 'production/videos/french-icons-001/agent_a_scout_publishers_stock.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect-source-access:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+      PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install provider metadata parser
+        run: |
+          python -m pip install --disable-pip-version-check -r production/footage_finder/requirements.txt
+      - name: Search official downloadable videos and exact-model stock
+        run: |
+          python production/videos/french-icons-001/agent_a_scout_publishers_stock.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-a-direct-media-and-stock-evidence
+          path: out/fr-classics-source-scout/report.json
+          retention-days: 7
+          if-no-files-found: warn
