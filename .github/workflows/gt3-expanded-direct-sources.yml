@@ -1,0 +1,42 @@
+name: YUNEX Agent A Expanded Direct MP4 Source Acquisition
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a-footage
+    paths:
+      - .github/workflows/gt3-expanded-direct-sources.yml
+      - production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_expanded_direct.py
+      - production/videos/gt3-nurburgring-multicar-001/agent-a/expanded_direct_sources.json
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg and quality inspection packages
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q requests pillow
+          git rev-parse HEAD
+      - name: Acquire and probe real publisher source files
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_expanded_direct.py
+      - name: Bundle native originals and visual proof for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-NURBURGRING-EXPANDED-NATIVE-MP4-REAL-SOURCES
+          path: out/gt3-direct-2026/
+          if-no-files-found: warn
+          retention-days: 7
+          compression-level: 0
+      - name: Publish transparent gate report
+        if: always()
+        run: |
+          if test -f out/gt3-direct-2026/manifest.json; then
+            python -c 'import json; d=json.load(open("out/gt3-direct-2026/manifest.json")); print("Native files:",d["native_hd_source_files"]); [print(s["id"],s["result"],s.get("width"),s.get("height"),s.get("error","")[:120]) for s in d["sources"]]'
+          fi
+          echo "GT3 identity/uniqueness requires independent human approval before PASS" >> "$GITHUB_STEP_SUMMARY"
