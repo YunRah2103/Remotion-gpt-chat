@@ -1,0 +1,48 @@
+name: STO Official YouTube original native source test
+on:
+  push:
+    branches: [automotive-edits/huracan-sto-v10-001/a-footage]
+    paths:
+      - production/videos/huracan-sto-v10-001/footage/probe_official_youtube.py
+      - .github/workflows/sto-official-youtube-probe.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  originals:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install FFmpeg + updated extractor
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check -U Pillow yt-dlp
+          python -m py_compile production/videos/huracan-sto-v10-001/footage/probe_official_youtube.py
+      - name: Probe native FullHD playable versions of original STO driving films
+        run: python production/videos/huracan-sto-v10-001/footage/probe_official_youtube.py
+      - name: Report actual acquired source quality
+        if: always()
+        run: |
+          python - <<'PY'
+          import pathlib,json,os
+          f=pathlib.Path('out/sto-youtube-hd/manifest.json')
+          if f.exists():
+           rows=json.loads(f.read_text())['sources']
+           with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as o:
+            o.write('## Huracán STO — actual original 1080p test\n')
+            for r in rows:o.write('- '+r['id']+': '+r['status']+' '+str(r.get('actual_probe',{}).get('width',''))+' '+r.get('error','')[-260:]+'\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STO-ORIGINAL-REAL-1080P-PUBLIC-VIDEO-TEST
+          path:
+            out/STO_PUBLIC_YOUTUBE_ORIGINALS_RESEARCH.zip
+          if-no-files-found: warn
+          retention-days: 5
+          compression-level: 0
