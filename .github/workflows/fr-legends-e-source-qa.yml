@@ -1,0 +1,74 @@
+name: French Legends Agent E - Independent 42 Clip Quality Gate
+
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/e-manager
+    paths:
+      - .github/workflows/fr-legends-e-source-qa.yml
+      - production/videos/french-icons-001/agent_e_source_audit.py
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  independent-source-check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch THE canonical 42-clip original video pack
+        uses: actions/download-artifact@v4
+        with:
+          repository: YunRah2103/Remotion-gpt-chat
+          run-id: 38169392715
+          name: YUNEX-FRENCH-LEGENDS-ALL-42-AGENT-A-AND-B-CLIPS-ONE-ZIP
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/e-source
+
+      - name: Install image-contact-sheet support
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python3 -m pip install --user pillow
+
+      - name: Audit all 42 exact source MP4 bytes, full decode, generate visual contact proof
+        run: |
+          python3 production/videos/french-icons-001/agent_e_source_audit.py
+
+      - name: Save independently generated audit data to Manager E branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add production/videos/french-icons-001/agent-e/SOURCE_GATE_INDEPENDENT_QA.md
+          git add production/videos/french-icons-001/agent-e/SOURCE_GATE_INDEPENDENT_QA.json
+          git add production/videos/french-icons-001/agent-e/decoded-contact-*.jpg
+          if ! git diff --staged --quiet; then
+            git commit -m "Agent E: record 42 real decoded-video source QA and contact sheets"
+            git push
+          fi
+
+      - name: Publish portable independent QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: FR-LEGENDS-AGENT-E-INDEPENDENT-42-CLIP-QA
+          path: |
+            production/videos/french-icons-001/agent-e/SOURCE_GATE_INDEPENDENT_QA.md
+            production/videos/french-icons-001/agent-e/SOURCE_GATE_INDEPENDENT_QA.json
+            production/videos/french-icons-001/agent-e/decoded-contact-*.jpg
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Explicit non-fake verdict
+        if: always()
+        run: |
+          if [ -f production/videos/french-icons-001/agent-e/SOURCE_GATE_INDEPENDENT_QA.md ]; then
+            head -n 22 production/videos/french-icons-001/agent-e/SOURCE_GATE_INDEPENDENT_QA.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "QA BLOCKED - no report produced; check job logs" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "This does not clear creative, finished-film, soundtrack, or publishing gates." >> "$GITHUB_STEP_SUMMARY"
