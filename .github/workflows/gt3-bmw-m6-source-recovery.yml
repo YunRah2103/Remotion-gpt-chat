@@ -1,0 +1,45 @@
+name: YUNEX BMW M6 GT3 2018 Native 4K Recovery
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths:
+      - .github/workflows/gt3-bmw-m6-source-recovery.yml
+      - production/videos/gt3-nurburgring-multicar-001/agent-a/verify_falken_bmw_m6_2018.py
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquire-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install physical original media tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q pillow
+      - name: Actually acquire original BMW M6 GT3 source sections
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/verify_falken_bmw_m6_2018.py
+      - name: Upload source-bitstream original BMW segments plus model evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-N24-BMW-M6-2018-NATIVE-4K-ACTUAL-CLIPS
+          path: out/gt3-bmw-authentic-4k/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
+      - name: Report source-level result
+        if: always()
+        shell: bash
+        run: |
+          if test -f out/gt3-bmw-authentic-4k/manifest.json; then
+            python - <<'PY'
+          import json
+          d=json.load(open('out/gt3-bmw-authentic-4k/manifest.json'))
+          for s in d['clips']:
+            print(s['id'],s['status'],s.get('sha256',''),s.get('error',''))
+          PY
+          fi
+          echo "BMW visual and track proof require review before inclusion; t195/t214 Porsche correction remains valid." >> "$GITHUB_STEP_SUMMARY"
