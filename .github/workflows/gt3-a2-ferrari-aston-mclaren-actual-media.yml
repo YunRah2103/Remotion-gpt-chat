@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     env:
-      A2_RUNTIME_SECONDS: "360"
+      A2_RUNTIME_SECONDS: "280"
       A2_MAX_ASSETS: "12"
     steps:
       - name: Checkout dedicated A2 branch
