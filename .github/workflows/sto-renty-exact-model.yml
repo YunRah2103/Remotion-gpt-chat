@@ -1,0 +1,72 @@
+name: STO exact model Renty high source audit
+on:
+  push:
+    branches: [automotive-edits/huracan-sto-v10-001/a-footage]
+    paths: [.github/workflows/sto-renty-exact-model.yml]
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  download:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg and PIL
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python3 -m pip install --break-system-packages Pillow
+      - name: Download actual Renty exact road STO high video and inspect
+        run: |
+          python3 - <<'PY'
+          import urllib.request,json,hashlib,subprocess,zipfile
+          from pathlib import Path
+          from PIL import Image,ImageDraw
+          out=Path('out/sto-renty-exact');out.mkdir(parents=True,exist_ok=True)
+          src='https://renty.ae/uploads/short-videos/videos/high/short_video_52062ec4cdd5203e.mp4'
+          page='https://renty.ae/cars/lamborghini-huracan-sto/5143/detail'
+          state={'source':src,'publisher_page':page,'model':'Huracan STO (Green), 2023','license':'NOT_GRANTED','status':'NOT_DOWNLOADED'}
+          f=out/'renty_green_2023_sto_high.mp4'
+          try:
+           req=urllib.request.Request(src,headers={'User-Agent':'Mozilla/5.0'})
+           with urllib.request.urlopen(req,timeout=30) as response:
+            if int(response.headers.get('Content-Length') or 0)>150000000:raise ValueError('too large')
+            n=0
+            with f.open('wb') as dest:
+             while True:
+              chunk=response.read(1024*1024)
+              if not chunk:break
+              n+=len(chunk)
+              if n>150000000:raise ValueError('exceeds max')
+              dest.write(chunk)
+           probe=subprocess.run(['ffprobe','-v','error','-show_format','-show_streams','-of','json',str(f)],capture_output=True,text=True,timeout=45,check=True)
+           j=json.loads(probe.stdout);v=next(x for x in j['streams'] if x['codec_type']=='video')
+           state.update(width=v['width'],height=v['height'],fps=v.get('avg_frame_rate'),duration=float(j['format']['duration']),bitrate=j['format'].get('bit_rate'),sha256=hashlib.sha256(f.read_bytes()).hexdigest(),bytes=n)
+           if v['width']<1920 or v['height']<1080 or v['width']<=v['height']:
+            state['status']='REJECT_RESOLUTION_OR_PORTRAIT';f.unlink()
+           else:
+            state['status']='NATIVE_FHD_CANDIDATE_REQUIRES_MANUAL_WATERMARK_DRIVING_QA'
+            im=Image.new('RGB',(960,4*155),'#111');draw=ImageDraw.Draw(im)
+            for i in range(16):
+             t=max(.05,state['duration']*(i+.5)/16);tmp=out/'.tmp.jpg'
+             subprocess.run(['ffmpeg','-v','error','-y','-ss',str(t),'-i',str(f),'-vf','scale=240:135','-frames:v','1',str(tmp)],capture_output=True,timeout=40)
+             if tmp.exists():
+              with Image.open(tmp) as frame:im.paste(frame.convert('RGB'),((i%4)*240,(i//4)*155+17))
+              tmp.unlink()
+             draw.text(((i%4)*240+3,(i//4)*155+3),str(round(t,1)),fill='white')
+            im.save(out/'renty_green_sto_contact.jpg',quality=85)
+          except Exception as e:
+           state.update(status='DOWNLOAD_ERROR',error=str(e)[:250]);f.unlink(missing_ok=True)
+          (out/'manifest.json').write_text(json.dumps(state,indent=2))
+          with zipfile.ZipFile('out/STO_RENTY_ORIGINAL_REVIEW.zip','w',zipfile.ZIP_STORED) as z:
+           for g in out.rglob('*'):
+            if g.is_file():z.write(g,g.relative_to(out))
+          print('STO_Renty_Actual',state)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STO-RENTY-EXACT-STO-ORIGINAL-QA
+          path: out/STO_RENTY_ORIGINAL_REVIEW.zip
+          retention-days: 5
+          compression-level: 0
