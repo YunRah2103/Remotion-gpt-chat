@@ -1,0 +1,66 @@
+name: YUNEX GT3 BMW M6 2018 Nürburgring Track Action Identity Gate
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a-footage
+    paths:
+      - .github/workflows/gt3-bmw-m6-identity.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  identify-bmw:
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg and Pillow
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q pillow
+      - name: Sample 2018 Falken source at potentially BMW-specific scene timestamps
+        run: |
+          mkdir -p out/gt3-bmw-identity
+          python - <<'PY'
+          import json,subprocess,hashlib
+          from pathlib import Path
+          from PIL import Image,ImageDraw
+          out=Path('out/gt3-bmw-identity')
+          u='https://www.falkentyre.com/_storage/asset/77989/storage/master/file/317009/download/FALKEN-HDR-h264-10Bit-56MBit.mp4'
+          times=[183,189,195,201,207,211,214,217,220,224,229,241,245,249,252,255,259,264]
+          sheet=Image.new('RGB',(500*5,315*4),'#101010');draw=ImageDraw.Draw(sheet)
+          results=[]
+          for i,t in enumerate(times):
+            f=out/f'source_{t:03d}s.jpg'
+            cmd=['ffmpeg','-nostdin','-v','error','-y','-ss',str(t),'-i',u,'-frames:v','1','-vf','zscale=t=linear:npl=100,format=gbrpf32le,tonemap=hable:desat=0,zscale=t=bt709:m=bt709:p=bt709,format=yuv420p,scale=500:-2',str(f)]
+            try:
+              p=subprocess.run(cmd,capture_output=True,text=True,timeout=23)
+              if p.returncode:raise ValueError(p.stderr[-140:])
+              with Image.open(f) as im:
+                x=(i%5)*500;y=(i//5)*315
+                sheet.paste(im.convert('RGB'),(x,y+25))
+                draw.text((x+6,y+5),f'Falken original t={t}s',fill='white')
+              f.unlink(missing_ok=True);results.append({'t':t,'ok':True})
+              print('SOURCE_FRAME',t,'PASS',flush=True)
+            except Exception as e:results.append({'t':t,'ok':False,'error':str(e)})
+          sheet.save(out/'BMW_M6_VISUAL_CLASSIFICATION_CONTACT.jpg',quality=92)
+          for index,t in enumerate([214,249]):
+            f=out/f'FALKEN_GT3_NATIVE_4K_t{t}_CANDIDATE.mkv'
+            p=subprocess.run(['ffmpeg','-nostdin','-v','error','-y','-ss',str(t),'-i',u,'-t','8','-map','0:v:0','-map','0:a?','-c','copy',str(f)],capture_output=True,text=True,timeout=95)
+            if p.returncode==0 and f.is_file():
+              probe=subprocess.run(['ffprobe','-v','error','-select_streams','v:0','-show_entries','stream=width,height','-of','csv=p=0',str(f)],capture_output=True,text=True)
+              print('NATIVE_SAMPLE',t,probe.stdout.strip(),f.stat().st_size,flush=True)
+              results.append({'clip':f.name,'timestamp':t,'probe':probe.stdout.strip(),'bytes':f.stat().st_size,'sha256':hashlib.sha256(f.read_bytes()).hexdigest()})
+            else:results.append({'clip':t,'error':p.stderr[-200:]})
+          (out/'manifest.json').write_text(json.dumps({'source':u,'actual_frames':results,'make':'UNVERIFIED until image inspection','warning':'Never credit BMW without clear badge/silhouette/livery evidence'},indent=2)+'\n')
+          PY
+      - name: Upload actual 4K samples with visual ID proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-BMW-M6-2018-18FRAME-NATIVE-4K-ID-CHECK
+          path: out/gt3-bmw-identity/
+          if-no-files-found: warn
+          retention-days: 7
+          compression-level: 0
