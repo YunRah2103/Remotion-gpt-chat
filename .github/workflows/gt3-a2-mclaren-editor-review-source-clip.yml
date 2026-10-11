@@ -1,0 +1,40 @@
+name: YUNEX GT3 A2 McLaren Original and Editor Review Video
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a2-ferrari-aston-mclaren
+    paths:
+      - .github/workflows/gt3-a2-mclaren-editor-review-source-clip.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  package-original-and-cinematic-contact-clip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download existing PROVEN original movie evidence from this same repository
+        run: |
+          mkdir -p out/gt3-a2-mclaren-pad-source staged
+          gh run download 38160211234 -R "${GITHUB_REPOSITORY}" -n "GT3-A2-MCLAREN-GTWC-NEARHD-REAL-VIDEO-REVIEW-ONLY" -D staged
+          unzip -qq staged/GT3_A2_MCLAREN_1916X1078_NEAR_1080_REVIEW.zip -d staged/unpacked
+          cp staged/unpacked/real_source_films_pending_gt3_visual_qa/mclaren_nurburgring_two_car_battle_7.mp4 out/gt3-a2-mclaren-pad-source/
+          sha256sum out/gt3-a2-mclaren-pad-source/*.mp4
+      - name: FFmpeg actual collision sequence extraction no scaling and strict original provenance
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -u production/videos/gt3-nurburgring-multicar-001/agent-a2/build_mclaren_editor_review_package.py
+      - name: Upload actual two movie files and SHA contract review flag
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-A2-MCLAREN-REAL-2026-NURBURGRING-ORIGINAL-AND-EDIT-REVIEW-ONLY
+          path: out/gt3-a2-mclaren-editor-review/GT3_A2_MCLAREN_2026_NURBURGRING_VERIFIED_CLIP_AND_ORIGINAL_REVIEW.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
