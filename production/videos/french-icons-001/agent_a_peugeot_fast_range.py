@@ -13,7 +13,7 @@ ROOT.mkdir(parents=True,exist_ok=True)
 IDENT="peugeot-205-gti-1.9.-is-this-the-best-hot-hatch-ever"
 FILENAME="Peugeot 205 GTi 1.9. Is this the best hot-hatch ever .mp4"
 URL="https://archive.org/download/"+IDENT+"/"+urllib.parse.quote(FILENAME)
-TIMES=[("front-205-oncoming",894.5,4.5),("rear-205-tracking",1015,4.5),("front-205-alternate",905,3)]
+TIMES=[("front-205-oncoming",991.0,9.0),("rear-205-tracking",1113.5,9.0)]
 def cmd(a,t=115):
  p=subprocess.run(a,text=True,capture_output=True,timeout=t)
  if p.returncode:raise RuntimeError(p.stderr[-650:])
