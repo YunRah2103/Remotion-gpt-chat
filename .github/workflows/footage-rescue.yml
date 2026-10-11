@@ -2,7 +2,7 @@ name: Footage Rescue - multi-engine source acquisition
 
 on:
   push:
-    branches: [feature/footage-rescue-multisource-20261011]
+    branches: [main, feature/footage-rescue-release-20261011]
     paths:
       - 'production/footage_rescue/**'
       - 'production/tests/test_footage_rescue.py'
