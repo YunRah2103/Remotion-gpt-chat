@@ -1,0 +1,58 @@
+name: Porsche Blender Reveal - native visual proof
+on:
+  push:
+    branches: [automotive-edits/porsche-blender-reveal-001/master]
+    paths:
+      - 'production/videos/porsche-blender-reveal-001/**'
+      - '.github/workflows/porsche-blender-reveal.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install native Blender and encoder
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq blender ffmpeg xvfb python3-pil
+      - name: Download the approved Porsche without editing its repository
+        run: |
+          mkdir -p /tmp/porsche out/proof
+          curl -fLsS --retry 2 https://raw.githubusercontent.com/YunRah2103/yunus-video-lab/main/cars/porsche-911-gt3-rs-992/model.glb -o /tmp/porsche/model.glb
+          echo '1c73fcb138c31e2b1d5ed126a2412074bb17f8e960b355436f28139bf518e1eb  /tmp/porsche/model.glb' | sha256sum -c -
+          blender --version > out/proof/blender-version.txt
+          echo '${{ github.sha }}' > out/proof/source-sha.txt
+      - name: Native full-resolution visual proofs
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          xvfb-run -a blender -b -t 4 --python-exit-code 1 --python production/videos/porsche-blender-reveal-001/scene.py -- --model /tmp/porsche/model.glb --out out/proof --frames 0,180,213,214,270,319,369,418 --samples 32 --save > out/proof/render.log 2>&1
+      - name: Generate review contact sheet
+        run: |
+          python3 - <<'PY'
+          from PIL import Image,ImageDraw
+          from pathlib import Path
+          frames=sorted(Path('out/proof').glob('frame_*.png'))
+          assert len(frames)==8, len(frames)
+          sheet=Image.new('RGB',(1080,1008),(16,18,20))
+          draw=ImageDraw.Draw(sheet)
+          for i,p in enumerate(frames):
+            img=Image.open(p); assert img.size==(1080,1920)
+            img.thumbnail((270,480))
+            x,y=(i%4)*270,(i//4)*504
+            sheet.paste(img,(x,y))
+            draw.text((x+8,y+483),p.stem,fill='white')
+          sheet.save('out/proof/contact.jpg',quality=95)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: PORSCHE-BLENDER-NATIVE-PROOF
+          path: out/proof/
+          if-no-files-found: error
+          retention-days: 14
