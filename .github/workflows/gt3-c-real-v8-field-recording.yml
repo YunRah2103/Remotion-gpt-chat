@@ -1,0 +1,74 @@
+name: GT3 Agent C - REAL GT3 Field V8 Samples
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/c-audio-final
+    paths:
+      - .github/workflows/gt3-c-real-v8-field-recording.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-race-engine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Get actual racing field recordings and verify audio
+        shell: bash
+        run: |
+          mkdir -p real_v8_audio
+          cat > /tmp/download.py <<'PY'
+          import urllib.request, urllib.error, re, html, json, os, hashlib, subprocess
+          src=[
+          ("MOSCOW_REAL_GT3_V8_TRACK_56S", "https://freesound.org/people/Walking.With.Microphones/sounds/556039/", 556039, "Real Zoom H6 field recording, named sequence Bentley Continental GT3, BMW Z4 GT3, Mercedes SLS AMG GT3; CC0"),
+          ("SILVERSTONE_REAL_GT3_RACE_2015", "https://freesound.org/people/konakaboom/sounds/275191/", 275191, "Actual 2015 British GT field recording including BMW Z4 GT3, Aston Martin GT3, Mercedes GT3; CC BY-NC 4.0"),
+          ("V8_SUPERCAR_SAMPLE_REVIEW", "https://freesound.org/people/FFKoenigsegg20012017/sounds/339136/", 339136, "Third-party V8-labeled custom effect; NOT independently proven real; never use without review")
+          ]
+          headers={"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126.0.0.0 Safari/537.36","Accept":"text/html,application/xhtml+xml,*/*"}
+          results=[]
+          for name,page,sid,description in src:
+            record={"name":name,"sound_id":sid,"page":page,"description":description}
+            try:
+              req=urllib.request.Request(page,headers=headers)
+              with urllib.request.urlopen(req,timeout=25) as resp: data=resp.read().decode("utf-8","replace")
+              dec=html.unescape(data).replace(r'\/', '/')
+              pats=[
+                rf'https?://[^"\'\s<>]*cdn\.freesound\.org/previews/{sid//1000}/{sid}_[0-9]+-(?:hq|lq)\.mp3',
+                rf'https?://[^"\'\s<>]*cdn\.freesound\.org/previews/\d+/{sid}_[0-9]+-(?:hq|lq)\.mp3',
+                rf'//cdn\.freesound\.org/previews/\d+/{sid}_[0-9]+-(?:hq|lq)\.mp3',
+              ]
+              links=[]
+              for pat in pats: links += re.findall(pat,dec)
+              links=list(dict.fromkeys([('https:'+x if x.startswith('//') else x) for x in links]))
+              links.sort(key=lambda x:("hq.mp3" not in x))
+              record["page_bytes"]=len(data)
+              record["found_candidate_previews"]=links[:7]
+              if not links: raise RuntimeError("No mp3 preview URLs found in HTML")
+              for url in links:
+                try:
+                  req=urllib.request.Request(url,headers={"User-Agent":headers["User-Agent"],"Referer":"https://freesound.org/"})
+                  with urllib.request.urlopen(req,timeout=30) as resp: blob=resp.read()
+                  if len(blob)<2000 or len(blob)>20000000:raise RuntimeError("bad bytes "+str(len(blob)))
+                  filename="real_v8_audio/"+name+".mp3"
+                  open(filename,"wb").write(blob)
+                  pr=subprocess.run(["ffprobe","-v","error","-show_entries","format=duration,format_name","-of","json",filename],capture_output=True,text=True)
+                  if pr.returncode:raise RuntimeError("audio validation failed "+pr.stderr[-150:])
+                  record.update(status="DOWNLOADED_AUDIO",url=url,bytes=len(blob),sha256=hashlib.sha256(blob).hexdigest(),media=json.loads(pr.stdout))
+                  break
+                except Exception as e:record["last_preview_error"]=str(e)[:250]
+              if record.get("status")!="DOWNLOADED_AUDIO":raise RuntimeError(record.get("last_preview_error","none downloaded"))
+            except Exception as e:
+              record["status"]="FAILED";record["error"]=str(e)[:300]
+            results.append(record)
+            print(json.dumps(record,ensure_ascii=False),flush=True)
+          open("real_v8_audio/acquisition_report.json","w").write(json.dumps(results,indent=2))
+          if not any(r.get("status")=="DOWNLOADED_AUDIO" and r["sound_id"]==556039 for r in results):
+            print("WARNING: no verified field recording yet, not claiming audio acquisition")
+          PY
+          python /tmp/download.py
+      - name: Package actual downloaded recordings (no fabricated bytes)
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-C-REAL-FIELD-RECORDED-V8-AUDIO-REVIEW
+          path: real_v8_audio/
+          if-no-files-found: error
