@@ -1,0 +1,33 @@
+name: FR Legends A - Official Citroen DS Video Original Download UI
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - 'production/videos/french-icons-001/agent_a_ds70_press_file_ui.py'
+      - '.github/workflows/fr-a-ds70-download-ui.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual-file-download-controls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Setup real share browser
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Identify download controls on two exact original publisher MP4s
+        run: python production/videos/french-icons-001/agent_a_ds70_press_file_ui.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-a-citroen-ds-original-mp4-download-ui-evidence
+          path: out/fr-a-ds-original-media-ui/
+          retention-days: 7
+          if-no-files-found: warn
