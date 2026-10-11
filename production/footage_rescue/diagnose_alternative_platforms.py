@@ -9,6 +9,7 @@ import shutil
 
 SITES={
  "vimeo":"https://vimeo.com/1084537", # Official Blender, Big Buck Bunny
+ "vimeo_embed":"https://player.vimeo.com/video/1084537", # Official Blender player embed
  "dailymotion":"https://www.dailymotion.com/video/x6nqmd", # CC BY film, reupload
  "peertube":"https://video.blender.org/videos/watch/bf1f3fb5-b119-4f9f-9930-8e20e892b898", # Blender's video instance
 }
