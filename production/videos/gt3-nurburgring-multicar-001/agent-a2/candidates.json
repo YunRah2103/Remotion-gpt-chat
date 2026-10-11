@@ -4,6 +4,62 @@
   "notes": "Publisher pages are discovery candidates, NOT acquired GT3 race shots. Agent A handles Audi/Lamborghini. No assumptions about model, format, class, or watermark until reviewed.",
   "sources": [
     {
+      "id": "nls9-official-2025-highlights",
+      "make": "Ferrari/Aston Martin",
+      "model": "296 GT3 & Vantage GT3 - VISUAL_QA",
+      "event": "2025 NLS9 Nürburgring",
+      "url": "https://www.motorsport.com/endurance/video/2025-nls9-57-adac-barbarossapreis-highlights/664576/",
+      "priority": -10
+    },
+    {
+      "id": "nls9-start-race",
+      "make": "Ferrari/Aston Martin",
+      "model": "296 GT3 & Vantage GT3 - VISUAL_QA",
+      "event": "2025 NLS9 Nürburgring start",
+      "url": "https://www.motorsport.com/endurance/video/drama-at-the-start-of-nls9/664531/",
+      "priority": -9
+    },
+    {
+      "id": "nls9-win-37sec",
+      "make": "Ferrari",
+      "model": "296 GT3",
+      "event": "2025 NLS9 Nürburgring",
+      "url": "https://www.motorsport.com/endurance/video/verstappen-and-lulham-take-victory-at-nls9/664541/",
+      "priority": -8
+    },
+    {
+      "id": "n24-2023-full-highlights",
+      "make": "Ferrari",
+      "model": "296 GT3",
+      "event": "2023 Nürburgring 24h",
+      "url": "https://www.motorsport.com/endurance/video/24h-nurburgring-full-race-highlights/591453/",
+      "priority": -7
+    },
+    {
+      "id": "aston-2014-gt3-lap",
+      "make": "Aston Martin",
+      "model": "V12 Vantage GT3 2014",
+      "event": "2014 Nürburgring 24h",
+      "url": "https://www.motorsport.com/endurance/video/aston-martin-vantage-gt3-n-rburgring-in-car-lap/96151/",
+      "priority": -6
+    },
+    {
+      "id": "aston-2014-gt3-race",
+      "make": "Aston Martin",
+      "model": "V12 Vantage GT3 2014",
+      "event": "2014 Nürburgring 24h",
+      "url": "https://www.motorsport.com/endurance/video/aston-martin-at-the-2014-n-rburgring-24-hours-race/96046/",
+      "priority": -5
+    },
+    {
+      "id": "mclaren-2026-retro-film",
+      "make": "McLaren",
+      "model": "720S GT3 EVO #59",
+      "event": "2026 Nürburgring 24h",
+      "url": "https://www.24h-rennen.de/en/2026/05/16/timo-glock-in-the-legendary-michael-schumacher-livery/",
+      "priority": -4
+    },
+    {
       "id": "ferrari-nls9-instagram-race",
       "make": "Ferrari",
       "model": "296 GT3",
