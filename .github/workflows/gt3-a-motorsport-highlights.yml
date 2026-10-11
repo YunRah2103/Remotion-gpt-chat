@@ -1,0 +1,45 @@
+name: GT3 Agent A Motorsport N24 GT3 Lamborghini Original Highlights
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-motorsport-highlights.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-filmmaker-media:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install download/verification dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q pillow yt-dlp requests
+      - name: Download actual native-HD sources and generate FFprobe + contact sheets
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_motorsport_highlights_source.py
+      - name: Upload actual video byte package and transparent failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-MOTORSPORT-GT3-REAL-NATIVE-VIDEO-OR-DIAGNOSTICS
+          path: out/gt3-a-motorsport-highlights/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Actual-media count
+        if: always()
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os
+          p=Path('out/gt3-a-motorsport-highlights/SOURCE_MANIFEST.json')
+          if not p.is_file():
+            summary='Acquisition not completed; no native source media proven.'
+          else:
+            j=json.loads(p.read_text()); good=[x for x in j['sources'] if x['status'].startswith('ACTUAL_NATIVE_HD')]
+            summary='Actual native landscape HD films downloaded and full-decoded: '+str(len(good))+'; ALL model and race footage QA pending.\n'
+            summary+='\n'.join(f'- {x["id"]}: {x["dimensions"]}, {x["bytes"]} bytes SHA {x["sha256"]}' for x in good)
+          Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(summary+'\n')
+          PY
