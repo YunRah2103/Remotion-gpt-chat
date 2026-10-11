@@ -1,0 +1,37 @@
+name: GT3 Agent A Ford Mustang 2026 Actual Nürburgring Scene High-Resolution Close QA
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-ford-2026-nordschleife-zoom-original.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect-actual-ford-nbr-make:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install authentic video original frame extraction tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q pillow
+      - name: Fetch actual previously acquired HRT Ford 84-sec true native HD original source media
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/hrt-2026-full-original
+          gh run download 38161427589 --repo YunRah2103/Remotion-gpt-chat --name GT3-AGENT-A-HRT-FORD-2026-FULL86-1080-ORIGINAL-REVIEW --dir inputs/hrt-2026-full-original
+      - name: Decode enlarged real original 1080 racecar frames at 26–28 sec and nighttime 73–76 sec
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/zoom_hrt_ford_nbr_mustang_2026_actual_frames.py
+      - name: Publish 26 original full-HD source frame closeups, SHA evidence and circuit identity
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-HRT-FORD-NORDSCHLEIFE-ORIGINAL-CAR-IDENTITY-26-FRAMES
+          path: out/gt3-a-hrt-ford-original-precise-nordschleife-identification/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
