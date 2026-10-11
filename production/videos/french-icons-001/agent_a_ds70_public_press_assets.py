@@ -32,7 +32,7 @@ for label,url in LINKS:
     urls.add(clean[:350])
   row["potential_video_media_urls"]=sorted(urls)[:60]
   row["video_keyword_counts"]={keyword:lower.count(keyword) for keyword in (".mp4",".m3u8",".webm","application/json","share-access","preview","download","video","citro","ds","parade")}
-  row["scripts"]=[html.unescape(x)[:200] for x in re.findall(r'<script[^>]+src=["\\']([^"\\']+)',body)][:14]
+  row["scripts"]=[html.unescape(x)[:200] for x in re.findall(r'<script[^>]+src="([^"]+)',body)][:14]
   row["data_context_samples"]=[m.group(0)[:290] for m in list(re.finditer(r".{0,90}(?:api/|share-access|sharingId|fileId|contentId|downloadUrl|\\.mp4).{0,125}",body,re.I))[:12]]
   print("SOURCE_PAGE",label,"code",code,"type",ct,"bytes",len(body),"media",len(urls),"keywords",row["video_keyword_counts"],flush=True)
   for u in row["potential_video_media_urls"][:6]:print("POSSIBLE_ASSET",label,u[:220],flush=True)
