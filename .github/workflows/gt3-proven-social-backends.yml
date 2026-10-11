@@ -1,0 +1,34 @@
+name: YUNEX N24 Proven Gallery-DL Instaloader Social Recovery
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths:
+      - .github/workflows/gt3-proven-social-backends.yml
+      - production/videos/gt3-nurburgring-multicar-001/agent-a/reuse_successful_sto_social_backends.py
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  recover-public-race-posts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 31
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install previously verified TikTok and Instagram extractors plus native media tools
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q -U gallery-dl instaloader pillow
+          gallery-dl --version
+          instaloader --version
+      - name: Use real previous-STO-method gallery-dl and Instaloader to find actual N24 GT3 race posts and native media
+        timeout-minutes: 23
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/reuse_successful_sto_social_backends.py
+      - name: Deliver actual original source video files and contact sheets if any, otherwise show precise platform errors
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-N24-PROVEN-TIKTOK-INSTAGRAM-NATIVE-SOURCE-PROOF
+          path: out/gt3-reused-sto-social-backends/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
