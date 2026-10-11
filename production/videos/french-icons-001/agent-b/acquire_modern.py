@@ -160,4 +160,6 @@ gate="PARTIAL — provisional clips, human review required" if records else "BLO
 (OUT/"README.md").write_text("# FR Legends Agent B — Actual Media Acquisition\n\n"
  +f"Gate B: **{gate}**. Decoded original videos: {len(records)}; covered labelled models: {len(counts)}. Strict PASS not established until 18 distinct reviewed moving shots over >=5 models.\n\n"
  +"All media in clips/ were downloaded from actual URLs; no generated or upscaled placeholder media. Exact SHA256, source and media properties in manifest files. Contact sheets derive from actual decoded frames. Discovery diagnostics list failed attempts. Source licensing and visual identity/watermark checks still require human review.\n")
-for item in diagnostics:\n print("PAGE_DIAGNOSTIC",item["id"],"links",len(item["links"]),"success",sum("DOWNLOADED" in s for s in item["notes"]),"candidate_urls",[z["url"][:100] for z in item["links"][:3]],"issues",item["notes"][:3])\nprint(json.dumps({"gate":gate,"downloaded":len(records),"models":dict(counts),"sources_checked":len(diagnostics)},indent=2))
+for item in diagnostics:
+ print("PAGE_DIAGNOSTIC", item["id"], "links", len(item["links"]), "success", sum("DOWNLOADED" in note for note in item["notes"]), "candidate_urls", [rec["url"][:100] for rec in item["links"][:3]], "issues", item["notes"][:3])
+print(json.dumps({"gate":gate,"downloaded":len(records),"models":dict(counts),"sources_checked":len(diagnostics)},indent=2))
