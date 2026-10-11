@@ -1,0 +1,44 @@
+name: FR Legends B - Curate Strong Source Shots
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/b-modern-footage
+    paths:
+      - production/videos/french-icons-001/agent-b/curate_strong.py
+      - .github/workflows/fr-legends-modern-curated.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  curated:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install FFmpeg and contact-sheet tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check Pillow
+          python -m py_compile production/videos/french-icons-001/agent-b/curate_strong.py
+      - name: Load previously verified 16 original MP4 clips
+        run: |
+          mkdir -p out/source-b
+          gh run download 38148017025 --repo "${{ github.repository }}" -n FR-LEGENDS-001-AGENT-B-MODERN-SOURCE-FOOTAGE -D out/source-b
+          test -s out/source-b/manifest.json
+      - name: Remux only worthwhile real moving shot windows, build manifests and QA contact sheets
+        run: python production/videos/french-icons-001/agent-b/curate_strong.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: FR-LEGENDS-001-B-CURATED-REAL-SHOTS
+          path: out/fr-legends-agent-b-curated/
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn
