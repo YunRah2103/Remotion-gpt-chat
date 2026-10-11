@@ -1,0 +1,45 @@
+name: Native footage rescue real extraction E2E
+on:
+  push:
+    branches: [feature/footage-rescue-multisource-20261011]
+    paths:
+      - 'production/footage_rescue/test_actual_production_extraction.py'
+      - '.github/workflows/footage-rescue-live-e2e.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-extraction:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    strategy:
+      fail-fast: false
+      matrix:
+        site: [instagram, tiktok]
+        method: [yt-dlp, yt-dlp-chrome]
+    name: "real engine - ${{ matrix.site }} - ${{ matrix.method }}"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Install actual app dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q -r production/footage/requirements.txt gallery-dl pytubefix curl-cffi
+      - name: Run actual downloader and full native FFmpeg decode
+        run: |
+          python production/footage_rescue/test_actual_production_extraction.py \
+            --site '${{ matrix.site }}' --method '${{ matrix.method }}'
+      - name: Publish only metadata, not unrelated post footage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-native-${{ matrix.site }}-${{ matrix.method }}
+          path: out/production-equivalent/
+          retention-days: 3
+          if-no-files-found: warn
