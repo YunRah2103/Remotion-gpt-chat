@@ -29,3 +29,16 @@ Nürburgring.tv actual original `case-fpv.mp4` from predecessor source [run 3814
 Use high-resolution downloadable producer originals and specifically named landscape race films (1920×1080+); avoid repeating YouTube downloads on anonymous GitHub Actions IPs without appropriate authorised access. If the repository owner separately configures properly authorised provider access, **never commit/log cookies, access tokens, raw browser profiles or other credentials**. Producer/source API links must be fetched physically and video decoded before claims. Any usable 2023 Ferrari 296 GT3 N24 #30 or later 2024-26 296 racing can be extracted only after visual identification and timecode QA; similarly McLaren #25 Dörr Motorsport (2025 DTM Nürburgring) or #23 Team RJN (2026 GTWC Nürburgring GP). Avoid mixing McLaren road car and real 720S GT3 EVO; don't claim Dörr's 2025 24h Nürburgring #59 Artura Trophy Evo as 720S GT3.
 
 **Next owner action**: keep Ferrari and McLaren acquisition independent of Aston. Do not hand diagnostic ZIPs to Agent B as video. When real media is found, include exact publisher source, actual native ffprobe, full ffmpeg decode, SHA256, 12-frame contact sheet, exact race/camera IDs, and one native ZIP with playable bytes.
+
+
+## Further official long-form GT World Challenge video acquisition (same date)
+
+To avoid repeating the previously failed short Facebook Reels, a new Chromium + public CDN+ native-HD ffprobe and full-decode Actions workflow was implemented:
+
+- Source script `production/videos/gt3-nurburgring-multicar-001/agent-a2/facebook_official_longform.py`, source commit `a1c5c55df9354ffc3ba142186223bbcd2e98f5ee`.
+- Executed on official A2-only workflow `.github/workflows/gt3-a2-official-longform-facebook-race-media.yml`, workflow commit `a0438b747baa40e6b492236e5a461c96f14bada0`.
+- [Real run 38158907205 / diagnostic artifact 11709353728](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38158907205/artifacts/11709353728). Actual 53,865-byte ZIP verified; **no actual native-HD video files**, so it is QA evidence only, not a footage package.
+- Attempted exactly four new original uploaded video posts: official GT World Challenge Europe 2026 Nürburgring weekend recap (2026 28-30 Aug, #7 Aston / Ben Dörr lap record), official GTWC Nürburgring last-time-out video, McLaren Automotive original 720S GT3 long-form developmental footage, and official GTWC 60-second Nürburgring preview. The browser recorded video-media CDN requests (12, 12, 3, 12 respectively), attempted the real stream URLs with public HTTP/yt-dlp, but **none yielded full-decodable >=1920x1080 landscape source bytes**. No Ferrari/McLaren original accepted.
+- The 2018 original McLaren developer documentary is anyway not credible evidence of a **2023+ 720S GT3 EVO racing at the Nürburgring**; it is a different generation/race and must never be relabelled.
+
+**Latest verified A2 approved GT3 deliverable remains 7 real Aston Vantage GT3 source views in the corrected V2 ZIP.** Ferrari 0, McLaren 0. Current combined source package issue #26 from Agent A has 5/6 identified GT3 manufacturers and 19/24 views per independent Agent A report, but Agent A2 footage must be evaluated for duplicates and race/class proof by master before count. No merged full Gate A PASS.
