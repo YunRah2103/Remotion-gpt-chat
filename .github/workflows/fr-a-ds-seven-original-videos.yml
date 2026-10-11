@@ -1,0 +1,32 @@
+name: FR Legends A - Seven Actual Original Citroen DS Film File Inventory
+on:
+  push:
+    branches: [automotive-edits/french-icons-001/a-classics-footage]
+    paths:
+      - '.github/workflows/fr-a-ds-seven-original-videos.yml'
+      - 'production/videos/french-icons-001/agent_a_ds70_7film_file_inventory.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  seven-original-citroen-movies:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install public publisher web-browser media navigator
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Open Citroen DS archive videos and Paris parade folders; inspect real file sizes and types
+        run: python production/videos/french-icons-001/agent_a_ds70_7film_file_inventory.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-a-seven-original-citroen-ds-videos-and-2025-parade-file-inventory
+          path: out/fr-a-ds-original-seven-videos/
+          retention-days: 7
+          if-no-files-found: warn
