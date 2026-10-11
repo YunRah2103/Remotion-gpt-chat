@@ -1,0 +1,49 @@
+name: FR Legends A - Acquire REAL Citroen DS Official Press Films 1080p QA
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - 'production/videos/french-icons-001/agent_a_ds70_acquire_originals.py'
+      - '.github/workflows/fr-a-ds70-acquire-originals.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-originals-dynamic-and-rally:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install original download browser and real video decoders
+        run: |
+          python -m pip install playwright Pillow
+          python -m playwright install --with-deps chromium
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Download 3 exact official public DS movie files via UI, original SHA, ffprobe, 24-frame visual QA
+        run: python production/videos/french-icons-001/agent_a_ds70_acquire_originals.py
+      - name: Source evidence summary
+        run: |
+          python - <<'PY'
+          import json,pathlib,os
+          data=json.loads(pathlib.Path("out/fr-a-citroen-ds-real-video/manifest.json").read_text())
+          lines=["## Official Stellantis Citroen DS original physical video acquisition",
+                 "- Permission to download openly given by publisher press-share UI. Social reuse rights still unverified.",
+                 f"- Source original native 1080+ films actually fully downloaded, probed and sampled: **{sum(x['status'].startswith('REAL_NATIVE') for x in data)} / {len(data)}**",
+                 "- Source QA is not final video gate; only clean moving footage will be clipped in separate reviewed build."]
+          lines += [f"- {x['id']}: {x['status']} {x.get('actual_probe')} {x.get('error','')}" for x in data]
+          pathlib.Path(os.environ["GITHUB_STEP_SUMMARY"]).write_text('\n'.join(lines)+'\n')
+          print('\n'.join(lines))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: FR-LEGENDS-A-CITROEN-DS-PUBLISHER-NATIVE-HD-REAL-MOVIE-PROOF
+          path: out/FR-A-CITROEN-DS-PUBLISHER-REAL-HD-QA.zip
+          if-no-files-found: warn
+          retention-days: 7
+          compression-level: 0
