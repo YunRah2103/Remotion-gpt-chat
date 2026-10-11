@@ -86,7 +86,13 @@ for key,record in originals.items():
  print("V8_NEW_PHYSICALLY_RECHECKED_INDEPENDENT_PORSCHE_GT3_R",key,record["physical_bytes"],record["approved_original_physical_video_sha256"],flush=True)
 assert len(approved)==2
 left=unique(COPY,"PORSCHE_2026_CAREFULLY_REVIEW_WHITE_REAR_4k.mp4")
-assert digest(left)=="1129e56f2d8aa792e6d6e1a46eb8e08646504049ec4d722e7c91fe18c4"
+v7_candidate_file=unique(COPY,"CANDIDATES_SHA_FFPROBE_PROVENANCE.json")
+original_candidate_manifest=json.loads(v7_candidate_file.read_text())
+v7_white=[c for c in original_candidate_manifest["candidates"] if c.get("file","").endswith(left.name)]
+assert len(v7_white)==1,"Third review file not in unmodified original source manifest"
+original_white_sha=v7_white[0]["sha256"]
+assert digest(left)==original_white_sha,"Third review clip changed from its REAL original producer manifest"
+print("THIRD_UNAPPROVED_CAMERA_PRESERVED_ORIGINAL_SHA",original_white_sha,flush=True)
 summary={
  "project":"YUNEX GT3 Multi-Car 001",
  "version":"V8 new independent positive GT3R entry-list and native-UHD video contact-frame proof",
