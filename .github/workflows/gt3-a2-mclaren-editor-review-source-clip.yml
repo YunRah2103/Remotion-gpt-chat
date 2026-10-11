@@ -12,7 +12,7 @@ permissions:
 jobs:
   package-original-and-cinematic-contact-clip:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 11
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
