@@ -14,11 +14,46 @@ OUT=Path("out/gt3-a2-browser")
 FILES=OUT/"originals_for_visual_review"; SHEETS=OUT/"contact_sheets"
 for p in (OUT,FILES,SHEETS):p.mkdir(parents=True,exist_ok=True)
 SOURCES=[
-("ferrari_nls9_broadcast","Ferrari 296 GT3","https://www.motorsport.com/endurance/video/2025-nls9-57-adac-barbarossapreis-highlights/664576/"),
-("ferrari_aston_nls9_start","Ferrari 296 GT3 / Aston Vantage GT3","https://www.motorsport.com/endurance/video/drama-at-the-start-of-nls9/664531/"),
-("ferrari_nls9_winner","Ferrari 296 GT3","https://www.motorsport.com/endurance/video/verstappen-and-lulham-take-victory-at-nls9/664541/"),
-("aston_2014_gt3_onboard","Aston Martin V12 Vantage GT3","https://www.motorsport.com/endurance/video/aston-martin-vantage-gt3-n-rburgring-in-car-lap/96151/"),
-("aston_2025_team_facebook","Aston Martin Vantage GT3","https://www.facebook.com/walkenhorstmotorsport/videos/turn-up-the-volume-and-enjoy-our-astons-roaring-through-the-n%C3%BCrburgringday-one-o/1779538113199248/"),
+  [
+    "ferrari_frikadelli_n24_nringinfo",
+    "Ferrari 296 GT3",
+    "https://www.facebook.com/Nringinfo/videos/was-traut-ihr-dem-ferrari-296-gt3-beim-24-stunden-rennen-zu-realize-kondo-racing/1761573544796603/"
+  ],
+  [
+    "aston_nls_race_win",
+    "Aston Martin Vantage GT3",
+    "https://www.facebook.com/astonmartinracing/videos/winners-the-vantage-gt3-delivered-the-first-outright-victory-for-aston-martin-on/648342162796998/"
+  ],
+  [
+    "aston_n24_race_last_hour",
+    "Aston Martin Vantage GT3",
+    "https://www.facebook.com/astonmartinracing/videos/one-hour-to-go-and-the-chase-is-onmattia-drudi-is-aboard-the-34-walkenhorst-moto/747174691753454/"
+  ],
+  [
+    "mclaren_gtwc_nurburgring_race",
+    "McLaren 720S GT3 EVO",
+    "https://www.facebook.com/GTWorldChallengeEurope/videos/a-dramatic-moment-at-the-n%C3%BCrburgring-as-two-mclarens-come-together-gtworld/1094931886398447/"
+  ],
+  [
+    "mclaren_rjn_nurburgring_preview",
+    "McLaren 720S GT3 EVO",
+    "https://www.facebook.com/teamrjn/videos/nurburgring-were-coming-for-you-mclarencustomerracing-mclaren-endurance-raceweek/4167586923541712/"
+  ],
+  [
+    "mclaren_dtm_nurburgring_corner",
+    "McLaren 720S GT3 EVO",
+    "https://www.facebook.com/100082201384266/videos/porsche-mclaren-bmw-mercedes-amg-one-corner-at-the-n%C3%BCrburgring-which-one-would-y/1807542117112411/"
+  ],
+  [
+    "aston_walkenhorst_double_race",
+    "Aston Martin Vantage GT3",
+    "https://www.facebook.com/walkenhorstmotorsport/videos/double-trouble-here-at-the-nurburgring-naturalelements-walkenhorstmotorsport-ast/1745006573493536/"
+  ],
+  [
+    "dtm2026_race_action",
+    "McLaren 720S GT3 EVO",
+    "https://www.facebook.com/DTM/videos/high-risk-low-reward-dtm-dtm26-n%C3%BCrburgring-randtm-ran__racing-ransport/2089340264987830/"
+  ]
 ]
 rows=[]
 def cmd(args,timeout=55):
@@ -76,7 +111,7 @@ def browser_discover(ctx,pageurl):
  page.on("response",response)
  try:
   page.goto(pageurl,wait_until="domcontentloaded",timeout=17000)
-  page.wait_for_timeout(5000)
+  page.wait_for_timeout(2200)
   # Do not interact with login or consent walls, but try ordinary visible player button.
   try:
    v=page.locator("video").first
@@ -86,7 +121,7 @@ def browser_discover(ctx,pageurl):
    play=page.locator("[aria-label*='Play' i],.vjs-big-play-button,[data-testid='play-button']").first
    if play.count():play.click(timeout=1800)
   except Exception:pass
-  page.wait_for_timeout(4500)
+  page.wait_for_timeout(2200)
   for value in page.evaluate("() => Array.from(document.querySelectorAll('video,source')).map(e=>e.currentSrc||e.src).filter(Boolean)"):
    if eligible_candidate(value):links.append(value)
   for value in re.findall(r"https?:[^\s\"'<>{}]{10,500}(?:\.m3u8|\.mp4|\.mpd)(?:\?[^\s\"'<>{}]{0,200})?",page.content(),re.I):
@@ -157,7 +192,7 @@ with sync_playwright() as pw:
    print("BROWSER VIDEO ENDPOINTS",id,len(links),title,flush=True)
    if "facebook.com" in page:
     links=sorted(links,key=lambda u:(0 if "fbcdn.net" in u and "/m367/" in u else 1 if "fbcdn.net" in u and "/m78/" not in u else 2))
-   for i,u in enumerate(links[:6] if "facebook.com" in page else links[:3]):
+   for i,u in enumerate(links[:9] if "facebook.com" in page else links[:3]):
     path=None
     try:
      path=download_candidate(u,id+str(i))
