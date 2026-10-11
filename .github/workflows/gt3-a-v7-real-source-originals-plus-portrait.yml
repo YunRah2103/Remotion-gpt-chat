@@ -1,0 +1,62 @@
+name: GT3 Agent A One Real Source ZIP V7 Including New HD Lamborghini and Three Native 4K Review Clips
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-v7-real-source-originals-plus-portrait.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  real-combined-physical-source-artifact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 21
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download actual previous verified V6 464 MB 5-make native-original footage
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 38154344876
+          github-token: ${{ github.token }}
+          name: GT3-MULTICAR-REAL-NATIVE-V6-ONE-ZIP-FIVE-MAKES-19-CAMERAS-PARTIAL
+          path: inputs/verified_v6
+      - name: Download physically hash-validated real 1080 by 1920 Lamborghini on-track original
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 38155950601
+          github-token: ${{ github.token }}
+          name: GT3-AGENT-A-ABT-LAMBO-2026-ACTUAL-ORIGINAL-1080-PORTRAIT-REVIEW
+          path: inputs/real_lambo_portrait
+      - name: Download actually decoded three 3840 by 2160 Porsche race-camera clips
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 38156764510
+          github-token: ${{ github.token }}
+          name: GT3-AGENT-A-2026-THREE-ADDITIONAL-NATIVE4K-RACING-SELECTS-REVIEW
+          path: inputs/porsche_additional_native4k
+      - name: Byte copy and SHA/CRC verify entire V6 and all new original media
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/build_v7_native_plus_new_real_review_media.py
+      - name: Upload ONE truly playable source-package with strict QA tags
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-MULTICAR-REAL-NATIVE-V7-ONE-ZIP-5-MAKES-19-VIEWS-PLUS-4-NEW-REAL-REVIEW-MEDIA
+          path: out/gt3-multicar-real-native-v7-plus-review/
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Prevent misrepresenting review-only assets as full producer footage gate
+        if: always()
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json
+          p=Path('out/gt3-multicar-real-native-v7-plus-review/COMBINED_GLOBAL_MANIFEST_V7.json')
+          if not p.exists():msg="V7 INTEGRATION FAILED. Do not deliver as a valid combined video package."
+          else:
+            x=json.loads(p.read_text())
+            assert x['confirmed_native_landscape_gt3_makes']==5 and x['confirmed_distinct_native_landscape_gt3_camera_views']==19
+            assert x['new_source_landscape_gt3_camera_count_approved']==0
+            msg="Physical V7 media assembled; 5/6 verified landscape GT3 makes, 19/24 verified views. Added REAL 1080x1920 Lamborghini portrait and THREE playable genuine 4K Porsche track shots review-only. Final footage gate BLOCKED."
+          Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(msg+'\n')
+          PY
