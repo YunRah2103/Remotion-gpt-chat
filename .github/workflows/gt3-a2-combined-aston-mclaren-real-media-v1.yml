@@ -40,13 +40,17 @@ jobs:
             assert 'source_shots_1920x1080/ASTON21_03_REAR_TRACK_APPROACH.mp4' in ast.namelist()
             names=[n for n in ast.namelist() if n.startswith('source_shots_1920x1080/') and n.endswith('.mp4')]
             assert len(names)==7
-          with zipfile.ZipFile(m) as mac:
+          with zipfile.ZipFile(m) as mc_outer:
+            assert mc_outer.testzip() is None
+            mc_inner=next(n for n in mc_outer.namelist() if n.endswith('.zip'))
+            mcdata=io.BytesIO(mc_outer.read(mc_inner))
+          with zipfile.ZipFile(mcdata) as mac:
             assert mac.testzip() is None
-            mcmanifest=json.loads(mac.read('MANIFEST_SHA_QA.json'))
-            assert mcmanifest['original_native_width']==1916 and mcmanifest['original_native_height']==1078
-            assert mcmanifest['allowed_gt3_native_shot_count']==0
-            for row in mcmanifest['files']:
-              assert hashlib.sha256(mac.read(row['name'])).hexdigest()==row['sha256']
+            mcmanifest=json.loads(mac.read('SOURCE_AND_VISUAL_QA.json'))
+            assert mcmanifest['original_pixels']==[1916,1078]
+            assert mcmanifest['qualifies_as_new_strict_native_1920x1080_make'] is False
+            assert hashlib.sha256(mac.read(mcmanifest['original_file'])).hexdigest()==mcmanifest['original_sha256']
+            assert hashlib.sha256(mac.read(mcmanifest['review_video_file'])).hexdigest()==mcmanifest['review_video_sha256']
           dst=Path('out/gt3-a2-combined/YUNEX_A2_ASTON_7_MCLAREN_REVIEW_REAL_MOVIES_ONE_ZIP.zip')
           manifest={'project':'YUNEX GT3 Multi-Car 001','branch':'a2-ferrari-aston-mclaren','global_6_make_24_camera_gate':'BLOCKED',
             'aston_nls8_approved_1080_camera_cuts':7,'mclaren_2026_nearHD_editorial_review_shots':1,
@@ -64,7 +68,7 @@ jobs:
                 blob=ast.read(name);key='ASTON_APPROVED_V2/'+name
                 merged.writestr(key,blob,compress_type=zipfile.ZIP_STORED)
                 if name.endswith('.mp4'):manifest['source_sha256'][key]=hashlib.sha256(blob).hexdigest()
-            with zipfile.ZipFile(m) as mac:
+            with zipfile.ZipFile(mcdata) as mac:
               for name in mac.namelist():
                 if name.endswith('/'):continue
                 blob=mac.read(name);key='MCLAREN_REVIEW_ONLY/'+name
