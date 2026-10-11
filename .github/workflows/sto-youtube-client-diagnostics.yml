@@ -1,0 +1,77 @@
+name: STO YouTube client diagnostic — six official playback clients
+on:
+  push:
+    branches: [automotive-edits/huracan-sto-v10-001/a-footage]
+    paths:
+      - production/videos/huracan-sto-v10-001/footage/diagnose_youtube_clients.py
+      - .github/workflows/sto-youtube-client-diagnostics.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnosis:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Install yt-dlp+EJS and inspect diagnostic code
+        run: |
+          python -m pip install -U --disable-pip-version-check "yt-dlp[default]"
+          python -m py_compile production/videos/huracan-sto-v10-001/footage/diagnose_youtube_clients.py
+          deno --version
+      - name: Load optional YouTube session cookies securely
+        env:
+          YOUTUBE_COOKIES_TXT: ${{ secrets.YOUTUBE_COOKIES_TXT }}
+          YOUTUBE_COOKIES_B64: ${{ secrets.YOUTUBE_COOKIES_B64 }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64, binascii, os, pathlib, stat
+          plaintext = os.environ.get('YOUTUBE_COOKIES_TXT', '').strip()
+          encoded = os.environ.get('YOUTUBE_COOKIES_B64', '').strip()
+          if plaintext:
+              raw = plaintext.encode('utf-8')
+              print('Using mobile-friendly raw Netscape cookie secret.')
+          elif encoded:
+              try:
+                  raw = base64.b64decode(encoded, validate=True)
+              except (ValueError, binascii.Error):
+                  raise SystemExit('Invalid base64 in YOUTUBE_COOKIES_B64')
+              print('Using Base64 Netscape cookie secret.')
+          else:
+              raw = b''
+              print('Cookie secret not set; downloads will be skipped (YOUTUBE_COOKIES_TXT or YOUTUBE_COOKIES_B64).')
+          if raw:
+              raw = raw.replace(b'\r\n', b'\n').replace(b'\r', b'\n')
+              header = raw.split(b'\n', 1)[0].strip()
+              if header not in (b'# Netscape HTTP Cookie File', b'# HTTP Cookie File'):
+                  raise SystemExit('Invalid cookies.txt header: export Netscape/Mozilla cookies.txt, not JSON.')
+              if b'youtube.com' not in raw.lower():
+                  raise SystemExit('Cookie export must contain YouTube cookies.')
+              if len(raw) > 45000:
+                  raise SystemExit('Cookies too large for GitHub repository secret; export YouTube.com only.')
+              target = pathlib.Path(os.environ['RUNNER_TEMP']) / 'sto-youtube-cookies.txt'
+              target.write_bytes(raw + (b'\n' if not raw.endswith(b'\n') else b''))
+              target.chmod(stat.S_IRUSR | stat.S_IWUSR)
+              with open(os.environ['GITHUB_ENV'], 'a') as env:
+                  env.write('YOUTUBE_COOKIES_FILE=' + str(target) + '\n')
+              print('Cookie file loaded temporarily; not printed, logged or uploaded.')
+          PY
+      - name: Test YouTube playback clients without downloading or logging URLs
+        run: python production/videos/huracan-sto-v10-001/footage/diagnose_youtube_clients.py
+      - name: Delete temporary cookie file
+        if: always()
+        run: rm -f -- "$RUNNER_TEMP/sto-youtube-cookies.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STO-YOUTUBE-CLIENT-ACCESS-RESULTS
+          path: out/sto-youtube-client-diagnostics/manifest.json
+          if-no-files-found: warn
+          retention-days: 5
