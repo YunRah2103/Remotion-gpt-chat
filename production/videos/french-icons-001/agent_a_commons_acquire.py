@@ -10,6 +10,7 @@ for d in (CLIPS,ORIG,SHEETS):d.mkdir(parents=True,exist_ok=True)
 SOURCES=[
  {"slug":"citroen-2cv-convoy-2022","model":"Citroën 2CV","title":"File:Multiple Citroën 2CV vehicles driving by (east Netherlands, 2022).webm","creator":"OSeveno","license":"CC BY-SA 4.0","shot_in":1,"duration":7,"notes":"4K original; 2CV convoy moving by same stationary camera"},
  {"slug":"citroen-2cv-meeting-2025","model":"Citroën 2CV","title":"File:2025 - 25th World Meeting of 2CV Friends in Slovenja.webm","creator":"komik video (verify page)","license":"CC BY 4.0 (verify page)","shot_in":1,"duration":7,"notes":"1080 original gathering, moving shot/model unverified"},
+ {"slug":"alpine-a110-1973-on-track","model":"Alpine A110 (original 1973 rally)","direct_url":"https://video.wixstatic.com/video/bd17ea_8e381c8a1af64c83a39998971f69a05c/1080p/mp4/file.mp4","page":"https://www.alpinelab.de/en/post/a110-1800-gr-iv-alpenfahrt-1973-2","creator":"GionnoTV via alpineLAB","license":"Rights/permission unknown: do not republish until verified","shot_in":1,"duration":7,"notes":"Native publisher-linked 1080p footage, moving-car identity not yet reviewed"},
  {"slug":"citroen-ds-oldtimer-2024","model":"Citroën DS (within mixed-car compilation)","title":"File:Oldtimer Meeting - Bistra pri Vrhniki - SLOVENIA.webm","creator":"Jan Šefran","license":"CC BY 3.0 - Wikimedia license review pending","shot_in":1,"duration":7,"notes":"1080 mixed-car video, DS *may not appear in selected 7s*: needs visual review"},
 ]
 USER_AGENT="YUNEX-ClassicFrenchFootageAcquisition/1.0 (https://github.com/YunRah2103/Remotion-gpt-chat)"
@@ -88,8 +89,9 @@ for s in SOURCES:
       "moving_cinematography_verified":False,"unique_angle_verified":False,
       "publication_attribution_required":True,"counted_towards_gate_a":False}
  try:
-  m=media_info(s["title"]);row["commons"]=m
-  filename=s["slug"]+".webm";origin=ORIG/filename
+  m=media_info(s["title"]) if s.get("title") else {"url":s["direct_url"],"page":s["page"],"api_width":None,"api_height":None,"api_license":s["license"]}
+  row["commons"]=m
+  ext=".mp4" if s.get("direct_url") else ".webm";filename=s["slug"]+ext;origin=ORIG/filename
   print("DOWNLOAD",s["slug"],m["url"],"api_res",m["api_width"],m["api_height"],flush=True)
   row["downloaded_bytes"]=download(m["url"],origin)
   source=probe(origin)
@@ -117,6 +119,7 @@ for s in SOURCES:
   row["reason"]=str(ex)[:800]
   print("ERROR_SOURCE",s["slug"],row["reason"],flush=True)
   (ORIG/(s["slug"]+".webm")).unlink(missing_ok=True)
+  (ORIG/(s["slug"]+".mp4")).unlink(missing_ok=True)
   (CLIPS/(s["slug"]+".mp4")).unlink(missing_ok=True)
  entries.append(row)
  (BASE/"manifest.json").write_text(json.dumps(entries,indent=2,ensure_ascii=False))
@@ -130,7 +133,7 @@ n=sum(x["status"].startswith("TECHNICAL_") for x in entries)
   "# FR Legends Classics — genuine original source media and native-HD converted examples\n\n"
   "Actual native-HD technical candidates: "+str(n)+"\n"
   "Gate A: BLOCKED (<18 confirmed unique clips, <5 confirmed makes/models).\n"
-  "Source original WebM files are preserved if downloaded and FFprobed at real native pixels.\n"
+  "Source original WebM and MP4 files are preserved if downloaded and FFprobed at real native pixels.\n"
   "MP4 clips use native resolution H264 CRF19 transcode (no upscaling), preserve available audio.\n"
   "Each clip from a source is only one potential camera angle, even if many cars drive through frame.\n"
   "CONTACT SHEETS: five source timestamps, essential human QA required.\n"
