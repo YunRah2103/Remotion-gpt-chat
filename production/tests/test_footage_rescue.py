@@ -29,9 +29,9 @@ class AcquisitionTests(unittest.TestCase):
         self.assertEqual(mod.engines_for("youtube", "auto", True),
                          ["yt-dlp", "pytubefix", "cobalt"])
         self.assertEqual(mod.engines_for("instagram", "auto", False),
-                         ["yt-dlp", "gallery-dl"])
+                         ["yt-dlp", "yt-dlp-chrome", "gallery-dl"])
         self.assertEqual(mod.engines_for("tiktok", "auto", False),
-                         ["yt-dlp", "gallery-dl"])
+                         ["yt-dlp", "yt-dlp-chrome", "gallery-dl"])
         with self.assertRaises(ValueError):
             mod.engines_for("youtube", "gallery-dl")
         with self.assertRaises(ValueError):
