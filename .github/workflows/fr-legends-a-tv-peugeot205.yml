@@ -1,0 +1,29 @@
+name: FR Legends A - Peugeot 205 Rally Television Source Quality
+on:
+  push:
+    branches: [automotive-edits/french-icons-001/a-classics-footage]
+    paths:
+      - 'production/videos/french-icons-001/agent_a_tv_205_format.py'
+      - '.github/workflows/fr-legends-a-tv-peugeot205.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-hd-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install current Dailymotion original stream inspector
+        run: python -m pip install -U yt-dlp
+      - name: Probe real 205 GTI motorsport films and Clio V6 quality
+        run: python production/videos/french-icons-001/agent_a_tv_205_format.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-a-peugeot205-tv-video-format-evidence
+          path: out/fr-a-dm-peugeot-205-television/manifest.json
+          retention-days: 5
