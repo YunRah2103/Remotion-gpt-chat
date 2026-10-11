@@ -1,0 +1,32 @@
+name: FR Legends B - Visual Source Review
+
+on:
+  push:
+    branches: [automotive-edits/french-icons-001/b-modern-footage]
+    paths:
+      - production/videos/french-icons-001/agent-b/review_contacts.py
+      - .github/workflows/fr-legends-modern-visual-review.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install Pillow
+      - name: Download the prior completed actual MP4 artifact
+        run: |
+          mkdir -p out/current
+          gh run download 38148017025 -n FR-LEGENDS-001-AGENT-B-MODERN-SOURCE-FOOTAGE -D out/current --repo "${{ github.repository }}"
+          test -s out/current/manifest.json
+      - name: Emit actual decoded contact sheets for manual review
+        run: python production/videos/french-icons-001/agent-b/review_contacts.py
