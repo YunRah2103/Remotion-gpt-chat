@@ -1,4 +1,4 @@
-name: YUNEX GT3 A2 Aston NLS Authentic Racing Package
+name: YUNEX GT3 A2 Aston NLS Racing QA Corrected V2
 on:
   push:
     branches:
@@ -57,7 +57,7 @@ jobs:
       - name: Upload ONE downloadable actual native racing package
         uses: actions/upload-artifact@v4
         with:
-          name: GT3-MULTICAR-AGENT-A2-ASTON-ACTUAL-NATIVE-1080-RACE-SHOTS
+          name: GT3-MULTICAR-AGENT-A2-ASTON-QA-CORRECTED-NATIVE-1080-V2
           path: out/gt3-a2-aston-approved/GT3_MULTICAR_A2_ASTON_RACING_NATIVE_1080_VERIFIED_PARTIAL.zip
           compression-level: 0
           retention-days: 7
