@@ -18,7 +18,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
-          python -m pip install --break-system-packages --disable-pip-version-check -q playwright pillow yt-dlp
+          python -m pip install --break-system-packages --disable-pip-version-check -q playwright pillow yt-dlp requests
           python -m playwright install chromium
       - name: Inspect real publicly playable embedded videos and download originals
         run: |
