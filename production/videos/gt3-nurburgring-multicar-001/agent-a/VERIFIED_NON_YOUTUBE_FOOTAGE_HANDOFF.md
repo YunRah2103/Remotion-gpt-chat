@@ -38,3 +38,26 @@ Square 16:9 crop QA run: https://github.com/YunRah2103/Remotion-gpt-chat/actions
 - **Delivered**: genuine downloadable GitHub source-media artifact with two full 4K films, manifest, contact sheets and source hashes; separate aspect-crop QA artifact.
 - **Not delivered**: requested 30–40 unique real Nürburgring GT3 racecar shots spanning six distinct makes. Do not mark Agent A gate PASS or Agent B footage-ready. Repeated excerpts from one film are not equal to 30 unique camera views.
 - **Next source priority**: independently accessible direct publisher 1080/4K full-motion footage of BMW M4 GT3 EVO, Mercedes-AMG GT3, Lamborghini Huracán GT3 EVO2, Ferrari 296 GT3, Audi R8 LMS GT3, Aston Martin GT3; crop only actual native high-res pixels, never upscale 720p.
+
+
+### Verified Falken 2018 real 4K racing source — completed after initial memo
+
+**Native publisher film:** https://www.falkentyre.com/_storage/asset/77989/storage/master/file/317009/download/FALKEN-HDR-h264-10Bit-56MBit.mp4
+
+**HEAD** HTTP200 `video/mp4`; actual source Content-Length **2,350,659,890 bytes**; accepts HTTP ranges.
+
+[Successful GitHub Actions source run 38141641859](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38141641859), [real 4K sample artifact 11703283097](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38141641859/artifacts/11703283097) **176,737,334 bytes**; FOUR six-second 3840×2160 stream-copy MKVs with source SHA256 proof and contact frames. FFprobe confirms **H.264, yuv420p10le, BT.2020 / SMPTE 2084 PQ HDR, 25fps**. Avoid washed-out SDR output: apply correct HDR-to-SDR tone map at final edit without replacing or upscaling original.
+
+**Independent 12-frame visual review, 3 frames per segment:**
+- Segment `falken2018_4k_hdr_01` source start 8s: apparent road BMWs and onboard, but NOT confidently a real GT3 class. **EXCLUDE from GT3 shot count**.
+- Segment `falken2018_4k_hdr_02` start 34s: **Porsche 911 GT3 R** cockpit track racing, actual on-board graphic references Jörg Bergmeister / Falken; some off-track scenic view, choose only on-track shots.
+- Segment `falken2018_4k_hdr_03` start 85s: drone aerial track, stadium, not visible close identifiable GT3. **Scenic cutaway only**.
+- Segment `falken2018_4k_hdr_04` start 150s: **Mercedes-AMG GT3** cockpit race-pack footage, Mercedes-AMG GT3 / Team Black Falcon race overlay; additional trackside racing shots, independently verified real GT3 context.
+
+Two identifiable makes are now backed by actual downloaded native 4K race footage: **Porsche and Mercedes-AMG**. There are **4 fetched 4K clips** from ONE original film, but only **2 clips presently accepted as plausible identifiable GT3 race sections**. Do not treat 4 clips as four distinct independent camera angles until editorial shot boundary inspection.
+
+2024 Falken mirror https://thetiremagazine.com/wp-content/uploads/2024/07/Falken-Tyres-Why-We-Race-24h-Race-Nurburgring-2024.mp4 HEAD 200 (33,393,795 bytes) but remote FFprobe **timed out after 60s**. Video content and native resolution remain unverified; do not count.
+
+**Local curated handoff** prepared separately: `YUNEX_GT3_PARTIAL_NATIVE_4K_CURATED.zip` (~123.2 MB), SHA256 `1c0e0dbb01e19789792ea1ea5378928453ed0f0a9d1f588b56bf5d5ad3e5fe60`. Contains copied native 4K Porsche+Mercedes 2018 race clips, a separately flagged 2026 Porsche Nürburgring footage candidate (car class verification pending), 2 contact sheets, source/time/hash manifest and README. B and D can use existing GitHub media archives above; no claim this partial package covers 24 shot quota.
+
+**Gate still BLOCKED:** GT3 marque coverage 2/6, independently selected different GT3 race shots fewer than 24. 
