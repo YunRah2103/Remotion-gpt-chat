@@ -58,7 +58,7 @@ for src in SOURCES:
    if f.returncode:raise ValueError("Frame decode failed: "+f.stderr[-200:])
    info.update(status="NATIVE_HD_SAMPLE_DOWNLOADED_VISUAL_QA_PENDING",bytes=path.stat().st_size,
       sha256=sha(path),probe={"width":w,"height":h,"duration":j["format"].get("duration"),
-      "fps":v.get("avg_frame_rate")},"file":str(path.relative_to(O)),"frame":frame.name)
+      "fps":v.get("avg_frame_rate")},file=str(path.relative_to(O)),frame=frame.name)
    print("ACQUIRED",src["id"],w,h,info["bytes"],flush=True)
   except Exception as e:
    info["status"]="REJECTED";info["error"]=str(e)
