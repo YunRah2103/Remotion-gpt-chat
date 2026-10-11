@@ -1,0 +1,44 @@
+name: STO C — acquire original Huracan 5.2 V10 sounds
+on:
+  push:
+    branches: [automotive-edits/huracan-sto-v10-001/c-sound-render]
+    paths: [.github/workflows/sto-c-raw-v10-source.yml]
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download genuine V10 reference recordings
+        run: |
+          set -euo pipefail
+          mkdir -p out/v10-audio
+          python - <<'PY'
+          import urllib.request, pathlib, hashlib, subprocess, json
+          root=pathlib.Path('out/v10-audio')
+          sources={
+             'huracan-real-v10.m4a':'https://raw.githubusercontent.com/sathyaram/exhaustnotes/master/public/sounds/huracan.m4a',
+             'audi-r8-5p2-real-v10.m4a':'https://raw.githubusercontent.com/sathyaram/exhaustnotes/master/public/sounds/audir8.m4a'
+          }
+          report={'collection':'Exhaust Notes actual vehicle sound recordings','publisher':'https://github.com/sathyaram/exhaustnotes','recordings':[]}
+          for name,url in sources.items():
+             d={'name':name,'url':url,'status':'not_downloaded','notes':'Real vehicle clips as identified in Exhaust Notes README; not guaranteed current commercial publishing clearance'}
+             try:
+              with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'}),timeout=30) as res:
+               data=res.read(5_000_000)
+              dest=root/name;dest.write_bytes(data)
+              p=subprocess.run(['ffprobe','-v','error','-show_entries','format=duration:stream=codec_type,codec_name,channels,sample_rate','-of','json',str(dest)],capture_output=True,text=True)
+              d.update({'status':'DOWNLOADED' if p.returncode==0 else 'FFPROBE_FAILED','sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data),'probe':json.loads(p.stdout) if p.returncode==0 else p.stderr[-500:]})
+             except Exception as e:d['error']=str(e)
+             report['recordings'].append(d)
+          (root/'manifest.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STO-C-REAL-HURACAN-AUDI-R8-V10
+          path: out/v10-audio/
+          retention-days: 3
