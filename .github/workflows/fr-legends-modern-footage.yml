@@ -1,0 +1,55 @@
+name: FR Legends Agent B - Modern Original Footage
+
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/b-modern-footage
+    paths:
+      - production/videos/french-icons-001/agent-b/**
+      - .github/workflows/fr-legends-modern-footage.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acquire-modern:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 42
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install media inspection tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check requests beautifulsoup4 Pillow
+          python -m py_compile production/videos/french-icons-001/agent-b/acquire_modern.py
+      - name: Acquire original publisher video and generate honest media QA evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python production/videos/french-icons-001/agent-b/acquire_modern.py
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          manifest=json.loads(Path('out/fr-legends-modern/manifest.json').read_text())
+          lines=["## French Legends — Agent B (Modern)", f"Decoded, acceptable source originals: **{len(manifest)}**", f"Distinct models: **{len({x['model'] for x in manifest})}**", "Status: Gate B PARTIAL unless 18 distinct moving shots covering 5+ models have passed human review."]
+          lines += [f"- {x['model']}: {x['width']}×{x['height']} | {x['duration']:.1f}s | {x['file']}" for x in manifest]
+          Path(os.environ['GITHUB_STEP_SUMMARY']).write_text("\n".join(lines)+"\n")
+          PY
+      - name: Upload one real footage and source-evidence ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: FR-LEGENDS-001-AGENT-B-MODERN-SOURCE-FOOTAGE
+          path: out/fr-legends-modern/
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 14
