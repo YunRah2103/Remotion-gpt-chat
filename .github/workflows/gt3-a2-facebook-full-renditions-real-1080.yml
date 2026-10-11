@@ -1,0 +1,56 @@
+name: YUNEX GT3 A2 Facebook Full Quality Ferrari McLaren Video Source
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a2-ferrari-aston-mclaren
+    paths:
+      - .github/workflows/gt3-a2-facebook-full-renditions-real-1080.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  collect-source-renditions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install browser and video quality tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q --break-system-packages playwright requests pillow
+          python -m playwright install chromium
+      - name: Find ALL authentic Facebook source quality renditions and attempt highest original
+        run: |
+          python -u production/videos/gt3-nurburgring-multicar-001/agent-a2/facebook_all_renditions_quality_test.py
+      - name: Full source evidence ZIP CRC + video SHA fingerprints
+        if: always()
+        run: |
+          python - <<'PY'
+          import pathlib,zipfile,json,hashlib
+          f=pathlib.Path('out/gt3-a2-facebook-all-qualities/GT3_A2_FACEBOOK_FULL_HD_ORIGINALS_QA.zip')
+          if not f.exists():
+            print('No source package exists')
+            raise SystemExit()
+          with zipfile.ZipFile(f) as z:
+            assert z.testzip() is None
+            m=json.loads(z.read('manifest.json'))
+            n=0
+            for s in m['publisher_sources']:
+              if s['status'].startswith('NATIVE'):
+                assert hashlib.sha256(z.read(s['real_file'])).hexdigest()==s['sha256']
+                assert s['native_pixels'][0]>=1920
+                assert s['native_pixels'][1]>=1080
+                n+=1
+          assert n==m['actual_decoded_native_landscape_source_count']
+          print('ACTUAL_NATIVE_FOOTAGE_SOURCES',n,'Ferrari/McLaren model gate still pending visual audit')
+          PY
+      - name: Upload one physically checked original-HD source archive
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-A2-FACEBOOK-HIGH-QUALITY-ORIGINALS-FERRARI-MCLAREN-1080-QA
+          path: out/gt3-a2-facebook-all-qualities/GT3_A2_FACEBOOK_FULL_HD_ORIGINALS_QA.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
