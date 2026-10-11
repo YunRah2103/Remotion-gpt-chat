@@ -1,0 +1,56 @@
+name: STO C — dry V10 field recording previews
+on:
+  push:
+    branches: [automotive-edits/huracan-sto-v10-001/c-sound-render]
+    paths: [.github/workflows/sto-c-freesound-preview.yml]
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch public CC BY V10 raw field-recording previews
+        run: |
+          set -euo pipefail
+          mkdir -p out/real-v10
+          python - <<'PY'
+          import urllib.request,urllib.parse,json,re,hashlib,html,pathlib,subprocess
+          out=pathlib.Path('out/real-v10')
+          inputs=[
+            ('r8-revs-field-recording','https://freesound.org/people/Jonas_Jocys/sounds/457733/'),
+            ('r8-racing-field-recording','https://freesound.org/people/ikbenraar/sounds/429099/')
+          ]
+          outjson={'result':[]}
+          for slug,page in inputs:
+            d={'slug':slug,'page':page,'license':'CC BY 4.0 as displayed by Freesound','status':'not_downloaded'}
+            try:
+              req=urllib.request.Request(page,headers={'User-Agent':'Mozilla/5.0'})
+              with urllib.request.urlopen(req,timeout=24) as resp:
+                raw=resp.read(5_000_000).decode('utf-8','replace')
+              raw=raw.replace('\\/','/').replace('\\u002F','/').replace('&amp;','&')
+              (out/(slug+'-html.txt')).write_text(raw[:400000])
+              candidates=re.findall(r'(?:https?:)?//[^\s<>"\x27\\]{10,250}?(?:-hq|-lq)\.mp3',raw,re.I)
+              candidates+=re.findall(r'[^\s<>"\x27\\]{8,220}(?:-hq|-lq)\.mp3',raw,re.I)
+              d['preview_urls_found']=list(dict.fromkeys(candidates))[:40]
+              selected=next((v for v in d['preview_urls_found'] if '-hq.mp3' in v.lower()),None)
+              if selected:
+                selected=selected if selected.startswith('http') else ('https:'+selected if selected.startswith('//') else urllib.parse.urljoin(page,selected))
+                file=out/(slug+'.mp3')
+                with urllib.request.urlopen(urllib.request.Request(selected,headers={'User-Agent':'Mozilla/5.0'}),timeout=35) as resp:content=resp.read(20_000_000)
+                file.write_bytes(content)
+                d.update({'status':'candidate_downloaded','source_preview_url':selected,'bytes':len(content),'sha256':hashlib.sha256(content).hexdigest()})
+              else:d['status']='no_preview_found'
+              print(slug,d['status'],len(d.get('preview_urls_found',[])))
+            except Exception as ex:d['error']=repr(ex)
+            outjson['result'].append(d)
+          (out/'manifest.json').write_text(json.dumps(outjson,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STO-C-DRY-V10-AUDIO-PREVIEWS
+          path: out/real-v10/
+          retention-days: 2
+          compression-level: 0
