@@ -1,0 +1,47 @@
+name: FR Legends A - Official Alpine Public Adaptive Stream Check
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - 'production/videos/french-icons-001/agent_a_alpine_hls_audit.py'
+      - '.github/workflows/fr-legends-a-alpine-hls.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-hd-source-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install FFmpeg and PIL for visual QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install pillow
+      - name: Test publicly available Alpine embedded HLS native 1080p video
+        run: python production/videos/french-icons-001/agent_a_alpine_hls_audit.py
+      - name: Honest results
+        run: |
+          python - <<'PY'
+          import pathlib,json,os
+          m=json.loads(pathlib.Path("out/alpine-a110-publisher-hls/manifest.json").read_text())
+          s=[f"## Alpine A110 official public stream gate",
+             f"- Native 1080p+ actual decoded MP4: **{m['verified_native_hd']}**",
+             f"- Source status: {m['status']}",
+             f"- Probe: {m.get('ffprobe')}",
+             f"- Error: {m.get('error','none')}",
+             "- Human visual/classic model and cinematography QA required."]
+          pathlib.Path(os.environ["GITHUB_STEP_SUMMARY"]).write_text("\n".join(s))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fr-legends-a-public-alpine-hls-proof
+          path: out/fr-legends-alpine-a110-public-hls-proof.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
