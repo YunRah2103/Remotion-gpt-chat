@@ -19,6 +19,12 @@ SAMPLES = {
     "pinterest": "https://uk.pinterest.com/pin/1084804629000125920/",
     "twitch": "https://www.twitch.tv/xqc/clip/CulturedAmazingKuduDatSheffy-TiZ_-ixAGYR3y2Uy",
     "bluesky": "https://bsky.app/profile/bsky.app/post/3l3vgf77uco2g",
+    "snapchat_gt3rs": "https://www.snapchat.com/%40carclips24/spotlight/W7_EDlXWTBiXAEEniNoMPwAAYb256dGtjdG9zAZRXQhLHAZRXQgtdAAAAAQ",
+    "snapchat_gt3rs2": "https://www.snapchat.com/%40yashx.fx/spotlight/W7_EDlXWTBiXAEEniNoMPwAAYZmJ6b2d0dGtkAZ5fX2njAZ5fX2nLAAAAAQ",
+    "snapchat_porsche": "https://www.snapchat.com/%40andrewexotics/spotlight/W7_EDlXWTBiXAEEniNoMPwAAYc2RzaWh6bHByAZ3_WlezAZ3_WleDAAAAAQ",
+    "pinterest_gt3rs": "https://uk.pinterest.com/pin/615726580336703478/",
+    "pinterest_gt3rs2": "https://ca.pinterest.com/pin/304626362315584186/",
+    "pinterest_gt3rs3": "https://ca.pinterest.com/pin/874261346424811017/",
 }
 p=argparse.ArgumentParser()
 p.add_argument("--sample",choices=SAMPLES.keys(),required=True)
