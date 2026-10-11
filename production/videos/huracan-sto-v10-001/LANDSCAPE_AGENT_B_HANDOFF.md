@@ -1,5 +1,27 @@
 # Agent B — Actual landscape STO edit handoff (10 October 2026)
 
+## V4 — REMOVE PHANTOM PUBLISHER WATERMARKS BY REPLACING FOUR SHOTS (11 October 2026)
+
+User flagged visible watermarks in V3. This was caused by the earlier Phantom rental-company video overlay on **V3 timeline slots 03, 07, 10 and 11**. Do not blur/erase/hide the author's watermark or pretend to obtain a clean original; **replace the four shot windows outright** with genuine cinematic STO footage from the newly user-provided FORMAT67 film.
+
+Exact changes:
+- 03 (frames 34–55): `FORMAT67` 23.85s clean Lamborghini STO carbon-fibre cockpit and steering wheel, replacing blue Phantom parked-cockpit.
+- 07 (frames 113–133): `FORMAT67` 35.85s white STO industrial roadway dynamic side, replacing blue Phantom side footage.
+- 10 (frames 182–205): `FORMAT67` 43.17s white STO illuminated container-yard rear-follow, replacing blue Phantom branded rear shot.
+- 11 (frames 206–231): `FORMAT67` 45.85s high-contrast black-and-white oncoming STO in tunnel, replacing blue Phantom branded close-pass.
+
+**All fourteen final selected edit slots now source solely from SHA-pinned FORMAT67 original** (`format67_sto_directors_full.mp4`, SHA `4c47e642babedfce0c7bd1cf60fa15a397b60679d430c534f5def4792738bfa3`, 1920×810 @25fps). The original 810px height requires the previously disclosed **1.333× uniform scaling and lateral cropping** to fit mandatory 1920×1080 landscape; native 1080p source quality cannot be claimed. The movie includes filmmaker end credits beyond 70s, swimmer intercuts and title cards: excluded from selected windows. The V4 new source shot windows contain no overlaid Phantom rental-company watermark; review actual rendered frames to confirm no unintended baked text remains. Removing Phantom footage decreases source-provider variety but not necessarily unique cinematography; nevertheless Gate A STILL NOT PASSED for 10+ independently verified moving STO angles, and filmmaker permissions have NOT been confirmed.
+
+Music and authentic STO V10 engine mix still Agent C responsibility. C should use V4 native Remotion artifact once independently rendered and decoded, rather than previously supplied V3. All 14 edits are 16:9, 30fps, 316 frames, frame-78 red STO reveal.
+
+Local reproduction with *only user's new night source ZIP*:
+```bash
+python production/videos/huracan-sto-v10-001/prepare_landscape_assets.py --zip HURACAN_STO_AGENT_B_NIGHT_CINEMATIC_SOURCE.zip
+node --test production/videos/huracan-sto-v10-001/edit-landscape.test.cjs
+node production/videos/huracan-sto-v10-001/validate-landscape-edit.cjs --assembly
+npx remotion render src/index.ts HuracanSTOLandscapeCandidate out/STO-B-V4-NO-PHANTOM-1920x1080-SILENT.mp4 --codec=h264 --pixel-format=yuv420p --concurrency=2
+```
+
 ## 10–11 October 2026 V3 — USER'S NEW FORMAT67 NIGHT MOVIE (IMPORTANT)
 User uploaded original `HURACAN_STO_AGENT_B_NIGHT_CINEMATIC_SOURCE.zip` (one real filmmaker source `format67_sto_directors_full.mp4`, 75.72s, 25fps, **1920×810 native cinemascope**, checksum `4c47e642babedfce0c7bd1cf60fa15a397b60679d430c534f5def4792738bfa3`). Inspected at regular intervals across original; excluded all swimmer/face/underwater/copy/logo scenes and all post-67s branded end credits. It has actual night/smoke/reflection footage, high-quality red/white STO closeups, and some white car container-yard motion. No accurate claim of pure race-track acceleration. Movie rights NOT GRANTED by source metadata.
 

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "project": "huracan-sto-v10-001",
-  "status": "NIGHT_CINEMATIC_CANDIDATE_REAL_SOURCE_VERIFIED_IDENTITY_AND_RIGHTS_GATE_UNPASSED",
+  "status": "V4_ALL_14_SHOTS_CLEAN_CINEMATIC_SOURCE__NATIVE_VISUAL_QA_PENDING__FOOTAGE_GATE_UNPASSED",
   "output": {
     "width": 1920,
     "height": 1080,
@@ -11,29 +11,8 @@
   "revealFrame": 78,
   "sourceGatePassed": false,
   "mediaDirectory": "public/sto-v10",
-  "inputPackage": "HURACAN_STO_LANDSCAPE_FOOTAGE.zip + HURACAN_STO_AGENT_B_NIGHT_CINEMATIC_SOURCE.zip",
+  "inputPackage": "HURACAN_STO_AGENT_B_NIGHT_CINEMATIC_SOURCE.zip",
   "sourceFiles": {
-    "phantom-sto-primary": {
-      "sha256": "dba560aea7cbdf0f64f7e7bb647ae2d43cabcf03a7af9a6a7a445122caa43f33",
-      "url": "https://phantommedia.sgp1.cdn.digitaloceanspaces.com/Phantom-Footer-Videos/2022/04/Rent-Lamborghini-Huracan-STO-In-Dubai.mp4",
-      "fps": 25,
-      "width": 1920,
-      "height": 1080
-    },
-    "phantom-sto-lambo": {
-      "sha256": "62deb84ce58be337c61402b8d1534b369d2d41c0b1797d0577cfdfe07365d502",
-      "url": "https://phantommedia.sgp1.cdn.digitaloceanspaces.com/Phantom-Footer-Videos/2022/04/STO-LAMBO-VIDEO-.mp4",
-      "fps": 60,
-      "width": 1920,
-      "height": 1080
-    },
-    "phantom-sto-huracan": {
-      "sha256": "d4d34a89be7b27f50e5f1a82a28521eae2fae9ac28e78613a847b0ef36564697",
-      "url": "https://phantommedia.sgp1.cdn.digitaloceanspaces.com/Phantom-Footer-Videos/2022/04/Lamborghini-Huracan-STO.mp4",
-      "fps": 60,
-      "width": 1920,
-      "height": 1080
-    },
     "format67_sto_directors_full": {
       "sha256": "4c47e642babedfce0c7bd1cf60fa15a397b60679d430c534f5def4792738bfa3",
       "url": "https://format67.net/wp-content/uploads/2024/08/STO_FORMAT.mp4",
@@ -112,14 +91,14 @@
       "aspectTreatment": "UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080"
     },
     {
-      "id": "03-original-blue-cockpit",
+      "id": "03-clean-night-sto-cockpit",
       "startFrame": 34,
       "endFrameExclusive": 56,
-      "sourceOriginal": "phantom-sto-primary.mp4",
-      "sourceStartSeconds": 9.64,
-      "sourceEndSeconds": 10.373333,
+      "sourceOriginal": "format67_sto_directors_full.mp4",
+      "sourceStartSeconds": 23.85,
+      "sourceEndSeconds": 24.583333,
       "file": "shot-03.mp4",
-      "intendedSubject": "Genuine blue STO open cockpit",
+      "intendedSubject": "Genuine STO carbon-fibre cockpit / Lamborghini steering-wheel closeup; clean cinematic filmmaker source",
       "cutStyle": "cut",
       "plannedFocalX": 0.5,
       "plannedFocalY": 0.5,
@@ -128,20 +107,20 @@
           "frame": 0,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.02
+          "zoom": 1.025
         },
         {
           "frame": 21,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.06
+          "zoom": 1.075
         }
       ],
       "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
       "uniqueMovingAngleKey": null,
       "movingAngleVerified": false,
-      "sourceCropX": 0.5,
-      "aspectTreatment": "NATIVE_1920X1080_UNSCALED"
+      "sourceCropX": 0.46,
+      "aspectTreatment": "UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080"
     },
     {
       "id": "04-night-front-headlight",
@@ -240,15 +219,15 @@
       "aspectTreatment": "UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080"
     },
     {
-      "id": "07-blue-road-side",
+      "id": "07-clean-white-sto-industrial-side",
       "startFrame": 113,
       "endFrameExclusive": 134,
-      "sourceOriginal": "phantom-sto-primary.mp4",
-      "sourceStartSeconds": 16.85,
-      "sourceEndSeconds": 17.55,
+      "sourceOriginal": "format67_sto_directors_full.mp4",
+      "sourceStartSeconds": 35.85,
+      "sourceEndSeconds": 36.55,
       "file": "shot-07.mp4",
-      "intendedSubject": "Blue STO side road moving angle",
-      "cutStyle": "cut",
+      "intendedSubject": "Genuine white STO industrial roadway dynamic left-to-right side tracking; clean cinematic filmmaker source",
+      "cutStyle": "whip-left",
       "plannedFocalX": 0.5,
       "plannedFocalY": 0.5,
       "cropKeyframes": [
@@ -256,20 +235,20 @@
           "frame": 0,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.02
+          "zoom": 1.025
         },
         {
           "frame": 20,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.06
+          "zoom": 1.075
         }
       ],
       "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
       "uniqueMovingAngleKey": null,
       "movingAngleVerified": false,
-      "sourceCropX": 0.5,
-      "aspectTreatment": "NATIVE_1920X1080_UNSCALED"
+      "sourceCropX": 0.54,
+      "aspectTreatment": "UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080"
     },
     {
       "id": "08-industrial-white-side",
@@ -336,46 +315,14 @@
       "aspectTreatment": "UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080"
     },
     {
-      "id": "10-blue-rear-rolling",
+      "id": "10-clean-white-sto-rear-track",
       "startFrame": 182,
       "endFrameExclusive": 206,
-      "sourceOriginal": "phantom-sto-lambo.mp4",
-      "sourceStartSeconds": 18.43,
-      "sourceEndSeconds": 19.23,
+      "sourceOriginal": "format67_sto_directors_full.mp4",
+      "sourceStartSeconds": 43.17,
+      "sourceEndSeconds": 43.97,
       "file": "shot-10.mp4",
-      "intendedSubject": "Blue STO rear-three-quarter road motion",
-      "cutStyle": "cut",
-      "plannedFocalX": 0.5,
-      "plannedFocalY": 0.5,
-      "cropKeyframes": [
-        {
-          "frame": 0,
-          "x": 0.5,
-          "y": 0.5,
-          "zoom": 1.02
-        },
-        {
-          "frame": 23,
-          "x": 0.5,
-          "y": 0.5,
-          "zoom": 1.06
-        }
-      ],
-      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
-      "uniqueMovingAngleKey": null,
-      "movingAngleVerified": false,
-      "sourceCropX": 0.5,
-      "aspectTreatment": "NATIVE_1920X1080_UNSCALED"
-    },
-    {
-      "id": "11-blue-close-pass",
-      "startFrame": 206,
-      "endFrameExclusive": 232,
-      "sourceOriginal": "phantom-sto-primary.mp4",
-      "sourceStartSeconds": 0.81,
-      "sourceEndSeconds": 1.676667,
-      "file": "shot-11.mp4",
-      "intendedSubject": "Blue STO dynamic roadside angle",
+      "intendedSubject": "Genuine white STO industrial container-corridor low rear follow; clean cinematic filmmaker source",
       "cutStyle": "whip-right",
       "plannedFocalX": 0.5,
       "plannedFocalY": 0.5,
@@ -384,20 +331,52 @@
           "frame": 0,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.02
+          "zoom": 1.025
+        },
+        {
+          "frame": 23,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.075
+        }
+      ],
+      "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
+      "uniqueMovingAngleKey": null,
+      "movingAngleVerified": false,
+      "sourceCropX": 0.7,
+      "aspectTreatment": "UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080"
+    },
+    {
+      "id": "11-clean-tunnel-front-impact",
+      "startFrame": 206,
+      "endFrameExclusive": 232,
+      "sourceOriginal": "format67_sto_directors_full.mp4",
+      "sourceStartSeconds": 45.85,
+      "sourceEndSeconds": 46.716667,
+      "file": "shot-11.mp4",
+      "intendedSubject": "Real STO high-contrast black-and-white tunnel front approach; clean filmmaker footage, no publisher watermark",
+      "cutStyle": "impact",
+      "plannedFocalX": 0.5,
+      "plannedFocalY": 0.5,
+      "cropKeyframes": [
+        {
+          "frame": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1.025
         },
         {
           "frame": 25,
           "x": 0.5,
           "y": 0.5,
-          "zoom": 1.06
+          "zoom": 1.075
         }
       ],
       "stoVisualStatus": "IDENTIFIABLE_CANDIDATE_NOT_INDEPENDENTLY_APPROVED",
       "uniqueMovingAngleKey": null,
       "movingAngleVerified": false,
       "sourceCropX": 0.5,
-      "aspectTreatment": "NATIVE_1920X1080_UNSCALED"
+      "aspectTreatment": "UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080"
     },
     {
       "id": "12-white-high-contrast-pass",
@@ -496,9 +475,16 @@
       "aspectTreatment": "UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080"
     }
   ],
-  "editRevision": "v3-night-cinematic-real-footage",
+  "editRevision": "v4-clean-watermark-free-nights",
   "nonNativeFullHDOriginals": [
     "format67_sto_directors_full"
   ],
-  "nightSourceSceneCount": 10
+  "nightSourceSceneCount": 14,
+  "excludedBrandedSources": [
+    "phantom-sto-primary",
+    "phantom-sto-lambo",
+    "phantom-sto-huracan"
+  ],
+  "watermarkReplacementReason": "Phantom uploader watermarks baked into four V3 blue STO slots; replaced all four with different real FORMAT67 footage windows; no editing-out of logos or synthetic patches.",
+  "visualDisclaimer": "Source movie includes filmmaker credits/title and noncar intercuts; only specifically inspected 14 shot windows used. Human reviewed expected not an automated no-watermark certification."
 }

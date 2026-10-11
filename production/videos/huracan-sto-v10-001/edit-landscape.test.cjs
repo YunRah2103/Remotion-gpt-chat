@@ -12,14 +12,17 @@ test('all timeline frames exactly once',()=>{
  for(const s of map.shots)for(let f=s.startFrame;f<s.endFrameExclusive;f++)n[f]++;
  assert(n.every(v=>v===1));
 });
-test('native 1080p sources + explicitly upscaled 810p FORMAT67 source, gate still fails',()=>{
- assert.equal(Object.keys(map.sourceFiles).length,4);
- assert(Object.values(map.sourceFiles).every(s=>s.width===1920&&[810,1080].includes(s.height)&&/^[0-9a-f]{64}$/.test(s.sha256)));
+test('14 real filmmaker night shots; none from branded Phantom publisher',()=>{
+ assert.equal(Object.keys(map.sourceFiles).length,1);
+ assert.equal(map.sourceFiles.format67_sto_directors_full.width,1920);
  assert.equal(map.sourceFiles.format67_sto_directors_full.height,810);
  assert.equal(map.sourceFiles.format67_sto_directors_full.native1080,false);
  assert.equal(map.nonNativeFullHDOriginals.length,1);
- assert.equal(map.nightSourceSceneCount,10);
- assert(map.shots.every(s=>s.aspectTreatment==='NATIVE_1920X1080_UNSCALED'||s.aspectTreatment==='UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080'));
+ assert.equal(map.nightSourceSceneCount,14);
+ assert.equal(map.shots.filter(s=>s.sourceOriginal==='format67_sto_directors_full.mp4').length,14);
+ assert(map.shots.every(s=>s.aspectTreatment==='UNIFORM_1.333X_SCALE_THEN_HORIZONTAL_CROP_1920X1080'));
+ assert(map.shots.every(s=>!s.sourceOriginal.toLowerCase().includes('phantom')));
+ assert.equal(map.excludedBrandedSources.length,3);
  assert(map.shots.every(s=>s.movingAngleVerified===false&&s.uniqueMovingAngleKey===null));
  assert.equal(map.sourceGatePassed,false);
 });
