@@ -1,0 +1,60 @@
+name: YUNEX GT3 A2 Official YouTube EJS Native Ferrari McLaren
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a2-ferrari-aston-mclaren
+    paths:
+      - .github/workflows/gt3-a2-youtube-ejs-native-rescue.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  true-native-ferrari-mclaren-ejs-scout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Node 24 runtime to support current yt-dlp EJS JS challenges
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install actual source-video extraction, FFmpeg, and EJS companion
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -U -q --break-system-packages 'yt-dlp[default]' pillow
+          yt-dlp --version
+          node --version
+      - name: Actually acquire and hash official Nürburgring/Ferrari/McLaren 1080 sources
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a2/youtube_ejs_native_rescue.py
+      - name: Check ZIP CRC and physically present video bytes and hashes
+        if: always()
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,zipfile
+          p=Path('out/gt3-a2-youtube-ejs/GT3_A2_YOUTUBE_EJS_REAL_NATIVE_MEDIA_AND_QA.zip')
+          if not p.exists():print("NO ZIP, NOT DELIVERED");raise SystemExit(0)
+          with zipfile.ZipFile(p) as z:
+            assert z.testzip() is None
+            m=json.loads(z.read('manifest.json'))
+            n=0
+            for x in m['sources']:
+              if x['status'].startswith('NATIVE'):
+                b=z.read(x['media_file'])
+                assert len(b)>100000
+                assert hashlib.sha256(b).hexdigest()==x['sha256']
+                assert x['native_pixels'][0]>=1920 and x['native_pixels'][1]>=1080
+                n+=1
+          assert n==m['film_count_with_real_decoded_native_1080_bytes']
+          print("ACTUALLY_VERIFIED_VIDEO_FILES",n)
+          PY
+      - name: Upload ONE source ZIP with REAL media when acquired
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-A2-EJS-YOUTUBE-REAL-FERRARI-MCLAREN-NATIVE-1080-SOURCE-QA
+          path: out/gt3-a2-youtube-ejs/GT3_A2_YOUTUBE_EJS_REAL_NATIVE_MEDIA_AND_QA.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
