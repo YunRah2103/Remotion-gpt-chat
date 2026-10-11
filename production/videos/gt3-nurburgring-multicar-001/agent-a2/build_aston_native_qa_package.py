@@ -22,11 +22,11 @@ PUBLISHER="https://www.facebook.com/astonmartinracing/videos/winners-the-vantage
 SHOTS=[
  {"id":"ASTON21_01_CORNER_EXIT","start":5.56,"end":9.95,"camera_id":"ASTON21_NLS8_CAM_A","angle":"Trackside follow-pan, car exits a fast right-hander","approved":True},
  {"id":"ASTON21_02_MULTI_CAR_BATTLE","start":10.24,"end":13.30,"camera_id":"ASTON21_NLS8_CAM_B","angle":"Trackside frontal pan with GT3 pack, Aston among cars","approved":True},
- {"id":"ASTON21_03_LONG_LENS_APPROACH","start":17.12,"end":18.34,"camera_id":"ASTON21_NLS8_CAM_C","angle":"Long-lens GT3 rear/approach, distinctive houses in background","approved":True},
+ {"id":"ASTON21_03_REAR_TRACK_APPROACH","start":15.48,"end":16.96,"camera_id":"ASTON21_NLS8_CAM_C","angle":"Actual racing Aston GT3 rear with houses in background, exclude garage cut at 17.04s","approved":True},
  {"id":"ASTON21_04_HEADLIGHTS_ATTACK","start":22.28,"end":24.25,"camera_id":"ASTON21_NLS8_CAM_D","angle":"Low frontal corner approach with aggressive headlights","approved":True},
  {"id":"ASTON21_05_FAST_TRACK_FLYBY","start":28.18,"end":31.85,"camera_id":"ASTON21_NLS8_CAM_E","angle":"High-speed trackside flyby, green hillside, car flashes past","approved":True},
  {"id":"ASTON21_06_REAR_CORNER","start":32.19,"end":34.25,"camera_id":"ASTON21_NLS8_CAM_F","angle":"Rear three-quarter fast corner with curbing","approved":True},
- {"id":"ASTON21_07_BANKED_SWEEP","start":34.41,"end":37.82,"camera_id":"ASTON21_NLS8_CAM_G","angle":"Elevated trackside banking, frontal / profile Aston GT3 #21","approved":True},
+ {"id":"ASTON21_07_BANKED_SWEEP","start":34.41,"end":37.04,"camera_id":"ASTON21_NLS8_CAM_G","angle":"Elevated trackside banking, frontal / profile Aston GT3 #21, excludes finish-line reaction","approved":True},
 ]
 def command(cmd,timeout=140):
  r=subprocess.run(cmd,capture_output=True,text=True,timeout=timeout)
@@ -123,7 +123,7 @@ with zipfile.ZipFile(IN) as zip:
    "Every clip has an exact source timecode, unique camera-view ID, real decoded frames, "
    "full decode, video metadata, SHA256 and 3-frame review sheet. "
    "Native movie cropped by 4px on top/bottom, never enlarged. "
-   "No audio replacement or soundtrack; editor can source original if audio needed. "
+   "Review corrected source ranges after full contact-sheet QA to avoid pit/garage and victory shots. No audio replacement or soundtrack; editor can source original if audio needed. "
    "**PARTIAL DELIVERY**: Ferrari/McLaren absent, total project 24+ shot / 6+ makes gate remains BLOCKED. "
    "See SOURCE_MANIFEST_FFPROBE_SHA256.json for verified provenance and QA.\n")
  pack=OUT/"GT3_MULTICAR_A2_ASTON_RACING_NATIVE_1080_VERIFIED_PARTIAL.zip"
