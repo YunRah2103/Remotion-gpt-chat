@@ -1,0 +1,25 @@
+name: FR Legends A - New Filmmaker Exact Model Full HD Source Discovery
+on:
+  push:
+    branches: [automotive-edits/french-icons-001/a-classics-footage]
+    paths:
+      - '.github/workflows/fr-legends-a-new-public-films.yml'
+      - 'production/videos/french-icons-001/agent_a_vimeo_new_leads.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  discover-native-video:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect ten real filmmaker embedded video manifests
+        run: python production/videos/french-icons-001/agent_a_vimeo_new_leads.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-a-classic-filmmaker-exact-video-format-report
+          path: out/fr-a-vimeo-new-discover/manifest.json
+          retention-days: 7
+          if-no-files-found: warn
