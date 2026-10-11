@@ -1,0 +1,37 @@
+name: GT3 Agent A 2018 Audi Actual Original 1080p Full 72-Frame Scene Survey
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-audi-2018-native-72-frame-survey.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  deep-actual-film:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Native-video inspection dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q pillow
+      - name: Fetch actual 1080 original Audi publisher film from previously acquired GitHub media artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/audi2018_actual
+          gh run download 38143817077 --repo YunRah2103/Remotion-gpt-chat --name GT3-AUDI-TIMESCOPE-2018-FULL-HD-FILM --dir inputs/audi2018_actual || gh api repos/YunRah2103/Remotion-gpt-chat/actions/artifacts/11704042208/zip > inputs/audi2018_actual/prior_audi_original.zip
+          find inputs/audi2018_actual -type f -printf '%p %s bytes\n'
+      - name: Independently SHA-verify full film and decode 72 source frames
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/scan_audi2018_real_72_native_frames.py
+      - name: Publish unmanipulated still proof QA, without invented angle approvals
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-AUDI-2018-72-REAL-HD-FRAMES-GT3-IDENTITY-QA
+          path: out/gt3-a-2018-audi-original-70-frame-camera-survey/
+          retention-days: 7
+          if-no-files-found: warn
