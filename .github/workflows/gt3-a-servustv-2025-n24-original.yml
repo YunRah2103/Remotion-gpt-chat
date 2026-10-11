@@ -1,0 +1,41 @@
+name: Agent A ServusTV 2025 N24 Native Racing Original Video
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-servustv-2025-n24-original.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-2025-n24-highlights:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install actual native-1080 and media extraction/visual proof stack
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q yt-dlp pillow
+      - name: Acquire official ServusTV race video original 1080p+ frames and contact sheets
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_servustv_2025_n24_multicar_real_hd.py
+      - name: Upload verified physical native media if acquired (else transparent diagnostic)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-SERVUSTV-2025-N24-REAL-NATIVE-MEDIA-OR-DIAGNOSTIC
+          path: out/gt3-a-servustv-n24-originals/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Actual native original source report
+        if: always()
+        run: |
+          python - <<'PY'
+          import json,pathlib,os
+          p=pathlib.Path('out/gt3-a-servustv-n24-originals/SOURCE_MANIFEST.json')
+          if p.exists():
+            j=json.loads(p.read_text());s='\n'.join(v['id']+' '+v['status']+' '+v.get('error','')[:100] for v in j['sources'])
+          else:s='No source manifest; no valid footage.'
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(s+'\n')
+          PY
