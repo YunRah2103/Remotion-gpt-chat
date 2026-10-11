@@ -48,6 +48,39 @@
       "event": "2024 ADAC Nürburgring 24h race"
     },
     {
+      "id": "swr-2025-race-review",
+      "publisher": "SWR Sport / ARD broadcast news",
+      "url": "https://www.swr.de/sport/mehr-sport/motorsport/bmw-gewinnt-24h-rennen-nuerburgring-100.html",
+      "method": "yt-dlp-webpage",
+      "type": "broadcast multi-camera N24 race report",
+      "model": "MULTI_GT3_UNKNOWN_PER_SHOT",
+      "make": "UNVERIFIED",
+      "starts": [
+        1,
+        11,
+        21,
+        31,
+        41
+      ],
+      "event": "2025 Nürburgring 24h race"
+    },
+    {
+      "id": "swr-2025-n24-preview",
+      "publisher": "SWR Sport / ARD broadcast news",
+      "url": "https://www.swr.de/sport/mehr-sport/motorsport/24-stunden-rennen-nuerburgring-2025-100.html",
+      "method": "yt-dlp-webpage",
+      "type": "broadcast multi-camera track report",
+      "model": "MULTI_GT3_UNKNOWN_PER_SHOT",
+      "make": "UNVERIFIED",
+      "starts": [
+        1,
+        11,
+        21,
+        31
+      ],
+      "event": "2025 Nürburgring 24h event"
+    },
+    {
       "id": "gtworld-2025-extended",
       "publisher": "GTWorld / SRO Motorsports",
       "url": "https://www.youtube.com/watch?v=JSYrh3FFsJI",
