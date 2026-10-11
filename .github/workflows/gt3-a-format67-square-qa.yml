@@ -1,0 +1,30 @@
+name: GT3 Agent A FORMAT67 Native Square Crop Proof
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-format67-square-qa.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  physical-original-rescan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install source probe
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q requests pillow
+      - name: Download original MP4 bytes, print actual dimensions and retain true 1920-wide
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/qa_format67_square_crop_native.py
+      - name: Preserve source video and scene contact sheets, if valid
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-A-FORMAT67-TRUE-PIXEL-SQUARE-CROP-REVIEW
+          path: out/gt3-format67-square-recheck/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
