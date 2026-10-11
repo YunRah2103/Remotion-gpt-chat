@@ -1,0 +1,59 @@
+name: STO Agent A - TikTok Instagram source scout
+on:
+  push:
+    branches: [automotive-edits/huracan-sto-v10-001/a-footage]
+    paths:
+      - production/videos/huracan-sto-v10-001/footage/scout_social_sto_v3.py
+      - .github/workflows/sto-social-footage-scout.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  social-masters:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 27
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install FFmpeg + social-media extractors
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check --upgrade Pillow "yt-dlp[default]" curl_cffi
+          python -m py_compile production/videos/huracan-sto-v10-001/footage/scout_social_sto_v3.py
+          yt-dlp --version
+      - name: Discover genuine STO posts and acquire full-HD landscape masters only
+        run: python production/videos/huracan-sto-v10-001/footage/scout_social_sto_v3.py
+      - name: Record honest source and technical QA
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, pathlib, os
+          manifest=pathlib.Path('out/sto-social-v3/manifest.json')
+          if not manifest.exists():
+              print('No source manifest — script did not finish.')
+          else:
+              j=json.loads(manifest.read_text())
+              lines=['## STO social source audit',
+                     '**Source acquisition only — no true STO identity or watermark certification without film-frame inspection.**',
+                     'Native >=1920x1080 landscape; reject all portrait and low-res originals.']
+              for d in j['discovery']:
+                  lines.append('- Search '+d['page']+': '+str(d.get('found','?'))+' Instagram direct post URLs')
+              for s in j['sources']:
+                  p=s.get('probe') or {}
+                  lines.append('- '+s['id']+': **'+s['status']+'** '+str(p.get('width','?'))+'x'+str(p.get('height','?'))+' '+s.get('reason_code',''))
+              with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f:f.write('\n'.join(lines))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STO-SOCIAL-ORIGINAL-MP4-LANDSCAPE-SCOUT
+          path: |
+            out/HURACAN_STO_TIKTOK_INSTAGRAM_ORIGINALS.zip
+            out/sto-social-v3/manifest.json
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 5
