@@ -1,0 +1,25 @@
+name: Agent A Audit Falken Actual UHD 2018 All Racing Camera Angles
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-falken-2018-42frames-original-review.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect-actual-original-filmmaker-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Image and source audit dependencies
+        run: python -m pip install --break-system-packages -q Pillow
+      - name: Download earlier true original native-4K 2018 source frame scan
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/falken2018_global_actual
+          gh run download 38142178896 --repo YunRah2103/Remotion-gpt-chat --name GT3-FALKEN-2018-42FRAME-REAL-4K-RACE-CAR-SCAN --dir inputs/falken2018_global_actual
+      - name: Inspect source frame proof for NEW distinct full-resolution GT3 cameras
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/display_falken2018_real_42frame_global.py
