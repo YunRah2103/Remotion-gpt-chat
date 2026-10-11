@@ -81,29 +81,41 @@ def beat_candidates(samples):
     return [{'frame': f, 'seconds': round(f/FPS, 3), 'onset_change': round(delta[f], 5)} for f in sorted(chosen)]
 
 
+def canonical_make(make):
+    normalized = make.strip().lower().replace('_','-')
+    return {'mercedes-amg':'mercedes', 'mercedes amg':'mercedes',
+            'aston-martin':'aston martin'}.get(normalized, normalized)
+
+
 def validate_shots(shotmap):
     shots = shotmap.get('shots', [])
     if len(shots) < 18 or len(shots) > 26:
         raise ValueError('Visual cut count must be 18-26 distinct shots')
-    makes = set()
+    makes, normalized_shots = set(), []
     for shot in shots:
-        make = shot['make'].strip().lower()
+        # B's real map uses verifiedMake/from/to. targetMake is NOT evidence.
+        make_raw = shot.get('verifiedMake') if 'verifiedMake' in shot else shot.get('make')
+        if not make_raw:
+            raise ValueError('B shot-map contains unverified make; targetMake is not source proof')
+        make = canonical_make(make_raw)
         if make not in MAKES:
             raise ValueError(f'Invalid GT3 car make: {make}')
         makes.add(make)
-        start, length = int(shot['start_frame']), int(shot['duration_frames'])
+        start = int(shot.get('start_frame', shot.get('from', -1)))
+        length = int(shot.get('duration_frames', int(shot.get('to', -1)) - start))
         if start < 0 or length < 1 or start + length > FRAMES:
             raise ValueError('Shot boundaries outside 316-frame master')
+        normalized_shots.append({'make':make,'start_frame':start,'duration_frames':length})
     if len(makes) < 6:
         raise ValueError('Visual montage must include >=6 unique GT3 marques')
-    return shots, makes
+    return normalized_shots, makes
 
 
 def mix_engine_cues(music, shots, cues, root):
     provenance = []
     for cue in cues:
         frame, count = int(cue['frame']), int(cue['duration_frames'])
-        make = cue['make'].strip().lower()
+        make = canonical_make(cue['make'])
         if make not in MAKES or not cue.get('verified_original_car_audio', False):
             raise ValueError('Engine cue requires a verified original GT3 car recording')
         if frame < 0 or count <= 0 or frame + count > FRAMES:
