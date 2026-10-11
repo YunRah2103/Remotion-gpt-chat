@@ -1,0 +1,43 @@
+name: Agent A FORMAT67 Live Publisher Original MP4 Acquisition
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-format67-real-originals.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  retrieve-actual-originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare media inspection dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q requests Pillow
+      - name: Download linked publisher MP4 originals and full-decode native 1080p gate
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_format67_live_linked_mp4.py
+      - name: Upload physical videos contact sheets and manifest, or transparent diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-FORMAT67-PUBLISHER-ORIGINAL-MP4-QA
+          path: out/gt3-a-format67-original-execution/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
+      - name: Summarize verified media-only gate
+        if: always()
+        run: |
+          python - <<'PY'
+          import pathlib,json,os
+          p=pathlib.Path('out/gt3-a-format67-original-execution/MANIFEST.json')
+          if p.exists():
+            j=json.loads(p.read_text())
+            parts=[f'{x["url"]} — {x["status"]} {x.get("native_width","")}x{x.get("native_height","")}' for x in j['original_video_attempts']]
+            msg='\n'.join(parts) + '\nCamera/make GT3 shot QA not automatically passed.\n'
+          else:msg='No valid manifest delivered, footage acquisition failed.'
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(msg)
+          PY
