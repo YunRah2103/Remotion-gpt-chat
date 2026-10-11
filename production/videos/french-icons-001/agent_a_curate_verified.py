@@ -22,7 +22,7 @@ def hash_file(path):
 def verify_decode(p):
  cmd=["ffmpeg","-hide_banner","-loglevel","error","-xerror","-i",str(p),"-map","0:v:0","-f","null","-"]
  subprocess.run(cmd,check=True,timeout=90,capture_output=True)
-probe_cmd=["ffprobe","-v","error","-show_entries","stream=width,height,avg_frame_rate,codec_name",
+ probe_cmd=["ffprobe","-v","error","-show_entries","stream=width,height,avg_frame_rate,codec_name",
            "-select_streams","v:0","-of","json",str(p)]
  j=json.loads(subprocess.run(probe_cmd,check=True,capture_output=True,text=True).stdout)
  s=j["streams"][0]
