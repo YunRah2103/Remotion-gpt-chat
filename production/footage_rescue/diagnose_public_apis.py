@@ -63,7 +63,8 @@ if __name__=="__main__":
     p=argparse.ArgumentParser()
     p.add_argument("--mode",choices=["piped","invidious"],required=True)
     p.add_argument("--host",choices=["pipedapi.kavin.rocks","pipedapi.leptons.xyz",
-                                    "inv.nadeko.net","invidious.tiekoetter.com"],required=True)
+                                    "inv.nadeko.net","invidious.tiekoetter.com",
+                                    "invidious.nerdvpn.de","yt.chocolatemoo53.com"],required=True)
     p.add_argument("--out",required=True)
     a=p.parse_args()
     exit(execute(a.mode,a.host,a.out))
