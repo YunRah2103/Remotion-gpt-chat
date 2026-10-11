@@ -1,0 +1,51 @@
+name: GT3 Agent A HRT Ford Full-HD Source Extract Four N24 Candidate Clips
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-hrt-four-ford-native1080-trims.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  actual-manufacturer-media:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install native 1920x1080 media and visual QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q pillow
+      - name: Get actual full-length HRT producer source from verified acquisition artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/hrt-2026-full-original
+          gh run download 38161427589 --repo YunRah2103/Remotion-gpt-chat --name GT3-AGENT-A-HRT-FORD-2026-FULL86-1080-ORIGINAL-REVIEW --dir inputs/hrt-2026-full-original
+      - name: Extract actual four independent time sections to native-FHD MP4, full-decode and emit real camera proof frames
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/extract_hrt_ford_84s_4_targets_actual_hd.py
+      - name: Verify source SHA and actual playable video byte SHA after extraction
+        run: |
+          python - <<'PY'
+          import hashlib,json,pathlib
+          root=pathlib.Path('out/gt3-a-hrt-ford-2026-targeted-originals')
+          m=json.loads((root/'SOURCE_MANIFEST.json').read_text())
+          assert len(m['source_excerpt_video_records'])==4
+          for x in m['source_excerpt_video_records']:
+            p=root/x['output_video']
+            assert p.is_file() and p.stat().st_size>200000
+            assert hashlib.sha256(p.read_bytes()).hexdigest()==x['output_video_sha256']
+            assert x['actual_native_pixels']==[1920,1080]
+            assert x['full_decode']=='PASS'
+            print('REAL_FULL_HD_VIDEO_SHA_CHECK',x['id'],x['output_video_sha256'])
+          PY
+      - name: Deliver four actual playable 1080 Ford racing media extracts and contact-sheet model QA
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-HRT-FOUR-REAL-FORD-ORIGINAL-1080-EXTRACTS-QA
+          path: out/gt3-a-hrt-ford-2026-targeted-originals/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
