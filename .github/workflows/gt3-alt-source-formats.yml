@@ -1,0 +1,52 @@
+name: YUNEX GT3 Alternative Source Format Proof
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a-footage
+    paths:
+      - .github/workflows/gt3-alt-source-formats.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install only yt-dlp for fast source-format verification
+        run: python -m pip install -q -U yt-dlp
+      - name: Ask Dailymotion for actual available source heights
+        shell: bash
+        run: |
+          mkdir -p out/gt3-alt-formats
+          : > out/gt3-alt-formats/formats.txt
+          for id in x7wirh7 x8zgvkk x9lnluu x8zh8py x4n08nv x27gjl7 x7c2iev x81w2pm x7c2iem x9m3dve; do
+            echo "=== https://www.dailymotion.com/video/$id ===" | tee -a out/gt3-alt-formats/formats.txt
+            timeout 25s python -m yt_dlp --ignore-config --no-warnings --list-formats "https://www.dailymotion.com/video/$id" 2>&1 | tee -a out/gt3-alt-formats/formats.txt || true
+          done
+          echo "=== Porsche original public publisher MP4 quality-variant HTTP probe (metadata only) ===" | tee -a out/gt3-alt-formats/formats.txt
+          for url in \
+            https://newstv.porsche.com/porschevideos/277424_en_3000000.mp4 \
+            https://newstv.porsche.com/porschevideos/277424_en_8000000.mp4 \
+            https://newstv.porsche.com/porschevideos/277424_en_12000000.mp4 \
+            https://newstv.porsche.com/porschevideos/newstv.porsche.com_322821_en.mp4; do
+            echo "$url" | tee -a out/gt3-alt-formats/formats.txt
+            curl -L -sS -I --max-time 14 -o /dev/null -w 'http=%{http_code} contenttype=%{content_type} size=%{size_download}\n' "$url" | tee -a out/gt3-alt-formats/formats.txt || true
+          done
+      - name: Upload real format-list proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-ALTERNATIVE-FORMAT-RESEARCH
+          path: out/gt3-alt-formats/formats.txt
+          if-no-files-found: error
+          retention-days: 7
+      - name: Source quality report in summary
+        if: always()
+        run: |
+          echo '## Source format probe - no MP4 footage claimed' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Native source resolution available only where Dailymotion lists it; use probe report, not nominal player dimensions.' >> "$GITHUB_STEP_SUMMARY"
+          grep -E '1080|2160| 720 |HTTP|http=' out/gt3-alt-formats/formats.txt | tail -n 45 >> "$GITHUB_STEP_SUMMARY" || true
