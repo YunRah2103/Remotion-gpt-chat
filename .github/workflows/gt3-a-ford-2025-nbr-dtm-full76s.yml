@@ -1,0 +1,45 @@
+name: Agent A Native Full-76s Ford at Nürburgring 2025 Manufacturer Race Film
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-ford-2025-nbr-dtm-full76s.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  full-film-ford-nbr:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install original-media browser capture
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q playwright pillow yt-dlp requests
+          python -m playwright install chromium
+      - name: Get genuine 2025 HRT Ford Nürburgring full 76s film bytes native 1920x1080
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_hrt_ford_2025_dtm_nbr_full76_original.py
+      - name: Prove physical original integrity and 1080 source pixels before packaging
+        run: |
+          python - <<'PY'
+          import zipfile,hashlib,json,pathlib
+          a=pathlib.Path('out/gt3-a-hrt-ford-deutschland-2025-nbr-76s/GT3_A_FORD_NURBURGRING_2025_FULL76SEC_1080_ORIGINAL.zip')
+          with zipfile.ZipFile(a) as z:
+            assert z.testzip() is None
+            m=json.loads(z.read('SOURCE_MANIFEST.json'))
+            assert m['native_hd_media_file_count']==1,m
+            x=next(t for t in m['sources'] if t.get('status')=='REAL_NATIVE_HD_FULL_DECODE_MODEL_REVIEW_PENDING')
+            assert x['resolution']==[1920,1080]
+            assert float(x['duration'])>=65
+            assert hashlib.sha256(z.read(x['file'])).hexdigest()==x['sha256']
+            print('REAL_NURBURGRING_FORD_GT3_2025_FULL_HD_MOVIE_SOURCE_SHA',x['sha256'],'DURATION',x['duration'])
+          PY
+      - name: Upload exact complete source film, not placeholder
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-NURBURGRING-DTM-2025-FORD-FULL76S-1080-ORIGINAL
+          path: out/gt3-a-hrt-ford-deutschland-2025-nbr-76s/GT3_A_FORD_NURBURGRING_2025_FULL76SEC_1080_ORIGINAL.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
