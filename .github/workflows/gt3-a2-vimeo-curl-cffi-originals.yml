@@ -1,0 +1,52 @@
+name: YUNEX GT3 A2 Vimeo Impersonation Ferrari Originals Test
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a2-ferrari-aston-mclaren
+    paths:
+      - .github/workflows/gt3-a2-vimeo-curl-cffi-originals.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-acquisition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install public video extraction with Chrome impersonation and FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -U -q --break-system-packages 'yt-dlp[default]' curl_cffi pillow
+          yt-dlp --list-impersonate-targets
+      - name: Acquire actual Vimeo films, full decode and hash native >=1080p originals
+        run: |
+          python -u production/videos/gt3-nurburgring-multicar-001/agent-a2/vimeo_impersonation_media_rescue.py
+      - name: Validate video bytes in single ZIP, never mark make from title
+        if: always()
+        run: |
+          python - <<'PY'
+          import pathlib,zipfile,json,hashlib
+          p=pathlib.Path('out/gt3-a2-vimeo-impersonation/GT3_A2_VIMEO_CURL_CFFI_NATIVE_SOURCE_QA.zip')
+          if not p.exists():print('NO_ZIP / NO_MOVIE');raise SystemExit(0)
+          with zipfile.ZipFile(p) as z:
+            assert z.testzip() is None
+            manifest=json.loads(z.read('manifest.json'))
+            n=0
+            for item in manifest['sources']:
+              if item['status'].startswith('NATIVE'):
+                assert hashlib.sha256(z.read(item['media_file'])).hexdigest()==item['sha256']
+                n+=1
+          assert n==manifest['film_count_with_real_decoded_native_1080_bytes']
+          print('NATIVE_FILMS_WITH_REAL_VIDEO_BYTES',n)
+          PY
+      - name: Publish real source ZIP only, no fake footage claims
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-A2-VIMEO-IMPERSONATION-FERRARI-ORIGINAL-NATIVE-REVIEW
+          path: out/gt3-a2-vimeo-impersonation/GT3_A2_VIMEO_CURL_CFFI_NATIVE_SOURCE_QA.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
