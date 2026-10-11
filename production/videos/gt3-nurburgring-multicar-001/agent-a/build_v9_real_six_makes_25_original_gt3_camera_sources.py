@@ -39,16 +39,17 @@ def get_actual_source(zfile,source_id,target):
   row=next(x for x in manifest["sources"] if x["source_id"]==source_id)
   assert row["status"]=="REAL_NATIVE_HD_FULL_DECODE_MODEL_REVIEW_PENDING",row["status"]
   assert row["resolution"]==[1920,1080]
-  with z.open(row["file"]) as inp,target.open("wb") as dst:
+  actual_target=target.with_suffix(Path(row["file"]).suffix)
+  with z.open(row["file"]) as inp,actual_target.open("wb") as dst:
    shutil.copyfileobj(inp,dst,1<<20)
-  assert checksum(target)==row["sha256"],(source_id,checksum(target),row["sha256"])
-  data=json.loads(cmd(["ffprobe","-v","error","-show_format","-show_streams","-of","json",str(target)],35))
+  assert checksum(actual_target)==row["sha256"],(source_id,checksum(actual_target),row["sha256"])
+  data=json.loads(cmd(["ffprobe","-v","error","-show_format","-show_streams","-of","json",str(actual_target)],35))
   v=next(x for x in data["streams"] if x["codec_type"]=="video")
   assert (int(v["width"]),int(v["height"]))==(1920,1080)
   duration=float(data["format"].get("duration") or 0)
-  cmd(["ffmpeg","-nostdin","-v","error","-xerror","-i",str(target),"-f","null","-"],210)
-  print("FULL_ORIGINAL_HD_SHA_1080_DECODE_PASS",source_id,checksum(target),duration,flush=True)
-  return row,duration
+  cmd(["ffmpeg","-nostdin","-v","error","-xerror","-i",str(actual_target),"-f","null","-"],210)
+  print("FULL_ORIGINAL_HD_SHA_1080_DECODE_PASS",source_id,checksum(actual_target),duration,flush=True)
+  return row,duration,actual_target
 # Byte-identically preserve all previous five approved marques and their twenty-one unique original cameras.
 old=exact(V8,"COMBINED_GLOBAL_MANIFEST_V8.json")
 v8=json.loads(old.read_text())
@@ -70,11 +71,11 @@ for sid,archive in [
  ("hrt_24hnbr_night",hrtsrc)
 ]:
  out=SOURCES/(sid+".mp4")
- row,duration=get_actual_source(archive,sid,out)
- sourcefiles[sid]=out
+ row,duration,actual=get_actual_source(archive,sid,out)
+ sourcefiles[sid]=actual
  source_meta[sid]={"producer_page":row["publisher_page"],"source_original_SHA256":row["sha256"],
                    "native_resolution":[1920,1080],"full_original_seconds":duration,
-                   "source_file":str(out.relative_to(OUT))}
+                   "source_file":str(actual.relative_to(OUT))}
 # Each source identified by independently visualized 20/60/26 frame proof, and by GT3 car references.
 targets=[
  {"id":"NBR_HRT_FORD_MUSTANG_GT3_NUMBER64_TRACKSIDE_APPROACH",
