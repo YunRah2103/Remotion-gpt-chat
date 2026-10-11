@@ -4,6 +4,34 @@ The existing workflow (.github/workflows/sto-official-youtube-probe.yml) now
 accepts an optional GitHub Actions secret named YOUTUBE_COOKIES_B64. No cookie
 data has been supplied or stored in the repository.
 
+## Android-only setup (no PC, no Base64)
+
+1. Install **Firefox for Android** and use a separate Firefox profile or browser
+   dedicated to the dummy YouTube account.
+2. Open youtube.com in Firefox and sign into the dummy account.
+3. Install **Get cookies.txt LOCALLY** from the official Firefox Android add-ons
+   page: https://addons.mozilla.org/en-US/android/addon/get-cookies-txt-locally/
+   (alternative: https://addons.mozilla.org/en-US/android/addon/cookies-txt/).
+   Grant the add-on cookie/site permissions when prompted.
+4. While viewing YouTube in Firefox, open the extension, choose the **Netscape**
+   cookies.txt format and export only youtube.com cookies where supported.
+5. Open the downloaded cookies.txt with a phone text editor and copy its entire
+   text, starting at the `# Netscape HTTP Cookie File` header. Do **not** paste
+   it in an AI chat, issue, source file or Git commit.
+6. In your mobile browser open
+   https://github.com/YunRah2103/Remotion-gpt-chat/settings/secrets/actions
+   and choose **New repository secret** (enable browser Desktop site if settings
+   controls are hidden):
+   **Name:** `YOUTUBE_COOKIES_TXT`
+   **Value:** paste the entire text from the export, including header/newlines.
+   Save secret.
+7. Ask the assistant to rerun the A-footage YouTube workflow and verify actual
+   Full HD MP4 downloads. YouTube can still reject datacentre IP addresses.
+
+**Mobile uses YOUTUBE_COOKIES_TXT directly. No encoding or PowerShell needed.**
+The older YOUTUBE_COOKIES_B64 secret remains supported on desktop; if both are
+configured, YOUTUBE_COOKIES_TXT takes precedence.
+
 ## Setup using your PC and dummy Google account
 
 1. Sign in at youtube.com from a separate browser profile used with the dummy
