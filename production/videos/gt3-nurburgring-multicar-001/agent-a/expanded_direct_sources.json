@@ -1,0 +1,53 @@
+{
+  "description": "Additional actual direct MP4 Nürburgring 2024-2026 candidates found on publisher webpages 2026-10-11. No shot or GT3/make should count before physical FFprobe and visual review.",
+  "sources": [
+    {
+      "id": "niterra_2026_live",
+      "url": "https://247grad.de/wp-content/uploads/2026/06/0610-1.mp4",
+      "event": "2026 Nürburgring 24h",
+      "provenance": "247GRAD Niterra official production case study",
+      "model_hint": "GT3 class unverified",
+      "priority": 1
+    },
+    {
+      "id": "max_verstappen_2026_amg_race",
+      "url": "https://campeones.com.ar/wp-content/uploads/2026/05/ssstwitter.com_1778967188274.mp4",
+      "event": "2026 Nürburgring 24h",
+      "provenance": "Campeones article about Mercedes-AMG GT3 #3 at N24",
+      "model_hint": "Mercedes-AMG GT3 candidate; confirm frames",
+      "priority": 1
+    },
+    {
+      "id": "verstappen_2026_amg_nls",
+      "url": "https://campeones.com.ar/wp-content/uploads/2026/03/ssstwitter.com_1774109469230.mp4",
+      "event": "2026 Nürburgring endurance race",
+      "provenance": "Campeones article, Verstappen Mercedes-AMG GT3",
+      "model_hint": "Mercedes-AMG GT3 candidate; confirm frames",
+      "priority": 1
+    },
+    {
+      "id": "falken_japan_2024_n24",
+      "url": "https://skmt.info/wp-content/uploads/2024/09/FALKEN_-HP%E7%94%A8.mp4",
+      "event": "2024 Nürburgring 24h",
+      "provenance": "SKMT Inc. producer portfolio Falken film",
+      "model_hint": "Porsche 911 GT3 R candidates; likely interview portions",
+      "priority": 2
+    },
+    {
+      "id": "falken_japan_2024_n24_raw",
+      "url": "https://skmt.info/wp-content/uploads/2024/09/FALKEN_-HP用.mp4",
+      "event": "2024 Nürburgring 24h",
+      "provenance": "SKMT Inc. producer portfolio Falken film original literal path",
+      "model_hint": "Porsche 911 GT3 R candidate",
+      "priority": 3
+    },
+    {
+      "id": "falken_whywerace_2024_direct",
+      "url": "https://thetiremagazine.com/wp-content/uploads/2024/07/Falken-Tyres-Why-We-Race-24h-Race-Nurburgring-2024.mp4",
+      "event": "2024 Nürburgring 24h",
+      "provenance": "The Tire Magazine Falken film",
+      "model_hint": "Porsche 911 GT3 R; mixed class check",
+      "priority": 2
+    }
+  ]
+}
