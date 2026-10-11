@@ -1,0 +1,38 @@
+name: YUNEX N24 Individual TikTok Instagram Native Footage Hunt
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a-footage
+    paths:
+      - .github/workflows/gt3-real-social-individual-posts.yml
+      - production/videos/gt3-nurburgring-multicar-001/agent-a/hunt_social_individual_posts.py
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  individual-social-post-acquisition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 27
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install legal public web extraction and actual-video QA
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q -U "yt-dlp[default]" requests beautifulsoup4 pillow
+      - name: Search and physically download indexed exact individual Instagram and TikTok posts
+        timeout-minutes: 20
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/hunt_social_individual_posts.py
+      - name: Upload actual native source bytes if acquired, otherwise detailed blockers
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-N24-SOCIAL-INDIVIDUAL-POSTS-REAL-MEDIA-PROOF
+          path: out/gt3-social-individual-post-hunt/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+      - name: Tell editor honest video count
+        if: always()
+        run: |
+          test -f out/gt3-social-individual-post-hunt/live_status.json &&           cat out/gt3-social-individual-post-hunt/live_status.json | head -c 5000 || true
+          echo "No social source qualifies until native decode AND independent N24 GT3 visual verification." >> "$GITHUB_STEP_SUMMARY"
