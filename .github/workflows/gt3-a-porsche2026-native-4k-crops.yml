@@ -1,0 +1,42 @@
+name: GT3 Agent A Porsche 2026 Original Native 4K Racing Crops
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-porsche2026-native-4k-crops.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  true-4k-racing-crop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg and Pillow for genuine original crops
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q pillow requests
+      - name: Download native 3840 square Nürburgring 2026 and crop original source pixels to real UHD landscape
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_porsche2026_4k_n24_source_crops.py
+      - name: Upload actual 2026 racing footage and independent contact sheets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-PORSCHE-2026-N24-NATIVE-4K-RACE-SQUARE-CROPS
+          path: out/gt3-a-porsche2026-4k-square-native-crops/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Native UHD 16-9 footage proof status
+        if: always()
+        run: |
+          python - <<'PY'
+          import json,pathlib,os
+          p=pathlib.Path('out/gt3-a-porsche2026-4k-square-native-crops/MANIFEST.json')
+          rows=json.loads(p.read_text())['crops'] if p.exists() else []
+          verified=[x for x in rows if x['status'].startswith('ACTUAL_NATIVE')]
+          msg=f'Original 2026 N24 full-bleed native 3840x2160 video crops completed: {len(verified)}. Race/model/camera QA pending.\n'
+          msg+='\n'.join(f'- {x["id"]}: {x["status"]} {x.get("bytes",0)} bytes' for x in rows)
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(msg+'\n')
+          PY
