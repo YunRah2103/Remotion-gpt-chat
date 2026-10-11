@@ -1,0 +1,50 @@
+name: GT3 Agent A V4 Audi-Confirmed Native Combined Footage Bundle
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-v4-combined-native.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  build-real-bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 23
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install native video inspection tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg unzip
+          python -m pip install --break-system-packages -q pillow
+      - name: Reuse original V3 playable bytes plus new native publisher captures
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p inputs/v3 inputs/second-wave
+          curl --connect-timeout 12 --max-time 250 -fLsS --retry 2 -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/artifacts/11705209678/zip \
+            -o /tmp/v3.zip
+          curl --connect-timeout 12 --max-time 150 -fLsS --retry 2 -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/artifacts/11705753703/zip \
+            -o /tmp/new-native.zip
+          unzip -q /tmp/v3.zip -d inputs/v3
+          unzip -q /tmp/new-native.zip -d inputs/second-wave
+          test -s inputs/v3/clips/AUDI_2018_N24_REVIEW_1080.mp4
+          test -s inputs/second-wave/original_hd_pending_model_qa/PRODUCER_07_case-fpv.mp4
+      - name: Generate independently model-verified Audi 1080 proof and exact source bundle
+        run: python production/videos/gt3-nurburgring-multicar-001/agent-a/build_native_source_v4.py
+      - name: Upload ONE full original-source-media ZIP with manifests and proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-MULTICAR-AGENT-A-NATIVE-PARTIAL-V4-AUDI-CONFIRMED
+          path: out/gt3-a-native-partial-v4/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+      - name: Print honest gate
+        run: |
+          echo '**ACTUAL NATIVE MEDIA V4, GATE BLOCKED: 4/6 makes and 6/24 sections, plus unapproved native portrait FPV and Mustang sources.**' >> "$GITHUB_STEP_SUMMARY"
+          du -sh out/gt3-a-native-partial-v4/ >> "$GITHUB_STEP_SUMMARY"
