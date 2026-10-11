@@ -1,0 +1,47 @@
+name: YouTube small video on GitHub Windows and Mac runners
+on:
+  push:
+    branches: [feature/footage-rescue-multisource-20261011]
+    paths:
+      - 'production/footage_rescue/cross_runner_probe.py'
+      - '.github/workflows/youtube-cross-runner-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare-runners:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    name: YouTube / ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Install yt-dlp and portable native FFmpeg
+        shell: bash
+        run: |
+          python -m pip install --disable-pip-version-check -q 'yt-dlp[default]==2026.08.19' imageio-ffmpeg
+          python -m yt_dlp --version
+          deno --version
+      - name: Download legitimate small test video; require native decode
+        shell: bash
+        run: |
+          python production/footage_rescue/cross_runner_probe.py
+      - name: Upload diagnostic report without movie bytes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cross-runner-${{ matrix.os }}
+          path: out/cross-platform-youtube/
+          retention-days: 3
+          if-no-files-found: warn
