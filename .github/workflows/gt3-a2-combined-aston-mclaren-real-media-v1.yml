@@ -30,10 +30,9 @@ jobs:
           import zipfile,io,json,hashlib
           a=next(Path('staged/aston').glob('*.zip'))
           m=next(Path('staged/mclaren').glob('*.zip'))
-          with zipfile.ZipFile(a) as outer:
-            assert outer.testzip() is None
-            inner=next(n for n in outer.namelist() if n.endswith('.zip'))
-            source=io.BytesIO(outer.read(inner))
+          with zipfile.ZipFile(a) as original:
+            assert original.testzip() is None
+          source=io.BytesIO(a.read_bytes())
           with zipfile.ZipFile(source) as ast:
             assert ast.testzip() is None
             astmanifest=json.loads(ast.read('SOURCE_MANIFEST_FFPROBE_SHA256.json'))
