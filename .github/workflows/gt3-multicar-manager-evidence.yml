@@ -1,0 +1,50 @@
+name: GT3 Multi-Car Agent D evidence (NOT a release PASS)
+
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/d-manager
+    paths:
+      - 'production/videos/gt3-nurburgring-multicar-001/**'
+      - '.github/workflows/gt3-multicar-manager-evidence.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa-evidence:
+    name: Independent manager gate smoke tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run manager release-gate unit tests
+        shell: bash
+        run: |
+          set -o pipefail
+          python3 -m unittest discover \
+            -s production/videos/gt3-nurburgring-multicar-001/agent-d \
+            -p test_manager_qa.py -v 2>&1 | tee gt3-d-unit-tests.log
+      - name: Create honest BLOCKED proof when source files are not present
+        shell: bash
+        run: |
+          mkdir -p gt3-d-evidence
+          set +e
+          python3 production/videos/gt3-nurburgring-multicar-001/agent-d/manager_qa.py \
+            --report gt3-d-evidence/release-gates.json
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "Expected missing-media BLOCKED exit code 2; got $code"
+            exit 1
+          fi
+          cp gt3-d-unit-tests.log gt3-d-evidence/unit-tests.log
+          cp production/videos/gt3-nurburgring-multicar-001/MANAGER_STATUS.md gt3-d-evidence/
+          git rev-parse HEAD > gt3-d-evidence/source-commit.txt
+      - name: Upload actual QA evidence (NOT a film)
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-D-MANAGER-BLOCKED-EVIDENCE
+          path: gt3-d-evidence/
+          if-no-files-found: error
+          retention-days: 30
