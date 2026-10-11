@@ -1,0 +1,59 @@
+name: YUNEX GT3 Publisher Direct MP4 Native Probe
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a-footage
+    paths:
+      - .github/workflows/gt3-porsche-original-mp4-probe.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  publisher:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download exact original linked by Porsche Newsroom
+        shell: bash
+        run: |
+          mkdir -p out/gt3-publisher
+          printf '%s\n' 'https://newstv.porsche.com/porschevideos/newstv.porsche.com_322821_en.mp4' > out/gt3-publisher/source_url.txt
+          curl -fL --retry 2 --max-time 130 \
+            'https://newstv.porsche.com/porschevideos/newstv.porsche.com_322821_en.mp4' \
+            -o out/gt3-publisher/original.mp4
+          sha256sum out/gt3-publisher/original.mp4 | tee out/gt3-publisher/original.sha256
+          ffprobe -v error -show_streams -show_format -of json out/gt3-publisher/original.mp4 > out/gt3-publisher/ffprobe.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('out/gt3-publisher/ffprobe.json'))
+          v=next(x for x in d['streams'] if x['codec_type']=='video')
+          w,h=v['width'],v['height']
+          ok=(w>=1920 and h>=1080 and w>h) or (w>=1080 and h>=1920 and h>w)
+          print(f"Porsche original native video resolution: {w}x{h}; qualifying={ok}")
+          open('out/gt3-publisher/native_1080_gate.txt','w').write('QUALIFIES' if ok else 'REJECTED_NATIVE_HD')
+          PY
+      - name: Build 8-second untouched video proof if native HD
+        if: success()
+        shell: bash
+        run: |
+          if test "$(cat out/gt3-publisher/native_1080_gate.txt)" = QUALIFIES; then
+            ffmpeg -hide_banner -loglevel error -y -ss 2 -i out/gt3-publisher/original.mp4 -t 8 -c copy out/gt3-publisher/GT3_R_2026_ORIGINAL_CLIP.mkv
+            ffmpeg -hide_banner -loglevel error -y -ss 4 -i out/gt3-publisher/GT3_R_2026_ORIGINAL_CLIP.mkv -frames:v 1 out/gt3-publisher/review_frame.png
+            cd out/gt3-publisher
+            zip -0 -q GT3_PUBLISHER_NATIVE_PROOF.zip GT3_R_2026_ORIGINAL_CLIP.mkv review_frame.png ffprobe.json original.sha256 source_url.txt native_1080_gate.txt
+          else
+            echo 'Published original is not a native >=1080p source; do not hand off as video.' > out/gt3-publisher/README_REJECTED.txt
+          fi
+      - name: Delete unapproved original from artifact bundle
+        if: always()
+        run: rm -f out/gt3-publisher/original.mp4
+      - name: Upload native evidence not false footage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-PORSCHE-PUBLISHER-NATIVE-PROBE
+          path: out/gt3-publisher/
+          retention-days: 7
+          if-no-files-found: warn
+          compression-level: 0
