@@ -1,0 +1,66 @@
+name: FR Legends Agent A - Real Commons Classics ZIP
+
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - '.github/workflows/fr-legends-classics-commons.yml'
+      - 'production/videos/french-icons-001/agent_a_commons_acquire.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  actual-video-ingest:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install FFmpeg and Pillow
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check pillow
+      - name: Download real files from author-approved Commons pages and verify original pixels
+        id: ingest
+        continue-on-error: true
+        run: |
+          python production/videos/french-icons-001/agent_a_commons_acquire.py
+      - name: Report actual media counts, not synthetic CI
+        if: always()
+        run: |
+          python - <<'PY'
+          import os,json,pathlib
+          p=pathlib.Path('out/fr-classics-commons/manifest.json')
+          rows=json.loads(p.read_text()) if p.exists() else []
+          valid=[x for x in rows if x.get('status','').startswith('TECHNICAL_')]
+          z=pathlib.Path('out/fr-legends-a-classics-real-sources.zip')
+          lines=['## YUNEX FR Legends: Agent A — actual classic footage package',
+             f'- Source downloads attempted: {len(rows)}',
+             f'- Native-HD/4K original-video decode-pass clips: {len(valid)}',
+             '- Unique cinematic angles independently visually confirmed: 0 until review',
+             '- Model visual and contact sheet review: pending',
+             '- Gate A: **BLOCKED** (<18 independently reviewed real angles / 5 classic models)',
+             f'- ZIP physically present: {z.exists()}',
+             f'- ZIP bytes: {z.stat().st_size if z.exists() else 0}']
+          lines.extend(f"- {x['slug']}: {x['status']} {x.get('reason','')[:140]}" for x in rows)
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(lines)+'\n')
+          print('\n'.join(lines))
+          PY
+      - name: Upload ONE honest ZIP with actual media where available
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fr-legends-a-classics-real-media-zip
+          path: out/fr-legends-a-classics-real-sources.zip
+          if-no-files-found: warn
+          retention-days: 7
+          compression-level: 0
+      - name: Fail if pipeline unexpectedly failed
+        if: steps.ingest.outcome != 'success'
+        run: exit 1
