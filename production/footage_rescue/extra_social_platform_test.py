@@ -12,6 +12,8 @@ SAMPLES = {
     "facebook": "https://www.facebook.com/reel/1283403743160634",
     "facebook2": "https://www.facebook.com/reel/2144727042986550",
     "twitter": "https://twitter.com/OPP_HSD/status/779210622571536384",
+    "twitter2": "https://twitter.com/BrooklynNets/status/1349794411333394432",
+    "twitter3": "https://twitter.com/CTVJLaidlaw/status/1600649710662213632/video/1",
     "reddit": "https://www.reddit.com/r/IdiotsInCars/comments/1x1j99a/almost_got_a_new_truck_yesterday_oc/",
     "snapchat": "https://www.snapchat.com/%40porschefromsam/spotlight/W7_EDlXWTBiXAEEniNoMPwAAYZ2V2bGR2bnhpAaBGQ9RvAaBEhtm2AAAAAw",
     "pinterest": "https://uk.pinterest.com/pin/1084804629000125920/",
