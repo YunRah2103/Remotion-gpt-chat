@@ -1,0 +1,65 @@
+name: FR Legends A - Curated Moving 2CV Four Shot ZIP V2
+
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - 'production/videos/french-icons-001/agent_a_curate_v2.py'
+      - '.github/workflows/fr-legends-a-curated-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  deliver-actual-originals-and-four-distinct-shots:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download previous approved original 4K single camera angle from GitHub artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p out/previous-curated
+          gh run download 38148189501 --repo YunRah2103/Remotion-gpt-chat \
+            --name fr-legends-a-classics-approved-one-zip \
+            --dir out/previous-curated
+          ls -lh out/previous-curated
+      - name: Install FFmpeg and image reviewer tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install pillow
+      - name: Re-download and checksum 1080p meeting original, extract 3 distinct moving shots
+        run: |
+          python production/videos/french-icons-001/agent_a_curate_v2.py
+      - name: Record actual delivered supporting clips and conservative gate
+        run: |
+          python - <<'PY'
+          import pathlib,os,json
+          p=pathlib.Path('out/fr-legends-agent-a-classics-v2/manifest.json')
+          d=json.loads(p.read_text())
+          z=pathlib.Path('out/FR-LEGENDS-A-CLASSICS-SUPPORTING-FOOTAGE-V2.zip')
+          lines=['## FR Legends Agent A — native French classic footage V2',
+          f"- Actual real moving 2CV supporting angles: **{d['verified_real_supporting_angles']}**",
+          f"- Distinct verified car models: **{len(d['verified_classic_models'])}**",
+          f"- Premium hero shots: **{d['verified_premium_hero_angles']}**",
+          "- Native 4K + native 1080p MP4s with decoded contact sheets, raw originals, SHA.",
+          f"- One final ZIP: **{z.stat().st_size:,} bytes**",
+          "- **Gate A: BLOCKED** (18 distinct premium shots / 5 classic models not achieved)."]
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(lines)+'\n')
+          print('\n'.join(lines))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fr-legends-a-four-authentic-classic-2cv-shots-one-zip
+          path: out/FR-LEGENDS-A-CLASSICS-SUPPORTING-FOOTAGE-V2.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
