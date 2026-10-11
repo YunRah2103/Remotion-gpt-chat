@@ -18,8 +18,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          mkdir -p inputs/2018 inputs/2024 inputs/audi inputs/bmw
-          for pair in 11703283097:2018 11703681795:2024 11704042208:audi 11704204180:bmw; do
+          mkdir -p inputs/2018 inputs/2024 inputs/audi inputs/bmw inputs/nbrtv
+          for pair in 11703283097:2018 11703681795:2024 11704042208:audi 11704204180:bmw 11704879537:nbrtv; do
             IFS=: read -r id folder <<< "$pair"
             curl -fsSL --retry 3 -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$id/zip" -o "/tmp/$id.zip"
             unzip -oq "/tmp/$id.zip" -d "inputs/$folder"
@@ -38,7 +38,9 @@ jobs:
           cp inputs/audi/native_hd_sources/audi_sport_timescope_2018_n24.mp4 out/gt3-partial/clips/AUDI_2018_N24_REVIEW_1080.mp4
           cp inputs/bmw/native_source/bmw_m6_gt3_2018_trackside_start_170s.mkv out/gt3-partial/clips/FALKEN18_BMW_M6_GT3_TRACK_4K_HDR.mkv
           cp inputs/bmw/native_source/bmw_m6_gt3_2018_pitlane_start_240s.mkv out/gt3-partial/clips/FALKEN18_BMW_M6_GT3_PIT_4K_HDR.mkv
-          cp inputs/2018/*.jpg inputs/2024/review_sheets/falken_japan_2024_n24_8FRAME.jpg inputs/audi/review_sheets/audi_sport_timescope_2018_n24_12FRAME.jpg inputs/bmw/contact_sheets/*.jpg out/gt3-partial/contact_sheets/
+          cp inputs/nbrtv/native_original_mp4/n24_legenden.mp4 out/gt3-partial/clips/NBR_TV_N24_BMW_Z4_GT3_WET_TRACK_NATIVE_1080.mp4
+          cp inputs/nbrtv/native_original_mp4/yokohama_24h_nuerburgring.mp4 out/gt3-partial/clips/NBR_TV_N24_YOKOHAMA_NIGHT_RACE_MODEL_QA_1080.mp4
+          cp inputs/2018/*.jpg inputs/2024/review_sheets/falken_japan_2024_n24_8FRAME.jpg inputs/audi/review_sheets/audi_sport_timescope_2018_n24_12FRAME.jpg inputs/bmw/contact_sheets/*.jpg inputs/nbrtv/contact_sheets/n24_legenden_12FRAME.jpg inputs/nbrtv/contact_sheets/yokohama_24h_nuerburgring_12FRAME.jpg out/gt3-partial/contact_sheets/
           python - <<'PY'
           from pathlib import Path
           import subprocess,hashlib,json
@@ -50,6 +52,8 @@ jobs:
             ('AUDI_2018_N24_REVIEW_1080.mp4','Audi (publisher attribution)','R8 LMS moving GT3 class NOT yet visually verified','night on-track/aerial',33,'https://player.vimeo.com/video/277958760?app_id=122963','GT3_CAR_IDENTIFICATION_PENDING'),
             ('FALKEN18_BMW_M6_GT3_TRACK_4K_HDR.mkv','BMW','M6 GT3 Falken #33','on-track front close-up plus other race cars',170,'https://www.falkentyre.com/_storage/asset/77989/storage/master/file/317009/download/FALKEN-HDR-h264-10Bit-56MBit.mp4','CONFIRMED_BMW_GT3_TRACK'),
             ('FALKEN18_BMW_M6_GT3_PIT_4K_HDR.mkv','BMW','M6 GT3 Falken #33','pit stop/garage off-track (not qualifying race shot)',240,'https://www.falkentyre.com/_storage/asset/77989/storage/master/file/317009/download/FALKEN-HDR-h264-10Bit-56MBit.mp4','CONFIRMED_BMW_GT3_PIT_NOT_RACING'),
+            ('NBR_TV_N24_BMW_Z4_GT3_WET_TRACK_NATIVE_1080.mp4','BMW','Z4 GT3 BMW-badged #3 race car','wet rear quarter driving/trackside departure, source 15-18 seconds',15.5,'https://nbrtv-website.fsn1.your-objectstorage.com/media/case-legenden.mp4','CONFIRMED_BMW_GT3_WET_TRACK_ONE_DISTINCT_CAMERA_PAN'),
+            ('NBR_TV_N24_YOKOHAMA_NIGHT_RACE_MODEL_QA_1080.mp4','UNVERIFIED','Nürburgring night racing, specific make and GT3 SP9 model unresolved','night cars cornering source 14-19 seconds',17.3,'https://nbrtv-website.fsn1.your-objectstorage.com/media/case-yokohama.mp4','REAL_NIGHT_RACE_VISUAL_IDENTITY_PENDING'),
           ]
           entries=[]
           for name,make,model,angle,timecode,url,status in spec:
@@ -61,26 +65,27 @@ jobs:
             v=next(s for s in ff['streams'] if s['codec_type']=='video')
             assert int(v['width'])>=1920 and int(v['height'])>=1080
             entries.append(dict(file='clips/'+name,sha256=h.hexdigest(),bytes=path.stat().st_size,make=make,model=model,angle=angle,source_time_seconds=timecode,url=url,status=status,ffprobe=ff))
-          assert len(entries)==6 and len(set(x['sha256'] for x in entries))==6
-          (root/'SOURCE_MANIFEST_FFPROBE.json').write_text(json.dumps(dict(footage_gate='BLOCKED',confirmed_gt3_makes=['Porsche','Mercedes-AMG','BMW'],confirmed_distinct_gt3_source_sections=4,required_distinct_shots=24,required_makes=6,duplicate_note='2024 Falken second filename contains identical source SHA and is deliberately excluded',sources=entries),indent=2,ensure_ascii=False)+'\n')
+          assert len(entries)==8 and len(set(x['sha256'] for x in entries))==8
+          (root/'SOURCE_MANIFEST_FFPROBE.json').write_text(json.dumps(dict(footage_gate='BLOCKED',confirmed_gt3_makes=['Porsche','Mercedes-AMG','BMW'],confirmed_distinct_gt3_source_sections=5,required_distinct_shots=24,required_makes=6,duplicate_note='2024 Falken second filename contains identical source SHA and is deliberately excluded',sources=entries),indent=2,ensure_ascii=False)+'\n')
           PY
           cat > out/gt3-partial/README_FIRST.md <<'EOF'
           # Agent A multi-car Nürburgring SOURCE PARTIAL
           Real native 1080p/4K video bytes and contact sheets, not filenames-only.
-          Gate BLOCKED: four confirmed on-track GT3 source sections across three model-confirmed makes (Porsche, Mercedes-AMG, BMW M6 GT3), not 24 across six.
+          Gate BLOCKED: five confirmed on-track GT3 source sections across three model-confirmed makes (Porsche, Mercedes-AMG, BMW M6 GT3 and BMW Z4 GT3), not 24 across six.
           Audi Sport 2018 original has genuine Nürburgring night racing but on-track car GT3 model not conclusively identified. Do not count yet.
           Falken 2024 20s source contains brief Porsche GT3 R racing at 16–18s and much crew/pit material. Duplicate source alias excluded.
           Falken 2018 4K excerpts are PQ HDR: tone-map to SDR for final delivery. Genuine BMW M6 GT3 #33 at source t175s and in pit around t245s; t195/t214 are still NOT BMW.
+          Nuerburgring.tv N24 1080p preview has a distinct BMW Z4 GT3 rear wet trackside pan at t15-18s, but contains baked-in subtitle/text; original Yokohama N24 video has night racing t14-19s with inconclusive car identities, not counted. Both 1080p previews have mixed non-race scenes; editors must isolate and may need crop away baked-in subtitles without stretching/upscaling. Avoid double-counting t15-18 of N24 as multiple camera angles.
           Some publisher watermarks/logos and interview content require editorial exclusion. Original sources, hashes, FFprobe and camera/angle notes are in SOURCE_MANIFEST_FFPROBE.json.
           EOF
       - name: Publish a single actual-source-media Actions ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: GT3-MULTICAR-AGENT-A-NATIVE-PARTIAL-V2
+          name: GT3-MULTICAR-AGENT-A-NATIVE-PARTIAL-V3
           path: out/gt3-partial/
           compression-level: 0
           retention-days: 7
           if-no-files-found: error
       - name: Report truthful gate status
         run: |
-          echo '**Gate BLOCKED: 4/24 source sections, 3/6 visually confirmed makes (BMW now physically verified).**' >> "$GITHUB_STEP_SUMMARY"
+          echo '**Gate BLOCKED: 5/24 source sections, 3/6 visually confirmed makes; new wet BMW Z4 GT3 pan; no new make yet.**' >> "$GITHUB_STEP_SUMMARY"
