@@ -1,0 +1,52 @@
+name: YUNEX GT3 A2 Vimeo 2023 N24 Native Film Rescue
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a2-ferrari-aston-mclaren
+    paths:
+      - .github/workflows/gt3-a2-vimeo-n24-original.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-documentary-footage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up actual media FFmpeg and Vimeo downloader
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y ffmpeg
+          python -m pip install --disable-pip-version-check --break-system-packages -q yt-dlp pillow
+      - name: Download producer-original film and decode 1080 native racing evidence
+        run: |
+          python -u production/videos/gt3-nurburgring-multicar-001/agent-a2/acquire_vimeo_n24_documentary.py
+      - name: Check actual ZIP file contents and source SHA-256
+        if: always()
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,zipfile
+          p=Path("out/gt3-a2-vimeo-2023/GT3_A2_RAVENOL_2023_NATIVE_REVIEW.zip")
+          if not p.is_file():
+            print("NO_DELIVERABLE_MEDIA_ZIP")
+            raise SystemExit()
+          with zipfile.ZipFile(p) as z:
+            assert z.testzip() is None
+            m=json.loads(z.read("manifest.json"))
+            if m["source_films_native_hd"]:
+              f=m["record"]["media_file"]
+              assert hashlib.sha256(z.read(f)).hexdigest()==m["record"]["sha256"]
+              print("ACTUAL_REAL_HD_FILM_HASH_VERIFIED", f)
+            else:print("NO_REAL_HD_FILM_ACQUIRED_GATE_BLOCKED")
+          PY
+      - name: Upload ONE real-media-or-diagnostic source archive
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-A2-2023-RAVENOL-N24-ORIGINAL-VIDEO-REVIEW
+          path: out/gt3-a2-vimeo-2023/GT3_A2_RAVENOL_2023_NATIVE_REVIEW.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
