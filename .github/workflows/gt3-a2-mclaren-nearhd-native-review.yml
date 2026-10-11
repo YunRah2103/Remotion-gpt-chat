@@ -1,0 +1,52 @@
+name: YUNEX A2 McLaren GTWC NearHD Real Video Technical Recovery
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a2-ferrari-aston-mclaren
+    paths:
+      - .github/workflows/gt3-a2-mclaren-nearhd-native-review.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-mclaren-source-extraction:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install real source network player and full decode tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y ffmpeg
+          python -m pip install -q --break-system-packages playwright pillow requests
+          python -m playwright install chromium
+      - name: Get full physical GTWC Nürburgring near-HD video and 12-frame visual contact sheet
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a2/recover_mclaren_near_native_1080.py
+      - name: Physically verify video SHA256 and record strict editorial REVIEW ONLY
+        run: |
+          python - <<'PY'
+          import zipfile,json,hashlib,pathlib
+          p=pathlib.Path('out/gt3-a2-mclaren-nearhd-recovery/GT3_A2_MCLAREN_1916X1078_NEAR_1080_REVIEW.zip')
+          assert p.is_file()
+          with zipfile.ZipFile(p) as z:
+            assert z.testzip() is None
+            m=json.loads(z.read('manifest.json'))
+            n=0
+            for x in m['publisher_sources']:
+              if x['status'].startswith('NEAR_NATIVE'):
+                assert hashlib.sha256(z.read(x['real_file'])).hexdigest()==x['sha256']
+                assert x['native_pixels'][0]>=1916
+                assert x['native_pixels'][1]>=1078
+                n+=1
+          print('GTC_RACING_REAL_NEAR_NATIVE_1080_FILES',n)
+          print('STILL_NOT_ACCEPTABLE_FOR_STRICT_1920X1080_NATIVE_GATE')
+          PY
+      - name: Upload one actual native-source diagnostic ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-A2-MCLAREN-GTWC-NEARHD-REAL-VIDEO-REVIEW-ONLY
+          path: out/gt3-a2-mclaren-nearhd-recovery/GT3_A2_MCLAREN_1916X1078_NEAR_1080_REVIEW.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
