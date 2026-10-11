@@ -15,44 +15,59 @@ FILES=OUT/"originals_for_visual_review"; SHEETS=OUT/"contact_sheets"
 for p in (OUT,FILES,SHEETS):p.mkdir(parents=True,exist_ok=True)
 SOURCES=[
   [
-    "ferrari_frikadelli_n24_nringinfo",
+    "ferrari_frikadelli_n24_nringinfo_2023",
+    "Ferrari 296 GT3",
+    "https://www.facebook.com/Nringinfo/videos/-der-ferrari-296-gt3-von-frikadelli-racing-ist-einfach-ein-absoluter-fan-lieblin/1765854030772184/"
+  ],
+  [
+    "ferrari_nbr_gt3_fullspeed_2026",
+    "Ferrari 296 GT3",
+    "https://www.facebook.com/61590582480924/videos/full-speed-around-the-n%C3%BCrburgring-in-the-ferrari-296-gt3-the-ferraris-side-by-si/2315548349196371/"
+  ],
+  [
+    "ferrari_fan_race_2026",
+    "Ferrari 296 GT3",
+    "https://www.facebook.com/EnduranceLive.fr/videos/reflex-%EF%B8%8Fnurburgringgt3-nurburgring-vln/1014294421658636/"
+  ],
+  [
+    "mclaren_rjn_gtwc_rollout",
+    "McLaren 720S GT3 EVO",
+    "https://www.facebook.com/teamrjn/videos/rolling-out-gtworldcheu-mclaren-gt3-nurburgring/29244441448478046/"
+  ],
+  [
+    "mclaren_gtwc_race2026",
+    "McLaren 720S GT3 EVO",
+    "https://www.facebook.com/GTWorldChallengeEurope/videos/that-was-a-bumpy-landing-n%C3%BCrburgring-2830-august-2026%EF%B8%8F-link-in-biogtworld-n%C3%BCrbur/28023681463940636/"
+  ],
+  [
+    "mclaren_gt3_collision_race",
+    "McLaren 720S GT3 EVO",
+    "https://www.facebook.com/61557918366855/videos/unfortunately-the-race-was-over-early-for-this-mclaren-720-gt3-evo-it-sustained-/2218250978749030/"
+  ],
+  [
+    "mclaren_dtm_dorr",
+    "McLaren 720S GT3 EVO",
+    "https://www.facebook.com/DTM/videos/vermeulen-magic-dtm-dtm26-dtm2026-ran__racing-ransport/1521328826044492/"
+  ],
+  [
+    "mclaren_trackset_race",
+    "McLaren 720S GT3 EVO",
+    "https://www.facebook.com/61577031971519/videos/n%C3%BCrburgring-was-as-always-a-one-of-a-kind-trackthanks-to-novem_goldgroup-for-the/1971592173553946/"
+  ],
+  [
+    "ferrari_race_24hr_team",
     "Ferrari 296 GT3",
     "https://www.facebook.com/Nringinfo/videos/was-traut-ihr-dem-ferrari-296-gt3-beim-24-stunden-rennen-zu-realize-kondo-racing/1761573544796603/"
   ],
   [
-    "aston_nls_race_win",
-    "Aston Martin Vantage GT3",
-    "https://www.facebook.com/astonmartinracing/videos/winners-the-vantage-gt3-delivered-the-first-outright-victory-for-aston-martin-on/648342162796998/"
-  ],
-  [
-    "aston_n24_race_last_hour",
-    "Aston Martin Vantage GT3",
-    "https://www.facebook.com/astonmartinracing/videos/one-hour-to-go-and-the-chase-is-onmattia-drudi-is-aboard-the-34-walkenhorst-moto/747174691753454/"
-  ],
-  [
-    "mclaren_gtwc_nurburgring_race",
+    "mclaren_nurb_gt3_cars",
     "McLaren 720S GT3 EVO",
-    "https://www.facebook.com/GTWorldChallengeEurope/videos/a-dramatic-moment-at-the-n%C3%BCrburgring-as-two-mclarens-come-together-gtworld/1094931886398447/"
+    "https://www.facebook.com/61573100890717/videos/the-speed-of-gt3-cars-is-crazy-motorsport-gt3-n%C3%BCrburgring-racing-mk96/1822910332039454/"
   ],
   [
-    "mclaren_rjn_nurburgring_preview",
+    "mclaren_nbr_gallery_race",
     "McLaren 720S GT3 EVO",
-    "https://www.facebook.com/teamrjn/videos/nurburgring-were-coming-for-you-mclarencustomerracing-mclaren-endurance-raceweek/4167586923541712/"
-  ],
-  [
-    "mclaren_dtm_nurburgring_corner",
-    "McLaren 720S GT3 EVO",
-    "https://www.facebook.com/100082201384266/videos/porsche-mclaren-bmw-mercedes-amg-one-corner-at-the-n%C3%BCrburgring-which-one-would-y/1807542117112411/"
-  ],
-  [
-    "aston_walkenhorst_double_race",
-    "Aston Martin Vantage GT3",
-    "https://www.facebook.com/walkenhorstmotorsport/videos/double-trouble-here-at-the-nurburgring-naturalelements-walkenhorstmotorsport-ast/1745006573493536/"
-  ],
-  [
-    "dtm2026_race_action",
-    "McLaren 720S GT3 EVO",
-    "https://www.facebook.com/DTM/videos/high-risk-low-reward-dtm-dtm26-n%C3%BCrburgring-randtm-ran__racing-ransport/2089340264987830/"
+    "https://www.facebook.com/61574516889044/videos/n%C3%BCrburgring-and-gt3s-is-just-the-perfect-combo-nothing-beats-the-sound-speed-and/1777139410154383/"
   ]
 ]
 rows=[]
