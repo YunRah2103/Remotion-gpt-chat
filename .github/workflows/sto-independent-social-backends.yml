@@ -1,0 +1,56 @@
+name: STO Independent Social Downloaders — compare tools
+on:
+  push:
+    branches: [automotive-edits/huracan-sto-v10-001/a-footage]
+    paths:
+      - production/videos/huracan-sto-v10-001/footage/test_independent_downloaders.py
+      - .github/workflows/sto-independent-social-backends.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test-acquisition:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install native QA tools and genuinely independent media downloaders
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check -U Pillow gallery-dl instaloader
+          python -m pip install --disable-pip-version-check --no-deps "git+https://github.com/bajaam/tt-dlp.git"
+          gallery-dl --version
+          instaloader --version
+          tt-dlp --version
+          python -m py_compile production/videos/huracan-sto-v10-001/footage/test_independent_downloaders.py
+      - name: Compare three independent extractors on STO TikTok and Instagram sources
+        run: python production/videos/huracan-sto-v10-001/footage/test_independent_downloaders.py
+      - name: Explain exact technical successes and blockers
+        if: always()
+        run: |
+          python - <<'PY'
+          import json,pathlib,os
+          x=pathlib.Path('out/sto-independent-downloaders/manifest.json')
+          if x.is_file():
+           obj=json.loads(x.read_text())
+           lines=['## Alternate STO social footage downloader test',
+             'Actual downloaded native landscape MP4s only; final human STO identity/watermark QA remains required.']
+           for d in obj['actual_results']:
+            lines.append('- '+d['backend']+': **'+d['status']+'**, media '+str(d.get('actual_media_files',0))+'; '+str(d.get('safe_failure_code','')))
+           with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as s:s.write('\n'.join(lines))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STO-REAL-INDEPENDENT-SOCIAL-DOWNLOADER-RESULTS
+          path: |
+            out/STO_INDEPENDENT_DOWNLOADERS_REVIEW.zip
+            out/sto-independent-downloaders/manifest.json
+          retention-days: 5
+          if-no-files-found: warn
+          compression-level: 0
