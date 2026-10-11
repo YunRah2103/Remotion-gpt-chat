@@ -1,0 +1,67 @@
+name: FR Legends A - 17 Genuine 1080p Classic French Cars One ZIP
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - '.github/workflows/fr-legends-a-v5-ds-17.yml'
+      - 'production/videos/french-icons-001/agent_a_curate_v5_ds.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  v5-real-source-integrated-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install native media and public publisher browser
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install playwright pillow
+          python -m playwright install --with-deps chromium
+      - name: Fetch 14 previously approved actual native-HD clips unchanged
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p out/source-v4
+          gh run download 38156284561 -R "${{ github.repository }}" -n FR-LEGENDS-AGENT-A-FOURTEEN-REAL-CLASSICS-ONE-ZIP -D out/source-v4
+          ls -lah out/source-v4/
+          test -f out/source-v4/FR-LEGENDS-AGENT-A-CLASSICS-14-REAL-MOVING-SHOTS.zip
+          echo "V4_FROM_GITHUB_ACTIONS_DOWNLOADED"
+      - name: Download public official DS 1080 master and extract 3 visually reviewed authentic moving classic-car angles
+        run: python production/videos/french-icons-001/agent_a_curate_v5_ds.py
+      - name: Verify ZIP and recorded native shots after build
+        run: |
+          python - <<'PY'
+          import pathlib,zipfile,json,hashlib,os
+          z=pathlib.Path('out/FR-LEGENDS-AGENT-A-CLASSICS-17-REAL-MOVING-SHOTS.zip')
+          with zipfile.ZipFile(z) as f:
+           assert f.testzip() is None
+           m=json.loads(f.read('manifest.json'))
+           assert len(m['clips'])==17 and m['models_count']==4 and m['gate']=='BLOCKED_PARTIAL'
+           for x in m['clips']:
+            data=f.read(x['clip'])
+            assert hashlib.sha256(data).hexdigest()==x['sha256'],x['id']
+          summary=['## YUNEX FR Legends Classics Agent A real V5 media delivery',
+             '**17 real clips across 4 original French classic models. STILL PARTIAL (18+ over 5 minimum).**',
+             f'- Physical ZIP archive: {z.stat().st_size} bytes (one downloadable GitHub artifact)',
+             '- Three additional classic Citroen DS Paris at night moving shots, actual native 1080p/24.',
+             '- Every clip hash reverified; all prior 14 originals and contact sheets preserved.',
+             '- Original Citroen publisher video was downloaded via public press share, not screenshot/still.',
+             '- Reuse licensing unresolved for some sources, do not publicly repost until checked.']
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(summary)+'\n')
+          print('\n'.join(summary))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FR-LEGENDS-A-CLASSICS-V5-17-REAL-1080P-MOVING-SHOTS-ONE-ZIP
+          path: out/FR-LEGENDS-AGENT-A-CLASSICS-17-REAL-MOVING-SHOTS.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
