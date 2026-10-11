@@ -43,4 +43,17 @@ class SoundTests(unittest.TestCase):
         self.assertGreaterEqual(len(beats),5)
         self.assertTrue(all(0<=b['frame']<316 for b in beats))
 
+    def test_b_shotmap_requires_verified_not_planned_make(self):
+        shots = [{'targetMake':'Porsche','verifiedMake':None,'from':i*12,'to':(i+1)*12} for i in range(18)]
+        with self.assertRaisesRegex(ValueError,'unverified make'):
+            audio.validate_shots({'shots':shots})
+
+    def test_b_verified_marques_normalized(self):
+        names = ['Porsche','BMW','Mercedes-AMG','Lamborghini','Ferrari','Audi']
+        shots = [{'verifiedMake':names[i%6], 'targetMake':'WRONG','from':i*12, 'to':(i+1)*12} for i in range(18)]
+        normalized, makes = audio.validate_shots({'shots':shots})
+        self.assertEqual(len(makes), 6)
+        self.assertIn('mercedes', makes)
+        self.assertEqual(normalized[2]['start_frame'],24)
+
 if __name__=='__main__': unittest.main()
