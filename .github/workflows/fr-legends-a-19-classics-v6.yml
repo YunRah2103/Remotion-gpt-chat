@@ -1,0 +1,70 @@
+name: FR Legends A - Final 19 Original Classics Five Models One ZIP
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/a-classics-footage
+    paths:
+      - 'production/videos/french-icons-001/agent_a_curate_v6_19_real.py'
+      - '.github/workflows/fr-legends-a-19-classics-v6.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  package-nineteen-real-classic-driving-shots:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 29
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install video source verification and actual-frame drawing
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install pillow
+      - name: Fetch verified native full-HD 17 clips from previous successful Actions delivery
+        uses: actions/download-artifact@v4
+        with:
+          name: FR-LEGENDS-A-CLASSICS-V5-17-REAL-1080P-MOVING-SHOTS-ONE-ZIP
+          run-id: 38161278906
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/v6-imports/v5
+      - name: Fetch two separate genuine 1920x1080 Peugeot 205 GTI tracking source originals
+        uses: actions/download-artifact@v4
+        with:
+          name: fr-legends-a-205-gti-native-1080-exterior-fast-source-qa
+          run-id: 38161931276
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/v6-imports/peugeot
+      - name: Verify exact sources, preserve 17 clip hashes and create 19 fully decoded real moving clips
+        run: python production/videos/french-icons-001/agent_a_curate_v6_19_real.py
+      - name: Write verified delivery report with publication and native-crop warnings
+        run: |
+          python - <<'PY'
+          import json,pathlib,os,hashlib
+          z=pathlib.Path("out/FR-LEGENDS-AGENT-A-CLASSICS-V6-19-REAL-DRIVING-SHOTS.zip")
+          m=json.loads(pathlib.Path("out/fr-legends-a-v6-19/manifest.json").read_text())
+          d=hashlib.sha256(z.read_bytes()).hexdigest()
+          lines=["## YUNEX French Classics A - 19 real moving clips across 5 classic models",
+             f"- Delivered: **{len(m['clips'])} video clips / {m['models_count']} historical model families**",
+             f"- File: `{z.name}`",
+             f"- Bytes: **{z.stat().st_size}**",
+             f"- SHA256: `{d}`",
+             "- All 17 V5 clips kept unchanged and individually SHA checked.",
+             "- Two new Peugeot 205 GTI source excerpts verified 1920x1080 25fps then edited to clean portrait crops.",
+             "- Portrait reframes were scaled from 608x1080 sections of native landscape originals: **NOT native camera 1080x1920**.",
+             "- Three DS clips last only 0.7-0.8s in adjoining cuts of one source. Editor MUST independently assess their compositional uniqueness.",
+             "- **Reuse rights are not cleared** for all film sources; do not take QA as social publishing permission.",
+             "- Footage gate: quantitative target met; higher cinematic-quality and rights review remain."]
+          pathlib.Path(os.environ["GITHUB_STEP_SUMMARY"]).write_text('\n'.join(lines)+'\n')
+          print('\n'.join(lines))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FR-LEGENDS-AGENT-A-19-GENUINE-MOVING-CLASSIC-SHOTS-5-MODELS-ONE-ZIP
+          path: out/FR-LEGENDS-AGENT-A-CLASSICS-V6-19-REAL-DRIVING-SHOTS.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
