@@ -1,0 +1,28 @@
+name: Agent A UHD Nürburgring Original New Camera Scene Scan
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-2026-native4k-additional-scene-scan.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  scene-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install actual UHD decoding and image tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q pillow requests
+      - name: Physically download independent native UHD N24 film and scan 48 frame locations
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/inspect_additional_porsche_2026_4k_scenes.py
+      - name: Publish film scene review and exact SHA (source media intentionally omitted)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-2026-N24-ADDITIONAL-48-FRAME-4K-SCENE-VISUAL-AUDIT
+          path: out/gt3-a-porsche-2026-second-native-film-scan/
+          retention-days: 7
