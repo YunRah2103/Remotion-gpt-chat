@@ -1,0 +1,60 @@
+name: GT3 Agent A Lamborghini Authentic Browser Video Capture
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-lamborghini-browser-original.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  lambo-real-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install real native video/Chromium acquisition
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages --disable-pip-version-check -q playwright pillow yt-dlp requests
+          python -m playwright install chromium
+      - name: Capture real network media from Lamborghini race/publisher players and full decode
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_lambo_browser_gt3_sources.py
+      - name: Validate zipped original physical video hashes
+        if: always()
+        run: |
+          python - <<'PY'
+          import hashlib,zipfile,json,pathlib
+          p=pathlib.Path('out/gt3-a-lambo-browser/GT3_A_LAMBO_BROWSER_ORIGINALS_AND_QA.zip')
+          if p.exists():
+            with zipfile.ZipFile(p) as z:
+              assert z.testzip() is None
+              m=json.loads(z.read('SOURCE_MANIFEST.json'))
+              for item in m['sources']:
+                if item.get('status')=='REAL_NATIVE_HD_FULL_DECODE_MODEL_REVIEW_PENDING':
+                  assert hashlib.sha256(z.read(item['file'])).hexdigest()==item['sha256']
+              print('ZIP CRC PASS; actual native media',m['native_hd_media_file_count'])
+          else:print('No evidence archive; no media claim.')
+          PY
+      - name: Upload real media or clearly labeled diagnostic-only ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-LAMBORGHINI-ACTUAL-NATIVE-RACE-MEDIA-OR-DIAGNOSTICS
+          path: out/gt3-a-lambo-browser/GT3_A_LAMBO_BROWSER_ORIGINALS_AND_QA.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Report independent scene identity still required
+        if: always()
+        run: |
+          python - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path('out/gt3-a-lambo-browser/SOURCE_MANIFEST.json')
+          if p.exists():
+            m=json.loads(p.read_text())
+            s=f"Downloaded and full-decoded native 1080p video sources: {m['native_hd_media_file_count']}. GT3 manufacturer and 24-scene credit require visual inspection.\n"
+            s+='\n'.join(x['source_id']+' '+x['status'] for x in m['sources'])
+          else:s="No verified original Lamborghini footage; source retrieval failed."
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(s+'\n')
+          PY
