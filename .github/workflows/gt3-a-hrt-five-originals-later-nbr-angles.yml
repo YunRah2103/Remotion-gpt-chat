@@ -1,0 +1,50 @@
+name: GT3 Agent A Recover Full HRT 2025 Ford + NBR Original Later Camera Shots
+on:
+  push:
+    branches: [automotive-edits/gt3-nurburgring-multicar-001/a-footage]
+    paths: [.github/workflows/gt3-a-hrt-five-originals-later-nbr-angles.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  real-hrt-native-film-window-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install true native video codec extraction tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages -q pillow
+      - name: Obtain prior true source movie footage and original network provenance manifest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs/actual_hrt_5_source_zips
+          gh run download 38160120679 --repo YunRah2103/Remotion-gpt-chat --name GT3-AGENT-A-HRT-FORD-NURBURGRING-ACTUAL-NATIVE-1080-OR-DIAGNOSTICS --dir inputs/actual_hrt_5_source_zips
+      - name: Recover physical original 1080 stream segments from 15s to full source duration and FFmpeg full decode
+        run: python -u production/videos/gt3-nurburgring-multicar-001/agent-a/acquire_hrt_ford_later_gt3_camera_sections_v2.py
+      - name: Upload actual native 1080 original camera cut video files or transparent failure logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-AGENT-A-HRT-FORD-2025-LATER-FILM-REAL-1080-RACE-CAMERA-REVIEW
+          path: out/gt3-a-hrt-real-native-v2-longer-scenes/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
+      - name: Honest media acquisition count
+        if: always()
+        run: |
+          python - <<'PY'
+          import json,pathlib,os
+          p=pathlib.Path('out/gt3-a-hrt-real-native-v2-longer-scenes/SOURCE_MANIFEST_LONGER_WINDOWS.json')
+          if p.exists():
+            d=json.loads(p.read_text())
+            msg=f"Additional actual native HD video camera segments: {d['new_physical_1080_video_sections']}; visually approved Nürburgring GT3 angles: 0 pending independent frame QA.\n"
+            msg+='\n'.join(x['id']+': '+str(len([v for v in x.get('new_scenes',[]) if v.get('status','').startswith('REAL_NATIVE')]))+' new downloaded sections' for x in d['sources'])
+          else:msg='No valid original source result manifest; nothing approved.'
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(msg+'\n')
+          PY
