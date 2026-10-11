@@ -1,0 +1,88 @@
+name: YUNEX GT3 Multi-Car Agent A Footage
+
+on:
+  push:
+    branches:
+      - automotive-edits/gt3-nurburgring-multicar-001/a-footage
+    paths:
+      - .github/workflows/gt3-multicar-agent-a.yml
+      - production/videos/gt3-nurburgring-multicar-001/agent-a/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gt3-multicar-agent-a
+  cancel-in-progress: false
+
+jobs:
+  acquire-native-media:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - name: Checkout exact Agent A source
+        uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Set up Node 22 for yt-dlp
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install acquisition and verification tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check -U "yt-dlp[default]" pillow
+          ffmpeg -version | head -n 1
+          python -m yt_dlp --version
+          git rev-parse HEAD
+      - name: Download verified source excerpts and generate QA/contact sheets
+        id: acquire
+        continue-on-error: true
+        run: |
+          python production/videos/gt3-nurburgring-multicar-001/agent-a/acquire.py --output out/gt3-multicar-agent-a --max-attempts 48 --max-minutes 61
+      - name: Show actual native-footage count and gate
+        if: always()
+        shell: bash
+        run: |
+          if test -f out/gt3-multicar-agent-a/QA_SUMMARY.json; then
+            cat out/gt3-multicar-agent-a/QA_SUMMARY.json
+            COUNT="$(jq -r .downloaded_hd_media_clips out/gt3-multicar-agent-a/QA_SUMMARY.json)"
+            GATE="$(jq -r .gate out/gt3-multicar-agent-a/QA_SUMMARY.json)"
+          else
+            COUNT=0
+            GATE=BLOCKED
+            mkdir -p out/gt3-multicar-agent-a
+            printf '{"gate":"BLOCKED","downloaded_hd_media_clips":0,"reason":"acquisition crashed before QA artifact"}\n' > out/gt3-multicar-agent-a/QA_SUMMARY.json
+          fi
+          echo "QA_COUNT=$COUNT" >> "$GITHUB_ENV"
+          echo "QA_GATE=$GATE" >> "$GITHUB_ENV"
+          {
+            echo "## Agent A native footage gate"
+            echo "Actual HD decoded files: **$COUNT**"
+            echo "Gate: **$GATE** (visual identity/camera review required even when 24+)"
+            echo "Source SHA: $(git rev-parse HEAD)"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload one ZIP with actual media and evidence, if present
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GT3-MULTICAR-FOOTAGE-AGENT-A
+          path: |
+            out/gt3-multicar-agent-a/GT3_MULTICAR_AGENT_A_ACTUAL_MEDIA.zip
+            out/gt3-multicar-agent-a/QA_SUMMARY.json
+          if-no-files-found: warn
+          retention-days: 7
+          compression-level: 0
+      - name: Strictly fail when native shots or makes do not meet target
+        if: always()
+        shell: bash
+        run: |
+          test "$QA_GATE" = NEEDS_VISUAL_REVIEW || {
+            echo "::error::Insufficient real HD multi-make assets; check uploaded QA report."
+            exit 1
+          }
+          echo "::notice::Downloaded sources require independent visual make/angle/watermark review; not PASS yet."
