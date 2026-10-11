@@ -1,0 +1,42 @@
+name: Real video on Vimeo Dailymotion PeerTube
+on:
+  push:
+    branches: [feature/footage-rescue-multisource-20261011]
+    paths:
+      - 'production/footage_rescue/diagnose_alternative_platforms.py'
+      - '.github/workflows/alternative-video-sites-test.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      matrix:
+        site: [vimeo, dailymotion, peertube]
+    name: ${{ matrix.site }} CC film: 5s actual media
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Install FFmpeg and supported yt-dlp
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q 'yt-dlp[default,curl-cffi]==2026.08.19'
+      - name: Download and prove a real small playable segment
+        run: python production/footage_rescue/diagnose_alternative_platforms.py --site '${{ matrix.site }}'
+      - name: Preserve diagnostics and native-quality metadata
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: alternate-${{ matrix.site }}
+          path: out/multisite/
+          retention-days: 3
+          if-no-files-found: warn
