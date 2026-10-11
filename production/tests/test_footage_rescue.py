@@ -25,6 +25,26 @@ class AcquisitionTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 mod.site_for(url)
 
+    def test_additional_social_single_video_allowlist(self):
+        cases = {
+            "snapchat": "https://www.snapchat.com/%40carclips24/spotlight/W7_EDlXWTBiXAEEniNoMPwAAYb256dGtjdG9zAZRXQhLHAZRXQgtdAAAAAQ",
+            "pinterest": "https://uk.pinterest.com/pin/615726580336703478/",
+            "twitch": "https://www.twitch.tv/xqc/clip/CulturedAmazingKuduDatSheffy-TiZ_-ixAGYR3y2Uy",
+            "x": "https://x.com/BrooklynNets/status/1349794411333394432",
+            "bluesky": "https://bsky.app/profile/bsky.app/post/3l3vgf77uco2g",
+        }
+        for site, url in cases.items():
+            with self.subTest(site=site):
+                self.assertEqual(mod.site_for(url), site)
+                self.assertEqual(mod.engines_for(site, "auto"), ["yt-dlp", "yt-dlp-chrome"])
+        for url in ("https://www.pinterest.com/my-board/",
+                    "https://www.snapchat.com/add/carclips24",
+                    "https://bsky.app/profile/bsky.app",
+                    "https://x.com/Porsche",
+                    "https://www.twitch.tv/xqc"):
+            with self.assertRaises(ValueError):
+                mod.site_for(url)
+
     def test_fallback_order_and_engine_support(self):
         self.assertEqual(mod.engines_for("youtube", "auto", True),
                          ["yt-dlp", "pytubefix", "cobalt"])
