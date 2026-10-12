@@ -1,6 +1,24 @@
 {
   "sources": [
     {
+      "id": "bmw-i-vision-dee-running",
+      "qa": {
+        "width": 1920,
+        "height": 1080,
+        "orientation": "landscape",
+        "source_native_vertical_1080": false,
+        "min_1080_pass": true,
+        "max_4k_preferred": true,
+        "duration": 460.48,
+        "fps": "25/1",
+        "codec": "h264",
+        "bit_rate": "24272151",
+        "audio": true,
+        "bytes": 1397105018
+      },
+      "candidate_count": 7
+    },
+    {
       "id": "bmw-i-vision-dee-exterior",
       "qa": {
         "width": 1920,
@@ -73,7 +91,7 @@
       "candidate_count": 2
     }
   ],
-  "candidate_count": 16,
+  "candidate_count": 23,
   "rejections": [
     {
       "source_id": "mercedes-amg-gt-xx-embedded",
