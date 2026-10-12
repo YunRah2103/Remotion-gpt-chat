@@ -63,14 +63,31 @@ jobs:
           ffmpeg -nostdin -v error -xerror -i dist/CYBER-FUTURE-001-E-VISUAL-1080x1920.mp4 -f null -
           python production/videos/cyber-future-prototypes-001/agent-e/render_visual.py --size landscape --out dist/CYBER-FUTURE-001-E-WIDESCREEN-1920x1080.mp4
           ffmpeg -nostdin -v error -xerror -i dist/CYBER-FUTURE-001-E-WIDESCREEN-1920x1080.mp4 -f null -
-          sha256sum dist/CYBER-FUTURE-001-E-VISUAL-1080x1920.mp4 dist/CYBER-FUTURE-001-E-WIDESCREEN-1920x1080.mp4 | tee dist/SHA256SUMS.txt
+          (cd dist && sha256sum CYBER-FUTURE-001-E-VISUAL-1080x1920.mp4 > VERTICAL_SHA256SUMS.txt)
+          (cd dist && sha256sum CYBER-FUTURE-001-E-WIDESCREEN-1920x1080.mp4 > WIDESCREEN_SHA256SUMS.txt)
+          cat dist/VERTICAL_SHA256SUMS.txt dist/WIDESCREEN_SHA256SUMS.txt
           cp production/videos/cyber-future-prototypes-001/agent-e/shotmap.json dist/shotmap.json
           ffprobe -v error -show_entries format=duration,size:stream=codec_name,width,height,r_frame_rate -of json dist/CYBER-FUTURE-001-E-VISUAL-1080x1920.mp4 > dist/ffprobe.json
           ffmpeg -nostdin -hide_banner -loglevel error -y -i dist/CYBER-FUTURE-001-E-VISUAL-1080x1920.mp4 -vf 'fps=0.74,scale=216:384,tile=4x4:padding=3:margin=5' -frames:v 1 dist/visual-contact.jpg
-      - name: Publish real decoded playable film proof and editorial evidence
+      - name: Publish VERTICAL single-film artifact compatible with Agent F
         uses: actions/upload-artifact@v4
         with:
           name: CYBER-FUTURE-001-EDITOR-E-1080P-VISUAL
-          path: dist/
+          path: |
+            dist/CYBER-FUTURE-001-E-VISUAL-1080x1920.mp4
+            dist/VERTICAL_SHA256SUMS.txt
+            dist/shotmap.json
+            dist/ffprobe.json
+            dist/visual-contact.jpg
+          if-no-files-found: error
+          retention-days: 10
+      - name: Publish WIDESCREEN single-film companion separately
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-EDITOR-E-WIDESCREEN
+          path: |
+            dist/CYBER-FUTURE-001-E-WIDESCREEN-1920x1080.mp4
+            dist/WIDESCREEN_SHA256SUMS.txt
+            dist/shotmap.json
           if-no-files-found: error
           retention-days: 10
