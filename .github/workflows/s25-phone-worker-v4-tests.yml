@@ -1,0 +1,54 @@
+name: YUNEX S25 media bridge V4 CI
+on:
+  push:
+    branches: [experiments/s25-footage-worker-v4-10min-20261012]
+    paths:
+      - 'production/phone_footage/**'
+      - '.github/workflows/s25-phone-worker-v4-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: read
+
+jobs:
+  verify-production-worker:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          node --version && ffmpeg -version | head -1
+      - name: Offline regression and real media encode
+        run: python -m unittest discover -s production/phone_footage -p test_v4_worker.py -v
+      - name: Check Termux setup and Boot helper shell syntax
+        run: bash -n production/phone_footage/install_v4_termux.sh production/phone_footage/enable_v3_boot.sh
+      - name: Compile all V4 Python source
+        run: python -m py_compile production/phone_footage/v4_worker.py production/phone_footage/agent_jobs_v4.py
+      - name: Verify job producer contract and source catalog
+        run: |
+          python production/phone_footage/agent_jobs_v4.py list
+          python production/phone_footage/agent_jobs_v4.py prepare --url 'https://www.youtube.com/watch?v=DqiKOr1aS9w' --start 12 --duration 600 --height 1080 > /tmp/v4-issue.txt
+          python - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          base=Path("production/phone_footage")
+          spec=importlib.util.spec_from_file_location("v4",base/"v4_worker.py")
+          m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+          body=Path("/tmp/v4-issue.txt").read_text()
+          assert m.parse_job({"body":body})["duration"]==600
+          print("Agent payload PASS")
+          PY
+      - name: Dry-run queue without downloading footage
+        env:
+          YUNEX_READ_TOKEN: ${{ github.token }}
+        run: |
+          printf '%s' "$YUNEX_READ_TOKEN" > "$RUNNER_TEMP/token"
+          chmod 600 "$RUNNER_TEMP/token"
+          YUNEX_GH_TOKEN_FILE="$RUNNER_TEMP/token" python production/phone_footage/v4_worker.py --once --dry-run
