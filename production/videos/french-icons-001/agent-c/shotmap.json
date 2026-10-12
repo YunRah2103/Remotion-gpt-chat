@@ -202,7 +202,7 @@
       "era": "heritage",
       "masterStartFrame": 589,
       "masterEndFrame": 705,
-      "sourceInSeconds": 0.7,
+      "sourceInSeconds": 2,
       "durationFrames": 116,
       "enterDissolveFrames": 0,
       "exitDissolveFrames": 6,
@@ -467,6 +467,7 @@
     "Independent playback of original Remotion film revealed C21 spent ~2s on rear-wing macro with baked bars. Replace C21 with blues-hour full-car C22, then transition to orange Alpine R Ultime.",
     "Original Peugeot 205 full landscape footage has a small lower-right Harry's Garage source watermark. Apply 1.20x center crop of the 1080p native image instead of showing watermark or using rejected bad portrait crops; verify body panels after crop.",
     "After actual v3 2fps frame-by-frame QA, original Peugeot front 205 source visibly cuts to an interior interview at t~19.75; shortened front shot to 56f so only driving is shown and lengthened rear-follow to 116f without changing overall 60s audio cuts.",
-    "Peugeot video had partial lower-corner source credit even at 1.2x center zoom. Set scale to 1.16 and Y crop focus to TOP (0) so footer credits are cropped off while width/frontal bumper stay visible."
+    "Peugeot video had partial lower-corner source credit even at 1.2x center zoom. Set scale to 1.16 and Y crop focus to TOP (0) so footer credits are cropped off while width/frontal bumper stay visible.",
+    "Full 2fps QA of v4 found the rear ORIGINAL 205 source (not front) begins with an interview at its prior 0.7s in-point. Updated rear source in-point to 2.0s, beyond interview; source is a confirmed native 9-second original and 2.0+116/30 < 9."
   ]
 }
