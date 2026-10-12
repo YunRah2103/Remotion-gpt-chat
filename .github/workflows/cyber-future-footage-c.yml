@@ -29,6 +29,10 @@ jobs:
           ffmpeg -version | head -n 1
       - name: Download publicly accessible original French concept films and validate pixels
         run: python production/videos/cyber-future-prototypes-001/agent-c/acquire_french.py
+      - name: Test second-wave Renault Alpine Peugeot footage and append reviewed candidate evidence
+        run: |
+          python -m py_compile production/videos/cyber-future-prototypes-001/agent-c/phase2_french.py
+          python production/videos/cyber-future-prototypes-001/agent-c/phase2_french.py
       - name: Package status and checksum
         if: always()
         run: |
