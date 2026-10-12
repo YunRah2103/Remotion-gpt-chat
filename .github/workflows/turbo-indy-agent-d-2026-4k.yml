@@ -1,0 +1,35 @@
+name: Turbo Indy Agent D - genuine 4K footage ZIP
+on:
+  push:
+    branches:
+      - automotive-edits/turbo-indy-reality-001/d-indy-cinematic
+    paths:
+      - 'production/videos/turbo-indy-reality-001/agent_d_2026_4k_deliver.py'
+      - '.github/workflows/turbo-indy-agent-d-2026-4k.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install pillow requests yt-dlp
+      - name: Download authentic 4K Indy 500, cut moving clips, validate checksums
+        run: python production/videos/turbo-indy-reality-001/agent_d_2026_4k_deliver.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-INDY-D-2026-NATIVE-4K-REAL-FOOTAGE
+          path: out/YUNEX_INDY_AGENT_D_2026_NATIVE_4K.zip
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 14
