@@ -22,7 +22,9 @@ jobs:
           sudo apt-get install -y -qq ffmpeg
           python -m pip install numpy Pillow
       - name: Download official original and scan 16 uncropped 4K PQ frames
-        run: |\n          sed -i 's/json.dumps(result).slice(0,400)/json.dumps(result)[:400]/' production/videos/yunex-hdr-cinematic-001/agent-a/native_hdr_audit.py\n          python production/videos/yunex-hdr-cinematic-001/agent-a/native_hdr_audit.py
+        run: |
+          sed -i 's/json.dumps(result).slice(0,400)/json.dumps(result)[:400]/' production/videos/yunex-hdr-cinematic-001/agent-a/native_hdr_audit.py
+          python production/videos/yunex-hdr-cinematic-001/agent-a/native_hdr_audit.py
       - name: Commit small real contact sheet and numeric HDR proof
         run: |
           git config user.name 'github-actions[bot]'
