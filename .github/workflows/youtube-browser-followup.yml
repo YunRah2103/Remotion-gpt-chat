@@ -1,0 +1,44 @@
+name: YUNEX Browser Recording - Audio and Privacy Embed
+on:
+  push:
+    branches: [experiments/youtube-browser-recording-20261012]
+    paths:
+      - '.github/workflows/youtube-browser-followup.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    strategy:
+      fail-fast: false
+      matrix:
+        sample: [control-mp4, youtube-nocookie]
+    name: tab capture / ${{ matrix.sample }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare browser and ffmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg xvfb
+          PUPPETEER_SKIP_DOWNLOAD=1 npm install --no-save --no-package-lock --prefix "$RUNNER_TEMP/yunex" puppeteer-core@24 puppeteer@24 puppeteer-stream@3
+      - name: Five-second verified audio-video capture
+        env:
+          SAMPLE: ${{ matrix.sample }}
+          METHOD: puppeteer-stream
+          NODE_PATH: ${{ runner.temp }}/yunex/node_modules
+          OUTPUT_DIR: output/${{ matrix.sample }}
+        run: |
+          xvfb-run -a -s "-screen 0 1280x720x24 -ac" timeout -k 10s 90s node production/youtube_screen_capture/browser_record_test.cjs
+      - name: Upload probe evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-audio-nocookie-${{ matrix.sample }}
+          path: output/
+          if-no-files-found: warn
+          retention-days: 3
