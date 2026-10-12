@@ -13,6 +13,7 @@ CONTACT=ROOT/"contact_sheets"
 MAX_BYTES=240*1024*1024
 BASE="https://renault.com.cy/wp-content/uploads/"
 DIRECT=[
+ {"id":"alpenglow_hy4_roadshot","model":"Alpine Alpenglow Hy4 (2024 rolling prototype)","url":"https://pplware.sapo.pt/wp-content/uploads/2024/05/alpine_alpenglow_hy4_pplware01.mp4","page":"https://pplware.sapo.pt/motores/alpine-alpenglow-hy4-nao-se-intimide-que-o-motor-de-hidrogenio-nao-estraga-a-festa/","owner":"Alpine footage via Pplware","type":"unknown"},
  {"id":"filante_2025_record","model":"Renault Filante Record 2025","url":BASE+"2026/01/renault-filante-record-z41-concept-020.mp4","page":"https://renault.com.cy/renault-z41/","owner":"Renault Cyprus","type":"unknown"},
  {"id":"embleme_interior","model":"Renault Emblème (physical model unconfirmed in footage)","url":BASE+"2024/10/renault-gt-vision-concept-014-video.mp4","page":"https://renault.com.cy/car/renault-embleme/","owner":"Renault Cyprus","type":"unknown"},
  {"id":"embleme_rolling_a","model":"Renault Emblème (physical model unconfirmed in footage)","url":BASE+"2024/10/renault-gt-vision-concept-021-video.mp4","page":"https://renault.com.cy/car/renault-embleme/","owner":"Renault Cyprus","type":"unknown"},
