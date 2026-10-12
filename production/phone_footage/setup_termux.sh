@@ -27,13 +27,13 @@ if [ ! -s "$TOKEN_FILE" ]; then
   unset YUNEX_PERSONAL_TOKEN
   chmod 600 "$TOKEN_FILE"
 fi
-RAW="https://raw.githubusercontent.com/$REPO/$BRANCH/production/phone_footage/worker.py"
-curl --fail --location --silent --show-error "$RAW" -o "$HOME/yunex-phone-worker.py"
-echo "[YUNEX] Checking local prerequisites..."
-python "$HOME/yunex-phone-worker.py" --doctor
-echo "[YUNEX] Launching the queued approved six-second YouTube phone job..."
-python "$HOME/yunex-phone-worker.py" --once
-echo
-echo "Ready. To check queue once: python ~/yunex-phone-worker.py --once"
-echo "To leave agent worker active: python ~/yunex-phone-worker.py --loop"
+RAW="https://raw.githubusercontent.com/$REPO/$BRANCH/production/phone_footage"
+curl --fail --location --silent --show-error "$RAW/worker.py" -o "$HOME/yunex-phone-worker-v2.py"
+curl --fail --location --silent --show-error "$RAW/approved_sources.json" -o "$HOME/approved_sources.json"
+echo "[YUNEX] Checking V2 prerequisites; this does NOT replace your working V1 script..."
+python "$HOME/yunex-phone-worker-v2.py" --doctor
+echo "[YUNEX] V2 staged for manual pilot; no phone downloads started."
+echo "Check authorised queue without side effects: python ~/yunex-phone-worker-v2.py --once --dry-run"
+echo "When pilot job is approved, run once: python ~/yunex-phone-worker-v2.py --once"
+echo "For continued queue checks after validating: python ~/yunex-phone-worker-v2.py --loop"
 echo "Leave Termux running; Samsung battery management may pause background workers."

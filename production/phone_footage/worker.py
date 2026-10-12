@@ -231,8 +231,8 @@ def run_once(token,dry_run=False):
             existing_asset = previous_release_asset(token, number)
             if existing_asset:
                 issue_comment(token,number,DONE+
-                              "\\n\\nExisting release found; skipped duplicate upload. "
-                              "This pass did not re-verify the old asset.\\n"+existing_asset)
+                              "\n\nExisting release found; skipped duplicate upload. "
+                              "This pass did not re-verify the old asset.\n"+existing_asset)
                 print(f"SKIPPED #{number}: previously uploaded release",flush=True)
                 return True
             with tempfile.TemporaryDirectory(prefix="yunex-phone-") as temp:
