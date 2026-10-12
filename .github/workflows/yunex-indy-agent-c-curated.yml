@@ -1,0 +1,52 @@
+name: YUNEX Agent C - Curated Footage ZIP
+on:
+  push:
+    branches:
+      - automotive-edits/turbo-indy-reality-001/c-indy-racing
+    paths:
+      - .github/workflows/yunex-indy-agent-c-curated.yml
+      - production/videos/turbo-indy-reality-001/curate_agent_c.py
+  pull_request:
+    paths:
+      - .github/workflows/yunex-indy-agent-c-curated.yml
+      - production/videos/turbo-indy-reality-001/curate_agent_c.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  curate-proven-1080p:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install ffprobe ffmpeg and contact sheet tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check Pillow
+      - name: Retrieve successfully verified 1080p racing artifact (not random low-quality rerun)
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 38270561114
+          repository: YunRah2103/Remotion-gpt-chat
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          name: yunex-turbo-indy-agent-c-footage
+          path: incoming
+      - name: Filter banned sponsor slate and inspect every playable clip
+        run: python production/videos/turbo-indy-reality-001/curate_agent_c.py
+      - name: Upload one real curated verified footage ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: yunex-agent-c-curated-indycar-native-1080p
+          path: out/agent-c-curated/yunex-agent-c-1080p-curated.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
+      - name: Human-review and rights caveats
+        run: cat out/agent-c-curated/REPORT.md >> "$GITHUB_STEP_SUMMARY"
