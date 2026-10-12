@@ -1,0 +1,42 @@
+name: CYBER FUTURE Agent C fast real Corsica R5 check
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/c-french-footage
+    paths:
+      - '.github/workflows/cyber-c-r5-fast.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  r5-physical-driving:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Test physical Renault R5 Turbo 3E Corsica press original
+        run: |
+          mkdir -p out/cyber-future-c/phase2
+          python production/videos/cyber-future-prototypes-001/agent-c/phase2_french.py
+      - name: Verify ZIP
+        if: always()
+        run: |
+          if [ -f out/CYBER-FUTURE-001-FOOTAGE-C.zip ]; then
+            sha256sum out/CYBER-FUTURE-001-FOOTAGE-C.zip
+            unzip -l out/CYBER-FUTURE-001-FOOTAGE-C.zip | tail -n 8
+          fi
+      - name: Upload actual candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-C-R5-FAST-CANDIDATES
+          path: out/CYBER-FUTURE-001-FOOTAGE-C.zip
+          if-no-files-found: warn
+          retention-days: 7
+          compression-level: 0
