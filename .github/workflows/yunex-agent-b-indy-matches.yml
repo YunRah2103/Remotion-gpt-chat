@@ -5,6 +5,7 @@ on:
       - automotive-edits/turbo-indy-reality-001/b-indy-matches
     paths:
       - production/videos/turbo-indy-reality-001/agent_b_acquire.py
+      - production/videos/turbo-indy-reality-001/agent_b_dvids_acquire.py
       - .github/workflows/yunex-agent-b-indy-matches.yml
   workflow_dispatch:
 permissions:
@@ -27,14 +28,14 @@ jobs:
         id: acquire
         run: |
           set -o pipefail
-          python3 production/videos/turbo-indy-reality-001/agent_b_acquire.py | tee agent-b-run.log
+          python3 -u production/videos/turbo-indy-reality-001/agent_b_dvids_acquire.py | tee agent-b-run.log
       - name: Upload verified playable footage ZIP
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: yunex-turbo-indy-agent-b-verified-video-${{ github.run_id }}
           path: |
-            out/agent-b-indy-matches-real-footage.zip
+            out/agent-b-dvids.zip
             agent-b-run.log
           compression-level: 0
           retention-days: 7
@@ -45,8 +46,8 @@ jobs:
         with:
           name: yunex-agent-b-FAILED-download-DIAGNOSTICS-${{ github.run_id }}
           path: |
-            out/agent-b-indy-matches/qa/manifest.json
-            out/agent-b-indy-matches/qa/README.md
+            out/agent-b-dvids/qa/manifest.json
+            out/agent-b-dvids/qa/README.txt
             agent-b-run.log
           retention-days: 7
           if-no-files-found: warn
