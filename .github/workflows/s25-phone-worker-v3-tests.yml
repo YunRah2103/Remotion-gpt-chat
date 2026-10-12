@@ -1,0 +1,52 @@
+name: YUNEX S25 media bridge V3 CI
+on:
+  push:
+    branches: [experiments/s25-footage-worker-v3-20261012]
+    paths:
+      - 'production/phone_footage/**'
+      - '.github/workflows/s25-phone-worker-v3-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: read
+
+jobs:
+  verify-production-worker:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          node --version && ffmpeg -version | head -1
+      - name: Offline regression and real media encode
+        run: python -m unittest discover -s production/phone_footage -p test_v3_worker.py -v
+      - name: Compile all V3 Python source
+        run: python -m py_compile production/phone_footage/v3_worker.py production/phone_footage/agent_jobs_v3.py
+      - name: Verify job producer contract and source catalog
+        run: |
+          python production/phone_footage/agent_jobs_v3.py list
+          python production/phone_footage/agent_jobs_v3.py prepare --url 'https://www.youtube.com/watch?v=DqiKOr1aS9w' --start 12 --duration 12 --height 1080 > /tmp/v3-issue.txt
+          python - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          base=Path("production/phone_footage")
+          spec=importlib.util.spec_from_file_location("v3",base/"v3_worker.py")
+          m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+          body=Path("/tmp/v3-issue.txt").read_text()
+          assert m.parse_job({"body":body})["duration"]==12
+          print("Agent payload PASS")
+          PY
+      - name: Dry-run queue without downloading footage
+        env:
+          YUNEX_READ_TOKEN: ${{ github.token }}
+        run: |
+          printf '%s' "$YUNEX_READ_TOKEN" > "$RUNNER_TEMP/token"
+          chmod 600 "$RUNNER_TEMP/token"
+          YUNEX_GH_TOKEN_FILE="$RUNNER_TEMP/token" python production/phone_footage/v3_worker.py --once --dry-run
