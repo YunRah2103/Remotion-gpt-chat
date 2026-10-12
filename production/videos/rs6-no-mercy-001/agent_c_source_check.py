@@ -55,7 +55,7 @@ try:
      part=response.read(1024*1024)
      if not part:break
      size+=len(part)
-     if size>60*1024*1024:raise RuntimeError("Preview exceeds 60 MiB cap")
+     if size>90*1024*1024:raise RuntimeError("Preview exceeds 90 MiB cap")
      out.write(part)
    print("PREVIEW_BYTES",size,"SHA256",hashlib.sha256(dest.read_bytes()).hexdigest())
    probe=subprocess.run(["ffprobe","-v","error","-show_entries","format=duration:stream=codec_name,width,height,r_frame_rate","-of","json",str(dest)],capture_output=True,text=True,timeout=30)
