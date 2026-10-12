@@ -41,7 +41,7 @@ def get(url,dest,limit=1600*1024*1024):
     if total<2048:raise RuntimeError("not_media")
     return {"url":url,"bytes":total,"sha256":sha(dest)}
 def getcuts(f,p):
-    if p["duration"]<3:return []
+    if p["duration"]<3:return [(0,p["duration"])]
     try:
         e=sh(["ffmpeg","-hide_banner","-nostdin","-i",str(f),"-an","-vf",
           "fps=3,scale=480:-2,select='gt(scene,0.30)',showinfo","-f","null","-"],320)
@@ -56,7 +56,7 @@ def getcuts(f,p):
         v=float(a)
         if 1<v<p["duration"]-1 and (not cuts or v-cuts[-1]>1.8):cuts.append(v)
     marks=[0]+cuts+[p["duration"]]
-    return [(a,b) for a,b in zip(marks,marks[1:]) if b-a>2.5] if cuts else []
+    return [(a,b) for a,b in zip(marks,marks[1:]) if b-a>2.5] if cuts else [(0,p["duration"])]
 def register(f,model,source_page,archive_url,credit,rights):
     try:
         src=probe(f)
@@ -67,7 +67,7 @@ def register(f,model,source_page,archive_url,credit,rights):
             "-i",str(f),"-map","0:v:0","-f","null","-"],500)
         cuts=getcuts(f,src)
         print("SCENES",f.name,cuts[:12],flush=True)
-        if not cuts:raise RuntimeError("continuous_scene_no_auto_duplicate_splitting")
+        if not cuts:raise RuntimeError("zero_candidate_scenes")
         for a,b in cuts[:3]:
             t=min(4.0,b-a-0.2);start=a+0.1
             name=model.lower().replace(" ","_")+"_"+str(len(accepted)+1).zfill(2)+".mp4"
@@ -106,12 +106,14 @@ def process_lotus():
     if not zipfile.is_zipfile(archive):raise RuntimeError("Lotus download lacks zip signature")
     with zipfile.ZipFile(archive) as z:
         entries=[m for m in z.infolist() if Path(m.filename).suffix.lower() in
-             {".mp4",".mov",".m4v",".mkv",".webm"} and 0<m.file_size<1000*1024*1024]
+             {".mp4",".mov",".m4v",".mkv",".webm"} and 0<m.file_size<2800*1024*1024]
+        entries=[m for m in entries if "__MACOSX" not in m.filename and not Path(m.filename).name.startswith("._")]
+        print("LOTUS_ZIP_CATALOG_TOP",[(m.filename,m.file_size) for m in sorted(z.infolist(),key=lambda x:-x.file_size)[:35]],flush=True)
         print("LOTUS_ZIP_MOVIES",[(m.filename,m.file_size) for m in entries],flush=True)
         entries.sort(key=lambda x:(0 if "BROLL" in x.filename.upper() or "THEORY" in x.filename.upper() else 1,x.file_size))
         extracted=0
         for i,m in enumerate(entries):
-            if i>=15 or extracted+m.file_size>2400*1024*1024:break
+            if i>=15 or extracted+m.file_size>3200*1024*1024:break
             path=RAW/("lotus_"+str(i)+"_"+re.sub(r"[^a-zA-Z0-9_.-]","_",Path(m.filename).name))
             with z.open(m) as src,open(path,"wb") as out:
                 while True:
