@@ -1,0 +1,39 @@
+name: CYBER FUTURE C editor selects delivery
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/c-french-footage
+    paths:
+      - ".github/workflows/cyber-c-publish-editor-selects.yml"
+      - "production/videos/cyber-future-prototypes-001/agent-c/publish_editor_selects.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  publish-reviewed:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve verified full Agent C archive
+        uses: actions/download-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-FOOTAGE-C-FULL
+          run-id: 38241671138
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out
+      - name: Build immutable original + 11 manually reviewed clips, hash-check all media
+        run: |
+          python -m py_compile production/videos/cyber-future-prototypes-001/agent-c/publish_editor_selects.py
+          python production/videos/cyber-future-prototypes-001/agent-c/publish_editor_selects.py
+          sha256sum out/CYBER-FUTURE-001-C-FRANCE-EDITOR-SELECTS.zip
+          unzip -t out/CYBER-FUTURE-001-C-FRANCE-EDITOR-SELECTS.zip | tail -n 2
+      - name: Upload editor-ready real physical French footage candidate ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-C-FRANCE-EDITOR-SELECTS
+          path: out/CYBER-FUTURE-001-C-FRANCE-EDITOR-SELECTS.zip
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
