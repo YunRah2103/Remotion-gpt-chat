@@ -1,0 +1,101 @@
+{
+  "selection_basis": "Human multiframe/contact review 2026-10-12; native media per file verified; stationary physical show cars, no driving claimed",
+  "approved": [
+    {
+      "source": "lotus",
+      "clip": "lotus_theory_1_01.mp4",
+      "visual_note": "Moody silhouette reveal, actual physical Lotus stage studio, car intentionally mostly shadowed",
+      "physical_evidence": "Official Lotus studio BROLL_GRADED-EXT_Overview photographed physical vehicle; subject static, camera moves",
+      "actual_vehicle_motion": "stationary_physical_showcar_camera_motion"
+    },
+    {
+      "source": "lotus",
+      "clip": "lotus_theory_1_03.mp4",
+      "visual_note": "Fully identifiable white-black Theory 1 front three-quarter beauty shot",
+      "physical_evidence": "Official Lotus studio BROLL_GRADED-EXT_Overview photographed physical vehicle; subject static, camera moves",
+      "actual_vehicle_motion": "stationary_physical_showcar_camera_motion"
+    },
+    {
+      "source": "lotus",
+      "clip": "lotus_theory_1_04.mp4",
+      "visual_note": "Rear three-quarter vehicle silhouette with continuous studio camera move",
+      "physical_evidence": "Official Lotus studio BROLL_GRADED-EXT_Overview photographed physical vehicle; subject static, camera moves",
+      "actual_vehicle_motion": "stationary_physical_showcar_camera_motion"
+    },
+    {
+      "source": "lotus",
+      "clip": "lotus_theory_1_05.mp4",
+      "visual_note": "Distinct door-raised side-angle mechanical detail on physical concept",
+      "physical_evidence": "Official Lotus studio BROLL_GRADED-EXT_Overview photographed physical vehicle; subject static, camera moves",
+      "actual_vehicle_motion": "stationary_physical_showcar_camera_motion"
+    },
+    {
+      "source": "lotus",
+      "clip": "lotus_theory_1_06.mp4",
+      "visual_note": "Symmetrical rear gullwing open reveal, authentic static physical display",
+      "physical_evidence": "Official Lotus studio BROLL_GRADED-EXT_Overview photographed physical vehicle; subject static, camera moves",
+      "actual_vehicle_motion": "stationary_physical_showcar_camera_motion"
+    },
+    {
+      "source": "lotus",
+      "clip": "lotus_theory_1_07.mp4",
+      "visual_note": "Clean rear fascia and diffuser framed as physical-showcar detail",
+      "physical_evidence": "Official Lotus studio BROLL_GRADED-EXT_Overview photographed physical vehicle; subject static, camera moves",
+      "actual_vehicle_motion": "stationary_physical_showcar_camera_motion"
+    },
+    {
+      "source": "porsche",
+      "clip": "porsche_mission_x_18.mp4",
+      "visual_note": "Physically filmed Porsche Mission X live reveal, rear illuminated grille macro",
+      "physical_evidence": "Porsche official Mission X on-stage physical unveil camera footage; subject static, camera/detail view",
+      "actual_vehicle_motion": "stationary_physical_showcar_camera_motion"
+    },
+    {
+      "source": "porsche",
+      "clip": "porsche_mission_x_20.mp4",
+      "visual_note": "Physically filmed Mission X front LED headlight detail under real show lights",
+      "physical_evidence": "Porsche official Mission X on-stage physical unveil camera footage; subject static, camera/detail view",
+      "actual_vehicle_motion": "stationary_physical_showcar_camera_motion"
+    }
+  ],
+  "rejected": [
+    {
+      "source": "Lotus Theory 1",
+      "clip": "lotus_theory_1_02.mp4",
+      "reason": "defocused and near-duplicate model angle"
+    },
+    {
+      "source": "Porsche Mission X",
+      "clips": [
+        "porsche_mission_x_13.mp4",
+        "porsche_mission_x_14.mp4",
+        "porsche_mission_x_15.mp4",
+        "porsche_mission_x_16.mp4"
+      ],
+      "reason": "isolated cyclorama studio visual has CGI possibility; no sufficient proof of actual physical filming"
+    },
+    {
+      "source": "Porsche Mission X",
+      "clips": [
+        "porsche_mission_x_17.mp4",
+        "porsche_mission_x_19.mp4"
+      ],
+      "reason": "presenter dominates, not car-hero shot"
+    },
+    {
+      "source": "CUPRA DarkRebel",
+      "clips": [
+        "cupra_darkrebel_08.mp4",
+        "cupra_darkrebel_09.mp4",
+        "cupra_darkrebel_10.mp4",
+        "cupra_darkrebel_11.mp4",
+        "cupra_darkrebel_12.mp4"
+      ],
+      "reason": "promotional CGI/live-action unclear; not approved as actual physical car"
+    },
+    {
+      "source": "Porsche low-res source",
+      "reason": "3000000 encoded versions are native 1280x720, rejected for HD gate"
+    }
+  ]
+}
