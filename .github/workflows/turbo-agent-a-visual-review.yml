@@ -22,6 +22,8 @@ jobs:
           run-id: 38270483310
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: out/visual
+      - name: Install ImageMagick for smaller visual review frames
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq imagemagick
       - name: Prepare inspectable transient Git blobs for decoded QA frames
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -43,5 +45,18 @@ jobs:
                          "Content-Type":"application/json"},method="POST")
               with urllib.request.urlopen(req,timeout=35) as resp: obj=json.load(resp)
               print("REVIEW_IMAGE_BLOB "+json.dumps({"name":p.name,"sha":obj["sha"],"bytes":p.stat().st_size}),flush=True)
+              # JPEG Base64 UTF-8 blob exists for agent-only visual review, never in tracked git files.
+              import subprocess
+              small=p.with_name(p.stem+"_web.jpg")
+              subprocess.run(["convert",str(p),"-resize","1200x1200>","-quality","67",str(small)],check=True)
+              base64text=base64.b64encode(small.read_bytes()).decode("ascii")
+              reqtext=urllib.request.Request(url,
+                data=json.dumps({"content":base64text,"encoding":"utf-8"}).encode(),
+                headers={"Authorization":"Bearer "+os.environ["GH_TOKEN"],
+                         "Accept":"application/vnd.github+json",
+                         "X-GitHub-Api-Version":"2022-11-28",
+                         "Content-Type":"application/json"},method="POST")
+              with urllib.request.urlopen(reqtext,timeout=35) as resp: objtext=json.load(resp)
+              print("REVIEW_TEXT_BLOB "+json.dumps({"name":p.name,"sha":objtext["sha"],"jpeg_bytes":small.stat().st_size}),flush=True)
           print("REVIEW_IMAGE_COUNT",len(paths))
           PY
