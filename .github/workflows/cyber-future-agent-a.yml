@@ -19,10 +19,13 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
-          python3 -m pip install --quiet --break-system-packages requests beautifulsoup4 yt-dlp
+          python3 -m pip install --quiet --break-system-packages requests beautifulsoup4 yt-dlp pillow
       - name: Discover and acquire Asian prototype manufacturer footage
         run: |
           python3 production/videos/cyber-future-prototypes-001/agent-a/acquire.py
+      - name: Curate independent real filmed Hyundai shots and contact sheets
+        run: |
+          python3 production/videos/cyber-future-prototypes-001/agent-a/curate.py
       - name: Upload evidence and actual clips when available
         if: always()
         uses: actions/upload-artifact@v4
