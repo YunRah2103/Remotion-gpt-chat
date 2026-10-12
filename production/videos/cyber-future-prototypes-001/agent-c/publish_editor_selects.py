@@ -37,7 +37,7 @@ def main():
         for idx,(label,tier,motion) in CHOICES.items():
             assert idx in indexed,f"Missing distinct original-shot cut {idx}"
             candidate=indexed[idx]
-            old=BASE+candidate["file"]
+            old=candidate["file"]
             data=src.read(old)
             assert digest(data)==candidate["clip_sha256"],idx
             dest=f"clips/C{idx:02d}_{motion}_renault_r5_turbo_3e_2025.mp4"
