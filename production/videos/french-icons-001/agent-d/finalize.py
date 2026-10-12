@@ -132,8 +132,8 @@ def contact_proofs(video, directory, shotmap=None):
         if not isinstance(shots, list):
             raise ValueError('shotmap must be an array, or an object with a shots array')
         for i, shot in enumerate(shots):
-            start = shot.get('master_start_frame')
-            end = shot.get('master_end_frame')
+            start = shot.get('masterStartFrame', shot.get('master_start_frame'))
+            end = shot.get('masterEndFrame', shot.get('master_end_frame'))
             if start is None or end is None:
                 start, end = shot.get('start_frame'), shot.get('end_frame')
             if start is None or end is None:
