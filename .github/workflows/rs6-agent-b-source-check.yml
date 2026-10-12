@@ -50,13 +50,16 @@ jobs:
           for entry in "${entries[@]}"; do
             name="${entry%%|*}"; url="${entry#*|}"
             printf 'source=%s\nurl=%s\n' "$name" "$url" > "reports/$name.txt"
+            # Is the delivery capped by the site/extractor, or is genuine 1080p accessible?
+            yt-dlp --ignore-config --list-formats --socket-timeout 12 --retries 1 "$url" >"reports/$name-formats.txt" 2>&1 || :
+            yt-dlp --ignore-config --impersonate chrome --list-formats --socket-timeout 12 --retries 1 "$url" >"reports/$name-chrome-formats.txt" 2>&1 || :
             for attempt in 1 2; do
               yt-dlp --ignore-config --no-playlist --skip-download --print '%(title)s | %(uploader)s | %(duration)s | %(license)s' --socket-timeout 15 --retries 1 "$url" >> "reports/$name.txt" 2>&1 && break
               sleep "$attempt"
             done
             # Preferred native high-resolution source, then a permissive format fallback.
             for fmt in 'bestvideo[height>=1080]+bestaudio/best[height>=1080]' 'bv*+ba/best'; do
-              yt-dlp --ignore-config --no-playlist --download-sections '*0-8' --force-keyframes-at-cuts --merge-output-format mp4 --format "$fmt" --socket-timeout 15 --retries 2 --fragment-retries 2 --output "staging/$name.%(ext)s" "$url" >> "reports/$name.txt" 2>&1 && break
+              yt-dlp --ignore-config --impersonate chrome --no-playlist --download-sections '*0-8' --force-keyframes-at-cuts --merge-output-format mp4 --format "$fmt" --socket-timeout 15 --retries 2 --fragment-retries 2 --output "staging/$name.%(ext)s" "$url" >> "reports/$name.txt" 2>&1 && break
             done
             # Fallback helper supports public embed/progressive when relevant; not permission to redistribute.
             # Do not assume that access to video implies permission to redistribute it.
