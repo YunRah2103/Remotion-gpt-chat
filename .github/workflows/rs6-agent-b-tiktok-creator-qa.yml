@@ -1,0 +1,63 @@
+name: RS6 Agent B TikTok creator-feed C8 acquisition QA
+on:
+  push:
+    branches: [automotive-edits/rs6-no-mercy-001/b-creator-driving]
+    paths: [.github/workflows/rs6-agent-b-tiktok-creator-qa.yml]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  tiktok-c8-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install video QA tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q -U yt-dlp curl_cffi
+      - name: Discover actual media from C8 RS6 owner's public feed
+        shell: bash
+        run: |
+          set +e
+          mkdir -p evidence clips
+          creator="https://www.tiktok.com/@fe78_rs6"
+          printf "source=%s\nC8-identification=https://crevideo.com/tiktok/fe78_rs6\n" "$creator" > evidence/creator.txt
+          # The account advertises 'Audi RS6 C8 4.0 TFSI V8'; do not assume every video depicts the car.
+          for mode in regular impersonated; do
+            if [[ "$mode" == impersonated ]]; then imp=(--impersonate chrome); else imp=(); fi
+            yt-dlp --ignore-config "${imp[@]}" --flat-playlist --playlist-end 5 --print '%(webpage_url)s' --socket-timeout 15 --retries 1 "$creator" >"evidence/discovered-$mode.txt" 2>"evidence/discovered-$mode.log"
+            echo "discovery_exit=$? mode=$mode" >> evidence/creator.txt
+          done
+          sort -u evidence/discovered-*.txt | grep -E '^https://(www\.)?tiktok\.com/(@|%40).+/video/[0-9]+' | head -n 3 > evidence/selected-urls.txt
+          if [[ ! -s evidence/selected-urls.txt ]]; then
+            echo "NO_PUBLIC_VIDEO_URLS_ACQUIRED" >> evidence/creator.txt
+          fi
+          index=0
+          while IFS= read -r url; do
+            index=$((index+1))
+            key="TikTokC8_$index"
+            echo "$url" >"evidence/$key-source.txt"
+            yt-dlp --ignore-config --no-playlist --download-sections '*0-7' --force-keyframes-at-cuts --merge-output-format mp4 --socket-timeout 15 --retries 2 --fragment-retries 2 -o "clips/$key.%(ext)s" "$url" >>"evidence/$key-source.txt" 2>&1
+            echo "download_exit=$?" >>"evidence/$key-source.txt"
+            file="$(find clips -maxdepth 1 -type f -name "$key.*" ! -name '*.part' | head -n 1)"
+            if [[ -z "$file" ]]; then continue; fi
+            ffprobe -v error -show_entries format=duration,size:stream=codec_name,codec_type,width,height,r_frame_rate -of json "$file" >"evidence/$key-ffprobe.json" 2>&1
+            ffmpeg -nostdin -v error -xerror -i "$file" -f null - >>"evidence/$key-source.txt" 2>&1
+            echo "decode_exit=$?" >>"evidence/$key-source.txt"
+            sha256sum "$file" >>"evidence/$key-source.txt"
+            mkdir -p "evidence/$key-frames"
+            ffmpeg -nostdin -v error -y -i "$file" -vf 'fps=1/2,scale=420:-1' -frames:v 3 "evidence/$key-frames/frame_%02d.jpg" 2>>"evidence/$key-source.txt"
+            rm -f "$file"
+          done < evidence/selected-urls.txt
+          # Technical QA is not public reuse permission or visual signoff.
+      - name: Upload forensic report without rehosting creator footage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-b-tiktok-owner-c8-qa
+          path: evidence/
+          retention-days: 14
