@@ -48,7 +48,7 @@ jobs:
         run: |
           mkdir -p out/cyber-f
           ffmpeg -hide_banner -v error -y -f lavfi -i "testsrc2=size=320x568:rate=30:duration=4" -c:v libx264 -preset ultrafast -pix_fmt yuv420p -an out/cyber-f/SYNTHETIC-VISUAL-ONLY.mp4
-          ffmpeg -hide_banner -v error -y -f lavfi -i "sine=frequency=440:sample_rate=44100:duration=4" -c:a libmp3lame -b:a 160k out/cyber-f/SYNTHETIC-AUDIO-ONLY.mp3
+          ffmpeg -hide_banner -v error -y -f lavfi -i "sine=frequency=440:sample_rate=44100:duration=4" -af "afade=t=in:st=0:d=1.0,afade=t=out:st=3.0:d=1.0" -c:a libmp3lame -b:a 160k out/cyber-f/SYNTHETIC-AUDIO-ONLY.mp3
       - name: Synthetic-test deterministic mux and audio-envelope QA
         run: |
           python3 production/videos/cyber-future-prototypes-001/agent-f/finalize.py \
