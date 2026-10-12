@@ -26,3 +26,5 @@ with tempfile.TemporaryDirectory() as d:
   samples.append({"second":sec,"brightness":round(mean,1),"contrast":round(contrast,1),"colorfulness":round(color,1),"fingerprint":hashlib.sha256(raw).hexdigest()[:12]})
  print("SAMPLES",json.dumps(samples),flush=True)
  # Deliberately no captured third-party frames emitted to GitHub logs or artifacts.
+
+# Run scene-level technical analysis.
