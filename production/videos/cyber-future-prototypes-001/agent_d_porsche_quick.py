@@ -4,7 +4,7 @@ import csv,hashlib,json,subprocess,urllib.request
 from pathlib import Path
 root=Path("out/CYBER-FUTURE-001-FOOTAGE-D")
 for p in (root,root/"clips",root/"contact_sheets",Path("out/raw")):p.mkdir(parents=True,exist_ok=True)
-URL="https://newstv.porsche.com/porschevideos/245385_en_6000000.mp4"
+URL="https://newstv.porsche.com/porschevideos/245346_en_6000000.mp4"
 F=Path("out/raw/porsche_mission_x_6mbps_original.mp4")
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 def run(cmd,timeout=120):
@@ -27,10 +27,10 @@ try:
     w=int(v["width"]);h=int(v["height"]);duration=float(probe["format"]["duration"])
     print("PORSCHE_NATIVE_SOURCE",w,h,v.get("avg_frame_rate"),duration,flush=True)
     if w<1920 or h<1080:raise RuntimeError(f"REJECT_BELOW_NATIVE_HD {w}x{h}")
-    positions=[20,45,70,100,130,160,195]
+    positions=[118,124,132,141,151,162,175]
     for i,t in enumerate(positions):
         if t+5>=duration:continue
-        basename=f"porsche_mission_x_native_{i+1:02d}.mp4"
+        basename=f"porsche_mission_x_event_{i+1:02d}.mp4"
         clip=root/"clips"/basename
         run(["ffmpeg","-v","error","-nostdin","-ss",str(t),"-i",str(F),"-t","4",
              "-map","0:v:0","-map","0:a?","-c:v","libx264","-crf","18",
