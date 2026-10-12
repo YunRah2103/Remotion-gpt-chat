@@ -64,8 +64,8 @@ def main():
     f"{len(records)} native-HD scene-separated candidate segments. Model is a real manufactured driving prototype but *the video frames* require actual photographic authenticity inspection. "+
     "No shot accepted until human review. Publisher source usage rights not confirmed. Included original video and contact JPEG frames.\n")
  zipfile.ZipFile("out/CYBER-C-CITROEN-OLI-QA.zip","w",zipfile.ZIP_STORED,allowZip64=True).close()
- with zipfile.ZipFile("out/CYBER-C-DS-ETENSE-QA.zip","a",zipfile.ZIP_STORED,allowZip64=True) as bundle:
+ with zipfile.ZipFile("out/CYBER-C-CITROEN-OLI-QA.zip","a",zipfile.ZIP_STORED,allowZip64=True) as bundle:
   for file in sorted(ROOT.iterdir()):
    if file.is_file():bundle.write(file,file.name)
- print("READY",len(records),Path("out/CYBER-C-DS-ETENSE-QA.zip").stat().st_size,flush=True)
+ print("READY",len(records),Path("out/CYBER-C-CITROEN-OLI-QA.zip").stat().st_size,flush=True)
 if __name__=="__main__":main()
