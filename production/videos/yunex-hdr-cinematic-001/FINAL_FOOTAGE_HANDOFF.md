@@ -9,7 +9,7 @@
 
 ## Creative status: HOLD — not approved as the final YUNEX HDR spectacle
 
-A second independent **16-frame native 4K 10-bit Y plane scan** across the original found **max PQ Y code value 470/1023**, with **zero pixels over code 600 in all 16 sampled frames**. This is luminance-code evidence of a restrained HDR grade, not proof of the entire film’s scene luminance and does not rule out bright RGB primaries. It does, however, make the requested bright HDR demonstration doubtful.
+**User reviewed the preview on 12 October 2026 and explicitly rejected its appearance. Do not treat this film as edit-approved, regardless of its technical HDR checks.**\n\nA second independent **16-frame native 4K 10-bit Y plane scan** across the original found **max PQ Y code value 470/1023**, with **zero pixels over code 600 in all 16 sampled frames**. This is luminance-code evidence of a restrained HDR grade, not proof of the entire film’s scene luminance and does not rule out bright RGB primaries. It does, however, make the requested bright HDR demonstration doubtful.
 
 The inspected 4x4 frame contact sheet shows documentary-style endurance racing, daylight track/paddock, some night pits, aerials, and sunset. Multiple distinct camera angles **do** exist, and source is real moving footage, but it lacks the consistent glossy supercar reveals, lit wet roads, and aggressive specular reflections envisioned by user. **Do not equate a genuine HDR technical file with impressive HDR peak-brightness.** No SDR-to-HDR regrading has been performed.
 
@@ -28,7 +28,7 @@ These are real inspected frame timestamps, not assertions that full adjacent int
 | 05:06.4 | Scenic tree-lined circuit at golden hour | Atmospheric transition |
 | 05:27.5 | Long sunset race-circuit view | Calm end card, not primary hero |
 
-This footage is a legitimate fallback for a motorsport-themed HDR production. **Do not start an edit unless the user accepts the visual compromise** or a materially better genuine native HDR source is acquired.
+This footage is an archival technical fallback only. **Do not start an edit with this film: the user rejected it.** Obtain another visually spectacular original HDR source with independently checked provenance and decoded frames.
 
 ## Device QA
 
