@@ -1,0 +1,32 @@
+name: CYBER FUTURE 001 Agent D Porsche Fast Native Sampler
+
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/d-radical-footage
+    paths:
+      - .github/workflows/cyber-future-agent-d-porsche-quick.yml
+      - production/videos/cyber-future-prototypes-001/agent_d_porsche_quick.py
+
+jobs:
+  physical-porsche:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install media tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Fetch direct Porsche 6Mbps MP4 and verify original pixels
+        run: |
+          python3 production/videos/cyber-future-prototypes-001/agent_d_porsche_quick.py
+          cat out/CYBER-FUTURE-001-FOOTAGE-D/QA_REPORT.json
+          find out/CYBER-FUTURE-001-FOOTAGE-D/clips -type f -printf '%P %s bytes\n' | sort
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-D-PORSCHE-QUICK
+          path: out/CYBER-FUTURE-001-FOOTAGE-D/
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: error
