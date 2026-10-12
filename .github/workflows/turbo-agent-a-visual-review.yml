@@ -1,0 +1,47 @@
+name: YUNEX Turbo A - Contact Sheet Visual Inspection
+on:
+  push:
+    branches:
+      - automotive-edits/turbo-indy-reality-001/a-turbo-film
+    paths:
+      - .github/workflows/turbo-agent-a-visual-review.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+jobs:
+  prepare-visual-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve verified footage artifact and contact sheets
+        uses: actions/download-artifact@v4
+        with:
+          name: yunex-turbo-agent-a-indy500-focus-38270483310
+          run-id: 38270483310
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/visual
+      - name: Prepare inspectable transient Git blobs for decoded QA frames
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPOSITORY: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import os, pathlib, json, base64, urllib.request
+          paths=sorted(pathlib.Path("out/visual").glob("**/*_contact.jpg"))
+          if not paths:
+              raise SystemExit("No decoded contact images found")
+          for p in paths:
+              data=base64.b64encode(p.read_bytes()).decode("ascii")
+              url="https://api.github.com/repos/"+os.environ["GH_REPOSITORY"]+"/git/blobs"
+              req=urllib.request.Request(url,
+                data=json.dumps({"content":data,"encoding":"base64"}).encode(),
+                headers={"Authorization":"Bearer "+os.environ["GH_TOKEN"],
+                         "Accept":"application/vnd.github+json",
+                         "X-GitHub-Api-Version":"2022-11-28",
+                         "Content-Type":"application/json"},method="POST")
+              with urllib.request.urlopen(req,timeout=35) as resp: obj=json.load(resp)
+              print("REVIEW_IMAGE_BLOB "+json.dumps({"name":p.name,"sha":obj["sha"],"bytes":p.stat().st_size}),flush=True)
+          print("REVIEW_IMAGE_COUNT",len(paths))
+          PY
