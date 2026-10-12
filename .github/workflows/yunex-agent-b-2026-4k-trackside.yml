@@ -1,0 +1,38 @@
+name: YUNEX B Real Indy 500 Native 4K Trackside Close Pass
+on:
+  push:
+    branches: [automotive-edits/turbo-indy-reality-001/b-indy-matches]
+    paths:
+      - production/videos/turbo-indy-reality-001/agent_b_2026_4k_trackside.py
+      - .github/workflows/yunex-agent-b-2026-4k-trackside.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-and-package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -U yt-dlp pillow
+      - name: Download true native 4K actual video and decode moving segments
+        run: python -u production/videos/turbo-indy-reality-001/agent_b_2026_4k_trackside.py
+      - name: Publish clips and SHA/contact sheets
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-B-2026-NATIVE-4K-ACTUAL-VIDEO-${{ github.run_id }}
+          path: out/YUNEX_AGENT_B_2026_4K_TRACKSIDE_CANDIDATES.zip
+          retention-days: 14
+          if-no-files-found: error
+          compression-level: 0
+      - name: Fail-specific diagnostics
+        if: failure()
+        run: echo 'No finished real footage ZIP. Check download/decode logs.'
