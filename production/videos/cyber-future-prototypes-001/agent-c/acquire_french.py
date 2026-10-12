@@ -42,7 +42,7 @@ def fetch_page(url):
 def candidates(htmltxt,page):
     htmltxt=html.unescape(htmltxt).replace("\\/","/")
     found=[]
-    for match in re.findall(r"https?://[^\\s\\\"'<>]+\\.(?:mp4|mov)(?:\\?[^\\s\\\"'<>]*)?",htmltxt,re.I):
+    for match in re.findall(r"https?://[^ <>()]+[.](?:mp4|mov)",htmltxt,re.I):
         url=urllib.parse.urljoin(page,match)
         if url.startswith("https://"):found.append(url)
     # Some press sites expose their download links as hidden anchor URLs rather than .mp4.
