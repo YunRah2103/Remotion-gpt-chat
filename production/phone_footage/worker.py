@@ -55,7 +55,7 @@ def issue_jobs(token):
     items = api("GET", f"/repos/{REPO}/issues?{query}", token)
     return [i for i in items if i.get("title","").startswith(TITLE_PREFIX)
             and i.get("user",{}).get("login","").casefold() == OWNER.casefold()
-            and not i.get("pull_request")]
+            and "pull_request" not in i]
 
 
 def parse_job(issue):
