@@ -1,0 +1,119 @@
+{
+  "archive_sha256": "05e942d935eaf75072f0207e4e31f06383d26841316ee625e1e0e5ead4acff6a",
+  "total": 11,
+  "model_count": 2,
+  "gate": "PARTIAL_REAL_FOOTAGE_CURATED",
+  "physical_and_rights_caveat": "BMW Vision M NEXT footage real road drive; BMW i Vision Dee circle/studio shots must NOT be described as driving. Some promoted studio images might include CGI manipulation. No true 1080 vertical source. Edit rights not confirmed.",
+  "clips": [
+    {
+      "id": "bmw-vision-m-next-driving-candidate-02",
+      "angle": "front tracking on mountain road",
+      "model": "BMW Vision M NEXT",
+      "sha256": "4f81d8a3358b269660119daed61d07719fc2ca84c9dbccb45f8c7fbc37a7d1e7",
+      "temporal_differences": [
+        40.518,
+        21.25
+      ]
+    },
+    {
+      "id": "bmw-vision-m-next-driving-candidate-05",
+      "angle": "rear three-quarter road curve",
+      "model": "BMW Vision M NEXT",
+      "sha256": "80f091b01ef76c1a5d96807d9ffa3eb8f3335f94bd0ea56016326cbc29e0e8ca",
+      "temporal_differences": [
+        66.253,
+        32.466
+      ]
+    },
+    {
+      "id": "bmw-vision-m-next-driving-candidate-06",
+      "angle": "rear drive-through bend",
+      "model": "BMW Vision M NEXT",
+      "sha256": "ee382caec575a2e8f51721d7e89856483298cd016c926ffb0ba75be8e43b4964",
+      "temporal_differences": [
+        19.722,
+        24.039
+      ]
+    },
+    {
+      "id": "bmw-vision-m-next-driving-candidate-07",
+      "angle": "closer rear tracking road",
+      "model": "BMW Vision M NEXT",
+      "sha256": "76d6a058a6055245c73cbd4181d7793d5230c3201a811abae7fe9804c8e4ce69",
+      "temporal_differences": [
+        44.967,
+        29.76
+      ]
+    },
+    {
+      "id": "bmw-vision-m-next-launch-candidate-01",
+      "angle": "dark studio illuminated front grille",
+      "model": "BMW Vision M NEXT",
+      "sha256": "6895b38349650e13af2dcf86043d11b2f4f0057834ac4f705b44150885c588d4",
+      "temporal_differences": [
+        7.259,
+        14.272
+      ]
+    },
+    {
+      "id": "bmw-i-vision-dee-running-candidate-01",
+      "angle": "three-quarter front on presentation plaza",
+      "model": "BMW i Vision Dee",
+      "sha256": "f37fe6f532c02be3102408bca831e95750f664587ff82c079edac7aa83733b42",
+      "temporal_differences": [
+        26.268,
+        27.303
+      ]
+    },
+    {
+      "id": "bmw-i-vision-dee-running-candidate-03",
+      "angle": "three-quarter rear plaza",
+      "model": "BMW i Vision Dee",
+      "sha256": "6369823910dffbdab5c0920038c3f0cdc64c12bf0b963a951804e1bec7b11f37",
+      "temporal_differences": [
+        35.406,
+        40.033
+      ]
+    },
+    {
+      "id": "bmw-i-vision-dee-running-candidate-07",
+      "angle": "wheel detail with fluorescent rim",
+      "model": "BMW i Vision Dee",
+      "sha256": "5eb5ab10be163a5ff045e00f5e28ad1c1dc135bcd8fc19cd0a10ebc7cb5e5b91",
+      "temporal_differences": [
+        29.086,
+        32.769
+      ]
+    },
+    {
+      "id": "bmw-i-vision-dee-running-candidate-08",
+      "angle": "rear light bar badge close-up",
+      "model": "BMW i Vision Dee",
+      "sha256": "33aa0d3170838e4c88d1f77b9912dcbf66f103d795a47a0fe0f104325d5d9f35",
+      "temporal_differences": [
+        22.106,
+        19.198
+      ]
+    },
+    {
+      "id": "bmw-i-vision-dee-running-candidate-09",
+      "angle": "overhead three-quarter side full-car plaza",
+      "model": "BMW i Vision Dee",
+      "sha256": "01985ffd36726b63a23b454c0b2dd736d30e3e302fd0c64fafdc97588a89faa4",
+      "temporal_differences": [
+        21.163,
+        20.347
+      ]
+    },
+    {
+      "id": "bmw-i-vision-dee-running-candidate-13",
+      "angle": "top-down roof and lit stage",
+      "model": "BMW i Vision Dee",
+      "sha256": "66420d71bd22952a8a660f664e51012a81029ed2bb409abaf2470693ec642d59",
+      "temporal_differences": [
+        11.433,
+        9.284
+      ]
+    }
+  ]
+}
