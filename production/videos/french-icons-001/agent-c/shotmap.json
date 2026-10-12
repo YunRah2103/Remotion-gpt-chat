@@ -29,7 +29,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "6-frame restrained cross-dissolve",
       "cinematicCropScale": 1,
-      "cinematicFocusXPercent": 50
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 50
     },
     {
       "shot": 2,
@@ -46,7 +47,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "clean motion-led cut",
       "cinematicCropScale": 1,
-      "cinematicFocusXPercent": 50
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 50
     },
     {
       "shot": 3,
@@ -63,7 +65,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "clean motion-led cut",
       "cinematicCropScale": 1,
-      "cinematicFocusXPercent": 50
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 50
     },
     {
       "shot": 4,
@@ -80,7 +83,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "6-frame restrained cross-dissolve",
       "cinematicCropScale": 1,
-      "cinematicFocusXPercent": 50
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 50
     },
     {
       "shot": 5,
@@ -97,7 +101,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "clean motion-led cut",
       "cinematicCropScale": 1,
-      "cinematicFocusXPercent": 50
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 50
     },
     {
       "shot": 6,
@@ -114,7 +119,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "clean motion-led cut",
       "cinematicCropScale": 1,
-      "cinematicFocusXPercent": 50
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 50
     },
     {
       "shot": 7,
@@ -131,7 +137,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "clean motion-led cut",
       "cinematicCropScale": 1,
-      "cinematicFocusXPercent": 50
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 50
     },
     {
       "shot": 8,
@@ -148,7 +155,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "6-frame restrained cross-dissolve",
       "cinematicCropScale": 1,
-      "cinematicFocusXPercent": 50
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 50
     },
     {
       "shot": 9,
@@ -165,7 +173,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "clean motion-led cut",
       "cinematicCropScale": 1,
-      "cinematicFocusXPercent": 50
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 50
     },
     {
       "shot": 10,
@@ -174,15 +183,16 @@
       "model": "Peugeot 205 GTI 1.9",
       "era": "heritage",
       "masterStartFrame": 533,
-      "masterEndFrame": 615,
+      "masterEndFrame": 589,
       "sourceInSeconds": 0.7,
-      "durationFrames": 82,
+      "durationFrames": 56,
       "enterDissolveFrames": 0,
       "exitDissolveFrames": 0,
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "clean motion-led cut",
-      "cinematicCropScale": 1.2,
-      "cinematicFocusXPercent": 50
+      "cinematicCropScale": 1.16,
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 0
     },
     {
       "shot": 11,
@@ -190,16 +200,17 @@
       "sourcePath": "Agent_A_Classics/originals/peugeot-205-gti-rear-205-tracking-source-1920x1080.mp4",
       "model": "Peugeot 205 GTI 1.9",
       "era": "heritage",
-      "masterStartFrame": 615,
+      "masterStartFrame": 589,
       "masterEndFrame": 705,
       "sourceInSeconds": 0.7,
-      "durationFrames": 90,
+      "durationFrames": 116,
       "enterDissolveFrames": 0,
       "exitDissolveFrames": 6,
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "6-frame restrained cross-dissolve",
-      "cinematicCropScale": 1.2,
-      "cinematicFocusXPercent": 50
+      "cinematicCropScale": 1.16,
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 0
     },
     {
       "shot": 12,
@@ -216,7 +227,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "clean motion-led cut",
       "cinematicCropScale": 1.08,
-      "cinematicFocusXPercent": 50
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 50
     },
     {
       "shot": 13,
@@ -233,7 +245,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "clean motion-led cut",
       "cinematicCropScale": 1,
-      "cinematicFocusXPercent": 50
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 50
     },
     {
       "shot": 14,
@@ -250,7 +263,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "clean motion-led cut",
       "cinematicCropScale": 1,
-      "cinematicFocusXPercent": 50
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 50
     },
     {
       "shot": 15,
@@ -267,7 +281,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "clean motion-led cut",
       "cinematicCropScale": 1,
-      "cinematicFocusXPercent": 50
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 50
     },
     {
       "shot": 16,
@@ -284,7 +299,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "6-frame restrained cross-dissolve",
       "cinematicCropScale": 1,
-      "cinematicFocusXPercent": 50
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 50
     },
     {
       "shot": 17,
@@ -301,7 +317,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "clean motion-led cut",
       "cinematicCropScale": 1,
-      "cinematicFocusXPercent": 50
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 50
     },
     {
       "shot": 18,
@@ -318,7 +335,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "clean motion-led cut",
       "cinematicCropScale": 1.25,
-      "cinematicFocusXPercent": 52
+      "cinematicFocusXPercent": 52,
+      "cinematicFocusYPercent": 50
     },
     {
       "shot": 19,
@@ -335,7 +353,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "clean motion-led cut",
       "cinematicCropScale": 1.25,
-      "cinematicFocusXPercent": 50
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 50
     },
     {
       "shot": 20,
@@ -352,7 +371,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "6-frame restrained cross-dissolve",
       "cinematicCropScale": 1,
-      "cinematicFocusXPercent": 50
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 50
     },
     {
       "shot": 21,
@@ -369,7 +389,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "clean motion-led cut",
       "cinematicCropScale": 1,
-      "cinematicFocusXPercent": 50
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 50
     },
     {
       "shot": 22,
@@ -386,7 +407,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "clean motion-led cut",
       "cinematicCropScale": 1,
-      "cinematicFocusXPercent": 50
+      "cinematicFocusXPercent": 50,
+      "cinematicFocusYPercent": 50
     },
     {
       "shot": 23,
@@ -403,7 +425,8 @@
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "clean motion-led cut",
       "cinematicCropScale": 1.25,
-      "cinematicFocusXPercent": 54
+      "cinematicFocusXPercent": 54,
+      "cinematicFocusYPercent": 50
     }
   ],
   "musicDynamicsAnalysis": {
@@ -442,6 +465,8 @@
     "Preserve no fake 9:16/4K source claims; original song stays external to public repo.",
     "Three key model switches aligned within a frame of measured soundtrack energy troughs. French lyric boundaries remain untranscribed.",
     "Independent playback of original Remotion film revealed C21 spent ~2s on rear-wing macro with baked bars. Replace C21 with blues-hour full-car C22, then transition to orange Alpine R Ultime.",
-    "Original Peugeot 205 full landscape footage has a small lower-right Harry's Garage source watermark. Apply 1.20x center crop of the 1080p native image instead of showing watermark or using rejected bad portrait crops; verify body panels after crop."
+    "Original Peugeot 205 full landscape footage has a small lower-right Harry's Garage source watermark. Apply 1.20x center crop of the 1080p native image instead of showing watermark or using rejected bad portrait crops; verify body panels after crop.",
+    "After actual v3 2fps frame-by-frame QA, original Peugeot front 205 source visibly cuts to an interior interview at t~19.75; shortened front shot to 56f so only driving is shown and lengthened rear-follow to 116f without changing overall 60s audio cuts.",
+    "Peugeot video had partial lower-corner source credit even at 1.2x center zoom. Set scale to 1.16 and Y crop focus to TOP (0) so footer credits are cropped off while width/frontal bumper stay visible."
   ]
 }
