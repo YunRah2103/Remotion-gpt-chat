@@ -1,0 +1,59 @@
+{
+  "sources": [
+    {
+      "id": "bmw-vision-m-next-driving",
+      "qa": {
+        "width": 1920,
+        "height": 1080,
+        "orientation": "landscape",
+        "source_native_vertical_1080": false,
+        "min_1080_pass": true,
+        "max_4k_preferred": true,
+        "duration": 154.16,
+        "fps": "25/1",
+        "codec": "h264",
+        "bit_rate": "25708860",
+        "audio": true,
+        "bytes": 495409751
+      },
+      "candidate_count": 7
+    },
+    {
+      "id": "bmw-vision-m-next-launch",
+      "qa": {
+        "width": 1920,
+        "height": 1080,
+        "orientation": "landscape",
+        "source_native_vertical_1080": false,
+        "min_1080_pass": true,
+        "max_4k_preferred": true,
+        "duration": 97.4,
+        "fps": "25/1",
+        "codec": "h264",
+        "bit_rate": "22167221",
+        "audio": true,
+        "bytes": 269885922
+      },
+      "candidate_count": 7
+    }
+  ],
+  "candidate_count": 14,
+  "rejections": [
+    {
+      "source_id": "audi-concept-c-dynamic",
+      "url": "https://www.mynewsdesk.com/dk/audi-danmark/videos/audi-concept-c-footage-dynamic-121552/download",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "source_id": "audi-concept-c-dynamic-vertical",
+      "url": "https://www.audi.com/en/videos/video/audi-concept-c-footage-dynamic-vertical-8048",
+      "error": "Command '['/opt/hostedtoolcache/Python/3.12.15/x64/bin/python', '-m', 'yt_dlp', '--ignore-config', '--no-playlist', '--no-progress', '--socket-timeout', '18', '--retries', '1', '--format', 'bv*+ba/b', '--merge-output-format', 'mp4', '--max-filesize', '820M', '-o', 'out/cyber-future-agent-b/sources/audi-concept-c-dynamic-vertical.%(ext)s', 'https://www.audi.com/en/videos/video/audi-concept-c-footage-dynamic-vertical-8048']' returned non-zero exit status 1."
+    },
+    {
+      "source_id": "audi-concept-c-dynamic-landscape",
+      "url": "https://www.audi.com/en/videos/video/audi-concept-c-footage-dynamic-8049",
+      "error": "Command '['/opt/hostedtoolcache/Python/3.12.15/x64/bin/python', '-m', 'yt_dlp', '--ignore-config', '--no-playlist', '--no-progress', '--socket-timeout', '18', '--retries', '1', '--format', 'bv*+ba/b', '--merge-output-format', 'mp4', '--max-filesize', '820M', '-o', 'out/cyber-future-agent-b/sources/audi-concept-c-dynamic-landscape.%(ext)s', 'https://www.audi.com/en/videos/video/audi-concept-c-footage-dynamic-8049']' returned non-zero exit status 1."
+    }
+  ],
+  "human_review": "PENDING"
+}
