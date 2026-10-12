@@ -132,7 +132,7 @@ def parse_job(issue):
         job = json.loads(body[len(MARKER)+1:].strip())
     except (ValueError, TypeError):
         return None
-    if not isinstance(job, dict) or set(job) - {"url", "start", "duration", "height", "max_mb"}:
+    if not isinstance(job, dict) or set(job) - {"url", "start", "duration", "height", "max_mb", "orientation"}:
         return None
     entry = LICENSED_PROOFS.get(job.get("url"))
     if not entry:
@@ -141,14 +141,16 @@ def parse_job(issue):
     duration = job.get("duration", 6)
     height = job.get("height", 1080)
     max_mb = job.get("max_mb", 45)
+    orientation = job.get("orientation", "landscape")
     if (type(start) not in (float, int) or type(duration) not in (float, int)
             or type(height) is not int or type(max_mb) is not int
             or not 0 <= start <= 3600 or not 2 <= duration <= 40
             or start + duration > 3640 or height not in (720, 1080)
-            or height > entry["max_height"] or not 5 <= max_mb <= 80):
+            or height > entry["max_height"] or not 5 <= max_mb <= 80
+            or orientation not in ("landscape", "portrait")):
         return None
     return {"url": job["url"], "start": float(start), "duration": float(duration),
-            "height": height, "max_mb": max_mb}
+            "height": height, "max_mb": max_mb, "orientation": orientation}
 
 def already_reported(token, number):
     comments = api("GET",f"/repos/{REPO}/issues/{number}/comments?per_page=100",token)
@@ -223,13 +225,17 @@ def download_proof(folder, job=None):
     if shutil.disk_usage(folder).free < MIN_FREE_BYTES:
         raise RuntimeError("At least 700 MiB of free phone storage required")
     start, duration, height = job["start"], job["duration"], job["height"]
+    orientation = job.get("orientation", "landscape")
     segment = f"*{start:g}-{start + duration:g}"
+    fmt = (f"bv*[width<={height}][height<={height*16//9}]+ba/b[width<={height}][height<={height*16//9}]/b"
+           if orientation == "portrait" else
+           f"bv*[height<={height}]+ba/b[height<={height}]/b")
     command = [sys.executable, "-m", "yt_dlp", "--ignore-config", "--no-playlist",
                "--no-progress", "--js-runtimes", "node", "--socket-timeout", "25",
                "--retries", "2", "--fragment-retries", "2", "--concurrent-fragments", "1",
                "--download-sections", segment, "--force-keyframes-at-cuts",
                "--merge-output-format", "mp4",
-               "-f", f"bv*[height<={height}]+ba/b[height<={height}]/b",
+               "-f", fmt,
                "--max-filesize", "240M", "-o", str(folder/"source.%(ext)s"), job["url"]]
     watched(command, 540, folder)
     candidates = sorted((p for p in folder.iterdir() if p.is_file()
@@ -242,7 +248,9 @@ def download_proof(folder, job=None):
                                        "-of", "json", str(candidates[0])], 25))
     source_video = next((x for x in source_probe.get("streams", [])
                          if x.get("codec_type") == "video"), None)
-    if not source_video or (height == 1080 and source_video.get("height", 0) < 1080):
+    source_short = (source_video or {}).get("width" if orientation == "portrait" else "height", 0)
+    if (not source_video or (height == 1080 and source_short < 1080)
+            or (orientation == "portrait" and source_video.get("width", 0) >= source_video.get("height", 0))):
         raise RuntimeError("Source lacks genuine 1080p frames")
     result = folder / "verified-phone-v3.mp4"
     watched(["ffmpeg", "-y", "-v", "error", "-i", str(candidates[0]),
@@ -258,10 +266,12 @@ def download_proof(folder, job=None):
     video = next((x for x in video_probe.get("streams", [])
                   if x.get("codec_type") == "video"), None)
     seconds = float(video_probe.get("format", {}).get("duration") or 0)
+    short = (video or {}).get("width" if orientation == "portrait" else "height", 0)
+    long = (video or {}).get("height" if orientation == "portrait" else "width", 0)
     if (not video or video.get("codec_name") != "h264"
-            or video.get("height", 0) > height
-            or (height == 1080 and video.get("height", 0) != 1080)
-            or video.get("width", 0) < 320
+            or short > height or (height == 1080 and short != 1080)
+            or short < 320 or long < 320
+            or (orientation == "portrait" and video.get("width", 0) >= video.get("height", 0))
             or not max(1.5, duration-1.2) <= seconds <= duration+2):
         raise RuntimeError("Decoded video codec, dimensions or duration invalid")
     checked(["ffmpeg", "-v", "error", "-xerror", "-i", str(result),
@@ -273,7 +283,8 @@ def download_proof(folder, job=None):
     return result, {"bytes": size, "width": video["width"], "height": video["height"],
                     "duration": round(seconds, 3), "codec": video["codec_name"],
                     "sha256": digest.hexdigest(), "requested_height": height,
-                    "source_height": source_video["height"], "start": start,
+                    "source_height": source_video["height"], "source_width": source_video["width"],
+                    "orientation": orientation, "start": start,
                     "full_decode": "PASS"}
 
 def upload_release(token, number, file, job=None, meta=None):
@@ -296,7 +307,8 @@ def upload_release(token, number, file, job=None, meta=None):
                 "issue": number, "source_url": job["url"], "license": entry["license"],
                 "attribution": entry["author"], "license_evidence": entry["license_reference"],
                 "requested_start": job["start"], "requested_duration": job["duration"],
-                "requested_height": job["height"], **meta,
+                "requested_height": job["height"],
+                "requested_orientation": job.get("orientation", "landscape"), **meta,
                 "mp4_url": asset["browser_download_url"],
                 "release_url": release["html_url"]}
     manifest_name = f"yunex-v3-{number}.json"
