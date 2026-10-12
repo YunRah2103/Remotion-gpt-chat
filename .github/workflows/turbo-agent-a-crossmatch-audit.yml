@@ -1,0 +1,54 @@
+name: YUNEX Turbo A - Cross-agent Frame Match Audit
+on:
+  push:
+    branches:
+      - automotive-edits/turbo-indy-reality-001/a-turbo-film
+    paths:
+      - production/videos/turbo-indy-reality-001/agent_a_crossmatch_audit.py
+      - .github/workflows/turbo-agent-a-crossmatch-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+jobs:
+  audit-existing-real-footage:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: yunex-turbo-indy-agent-b-verified-video-38272031857
+          run-id: 38272031857
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/thirdparty/B
+      - uses: actions/download-artifact@v4
+        with:
+          name: yunex-agent-c-curated-indycar-native-1080p
+          run-id: 38272030425
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/thirdparty/C
+      - uses: actions/download-artifact@v4
+        with:
+          name: YUNEX-INDY-D-2026-NATIVE-4K-REAL-FOOTAGE
+          run-id: 38273704533
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/thirdparty/D
+      - name: Install ffprobe and Pillow
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check Pillow
+      - name: Verify real B/C/D files and create visual review frame maps
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python production/videos/turbo-indy-reality-001/agent_a_crossmatch_audit.py
+      - name: Save contact images and QA manifest only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-A-to-real-IndyCar-crossmatch-frames-${{ github.run_id }}
+          path: out/turbo-indy-match-audit/
+          retention-days: 14
+          compression-level: 0
+          if-no-files-found: warn
