@@ -39,3 +39,28 @@ for marker in ("pobierz","download","mp4","video","plik","media"):
 
 for match in re.findall(r'https?[^\s<>]+?\.mp4', content, re.I):
  print('POSSIBLE_MP4', match[:300])
+
+# Verify the explicitly embedded 1280x720 playback MP4 temporarily, without public distribution.
+import pathlib
+preview=urllib.parse.urljoin(URL,"/data/filmy/48075/o/7405893_content_1280x720_play.mp4")
+print("EMBEDDED_PREVIEW",preview)
+try:
+ with urllib.request.urlopen(urllib.request.Request(preview,headers={"User-Agent":"Mozilla/5.0"}),timeout=35) as response:
+  print("PREVIEW_HTTP",response.status,response.headers.get("Content-Type"),response.headers.get("Content-Length"))
+  with tempfile.TemporaryDirectory() as td:
+   dest=pathlib.Path(td)/"rs6_official_preview.mp4"
+   size=0
+   with dest.open("wb") as out:
+    while True:
+     part=response.read(1024*1024)
+     if not part:break
+     size+=len(part)
+     if size>60*1024*1024:raise RuntimeError("Preview exceeds 60 MiB cap")
+     out.write(part)
+   print("PREVIEW_BYTES",size,"SHA256",hashlib.sha256(dest.read_bytes()).hexdigest())
+   probe=subprocess.run(["ffprobe","-v","error","-show_entries","format=duration:stream=codec_name,width,height,r_frame_rate","-of","json",str(dest)],capture_output=True,text=True,timeout=30)
+   print("FFPROBE",probe.returncode,probe.stdout[:1800],probe.stderr[:500])
+   decode=subprocess.run(["ffmpeg","-v","error","-xerror","-i",str(dest),"-f","null","-"],capture_output=True,text=True,timeout=120)
+   print("FULL_DECODE",decode.returncode,decode.stderr[:500])
+except Exception as e:
+ print("PREVIEW_ERROR",repr(e))
