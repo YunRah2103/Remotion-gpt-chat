@@ -1,0 +1,68 @@
+name: FR Legends D - verified 42-footage transport shards
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/d-audio-render
+    paths:
+      - .github/workflows/fr-legends-d-footage-shards.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  split-verified-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download A+B combined exact canonical media artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p /tmp/fr-legends-source
+          gh run download 38169392715 --repo YunRah2103/Remotion-gpt-chat --name YUNEX-FRENCH-LEGENDS-ALL-42-AGENT-A-AND-B-CLIPS-ONE-ZIP --dir /tmp/fr-legends-source
+          find /tmp/fr-legends-source -type f -printf '%s %p\n'
+      - name: Verify original inner 42-clip source archive and make transport shards
+        shell: bash
+        run: |
+          set -euo pipefail
+          f="$(find /tmp/fr-legends-source -type f -name '*.zip' -size +500M | head -1)"
+          test -n "$f"
+          test "$(stat -c %s "$f")" -eq 671925099
+          printf '46073d50fb4efe246b3e7ee1adee1601eec025a3aa2a07df45f038731218c533  %s\n' "$f" | sha256sum -c -
+          unzip -t "$f" | tail -2
+          mkdir -p chunks
+          split -b 280M -d -a 2 "$f" chunks/fr-legends-42-source-part-
+          find chunks -type f -printf '%s %f\n'
+          test "$(find chunks -type f | wc -l)" -eq 3
+          for part in chunks/*; do sha256sum "$part"; done > chunks/SHARDS_SHA256.txt
+          cat chunks/SHARDS_SHA256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FR-LEGENDS-42-VERIFIED-PART-00
+          path: chunks/fr-legends-42-source-part-00
+          compression-level: 0
+          retention-days: 4
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FR-LEGENDS-42-VERIFIED-PART-01
+          path: chunks/fr-legends-42-source-part-01
+          compression-level: 0
+          retention-days: 4
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FR-LEGENDS-42-VERIFIED-PART-02
+          path: chunks/fr-legends-42-source-part-02
+          compression-level: 0
+          retention-days: 4
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FR-LEGENDS-42-VERIFIED-PART-MANIFEST
+          path: chunks/SHARDS_SHA256.txt
+          retention-days: 4
+          if-no-files-found: error
