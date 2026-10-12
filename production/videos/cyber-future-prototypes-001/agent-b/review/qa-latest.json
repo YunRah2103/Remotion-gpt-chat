@@ -1,6 +1,42 @@
 {
   "sources": [
     {
+      "id": "bmw-i-vision-dee-exterior",
+      "qa": {
+        "width": 1920,
+        "height": 1080,
+        "orientation": "landscape",
+        "source_native_vertical_1080": false,
+        "min_1080_pass": true,
+        "max_4k_preferred": true,
+        "duration": 18.2,
+        "fps": "25/1",
+        "codec": "prores",
+        "bit_rate": "180295414",
+        "audio": true,
+        "bytes": 410172068
+      },
+      "candidate_count": 4
+    },
+    {
+      "id": "bmw-i-vision-dee-e-ink",
+      "qa": {
+        "width": 1920,
+        "height": 1080,
+        "orientation": "landscape",
+        "source_native_vertical_1080": false,
+        "min_1080_pass": true,
+        "max_4k_preferred": true,
+        "duration": 14.96,
+        "fps": "25/1",
+        "codec": "prores",
+        "bit_rate": "177555428",
+        "audio": true,
+        "bytes": 332028652
+      },
+      "candidate_count": 5
+    },
+    {
       "id": "bmw-vision-m-next-driving",
       "qa": {
         "width": 1920,
@@ -37,7 +73,7 @@
       "candidate_count": 2
     }
   ],
-  "candidate_count": 7,
+  "candidate_count": 16,
   "rejections": [
     {
       "source_id": "mercedes-amg-gt-xx-embedded",
