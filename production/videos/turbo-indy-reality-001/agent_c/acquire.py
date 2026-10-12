@@ -158,6 +158,11 @@ def main():
             # Preserve temporal variety; don't falsely count alternate excerpts as independent camera angles.
             if not times:
                 times=[float(i) for i in range(3, min(int(prop["duration"])-2,25),5)]
+            if src["id"]=="indy500_2026_finish":
+                # Reviewed contact sheets: 109s+ is branded outro, never deliver it.
+                # 34-57s contains a genuine wheel-to-wheel battle shown by onboard.
+                # Three separate moments, same CAMERA angle; never count as independent angles.
+                times=[34.0,45.0,55.0]
             if src["id"]=="indy500_2024_formation":times=[3.0,8.0]
             # source 1 > source 2 > source 3; limit source size and redundant shots.
             cap=7 if src["priority"]==1 else 4
