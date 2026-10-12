@@ -41,7 +41,7 @@ jobs:
             index=$((index+1))
             key="TikTokC8_$index"
             echo "$url" >"evidence/$key-source.txt"
-            yt-dlp --ignore-config --no-playlist --download-sections '*0-7' --force-keyframes-at-cuts --merge-output-format mp4 --socket-timeout 15 --retries 2 --fragment-retries 2 -o "clips/$key.%(ext)s" "$url" >>"evidence/$key-source.txt" 2>&1
+            yt-dlp --ignore-config --format "bv*+ba/b" --no-playlist --download-sections '*0-7' --force-keyframes-at-cuts --merge-output-format mp4 --socket-timeout 15 --retries 2 --fragment-retries 2 -o "clips/$key.%(ext)s" "$url" >>"evidence/$key-source.txt" 2>&1
             echo "download_exit=$?" >>"evidence/$key-source.txt"
             file="$(find clips -maxdepth 1 -type f -name "$key.*" ! -name '*.part' | head -n 1)"
             if [[ -z "$file" ]]; then continue; fi
@@ -49,6 +49,8 @@ jobs:
             ffmpeg -nostdin -v error -xerror -i "$file" -f null - >>"evidence/$key-source.txt" 2>&1
             echo "decode_exit=$?" >>"evidence/$key-source.txt"
             sha256sum "$file" >>"evidence/$key-source.txt"
+            # Record visual review metadata and reject non-driving/non-C8 frames manually.
+            echo "visual_review_status=REQUIRES_FRAME_INSPECTION" >>"evidence/$key-source.txt"
             mkdir -p "evidence/$key-frames"
             ffmpeg -nostdin -v error -y -i "$file" -vf 'fps=1/2,scale=420:-1' -frames:v 3 "evidence/$key-frames/frame_%02d.jpg" 2>>"evidence/$key-source.txt"
             rm -f "$file"
