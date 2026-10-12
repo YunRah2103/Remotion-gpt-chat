@@ -206,8 +206,34 @@ poses = [
     ((-3.0,7.0,1.5),(-2.0,6.2,1.25),45),
     ((1.4,8.5,2.5),(0.5,8.2,2.2),48),
     ((0.9,-7.8,1.15),(-0.2,-7.5,1.05),48),
-    ((-3.6,2.8,1.0),(-3.2,-2.9,0.95),28),
+    ((-4.2,3.2,0.8),(-3.7,-2.9,0.85),28),
 ]
+
+# Fit each problematic orbit once for its widest silhouette, not at every frame.
+# Increasing distance mid-orbit made the old threshold fitter jump visibly.
+def calibrate_framing(index):
+    a,b,lens = poses[index]
+    pos = root.location.copy()
+    target = pos+Vector((0,-0.1,0.70))
+    factor = 1.0
+    cam.data.lens = lens
+    cam.data.sensor_fit = 'HORIZONTAL' if index == 9 else 'AUTO'
+    for step in range(121):
+        rel = Vector(a).lerp(Vector(b),step/120)
+        for attempt in range(32):
+            cam.location = target+(pos+rel-target)*factor
+            cam.rotation_euler = (target-cam.location).to_track_quat('-Z','Y').to_euler()
+            bpy.context.view_layer.update()
+            points = [world_to_camera_view(s,cam,pos+v) for v in static_bounds]
+            if all(0.065 < v.x < 0.935 and 0.13 < v.y < 0.87 and v.z > 0 for v in points):
+                break
+            ratio = max(max(abs(v.x-0.5)/0.435,abs(v.y-0.5)/0.37) for v in points)
+            factor *= max(ratio,1.005)*1.005
+        else:
+            raise RuntimeError('Unable to safely calibrate orbit '+str(index))
+    print('FIXED_FRAMING',index,factor,flush=True)
+    return factor*1.005
+framing_factors = {i:calibrate_framing(i) for i in [8,9]}
 
 def frame_state(f, apply_render=True):
     # The viewport and first cinematic shot share one camera path, then beat-cut shots.
@@ -226,16 +252,21 @@ def frame_state(f, apply_render=True):
     target = pos+Vector((0,-0.1,0.70))
     cam.rotation_euler = (target-cam.location).to_track_quat('-Z','Y').to_euler()
     cam.data.lens = lens
+    cam.data.sensor_fit = 'HORIZONTAL' if idx == 9 else 'AUTO'
     # Frame the complete approved silhouette in portrait, including the rear wing.
     bpy.context.view_layer.update()
     bounds = [pos+v for v in static_bounds]
-    for attempt in range(8):
-        screen = [world_to_camera_view(s,cam,v) for v in bounds]
-        if all(0.055 < v.x < 0.945 and 0.12 < v.y < 0.88 and v.z > 0 for v in screen):
-            break
-        factor = max(max(abs(v.x-0.5)/0.445,abs(v.y-0.5)/0.38) for v in screen)*1.01
-        cam.location = target + (cam.location-target)*max(factor,1.01)
+    if idx in framing_factors:
+        cam.location = target+(cam.location-target)*framing_factors[idx]
         bpy.context.view_layer.update()
+    else:
+        for attempt in range(8):
+            screen = [world_to_camera_view(s,cam,v) for v in bounds]
+            if all(0.055 < v.x < 0.945 and 0.12 < v.y < 0.88 and v.z > 0 for v in screen):
+                break
+            factor = max(max(abs(v.x-0.5)/0.445,abs(v.y-0.5)/0.38) for v in screen)*1.01
+            cam.location = target + (cam.location-target)*max(factor,1.01)
+            bpy.context.view_layer.update()
     for l,offset in [(fill,(-4,-3,7)),(rim,(5,2,5))]:
         l.location = pos+Vector(offset)
         l.rotation_euler = (target-l.location).to_track_quat('-Z','Y').to_euler()
