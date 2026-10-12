@@ -30,7 +30,7 @@ jobs:
           python -m pip install -q --upgrade yt-dlp requests curl_cffi
           ffprobe -version | head -n 1
           ffmpeg -version | head -n 1
-      - name: Acquire C8 creator candidates using bounded fallbacks
+      - name: Acquire C8 Dailymotion creator/benchmark clips (technical QA only)
         shell: bash
         env:
           APPROVED_URL: ${{ inputs.approved_url }}
@@ -39,10 +39,9 @@ jobs:
           set -uo pipefail
           mkdir -p reports staging deliver
           declare -a entries=(
-            "2n2|https://vimeo.com/803836362"
-            "FumeStudio|https://vimeo.com/761014676"
-            "NightShip|https://vimeo.com/712787364"
-            "PixabayRS6Candidate|https://pixabay.com/videos/audi-rs6-audi-exhaust-sound-126186/"
+            "DMcreatorExoticCarspotters|https://www.dailymotion.com/video/x9zt11g"
+            "DMc8DaytonaDriving|https://www.dailymotion.com/video/x7op6zd"
+            "DMc8GTDriving|https://www.dailymotion.com/video/x95q1ti"
           )
           if [[ -n "${APPROVED_URL:-}" ]]; then
             if [[ ! "${APPROVED_URL}" =~ ^https:// ]]; then echo "Approved URL must be HTTPS" >&2; exit 2; fi
@@ -59,7 +58,7 @@ jobs:
             for fmt in 'bestvideo[height>=1080]+bestaudio/best[height>=1080]' 'bv*+ba/best'; do
               yt-dlp --ignore-config --no-playlist --download-sections '*0-8' --force-keyframes-at-cuts --merge-output-format mp4 --format "$fmt" --socket-timeout 15 --retries 2 --fragment-retries 2 --output "staging/$name.%(ext)s" "$url" >> "reports/$name.txt" 2>&1 && break
             done
-            # Different acquisition route: Vimeo public embed/config progressive or Pixabay direct mp4.
+            # Fallback helper supports public embed/progressive when relevant; not permission to redistribute.
             # Do not assume that access to video implies permission to redistribute it.
             if ! find staging -maxdepth 1 -name "$name.*" -type f | grep -q .; then
               python production/videos/rs6-no-mercy-001/agent_b_direct_media_fallback.py "$name" "$url" "staging/$name.mp4" >>"reports/$name.txt" 2>&1 || :
