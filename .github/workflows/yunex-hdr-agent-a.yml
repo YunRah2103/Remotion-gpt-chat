@@ -1,0 +1,54 @@
+name: YUNEX HDR Cinematic 001 - Agent A original footage
+on:
+  push:
+    branches:
+      - automotive-edits/yunex-hdr-cinematic-001/a-hdr-footage
+    paths:
+      - production/videos/yunex-hdr-cinematic-001/agent-a/**
+      - .github/workflows/yunex-hdr-agent-a.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquire-probe-and-deliver:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 85
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install genuine-media verification tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg mediainfo
+          python -m pip install Pillow
+          ffprobe -version | head -1
+          mediainfo --Version | head -2
+      - name: Acquire official Falken 4K HDR and verify 10-bit actual decoded frames
+        id: acquire
+        continue-on-error: true
+        env:
+          HDR_OUT: out/yunex-hdr-cinematic-001
+        run: |
+          python production/videos/yunex-hdr-cinematic-001/agent-a/acquire_falken_hdr.py
+      - name: Surface source QA decision
+        if: always()
+        run: |
+          cat out/yunex-hdr-cinematic-001/quality-report.json || true
+          ls -lh out/yunex-hdr-cinematic-001/ || true
+          du -h out/YUNEX-HDR-AGENT-A-original-and-QA.zip || true
+      - name: Upload single ZIP of verified original, phone sample, and independent reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-HDR-001-AGENT-A-original-and-QA
+          path: out/YUNEX-HDR-AGENT-A-original-and-QA.zip
+          retention-days: 5
+          compression-level: 0
+          if-no-files-found: warn
+      - name: Fail run if original HDR proof did not pass
+        if: always()
+        env:
+          RESULT: ${{ steps.acquire.outcome }}
+        run: test "$RESULT" = success
