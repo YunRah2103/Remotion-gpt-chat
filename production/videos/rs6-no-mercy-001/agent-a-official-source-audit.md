@@ -32,3 +32,11 @@ Once permission exists: secure direct authorized MP4, download to an appropriate
 - Discovered Auditography 2026 C8 RS6 performance film (original creator): https://www.youtube.com/watch?v=8l9D4aS0IIs (published 5 Jan 2026). Strong original lead, but publisher rights and download unverified.
 - Secondary original manufacturer-associated source: RaceChip 2020/2021 C8 RS6 filming: https://press.racechip.co.uk/2020_audi-rs6-avant/ (film link embedded; download unverified).
 - No playable video acquired. No source MP4 SHA/FFprobe/contact sheets can honestly be provided.
+
+## Verified source download (second execution environment, 12 Oct 2026)
+- Original official website extracted playable `<video><source src>`: `https://audi-mediacenter.pl/data/filmy/48075/o/7405893_content_1280x720_play.mp4`.
+- HTTP byte-range probe: `206 Partial Content`, type `video/mp4`, server total `72,820,901` bytes. First bytes valid ISO BMFF ftyp (isom/iso2/avc1/mp41).
+- Whole file transferred successfully via HTTPS to transient isolated compute (`/tmp/audi_rs6_official_preview.mp4`), `72,820,901` bytes exactly, SHA256 `b3b69741e3d60d6bc680cd870b558975a77734cb95ddaf4cfc9a0d79c69a513b`.
+- MP4 atoms `ftyp`, `moov` and `mdat` detected. **This confirms downloaded MP4 bytes, not full playback validation.** ffprobe/decoded moving-frame visual QA unavailable in that transient environment (ffmpeg/ffprobe executables absent). Source URI labels 1280x720 preview; no verified original-resolution claim.
+- Licensing: Audi press page says journalistic uses only. **Do not copy file into public GitHub releases or republish as a cleared YUNEX clip without Audi's permission.**
+- This first technical download is **not an Actions ZIP or completed Agent A handoff.** Original source link is playable remotely; transient VM file not persisted in ChatGPT artifact store.
