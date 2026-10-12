@@ -1,4 +1,4 @@
-name: YUNEX ONE Pexels 4K car video
+name: YUNEX ONE vertical 4K black car video
 on:
   push:
     branches:
@@ -22,7 +22,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
           python -m pip install Pillow
-      - name: Download and fully decode ONE 4070x2160 moving night supercar film
+      - name: Download and fully decode ONE 2160x3840 cinematic black-car film
         id: acquisition
         continue-on-error: true
         run: python production/videos/yunex-hdr-cinematic-001/agent-a/acquire_one_4k_supercar.py
