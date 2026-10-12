@@ -1,0 +1,37 @@
+name: YUNEX B IndyCar Alternate Camera Verification
+on:
+  push:
+    branches:
+      - automotive-edits/turbo-indy-reality-001/b-indy-matches
+    paths:
+      - production/videos/turbo-indy-reality-001/agent_b_freedom250_probes.py
+      - .github/workflows/yunex-agent-b-freedom250-probe.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  decode-and-inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install media QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check -U yt-dlp pillow
+      - name: Actually fetch videos, reject sub-HD and generate decoded frame contacts
+        run: |
+          set -euo pipefail
+          python -u production/videos/turbo-indy-reality-001/agent_b_freedom250_probes.py
+      - name: Attach contact-sheet research evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-Agent-B-Freedom250-camera-probes-${{ github.run_id }}
+          path: out/YUNEX_AGENT_B_FREEDOM250_PROBE.zip
+          retention-days: 7
+          if-no-files-found: warn
