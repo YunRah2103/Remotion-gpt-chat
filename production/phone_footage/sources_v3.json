@@ -1,0 +1,22 @@
+{
+  "https://www.youtube.com/watch?v=YE7VzlLtp-4": {
+    "title": "Big Buck Bunny",
+    "author": "Blender Foundation",
+    "license": "CC-BY-3.0",
+    "source": "https://www.youtube.com/watch?v=YE7VzlLtp-4",
+    "license_reference": "https://peach.blender.org/",
+    "max_height": 720,
+    "reviewed_by": "YunRah2103",
+    "approved": true
+  },
+  "https://www.youtube.com/watch?v=DqiKOr1aS9w": {
+    "title": "Aerial views of a car driving in snow through a forest",
+    "author": "Vladislav Sanikovich",
+    "license": "CC-BY-3.0",
+    "source": "https://www.youtube.com/watch?v=DqiKOr1aS9w",
+    "license_reference": "https://commons.wikimedia.org/wiki/File:Aerial_views_of_a_car_driving_in_snow_through_a_forest.webm",
+    "max_height": 1080,
+    "reviewed_by": "YunRah2103",
+    "approved": true
+  }
+}
