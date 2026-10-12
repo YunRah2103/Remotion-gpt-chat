@@ -10,7 +10,7 @@
   "sourceArtifactId": 11713925779,
   "sourceArchiveSHA256": "46073d50fb4efe246b3e7ee1adee1601eec025a3aa2a07df45f038731218c533",
   "originalSoundtrackSHA256": "2334fc7c70a4320faf1b137b97ec9e2899ed325e01cc1fb954733a21d802ec55",
-  "musicStatus": "UNAVAILABLE IN THIS CHAT — DO NOT CLAIM LYRIC SYNC. Visual timeline provisional until exact M4A provided.",
+  "musicStatus": "Verified ORIGINAL user M4A exact SHA, 60.000s stereo AAC 44.1k. Musical RMS energy-trough markers measured; not claim of decoded lyrics. Agent D owns final original-audio mux.",
   "rightsStatus": "Publisher/creator re-use permissions must be confirmed before publishing.",
   "aspectNotes": "Landscape native first. Two original landscape Peugeot 205 sources replace rejected portrait-upscales; do not use 1080x1920 cropped 205 files in 16:9.",
   "shots": [
@@ -27,7 +27,9 @@
       "enterDissolveFrames": 0,
       "exitDissolveFrames": 6,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "6-frame restrained cross-dissolve"
+      "transitionOut": "6-frame restrained cross-dissolve",
+      "cinematicCropScale": 1,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 2,
@@ -42,7 +44,9 @@
       "enterDissolveFrames": 6,
       "exitDissolveFrames": 0,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "clean motion-led cut"
+      "transitionOut": "clean motion-led cut",
+      "cinematicCropScale": 1,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 3,
@@ -57,7 +61,9 @@
       "enterDissolveFrames": 0,
       "exitDissolveFrames": 0,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "clean motion-led cut"
+      "transitionOut": "clean motion-led cut",
+      "cinematicCropScale": 1,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 4,
@@ -72,7 +78,9 @@
       "enterDissolveFrames": 0,
       "exitDissolveFrames": 6,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "6-frame restrained cross-dissolve"
+      "transitionOut": "6-frame restrained cross-dissolve",
+      "cinematicCropScale": 1,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 5,
@@ -87,7 +95,9 @@
       "enterDissolveFrames": 6,
       "exitDissolveFrames": 0,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "clean motion-led cut"
+      "transitionOut": "clean motion-led cut",
+      "cinematicCropScale": 1,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 6,
@@ -102,7 +112,9 @@
       "enterDissolveFrames": 0,
       "exitDissolveFrames": 0,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "clean motion-led cut"
+      "transitionOut": "clean motion-led cut",
+      "cinematicCropScale": 1,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 7,
@@ -117,7 +129,9 @@
       "enterDissolveFrames": 0,
       "exitDissolveFrames": 0,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "clean motion-led cut"
+      "transitionOut": "clean motion-led cut",
+      "cinematicCropScale": 1,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 8,
@@ -132,7 +146,9 @@
       "enterDissolveFrames": 0,
       "exitDissolveFrames": 6,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "6-frame restrained cross-dissolve"
+      "transitionOut": "6-frame restrained cross-dissolve",
+      "cinematicCropScale": 1,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 9,
@@ -141,13 +157,15 @@
       "model": "Renault 5 Turbo 2",
       "era": "heritage",
       "masterStartFrame": 402,
-      "masterEndFrame": 525,
+      "masterEndFrame": 533,
       "sourceInSeconds": 1.1,
-      "durationFrames": 123,
+      "durationFrames": 131,
       "enterDissolveFrames": 6,
       "exitDissolveFrames": 0,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "clean motion-led cut"
+      "transitionOut": "clean motion-led cut",
+      "cinematicCropScale": 1,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 10,
@@ -155,14 +173,16 @@
       "sourcePath": "Agent_A_Classics/originals/peugeot-205-gti-front-205-oncoming-source-1920x1080.mp4",
       "model": "Peugeot 205 GTI 1.9",
       "era": "heritage",
-      "masterStartFrame": 525,
+      "masterStartFrame": 533,
       "masterEndFrame": 615,
       "sourceInSeconds": 0.7,
-      "durationFrames": 90,
+      "durationFrames": 82,
       "enterDissolveFrames": 0,
       "exitDissolveFrames": 0,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "clean motion-led cut"
+      "transitionOut": "clean motion-led cut",
+      "cinematicCropScale": 1,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 11,
@@ -177,7 +197,9 @@
       "enterDissolveFrames": 0,
       "exitDissolveFrames": 6,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "6-frame restrained cross-dissolve"
+      "transitionOut": "6-frame restrained cross-dissolve",
+      "cinematicCropScale": 1,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 12,
@@ -192,7 +214,9 @@
       "enterDissolveFrames": 6,
       "exitDissolveFrames": 0,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "clean motion-led cut"
+      "transitionOut": "clean motion-led cut",
+      "cinematicCropScale": 1.19,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 13,
@@ -207,7 +231,9 @@
       "enterDissolveFrames": 0,
       "exitDissolveFrames": 0,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "clean motion-led cut"
+      "transitionOut": "clean motion-led cut",
+      "cinematicCropScale": 1,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 14,
@@ -222,7 +248,9 @@
       "enterDissolveFrames": 0,
       "exitDissolveFrames": 0,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "clean motion-led cut"
+      "transitionOut": "clean motion-led cut",
+      "cinematicCropScale": 1,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 15,
@@ -237,7 +265,9 @@
       "enterDissolveFrames": 0,
       "exitDissolveFrames": 0,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "clean motion-led cut"
+      "transitionOut": "clean motion-led cut",
+      "cinematicCropScale": 1,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 16,
@@ -252,7 +282,9 @@
       "enterDissolveFrames": 0,
       "exitDissolveFrames": 6,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "6-frame restrained cross-dissolve"
+      "transitionOut": "6-frame restrained cross-dissolve",
+      "cinematicCropScale": 1,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 17,
@@ -261,13 +293,15 @@
       "model": "Alpine A110 R Ultime",
       "era": "modern",
       "masterStartFrame": 1143,
-      "masterEndFrame": 1248,
+      "masterEndFrame": 1262,
       "sourceInSeconds": 1.2,
-      "durationFrames": 105,
+      "durationFrames": 119,
       "enterDissolveFrames": 6,
       "exitDissolveFrames": 0,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "clean motion-led cut"
+      "transitionOut": "clean motion-led cut",
+      "cinematicCropScale": 1,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 18,
@@ -275,14 +309,16 @@
       "sourcePath": "Agent_B_Modern/clips/bugatti-chiron-hajar-aerial.mp4",
       "model": "Bugatti Chiron",
       "era": "hypercar",
-      "masterStartFrame": 1248,
+      "masterStartFrame": 1262,
       "masterEndFrame": 1353,
       "sourceInSeconds": 0.25,
-      "durationFrames": 105,
+      "durationFrames": 91,
       "enterDissolveFrames": 0,
       "exitDissolveFrames": 0,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "clean motion-led cut"
+      "transitionOut": "clean motion-led cut",
+      "cinematicCropScale": 1.25,
+      "cinematicFocusXPercent": 52
     },
     {
       "shot": 19,
@@ -297,22 +333,26 @@
       "enterDissolveFrames": 0,
       "exitDissolveFrames": 0,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "clean motion-led cut"
+      "transitionOut": "clean motion-led cut",
+      "cinematicCropScale": 1.25,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 20,
-      "sourceId": "C35",
-      "sourcePath": "Agent_B_Modern/clips/bugatti-chiron-california-hero.mp4",
-      "model": "Bugatti Chiron Pur Sport",
+      "sourceId": "C34",
+      "sourcePath": "Agent_B_Modern/clips/bugatti-chiron-bilster-rear-track.mp4",
+      "model": "Bugatti Chiron",
       "era": "hypercar",
       "masterStartFrame": 1458,
-      "masterEndFrame": 1563,
+      "masterEndFrame": 1573,
       "sourceInSeconds": 0.3,
-      "durationFrames": 105,
+      "durationFrames": 115,
       "enterDissolveFrames": 0,
       "exitDissolveFrames": 6,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "6-frame restrained cross-dissolve"
+      "transitionOut": "6-frame restrained cross-dissolve",
+      "cinematicCropScale": 1,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 21,
@@ -320,14 +360,16 @@
       "sourcePath": "Agent_B_Modern/clips/bugatti-bolide-cota-close-pass.mp4",
       "model": "Bugatti Bolide",
       "era": "hypercar",
-      "masterStartFrame": 1557,
+      "masterStartFrame": 1567,
       "masterEndFrame": 1632,
       "sourceInSeconds": 0.15,
-      "durationFrames": 75,
+      "durationFrames": 65,
       "enterDissolveFrames": 6,
       "exitDissolveFrames": 0,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "clean motion-led cut"
+      "transitionOut": "clean motion-led cut",
+      "cinematicCropScale": 1,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 22,
@@ -342,22 +384,62 @@
       "enterDissolveFrames": 0,
       "exitDissolveFrames": 0,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "clean motion-led cut"
+      "transitionOut": "clean motion-led cut",
+      "cinematicCropScale": 1,
+      "cinematicFocusXPercent": 50
     },
     {
       "shot": 23,
-      "sourceId": "C32",
-      "sourcePath": "Agent_B_Modern/clips/bugatti-bolide-paul-ricard-rear-track.mp4",
-      "model": "Bugatti Bolide",
+      "sourceId": "C39",
+      "sourcePath": "Agent_B_Modern/clips/bugatti-chiron-hajar-rear.mp4",
+      "model": "Bugatti Chiron — golden mountain-road finale",
       "era": "hypercar",
       "masterStartFrame": 1725,
       "masterEndFrame": 1800,
-      "sourceInSeconds": 0.2,
+      "sourceInSeconds": 1.2,
       "durationFrames": 75,
       "enterDissolveFrames": 0,
       "exitDissolveFrames": 0,
       "musicPhraseBoundarySeconds": null,
-      "transitionOut": "clean motion-led cut"
+      "transitionOut": "clean motion-led cut",
+      "cinematicCropScale": 1.25,
+      "cinematicFocusXPercent": 54
     }
+  ],
+  "musicDynamicsAnalysis": {
+    "method": "Mono 22.05kHz decoded song, ~50ms RMS windows, 11-window Savitzky-Golay smoothing, RMS trough prominence >=0.13. Energy dips are plausible rhythmic or vocal breathing points, NOT transcribed French phrase endings.",
+    "verifiedAudioSHA256": "2334fc7c70a4320faf1b137b97ec9e2899ed325e01cc1fb954733a21d802ec55",
+    "durationSeconds": 60,
+    "channelLayout": "stereo",
+    "originalSampleRateHz": 44100,
+    "cues": [
+      {
+        "seconds": 17.767,
+        "frame": 533,
+        "edit": "original Renault 5 Turbo 2 to Peugeot 205 GTI"
+      },
+      {
+        "seconds": 23.314,
+        "frame": 699,
+        "edit": "classic Peugeot into modern Alpine; retained near pre-existing cut"
+      },
+      {
+        "seconds": 42.056,
+        "frame": 1262,
+        "edit": "modern Alpine into first Bugatti Chiron golden scene"
+      },
+      {
+        "seconds": 52.251,
+        "frame": 1567,
+        "edit": "Chiron into short Bugatti Bolide chapter"
+      }
+    ]
+  },
+  "editorialRevisionNotes": [
+    "Changed source 20 from smoky Chiron California to clear Chiron Bilster rear-track rolling.",
+    "Changed final 2.5s source from Bolide circuit to Chiron golden-hour mountain-road rear, restoring elegance.",
+    "Apply modest optical crop to baked-in black-bar Alpine orange and Hajar Chiron footage; inspect final frame quality.",
+    "Preserve no fake 9:16/4K source claims; original song stays external to public repo.",
+    "Three key model switches aligned within a frame of measured soundtrack energy troughs. French lyric boundaries remain untranscribed."
   ]
 }
