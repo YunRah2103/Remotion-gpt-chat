@@ -10,6 +10,8 @@ import bpy
 import numpy as np  # Fail early if the Blender GLB import dependency is missing.
 from bpy_extras.object_utils import world_to_camera_view
 from mathutils import Vector
+sys.path.insert(0, str(Path(__file__).parent))
+from wheel_motion import prepare_wheels, set_wheel_distance
 
 args = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
 ap = argparse.ArgumentParser()
@@ -37,15 +39,17 @@ s.render.engine = 'CYCLES'
 s.cycles.samples = opt.samples
 s.cycles.use_denoising = True
 s.cycles.adaptive_threshold = 0.04
-s.cycles.adaptive_min_samples = 8
+s.cycles.adaptive_min_samples = 16
 s.cycles.max_bounces = 6
 s.cycles.diffuse_bounces = 2
-s.cycles.glossy_bounces = 3
+s.cycles.glossy_bounces = 4
+s.cycles.volume_bounces = 0
+s.cycles.volume_step_rate = 2.0
 s.cycles.transmission_bounces = 4
 s.cycles.transparent_max_bounces = 4
 s.cycles.sample_clamp_indirect = 3
 s.render.threads_mode = 'FIXED'
-s.render.threads = 4
+s.render.threads = 8
 s.view_settings.view_transform = 'AgX'
 s.view_settings.look = 'AgX - Medium High Contrast'
 s.view_settings.exposure = 0.1
@@ -90,19 +94,6 @@ def material(name, color, rough=0.6, noise=False, scale=10, bump=0.08):
         nt.links.new(bn.outputs[0], p.inputs['Normal'])
     return m
 
-asphalt = material('fine aggregate / dark damp asphalt', (0.036, 0.044, 0.048), 0.34, True, 95, 0.3)
-paint = material('weathered ivory road markings', (0.65, 0.65, 0.54), 0.48, True, 70, 0.1)
-earth = material('forest verge and moss', (0.047, 0.065, 0.026), 0.95, True, 3)
-bark = material('textured bark', (0.085, 0.055, 0.027), 0.92, True, 9, 0.65)
-leaves = [material('leaf canopy '+str(i), c, 0.8) for i, c in enumerate([
-    (0.026, 0.067, 0.022), (0.062, 0.105, 0.036), (0.13, 0.15, 0.047)])]
-for m in leaves:
-    p = m.node_tree.nodes.get('Principled BSDF')
-    p.inputs['Subsurface Weight'].default_value = 0.08
-    p.inputs['Subsurface Radius'].default_value = (0.3, 0.5, 0.2)
-metal = material('guardrail brushed galvanized steel', (0.3, 0.34, 0.37), 0.4)
-metal.node_tree.nodes.get('Principled BSDF').inputs['Metallic'].default_value = 0.7
-
 def box(name, loc, scale, mat):
     mesh = bpy.data.meshes.new(name)
     mesh.from_pydata([(-0.5,-0.5,-0.5),(0.5,-0.5,-0.5),(0.5,0.5,-0.5),(-0.5,0.5,-0.5),
@@ -131,88 +122,8 @@ def cylinder(name, a, b, radius, mat, vertices=8):
     o.data.materials.append(mat)
     return o
 
-box('ROAD / 720 metres', (0,-160,-0.085), (8,720,0.15), asphalt)
-box('forest floor', (0,-160,-0.15), (150,720,0.18), earth)
-for x in [-3.65, 3.65]:
-    box('continuous road edge', (x,-160,0.005), (0.085,720,0.007), paint)
-for y in range(-500,201,8):
-    box('broken centre line', (0,y,0.009), (0.095,3.1,0.007), paint)
-for x in [-4.5,4.5]:
-    for y in range(-490,201,20):
-        box('roadside delineator', (x,y,0.4), (0.085,0.1,0.8), paint)
-
-# Leaf clusters use thousands of actual small bent leaf polygons; linked meshes preserve memory.
-cluster_meshes = []
-viewport_meshes = []
-for k in range(3):
-    verts, faces = [], []
-    for i in range(380):
-        v = Vector((rng.uniform(-1,1),rng.uniform(-1,1),rng.uniform(-0.8,0.8)))
-        if v.length > 1:
-            v.normalize()
-            v *= rng.uniform(0.2, 1)
-        n = Vector((rng.uniform(-1,1),rng.uniform(-1,1),rng.uniform(-1,1))).normalized()
-        a = n.cross(Vector((0,0,1)))
-        if a.length < 0.01:
-            a = Vector((1,0,0))
-        a.normalize()
-        b = n.cross(a).normalized()
-        length = rng.uniform(0.07,0.16)
-        width = length * rng.uniform(0.35,0.55)
-        base = len(verts)
-        verts += [tuple(v-a*length), tuple(v+b*width), tuple(v+a*length), tuple(v-b*width), tuple(v+n*length*0.16)]
-        faces += [(base,base+1,base+4),(base+1,base+2,base+4),(base+2,base+3,base+4),(base+3,base,base+4)]
-    mesh = bpy.data.meshes.new('botanical leaf cluster '+str(k))
-    mesh.from_pydata(verts,[],faces)
-    mesh.materials.append(leaves[k])
-    cluster_meshes.append(mesh)
-    # Editing-view foliage LOD: real leaf triangles, with the complete canonical car retained.
-    pv, pf = [], []
-    for leaf in range(0,380,12):
-        start = len(pv)
-        pv.extend(verts[leaf*5:leaf*5+5])
-        pf.extend([(start,start+1,start+4),(start+1,start+2,start+4),(start+2,start+3,start+4),(start+3,start,start+4)])
-    proxy = bpy.data.meshes.new('viewport leaf cluster '+str(k))
-    proxy.from_pydata(pv,[],pf)
-    proxy.materials.append(leaves[k])
-    viewport_meshes.append(proxy)
-
-for side in [-1,1]:
-    for i in range(210):
-        y = -320 + i*2.65 + rng.uniform(-1,1)
-        x = side*rng.uniform(6.5,22)
-        h = rng.uniform(7.5,15)
-        r = rng.uniform(0.13,0.27)
-        cylinder('tree trunk', (x,y,0), (x+0.18,y,h*0.75), r, bark)
-        for j in range(5):
-            angle = j*math.tau/5 + rng.uniform(-0.3,0.3)
-            bx, by = x+math.cos(angle)*2, y+math.sin(angle)*2
-            z = h*rng.uniform(0.55,0.8)
-            cylinder('tree branch', (x,y,z-1.8), (bx,by,z), r*0.36, bark, 6)
-            for n in range(2):
-                mesh = cluster_meshes[rng.randrange(3)]
-                o = bpy.data.objects.new('layered leaf crown',mesh)
-                s.collection.objects.link(o)
-                o.location = (bx+rng.uniform(-0.7,0.7),by+rng.uniform(-0.7,0.7),z+n*1.3)
-                size = rng.uniform(1.5,2.5)
-                o.scale = (size,size,size*0.85)
-                o.rotation_euler = (rng.random(),rng.random(),rng.random()*6)
-        if i % 2 == 0:
-            o = bpy.data.objects.new('understory fern canopy', cluster_meshes[i%3])
-            s.collection.objects.link(o)
-            o.location = (side*rng.uniform(10,14),y,0.4)
-            o.scale = (0.8,0.8,0.8)
-
-# Layered undergrowth closes the artificial empty horizon behind the hero trees.
-for side in [-1,1]:
-    for y in range(-360,261,3):
-        for layer in range(2):
-            o = bpy.data.objects.new('deep forest undergrowth',cluster_meshes[rng.randrange(2)])
-            s.collection.objects.link(o)
-            o.location = (side*(23+layer*4+rng.uniform(-1,1)),y+rng.uniform(-1,1),rng.uniform(1.1,2.6))
-            size = rng.uniform(1.7,2.7)
-            o.scale = (size,size,size)
-            o.rotation_euler = (rng.random(),rng.random(),rng.random()*6)
+from rain_environment import build_environment
+update_weather = build_environment(s, material, box, cylinder)
 
 bpy.ops.import_scene.gltf(filepath=str(Path(opt.model).resolve()))
 root = bpy.data.objects.get('YUNEX_Porsche_911_GT3_RS_992')
@@ -231,14 +142,17 @@ for o in spin:
     local_rotation = o.matrix_basis.to_euler('XYZ')
     o.rotation_mode = 'XYZ'
     o.rotation_euler = local_rotation
-base_rotations = [o.rotation_euler.copy() for o in spin]
+wheel_specs = prepare_wheels()
+static_bounds = [o.matrix_world @ Vector(v) for o in car_objs if o.type == 'MESH'
+                 and not o.name.startswith('Wheel_') for v in o.bound_box]
+static_bounds = [v-root.location for v in static_bounds]
 
 sun = bpy.data.objects.new('sun',bpy.data.lights.new('sun','SUN'))
 s.collection.objects.link(sun)
 sun.location = (10,-20,16)
 sun.name = 'late afternoon filtered sunlight'
 sun.rotation_euler = (math.radians(57),math.radians(-17),math.radians(-35))
-sun.data.energy = 1.35
+sun.data.energy = 0.06
 sun.data.angle = math.radians(8)
 sun.data.color = (0.92,0.96,1)
 
@@ -251,8 +165,8 @@ def area(name, loc, energy, size, color):
     l.data.size = size
     l.data.color = color
     return l
-fill = area('open sky soft fill', (-4,-3,7), 1000, 9, (0.74,0.85,1))
-rim = area('forest clearing soft edge', (5,2,5), 700, 7, (0.92,0.96,1))
+fill = area('rain sky hero softbox', (-4,-3,7), 1900, 9, (0.64,0.78,1))
+rim = area('warm reflected hero edge', (5,2,5), 1800, 7, (1,0.72,0.43))
 
 cam = bpy.data.objects.new('camera',bpy.data.cameras.new('camera'))
 s.collection.objects.link(cam)
@@ -281,11 +195,7 @@ poses = [
     ((-5.4,3.3,1.4),(-4.6,-2.2,1.1),43),
 ]
 
-foliage_objects = [(o,cluster_meshes.index(o.data)) for o in s.objects if o.type=='MESH' and o.data in cluster_meshes]
-foliage_mode = None
-
 def frame_state(f, apply_render=True):
-    global foliage_mode
     # The viewport and first cinematic shot share one camera path, then beat-cut shots.
     idx = next(i for i in range(len(cuts)-1) if cuts[i] <= f < cuts[i+1])
     lo, hi = cuts[idx], cuts[idx+1]
@@ -296,9 +206,7 @@ def frame_state(f, apply_render=True):
     rel = Vector(a).lerp(Vector(b),t)
     pos = Vector((-1.75,-f/30*12.5,0))
     root.location = pos
-    for o,r in zip(spin,base_rotations):
-        o.rotation_euler = r.copy()
-        o.rotation_euler.x += f/30*12.5/0.36
+    set_wheel_distance(wheel_specs, f/30*12.5)
     focus.location = pos+Vector((0,0,0.67))
     cam.location = pos+rel
     target = pos+Vector((0,-0.1,0.70))
@@ -306,7 +214,7 @@ def frame_state(f, apply_render=True):
     cam.data.lens = lens
     # Frame the complete approved silhouette in portrait, including the rear wing.
     bpy.context.view_layer.update()
-    bounds = [o.matrix_world @ Vector(v) for o in car_objs if o.type == 'MESH' for v in o.bound_box]
+    bounds = [pos+v for v in static_bounds]
     for attempt in range(8):
         screen = [world_to_camera_view(s,cam,v) for v in bounds]
         if all(0.055 < v.x < 0.945 and 0.12 < v.y < 0.88 and v.z > 0 for v in screen):
@@ -320,10 +228,7 @@ def frame_state(f, apply_render=True):
     if not apply_render:
         return
     editing = f < 214
-    if foliage_mode != editing:
-        for o,index in foliage_objects:
-            o.data = viewport_meshes[index] if editing else cluster_meshes[index]
-        foliage_mode = editing
+    update_weather(f, pos, editing)
     cam.data.dof.use_dof = not editing
     s.render.engine = 'BLENDER_WORKBENCH' if editing else 'CYCLES'
     s.display.shading.light = 'STUDIO'
@@ -340,9 +245,9 @@ def frame_state(f, apply_render=True):
     s.world.color = (0.065,0.065,0.065)
     s.view_settings.view_transform = 'Standard' if f < 214 else 'AgX'
     s.view_settings.look = 'None' if f < 214 else 'AgX - Medium High Contrast'
-    s.view_settings.exposure = 0 if f < 214 else 0.1
+    s.view_settings.exposure = 0 if f < 214 else 0.6
     s.render.use_motion_blur = f >= 214 and not any(abs(f-c) <= 1 for c in cuts if c != 214)
-    s.render.motion_blur_shutter = 0.3
+    s.render.motion_blur_shutter = 0.5
     bpy.context.view_layer.update()
 
 if ':' in opt.frames:
