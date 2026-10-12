@@ -7,6 +7,9 @@ RAW=BASE/"raw"; QA=BASE/"qa"; CLIPS=BASE/"clips"
 for d in [RAW,QA,CLIPS]: d.mkdir(parents=True,exist_ok=True)
 report={"role":"A - Turbo 2013 film","status":"NOT_VERIFIED","sources":[],"clips":[],"rights":"Copyright DreamWorks/Universal. Public accessibility does not establish editing/republication permission.","generated":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime())}
 sources=[
+("2013_trailer_three_dailymotion","https://www.dailymotion.com/video/x11ptp8","Original 2013 official trailer republished by Fan Reviews, rights unconfirmed"),
+("2013_trailer_two_dailymotion","https://www.dailymotion.com/video/xydniw","Original 2013 official trailer republished by Fan Reviews, rights unconfirmed"),
+("2013_trailer_french_dailymotion","https://www.dailymotion.com/video/x8ptei9","Original 2013 French trailer uploaded by Telerama, rights unconfirmed"),
 ("official_clip_race_finish","https://www.rottentomatoes.com/m/turbo_2013/videos/831UUTZ5GK0n","Rotten Tomatoes official movie excerpt"),
 ("official_clip_great_snail_race","https://www.rottentomatoes.com/m/turbo_2013/videos/zrxI5DBxDU1L","Rotten Tomatoes official movie excerpt"),
 ("official_clip_fast_furious","https://www.rottentomatoes.com/m/turbo_2013/videos/BwD_delQR9bs","Rotten Tomatoes official movie excerpt"),
