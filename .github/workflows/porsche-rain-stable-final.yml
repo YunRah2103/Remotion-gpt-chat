@@ -1,0 +1,120 @@
+name: Porsche Rain Cinematic - stable camera final
+on:
+  push:
+    branches: [automotive-edits/porsche-blender-reveal-001/rain-polish]
+    paths: ['.github/workflows/porsche-rain-stable-final.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        include:
+          - {part: 0, frames: '369:387', save: '--save'}
+          - {part: 1, frames: '388:406', save: ''}
+          - {part: 2, frames: '407:425', save: ''}
+          - {part: 3, frames: '426:444', save: ''}
+          - {part: 4, frames: '445:463', save: ''}
+          - {part: 5, frames: '464:478', save: ''}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - name: Install official native Blender
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg xvfb libxi6 libxrender1 libgl1 libxkbcommon0 libegl1 libegl-mesa0 libgles2 libgl1-mesa-dri libsm6 libxxf86vm1
+          curl -fLsS --retry 2 https://download.blender.org/release/Blender4.0/blender-4.0.2-linux-x64.tar.xz -o /tmp/blender.tar.xz
+          mkdir -p /tmp/blender
+          tar -xf /tmp/blender.tar.xz -C /tmp/blender --strip-components=1
+          mkdir -p /tmp/porsche out/frames
+          curl -fLsS --retry 2 https://raw.githubusercontent.com/YunRah2103/yunus-video-lab/main/cars/porsche-911-gt3-rs-992/model.glb -o /tmp/porsche/model.glb
+          echo '1c73fcb138c31e2b1d5ed126a2412074bb17f8e960b355436f28139bf518e1eb  /tmp/porsche/model.glb' | sha256sum -c -
+      - name: Verify corrected tyre roundness, hubs and axles
+        run: |
+          /tmp/blender/blender -b -t 4 --python-exit-code 1 --python production/videos/porsche-blender-reveal-001/wheel_qa.py -- /tmp/porsche/model.glb --correct > out/frames/wheel-qa-${{ matrix.part }}.log 2>&1
+      - name: Render actual rain, spray, wet road and reflections
+        env: {LIBGL_ALWAYS_SOFTWARE: '1'}
+        run: |
+          xvfb-run -a /tmp/blender/blender -b -t 4 --python-exit-code 1 --python production/videos/porsche-blender-reveal-001/scene.py -- --model /tmp/porsche/model.glb --out out/frames --frames '${{ matrix.frames }}' --samples 48 ${{ matrix.save }} > out/frames/render-${{ matrix.part }}.log 2>&1
+          echo '${{ github.sha }}' > out/frames/source-sha-${{ matrix.part }}.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: PORSCHE-RAIN-STABLE-FRAMES-${{ matrix.part }}
+          path: out/frames/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
+  finish:
+    needs: render
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg python3-pil fonts-dejavu-core
+      - name: Wait for original unaffected frames to finish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import json,os,time,urllib.request
+          url='https://api.github.com/repos/YunRah2103/Remotion-gpt-chat/actions/runs/38246191831'
+          for attempt in range(180):
+              req=urllib.request.Request(url,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(req) as response: data=json.load(response)
+              if data['status']=='completed':
+                  assert data['conclusion']=='success',data['conclusion']
+                  break
+              time.sleep(20)
+          else: raise RuntimeError('Original render did not finish within 60 minutes')
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 38246191831
+          github-token: ${{ github.token }}
+          pattern: PORSCHE-RAIN-FRAMES-*
+          path: out/original
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: PORSCHE-RAIN-STABLE-FRAMES-*
+          path: out/frames
+          merge-multiple: true
+      - name: Retain verified unaffected frames and corrected final two shots
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil,json
+          for f in range(369):
+              src=Path('out/original')/f'frame_{f:04d}.png'
+              assert src.is_file(),f
+              shutil.copy2(src,Path('out/frames')/src.name)
+          for f in range(369,479):
+              assert (Path('out/frames')/f'frame_{f:04d}.png').is_file(),f
+          Path('out/source-provenance.json').write_text(json.dumps({'unchanged_frames':[0,368],'unchanged_run':38246191831,'corrected_frames':[369,478],'camera_fix':'fixed shot-wide framing removes adaptive fit jumps'},indent=2))
+          PY
+      - name: Encode and verify exact original audio
+        run: |
+          python3 production/videos/porsche-blender-reveal-001/finish.py --frames out/frames --audio production/videos/porsche-blender-reveal-001/reference-audio.m4a --out out/final
+          mv out/final/YUNEX_PORSCHE_BLENDER_REVEAL_1080P.mp4 out/final/YUNEX_PORSCHE_RAIN_CINEMATIC_1080P.mp4
+          ffmpeg -v error -y -i out/final/YUNEX_PORSCHE_RAIN_CINEMATIC_1080P.mp4 -vf 'fps=1,scale=270:480,tile=4x4' -frames:v 1 out/final/contact.jpg
+          cp out/frames/source-sha-0.txt out/final/source-sha.txt
+          cp out/source-provenance.json out/final/source-provenance.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-PORSCHE-RAIN-STABLE-FINAL
+          path: out/final/
+          retention-days: 14
+          compression-level: 0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PORSCHE-RAIN-STABLE-EDITABLE-SCENE
+          path: out/frames/Porsche_Blender_Reveal.blend
+          retention-days: 14
+          compression-level: 1
