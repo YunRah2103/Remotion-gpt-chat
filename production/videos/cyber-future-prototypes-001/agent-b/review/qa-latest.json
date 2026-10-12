@@ -16,7 +16,7 @@
         "audio": true,
         "bytes": 495409751
       },
-      "candidate_count": 7
+      "candidate_count": 5
     },
     {
       "id": "bmw-vision-m-next-launch",
@@ -34,11 +34,16 @@
         "audio": true,
         "bytes": 269885922
       },
-      "candidate_count": 7
+      "candidate_count": 2
     }
   ],
-  "candidate_count": 14,
+  "candidate_count": 7,
   "rejections": [
+    {
+      "source_id": "mercedes-amg-gt-xx-embedded",
+      "url": "https://video.wixstatic.com/video/f84172_da8b552d8bad46f0be79ae4d992ac7de/1080p/mp4/file.mp4",
+      "error": "HTTP Error 403: Forbidden"
+    },
     {
       "source_id": "audi-concept-c-dynamic",
       "url": "https://www.mynewsdesk.com/dk/audi-danmark/videos/audi-concept-c-footage-dynamic-121552/download",
