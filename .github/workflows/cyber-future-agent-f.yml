@@ -1,0 +1,127 @@
+name: CYBER FUTURE 001 - Agent F audio and final QA
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/f-audio-render
+    paths:
+      - production/videos/cyber-future-prototypes-001/agent-f/**
+      - .github/workflows/cyber-future-agent-f.yml
+  workflow_dispatch:
+    inputs:
+      editor_run_id:
+        description: "GitHub Actions run with Agent E real film"
+        required: true
+        type: string
+      editor_artifact:
+        description: "Exact approved Agent E video artifact name"
+        required: true
+        type: string
+      audio_run_id:
+        description: "Actions run containing the ORIGINAL user MP3 or audio ZIP artifact"
+        required: true
+        type: string
+      audio_artifact:
+        description: "Exact original user audio-pack artifact name"
+        required: true
+        type: string
+permissions:
+  contents: read
+  actions: read
+jobs:
+  smoke-test:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check FFmpeg / Python script
+        run: |
+          ffmpeg -version | head -n 2
+          python3 -m py_compile production/videos/cyber-future-prototypes-001/agent-f/finalize.py
+      - name: Produce test sources (NOT YUNEX RELEASE FOOTAGE)
+        run: |
+          mkdir -p out/cyber-f
+          ffmpeg -hide_banner -v error -y -f lavfi -i "testsrc2=size=320x568:rate=30:duration=4" -c:v libx264 -preset ultrafast -pix_fmt yuv420p -an out/cyber-f/SYNTHETIC-VISUAL-ONLY.mp4
+          ffmpeg -hide_banner -v error -y -f lavfi -i "sine=frequency=440:sample_rate=44100:duration=4" -c:a libmp3lame -b:a 160k out/cyber-f/SYNTHETIC-AUDIO-ONLY.mp3
+      - name: Synthetic-test deterministic mux and audio-envelope QA
+        run: |
+          python3 production/videos/cyber-future-prototypes-001/agent-f/finalize.py \
+            --editor-video out/cyber-f/SYNTHETIC-VISUAL-ONLY.mp4 \
+            --original-mp3 out/cyber-f/SYNTHETIC-AUDIO-ONLY.mp3 \
+            --out out/cyber-f/SYNTHETIC-SMOKE-ONLY.mp4 \
+            --qa-json out/cyber-f/qa-smoke.json --test-mode \
+            --frames 120 --width 320 --height 568 --preset fast
+          python3 -c "import json; r=json.load(open('out/cyber-f/qa-smoke.json')); assert r['automated_pass'] and not r['release']"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cyber-f-agent-f-SYNTHETIC-TEST-ONLY-${{ github.run_id }}
+          path: |
+            out/cyber-f/qa-smoke.json
+            out/cyber-f/cyber_f_contact_sheet.jpg
+          retention-days: 7
+          if-no-files-found: warn
+
+  final-film:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ensure FFmpeg available
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ inputs.editor_run_id }}
+          name: ${{ inputs.editor_artifact }}
+          github-token: ${{ github.token }}
+          path: incoming/editor
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ inputs.audio_run_id }}
+          name: ${{ inputs.audio_artifact }}
+          github-token: ${{ github.token }}
+          path: incoming/audio
+      - name: Select exactly one approved film and ORIGINAL hashed MP3
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/cyber-f
+          while IFS= read -r -d '' z; do
+            unzip -oq "$z" -d incoming/audio/unpacked
+          done < <(find incoming/audio -type f -iname "*.zip" -print0)
+          mapfile -d '' FILMS < <(find incoming/editor -type f -iname '*.mp4' -print0)
+          mapfile -d '' SONGS < <(find incoming/audio -type f -iname '*.mp3' -print0)
+          if (( ${#FILMS[@]} != 1 )); then
+            echo "Expected ONE approved Agent E film; got ${#FILMS[@]}" >&2
+            exit 1
+          fi
+          if (( ${#SONGS[@]} != 1 )); then
+            echo "Expected ONE original song MP3; got ${#SONGS[@]}" >&2
+            exit 1
+          fi
+          SONG_SHA="$(sha256sum "${SONGS[0]}" | awk '{print $1}')"
+          test "$SONG_SHA" = d853d5209240bd9b84ebffc11aff9e68812df7a17eeb4aa266b8e028cd89784c
+          printf '%s' "${FILMS[0]}" > out/cyber-f/editor_file.txt
+          printf '%s' "${SONGS[0]}" > out/cyber-f/song_file.txt
+      - name: Exact original music mux and full decoded video/audio QA
+        run: |
+          python3 production/videos/cyber-future-prototypes-001/agent-f/finalize.py \
+            --editor-video "$(cat out/cyber-f/editor_file.txt)" \
+            --original-mp3 "$(cat out/cyber-f/song_file.txt)" \
+            --out out/cyber-f/YUNEX-CYBER-FUTURE-001-FINAL.mp4 \
+            --qa-json out/cyber-f/final-qa.json --preset slow
+          sha256sum out/cyber-f/YUNEX-CYBER-FUTURE-001-FINAL.mp4 > out/cyber-f/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: YUNEX-CYBER-FUTURE-001-FINAL-MP4-${{ github.run_id }}
+          path: |
+            out/cyber-f/YUNEX-CYBER-FUTURE-001-FINAL.mp4
+            out/cyber-f/final-qa.json
+            out/cyber-f/cyber_f_contact_sheet.jpg
+            out/cyber-f/SHA256SUMS.txt
+          retention-days: 30
+          if-no-files-found: error
