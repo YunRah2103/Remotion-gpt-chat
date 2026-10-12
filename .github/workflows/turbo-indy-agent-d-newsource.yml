@@ -1,0 +1,29 @@
+name: Turbo Indy Agent D - new source HD access probe
+on:
+  push:
+    branches:
+      - automotive-edits/turbo-indy-reality-001/d-indy-cinematic
+    paths:
+      - 'production/videos/turbo-indy-reality-001/agent_d_newsource_probe.py'
+      - '.github/workflows/turbo-indy-agent-d-newsource.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check requests yt-dlp
+      - run: python production/videos/turbo-indy-reality-001/agent_d_newsource_probe.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-INDY-D-new-source-probe-NOT-FOOTAGE
+          path: out/agent-d-newsource-probe/PROBE.json
+          if-no-files-found: warn
+          retention-days: 7
