@@ -15,3 +15,10 @@ The saved `.blend` contains the reusable forest, canonical car and baked camera/
 Full render is isolated on `automotive-edits/porsche-blender-reveal-001/master`. The final workflow renders non-overlapping frame ranges and assembles them only when all ranges succeed. Checks include complete frame coverage, exact frame count/resolution/fps, full video/audio decode and every reference audio packet hash.
 
 The original Porsche model credits Ddiaz Design; see its source repository's car README and licence. Geometry, livery and embedded materials are retained. This film adds forest-road environment, camera/vehicle/wheel animation and lighting.
+
+## Rain revision
+The `rain-polish` branch adds a blue-hour wet forest parkway with real Cycles road reflections, layered raised terrain, linked leaf geometry, roadside lamps, finite rain haze, falling rain and tyre spray. The exterior and livery are preserved. Wheel meshes receive a small radial aspect correction to remove source ellipticity; wheel width, UVs, materials, hubs and non-rotating brake groups remain intact. Front and rear angular speed follows each corrected tyre radius. Camera fitting uses fixed body bounds rather than revolving wheel bounds.
+
+Run `wheel_qa.py -- /path/to/model.glb --correct` in Blender before production. It checks actual tyre envelope runout, fixed hub positions and fixed axle directions through a full rotation. The raw source fails the 1.5mm runout limit; corrected front/rear values are approximately 0.44/1.15mm.
+
+Use `.github/workflows/porsche-rain-cinematic.yml` for 479 native 1080×1920 frames at 30fps with 48 Cycles samples. Camera, wheel and car motion are baked with temporal neighbours for sampled shutter times; `--save` bakes the complete range. Rain and spray are updated by the deterministic Python renderer at each frame. The `.blend` contains the scene and baked hero motion, while the renderer is required to reproduce animated weather and the Workbench-to-Cycles switch. Audio remains the original copied AAC, without added rain or engine sounds.
