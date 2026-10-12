@@ -71,7 +71,7 @@ def process(identity,local,url,label,rights,role,initial_sec=0.5):
     dest=CLIPS/(identity+".mp4")
     # 4K originals are explicitly downsampled to 1080p deliverable. Never upscale source.
     p=run(["ffmpeg","-hide_banner","-nostdin","-y","-loglevel","error","-ss",str(start),"-i",str(local),
-           "-t",str(duration),"-map","0:v:0","-an","-vf","scale='if(gt(iw,1920),1920,iw)':'if(gt(ih,1080),1080,ih)':force_original_aspect_ratio=decrease:force_divisible_by=2",
+           "-t",str(duration),"-map","0:v:0","-an","-vf","scale='min(iw,1920)':'min(ih,1920)':force_original_aspect_ratio=decrease:force_divisible_by=2",
            "-c:v","libx264","-preset","veryfast","-crf","20","-pix_fmt","yuv420p","-movflags","+faststart",str(dest)],timeout=100)
     if p.returncode: raise RuntimeError("ffmpeg transcode failed "+p.stderr[-500:])
     delivered=probe(dest)
