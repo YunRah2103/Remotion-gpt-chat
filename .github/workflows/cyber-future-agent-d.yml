@@ -1,0 +1,51 @@
+name: CYBER FUTURE 001 Agent D Radical Footage
+
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/d-radical-footage
+    paths:
+      - production/videos/cyber-future-prototypes-001/agent_d_acquire.py
+      - .github/workflows/cyber-future-agent-d.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acquire-native-manufacturer-media:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 95
+    steps:
+      - name: Check out Agent D branch
+        uses: actions/checkout@v4
+      - name: Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Real video tools
+        run: |
+          set -euo pipefail
+          command -v ffmpeg
+          command -v ffprobe
+          python -m pip install --quiet --upgrade yt-dlp
+          python -m yt_dlp --version
+      - name: Download official physical-concept B-roll and verify actual frames
+        run: |
+          set -uo pipefail
+          python production/videos/cyber-future-prototypes-001/agent_d_acquire.py
+          cat out/CYBER-FUTURE-001-FOOTAGE-D/QA_REPORT.json
+      - name: Verify artifact file inventories
+        if: always()
+        run: |
+          find out/CYBER-FUTURE-001-FOOTAGE-D -type f -printf '%P %s bytes\n' | sort
+          find out/CYBER-FUTURE-001-FOOTAGE-D/clips -name '*.mp4' -type f | wc -l
+      - name: Upload REAL videos plus manifest and contact evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-FOOTAGE-D
+          path: out/CYBER-FUTURE-001-FOOTAGE-D/
+          retention-days: 14
+          compression-level: 0
+          if-no-files-found: error
