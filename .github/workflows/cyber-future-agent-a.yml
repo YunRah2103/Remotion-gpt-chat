@@ -1,0 +1,34 @@
+name: CYBER FUTURE 001 - Agent A Asia Footage
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/a-asia-footage
+    paths:
+      - '.github/workflows/cyber-future-agent-a.yml'
+      - 'production/videos/cyber-future-prototypes-001/agent-a/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install video tools and Python dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python3 -m pip install --quiet --break-system-packages requests beautifulsoup4 yt-dlp
+      - name: Discover and acquire Asian prototype manufacturer footage
+        run: |
+          python3 production/videos/cyber-future-prototypes-001/agent-a/acquire.py
+      - name: Upload evidence and actual clips when available
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-FOOTAGE-A
+          path: out/cyber-future-agent-a/
+          retention-days: 7
+          if-no-files-found: warn
+          compression-level: 0
