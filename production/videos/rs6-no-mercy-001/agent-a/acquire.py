@@ -40,9 +40,9 @@ for attempt in range(1,4):
         if file.stat().st_size<100_000: raise ValueError("source unexpectedly small")
         info=json.loads(run(["ffprobe","-v","error","-show_streams","-show_format","-of","json",str(file)]))
         video=next(t for t in info["streams"] if t["codec_type"]=="video")
-        if video["width"]<1080 or video["height"]<1080:
-            raise ValueError("source lacks native 1080-height: "+str((video["width"],video["height"])))
-        run(["ffmpeg","-v","error","-xerror","-i",str(file),"-f","null","-"],105)
+        if video["width"]<1920 or video["height"]<1080:
+            raise ValueError("source not native landscape full HD: "+str((video["width"],video["height"])))
+        run(["ffmpeg","-v","error","-xerror","-i",str(file),"-f","null","-"],300)
         for i,pct in enumerate((0.15,0.5,0.85)):
             duration=float(info["format"]["duration"])
             run(["ffmpeg","-y","-v","error","-ss",str(duration*pct),"-i",str(file),"-frames:v","1",str(ROOT/f"contact_{i}.jpg")])
@@ -52,6 +52,7 @@ for attempt in range(1,4):
     except Exception as e:
         OUT["attempts"].append({"download_attempt":attempt,"error":str(e)[:350]})
         if file.exists(): file.unlink()
+        if "not native landscape full HD" in str(e) or "invalid_url" in str(e): break
         if attempt<3:time.sleep(attempt*3)
 else:
     OUT["status"]="all_attempts_failed"
