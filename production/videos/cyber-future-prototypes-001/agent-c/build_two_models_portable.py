@@ -46,8 +46,8 @@ def metadata(path):
     videoline=next((line for line in info.splitlines() if "Video:" in line),None)
     if not videoline:raise RuntimeError("FFmpeg stream has no video: "+info[-320:])
     dims=re.search(r"(?<![0-9])(\d{3,5})x(\d{3,5})(?![0-9])",videoline)
-    rate=re.search(r"([0-9]+(?:\\.[0-9]+)?) fps",videoline)
-    dur=re.search(r"Duration:\s*(\d+):(\d+):(\d+(?:\\.[0-9]+)?)",info)
+    rate=re.search(r"([0-9]+(?:\.[0-9]+)?) fps",videoline)
+    dur=re.search(r"Duration:\s*(\d+):(\d+):(\d+(?:\.[0-9]+)?)",info)
     if not (dims and rate and dur):raise RuntimeError("Native metadata parsing failed: "+videoline+" "+info[:180])
     seconds=int(dur.group(1))*3600+int(dur.group(2))*60+float(dur.group(3))
     return int(dims.group(1)),int(dims.group(2)),str(round(float(rate.group(1))))+"/1",seconds
