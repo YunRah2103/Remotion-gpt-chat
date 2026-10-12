@@ -1,0 +1,36 @@
+name: Turbo Indy Agent D - DVIDS real-video frame review
+on:
+  push:
+    branches:
+      - automotive-edits/turbo-indy-reality-001/d-indy-cinematic
+    paths:
+      - 'production/videos/turbo-indy-reality-001/agent_d_dvids_review.py'
+      - '.github/workflows/turbo-indy-agent-d-dvids-review.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  decode:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install decoder and YT-DLP for open public HLS video
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check pillow requests yt-dlp
+      - name: Download DVIDS video bytes and build actual 32-frame visual evidence
+        run: python production/videos/turbo-indy-reality-001/agent_d_dvids_review.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-INDY-D-DVIDS-contact-sheets-ONLY
+          path: |
+            out/indy-d-dvids-review/*_32frame_contact.jpg
+            out/indy-d-dvids-review/inspection.json
+          retention-days: 7
+          if-no-files-found: warn
