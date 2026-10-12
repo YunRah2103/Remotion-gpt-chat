@@ -32,7 +32,7 @@ jobs:
             yt-dlp --ignore-config "${imp[@]}" --flat-playlist --playlist-end 5 --print '%(webpage_url)s' --socket-timeout 15 --retries 1 "$creator" >"evidence/discovered-$mode.txt" 2>"evidence/discovered-$mode.log"
             echo "discovery_exit=$? mode=$mode" >> evidence/creator.txt
           done
-          grep -hE '^https://(www\\.)?tiktok\\.com/(@|%40).+/video/[0-9]+' evidence/discovered-*.txt | sort -u -r | head -n 5 > evidence/selected-urls.txt
+          grep -hE '^https://(www[.])?tiktok[.]com/(@|%40).+/video/[0-9]+' evidence/discovered-*.txt | sort -u -r | head -n 5 > evidence/selected-urls.txt
           if [[ ! -s evidence/selected-urls.txt ]]; then
             echo "NO_PUBLIC_VIDEO_URLS_ACQUIRED" >> evidence/creator.txt
           fi
