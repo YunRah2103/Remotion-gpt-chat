@@ -143,6 +143,7 @@ for x in [-4.5,4.5]:
 
 # Leaf clusters use thousands of actual small bent leaf polygons; linked meshes preserve memory.
 cluster_meshes = []
+viewport_meshes = []
 for k in range(3):
     verts, faces = [], []
     for i in range(380):
@@ -165,6 +166,16 @@ for k in range(3):
     mesh.from_pydata(verts,[],faces)
     mesh.materials.append(leaves[k])
     cluster_meshes.append(mesh)
+    # Editing-view foliage LOD: real leaf triangles, with the complete canonical car retained.
+    pv, pf = [], []
+    for leaf in range(0,380,12):
+        start = len(pv)
+        pv.extend(verts[leaf*5:leaf*5+5])
+        pf.extend([(start,start+1,start+4),(start+1,start+2,start+4),(start+2,start+3,start+4),(start+3,start,start+4)])
+    proxy = bpy.data.meshes.new('viewport leaf cluster '+str(k))
+    proxy.from_pydata(pv,[],pf)
+    proxy.materials.append(leaves[k])
+    viewport_meshes.append(proxy)
 
 for side in [-1,1]:
     for i in range(210):
@@ -270,7 +281,11 @@ poses = [
     ((-5.4,3.3,1.4),(-4.6,-2.2,1.1),43),
 ]
 
+foliage_objects = [(o,cluster_meshes.index(o.data)) for o in s.objects if o.type=='MESH' and o.data in cluster_meshes]
+foliage_mode = None
+
 def frame_state(f, apply_render=True):
+    global foliage_mode
     # The viewport and first cinematic shot share one camera path, then beat-cut shots.
     idx = next(i for i in range(len(cuts)-1) if cuts[i] <= f < cuts[i+1])
     lo, hi = cuts[idx], cuts[idx+1]
@@ -304,14 +319,20 @@ def frame_state(f, apply_render=True):
         l.rotation_euler = (target-l.location).to_track_quat('-Z','Y').to_euler()
     if not apply_render:
         return
-    s.render.engine = 'BLENDER_WORKBENCH' if f < 214 else 'CYCLES'
+    editing = f < 214
+    if foliage_mode != editing:
+        for o,index in foliage_objects:
+            o.data = viewport_meshes[index] if editing else cluster_meshes[index]
+        foliage_mode = editing
+    cam.data.dof.use_dof = not editing
+    s.render.engine = 'BLENDER_WORKBENCH' if editing else 'CYCLES'
     s.display.shading.light = 'STUDIO'
     s.display.shading.studiolight_rotate_z = 0.5
     s.display.shading.color_type = 'SINGLE'
     s.display.shading.single_color = (0.48,0.49,0.5)
-    s.display.shading.show_shadows = True
+    s.display.shading.show_shadows = False
     s.display.shading.show_cavity = True
-    s.display.shading.cavity_type = 'BOTH'
+    s.display.shading.cavity_type = 'SCREEN'
     s.display.shading.show_specular_highlight = True
     s.display.shading.background_type = 'WORLD'
     s.display.shading.show_object_outline = False

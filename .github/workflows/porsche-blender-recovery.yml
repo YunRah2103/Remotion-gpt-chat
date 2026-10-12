@@ -1,0 +1,92 @@
+name: Porsche Blender Reveal - viewport recovery and final
+on:
+  push:
+    branches: [automotive-edits/porsche-blender-reveal-001/master]
+    paths: ['.github/workflows/porsche-blender-recovery.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  viewport:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {part: 0, frames: '0:35'}
+          - {part: 1, frames: '36:71'}
+          - {part: 2, frames: '72:107'}
+          - {part: 3, frames: '108:143'}
+          - {part: 4, frames: '144:178'}
+          - {part: 5, frames: '179:213'}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - name: Install official Blender
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg xvfb libxi6 libxrender1 libgl1 libxkbcommon0 libegl1 libegl-mesa0 libgles2 libgl1-mesa-dri libsm6 libxxf86vm1
+          curl -fLsS --retry 2 https://download.blender.org/release/Blender4.0/blender-4.0.2-linux-x64.tar.xz -o /tmp/blender.tar.xz
+          mkdir -p /tmp/blender
+          tar -xf /tmp/blender.tar.xz -C /tmp/blender --strip-components=1
+          mkdir -p /tmp/porsche out/frames
+          curl -fLsS --retry 2 https://raw.githubusercontent.com/YunRah2103/yunus-video-lab/main/cars/porsche-911-gt3-rs-992/model.glb -o /tmp/porsche/model.glb
+          echo '1c73fcb138c31e2b1d5ed126a2412074bb17f8e960b355436f28139bf518e1eb  /tmp/porsche/model.glb' | sha256sum -c -
+      - name: Render native Blender editing view
+        env: {LIBGL_ALWAYS_SOFTWARE: '1'}
+        run: |
+          xvfb-run -a /tmp/blender/blender -b -t 4 --python-exit-code 1 --python production/videos/porsche-blender-reveal-001/scene.py -- --model /tmp/porsche/model.glb --out out/frames --frames '${{ matrix.frames }}' --samples 32 > out/frames/viewport-${{ matrix.part }}.log 2>&1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: PORSCHE-VIEWPORT-${{ matrix.part }}
+          path: out/frames/
+          retention-days: 7
+          compression-level: 0
+  finish:
+    needs: viewport
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg python3-pil fonts-dejavu-core
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: PORSCHE-VIEWPORT-*
+          path: out/frames
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 38183474108
+          github-token: ${{ github.token }}
+          pattern: PORSCHE-NATIVE-FRAMES-*
+          path: out/cinematic
+          merge-multiple: true
+      - name: Reuse every completed original cinematic frame
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil
+          for f in range(214,479):
+            src=Path('out/cinematic')/f'frame_{f:04d}.png'
+            assert src.is_file(),f
+            shutil.copy2(src,Path('out/frames')/src.name)
+          PY
+      - name: Finish exact-audio film and validate every frame
+        run: |
+          python3 production/videos/porsche-blender-reveal-001/finish.py --frames out/frames --audio production/videos/porsche-blender-reveal-001/reference-audio.m4a --out out/final
+          ffmpeg -v error -y -i out/final/YUNEX_PORSCHE_BLENDER_REVEAL_1080P.mp4 -vf 'fps=1,scale=270:480,tile=4x4' -frames:v 1 out/final/contact.jpg
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path('out/final/YUNEX_PORSCHE_BLENDER_REVEAL_1080P.mp4')
+          Path('out/final/delivery-meta.json').write_text(json.dumps({'file_name':p.name,'file_size_bytes':p.stat().st_size,'mime_type':'video/mp4'}))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-PORSCHE-BLENDER-REVEAL-FINAL
+          path: out/final/
+          retention-days: 14
+          compression-level: 0
