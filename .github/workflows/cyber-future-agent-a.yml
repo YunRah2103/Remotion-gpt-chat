@@ -5,7 +5,8 @@ on:
       - automotive-edits/cyber-future-prototypes-001/a-asia-footage
     paths:
       - '.github/workflows/cyber-future-agent-a.yml'
-      - 'production/videos/cyber-future-prototypes-001/agent-a/**'
+      - 'production/videos/cyber-future-prototypes-001/agent-a/acquire.py'
+      - 'production/videos/cyber-future-prototypes-001/agent-a/curate.py'
   workflow_dispatch:
 permissions:
   contents: read
