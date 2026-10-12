@@ -32,10 +32,10 @@ def build_environment(scene, material, box, cylinder):
     rough.inputs['To Min'].default_value=0.04;rough.inputs['To Max'].default_value=0.24
     nt.links.new(noise.outputs['Fac'],rough.inputs[0]);nt.links.new(rough.outputs[0],p.inputs['Roughness'])
     nt.links.new(rough.outputs[0],p.inputs['Coat Roughness'])
-    road_object=box('WET ROAD / reflected forest and lamps',(0,-160,-0.085),(8,720,0.15),road)
+    road_object=box('WET ROAD / reflected forest and lamps',(0,-160,-0.085),(12,720,0.15),road)
     paint=material('wet reflective road markings',(0.64,0.68,0.64),0.17,True,80,0.06)
     paint.node_tree.nodes.get('Principled BSDF').inputs['Coat Weight'].default_value=0.6
-    for x in [-3.65,3.65]:box('wet road edge',(x,-160,-0.006),(0.085,720,0.002),paint)
+    for x in [-5.65,5.65]:box('wet road edge',(x,-160,-0.006),(0.085,720,0.002),paint)
     for y in range(-500,201,8):box('centre dash',(0,y,-0.006),(0.095,3.1,0.002),paint)
 
     soil=material('wet moss earth',(0.025,0.044,0.026),0.76,True,3.4,0.34)
@@ -54,7 +54,7 @@ def build_environment(scene, material, box, cylinder):
         y=-510+j*3
         for i in range(nx):
             x=-90+i*3
-            edge=max(0,abs(x)-4)
+            edge=max(0,abs(x)-6)
             z=-0.04 + min(edge/8,1)*(0.5+0.32*math.sin(y*.085+x*.4))
             z += max(0,edge-8)*(.10+.03*math.sin(y*.017))+min(edge/4,1)*rng.uniform(-.12,.12)
             verts.append((x,y,z))
@@ -99,22 +99,22 @@ def build_environment(scene, material, box, cylinder):
                 xx=side*(19+layer*7+rng.uniform(-2,2))
                 crown('deep forest layers',(xx,y,3+layer*.7),(3.4,3.8,3.0),layer%3)
             for j in range(3):
-                xx=side*rng.uniform(4.3,6.8)
+                xx=side*rng.uniform(9.0,12.0)
                 crown('wet verge fern',(xx,y+j*1.5,.4),(.5,.65,.55),j%3)
             if i%3==0:
-                bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1,radius=1,location=(side*rng.uniform(4.3,6.5),y,.25))
+                bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1,radius=1,location=(side*rng.uniform(8.0,10.0),y,.25))
                 stone=bpy.context.object;stone.name='mossy wet verge stone';stone.scale=(rng.uniform(.2,.5),rng.uniform(.25,.65),rng.uniform(.15,.4));stone.data.materials.append(rock)
     steel=material('wet dark roadside metal',(0.05,.07,.09),.19)
     steel.node_tree.nodes.get('Principled BSDF').inputs['Metallic'].default_value=.75
     luminous=material('warm lamp diffuser',(0.8,.65,.38),.25)
     bs=luminous.node_tree.nodes.get('Principled BSDF');bs.inputs['Emission Color'].default_value=(1,.56,.23,1);bs.inputs['Emission Strength'].default_value=12
     for i,y in enumerate(range(-320,221,24)):
-        side=-1 if i%2 else 1;x=side*5.7
+        side=-1 if i%2 else 1;x=side*7.7
         cylinder('road lamp pole',(x,y,0),(x,y,6),.075,steel,10)
-        cylinder('road lamp arm',(x,y,5.9),(side*4.2,y,5.9),.055,steel,8)
-        box('warm luminous lamp',(side*4.2,y,5.85),(.45,.65,.05),luminous)
+        cylinder('road lamp arm',(x,y,5.9),(side*6.2,y,5.9),.055,steel,8)
+        box('warm luminous lamp',(side*6.2,y,5.85),(.45,.65,.05),luminous)
         data=bpy.data.lights.new('warm rain lamp','AREA');data.energy=1800;data.color=(1,.63,.34);data.shape='RECTANGLE';data.size=.5;data.size_y=.65
-        lamp=bpy.data.objects.new('roadside reflected warm light',data);scene.collection.objects.link(lamp);lamp.location=(side*4.2,y,5.8)
+        lamp=bpy.data.objects.new('roadside reflected warm light',data);scene.collection.objects.link(lamp);lamp.location=(side*6.2,y,5.8)
 
     # Finite haze volume keeps distant layers soft while the hero remains crisp.
     mist=bpy.data.materials.new('rain air / finite atmosphere');mist.use_nodes=True
@@ -143,9 +143,13 @@ def build_environment(scene, material, box, cylinder):
         x=seeds[:,0];y=(seeds[:,1]+t*12.5+26)%52-26;z=(seeds[:,2]-t*18)%15-.2
         p=np.stack([x,y,z],axis=1)
         vs=np.repeat(p[:,None,:],4,axis=1)
-        vs[:,0,0]-=seeds[:,4];vs[:,1,0]+=seeds[:,4]
-        vs[:,2,0]+=seeds[:,4]+seeds[:,3]*.1;vs[:,3,0]+=-seeds[:,4]+seeds[:,3]*.1
-        vs[:,2:,2]+=seeds[:,3,None]
+        right = np.array(tuple(scene.camera.rotation_euler.to_matrix().col[0]))
+        right[2] = 0; right /= np.linalg.norm(right)
+        width = seeds[:,4,None] * right[None,:]
+        vs[:,0,:] -= width; vs[:,1,:] += width
+        vs[:,2,:] += width; vs[:,3,:] -= width
+        vs[:,2:,0] += seeds[:,3,None]*.1
+        vs[:,2:,2] += seeds[:,3,None]
         rainmesh.vertices.foreach_set('co',vs.ravel());rainmesh.update();rain.location=pos
         age=(drops[:,1]+t*2.1)%1
         p=np.stack([drops[:,0]*(.80+age*.42)+drops[:,2]*age*.3,1.2+age*3.5,.10+np.sin(age*math.pi)*.50+drops[:,3]*age*.08],axis=1)
