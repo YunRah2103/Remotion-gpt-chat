@@ -206,7 +206,7 @@ poses = [
     ((-3.0,7.0,1.5),(-2.0,6.2,1.25),45),
     ((1.4,8.5,2.5),(0.5,8.2,2.2),48),
     ((0.9,-7.8,1.15),(-0.2,-7.5,1.05),48),
-    ((-5.4,3.3,1.4),(-4.6,-2.2,1.1),43),
+    ((-3.6,2.8,1.0),(-3.2,-2.9,0.95),28),
 ]
 
 def frame_state(f, apply_render=True):
@@ -270,7 +270,8 @@ if ':' in opt.frames:
 else:
     frames = list(map(int,opt.frames.split(',')))
 # Bake the real camera/car/wheel motion before rendering so Cycles samples motion blur.
-for f in range(479):
+bake_frames = range(479) if opt.save else sorted({max(0,min(478,f+d)) for f in frames for d in [-1,0,1]})
+for f in bake_frames:
     s.frame_set(f)
     frame_state(f,apply_render=False)
     for o in [root,cam,focus,fill,rim]+spin:
