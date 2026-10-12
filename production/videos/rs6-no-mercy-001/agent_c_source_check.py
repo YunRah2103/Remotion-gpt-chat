@@ -36,5 +36,6 @@ for marker in ("pobierz","download","mp4","video","plik","media"):
   frag=content[max(0,m.start()-110):min(len(content),m.end()+180)]
   frag=re.sub(r"\\s+"," ",frag)
   print("CONTEXT",frag[:280])
-for raw in re.findall(r'(?:(?:https?:)?//[^\\s\\"\\'<>]+|/[^\\s\\"\\'<>]+)\\.mp4(?:\\?[^\\s\\"\\'<>]*)?',content,re.I):
- print("POSSIBLE_MP4",html.unescape(raw)[:300])
+
+for match in re.findall(r'https?[^\s<>]+?\.mp4', content, re.I):
+ print('POSSIBLE_MP4', match[:300])
