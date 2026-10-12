@@ -17,7 +17,8 @@ PAGES=[
 ("Hyundai INSTEROID at gamescom","https://www.hyundai.news/eu/articles/press-releases/hyundai-motor-brings-retro-arcade-fun-with-insteroid-concept-car-to-gamescom-2025.html"),
 ("Genesis X Gran Berlinetta physical studio film","https://www.genesis.com/us/en/genesis-x-gran-berlinetta-concept"),
 ("Genesis X Gran Berlinetta press","https://www.genesisnewseurope.com/english/gran-berlinetta"),
-("Mazda ICONIC SP production reveal","https://newsroom.mazda.com/en/publicity/release/2023/202310/231025a.html"),
+("Mazda ICONIC SP official Mazda USA MP4","https://news.mazdausa.com/vehicles-iconic-sp-concept"),
+("Mazda ICONIC SP Japan press release","https://newsroom.mazda.com/en/publicity/release/2023/202310/231025a.html"),
 ]
 def check(path):
  j=json.loads(subprocess.run(["ffprobe","-v","error","-show_streams","-show_format","-of","json",str(path)],capture_output=True,text=True,check=True,timeout=30).stdout)
@@ -72,11 +73,13 @@ for i,(label,page) in enumerate(PAGES):
   items=[]
   for src,body in variants:
    for u in urls(body,src):items.append((src,u))
+  if "Mazda ICONIC SP official Mazda USA MP4" in label:
+   items.insert(0,(page,"https://mmx.prnewswire.com/media/MS1808399/20231024_mazda_360D.mp4?p=download"))
   seen=set();items=[(src,u) for src,u in items if not(u in seen or seen.add(u))]
   print("SCAN",label,r.status_code,"variants",len(variants),"videos",len(items),flush=True)
   record={"label":label,"page":page,"variants":[x[0] for x in variants],"video_urls":[x[1] for x in items],"outcomes":[]}
   for k,(src,u) in enumerate(items[:5]):
-   if selected>=5:break
+   if selected>=7:break
    try:
     stem=f"source_{i:02}_{k:02}"
     m=grab(u,stem)
