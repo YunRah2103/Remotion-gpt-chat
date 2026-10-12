@@ -1,0 +1,43 @@
+name: YUNEX HDR - Native Pixel and Phone Playback QA
+on:
+  push:
+    branches:
+      - automotive-edits/yunex-hdr-cinematic-001/a-hdr-footage
+    paths:
+      - .github/workflows/yunex-hdr-pixel-audit.yml
+permissions:
+  contents: write
+jobs:
+  sample-native-pixels:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install actual 10-bit video QA dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install numpy Pillow
+      - name: Download official original and scan 16 uncropped 4K PQ frames
+        run: python production/videos/yunex-hdr-cinematic-001/agent-a/native_hdr_audit.py
+      - name: Commit small real contact sheet and numeric HDR proof
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add production/videos/yunex-hdr-cinematic-001/qa-inspection/hdr-cinematic-contact-sheet.jpg
+          git add production/videos/yunex-hdr-cinematic-001/qa-inspection/native-hdr-pixel-audit.json
+          git add production/videos/yunex-hdr-cinematic-001/qa-inspection/REVIEW.md
+          git commit -m "qa(hdr): record native-pixel PQ highlight and real contact-sheet audit"
+          git push origin HEAD:automotive-edits/yunex-hdr-cinematic-001/a-hdr-footage
+      - name: Upload small inspection images and derived HEVC HDR10 phone test
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-HDR-001-visual-and-HEVC-phone-QA
+          path: production/videos/yunex-hdr-cinematic-001/qa-inspection/
+          retention-days: 5
+          compression-level: 0
+          if-no-files-found: warn
