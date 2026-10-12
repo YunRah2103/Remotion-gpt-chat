@@ -48,7 +48,9 @@ jobs:
           git add production/videos/french-icons-001/agent-e/decoded-contact-*.jpg
           if ! git diff --staged --quiet; then
             git commit -m "Agent E: record 42 real decoded-video source QA and contact sheets"
-            git push
+            git fetch origin "${GITHUB_REF_NAME}"
+            git rebase "origin/${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
 
       - name: Publish portable independent QA evidence
