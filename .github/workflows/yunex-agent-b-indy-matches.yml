@@ -6,6 +6,7 @@ on:
     paths:
       - production/videos/turbo-indy-reality-001/agent_b_acquire.py
       - production/videos/turbo-indy-reality-001/agent_b_dvids_acquire.py
+      - production/videos/turbo-indy-reality-001/agent_b_stock_acquire.py
       - .github/workflows/yunex-agent-b-indy-matches.yml
   workflow_dispatch:
 permissions:
@@ -26,16 +27,19 @@ jobs:
           ffmpeg -version | head -n 1
       - name: Fetch real video; decode, crop and validate
         id: acquire
+        env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
         run: |
           set -o pipefail
-          python3 -u production/videos/turbo-indy-reality-001/agent_b_dvids_acquire.py | tee agent-b-run.log
+          python3 -u production/videos/turbo-indy-reality-001/agent_b_stock_acquire.py | tee agent-b-run.log
       - name: Upload verified playable footage ZIP
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: yunex-turbo-indy-agent-b-verified-video-${{ github.run_id }}
           path: |
-            out/agent-b-dvids.zip
+            out/agent-b-stock-originals.zip
             agent-b-run.log
           compression-level: 0
           retention-days: 7
@@ -46,8 +50,8 @@ jobs:
         with:
           name: yunex-agent-b-FAILED-download-DIAGNOSTICS-${{ github.run_id }}
           path: |
-            out/agent-b-dvids/qa/manifest.json
-            out/agent-b-dvids/qa/README.txt
+            out/agent-b-stock/qa/manifest.json
+            out/agent-b-stock/qa/candidate_catalog.json
             agent-b-run.log
           retention-days: 7
           if-no-files-found: warn
