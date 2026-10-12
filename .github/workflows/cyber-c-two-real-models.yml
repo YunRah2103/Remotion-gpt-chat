@@ -1,0 +1,52 @@
+name: CYBER FUTURE C TWO verified French models final editor pack
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/c-french-footage
+    paths:
+      - ".github/workflows/cyber-c-two-real-models.yml"
+      - "production/videos/cyber-future-prototypes-001/agent-c/build_two_real_models.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  assemble-and-decode:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch verified Renault Corsica editor original and 11 clips
+        uses: actions/download-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-C-FRANCE-EDITOR-SELECTS
+          run-id: 38242718272
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/incoming_r5
+      - name: Fetch independent Citroen Oli physical full 1080p film
+        uses: actions/download-artifact@v4
+        with:
+          name: CYBER-C-CITROEN-OLI-REAL-CAMERA-QA
+          run-id: 38244290219
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/incoming_oli
+      - name: Install true media verification tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          ffprobe -version | head -n 1
+      - name: Verify two original SHA256 and every clip full-decoded original 1080p; package both models
+        run: |
+          python -m py_compile production/videos/cyber-future-prototypes-001/agent-c/build_two_real_models.py
+          python production/videos/cyber-future-prototypes-001/agent-c/build_two_real_models.py
+          sha256sum out/CYBER-FUTURE-001-C-TWO-REAL-MODELS.zip
+          unzip -t out/CYBER-FUTURE-001-C-TWO-REAL-MODELS.zip | tail -n 3
+      - name: Upload final two-model 19-clips camera-footage package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-C-TWO-REAL-MODELS
+          path: out/CYBER-FUTURE-001-C-TWO-REAL-MODELS.zip
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
