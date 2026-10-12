@@ -60,3 +60,10 @@ Once permission exists: secure direct authorized MP4, download to an appropriate
 - Tango Red 44944 preview: https://audi-mediacenter.pl/data/filmy/44944/o/18973_amtv-content720p-web_play.mp4 ; actual stream AVC 480x270 at 25fps, 578.904s, 28,501,778 bytes; SHA256 1664cf1d1dab404650d39ab5facee9bd2b0e555fd48efa7243b07cb9c6a4f3eb. Downloaded and parsed. REJECT quality.
 - Auditography C8 RS6 YouTube film: https://www.youtube.com/watch?v=8l9D4aS0IIs ; page fetch HTTP 200; yt-dlp 2026.08.19 formats probe failed YouTube bot-confirmation challenge. No stream downloaded.
 - All 3 original Audi MP4s were downloaded to an ephemeral environment, not retained as a GitHub media artifact. All three are materially under full HD, thus not acceptable final clips. No contact sheet/decoded frame QA. These files remain journalistic-use-limited, do not mirror into public Releases.
+
+## V4 source-registry validation — 12 Oct 2026
+- Reviewed experiment branch `experiments/s25-footage-worker-v4-10min-20261012` source registry and `agent_jobs_v4.py`.
+- `sources_v3.json` contains only approved Big Buck Bunny `YE7VzlLtp-4` (720p) and snow forest car `DqiKOr1aS9w` (1080p). Neither features an Audi RS6 C8.
+- Agent A candidate Auditography C8 YouTube `8l9D4aS0IIs` is NOT approved and cannot pass V4 `parse_job`; do not queue a knowingly invalid phone job. No creator permission / qualifying licence identified.
+- Further search found paid 1080p/4K RS6 stock footage on Pond5, but marked **editorial use** and requires purchase. No available clean approved RS6 source for V4.
+- V4 worker must be executed on user phone; GitHub issue queue alone cannot invoke Termux. No V4 job submitted, no release/MP4 claimed.
