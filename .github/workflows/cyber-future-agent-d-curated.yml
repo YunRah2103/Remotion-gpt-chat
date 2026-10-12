@@ -1,0 +1,48 @@
+name: CYBER FUTURE 001 Agent D Final Curated Footage
+
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/d-radical-footage
+    paths:
+      - production/videos/cyber-future-prototypes-001/AGENT_D_SELECTION.json
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  curate-verified-originals:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 38188050630
+          name: CYBER-FUTURE-001-FOOTAGE-D
+          path: incoming/lotus
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 38188682331
+          name: CYBER-FUTURE-001-D-PORSCHE-HQ
+          path: incoming/porsche
+          github-token: ${{ github.token }}
+      - name: Native media tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Build single human-curated source package
+        run: |
+          python production/videos/cyber-future-prototypes-001/agent_d_curate.py
+          cat out/CYBER-FUTURE-001-FOOTAGE-D/QA_REPORT.json
+          find out/CYBER-FUTURE-001-FOOTAGE-D -type f -printf '%P %s bytes\n' | sort
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-FOOTAGE-D
+          path: out/CYBER-FUTURE-001-FOOTAGE-D/
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: error
