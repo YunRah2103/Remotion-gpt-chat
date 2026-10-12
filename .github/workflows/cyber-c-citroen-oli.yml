@@ -1,0 +1,35 @@
+name: CYBER FUTURE Agent C Citroen Oli physical second model
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/c-french-footage
+    paths:
+      - ".github/workflows/cyber-c-citroen-oli.yml"
+      - "production/videos/cyber-future-prototypes-001/agent-c/acquire_citroen_oli.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  citroen-oli-real-camera:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check FFmpeg availability
+        run: |
+          ffmpeg -version | head -n 1
+          ffprobe -version | head -n 1
+      - name: Fetch original Citroen Oli true-native 1080p source, scene-cut and fully decode
+        run: |
+          python -m py_compile production/videos/cyber-future-prototypes-001/agent-c/acquire_citroen_oli.py
+          python production/videos/cyber-future-prototypes-001/agent-c/acquire_citroen_oli.py
+          sha256sum out/CYBER-C-CITROEN-OLI-QA.zip
+      - name: Upload actual decoded video and independent contact frames
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-C-CITROEN-OLI-REAL-CAMERA-QA
+          path: out/CYBER-C-CITROEN-OLI-QA.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
