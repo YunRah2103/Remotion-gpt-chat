@@ -7,3 +7,5 @@ for endpoint in ["/pobierz.php?id_typu=3&id_materialu=48075","/data/filmy/48075/
    with urllib.request.urlopen(req,timeout=25) as r:
     print(method,endpoint,"STATUS",r.status,"TYPE",r.headers.get("Content-Type"),"SIZE",r.headers.get("Content-Length"),"DISPOSITION",r.headers.get("Content-Disposition"),"FINAL_URL",r.geturl())
   except Exception as e:print("ERROR",endpoint,repr(e)[:350])
+
+# Trigger source-endpoint HEAD verification.
