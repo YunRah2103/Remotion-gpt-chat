@@ -36,11 +36,11 @@ const VideoShot: React.FC<{shot: Shot}> = ({shot}) => {
         width: "100%",
         height: "100%",
         objectFit: "cover",
-        objectPosition: shot.cinematicFocusXPercent + "% center",
+        objectPosition: shot.cinematicFocusXPercent + "% " + shot.cinematicFocusYPercent + "%",
         // Crop original letterbox pixels without stretching the real car.
         // Shot-specific values are audited in shotmap.json.
         transform: "scale(" + shot.cinematicCropScale + ")",
-        transformOrigin: shot.cinematicFocusXPercent + "% center",
+        transformOrigin: shot.cinematicFocusXPercent + "% " + shot.cinematicFocusYPercent + "%",
         filter: eraFilter[shot.era] ?? "none",
       }}
     />

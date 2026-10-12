@@ -35,6 +35,7 @@ def normalize(s):
     n=s["durationFrames"]
     scale=float(s["cinematicCropScale"])
     focus=float(s["cinematicFocusXPercent"])/100
+    focus_y=float(s["cinematicFocusYPercent"])/100
     w=2*int((1920*scale+1)/2)
     h=2*int((1080*scale+1)/2)
     era=s["era"]
@@ -46,7 +47,7 @@ def normalize(s):
     # Crop the native picture (no distorted aspect). This removes embedded bars.
     vf=(
       f"fps=fps=30,scale={w}:{h}:flags=lanczos,"
-      f"crop=1920:1080:(iw-1920)*{focus:.4f}:(ih-1080)/2,"
+      f"crop=1920:1080:(iw-1920)*{focus:.4f}:(ih-1080)*{focus_y:.4f},"
       f"{grade},format=yuv420p,trim=end_frame={n},setpts=PTS-STARTPTS"
     )
     tgt=TEMP/f"shot_{s['shot']:02d}.mp4"
