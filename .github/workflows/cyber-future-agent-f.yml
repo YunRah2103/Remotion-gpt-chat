@@ -34,8 +34,14 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - name: Install FFmpeg on clean hosted runner
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
       - name: Check FFmpeg / Python script
         run: |
+          set -euo pipefail
+          command -v ffmpeg
           ffmpeg -version | head -n 2
           python3 -m py_compile production/videos/cyber-future-prototypes-001/agent-f/finalize.py
       - name: Produce test sources (NOT YUNEX RELEASE FOOTAGE)
