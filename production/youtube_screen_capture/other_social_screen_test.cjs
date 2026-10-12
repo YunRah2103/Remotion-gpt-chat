@@ -138,8 +138,12 @@ async function runTest(){
  }
  report.after=await pageState(page);
  report.failedRequests=errs;
+ // A social clip may LOOP during the five-second capture. totalVideoFrames remains
+ // monotonic across a loop, whereas currentTime resets to zero.
  report.playbackVerified=report.before.some(a=>a.video&&report.after.some(b=>
-   b.video && b.frame===a.frame && b.currentTime>a.currentTime+1.5 && b.videoWidth>0 && b.readyState>=2));
+   b.video && b.frame===a.frame && b.videoWidth>0 && b.readyState>=2
+   && ((typeof a.frames==='number' && typeof b.frames==='number' && b.frames-a.frames>=25)
+     || b.currentTime>a.currentTime+1.5)));
  try{await page.screenshot({path:path.join(dir,'after.png')});}catch{}
  await browser.close();browser=null;
  if(stream && !stream.destroyed)await stream.destroy().catch(()=>{});
