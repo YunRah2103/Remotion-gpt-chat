@@ -1,0 +1,49 @@
+name: YUNEX ONE high-quality car film
+on:
+  push:
+    branches:
+      - automotive-edits/yunex-hdr-cinematic-001/a-hdr-footage
+    paths:
+      - .github/workflows/yunex-one-car-film.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquire-one-video:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install original-format video tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -U "yt-dlp[default]" Pillow
+      - name: Download ONE professionally filmed McLaren 720S source
+        id: acquisition
+        continue-on-error: true
+        env:
+          SOURCE_URL: https://vimeo.com/349379849
+        run: python production/videos/yunex-hdr-cinematic-001/agent-a/acquire_one_mclaren_film.py
+      - name: Show exact acquisition details
+        if: always()
+        run: |
+          cat out/yunex-one-film/diagnostics.json || true
+          du -sh out/yunex-one-film || true
+      - name: Upload ONLY one original video and its quality proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-ONE-CAR-FILM
+          path: out/YUNEX-ONE-CAR-FILM.zip
+          compression-level: 0
+          retention-days: 5
+          if-no-files-found: warn
+      - name: Do not claim success on extractor failure
+        if: always()
+        env:
+          RESULT: ${{ steps.acquisition.outcome }}
+        run: test "$RESULT" = success
