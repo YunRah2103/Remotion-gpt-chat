@@ -21,6 +21,13 @@ jobs:
             echo "=== $src ==="
             timeout 35s yt-dlp --list-formats "$src" 2>&1 | tail -22 || true
           done
+      - name: Probe free license Indianapolis track and pit B-roll
+        shell: bash
+        run: |
+          for src in "https://www.pexels.com/video/lots-of-race-cars-on-starting-line-9737951/" "https://www.pexels.com/video/large-group-of-race-cars-on-starting-line-9737952/" "https://www.pexels.com/video/footage-of-speedway-with-crew-9737840/" "https://www.pexels.com/video/crew-replacing-tires-of-race-car-9737948/"; do
+            echo "=== $src ==="
+            timeout 25s yt-dlp --list-formats "$src" 2>&1 | tail -18 || true
+          done
       - name: Inspect HTML of publicly visible INDYCAR players
         shell: bash
         run: |
