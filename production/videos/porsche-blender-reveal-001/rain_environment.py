@@ -10,8 +10,8 @@ def build_environment(scene, material, box, cylinder):
     world = scene.world.node_tree
     world.nodes.clear()
     bg = world.nodes.new('ShaderNodeBackground')
-    bg.inputs['Color'].default_value = (0.07,0.13,0.24,1)
-    bg.inputs['Strength'].default_value = 0.65
+    bg.inputs['Color'].default_value = (0.045,0.095,0.20,1)
+    bg.inputs['Strength'].default_value = 0.48
     output = world.nodes.new('ShaderNodeOutputWorld')
     world.links.new(bg.outputs[0],output.inputs['Surface'])
 
@@ -118,7 +118,7 @@ def build_environment(scene, material, box, cylinder):
 
     # Finite haze volume keeps distant layers soft while the hero remains crisp.
     mist=bpy.data.materials.new('rain air / finite atmosphere');mist.use_nodes=True
-    nt=mist.node_tree;nt.nodes.clear();v=nt.nodes.new('ShaderNodeVolumePrincipled');v.inputs['Density'].default_value=.006
+    nt=mist.node_tree;nt.nodes.clear();v=nt.nodes.new('ShaderNodeVolumePrincipled');v.inputs['Density'].default_value=.0035
     v.inputs['Color'].default_value=(.62,.73,.87,1);v.inputs['Anisotropy'].default_value=.35
     o=nt.nodes.new('ShaderNodeOutputMaterial');nt.links.new(v.outputs[0],o.inputs['Volume'])
     haze=box('rain atmosphere',(0,-140,12),(110,680,26),mist)
@@ -127,7 +127,7 @@ def build_environment(scene, material, box, cylinder):
     nt=rainmat.node_tree;bs=nt.nodes.get('Principled BSDF');bs.inputs['Emission Color'].default_value=(.21,.3,.43,1);bs.inputs['Emission Strength'].default_value=.22
     transparent=nt.nodes.new('ShaderNodeBsdfTransparent');mix=nt.nodes.new('ShaderNodeMixShader');mix.inputs[0].default_value=.42
     nt.links.new(transparent.outputs[0],mix.inputs[1]);nt.links.new(bs.outputs[0],mix.inputs[2]);nt.links.new(mix.outputs[0],nt.nodes.get('Material Output').inputs['Surface'])
-    seeds=np.array([[rng.uniform(-18,18),rng.uniform(-26,26),rng.uniform(0,15),rng.uniform(.09,.24),rng.uniform(.0025,.006)] for _ in range(1600)])
+    seeds=np.array([[rng.uniform(-18,18),rng.uniform(-26,26),rng.uniform(0,15),rng.uniform(.09,.24),rng.uniform(.006,.013)] for _ in range(1600)])
     rainmesh=bpy.data.meshes.new('moving rain streaks')
     rainmesh.from_pydata([(0,0,0)]*len(seeds)*4,[],[(i*4,i*4+1,i*4+2,i*4+3) for i in range(len(seeds))]);rainmesh.materials.append(rainmat)
     rain=bpy.data.objects.new('falling rain',rainmesh);scene.collection.objects.link(rain)
