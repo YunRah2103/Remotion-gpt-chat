@@ -1,0 +1,64 @@
+name: French Legends C - fast real-footage 60s preview
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/c-cinematic-edit
+    paths:
+      - '.github/workflows/fr-legends-c-fast-picture.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  fast-native-60s-picture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install actual video toolchain and compile Remotion edit
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg unzip
+          npm ci --no-audit --no-fund
+          npm run check
+      - name: Download the exact verified original combined media
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p out/fr-legends-fast/outer out/fr-legends-fast/source
+          curl -fL --retry 3 --retry-delay 5 \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/YunRah2103/Remotion-gpt-chat/actions/artifacts/11713925779/zip" \
+            -o out/fr-legends-fast/outer/archive.zip
+          unzip -tq out/fr-legends-fast/outer/archive.zip
+          unzip -q out/fr-legends-fast/outer/archive.zip -d out/fr-legends-fast/outer
+          mapfile -d '' -t sources < <(find out/fr-legends-fast/outer -mindepth 1 -name '*.zip' ! -name archive.zip -print0)
+          test "${#sources[@]}" -eq 1
+          echo "46073d50fb4efe246b3e7ee1adee1601eec025a3aa2a07df45f038731218c533  ${sources[0]}" | sha256sum -c -
+          unzip -q "${sources[0]}" -d out/fr-legends-fast/source
+          mkdir -p out/fr-legends-c
+          ln -s ../fr-legends-fast/source out/fr-legends-c/media
+          python production/videos/french-icons-001/agent-c/validate_edit.py | tee out/fr-legends-fast/source_validation.json
+          rm -rf out/fr-legends-fast/outer
+      - name: Actually edit 60 real seconds and fully decode native master
+        run: python production/videos/french-icons-001/agent-c/render_fast_picture.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: FR-LEGENDS-C-AUDIO-ALIGNED-PICTURE-${{ github.run_id }}
+          path: |
+            out/fr-legends-fast/FRENCH_LEGENDS_C_MUTED_FAST_1080P.mp4
+            out/fr-legends-fast/FAST_FILM_QA.json
+            out/fr-legends-fast/ffprobe.json
+            out/fr-legends-fast/decoded_60sec_contact.jpg
+            out/fr-legends-fast/source_validation.json
+            production/videos/french-icons-001/agent-c/shotmap.json
+          retention-days: 14
+          if-no-files-found: warn
