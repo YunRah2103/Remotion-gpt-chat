@@ -13,6 +13,17 @@ SHEETS=ROOT/"contact_sheets"
 for d in (ROOT, RAW, CLIPS, SHEETS): d.mkdir(parents=True,exist_ok=True)
 USER_AGENT="YUNEX-Footage-QA/1.0 (public media only; no access-control bypass)"
 SOURCES=[
+  dict(id="indy500_2025_real_race_start",kind="wikimedia",filename="Indy5002025start.webm",
+       url="https://commons.wikimedia.org/wiki/File:Indy5002025start.webm",
+       title="2025 Indianapolis 500 actual racing start and Marco Andretti incident",
+       uploader="Waluigithewalrus (original uploader, Commons)",
+       rights="Marked public domain (PD-self) by uploader on Wikimedia Commons; IMPORTANT: video license review pending. Verify underlying rights before publication.",
+       role="GENUINE RACE ACTION: dense starting pack, opening-lap traffic and race incident",priority=1),
+  dict(id="indy500_2025_yt_official",kind="yt",url="https://www.youtube.com/watch?v=MuwzLjaB8Lo",
+       title="Official INDYCAR 2025 Indianapolis 500 highlights",
+       uploader="NTT INDYCAR SERIES",
+       rights="Copyright NTT INDYCAR SERIES; permission to republish NOT established; internal editorial review only.",
+       role="Real oval overtakes and race packs; accept only if public extraction and native >=1080p.",priority=1),
   dict(id="indy500_2026_finish",kind="yt",url="https://www.dailymotion.com/video/xab5b6s",
        title="2026 Indianapolis 500 final-lap Rosenqvist/Malukas close race", uploader="Dailymotion video uploader",
        rights="Third-party racing broadcast; no reuse licence confirmed. INTERNAL REVIEW ONLY until licensed.",
@@ -214,7 +225,7 @@ def main():
     (ROOT/"REPORT.md").write_text("\n".join(report)+"\n")
     with zipfile.ZipFile(ROOT/"agent-c-indycar-footage.zip","w",compression=zipfile.ZIP_STORED) as z:
         for p in sorted(ROOT.rglob("*")):
-            if p.is_file() and p.suffix.lower() in (".mp4",".jpg",".json",".sha256",".md"):
+            if p.is_file() and RAW not in p.parents and p.suffix.lower() in (".mp4",".jpg",".json",".sha256",".md"):
                 z.write(p,p.relative_to(ROOT))
     print(json.dumps({"status":manifest["status"],"action_clips":manifest["usable_action_candidate_count"],
                       "formation_clips":manifest["licensed_formation_count"],
