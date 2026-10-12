@@ -1,0 +1,33 @@
+name: CYBER FUTURE 001 - Agent A Hyundai RN24 Original
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/a-asia-footage
+    paths:
+      - '.github/workflows/cyber-future-agent-a-rn24.yml'
+      - 'production/videos/cyber-future-prototypes-001/agent-a/hmg_rn24_acquire.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install native FFmpeg + requests
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python3 -m pip install --quiet --break-system-packages requests
+      - name: Download & full decode official RN24 video
+        run: python3 -u production/videos/cyber-future-prototypes-001/agent-a/hmg_rn24_acquire.py
+      - name: Upload real media and 40 frame inspection sheet
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-AGENT-A-RN24-SOURCE
+          path: out/cyber-future-rn24-source/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
