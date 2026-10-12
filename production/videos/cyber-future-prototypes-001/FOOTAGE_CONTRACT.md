@@ -1,4 +1,6 @@
 # YUNEX — CYBER//FUTURE 001: REAL FUTURISTIC PROTOTYPES
+
+**REQUIRED NEW ACQUISITION TOOLKIT:** Read `production/videos/cyber-future-prototypes-001/ACQUISITION_TOOLKIT_AND_QA.md` on **`automotive-edits/cyber-future-prototypes-001/footage-contract`** before sourcing. It documents verified `curl`/`wget` direct MP4, `yt-dlp` + Chrome impersonation + `gallery-dl`, main-branch `production/footage_rescue/acquire.py`, optional experimental social sites, YouTube failure caveats, FFprobe/FFmpeg/PySceneDetect checks, GitHub Actions artifact ZIP requirements and concise source-provenance treatment. DO NOT assume this new contract file exists on your older agent branch: read it explicitly from the shared contract ref. Post progress to issue #32. Do not get stuck in generic licensing discussions; keep provenance and unresolved reuse permissions factual and brief, without bypassing restricted sites.
 Status: 2026-10-12 — **FOOTAGE STAGE ONLY (four agents: A, B, C, D)**
 
 ## User objective / strict film intent
