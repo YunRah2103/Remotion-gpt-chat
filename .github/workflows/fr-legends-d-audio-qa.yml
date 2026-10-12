@@ -1,0 +1,32 @@
+name: FR Legends Agent D Audio QA
+on:
+  push:
+    branches:
+      - automotive-edits/french-icons-001/d-audio-render
+    paths:
+      - production/videos/french-icons-001/agent-d/**
+      - .github/workflows/fr-legends-d-audio-qa.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  agent-d-code-and-gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install audio-video quality-check requirements
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python3 -m pip install --user numpy pillow
+      - name: Run exact-song gate / visual-input rejection tests
+        run: python3 production/videos/french-icons-001/agent-d/test_finalize.py
+      - name: Check the delivery script compiles and publishes usage instructions
+        run: |
+          python3 -m py_compile production/videos/french-icons-001/agent-d/finalize.py
+          python3 production/videos/french-icons-001/agent-d/finalize.py --help > /tmp/agent-d-usage.txt
+          test -s /tmp/agent-d-usage.txt
+          echo "NO FINAL FILM CLAIM: tests use synthetic data and contain no private song or approved Agent C picture"
