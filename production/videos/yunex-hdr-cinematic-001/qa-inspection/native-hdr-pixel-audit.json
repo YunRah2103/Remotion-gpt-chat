@@ -1,0 +1,172 @@
+{
+  "source": "https://www.falkentyre.com/_storage/asset/77989/storage/master/file/317009/download/FALKEN-HDR-h264-10Bit-56MBit.mp4",
+  "checksum": "389a5e6c367466de1896076a137e9ae475f1b8062ed70bdf08ed70a47225c9ad",
+  "durationSeconds": 338.04,
+  "method": "16 native-resolution 3840x2160 Y samples from untouched 10-bit PQ H.264 original.",
+  "caveat": "PQ video luma code values are not a precise HDR colour-managed luminance measurement; good evidence of available encoded highlight excursion, not camera dynamic-range proof.",
+  "frames": [
+    {
+      "timeSeconds": 10.56,
+      "maxCode": 458,
+      "p99Code": 442.0,
+      "p999Code": 451.0,
+      "aboveCode550": 0,
+      "aboveCode600": 0,
+      "aboveCode700": 0,
+      "pixelCount": 8294400
+    },
+    {
+      "timeSeconds": 31.69,
+      "maxCode": 463,
+      "p99Code": 432.0,
+      "p999Code": 436.0,
+      "aboveCode550": 0,
+      "aboveCode600": 0,
+      "aboveCode700": 0,
+      "pixelCount": 8294400
+    },
+    {
+      "timeSeconds": 52.82,
+      "maxCode": 454,
+      "p99Code": 445.0,
+      "p999Code": 446.0,
+      "aboveCode550": 0,
+      "aboveCode600": 0,
+      "aboveCode700": 0,
+      "pixelCount": 8294400
+    },
+    {
+      "timeSeconds": 73.95,
+      "maxCode": 439,
+      "p99Code": 381.0,
+      "p999Code": 397.0,
+      "aboveCode550": 0,
+      "aboveCode600": 0,
+      "aboveCode700": 0,
+      "pixelCount": 8294400
+    },
+    {
+      "timeSeconds": 95.07,
+      "maxCode": 459,
+      "p99Code": 431.0,
+      "p999Code": 447.0,
+      "aboveCode550": 0,
+      "aboveCode600": 0,
+      "aboveCode700": 0,
+      "pixelCount": 8294400
+    },
+    {
+      "timeSeconds": 116.2,
+      "maxCode": 458,
+      "p99Code": 446.0,
+      "p999Code": 450.0,
+      "aboveCode550": 0,
+      "aboveCode600": 0,
+      "aboveCode700": 0,
+      "pixelCount": 8294400
+    },
+    {
+      "timeSeconds": 137.33,
+      "maxCode": 470,
+      "p99Code": 382.0,
+      "p999Code": 431.0,
+      "aboveCode550": 0,
+      "aboveCode600": 0,
+      "aboveCode700": 0,
+      "pixelCount": 8294400
+    },
+    {
+      "timeSeconds": 158.46,
+      "maxCode": 460,
+      "p99Code": 451.0,
+      "p999Code": 451.0,
+      "aboveCode550": 0,
+      "aboveCode600": 0,
+      "aboveCode700": 0,
+      "pixelCount": 8294400
+    },
+    {
+      "timeSeconds": 179.58,
+      "maxCode": 457,
+      "p99Code": 451.0,
+      "p999Code": 451.0,
+      "aboveCode550": 0,
+      "aboveCode600": 0,
+      "aboveCode700": 0,
+      "pixelCount": 8294400
+    },
+    {
+      "timeSeconds": 200.71,
+      "maxCode": 449,
+      "p99Code": 410.0,
+      "p999Code": 412.0,
+      "aboveCode550": 0,
+      "aboveCode600": 0,
+      "aboveCode700": 0,
+      "pixelCount": 8294400
+    },
+    {
+      "timeSeconds": 221.84,
+      "maxCode": 452,
+      "p99Code": 423.0,
+      "p999Code": 448.0,
+      "aboveCode550": 0,
+      "aboveCode600": 0,
+      "aboveCode700": 0,
+      "pixelCount": 8294400
+    },
+    {
+      "timeSeconds": 242.97,
+      "maxCode": 464,
+      "p99Code": 429.0,
+      "p999Code": 451.0,
+      "aboveCode550": 0,
+      "aboveCode600": 0,
+      "aboveCode700": 0,
+      "pixelCount": 8294400
+    },
+    {
+      "timeSeconds": 264.09,
+      "maxCode": 433,
+      "p99Code": 352.0,
+      "p999Code": 402.0,
+      "aboveCode550": 0,
+      "aboveCode600": 0,
+      "aboveCode700": 0,
+      "pixelCount": 8294400
+    },
+    {
+      "timeSeconds": 285.22,
+      "maxCode": 451,
+      "p99Code": 389.0,
+      "p999Code": 392.0,
+      "aboveCode550": 0,
+      "aboveCode600": 0,
+      "aboveCode700": 0,
+      "pixelCount": 8294400
+    },
+    {
+      "timeSeconds": 306.35,
+      "maxCode": 454,
+      "p99Code": 435.0,
+      "p999Code": 441.0,
+      "aboveCode550": 0,
+      "aboveCode600": 0,
+      "aboveCode700": 0,
+      "pixelCount": 8294400
+    },
+    {
+      "timeSeconds": 327.48,
+      "maxCode": 451,
+      "p99Code": 436.0,
+      "p999Code": 445.0,
+      "aboveCode550": 0,
+      "aboveCode600": 0,
+      "aboveCode700": 0,
+      "pixelCount": 8294400
+    }
+  ],
+  "globalMaxCodeOfSamples": 470,
+  "framesWithAnyCodeAbove600": 0,
+  "framesWithAnyCodeAbove700": 0
+}
