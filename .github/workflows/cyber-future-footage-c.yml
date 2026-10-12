@@ -1,0 +1,49 @@
+name: CYBER FUTURE Agent C French Footage
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/c-french-footage
+    paths:
+      - 'production/videos/cyber-future-prototypes-001/agent-c/**'
+      - '.github/workflows/cyber-future-footage-c.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acquire-real-french-footage:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify acquisition script compiles
+        run: python -m py_compile production/videos/cyber-future-prototypes-001/agent-c/acquire_french.py
+      - name: Install FFmpeg verification and extraction dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          ffmpeg -version | head -n 1
+      - name: Download publicly accessible original French concept films and validate pixels
+        run: python production/videos/cyber-future-prototypes-001/agent-c/acquire_french.py
+      - name: Package status and checksum
+        if: always()
+        run: |
+          if [ -f out/CYBER-FUTURE-001-FOOTAGE-C.zip ]; then
+            sha256sum out/CYBER-FUTURE-001-FOOTAGE-C.zip
+            unzip -l out/CYBER-FUTURE-001-FOOTAGE-C.zip | tail -n 8
+          else
+            echo "Acquisition exited before any ZIP was produced"
+          fi
+      - name: Upload one source package (only if produced)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-FOOTAGE-C
+          path: out/CYBER-FUTURE-001-FOOTAGE-C.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
