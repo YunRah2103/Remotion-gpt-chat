@@ -1,0 +1,36 @@
+name: CYBER FUTURE Agent C DS E-TENSE Physical Second Model
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/c-french-footage
+    paths:
+      - ".github/workflows/cyber-c-ds-etense.yml"
+      - "production/videos/cyber-future-prototypes-001/agent-c/acquire_ds_etense.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-second-french-model:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install real video decoding utilities
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Download DS E-TENSE 2022 physical demonstrator film and full-decode QA
+        run: |
+          python -m py_compile production/videos/cyber-future-prototypes-001/agent-c/acquire_ds_etense.py
+          python production/videos/cyber-future-prototypes-001/agent-c/acquire_ds_etense.py
+          sha256sum out/CYBER-C-DS-ETENSE-QA.zip
+          unzip -t out/CYBER-C-DS-ETENSE-QA.zip | tail -n 3
+      - name: Publish actual original and decoded candidate shots for visual review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-C-DS-ETENSE-SECOND-MODEL-QA
+          path: out/CYBER-C-DS-ETENSE-QA.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
