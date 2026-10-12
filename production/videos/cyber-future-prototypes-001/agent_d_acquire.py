@@ -95,20 +95,32 @@ def register(f,model,source_page,archive_url,credit,rights):
         print("REJECTED",f.name,str(e),flush=True)
         rejected.append(dict(file=f.name,reason=str(e)[:400]))
 def process_lotus():
-    dest=RAW/"lotus_official_video.zip"
-    meta=get(LOTUS,dest);sources.append(meta)
-    if not zipfile.is_zipfile(dest):raise RuntimeError("Lotus response not a zip")
-    with zipfile.ZipFile(dest) as z:
-        movie_entries=[m for m in z.infolist() if Path(m.filename).suffix.lower() in
-            {".mp4",".mov",".m4v",".mkv",".webm"} and m.file_size<1000*1024*1024]
-        print("ZIP_MOVIE_ENTRIES",[(m.filename,m.file_size) for m in movie_entries],flush=True)
-        if not movie_entries:raise RuntimeError("Lotus zip contains no movies")
-        for i,m in enumerate(movie_entries[:15]):
-            f=RAW/("lotus_"+str(i)+"_"+re.sub(r"[^a-zA-Z0-9_.-]","_",Path(m.filename).name))
-            with z.open(m) as src,open(f,"wb") as out:
-                while b:=src.read(1048576):out.write(b)
-            register(f,"Lotus Theory 1",LOTUS_PAGE,LOTUS,"Lotus Cars",
-                     "Lotus gallery allows editorial/media uses; unrestricted social reuse not verified")
+    # Manufacturer press ZIP exceeds 1.6 GiB; fetch only wanted members via HTTP Range.
+    # remotezip reads ZIP central directory from the end, never downloads entire package.
+    from remotezip import RemoteZip
+    with RemoteZip(LOTUS) as z:
+        items=[m for m in z.infolist() if Path(m.filename).suffix.lower() in
+            {".mp4",".mov",".m4v",".mkv",".webm"} and m.file_size<850*1024*1024]
+        items.sort(key=lambda x: (
+            0 if "BROLL" in x.filename.upper() or "THEORY" in x.filename.upper() else 1,
+            x.file_size))
+        print("LOTUS_REMOTE_ARCHIVE_ENTRIES",[(m.filename,m.file_size) for m in items[:35]],flush=True)
+        if not items:raise RuntimeError("Lotus remote archive no media entries")
+        extracted=0
+        for i,m in enumerate(items[:12]):
+            if extracted+m.file_size>1800*1024*1024:break
+            path=RAW/("lotus_"+str(i)+"_"+re.sub(r"[^a-zA-Z0-9_.-]","_",Path(m.filename).name))
+            with z.open(m) as src,open(path,"wb") as out:
+                while True:
+                    piece=src.read(1048576)
+                    if not piece:break
+                    out.write(piece)
+            extracted+=path.stat().st_size
+            print("LOTUS_REMOTE_VIDEO_BYTES",path.name,path.stat().st_size,"SHA",sha(path),flush=True)
+            register(path,"Lotus Theory 1",LOTUS_PAGE,LOTUS,"Lotus Cars",
+                "Lotus gallery editorial/media use only; public social reuse not confirmed")
+    sources.append(dict(url=LOTUS,mode="byte-range-remotezip",extracted_media_bytes=extracted,
+                        source="Lotus official press video package"))
 def process_porsche():
     # Verbatim original native video URLs from Porsche's downloadable Mission X press PDF.
     # They are not inferred YouTube streams. Evaluate both since one may be a walkaround.
