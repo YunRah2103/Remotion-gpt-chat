@@ -1,0 +1,47 @@
+name: YUNEX Agent A - Turbo versus B26 real 4K crossmatch
+on:
+  push:
+    branches: [automotive-edits/turbo-indy-reality-001/a-turbo-film]
+    paths:
+      - production/videos/turbo-indy-reality-001/agent_a_compare_b26.py
+      - .github/workflows/turbo-agent-a-b26-crossmatch.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  crossmatch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download verified final Agent A animated film clips
+        uses: actions/download-artifact@v4
+        with:
+          name: YUNEX-Turbo-AgentA-Indy500-Selection-38275198546
+          run-id: 38275198546
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/A-final
+      - name: Download new genuine 4K IndyCar B26 moving/smoke shot
+        uses: actions/download-artifact@v4
+        with:
+          name: yunex-agent-b-2026-4k-trackside-close-pass-38292078908
+          run-id: 38292078908
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/B26-delivery
+      - name: Install real-video QA tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check Pillow
+      - name: Verify and compare A01/A05/A02 versus B26 4K
+        run: python production/videos/turbo-indy-reality-001/agent_a_compare_b26.py
+      - name: Deliver storyboard inspection artifact only - no finished video claim
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-A-vs-B26-frame-comparison-${{ github.run_id }}
+          path: out/A-B26-comparison/
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn
