@@ -28,7 +28,7 @@ class PhoneWorkerTests(unittest.TestCase):
 
     def test_car_clip_authorised_at_720p_or_lower(self):
         job={"url":worker.CAR_VIDEO,"seconds":6,"license":"CC-BY-3.0"}
-        issue={"body":worker.MARKER+"\\n"+json.dumps(job)}
+        issue={"body":worker.MARKER+"\n"+json.dumps(job)}
         self.assertEqual(worker.parse_job(issue),job)
         with mock.patch.object(worker,"checked",side_effect=RuntimeError("stop before download")):
             with tempfile.TemporaryDirectory() as temp:
