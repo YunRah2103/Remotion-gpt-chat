@@ -168,6 +168,20 @@ def area(name, loc, energy, size, color):
 fill = area('rain sky hero softbox', (-4,-3,7), 1900, 9, (0.64,0.78,1))
 rim = area('warm reflected hero edge', (5,2,5), 1800, 7, (1,0.72,0.43))
 
+# Real headlights illuminate rain and leave streaked pools on the wet tarmac.
+for side in [-1,1]:
+    data = bpy.data.lights.new('Porsche dipped beam', 'SPOT')
+    data.energy = 140
+    data.color = (0.82,0.90,1.0)
+    data.spot_size = math.radians(55)
+    data.spot_blend = 0.65
+    data.shadow_soft_size = 0.10
+    light = bpy.data.objects.new('wet road headlight beam',data)
+    s.collection.objects.link(light)
+    light.parent = root
+    light.location = (side*0.66,-1.93,0.65)
+    light.rotation_euler = Vector((side*0.06,-1,-0.14)).to_track_quat('-Z','Y').to_euler()
+
 cam = bpy.data.objects.new('camera',bpy.data.cameras.new('camera'))
 s.collection.objects.link(cam)
 cam.name = 'tracked cinematic camera'
