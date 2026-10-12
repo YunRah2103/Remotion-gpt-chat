@@ -16,7 +16,7 @@
         "audio": true,
         "bytes": 1397105018
       },
-      "candidate_count": 7
+      "candidate_count": 14
     },
     {
       "id": "bmw-i-vision-dee-exterior",
@@ -91,7 +91,7 @@
       "candidate_count": 2
     }
   ],
-  "candidate_count": 23,
+  "candidate_count": 30,
   "rejections": [
     {
       "source_id": "mercedes-amg-gt-xx-embedded",
