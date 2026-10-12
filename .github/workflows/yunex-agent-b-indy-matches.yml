@@ -7,13 +7,14 @@ on:
       - production/videos/turbo-indy-reality-001/agent_b_acquire.py
       - production/videos/turbo-indy-reality-001/agent_b_dvids_acquire.py
       - production/videos/turbo-indy-reality-001/agent_b_stock_acquire.py
+      - production/videos/turbo-indy-reality-001/agent_b_wikimedia_acquire.py
       - .github/workflows/yunex-agent-b-indy-matches.yml
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   acquire_and_verify:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - name: Checkout assigned branch
@@ -21,6 +22,7 @@ jobs:
       - name: Install FFmpeg and Python
         run: |
           python3 --version
+          python3 -m pip install --disable-pip-version-check requests pillow yt-dlp
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
           ffprobe -version | head -n 1
@@ -32,14 +34,14 @@ jobs:
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
         run: |
           set -o pipefail
-          python3 -u production/videos/turbo-indy-reality-001/agent_b_stock_acquire.py | tee agent-b-run.log
+          python3 -u production/videos/turbo-indy-reality-001/agent_b_wikimedia_acquire.py | tee agent-b-run.log
       - name: Upload verified playable footage ZIP
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: yunex-turbo-indy-agent-b-verified-video-${{ github.run_id }}
           path: |
-            out/agent-b-stock-originals.zip
+            out/YUNEX_TURBO_INDY_AGENT_B_MATCHES.zip
             agent-b-run.log
           compression-level: 0
           retention-days: 7
@@ -50,8 +52,8 @@ jobs:
         with:
           name: yunex-agent-b-FAILED-download-DIAGNOSTICS-${{ github.run_id }}
           path: |
-            out/agent-b-stock/qa/manifest.json
-            out/agent-b-stock/qa/candidate_catalog.json
+            out/turbo-indy-agent-b/manifest.json
+            out/turbo-indy-agent-b/acquisition_log.json
             agent-b-run.log
           retention-days: 7
           if-no-files-found: warn
