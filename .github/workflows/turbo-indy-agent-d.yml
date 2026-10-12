@@ -34,7 +34,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: YUNEX-TURBO-INDY-AGENT-D-CINEMATIC
-          path: out/YUNEX_TURBO_INDY_AGENT_D_CINEMATIC.zip
+          path: out/turbo-indy-agent-d/
           if-no-files-found: warn
           retention-days: 14
           compression-level: 0
