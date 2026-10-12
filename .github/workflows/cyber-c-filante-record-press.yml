@@ -1,0 +1,44 @@
+name: CYBER FUTURE Agent C Filante Record Swiss official press QA
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/c-french-footage
+    paths:
+      - ".github/workflows/cyber-c-filante-record-press.yml"
+      - "production/videos/cyber-future-prototypes-001/agent-c/probe_filante_record_press.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  filante-record-original-native-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install actual native media tools and HTML parser
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --user requests beautifulsoup4
+      - name: Probe Renault official Swiss press video original and preserve diagnostic evidence
+        run: |
+          python -m py_compile production/videos/cyber-future-prototypes-001/agent-c/probe_filante_record_press.py
+          python production/videos/cyber-future-prototypes-001/agent-c/probe_filante_record_press.py
+          test -s out/filante_record_press/PRESS_AUDIT.json
+          python - <<'PY'
+          import json
+          j=json.load(open("out/filante_record_press/PRESS_AUDIT.json"))
+          print("PAGE_DIAGNOSTICS",len(j["page_inspection"]))
+          for x in j["page_inspection"]:
+              print("SITE",x["url"],"links",len(x.get("relevant_links",[])),"error",x.get("error"))
+          for x in j["candidate_results"]:
+              print("SOURCE",x["url"],x.get("ffprobe"),x.get("REJECT"),x.get("error"))
+          PY
+      - name: Upload actual originals and evidence; no footage PASS assumed
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-C-FILANTE-2025-NATIVE-PRESS-QA
+          path: out/filante_record_press/
+          retention-days: 7
+          if-no-files-found: warn
