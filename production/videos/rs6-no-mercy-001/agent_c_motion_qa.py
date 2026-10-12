@@ -30,3 +30,5 @@ with tempfile.TemporaryDirectory() as td:
  top=sorted([x for x in shortlist if x["luma"]>40],key=lambda x:x["motion"]*min(x["contrast"],80),reverse=True)[:18]
  print("CANDIDATE_COUNT",len(shortlist),"TOP_MOTION_CONTRAST",json.dumps(top),flush=True)
  print("RESULT_NOTE","Numerical scene ranking, not human recognition of headlights/wheels or approval.",flush=True)
+
+# Trigger scene-motion QA.
