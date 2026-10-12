@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """YUNEX Termux worker: process agent-created licensed YouTube test jobs.
-First proof permits ONLY Blender Foundation Big Buck Bunny (CC BY 3.0).
+Only allowlisted CC BY test videos may be queued, including a short car shot.
 The phone performs the download, verifies the MP4, and uploads a release asset.
 """
 import argparse
@@ -22,6 +22,22 @@ OWNER = "YunRah2103"
 TITLE_PREFIX = "[YUNEX PHONE JOB]"
 MARKER = "YUNEX_PHONE_JOB_V1"
 TEST_VIDEO = "https://www.youtube.com/watch?v=YE7VzlLtp-4"
+CAR_VIDEO = "https://www.youtube.com/watch?v=DqiKOr1aS9w"
+LICENSED_PROOFS = {
+    TEST_VIDEO: {
+        "title": "Big Buck Bunny",
+        "author": "Blender Foundation",
+        "license": "CC-BY-3.0",
+        "source": TEST_VIDEO,
+    },
+    CAR_VIDEO: {
+        "title": "Aerial views of a car driving in snow through a forest",
+        "author": "Vladislav Sanikovich",
+        "license": "CC-BY-3.0",
+        "source": CAR_VIDEO,
+        "license_reference": "https://commons.wikimedia.org/wiki/File:Aerial_views_of_a_car_driving_in_snow_through_a_forest.webm",
+    },
+}
 DONE, FAILED = "YUNEX_PHONE_DONE_V1", "YUNEX_PHONE_FAILED_V1"
 MAX_BYTES = 30 * 1024 * 1024
 
@@ -66,7 +82,7 @@ def parse_job(issue):
         job = json.loads(body.split("\n",1)[1].strip())
     except (ValueError,TypeError):
         return None
-    if (not isinstance(job,dict) or job.get("url") != TEST_VIDEO or
+    if (not isinstance(job,dict) or job.get("url") not in LICENSED_PROOFS or
             job.get("seconds") != 6 or job.get("license") != "CC-BY-3.0"):
         return None
     return job
@@ -93,15 +109,16 @@ def checked(cmd, timeout):
     return p.stdout
 
 
-def download_proof(folder):
+def download_proof(folder, job=None):
     if not all(shutil.which(x) for x in ("node","ffmpeg","ffprobe")):
         raise RuntimeError("Termux requires nodejs and ffmpeg")
+    url = job["url"] if job else TEST_VIDEO
     command = [sys.executable,"-m","yt_dlp","--ignore-config","--no-playlist",
                "--no-progress","--js-runtimes","node","--socket-timeout","20",
                "--retries","1","--fragment-retries","1","--download-sections","*0-6",
                "--merge-output-format","mp4",
                "-f","bv*[height<=720]+ba/b[height<=720]/b",
-               "--max-filesize","30M","-o",str(folder/"download.%(ext)s"),TEST_VIDEO]
+               "--max-filesize","30M","-o",str(folder/"download.%(ext)s"),url]
     checked(command,165)
     candidates = sorted((f for f in folder.iterdir() if f.is_file() and
                          f.suffix.lower() in {".mp4",".mkv",".webm",".mov"}),
@@ -119,7 +136,7 @@ def download_proof(folder):
                               "-of","json",str(result)],15))
     video=next((s for s in probe.get("streams",[]) if s.get("codec_type")=="video"),None)
     duration=float(probe.get("format",{}).get("duration") or 0)
-    if not video or video.get("width",0)<320 or not 2<=duration<=12:
+    if not video or video.get("width",0)<320 or video.get("height",0)>720 or not 2<=duration<=12:
         raise RuntimeError("Video codec/size/duration validation failed")
     checked(["ffmpeg","-v","error","-xerror","-i",str(result),
              "-t","4","-map","0:v:0","-f","null","-"],30)
@@ -131,12 +148,21 @@ def download_proof(folder):
         "full_decode_first_4s":"PASS"}
 
 
-def upload_release(token, number, file):
+def upload_release(token, number, file, job=None):
     tag=f"yunex-phone-proof-{number}"
+    source = (job or {}).get("url", TEST_VIDEO)
+    attribution = LICENSED_PROOFS[source]
+    credit = ("Six-second 720p-or-lower extraction test. "
+              + attribution["title"] + " by " + attribution["author"]
+              + " (Creative Commons Attribution 3.0). Source: " + source
+              + "\nLicense: https://creativecommons.org/licenses/by/3.0/"
+              + "\nEdited: 6-second excerpt, H.264/AAC transcode.")
+    if attribution.get("license_reference"):
+        credit += "\nArchive license evidence: " + attribution["license_reference"]
     release=api("POST",f"/repos/{REPO}/releases",token,{
         "tag_name":tag,"target_commitish":"main",
         "name":f"S25 phone footage proof #{number}","draft":False,"prerelease":True,
-        "body":"Six-second test from Blender Foundation Big Buck Bunny (CC BY 3.0). Source: "+TEST_VIDEO})
+        "body":credit})
     rid=release["id"]
     upload=f"/UPLOAD/repos/{REPO}/releases/{rid}/assets?name="+urllib.parse.quote(file.name)
     asset=api("POST",upload,token,binary=file.read_bytes(),content_type="video/mp4")
@@ -145,7 +171,8 @@ def upload_release(token, number, file):
 
 def run_once(token,dry_run=False):
     for issue in issue_jobs(token):
-        if parse_job(issue) is None:
+        job = parse_job(issue)
+        if job is None:
             continue
         number=issue["number"]
         if already_reported(token,number):
@@ -156,8 +183,8 @@ def run_once(token,dry_run=False):
             return True
         try:
             with tempfile.TemporaryDirectory(prefix="yunex-phone-") as temp:
-                file,meta=download_proof(Path(temp))
-                asset,release=upload_release(token,number,file)
+                file,meta=download_proof(Path(temp),job)
+                asset,release=upload_release(token,number,file,job)
             issue_comment(token,number,DONE+"\n\nVerified on phone.\n\n~~~json\n"+
                           json.dumps(meta,indent=2)+"\n~~~\n\n"+
                           f"[Playable MP4]({asset}) | [Release]({release})")
