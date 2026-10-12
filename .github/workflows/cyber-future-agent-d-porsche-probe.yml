@@ -1,0 +1,39 @@
+name: Agent D Porsche Native-HD Variant Probe
+
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/d-radical-footage
+    paths:
+      - .github/workflows/cyber-future-agent-d-porsche-probe.yml
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Investigate native manufacturer encodes
+        run: |
+          python3 - <<'PY'
+          import urllib.request,urllib.error,json,time
+          results=[]
+          for id in ("245385","245346"):
+            for rate in ("20000000","15000000","12000000","10000000","8000000","6000000","5000000","4500000"):
+              url=f"https://newstv.porsche.com/porschevideos/{id}_en_{rate}.mp4"
+              req=urllib.request.Request(url,method="HEAD",headers={"User-Agent":"Mozilla/5.0"})
+              try:
+                with urllib.request.urlopen(req,timeout=9) as res:
+                  row={"url":url,"status":res.status,"bytes":res.headers.get("Content-Length"),
+                       "content_type":res.headers.get("Content-Type")}
+              except urllib.error.HTTPError as e:row={"url":url,"status":e.code}
+              except Exception as e:row={"url":url,"error":str(e)[:100]}
+              print(json.dumps(row),flush=True);results.append(row)
+          with open("porsche_variant_scan.json","w") as f:json.dump(results,f,indent=2)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-D-PORSCHE-SCAN
+          path: porsche_variant_scan.json
+          if-no-files-found: error
+          retention-days: 7
