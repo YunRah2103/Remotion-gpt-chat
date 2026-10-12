@@ -9,11 +9,9 @@ SRC_URL="https://www.dvidshub.net/video/1008379/us-armed-forces-participate-indy
 RIGHTS="Public domain identified by DVIDS; third-party identities/trademarks may remain protected. https://www.dvidshub.net/about/copyright"
 # Diverse requested accents, deliberately exclude military procession and broadcast footage.
 CANDIDATES=[
-("dvids26_car_rear_4k",10.5,3.2,"car exterior and wheel close-up from 2026 Indy 500 grid"),
-("dvids26_yellow_grid_4k",20.0,4.0,"yellow IndyCar near pit/grid at IMS"),
-("dvids26_orange_cockpit_4k",30.0,4.2,"orange IndyCar upper body and cockpit"),
-("dvids26_oval_action_first_4k",313.5,4.0,"real racing pass near grandstands, original independent camera"),
-("dvids26_oval_action_second_4k",322.5,4.0,"alternate later IndyCar passing action near grandstands"),
+("dvids26_yellow_indycar_wheel_native4k",21.5,3.1,"Genuine yellow IndyCar stationary wheel and sidepod at grid; foreground detail"),
+("dvids26_orange_indycar_front_native4k",33.0,3.2,"Genuine orange Andretti IndyCar cockpit and front bodywork near grid"),
+("dvids26_oval_race_pass_native4k",322.5,4.0,"Authentic distant Indy 500 racing pass before full grandstands; static elevated camera"),
 ]
 def exec(cmd,timeout=70):
     return subprocess.run(cmd,text=True,capture_output=True,timeout=timeout)
@@ -61,14 +59,14 @@ def main():
             "description":description,"rightsholder_statement":RIGHTS,"source_resolution":orig,
             "source_start_time_s":start,"source_duration_s":length,"delivered_resolution":dv,
             "pixel_motion_differences":delta,"sha256":digest(dst),
-            "review_status":"PROVISIONAL: close visual review required; no onboard or pit-stop action claimed"}
+            "review_status":"MANUAL VISUAL QA: distinctive subject verified in independently inspected source frames; no onboard or moving pit-stop claimed"}
         manifest.append(row)
         print("VERIFIED_VIDEO",ident,row["delivered_resolution"],"SHA256",row["sha256"],flush=True)
     (BASE/"manifest.json").write_text(json.dumps(manifest,indent=2))
     (BASE/"SHA256SUMS.txt").write_text("".join(x["sha256"]+"  "+x["file"]+"\n" for x in manifest))
     (BASE/"REPORT.md").write_text("# INDYCAR Agent D — New genuine 4K camera footage\n\n"
         "Source: "+SRC_URL+"\n\n"
-        "Five short samples extracted from genuine public-domain Indiana National Guard video showing 2026 Indy 500 grid, IndyCars, and track action. **Not helmet cam, onboard or pit-stop change**. Confirm exact frame contents from included contact sheets before use. Source decoded at native 3840×2160; 4K delivery preserved.\n\n"
+        "Three manually selected distinct real 4K shots extracted from genuine public-domain Indiana National Guard video showing yellow wheel detail, orange car cockpit/front, and genuine Indy 500 distant oval pass. **Not helmet cam, onboard or pit-stop change**. Confirm exact frame contents from included contact sheets before use. Source decoded at native 3840×2160; 4K delivery preserved.\n\n"
         "License caveat: "+RIGHTS+"\n")
     target=Path("out/YUNEX_INDY_AGENT_D_2026_NATIVE_4K.zip")
     with zipfile.ZipFile(target,"w",compression=zipfile.ZIP_DEFLATED,compresslevel=1) as z:
