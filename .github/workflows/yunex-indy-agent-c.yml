@@ -7,6 +7,10 @@ on:
       - .github/workflows/yunex-indy-agent-c.yml
       - production/videos/turbo-indy-reality-001/agent_c/**
   workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/yunex-indy-agent-c.yml
+      - production/videos/turbo-indy-reality-001/agent_c/**
 
 permissions:
   contents: read
