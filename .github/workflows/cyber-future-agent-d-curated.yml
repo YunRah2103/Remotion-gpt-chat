@@ -30,6 +30,12 @@ jobs:
           name: CYBER-FUTURE-001-D-PORSCHE-HQ
           path: incoming/porsche
           github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 38192377224
+          name: CYBER-FUTURE-001-D-PORSCHE-QUICK
+          path: incoming/porsche_late
+          github-token: ${{ github.token }}
       - name: Native media tools
         run: |
           sudo apt-get update -qq
