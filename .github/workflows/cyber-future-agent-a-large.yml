@@ -1,0 +1,33 @@
+name: CYBER FUTURE 001 - Agent A Large Source Review
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/a-asia-footage
+    paths:
+      - '.github/workflows/cyber-future-agent-a-large.yml'
+      - 'production/videos/cyber-future-prototypes-001/agent-a/large_source_probe.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install video tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python3 -m pip install --quiet --break-system-packages requests
+      - name: Review two large original manufacturer MP4s
+        run: python3 -u production/videos/cyber-future-prototypes-001/agent-a/large_source_probe.py
+      - name: Upload proof clips, contact screenshots, media hashes and QA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-A-LARGE-SOURCE-REVIEW
+          path: out/agent-a-large-source-probe/
+          retention-days: 5
+          compression-level: 0
+          if-no-files-found: warn
