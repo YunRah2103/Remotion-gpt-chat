@@ -15,7 +15,6 @@ SELECTION={
  "bmw-vision-m-next-driving-candidate-05":("rear three-quarter road curve","real road-driving film",5),
  "bmw-vision-m-next-driving-candidate-06":("rear drive-through bend","real road-driving film",4),
  "bmw-vision-m-next-driving-candidate-07":("closer rear tracking road","real road-driving film",5),
- "bmw-vision-m-next-launch-candidate-01":("dark studio illuminated front grille","physical-studio appearance; motion to verify",4),
  "bmw-i-vision-dee-running-candidate-01":("three-quarter front on presentation plaza","static physical show car / moving camera or turntable",4),
  "bmw-i-vision-dee-running-candidate-03":("three-quarter rear plaza","static physical show car / moving camera or turntable",4),
  "bmw-i-vision-dee-running-candidate-07":("wheel detail with fluorescent rim","static physical show car close-up",4),
@@ -51,7 +50,7 @@ def temporal(path):
 def write_gallery(all_tiles,out):
     W=1280;H=210
     canvas=Image.new("RGB",(W,len(all_tiles)*H+46),(16,18,22))
-    dr=ImageDraw.Draw(canvas);dr.text((12,14),"AGENT B — GENUINE DECODED FRAMES | START / MID / END | 11 CURATED CANDIDATES",fill="white")
+    dr=ImageDraw.Draw(canvas);dr.text((12,14),"AGENT B — GENUINE DECODED FRAMES | START / MID / END | 10 CURATED CANDIDATES",fill="white")
     for n,(label,views,qa) in enumerate(all_tiles):
         y=n*H+46
         dr.text((10,y+10),f"{n+1:02} {label} | mean frame change {qa}",fill=(240,230,210))
@@ -108,12 +107,12 @@ def main():
             target.writestr("manifest.csv",s.getvalue())
             target.writestr("rejections.json",json.dumps(manifest.get("rejections",[]),indent=2))
             readme=("# CYBER//FUTURE 001 — AGENT B / CURATED ACTUAL FILM\n\n"
-                 "11 video excerpts, **BMW Vision M NEXT** and **BMW i Vision Dee**. "
+                 "10 video excerpts, **BMW Vision M NEXT** and **BMW i Vision Dee**. "
                  "All files native 1920x1080/25 FPS, original camera-side audio preserved where present. "
                  "All bytes verified SHA256 + FFprobe + full FFmpeg decode; 3 frames per clip sampled with measured temporal differences. "
                  "BMW M NEXT moving road-camera clips; Dee physically built concept filmed on circular studio/plaza stage (not established road driving). "
                  "CGI/manipulations in manufacturer promotional edits cannot be categorically ruled out. "
-                 "Selected angles: 4 M NEXT drive, 1 studio headlamp, 6 Dee stage angles. "
+                 "Selected angles: 4 M NEXT road drives and 6 Dee studio/show-car angles; the promotional intro with black bars was rejected after three-frame visual inspection. "
                  "There is no native portrait 1080 source. Rights to redistribute/edit the publisher footage are unconfirmed. "
                  "Source URLs, hashes, timecodes and details in manifest.json. No music, edits or video renders created.\n")
             target.writestr("README_START_HERE.md",readme)
