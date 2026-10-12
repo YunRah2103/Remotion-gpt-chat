@@ -1,0 +1,60 @@
+name: YUNEX YouTube Browser Screen Capture Proof
+on:
+  push:
+    branches:
+      - experiments/youtube-browser-recording-20261012
+    paths:
+      - '.github/workflows/youtube-browser-screen-proof.yml'
+      - 'production/youtube_screen_capture/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recording-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 9
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        method: [x11grab, puppeteer-stream]
+        sample: [control-mp4, youtube-watch, youtube-embed]
+    name: ${{ matrix.method }} / ${{ matrix.sample }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Setup Chrome, virtual display and recorder
+        shell: bash
+        run: |
+          set -eux
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg xvfb
+          which google-chrome || which google-chrome-stable || which chromium
+          export PUPPETEER_SKIP_DOWNLOAD=1
+          npm install --no-save --no-package-lock --prefix "$RUNNER_TEMP/yunex" puppeteer-core@24 puppeteer@24 puppeteer-stream@3
+      - name: Record authorized Blender CC BY test video
+        shell: bash
+        env:
+          SAMPLE: ${{ matrix.sample }}
+          METHOD: ${{ matrix.method }}
+          NODE_PATH: ${{ runner.temp }}/yunex/node_modules
+          OUTPUT_DIR: output/${{ matrix.sample }}/${{ matrix.method }}
+        run: |
+          set +e
+          xvfb-run -a -s "-screen 0 1280x720x24 -ac" \
+            timeout -k 10s 130s node production/youtube_screen_capture/browser_record_test.cjs
+          rc=$?
+          echo "recording_exit_code=$rc"
+          exit "$rc"
+      - name: Publish proof metadata, screenshots and recorded snippet
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-browser-${{ matrix.method }}-${{ matrix.sample }}
+          path: output/
+          if-no-files-found: warn
+          retention-days: 3
