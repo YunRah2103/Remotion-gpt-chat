@@ -1,4 +1,4 @@
-name: YUNEX Turbo A - Final Clip Frame Review
+name: YUNEX Turbo A - Final Corrected Clip Review
 on:
   push:
     branches:
@@ -18,8 +18,8 @@ jobs:
       - name: Retrieve verified footage artifact and contact sheets
         uses: actions/download-artifact@v4
         with:
-          name: YUNEX-Turbo-AgentA-Indy500-Selection-38274763279
-          run-id: 38274763279
+          name: YUNEX-Turbo-AgentA-Indy500-Selection-38275198546
+          run-id: 38275198546
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: out/visual
       - name: Install ImageMagick for smaller visual review frames
