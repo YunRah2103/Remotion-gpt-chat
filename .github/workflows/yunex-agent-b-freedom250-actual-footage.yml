@@ -1,0 +1,38 @@
+name: YUNEX Agent B Freedom250 Genuine IndyCar Alternative
+on:
+  push:
+    branches:
+      - automotive-edits/turbo-indy-reality-001/b-indy-matches
+    paths:
+      - production/videos/turbo-indy-reality-001/agent_b_freedom250_real_indycar.py
+      - .github/workflows/yunex-agent-b-freedom250-actual-footage.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  deliver-alternative-real-indycar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install FFmpeg and acquisition dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check -U yt-dlp pillow
+      - name: Download and verify real street-race camera footage
+        run: |
+          set -euo pipefail
+          python -u production/videos/turbo-indy-reality-001/agent_b_freedom250_real_indycar.py
+      - name: Deliver actual independently decodable MP4 and QA ZIP
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-Agent-B-Alternative-REAL-IndyCar-${{ github.run_id }}
+          path: out/YUNEX_AGENT_B_FREEDOM250_REAL_INDYCAR_1080P.zip
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
