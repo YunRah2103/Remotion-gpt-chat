@@ -40,3 +40,11 @@ Once permission exists: secure direct authorized MP4, download to an appropriate
 - MP4 atoms `ftyp`, `moov` and `mdat` detected. **This confirms downloaded MP4 bytes, not full playback validation.** ffprobe/decoded moving-frame visual QA unavailable in that transient environment (ffmpeg/ffprobe executables absent). Source URI labels 1280x720 preview; no verified original-resolution claim.
 - Licensing: Audi press page says journalistic uses only. **Do not copy file into public GitHub releases or republish as a cleared YUNEX clip without Audi's permission.**
 - This first technical download is **not an Actions ZIP or completed Agent A handoff.** Original source link is playable remotely; transient VM file not persisted in ChatGPT artifact store.
+
+## Independent MP4 stream metadata (MP4Box parser, 2026-10-12)
+- Byte count 72,820,901; SHA256 `b3b69741e3d60d6bc680cd870b558975a77734cb95ddaf4cfc9a0d79c69a513b`.
+- Container duration **639.042 seconds** (10m39.042s).
+- H.264 AVC High `avc1.64001e`, actual **620x348** coded video display, **25fps**, 15,975 video samples. This contradicts filename suffix `1280x720_play`. **REJECT as quality source** for YUNEX native 1080x1920 edit.
+- Audio AAC-LC `mp4a.40.2`, 44.1kHz stereo.
+- Runtime could not install FFmpeg due to VM container privilege restrictions; codec frames not fully decoded/visually ranked. Structural MP4Box parser ready.
+- DO NOT present source as final 720p or 1080p; cannot infer native quality from website, file name, or byte size.
