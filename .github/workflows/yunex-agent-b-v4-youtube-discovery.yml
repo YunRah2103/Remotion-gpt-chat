@@ -1,0 +1,34 @@
+name: YUNEX Agent B V4 YouTube Source Rights Discovery
+on:
+  push:
+    branches:
+      - automotive-edits/turbo-indy-reality-001/b-indy-matches
+    paths:
+      - production/videos/turbo-indy-reality-001/agent_b_v4_youtube_discovery.py
+      - .github/workflows/yunex-agent-b-v4-youtube-discovery.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  youtube-metadata-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Set up yt-dlp search (no video downloads)
+        run: |
+          python -m pip install -U --disable-pip-version-check "yt-dlp[default]"
+      - name: Find actual YouTube IDs and screen licensing and native formats
+        run: |
+          python -u production/videos/turbo-indy-reality-001/agent_b_v4_youtube_discovery.py
+      - name: Upload source research and rights diagnostics (not media)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-Agent-B-YouTube-V4-rights-research-${{ github.run_id }}
+          path: out/agent-b-v4-youtube-discovery/
+          if-no-files-found: warn
+          retention-days: 7
