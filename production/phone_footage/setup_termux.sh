@@ -31,6 +31,8 @@ RAW="https://raw.githubusercontent.com/$REPO/$BRANCH/production/phone_footage/wo
 curl --fail --location --silent --show-error "$RAW" -o "$HOME/yunex-phone-worker.py"
 echo "[YUNEX] Checking local prerequisites..."
 python "$HOME/yunex-phone-worker.py" --doctor
+echo "[YUNEX] Launching the queued 6-second YouTube phone test automatically..."
+python "$HOME/yunex-phone-worker.py" --once
 echo
 echo "Ready. To check queue once: python ~/yunex-phone-worker.py --once"
 echo "To leave agent worker active: python ~/yunex-phone-worker.py --loop"
