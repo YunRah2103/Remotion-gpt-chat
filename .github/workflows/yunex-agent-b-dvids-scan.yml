@@ -1,0 +1,36 @@
+name: YUNEX B IndyCar Full-Scene Frame Inspection
+on:
+  push:
+    branches:
+      - automotive-edits/turbo-indy-reality-001/b-indy-matches
+    paths:
+      - production/videos/turbo-indy-reality-001/agent_b_dvids_full_scene_scan.py
+      - .github/workflows/yunex-agent-b-dvids-scan.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  analyse-public-domain-originals:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: 
+          python-version: '3.12'
+      - name: Install decoder, downloader and image inspection
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check -U yt-dlp pillow
+      - name: Download and decode multiple original motorsport source videos
+        run: python -u production/videos/turbo-indy-reality-001/agent_b_dvids_full_scene_scan.py
+      - name: Deliver decoded frame/timecode contact sheets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-Agent-B-DVIDS-all-scenes-${{ github.run_id }}
+          path: out/agent-b-dvids-contact-scans.zip
+          if-no-files-found: warn
+          retention-days: 7
+          compression-level: 0
