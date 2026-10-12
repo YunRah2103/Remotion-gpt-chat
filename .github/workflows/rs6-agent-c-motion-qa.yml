@@ -1,0 +1,14 @@
+name: RS6 Agent C scene and motion QA
+on:
+  push:
+    branches: [automotive-edits/rs6-no-mercy-001/c-details-atmosphere]
+    paths: [production/videos/rs6-no-mercy-001/agent_c_motion_qa.py]
+  workflow_dispatch:
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - run: python -u production/videos/rs6-no-mercy-001/agent_c_motion_qa.py
