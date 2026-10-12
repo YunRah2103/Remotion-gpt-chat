@@ -11,8 +11,9 @@ URL="https://www.dvidshub.net/video/1008379/us-armed-forces-participate-indy-500
 SOURCE_CREDIT="Indiana National Guard, Staff Sgt. Hector Tinoco, May 24 2026, DVIDS."
 RIGHTS="Marked public domain by DVIDS; review https://www.dvidshub.net/about/copyright and possible INDYCAR/third-party event rights before online publication."
 CUTS=[
- ("B26_01_original_real_car_trackside",47.0,5.0,"Movement along Speedway front straight; 49.5s shows actual filmed open-wheel car. Check actual real race vs procession before approval.","A02 optional angle/pan only, not A01 wheel-match."),
- ("B26_02_original_real_car_close_pass",290.5,5.0,"Fast close trackside approach/passing at approx 293.5s, modern IndyCars. This is a separate camera composition to Agent D 322.5.","A02 fast passing car frame may align; A01 very-low lens still unmatched.")
+ ("B26_01_modern_indycar_smoke_near_pitwall",290.5,3.10,
+ "Real modern green-and-white IndyCar passing adjacent to pit wall with other green IndyCar creating tyre smoke. Near-side telephoto tracking, not track-level or high-speed racing; camera cut at 293.7 excluded.",
+ "Provisional physical wheel/sidepod-and-smoke match to A01 and A05. Does not meet exact low-lens or same banking geometry.")
 ]
 def run(args,timeout=90):
  x=subprocess.run(args,text=True,capture_output=True,timeout=timeout)
@@ -43,7 +44,7 @@ def main():
   # Decode *entire* clip, not only a probe header.
   run(["ffmpeg","-nostdin","-v","error","-i",str(dest),"-f","null","-"],70)
   shots=[]; diffs=[]
-  for n,dt in enumerate([.2,.65,1.1,1.55,2.0,2.45,3.2,4.2]):
+  for n,dt in enumerate([.15,.42,.75,1.05,1.4,1.8,2.3,2.82]):
    p=SHEETS/(ident+f"_frame{n:02}.jpg")
    run(["ffmpeg","-nostdin","-y","-v","error","-ss",str(dt),"-i",str(dest),"-frames:v","1",
         "-vf","scale=720:-2","-q:v","4",str(p)],30)
@@ -68,7 +69,7 @@ def main():
  (BASE/"manifest.json").write_text(json.dumps(manifest,indent=2)+"\n")
  (BASE/"SHA256SUMS.txt").write_text("".join(x["sha256"]+"  "+x["clip"]+"\n" for x in manifest))
  (BASE/"REPORT.md").write_text("# Agent B 2026 4K Trackside Original Video Candidates\n\nSource DVIDS public-domain marked "+URL+
-     "\n\nBoth sourced from one original film shot at different points, not two independent recording authors or guaranteed distinct camera angles. \n\nAll clips actual 4K video, fully decoded and checked SHA256. Reference Agent A A01 (wheel, low lens) and A02 (pack corner). Needs human QA and licensing review. No duplicated Agent D selected 322.5s material.\n\n"+RIGHTS+"\n")
+     "\n\nOne distinct 3.10-second modern IndyCar movement with smoke from a genuine 2026 4K recording, not multiple independent angles. Historic cars and aerial cutaway deliberately rejected. \n\nActual 3840x2160 video fully decoded and SHA256-checked. This is near-pitwall moving cars, NOT low camera beside asphalt nor banked oval match. Reference Agent A A01 (wheel, low lens) and A02 (pack corner). Needs human QA and licensing review. No duplicated Agent D selected 322.5s material. Rights for reuse not yet finally cleared.\n\n"+RIGHTS+"\n")
  archive=Path("out/YUNEX_AGENT_B_2026_4K_TRACKSIDE_CANDIDATES.zip")
  with zipfile.ZipFile(archive,"w",compression=zipfile.ZIP_DEFLATED,compresslevel=1) as z:
   for p in BASE.rglob("*"):
