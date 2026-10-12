@@ -1,4 +1,4 @@
-name: RS6 Agent B source access diagnostics
+name: RS6 Agent B real source and decode probe
 on:
   push:
     branches:
@@ -9,34 +9,40 @@ on:
 jobs:
   source-check:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
-      - name: Install acquisition diagnostic tools
+      - name: Install video tools
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
           python -m pip install -q -U yt-dlp
-      - name: Test Vimeo C8 RS6 sources without public media redistribution
+      - name: Probe real C8 RS6 creator candidates
         shell: bash
         run: |
           set +e
-          mkdir -p reports
-          for entry in '2n2|https://vimeo.com/803836362' 'FumeStudio|https://vimeo.com/761014676' 'NightShip|https://vimeo.com/712787364'; do
+          mkdir -p reports private-test
+          for entry in '2n2|https://vimeo.com/803836362' 'FumeStudio|https://vimeo.com/761014676'; do
             label="${entry%%|*}"
             url="${entry#*|}"
-            echo "SOURCE: $label $url" | tee "reports/$label.txt"
-            yt-dlp --no-playlist --skip-download --dump-single-json --socket-timeout 12 --retries 1 "$url" >"reports/$label.json" 2>>"reports/$label.txt"
-            code=$?
-            echo "extract_exit=$code" | tee -a "reports/$label.txt"
-            if [ "$code" -eq 0 ]; then
-              python -c 'import sys,json; d=json.load(open(sys.argv[1])); print("title:",d.get("title"),"width:",d.get("width"),"height:",d.get("height"),"duration:",d.get("duration"),"uploader:",d.get("uploader"))' "reports/$label.json" | tee -a "reports/$label.txt"
+            echo "Source: $label $url" >"reports/$label.txt"
+            yt-dlp --no-playlist --skip-download --print 'title=%(title)s id=%(id)s width=%(width)s height=%(height)s duration=%(duration)s license=%(license)s' --socket-timeout 12 --retries 1 "$url" >>"reports/$label.txt" 2>&1
+            echo "metadata_exit=$?" >>"reports/$label.txt"
+            # Extract up to 6 seconds to runner-private workspace for technical assessment.
+            # NOT uploaded to a public artifact before source permission is established.
+            yt-dlp --no-playlist --download-sections '*0-6' --force-keyframes-at-cuts --merge-output-format mp4 --format 'bestvideo[height>=1080]+bestaudio/best[height>=1080]/best' --socket-timeout 15 --retries 1 --output "private-test/$label.%(ext)s" "$url" >>"reports/$label.txt" 2>&1
+            echo "download_exit=$?" >>"reports/$label.txt"
+            file=$(find private-test -maxdepth 1 -type f -name "$label.*" | head -n 1)
+            if [[ -n "$file" ]]; then
+              ffprobe -v error -show_entries format=duration,size:stream=codec_name,width,height,r_frame_rate -of json "$file" >"reports/$label-ffprobe.json" 2>&1
+              ffmpeg -v error -xerror -i "$file" -f null - >>"reports/$label.txt" 2>&1
+              echo "full_decode_exit=$?" >>"reports/$label.txt"
+              sha256sum "$file" >>"reports/$label.txt"
             fi
           done
-          curl --head --location --max-time 20 'https://audi-mediacenter.pl/film,48075,footage:-audi-rs-6-avant-performance-mythos-black-metallic-.html' > reports/audi-http.txt 2>&1
-          echo "Audi source is Agent A territory; metadata-only test" >> reports/audi-http.txt
-      - uses: actions/upload-artifact@v4
+      - name: Upload diagnostics only
         if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: rs6-b-source-access-diagnostics
-          path: reports/*.txt
+          name: rs6-b-creator-source-diagnostics
+          path: reports/
