@@ -1,0 +1,44 @@
+name: Turbo Indy Agent D - actual cinematic footage ZIP
+on:
+  push:
+    branches:
+      - automotive-edits/turbo-indy-reality-001/d-indy-cinematic
+    paths:
+      - 'production/videos/turbo-indy-reality-001/agent_d_acquire.py'
+      - '.github/workflows/turbo-indy-agent-d.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acquire-real-indycar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install frame decoder and acquisition tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check pillow requests yt-dlp
+          ffmpeg -version | head -1
+      - name: Obtain, transcode, inspect, and package real moving footage
+        run: |
+          python production/videos/turbo-indy-reality-001/agent_d_acquire.py
+      - name: Upload playable clips and QA evidence as Actions artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-TURBO-INDY-AGENT-D-CINEMATIC
+          path: out/YUNEX_TURBO_INDY_AGENT_D_CINEMATIC.zip
+          if-no-files-found: warn
+          retention-days: 14
+          compression-level: 0
+      - name: Print output index
+        if: always()
+        run: |
+          find out -maxdepth 3 -type f -printf '%p %s bytes\n' 2>/dev/null | head -80 || true
