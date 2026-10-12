@@ -9,13 +9,13 @@ OUT=Path("out/turbo-indy-agent-d"); SRC=OUT/"sources"; CLIPS=OUT/"clips"; SHEETS
 for p in (SRC,CLIPS,SHEETS): p.mkdir(parents=True,exist_ok=True)
 session=requests.Session(); session.headers.update({"User-Agent":"YUNEX-IndyCar-Research/1.0 (GitHub Actions footage quality review; contact via GitHub issue 37)"})
 SOURCES=[
- ("indy24_04","2024 Indianapolis 500 - Sarah Stierch 04.webm","Indianapolis 500 candid B-roll","context/detail, manual frame review needed"),
- ("indy24_08","2024 Indianapolis 500 - Sarah Stierch 08.webm","Indianapolis 500 candid B-roll","context/detail, manual frame review needed"),
- ("indy24_05","2024 Indianapolis 500 - Sarah Stierch 05.webm","crowds under grandstands/weather delay","race atmosphere, NOT car or pit footage"),
- ("indy24_11","2024 Indianapolis 500 - Sarah Stierch 11.webm","Borg-Warner trophy on truck","pre-race tradition, vertical shot"),
- ("indy22_08","2022 Indianapolis 500 - Sarah Stierch 08.webm","Indianapolis 500 candid B-roll","context/detail, manual frame review needed"),
- ("indy24_01","2024 Indianapolis 500 - Sarah Stierch 01.webm","IndyCar formation/pace lap","grid build-up, CC BY attribution"),
+ ("indy24_01","2024 Indianapolis 500 - Sarah Stierch 01.webm","2024 Indianapolis 500 pace lap","official Indy 500 formation lap - grid build-up",5.0),
+ ("indy22_08","2022 Indianapolis 500 - Sarah Stierch 08.webm","2022 Indianapolis 500 spectator camera","Indy 500 4K supplemental scene, needs manual vision review",1.0),
+ ("indy24_11","2024 Indianapolis 500 - Sarah Stierch 11.webm","2024 Indianapolis 500 Borg-Warner trophy procession","dramatic vertical pre-race trophy reveal",4.0),
+ ("indy24_04","2024 Indianapolis 500 - Sarah Stierch 04.webm","2024 Indianapolis 500 grandstand","distant track atmosphere fallback, NOT an action close-up",0.5),
+ ("indy24_08","2024 Indianapolis 500 - Sarah Stierch 08.webm","2024 Indianapolis 500 flags","race atmosphere fallback, NOT car footage",0.5),
 ]
+
 OFFICIAL=[
  ("official_newgarden_helmet","https://www.indycar.com/videos/2025/05/05-14-nics-helmetcam-indy500-vid","driver helmet cam onboard","rights reserved; editor must seek clearance"),
  ("official_pit_challenge","https://www.indycar.com/videos/2025/05/05-23-nics-pitstop-vid","real pit crew wheel change","rights reserved; editor must seek clearance"),
@@ -101,7 +101,7 @@ def process(identity,local,url,label,rights,role,initial_sec=0.5):
        "sha256":digest,"editorial_status":"PROVISIONAL: contact sheet visual review required; no claim of artistic approval"})
     LOG.append({"accepted_ffprobe":identity,"source_px":f'{meta["width"]}x{meta["height"]}',"clip_px":f'{delivered["width"]}x{delivered["height"]}',"motion_luma_deltas":diffs})
 def main():
-    for ident,name,desc,role in SOURCES:
+    for ident,name,desc,role,offset in SOURCES:
         url=md5_link(name);file=SRC/(ident+".webm")
         try:
             info=wiki_metadata(name);actual=info.get("url") or url
@@ -110,7 +110,7 @@ def main():
                 LOG.append({"primary_failed":ident,"error":str(e)[:240]})
                 final_url=download(url,file)
             rights=info.get("license","Unknown")+"; attribution/terms on "+"https://commons.wikimedia.org/wiki/File:"+name.replace(" ","_")
-            process(ident,file,final_url,desc,rights,role)
+            process(ident,file,final_url,desc,rights,role,initial_sec=offset)
         except Exception as e:LOG.append({"failed":ident,"url":url,"error":str(e)[:500]})
         finally:
             if file.exists():file.unlink()
