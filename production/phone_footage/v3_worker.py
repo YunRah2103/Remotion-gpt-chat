@@ -48,6 +48,42 @@ def load_approved_sources(path=None):
 
 LICENSED_PROOFS = load_approved_sources()
 
+def refresh_sources():
+    """Refresh reviewed source records from our GitHub branch; never execute remote code.
+
+    A network failure preserves the last reviewed catalog on the phone.
+    New sources still need an authorised, rights-checked registry commit.
+    """
+    global LICENSED_PROOFS
+    remote = ("https://raw.githubusercontent.com/" + REPO
+              + "/experiments/s25-footage-worker-v3-20261012/"
+              + "production/phone_footage/sources_v3.json")
+    destination = Path(__file__).with_name("sources_v3.json")
+    temporary = destination.with_name(".sources_v3.download")
+    try:
+        req = urllib.request.Request(remote, headers={"User-Agent": "yunex-v3-catalog"})
+        with urllib.request.urlopen(req, timeout=12) as response:
+            data = response.read(128 * 1024 + 1)
+        if len(data) > 128 * 1024:
+            raise RuntimeError("Remote registry too large")
+        temporary.write_bytes(data)
+        updated = load_approved_sources(temporary)
+        if data != destination.read_bytes():
+            os.replace(temporary, destination)
+            print(f"Updated approved source catalog ({len(updated)} entries)", flush=True)
+        else:
+            temporary.unlink(missing_ok=True)
+        LICENSED_PROOFS = updated
+        return True
+    except Exception as exc:
+        temporary.unlink(missing_ok=True)
+        print("Catalog refresh unavailable; using existing reviewed sources: "
+              + str(exc)[:100], flush=True)
+        return False
+
+
+
+
 DONE, FAILED = "YUNEX_PHONE_DONE_V3", "YUNEX_PHONE_FAILED_V3"
 MAX_BYTES = 80 * 1024 * 1024
 MAX_WORKSPACE_BYTES = 350 * 1024 * 1024
@@ -364,6 +400,7 @@ def main():
     token=read_token()
     while True:
         try:
+            refresh_sources()
             run_once(token,args.dry_run)
         except Exception as err:
             print("Worker error:",str(err)[:200],flush=True)
