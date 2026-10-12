@@ -3,6 +3,8 @@ on:
   push:
     branches: [automotive-edits/rs6-no-mercy-001/b-creator-driving]
     paths: [.github/workflows/rs6-agent-b-source-check.yml]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
     inputs:
       approved_url:
