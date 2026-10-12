@@ -1,0 +1,12 @@
+{
+  "status": "TECHNICAL_PASS",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "frames": 479,
+  "reveal_frame": 214,
+  "audio": "original AAC copied; every audio packet SHA256 identical",
+  "full_decode": "passed",
+  "sha256": "1bb27a01d37efbc8ec76d468b615231f1963eb87ac2e956650cf8935526fb477",
+  "visual_review": "required independently of technical checks"
+}
