@@ -3,7 +3,7 @@
 # This script never prints your GitHub token and does not post jobs itself.
 set -euo pipefail
 REPO="YunRah2103/Remotion-gpt-chat"
-BRANCH="experiments/s25-autonomous-footage-worker-20261012"
+BRANCH="experiments/s25-footage-worker-v2-20261012"
 echo "[YUNEX] Installing official yt-dlp, Node.js and FFmpeg for Android..."
 pkg update -y
 pkg install -y python python-pip nodejs ffmpeg curl
@@ -31,7 +31,7 @@ RAW="https://raw.githubusercontent.com/$REPO/$BRANCH/production/phone_footage/wo
 curl --fail --location --silent --show-error "$RAW" -o "$HOME/yunex-phone-worker.py"
 echo "[YUNEX] Checking local prerequisites..."
 python "$HOME/yunex-phone-worker.py" --doctor
-echo "[YUNEX] Launching the queued 6-second YouTube phone test automatically..."
+echo "[YUNEX] Launching the queued approved six-second YouTube phone job..."
 python "$HOME/yunex-phone-worker.py" --once
 echo
 echo "Ready. To check queue once: python ~/yunex-phone-worker.py --once"

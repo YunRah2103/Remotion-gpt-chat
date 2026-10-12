@@ -36,6 +36,32 @@ class PhoneWorkerTests(unittest.TestCase):
                     worker.download_proof(Path(temp),job)
         self.assertTrue(worker.CAR_VIDEO.startswith("https://www.youtube.com/watch?v="))
 
+    def test_1080p_jobs_require_registry_approval(self):
+        car={"url":worker.CAR_VIDEO,"seconds":6,"license":"CC-BY-3.0","height":1080}
+        bunny={**car,"url":worker.TEST_VIDEO}
+        mk=lambda j: {"body":worker.MARKER+"\\n"+json.dumps(j)}
+        self.assertEqual(worker.parse_job(mk(car)),car)
+        self.assertIsNone(worker.parse_job(mk(bunny)))
+        for bad in (0, 360, 720.5, 2160, True):
+            self.assertIsNone(worker.parse_job(mk({**car,"height":bad})))
+
+    def test_registry_rejects_unreviewed_sources(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            registry=Path(tmp)/"registry.json"
+            registry.write_text(json.dumps({
+                "https://malicious.example/watch?v=test":{
+                    "license":"CC-BY-3.0","title":"test","author":"test",
+                    "source":"https://malicious.example/watch?v=test",
+                    "license_reference":"https://example.com/license","max_height":1080}}))
+            with self.assertRaisesRegex(RuntimeError,"noncanonical"):
+                worker.load_approved_sources(registry)
+
+    def test_idempotence_uses_existing_release(self):
+        fake_release={"assets":[{"browser_download_url":"https://example.com/old.mp4"}]}
+        with mock.patch.object(worker,"api",return_value=fake_release):
+            self.assertEqual(worker.previous_release_asset("secret",41),
+                             "https://example.com/old.mp4")
+
     def test_owner_only_and_safe_queue(self):
         fake=[
           {"number":8,"title":"[YUNEX PHONE JOB] accepted","user":{"login":"YunRah2103"}},
@@ -53,6 +79,7 @@ class PhoneWorkerTests(unittest.TestCase):
                  "url":worker.TEST_VIDEO,"seconds":6,"license":"CC-BY-3.0"})}
         with mock.patch.object(worker,"issue_jobs",return_value=[job]), \
              mock.patch.object(worker,"already_reported",return_value=False), \
+             mock.patch.object(worker,"previous_release_asset",return_value=None), \
              mock.patch.object(worker,"download_proof") as download:
             self.assertTrue(worker.run_once("dummy",True))
             download.assert_not_called()
@@ -78,7 +105,7 @@ class PhoneWorkerTests(unittest.TestCase):
             self.assertTrue(result.is_file())
             self.assertEqual((meta["width"],meta["height"]),(640,360))
             self.assertGreater(meta["bytes"],10000)
-            self.assertEqual(meta["full_decode_first_4s"],"PASS")
+            self.assertEqual(meta["full_decode"],"PASS")
             self.assertTrue(4<=meta["duration"]<=7)
 
     def test_release_payload_and_binary(self):

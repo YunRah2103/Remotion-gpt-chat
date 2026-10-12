@@ -1,7 +1,7 @@
-name: YUNEX S25 phone-worker offline proof
+name: YUNEX S25 worker V2 offline QA
 on:
   push:
-    branches: [experiments/s25-autonomous-footage-worker-20261012]
+    branches: [experiments/s25-footage-worker-v2-20261012]
     paths:
       - 'production/phone_footage/**'
       - '.github/workflows/s25-phone-worker-tests.yml'
@@ -14,7 +14,7 @@ permissions:
 jobs:
   validate-phone-worker:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
