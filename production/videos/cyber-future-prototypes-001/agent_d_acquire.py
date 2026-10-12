@@ -68,7 +68,13 @@ def register(f,model,source_page,archive_url,credit,rights):
         cuts=getcuts(f,src)
         print("SCENES",f.name,cuts[:12],flush=True)
         if not cuts:raise RuntimeError("zero_candidate_scenes")
-        for a,b in cuts[:7 if model=="Lotus Theory 1" else 4]:
+        if model=="CUPRA DarkRebel":
+            # Intro is a digitally composited branding film with no real show car;
+            # inspect the later genuine world-premiere intervals instead.
+            chosen=cuts[4:9]
+        else:
+            chosen=cuts[:7]
+        for a,b in chosen:
             t=min(4.0,b-a-0.2);start=a+0.1
             name=model.lower().replace(" ","_")+"_"+str(len(accepted)+1).zfill(2)+".mp4"
             out=ROOT/"clips"/name
