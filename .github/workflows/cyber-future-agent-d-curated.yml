@@ -6,6 +6,8 @@ on:
       - automotive-edits/cyber-future-prototypes-001/d-radical-footage
     paths:
       - production/videos/cyber-future-prototypes-001/AGENT_D_SELECTION.json
+      - production/videos/cyber-future-prototypes-001/agent_d_curate.py
+      - .github/workflows/cyber-future-agent-d-curated.yml
   workflow_dispatch:
 
 permissions:
