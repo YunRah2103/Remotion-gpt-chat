@@ -11,6 +11,10 @@ CONTACTS=ROOT/"contact_sheets"
 REVIEW=Path("production/videos/cyber-future-prototypes-001/agent-b/review")
 NAME="CYBER-FUTURE-001-FOOTAGE-B"
 SOURCE_LIST=[
+ {"id":"bmw-i-vision-dee-running","model":"BMW i Vision Dee","publisher":"BMW PressClub",
+  "url":"https://www.press.bmwgroup.com/global/tv-footage/detail/PF0009271/bmw-i-vision-dee-running-footage-exterior-interior",
+  "page":"https://www.press.bmwgroup.com/global/tv-footage/detail/PF0009271/bmw-i-vision-dee-running-footage-exterior-interior",
+  "method":"bmw-scene","rights":"BMW PressClub actual running camera footage; edit/redistribution permission unconfirmed"},
  {"id":"bmw-i-vision-dee-exterior","model":"BMW i Vision Dee","publisher":"BMW PressClub",
   "url":"https://mediapool.bmwgroup.com/download/edown/tvFootageDownload.mov?actEvent=tvFootageMovHd&attachment=1&dokNo=PF0009272",
   "page":"https://www.press.bmwgroup.com/global/video/detail/PF0009272/bmw-i-vision-dee-design-exterieur",
@@ -75,12 +79,28 @@ def get_direct(url, path):
             chunk=r.read(1024*1024)
             if not chunk:break
             total+=len(chunk)
-            if total>820*1024*1024:raise ValueError("Source over 820MB limit")
+            if total>1450*1024*1024:raise ValueError("Source over 820MB limit")
             f.write(chunk)
         print("DIRECT",r.status,ctype,total,flush=True)
         if total<100*1024 or ("text/html" in ctype.lower()):
             raise ValueError("Not video bytes ("+ctype+")")
     return path
+
+def get_bmw_scene(page,path):
+    import html
+    req=urllib.request.Request(page,headers={"User-Agent":"Mozilla/5.0","Accept":"text/html"})
+    with urllib.request.urlopen(req,timeout=45) as r:
+        page_html=r.read(8*1024*1024).decode("utf-8","replace")
+    decoded=html.unescape(page_html)
+    matches=re.findall(r'filmSceneFileId(?:=|%3D|&#61;|["\x27]\s*:\s*["\x27]?)(\d{3,9})',decoded,re.I)
+    if not matches:
+        matches=re.findall(r'(?:sceneFileId|filmSceneFileId)\D{0,40}(\d{3,9})',decoded,re.I)
+    if not matches:raise ValueError("BMW scene HD download ID not exposed in public page; no credential bypass")
+    scene_id=matches[0]
+    media="https://mediapool.bmwgroup.com/download/edown/tvFootageDownload?actEvent=tvFootageSceneHD&attachment=1&filmSceneFileId="+scene_id
+    print("RESOLVED BMW PRESSCLUB PUBLIC HD SCENE",scene_id,flush=True)
+    return get_direct(media,path)
+
 def get_ytdlp(url,prefix):
     result=run([sys.executable,"-m","yt_dlp","--ignore-config","--no-playlist",
         "--no-progress","--socket-timeout","18","--retries","1",
@@ -132,7 +152,8 @@ def contact_sheet(photos,dest,title):
 def acquire(s):
     sid=s["id"]; print("START",sid,flush=True)
     start=time.time(); fn=SRC/(sid+(".mov" if "mov" in s["url"].lower() else ".mp4"))
-    if s["method"]=="direct": path=get_direct(s["url"],fn)
+    if s["method"]=="bmw-scene":path=get_bmw_scene(s["url"],fn)
+    elif s["method"]=="direct": path=get_direct(s["url"],fn)
     else:path=get_ytdlp(s["url"],SRC/sid)
     p=probe(path)
     print("PROBE",sid,json.dumps(p),flush=True)
