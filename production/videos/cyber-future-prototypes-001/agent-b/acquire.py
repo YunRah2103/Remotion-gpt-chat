@@ -11,6 +11,14 @@ CONTACTS=ROOT/"contact_sheets"
 REVIEW=Path("production/videos/cyber-future-prototypes-001/agent-b/review")
 NAME="CYBER-FUTURE-001-FOOTAGE-B"
 SOURCE_LIST=[
+ {"id":"bmw-i-vision-dee-exterior","model":"BMW i Vision Dee","publisher":"BMW PressClub",
+  "url":"https://mediapool.bmwgroup.com/download/edown/tvFootageDownload.mov?actEvent=tvFootageMovHd&attachment=1&dokNo=PF0009272",
+  "page":"https://www.press.bmwgroup.com/global/video/detail/PF0009272/bmw-i-vision-dee-design-exterieur",
+  "method":"direct","rights":"BMW PressClub published film; editorial vs edit/redistribution rights unconfirmed"},
+ {"id":"bmw-i-vision-dee-e-ink","model":"BMW i Vision Dee","publisher":"BMW PressClub",
+  "url":"https://mediapool.bmwgroup.com/download/edown/tvFootageDownload.mov?actEvent=tvFootageMovHd&attachment=1&dokNo=PF0009288",
+  "page":"https://www.press.bmwgroup.com/global/video/detail/PF0009288/bmw-i-vision-dee-featuring-e-ink",
+  "method":"direct","rights":"BMW PressClub published film; editorial vs edit/redistribution rights unconfirmed"},
  {"id":"mercedes-amg-gt-xx-embedded","model":"Mercedes-AMG Concept GT XX","publisher":"e-auto.pt (embedded vehicle footage; origin not independently established)",
   "url":"https://video.wixstatic.com/video/f84172_da8b552d8bad46f0be79ae4d992ac7de/1080p/mp4/file.mp4",
   "page":"https://www.e-auto.pt/post/mais-de-1360-cv-no-amg-gt-xx","method":"direct",
