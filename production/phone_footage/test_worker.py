@@ -26,6 +26,16 @@ class PhoneWorkerTests(unittest.TestCase):
             self.assertIsNone(worker.parse_job({"body":worker.MARKER+"\n"+json.dumps(sample)}))
         self.assertIsNone(worker.parse_job({"body":"not a job"}))
 
+    def test_car_clip_authorised_at_720p_or_lower(self):
+        job={"url":worker.CAR_VIDEO,"seconds":6,"license":"CC-BY-3.0"}
+        issue={"body":worker.MARKER+"\\n"+json.dumps(job)}
+        self.assertEqual(worker.parse_job(issue),job)
+        with mock.patch.object(worker,"checked",side_effect=RuntimeError("stop before download")):
+            with tempfile.TemporaryDirectory() as temp:
+                with self.assertRaisesRegex(RuntimeError, "stop before download"):
+                    worker.download_proof(Path(temp),job)
+        self.assertTrue(worker.CAR_VIDEO.startswith("https://www.youtube.com/watch?v="))
+
     def test_owner_only_and_safe_queue(self):
         fake=[
           {"number":8,"title":"[YUNEX PHONE JOB] accepted","user":{"login":"YunRah2103"}},
