@@ -10,7 +10,7 @@ ROOT=Path("out/agent-b-alt-indycar-street");SRC=ROOT/"original";CLIPS=ROOT/"clip
 for x in [SRC,CLIPS,SHEETS]:x.mkdir(parents=True,exist_ok=True)
 URL="https://www.dvidshub.net/video/1020299/jtf-dc-national-guardsmen-assist-with-freedom-250-grand-prix"
 NAME="B_ALT1_2026_Freedom250_low_corner_indycar_pack"
-START=4.8;LENGTH=3.8
+START=5.7;LENGTH=1.7
 def run(a,timeout=140):
  r=subprocess.run(a,capture_output=True,text=True,timeout=timeout)
  if r.returncode: raise RuntimeError(str(a[:2])+" failed: "+r.stderr[-1200:])
@@ -37,7 +37,7 @@ def main():
  delivered=probe(out)
  assert delivered["width"]>=1920 and delivered["height"]>=1080,"clip below HD"
  run(["ffmpeg","-nostdin","-v","error","-i",str(out),"-f","null","-"],100)
- times=[.2,.65,1.05,1.55,2.05,2.55,3.05,3.55]
+ times=[.10,.30,.50,.70,.90,1.10,1.35,1.55]
  pics=[];diffs=[]
  for i,t in enumerate(times):
   pic=SRC/"tmp.jpg"
@@ -60,7 +60,7 @@ def main():
   "source_original":p,"delivered":delivered,"source_start_s":START,"clip_duration_s":LENGTH,
   "original_sha256":sha(source),"clip_sha256":sha(out),"clip_bytes":out.stat().st_size,
   "pixel_motion_differences":diffs,"angle":"Roadside corner, car pass under overhead orange sponsor banner, multiple real modern IndyCars",
-  "visual_status":"PROVISIONAL; must independently confirm no editorial cut/commentary overlays in chosen 3.8 s before considering any use",
+  "visual_status":"PROVISIONAL; Verified cut from 5.70s through 7.40s excludes earlier fence shot and later soldier interview; independent replay review still required",
   "contract_status":"NOT a valid Indianapolis banked oval match; substitute would REQUIRE USER APPROVAL",
   "rights":"DVIDS public-domain government creation statement. IndyCar/event/third-party footage and logo rights are not confirmed; internal review only."
  }
