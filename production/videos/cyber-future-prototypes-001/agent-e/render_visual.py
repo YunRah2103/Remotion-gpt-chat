@@ -12,6 +12,8 @@ def run(argv):
 def filt(s,w,h):
  prefix="crop=1920:796:0:142," if s["source"].startswith("A/clips/") else ""
  grade="eq=contrast=1.07:saturation=1.10:gamma=0.98,setsar=1"
+ if w>h:
+  return prefix+f"scale={w}:{h}:force_original_aspect_ratio=increase:flags=lanczos,crop={w}:{h},"+grade+",format=yuv420p"
  if s["reframe"]=="full":
   return prefix+f"scale={w}:{h}:force_original_aspect_ratio=increase:flags=lanczos,crop={w}:{h},"+grade+",format=yuv420p"
  fw=round(w*1.08/2)*2
@@ -21,11 +23,11 @@ def filt(s,w,h):
  return prefix+f"split=2[b][f];[b]{bg}[back];[f]{fg}[front];[back][front]overlay=(W-w)/2:(H-h)/2:shortest=1,format=yuv420p"
 def main():
  ap=argparse.ArgumentParser()
- ap.add_argument("--size",choices=["proof","master"],default="master")
+ ap.add_argument("--size",choices=["proof","master","landscape"],default="master")
  ap.add_argument("--audio",default=None)
  ap.add_argument("--out",default=None)
  a=ap.parse_args()
- w,h=(540,960) if a.size=="proof" else (1080,1920)
+ w,h=(540,960) if a.size=="proof" else (1920,1080) if a.size=="landscape" else (1080,1920)
  data=json.loads((R/"shotmap.json").read_text())
  assert data["fps"]==30 and data["duration_frames"]==632 and len(data["scenes"])==16
  t=R/"_render_tmp";t.mkdir(parents=True,exist_ok=True)
@@ -36,7 +38,7 @@ def main():
   output=t/f"{s['order']:02d}.mp4"
   filters=filt(s,w,h)+f",setpts=(PTS-STARTPTS)/{s['source_speed']},fps=30,trim=end_frame={s['frames']},setpts=N/(30*TB)"
   print(s["order"],s["model"],s["frames"],s["reframe"],flush=True)
-  run(["ffmpeg","-nostdin","-hide_banner","-loglevel","error","-y","-ss",str(s["source_seek_seconds"]),"-i",str(source),"-an","-filter_complex","[0:v]"+filters+"[v]","-map","[v]","-r","30","-frames:v",str(s["frames"]),"-c:v","libx264","-preset","veryfast" if a.size=="master" else "ultrafast","-crf","18" if a.size=="master" else "19","-pix_fmt","yuv420p",str(output)])
+  run(["ffmpeg","-nostdin","-hide_banner","-loglevel","error","-y","-ss",str(s["source_seek_seconds"]),"-i",str(source),"-an","-filter_complex","[0:v]"+filters+"[v]","-map","[v]","-r","30","-frames:v",str(s["frames"]),"-c:v","libx264","-preset","ultrafast" if a.size=="proof" else "veryfast","-crf","18" if a.size=="master" else "19","-pix_fmt","yuv420p",str(output)])
   count=json.loads(run(["ffprobe","-v","error","-count_frames","-select_streams","v:0","-show_entries","stream=nb_read_frames","-of","json",str(output)]))["streams"][0]["nb_read_frames"]
   if int(count)!=s["frames"]:raise RuntimeError("BAD SHOT FRAME COUNT "+str(s["order"]))
  (t/"concat.txt").write_text("".join("file '"+f"{s['order']:02d}.mp4"+"'"+"\n" for s in data["scenes"]))
