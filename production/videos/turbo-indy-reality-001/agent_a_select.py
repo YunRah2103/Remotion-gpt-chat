@@ -8,12 +8,12 @@ OUT=Path("out/agent-a-selected")
 VIDEOS=OUT/"clips"; SHEETS=OUT/"qa"
 for p in (OUT,VIDEOS,SHEETS):p.mkdir(parents=True,exist_ok=True)
 SELECTIONS=[
-  ("A01_blue_lane_low_follow","broken_shell",7.6,4.1,"Rear three-quarter low-view of IndyCar next to wall, Turbo's blue lane; match rear-facing real low track-level view", "rear-follow / low", "check left-right direction from contact"),
-  ("A02_indycar_pack_corner","broken_shell",76.4,4.0,"Animated open-wheel pack in speedway corner; real banked wide-side pack match", "wide side / pack", "match track curvature and direction"),
-  ("A03_hero_glow_car_passing","pit_stop_pep_talk",92.0,4.1,"Turbo moving alongside IndyCar tire and blue glow; match underwheel real camera", "track-level / tire", "match open wheel passage"),
-  ("A04_lap_108_blue_streak","pit_stop_pep_talk",126.3,4.1,"Turbo's clean lateral blue glowing speed trail on Indianapolis oval; match side-panning IndyCar", "side tracking / blue trail", "match motion direction"),
+  ("A01_blue_lane_low_follow","broken_shell",8.65,3.05,"Rear three-quarter low-view of IndyCar next to wall, Turbo's blue lane; match rear-facing real low track-level view", "rear-follow / low", "check left-right direction from contact"),
+  ("A02_indycar_pack_corner","broken_shell",77.46,1.47,"Animated open-wheel pack in speedway corner; real banked wide-side pack match", "wide side / pack", "match track curvature and direction"),
+  ("A03_hero_glow_car_passing","pit_stop_pep_talk",93.52,2.6,"Turbo moving alongside IndyCar tire and blue glow; match underwheel real camera", "track-level / tire", "match open wheel passage"),
+  ("A04_lap_108_blue_streak","pit_stop_pep_talk",126.88,1.65,"Turbo's clean lateral blue glowing speed trail on Indianapolis oval; match side-panning IndyCar", "side tracking / blue trail", "match motion direction"),
   ("A05_glow_low_car_rear","pit_stop_pep_talk",166.7,4.0,"Ultra-low car-side Turbo glow and speed-blur past tire; match real tire-level Indy", "low follow / blue", "match color and speed"),
-  ("A06_blue_orbit_launch","your_driver_is_snail",73.4,4.4,"Turbo launch at Indy Speedway with dramatic blue trail and track/horizon; potential blue-streak transition", "track-level / rapid pullaway", "likely rapid travelling shot")]
+  ("A06_blue_orbit_launch","your_driver_is_snail",75.02,2.75,"Turbo launch at Indy Speedway with dramatic blue trail and track/horizon; potential blue-streak transition", "track-level / rapid pullaway", "likely rapid travelling shot")]
 def call(cmd,timeout=90):
     p=subprocess.run(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,timeout=timeout)
     if p.returncode:raise RuntimeError("command failed: "+p.stderr[-700:])
@@ -66,5 +66,5 @@ for id_,source,start,duration,reason,angle,match in SELECTIONS:
 manifest["status"]="SIX_REAL_PLAYABLE_CLIPS_QA_CONTACTS_GENERATED"
 manifest["summary"]={"clip_count":len(manifest["selections"]),"full_hd_geometry_clips":sum(x["source_native_full_hd_geometry"] for x in manifest["selections"]),"remaining_720p_clips":sum(not x["source_native_full_hd_geometry"] for x in manifest["selections"])}
 (OUT/"manifest.json").write_text(json.dumps(manifest,indent=2))
-(OUT/"README.md").write_text("# YUNEX Turbo Agent A - Six focused moving clips\n\nSix original-film extracts, not frame loops or mockups. FFprobe, frame-difference verification, exact source timecodes and SHA256 in manifest.json. Nine decoded frames per cut, with per-clip contact JPEG. 1080p geometry is preserved only for A01/A02, while other clips remain native-source 720p. These are selected match candidates, still require final per-shot motion direction alignment to Agent B footage. Copyright remains restricted; not a reuse licence.\n")
+(OUT/"README.md").write_text("# YUNEX Turbo Agent A - Six focused moving clips\n\nSix original-film extracts, selected after viewing 9 decoded frames per candidate and surgically trimmed to exclude commentator and pit crew cutaways. Not frame loops or mockups. FFprobe, frame-difference verification, exact source timecodes and SHA256 in manifest.json. Nine decoded frames per cut, with per-clip contact JPEG. 1080p geometry is preserved only for A01/A02, while other clips remain native-source 720p. These are selected match candidates, still require final per-shot motion direction alignment to Agent B footage. Copyright remains restricted; not a reuse licence.\n")
 print("FINAL_SUMMARY "+json.dumps(manifest["summary"]),flush=True)
