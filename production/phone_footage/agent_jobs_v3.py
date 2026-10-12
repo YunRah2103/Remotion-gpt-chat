@@ -17,9 +17,9 @@ worker = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(worker)
 
 
-def prepare(url, start, duration, height, max_mb):
+def prepare(url, start, duration, height, max_mb, orientation="landscape"):
     job = {"url": url, "start": start, "duration": duration,
-           "height": height, "max_mb": max_mb}
+           "height": height, "max_mb": max_mb, "orientation": orientation}
     body = worker.MARKER + "\n" + json.dumps(job, separators=(",", ":"))
     if worker.parse_job({"body": body}) is None:
         raise ValueError("Source unapproved or job exceeds V3 safety/quality limits")
@@ -60,6 +60,7 @@ def main():
     prepare_parser.add_argument("--duration", type=float, default=6)
     prepare_parser.add_argument("--height", type=int, choices=(720, 1080), default=1080)
     prepare_parser.add_argument("--max-mb", type=int, default=45)
+    prepare_parser.add_argument("--orientation", choices=("landscape", "portrait"), default="landscape")
     result_parser = sub.add_parser("result", help="Read confirmed GitHub Issue result.")
     result_parser.add_argument("--issue", required=True, type=int)
     args = parser.parse_args()
@@ -70,7 +71,8 @@ def main():
                 for url, item in worker.LICENSED_PROOFS.items()]
         print(json.dumps(rows, indent=2))
     elif args.cmd == "prepare":
-        print(prepare(args.url, args.start, args.duration, args.height, args.max_mb))
+        print(prepare(args.url, args.start, args.duration, args.height,
+                      args.max_mb, args.orientation))
     else:
         record = fetch_result(args.issue)
         if record is None:
