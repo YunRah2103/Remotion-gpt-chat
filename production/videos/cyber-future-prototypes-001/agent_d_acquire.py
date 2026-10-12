@@ -110,19 +110,22 @@ def process_lotus():
             register(f,"Lotus Theory 1",LOTUS_PAGE,LOTUS,"Lotus Cars",
                      "Lotus gallery allows editorial/media uses; unrestricted social reuse not verified")
 def process_porsche():
-    # Official Porsche page embed is attempted once, not YouTube.
-    folder=RAW/"porsche";folder.mkdir(exist_ok=True)
-    try:
-        x=subprocess.run([sys.executable,"-m","yt_dlp","--ignore-config",
-           "--no-playlist","--socket-timeout","12","--retries","1","--fragment-retries","1",
-           "--max-filesize","800M","-o",str(folder/"porsche_%(id)s.%(ext)s"),PORSCHE],
-           text=True,capture_output=True,timeout=190)
-        print("PORSCHE_EXTRACTOR",x.returncode,(x.stderr+x.stdout)[-1600:],flush=True)
-        for f in list(folder.glob("*.mp4"))+list(folder.glob("*.mkv"))+list(folder.glob("*.mov")):
-            register(f,"Porsche Mission X",PORSCHE,PORSCHE,"Porsche AG",
-                     "Porsche press source; publication/redistribution permission not confirmed")
-        if not list(folder.iterdir()):rejected.append(dict(file=PORSCHE,reason="no_Porsche_download"))
-    except Exception as e:rejected.append(dict(file=PORSCHE,reason="download_failed:"+str(e)[:250]))
+    # Verbatim original native video URLs from Porsche's downloadable Mission X press PDF.
+    # They are not inferred YouTube streams. Evaluate both since one may be a walkaround.
+    originals=[
+      "https://newstv.porsche.com/porschevideos/245385_en_3000000.mp4",
+      "https://newstv.porsche.com/porschevideos/245346_en_3000000.mp4"]
+    for idx,url in enumerate(originals):
+        f=RAW/("porsche_missionx_original_"+str(idx)+".mp4")
+        try:
+            metadata=get(url,f,limit=900*1024*1024)
+            metadata["publisher"]="Porsche Newsroom"
+            sources.append(metadata)
+            register(f,"Porsche Mission X",PORSCHE,url,"Porsche AG",
+                "Official Porsche press source; social publishing permission not confirmed")
+        except Exception as e:
+            rejected.append(dict(file=url,reason="direct_download_failed:"+str(e)[:260]))
+            print("PORSCHE_DIRECT_FAIL",url,repr(e),flush=True)
 def finish():
     (ROOT/"manifest.json").write_text(json.dumps(accepted,indent=2))
     with open(ROOT/"manifest.csv","w",newline="") as f:
