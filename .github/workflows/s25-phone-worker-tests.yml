@@ -1,0 +1,32 @@
+name: YUNEX S25 phone-worker offline proof
+on:
+  push:
+    branches: [experiments/s25-autonomous-footage-worker-20261012]
+    paths:
+      - 'production/phone_footage/**'
+      - '.github/workflows/s25-phone-worker-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-phone-worker:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install FFmpeg and verify Node
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          node --version && ffmpeg -version | head -1
+      - name: Run queue contract and real encoding tests
+        run: |
+          python -m unittest discover -s production/phone_footage -p test_worker.py -v
+      - name: Syntax compile phone worker
+        run: |
+          python -m py_compile production/phone_footage/worker.py
