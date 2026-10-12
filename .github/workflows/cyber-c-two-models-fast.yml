@@ -1,0 +1,50 @@
+name: CYBER FUTURE C 2-CAR FAST VERIFIED ARTIFACT
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/c-french-footage
+    paths:
+      - ".github/workflows/cyber-c-two-models-fast.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  package-two-real-models:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve prior sha-verified real Renault Corsica media
+        uses: actions/download-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-C-FRANCE-EDITOR-SELECTS
+          run-id: 38242718272
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/incoming_r5
+      - name: Retrieve real photographed Citroen Oli source
+        uses: actions/download-artifact@v4
+        with:
+          name: CYBER-C-CITROEN-OLI-REAL-CAMERA-QA
+          run-id: 38244290219
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out/incoming_oli
+      - name: Fast FFmpeg provision from existing apt repository metadata
+        run: |
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends ffmpeg
+          command -v ffmpeg
+          command -v ffprobe
+      - name: SHA verify both originals and every real 1080p shot; publish full media ZIP
+        run: |
+          python -m py_compile production/videos/cyber-future-prototypes-001/agent-c/build_two_real_models.py
+          python production/videos/cyber-future-prototypes-001/agent-c/build_two_real_models.py
+          sha256sum out/CYBER-FUTURE-001-C-TWO-REAL-MODELS.zip
+          unzip -t out/CYBER-FUTURE-001-C-TWO-REAL-MODELS.zip | tail -n 2
+      - name: Deliver 19 clips across two models
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-C-TWO-REAL-MODELS-FAST
+          path: out/CYBER-FUTURE-001-C-TWO-REAL-MODELS.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
