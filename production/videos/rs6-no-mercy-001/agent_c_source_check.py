@@ -26,3 +26,15 @@ for url in links[:6]:
  except Exception as e:print("HEAD_ERROR",str(e)[:250])
 if not links:
  print("No direct anchor parsed; inspect page's javascript download handler manually.")
+
+# Second pass: inspect media URLs embedded in source HTML, not merely anchor hrefs.
+import re, html
+for marker in ("pobierz","download","mp4","video","plik","media"):
+ matches=list(re.finditer(marker,content,re.I))
+ print("MARKER",marker,"count",len(matches))
+ for m in matches[:6]:
+  frag=content[max(0,m.start()-110):min(len(content),m.end()+180)]
+  frag=re.sub(r"\\s+"," ",frag)
+  print("CONTEXT",frag[:280])
+for raw in re.findall(r'(?:(?:https?:)?//[^\\s\\"\\'<>]+|/[^\\s\\"\\'<>]+)\\.mp4(?:\\?[^\\s\\"\\'<>]*)?',content,re.I):
+ print("POSSIBLE_MP4",html.unescape(raw)[:300])
