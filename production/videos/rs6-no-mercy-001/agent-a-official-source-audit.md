@@ -48,3 +48,9 @@ Once permission exists: secure direct authorized MP4, download to an appropriate
 - Audio AAC-LC `mp4a.40.2`, 44.1kHz stereo.
 - Runtime could not install FFmpeg due to VM container privilege restrictions; codec frames not fully decoded/visually ranked. Structural MP4Box parser ready.
 - DO NOT present source as final 720p or 1080p; cannot infer native quality from website, file name, or byte size.
+
+## Further official-source discovery
+- Audi MediaCenter model catalogue: https://audi-mediacenter.pl/modele,audi-a6,audi-rs-6-avant.html . Additional RS6 C8 entries listed, notably original early C8 RS6 00:00:47 short promo, on-location Daytona Grey and Tango Red under 20-year RS6 catalogue. These sources are NOT download/quality-verified and should be checked for an actual high-definition master.
+- Audi press collection: https://www.audi-mediacenter.pl/modele,audi-a6,audi-20-lat-audi-rs-6.html lists Daytona Grey 10:34 and Tango Red 9:38 on-location footage but also contains other generations, so isolate C8 only.
+- 2024 RS6 GT footage found but **intentionally excluded**: contract disallows GT without manager exception.
+- Status remains **one true source MP4 obtained at 620x348 and rejected on fidelity; zero production-usable delivered clips**.
