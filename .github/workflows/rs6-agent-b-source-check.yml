@@ -25,7 +25,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install tools
         run: |
-          python -m pip install -q --upgrade yt-dlp requests
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q --upgrade yt-dlp requests curl_cffi
           ffprobe -version | head -n 1
           ffmpeg -version | head -n 1
       - name: Acquire C8 creator candidates using bounded fallbacks
@@ -40,6 +42,7 @@ jobs:
             "2n2|https://vimeo.com/803836362"
             "FumeStudio|https://vimeo.com/761014676"
             "NightShip|https://vimeo.com/712787364"
+            "PixabayRS6Candidate|https://pixabay.com/videos/audi-rs6-audi-exhaust-sound-126186/"
           )
           if [[ -n "${APPROVED_URL:-}" ]]; then
             if [[ ! "${APPROVED_URL}" =~ ^https:// ]]; then echo "Approved URL must be HTTPS" >&2; exit 2; fi
@@ -56,6 +59,11 @@ jobs:
             for fmt in 'bestvideo[height>=1080]+bestaudio/best[height>=1080]' 'bv*+ba/best'; do
               yt-dlp --ignore-config --no-playlist --download-sections '*0-8' --force-keyframes-at-cuts --merge-output-format mp4 --format "$fmt" --socket-timeout 15 --retries 2 --fragment-retries 2 --output "staging/$name.%(ext)s" "$url" >> "reports/$name.txt" 2>&1 && break
             done
+            # Different acquisition route: Vimeo public embed/config progressive or Pixabay direct mp4.
+            # Do not assume that access to video implies permission to redistribute it.
+            if ! find staging -maxdepth 1 -name "$name.*" -type f | grep -q .; then
+              python production/videos/rs6-no-mercy-001/agent_b_direct_media_fallback.py "$name" "$url" "staging/$name.mp4" >>"reports/$name.txt" 2>&1 || :
+            fi
             file="$(find staging -maxdepth 1 -type f -name "$name.*" ! -name '*.part' | head -n 1)"
             if [[ -z "$file" ]]; then echo 'DOWNLOAD_FAILED' >>"reports/$name.txt"; continue; fi
             ffprobe -v error -show_entries format=duration,size:stream=codec_name,codec_type,width,height,r_frame_rate -of json "$file" >"reports/$name-probe.json" 2>>"reports/$name.txt"
@@ -63,6 +71,8 @@ jobs:
             decoded=$?
             echo "decode_exit=$decoded" >>"reports/$name.txt"
             sha256sum "$file" >>"reports/$name.txt"
+            mkdir -p "reports/$name-frames"
+            ffmpeg -hide_banner -nostdin -v error -y -i "$file" -vf "fps=1/2,scale=420:-1" -frames:v 3 "reports/$name-frames/frame_%02d.jpg" || :
             python - "$file" "$name" "$decoded" "${PERMISSION_REFERENCE:-}" <<'PY'
           import json,subprocess,sys,pathlib,shutil
           f,name,decoded,permission=sys.argv[1:]
@@ -79,6 +89,19 @@ jobs:
           pathlib.Path('reports',name+'-status.json').write_text(json.dumps(record,indent=2))
           PY
             rm -f "$file"
+          done
+      - name: Summarize acquisition outcomes
+        if: always()
+        shell: bash
+        run: |
+          for f in reports/*-status.json; do
+            [[ -f "$f" ]] || continue
+            echo "RESULT: $f"
+            cat "$f"
+          done
+          for f in reports/*.txt; do
+            echo "SOURCE_LOG_TAIL $f"
+            tail -n 10 "$f"
           done
       - name: Publish evidence reports
         if: always()
