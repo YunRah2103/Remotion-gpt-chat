@@ -173,5 +173,5 @@ finally {
  try{if(browser)await browser.close();}catch{}
  try{if(method==='puppeteer-stream' && wss) (await wss).close();}catch{}
  fs.writeFileSync(path.join(dir,'report.json'),JSON.stringify(report,null,2));
- process.exitCode=report.success?0:2;
+ process.exit(report.success?0:2);
 }})();
