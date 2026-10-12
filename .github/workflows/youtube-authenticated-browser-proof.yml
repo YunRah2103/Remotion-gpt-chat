@@ -1,0 +1,48 @@
+name: YUNEX YouTube Authenticated Browser Playback Proof
+on:
+  push:
+    branches:
+      - experiments/youtube-browser-recording-20261012
+    paths:
+      - '.github/workflows/youtube-authenticated-browser-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cookie-browser-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        sample: [youtube-watch, youtube-embed]
+    name: Chrome authenticated / ${{ matrix.sample }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Chrome recorder dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg xvfb
+          PUPPETEER_SKIP_DOWNLOAD=1 npm install --no-save --no-package-lock --prefix "$RUNNER_TEMP/yunex" puppeteer-core@24 puppeteer@24 puppeteer-stream@3
+      - name: Load existing secret only inside private browser and verify playback
+        env:
+          YOUTUBE_COOKIES_TXT: ${{ secrets.YOUTUBE_COOKIES_TXT }}
+          SAMPLE: ${{ matrix.sample }}
+          METHOD: puppeteer-stream
+          NODE_PATH: ${{ runner.temp }}/yunex/node_modules
+          OUTPUT_DIR: output/authenticated/${{ matrix.sample }}
+        shell: bash
+        run: |
+          xvfb-run -a -s "-screen 0 1280x720x24 -ac" timeout -k 10s 100s node production/youtube_screen_capture/authenticated_youtube_screen_test.cjs
+      - name: Upload sanitized report only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: authenticated-playback-${{ matrix.sample }}
+          path: output/authenticated/${{ matrix.sample }}/report.json
+          if-no-files-found: warn
+          retention-days: 3
