@@ -1,0 +1,35 @@
+name: YUNEX Indy D - actual helmet camera native HD technical proof
+on:
+  push:
+    branches:
+      - automotive-edits/turbo-indy-reality-001/d-indy-cinematic
+    paths:
+      - 'production/videos/turbo-indy-reality-001/agent_d_helmet_dailymotion_probe.py'
+      - '.github/workflows/yunex-indy-d-helmet-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Set up video tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check yt-dlp requests pillow
+      - name: Check actual native resolution, decode moving frames, record rights restrictions
+        run: python production/videos/turbo-indy-reality-001/agent_d_helmet_dailymotion_probe.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-INDY-D-HELMET-TECHNICAL-REVIEW-NOT-LICENSED
+          path: out/YUNEX_INDY_AGENT_D_HELMET_REVIEW.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: warn
