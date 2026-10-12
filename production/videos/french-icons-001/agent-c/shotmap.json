@@ -181,7 +181,7 @@
       "exitDissolveFrames": 0,
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "clean motion-led cut",
-      "cinematicCropScale": 1,
+      "cinematicCropScale": 1.2,
       "cinematicFocusXPercent": 50
     },
     {
@@ -198,24 +198,24 @@
       "exitDissolveFrames": 6,
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "6-frame restrained cross-dissolve",
-      "cinematicCropScale": 1,
+      "cinematicCropScale": 1.2,
       "cinematicFocusXPercent": 50
     },
     {
       "shot": 12,
-      "sourceId": "C21",
-      "sourcePath": "Agent_B_Modern/clips/alpine-a110-orange-rolling-1.mp4",
-      "model": "Alpine A110 (modern)",
+      "sourceId": "C22",
+      "sourcePath": "Agent_B_Modern/clips/alpine-a110-r-blue-track-1.mp4",
+      "model": "Alpine A110 R — dusk-to-daylight bridge",
       "era": "modern",
       "masterStartFrame": 699,
       "masterEndFrame": 804,
-      "sourceInSeconds": 0.3,
+      "sourceInSeconds": 3,
       "durationFrames": 105,
       "enterDissolveFrames": 6,
       "exitDissolveFrames": 0,
       "musicPhraseBoundarySeconds": null,
       "transitionOut": "clean motion-led cut",
-      "cinematicCropScale": 1.19,
+      "cinematicCropScale": 1.08,
       "cinematicFocusXPercent": 50
     },
     {
@@ -440,6 +440,8 @@
     "Changed final 2.5s source from Bolide circuit to Chiron golden-hour mountain-road rear, restoring elegance.",
     "Apply modest optical crop to baked-in black-bar Alpine orange and Hajar Chiron footage; inspect final frame quality.",
     "Preserve no fake 9:16/4K source claims; original song stays external to public repo.",
-    "Three key model switches aligned within a frame of measured soundtrack energy troughs. French lyric boundaries remain untranscribed."
+    "Three key model switches aligned within a frame of measured soundtrack energy troughs. French lyric boundaries remain untranscribed.",
+    "Independent playback of original Remotion film revealed C21 spent ~2s on rear-wing macro with baked bars. Replace C21 with blues-hour full-car C22, then transition to orange Alpine R Ultime.",
+    "Original Peugeot 205 full landscape footage has a small lower-right Harry's Garage source watermark. Apply 1.20x center crop of the 1080p native image instead of showing watermark or using rejected bad portrait crops; verify body panels after crop."
   ]
 }
