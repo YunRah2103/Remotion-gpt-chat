@@ -1,0 +1,57 @@
+name: CYBER FUTURE 001 - Agent A Three Prototype Combined Deliverable
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/a-asia-footage
+    paths:
+      - '.github/workflows/cyber-future-agent-a-combined.yml'
+      - 'production/videos/cyber-future-prototypes-001/agent-a/extend_delivery_with_rn24.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  combine:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install video verification tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python3 -m pip install --quiet --break-system-packages requests beautifulsoup4 pillow
+      - name: Acquire official 2022 Hyundai two-model original
+        run: python3 -u production/videos/cyber-future-prototypes-001/agent-a/acquire.py
+      - name: Verify and curate original Hyundai film
+        run: python3 -u production/videos/cyber-future-prototypes-001/agent-a/curate.py
+      - name: Acquire RN24 independent original and generate strictly labelled supplemental clips
+        run: python3 -u production/videos/cyber-future-prototypes-001/agent-a/extend_delivery_with_rn24.py
+      - name: Verify all real media are playable, package contents count and file hashes
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, subprocess, hashlib
+          from pathlib import Path
+          p=Path('out/cyber-future-agent-a')
+          j=json.loads((p/'manifest.json').read_text())
+          assert len(list((p/'clips').glob('*.mp4')))==9
+          assert len(list((p/'supplemental_native_1920x820').glob('*.mp4')))==7
+          assert len(list((p/'originals').glob('*.mp4')))==2
+          assert j['gate']=='BLOCKED_STRICT_NATIVE_1080P_ACTIVE_HEIGHT'
+          for f in list((p/'clips').glob('*.mp4'))+list((p/'supplemental_native_1920x820').glob('*.mp4')):
+           subprocess.run(['ffmpeg','-v','error','-xerror','-i',str(f),'-f','null','-'],check=True,timeout=90)
+          with (p/'checksums.sha256').open('w') as out:
+           for f in sorted([x for x in p.rglob('*') if x.is_file()]):
+            if f!=p/'checksums.sha256':
+             h=hashlib.sha256(f.read_bytes()).hexdigest()
+             out.write(h+'  '+str(f.relative_to(p))+'\n')
+          print('QA_CORRECT_VERIFIED_PLAYABLE: 9 original + 7 supplemental + two full parent files')
+          PY
+      - name: Upload ONE real, playable full-footage ZIP (strict quality gate still blocked)
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-FOOTAGE-A
+          path: out/cyber-future-agent-a/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
