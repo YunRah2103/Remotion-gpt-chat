@@ -7,6 +7,8 @@ on:
     paths:
       - ".github/workflows/yunex-cyber-future-editor-e.yml"
       - "production/videos/cyber-future-prototypes-001/agent-e/**"
+      - "src/CyberFutureFilm.tsx"
+      - "src/Root.tsx"
 permissions:
   contents: read
   actions: read
@@ -16,6 +18,10 @@ jobs:
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
+      - name: Install project dependencies and type-check Remotion production
+        run: |
+          npm ci --no-audit --no-fund
+          npm run check
       - name: Install FFmpeg on runner
         run: |
           sudo apt-get update -qq
