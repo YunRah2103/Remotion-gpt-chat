@@ -54,3 +54,9 @@ Once permission exists: secure direct authorized MP4, download to an appropriate
 - Audi press collection: https://www.audi-mediacenter.pl/modele,audi-a6,audi-20-lat-audi-rs-6.html lists Daytona Grey 10:34 and Tango Red 9:38 on-location footage but also contains other generations, so isolate C8 only.
 - 2024 RS6 GT footage found but **intentionally excluded**: contract disallows GT without manager exception.
 - Status remains **one true source MP4 obtained at 620x348 and rejected on fidelity; zero production-usable delivered clips**.
+
+## Further verification — 12 Oct 2026
+- Daytona Grey 44943 original press preview: https://audi-mediacenter.pl/data/filmy/44943/o/18972_amtv-content720p-web_play.mp4 ; actual stream AVC 480x270 at 25fps, 634.498s, 33,542,829 bytes; SHA256 8d7fd22faee14249bc950c35da09c84e3ae6d245df7eee57252b67df8e3be59d. Downloaded and parsed. REJECT quality.
+- Tango Red 44944 preview: https://audi-mediacenter.pl/data/filmy/44944/o/18973_amtv-content720p-web_play.mp4 ; actual stream AVC 480x270 at 25fps, 578.904s, 28,501,778 bytes; SHA256 1664cf1d1dab404650d39ab5facee9bd2b0e555fd48efa7243b07cb9c6a4f3eb. Downloaded and parsed. REJECT quality.
+- Auditography C8 RS6 YouTube film: https://www.youtube.com/watch?v=8l9D4aS0IIs ; page fetch HTTP 200; yt-dlp 2026.08.19 formats probe failed YouTube bot-confirmation challenge. No stream downloaded.
+- All 3 original Audi MP4s were downloaded to an ephemeral environment, not retained as a GitHub media artifact. All three are materially under full HD, thus not acceptable final clips. No contact sheet/decoded frame QA. These files remain journalistic-use-limited, do not mirror into public Releases.
