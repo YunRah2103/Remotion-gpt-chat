@@ -7,6 +7,7 @@ The existing S25 V2 proof issue #41 produced 1920x1080 genuine phone-acquired H.
 ## Features
 
 - Reviewed and versioned source registry sources_v3.json (not a hardcoded pair in Python).
+- Explicit landscape or portrait mode: for vertical Full HD, V3 targets genuine 1080x1920 video rather than mistaking portrait footage for ordinary 1080p landscape. Actual orientation and native dimensions are checked before accepting a clip.
 - Excerpts from 2 to 40 seconds, start offsets up to 3600 seconds.
 - Landscape 720p or genuinely native 1080p; 1080p jobs FAIL rather than upscaling 720p.
 - Output cap up to 80 MiB per issue (default 45 MiB).
@@ -84,5 +85,7 @@ Only use completed, validated MP4 assets in edits. Treat YUNEX_PHONE_FAILED_V3 a
 - yt-dlp may be challenged by YouTube; network/format availability is not assured for every source.
 - Temporary source fragments can briefly be bigger than final MP4. Hard Android kills may leave stale temp directories until later cleanup.
 - CI offline tests do not establish real S25 V3 acquisition. That requires a new confirmed mobile MP4 release.
+
+V3 mobile pilot: https://github.com/YunRah2103/Remotion-gpt-chat/issues/42 — approved 12-second 1080p excerpt beginning at source time 3s. This is queued, not yet a completed video. Run the V3 install command above with --once; check for the actual completed GitHub Release before claiming phone-side success.
 
 CI: .github/workflows/s25-phone-worker-v3-tests.yml.
