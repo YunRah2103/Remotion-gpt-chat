@@ -58,8 +58,8 @@ def main():
             rows.append({
                 "file":name,"vehicle":"Renault 5 Turbo 3E (2025)","resolution":[1920,1080],
                 "source_url":"https://www.auto-medienportal.net/video/load/original/3469/",
-                "original_sha256":SHA_R5,"sha256":sha(data),"original_in":src["source_in"],
-                "original_out":src["source_out"],"camera":"genuine photographed physical 2025 prototype on Corsica roads",
+                "original_sha256":SHA_R5,"sha256":sha(data),"original_in":src.get("source_in",src.get("original_in")),
+                "original_out":src.get("source_out",src.get("original_out")),"camera":"genuine photographed physical 2025 prototype on Corsica roads",
                 "tier":src.get("editor_tier","support"),"contacts":contact,"embedded_promotional_text":False,
                 "publishing_rights":"NOT VERIFIED"})
         oli_data=second.read("CITROEN_OLI_PERFORMANCE_SOURCE_ORIGINAL.mp4")
