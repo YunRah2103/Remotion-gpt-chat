@@ -1,0 +1,50 @@
+name: YUNEX RS6 Agent A — verified acquisition
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/a-official-footage
+    paths:
+      - '.github/workflows/rs6-agent-a-acquisition.yml'
+      - 'production/videos/rs6-no-mercy-001/agent-a/**'
+  workflow_dispatch:
+    inputs:
+      media_url:
+        description: "Direct MP4 URL that you are authorized to download and redistribute via this artifact"
+        required: false
+        type: string
+      rights_confirmed:
+        description: "You have verified public artifact redistribution rights for this URL"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  acquisition:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SOURCE_URL: ${{ inputs.media_url }}
+      RIGHTS_CONFIRMED: ${{ inputs.rights_confirmed }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare codecs
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          ffmpeg -version | head -1
+      - name: Run source checks and bounded acquisition
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/rs6-agent-a /tmp/rs6-out
+          python3 production/videos/rs6-no-mercy-001/agent-a/acquire.py
+      - name: Publish diagnostics and permitted media
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-agent-a-qa-${{ github.run_id }}
+          path: /tmp/rs6-out/
+          retention-days: 5
