@@ -3,8 +3,8 @@
 import json,os,hashlib,subprocess,sys
 from pathlib import Path
 from PIL import Image, ImageDraw
-URL="https://videos.pexels.com/video-files/29498801/12698140_4070_2160_24fps.mp4"
-PAGE="https://www.pexels.com/video/speeding-red-sports-car-close-up-29498801/"
+URL="https://videos.pexels.com/video-files/6872069/6872069-uhd_2160_3840_25fps.mp4"
+PAGE="https://www.pexels.com/video/close-up-shot-of-a-black-sports-car-6872069/"
 OUT=Path("out/one-car") 
 OUT.mkdir(parents=True, exist_ok=True)
 VID=OUT/"YUNEX-ONE-CLIP-ORIGINAL-4K.mp4"
@@ -17,7 +17,7 @@ def digest(f):
     with f.open("rb") as r:
         while c:=r.read(4*1024*1024):h.update(c)
     return h.hexdigest()
-rep={"sourcePage":PAGE,"sourceDirectMP4":URL,"attribution":"Michael Pronin / Pexels","licenseSource":"https://www.pexels.com/license/",
+rep={"sourcePage":PAGE,"sourceDirectMP4":URL,"attribution":"Tima Miroshnichenko / Pexels","licenseSource":"https://www.pexels.com/license/",
      "status":"NOT_VERIFIED"}
 try:
     print("Downloading one and only one publicly downloadable Pexels video", flush=True)
@@ -26,7 +26,7 @@ try:
     p=json.loads(run(["ffprobe","-v","error","-show_format","-show_streams","-of","json",str(VID)]))
     v=next(x for x in p["streams"] if x["codec_type"]=="video")
     duration=float(p["format"]["duration"])
-    if int(v.get("width",0))<3840 or int(v.get("height",0))<2160 or duration<8:raise RuntimeError("Reject low-quality native file")
+    if int(v.get("width",0))<2160 or int(v.get("height",0))<3840 or duration<8:raise RuntimeError("Reject low-quality native file")
     run(["ffmpeg","-v","error","-xerror","-i",str(VID),"-map","0:v:0","-f","null","-"],timeout=420)
     rep.update(status="SOURCE_DOWNLOADED_AND_FULLY_DECODED",file=VID.name,sha256=digest(VID),
                bytes=VID.stat().st_size,
