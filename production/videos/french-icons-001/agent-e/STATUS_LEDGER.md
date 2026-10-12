@@ -36,3 +36,13 @@ Updated 2026-10-12 (Europe/London). This file is based on independent repo/Actio
 - Preserve original source media via Actions artifacts, not commits.
 - Source archive expires **25 Oct 2026**, so downstream video integration should copy needed assets before expiry.
 - Agent E technical audit output: `production/videos/french-icons-001/agent-e/SOURCE_GATE_INDEPENDENT_QA.md` and JSON/contact montage after Actions run finishes. This ledger remains provisional while run is in progress.
+
+## Verified 12 October 2026 update — E source audit DONE
+
+- **Independent E workflow [38186521047](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38186521047) has fully completed SUCCESS**, including pushing the generated QA files on this branch; the earlier 38186274502 red status was solely a Git push race and was corrected.
+- Independent real combined ZIP checksum exactly `46073d50fb4efe246b3e7ee1adee1601eec025a3aa2a07df45f038731218c533`, ZIP CRC PASS, 42/42 verified clip SHA256, 42/42 complete video decodes, 126/126 decoded proof frames, six published contact sheets.
+- Portable genuine [E QA artifact 11720031428](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38186521047/artifacts/11720031428), ~1.2MB, expires 2026-10-26. `SOURCE_GATE_INDEPENDENT_QA.md`, JSON and six JPEGs are also now committed.
+- I inspected all 6 JPEG contact montages and committed `FRAME_VISUAL_REVIEW_2026-10-12.md`, highlighting the event/campsite 2CV rejects, letterboxing in modern Alpine/Chiron clips, elegant classic Alpine/R5/DS picks, and the Chiron sunset ending opportunity.
+- **Agent C now committed real `src/FrenchLegendsFilm.tsx` and 23-shot 1800-frame provisional visual timeline.** [C real 60-second muted render job 38186524230](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38186524230) underway; source archive mount and validation passed, first 4-second proof render stage underway at latest poll.
+- **Agent D recovered exact original soundtrack from the user's Library**, verified expected SHA, prepared 60.000s 48 kHz stereo AAC master and three waveform correlation checks. D implementation in its own branch has working QA pipeline; still no actual final picture + song MP4 until C has rendered and delivered.
+- **Unchanged blockers:** C song-phrase timing is not yet calibrated; cinematic final playback not done, publisher/creator reuse permissions unconfirmed.
