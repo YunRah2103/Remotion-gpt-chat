@@ -28,14 +28,25 @@ jobs:
         run: |
           set -o pipefail
           python3 production/videos/turbo-indy-reality-001/agent_b_acquire.py | tee agent-b-run.log
-      - name: Upload actual source media and QA ZIP
-        if: always()
+      - name: Upload verified playable footage ZIP
+        if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: yunex-turbo-indy-agent-b-real-footage-${{ github.run_id }}
+          name: yunex-turbo-indy-agent-b-verified-video-${{ github.run_id }}
           path: |
             out/agent-b-indy-matches-real-footage.zip
             agent-b-run.log
           compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
+      - name: Upload blocked-download diagnostics only
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: yunex-agent-b-FAILED-download-DIAGNOSTICS-${{ github.run_id }}
+          path: |
+            out/agent-b-indy-matches/qa/manifest.json
+            out/agent-b-indy-matches/qa/README.md
+            agent-b-run.log
           retention-days: 7
           if-no-files-found: warn
