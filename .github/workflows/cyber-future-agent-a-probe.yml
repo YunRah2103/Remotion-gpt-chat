@@ -1,0 +1,33 @@
+name: CYBER FUTURE 001 - Agent A Extended Official Video Probe
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/a-asia-footage
+    paths:
+      - '.github/workflows/cyber-future-agent-a-probe.yml'
+      - 'production/videos/cyber-future-prototypes-001/agent-a/extended_probe.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python3 -m pip install --quiet --break-system-packages requests beautifulsoup4
+      - name: Probe original manufacturer media
+        run: python3 -u production/videos/cyber-future-prototypes-001/agent-a/extended_probe.py
+      - name: Export footage candidates + real screenshot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-A-EXTENDED-PROBE
+          path: out/agent-a-extended-probe/
+          retention-days: 5
+          compression-level: 0
+          if-no-files-found: warn
