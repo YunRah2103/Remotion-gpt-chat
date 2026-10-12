@@ -141,6 +141,26 @@ def process_porsche():
         except Exception as e:
             rejected.append(dict(file=url,reason="direct_download_failed:"+str(e)[:260]))
             print("PORSCHE_DIRECT_FAIL",url,repr(e),flush=True)
+def process_cupra():
+    # Public HQ original physical-showcar event video, carried by the publishing outlet.
+    candidates=[
+      "https://www.autobrava.lv/wp-content/uploads/2023/09/CUPRAs-DarkRebel-Showcar-makes-its-world-debut-at-the-Volkswagen-Group-Night-IAA-in-Munich_Video_HQ_Original-1.mp4",
+      "https://i.bstr.es/highmotor/2023/09/CUPRAs-DarkRebel-Showcar-makes-its-world-debut-at-the-Volkswagen-Group-Night-IAA-in-Munich_Video_HQ_Original1.mp4"
+    ]
+    for i,url in enumerate(candidates):
+        f=RAW/("cupra_darkrebel_event_"+str(i)+".mp4")
+        try:
+            meta=get(url,f,limit=1000*1024*1024)
+            sources.append(meta)
+            register(f,"CUPRA DarkRebel",
+                "https://www.cupra.com/en/brand/news/cars/cupra-darkrebel-world-premiere",
+                url,"CUPRA event video via Autobrava/Highmotor",
+                "Photographed live Munich reveal; ownership/reuse for YUNEX not established")
+            # These may be duplicates of one original event file; don't blindly count both.
+            if accepted and any(v["model"]=="CUPRA DarkRebel" for v in accepted):break
+        except Exception as e:
+            rejected.append(dict(file=url,reason="download_failed:"+str(e)[:250]))
+            print("CUPRA_SOURCE_FAIL",url,repr(e),flush=True)
 def finish():
     (ROOT/"manifest.json").write_text(json.dumps(accepted,indent=2))
     with open(ROOT/"manifest.csv","w",newline="") as f:
@@ -166,4 +186,5 @@ try:
         rejected.append(dict(file=LOTUS,reason=str(e)[:300]))
         print("LOTUS_FAILURE",repr(e),flush=True)
     process_porsche()
+    process_cupra()
 finally:finish()
