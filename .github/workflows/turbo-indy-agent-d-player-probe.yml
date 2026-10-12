@@ -28,6 +28,24 @@ jobs:
             echo "=== $src ==="
             timeout 25s yt-dlp --list-formats "$src" 2>&1 | tail -18 || true
           done
+      - name: Test original Commons pace lap and public Pexels media files
+        shell: bash
+        run: |
+          python - <<'PY'
+          import requests
+          urls=["https://upload.wikimedia.org/wikipedia/commons/3/3b/2024_Indianapolis_500_-_Sarah_Stierch_01.webm",
+                "https://videos.pexels.com/video-files/9737952/9737952-hd_1920_1080_25fps.mp4",
+                "https://videos.pexels.com/video-files/9737952/9737952-hd_1920_1080_30fps.mp4",
+                "https://videos.pexels.com/video-files/9737840/9737840-hd_1920_1080_25fps.mp4",
+                "https://videos.pexels.com/video-files/9737948/9737948-hd_1920_1080_25fps.mp4",
+                "https://videos.pexels.com/video-files/9737951/9737951-hd_1920_1080_25fps.mp4"]
+          for url in urls:
+            try:
+              r=requests.get(url,headers={"Range":"bytes=0-999","User-Agent":"Mozilla/5.0"},stream=True,timeout=15)
+              print(r.status_code,r.headers.get("content-type"),r.headers.get("content-range"),r.headers.get("content-length"),url)
+              r.close()
+            except Exception as e:print(type(e).__name__,str(e)[:140])
+          PY
       - name: Inspect HTML of publicly visible INDYCAR players
         shell: bash
         run: |
