@@ -1,0 +1,47 @@
+name: CYBER FUTURE Agent C Final Corsica Original + Scenes
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/c-french-footage
+    paths:
+      - '.github/workflows/cyber-c-corsica-curated.yml'
+      - 'production/videos/cyber-future-prototypes-001/agent-c/curate_corsica.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  curated-full-original-and-scenes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve previous C package for single consolidated ZIP
+        uses: actions/download-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-FOOTAGE-C
+          run-id: 38240920120
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: out
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Download native original and cut full-film scene candidates
+        run: |
+          python -m py_compile production/videos/cyber-future-prototypes-001/agent-c/curate_corsica.py
+          python production/videos/cyber-future-prototypes-001/agent-c/curate_corsica.py
+      - name: Verify final package and hashes
+        run: |
+          sha256sum out/CYBER-FUTURE-001-FOOTAGE-C.zip
+          unzip -t out/CYBER-FUTURE-001-FOOTAGE-C.zip | tail -n 4
+          unzip -l out/CYBER-FUTURE-001-FOOTAGE-C.zip | tail -n 6
+      - name: Upload one consolidated Agent C source package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-FOOTAGE-C-FULL
+          path: out/CYBER-FUTURE-001-FOOTAGE-C.zip
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
