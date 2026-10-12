@@ -41,6 +41,33 @@ class WorkerV3Tests(unittest.TestCase):
             self.assertIsNone(v3.parse_job({"body": marker + "\n" +
                                             self.issue["body"].split("\n", 1)[1]}))
 
+    def test_portrait_format_is_explicit_and_not_a_fake_landscape_upscale(self):
+        data = json.loads(self.issue["body"].split("\n", 1)[1])
+        data["orientation"] = "portrait"
+        self.assertEqual(v3.parse_job({"body": v3.MARKER + "\n" + json.dumps(data)})
+                         ["orientation"], "portrait")
+        data["orientation"] = "diagonal"
+        self.assertIsNone(v3.parse_job({"body": v3.MARKER + "\n" + json.dumps(data)}))
+
+    def test_catalog_refresh_preserves_local_sources_on_failure(self):
+        import io
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp) / "sources_v3.json"
+            original = (HERE / "sources_v3.json").read_bytes()
+            p.write_bytes(original)
+            with mock.patch.object(v3, "__file__", str(Path(tmp) / "v3_worker.py")), \
+                 mock.patch.object(v3.urllib.request, "urlopen", side_effect=OSError("offline")):
+                self.assertFalse(v3.refresh_sources())
+            self.assertEqual(p.read_bytes(), original)
+
+    def test_portrait_filter_syntax(self):
+        # FFmpeg/yt-dlp syntax contract: a vertical 1080p file is 1080x1920.
+        h = 1080
+        fmt = (f"bv*[width<={h}][height<={h*16//9}]+ba/"
+               f"b[width<={h}][height<={h*16//9}]/b")
+        self.assertIn("width<=1080", fmt)
+        self.assertIn("height<=1920", fmt)
+
     def test_720p_max_for_bunny(self):
         obj = json.loads(self.issue["body"].split("\n", 1)[1])
         obj["url"] = v3.TEST_VIDEO
