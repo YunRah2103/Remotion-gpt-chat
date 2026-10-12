@@ -1,0 +1,16 @@
+name: RS6 C numerical scene profiling
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/c-details-atmosphere
+    paths:
+      - 'production/videos/rs6-no-mercy-001/agent_c_scene_profile.py'
+  workflow_dispatch:
+jobs:
+  profile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - run: python production/videos/rs6-no-mercy-001/agent_c_scene_profile.py
