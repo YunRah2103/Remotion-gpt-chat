@@ -95,20 +95,23 @@ def register(f,model,source_page,archive_url,credit,rights):
         print("REJECTED",f.name,str(e),flush=True)
         rejected.append(dict(file=f.name,reason=str(e)[:400]))
 def process_lotus():
-    # Manufacturer press ZIP exceeds 1.6 GiB; fetch only wanted members via HTTP Range.
-    # remotezip reads ZIP central directory from the end, never downloads entire package.
-    from remotezip import RemoteZip
-    with RemoteZip(LOTUS) as z:
-        items=[m for m in z.infolist() if Path(m.filename).suffix.lower() in
-            {".mp4",".mov",".m4v",".mkv",".webm"} and m.file_size<850*1024*1024]
-        items.sort(key=lambda x: (
-            0 if "BROLL" in x.filename.upper() or "THEORY" in x.filename.upper() else 1,
-            x.file_size))
-        print("LOTUS_REMOTE_ARCHIVE_ENTRIES",[(m.filename,m.file_size) for m in items[:35]],flush=True)
-        if not items:raise RuntimeError("Lotus remote archive no media entries")
+    # Lotus public ZIP does not support HTTP range. One bounded full download.
+    archive=RAW/"lotus_manufacturer_originals.zip"
+    try:
+        head=urllib.request.urlopen(urllib.request.Request(LOTUS,method="HEAD"),timeout=20)
+        print("LOTUS_HEAD",head.status,"CONTENT_LENGTH",head.headers.get("Content-Length"),flush=True)
+    except Exception as e:print("LOTUS_HEAD_UNAVAILABLE",repr(e),flush=True)
+    meta=get(LOTUS,archive,limit=6*1024*1024*1024)
+    sources.append(meta)
+    if not zipfile.is_zipfile(archive):raise RuntimeError("Lotus download lacks zip signature")
+    with zipfile.ZipFile(archive) as z:
+        entries=[m for m in z.infolist() if Path(m.filename).suffix.lower() in
+             {".mp4",".mov",".m4v",".mkv",".webm"} and 0<m.file_size<1000*1024*1024]
+        print("LOTUS_ZIP_MOVIES",[(m.filename,m.file_size) for m in entries],flush=True)
+        entries.sort(key=lambda x:(0 if "BROLL" in x.filename.upper() or "THEORY" in x.filename.upper() else 1,x.file_size))
         extracted=0
-        for i,m in enumerate(items[:12]):
-            if extracted+m.file_size>1800*1024*1024:break
+        for i,m in enumerate(entries):
+            if i>=15 or extracted+m.file_size>2400*1024*1024:break
             path=RAW/("lotus_"+str(i)+"_"+re.sub(r"[^a-zA-Z0-9_.-]","_",Path(m.filename).name))
             with z.open(m) as src,open(path,"wb") as out:
                 while True:
@@ -116,11 +119,9 @@ def process_lotus():
                     if not piece:break
                     out.write(piece)
             extracted+=path.stat().st_size
-            print("LOTUS_REMOTE_VIDEO_BYTES",path.name,path.stat().st_size,"SHA",sha(path),flush=True)
+            print("LOTUS_ORIGINAL_FILE",path.name,path.stat().st_size,sha(path),flush=True)
             register(path,"Lotus Theory 1",LOTUS_PAGE,LOTUS,"Lotus Cars",
-                "Lotus gallery editorial/media use only; public social reuse not confirmed")
-    sources.append(dict(url=LOTUS,mode="byte-range-remotezip",extracted_media_bytes=extracted,
-                        source="Lotus official press video package"))
+                "Lotus gallery says editorial/media use; other reuse unconfirmed")
 def process_porsche():
     # Verbatim original native video URLs from Porsche's downloadable Mission X press PDF.
     # They are not inferred YouTube streams. Evaluate both since one may be a walkaround.
