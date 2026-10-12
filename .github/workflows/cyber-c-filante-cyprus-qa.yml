@@ -1,0 +1,35 @@
+name: CYBER FUTURE Agent C Filante Cyprus real-car film QA
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/c-french-footage
+    paths:
+      - ".github/workflows/cyber-c-filante-cyprus-qa.yml"
+      - "production/videos/cyber-future-prototypes-001/agent-c/probe_filante_cyprus_exterior.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect-native-renault-video:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install native decoder
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Download, FFprobe, full decode and snapshot 30 actual Filante frames
+        run: |
+          python -m py_compile production/videos/cyber-future-prototypes-001/agent-c/probe_filante_cyprus_exterior.py
+          python production/videos/cyber-future-prototypes-001/agent-c/probe_filante_cyprus_exterior.py
+          test -s out/agent-c-filante-cyprus/audit.json
+      - name: Publish verified source and contact frames for independent QA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-C-FILANTE-CYPRUS-CAMERA-QA
+          path: out/agent-c-filante-cyprus/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
