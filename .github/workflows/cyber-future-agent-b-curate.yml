@@ -1,0 +1,69 @@
+name: Cyber Future 001 - Agent B final hand-reviewed footage
+
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/b-europe-footage
+    paths:
+      - '.github/workflows/cyber-future-agent-b-curate.yml'
+      - 'production/videos/cyber-future-prototypes-001/agent-b/curate.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: cyber-future-agent-b-curate
+  cancel-in-progress: false
+
+jobs:
+  curate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install FFmpeg and native-motion checking
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q opencv-python-headless Pillow
+      - name: Retrieve genuine 1080p decoded 30-source-candidate ZIP from approved running-shot run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 38188226958 \
+            -R YunRah2103/Remotion-gpt-chat \
+            -n CYBER-FUTURE-001-FOOTAGE-B \
+            -D incoming
+          test -s incoming/CYBER-FUTURE-001-FOOTAGE-B.zip
+          unzip -l incoming/CYBER-FUTURE-001-FOOTAGE-B.zip | tail -3
+      - name: Extract 11 chosen original scenes, verify SHA256 + full video decode + 3-point temporal differences
+        run: |
+          python production/videos/cyber-future-prototypes-001/agent-b/curate.py
+      - name: Deliver ONE authentic playable source ZIP and manifests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-FOOTAGE-B
+          path: |
+            out/cyber-future-agent-b-final/CYBER-FUTURE-001-FOOTAGE-B.zip
+            out/cyber-future-agent-b-final/QA_SUMMARY.json
+          compression-level: 0
+          retention-days: 5
+          if-no-files-found: warn
+      - name: Publish genuine first/middle/end footage QA montage to Agent B branch
+        if: success()
+        run: |
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git config user.name 'github-actions[bot]'
+          git add production/videos/cyber-future-prototypes-001/agent-b/review/
+          git diff --cached --quiet || {
+            git commit -m 'qa(cyber): save 11-shot frame-triptych and SHA256 verification'
+            git push origin HEAD:automotive-edits/cyber-future-prototypes-001/b-europe-footage
+          }
