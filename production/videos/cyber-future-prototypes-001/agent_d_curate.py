@@ -6,7 +6,7 @@ S=Path("production/videos/cyber-future-prototypes-001/AGENT_D_SELECTION.json")
 C=json.loads(S.read_text())
 OUT=Path("out/CYBER-FUTURE-001-FOOTAGE-D")
 for p in (OUT,OUT/"clips",OUT/"contact_sheets"):p.mkdir(parents=True,exist_ok=True)
-BASE={"lotus":Path("incoming/lotus"),"porsche":Path("incoming/porsche")}
+BASE={"lotus":Path("incoming/lotus"),"porsche":Path("incoming/porsche"),"porsche_late":Path("incoming/porsche_late")}
 manifests={key:{Path(x["clip"]).name:x for x in json.loads((root/"manifest.json").read_text())}
  for key,root in BASE.items()}
 rows=[]
