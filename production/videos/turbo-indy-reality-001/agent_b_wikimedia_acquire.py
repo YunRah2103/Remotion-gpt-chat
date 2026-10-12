@@ -12,7 +12,6 @@ session=requests.Session(); session.headers.update({"User-Agent":"YUNEX-IndyCar-
 SOURCES=[
  ("indy25_start","Indy5002025start.webm","2025 Indy 500 real race start / Andretti incident","TRUE RACE START — editorial licensing HOLD (license review pending)",3.5),
  ("indy25_parade","2025Indy500parade.webm","2025 Indy 500 procession / parade","Only for possible real car perspective; no race speed",1.0),
- ("indy24_01_fallback","2024 Indianapolis 500 - Sarah Stierch 01.webm","2024 Indy 500 genuine pace lap","DUPLICATE OF AGENT D — use only for A/B motion comparison, not separate footage",5.0),
 ]
 
 OFFICIAL=[]
@@ -132,7 +131,7 @@ def main():
     (OUT/"acquisition_log.json").write_text(json.dumps(LOG,indent=2))
     with open(OUT/"SHA256SUMS.txt","w") as f:
         for x in MANIFEST:f.write(x["sha256"]+"  "+x["clip"]+"\n")
-    report="# Agent D: independent IndyCar cinematic footage QA\n\n"
+    report="# Agent B: 2025 Indy 500 real camera footage QA — camera match not approved\n\n"
     report+=f"Accepted mechanically verifiable video snippets: **{len(MANIFEST)}**. Human contact-sheet review is still required.\n\n"
     report+="No repeat of race-pack television footage is intentionally included. Files are real camera-recorded footage and must be screened for visual suitability. Some context clips have no cars. The 2025 race start is license-review pending and must NOT be treated as cleared for publication. Sources may require attribution, and official IndyCar media is *not* cleared for commercial reuse.\n\n"
     report+="| Clip | Role | Original resolution | Delivered | Motion deltas |\n|---|---|---|---|---|\n"
@@ -140,7 +139,7 @@ def main():
         a=x["original_source"];b=x["delivered_video"]
         report+=f'| {x["clip"]} | {x["visual_role"]} | {a["width"]}x{a["height"]} | {b["width"]}x{b["height"]} | {x["pixel_change_mean"]} |\n'
     (OUT/"QA_REPORT.md").write_text(report)
-    archive=Path("out/YUNEX_TURBO_INDY_AGENT_B_CINEMATIC.zip")
+    archive=Path("out/YUNEX_TURBO_INDY_AGENT_B_MATCHES.zip")
     with zipfile.ZipFile(archive,"w",compression=zipfile.ZIP_DEFLATED,compresslevel=2) as z:
         for p in OUT.rglob("*"):
             if p.is_file():z.write(p,p.relative_to(OUT))
