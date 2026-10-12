@@ -1,6 +1,6 @@
 {
-  "archive_sha256": "05e942d935eaf75072f0207e4e31f06383d26841316ee625e1e0e5ead4acff6a",
-  "total": 11,
+  "archive_sha256": "4a8caf5be7b686e391fefc911756e75cbdb51123b14e18c47046fb32430191f4",
+  "total": 10,
   "model_count": 2,
   "gate": "PARTIAL_REAL_FOOTAGE_CURATED",
   "physical_and_rights_caveat": "BMW Vision M NEXT footage real road drive; BMW i Vision Dee circle/studio shots must NOT be described as driving. Some promoted studio images might include CGI manipulation. No true 1080 vertical source. Edit rights not confirmed.",
@@ -43,16 +43,6 @@
       "temporal_differences": [
         44.967,
         29.76
-      ]
-    },
-    {
-      "id": "bmw-vision-m-next-launch-candidate-01",
-      "angle": "dark studio illuminated front grille",
-      "model": "BMW Vision M NEXT",
-      "sha256": "6895b38349650e13af2dcf86043d11b2f4f0057834ac4f705b44150885c588d4",
-      "temporal_differences": [
-        7.259,
-        14.272
       ]
     },
     {
