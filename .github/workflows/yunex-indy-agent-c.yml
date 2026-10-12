@@ -28,7 +28,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
-          python -m pip install --disable-pip-version-check --upgrade "yt-dlp[default]" Pillow
+          python -m pip install --disable-pip-version-check --upgrade "yt-dlp[default]" curl-cffi Pillow
           ffmpeg -version | head -1
           yt-dlp --version
       - name: Download REAL racing media; verify native dimensions, decoded motion, SHA-256 and contact sheets
