@@ -15,6 +15,11 @@ source_entry=next((m for m in MAN if m.get("file")=="clips/asian_proto_01_01.mp4
 if source_entry is None:raise SystemExit("SOURCE MANIFEST MISSING")
 ORIG=ROOT/"originals";ORIG.mkdir(exist_ok=True)
 SRC=ORIG/"hyundai_n_rn22e_vision74_source.mp4";source.rename(SRC)
+# Quarantine additional downloads until exact vehicle, live-action content, and frame setup are inspected.
+UNREVIEWED=ORIG/"unreviewed";UNREVIEWED.mkdir(exist_ok=True)
+for extra in (ROOT/"clips").glob("*.mp4"):
+ extra.rename(UNREVIEWED/extra.name)
+ print("UNREVIEWED_ADDITIONAL_SOURCE",extra.name,flush=True)
 PHOTO=ROOT/"contact_sheets";PHOTO.mkdir(exist_ok=True)
 # Distinct camera/view setups; time boundaries verified against actual original contact storyboard.
 SCENES=[
