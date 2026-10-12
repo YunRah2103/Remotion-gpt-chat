@@ -1,0 +1,47 @@
+name: YUNEX Turbo 001 - Agent A Acquire and QA
+on:
+  push:
+    branches:
+      - automotive-edits/turbo-indy-reality-001/a-turbo-film
+    paths:
+      - production/videos/turbo-indy-reality-001/agent_a_acquire.py
+      - .github/workflows/turbo-agent-a-acquisition.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquire-and-verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 32
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare video tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg imagemagick
+          python -m pip install -U yt-dlp requests
+          ffmpeg -version | head -n 1
+          yt-dlp --version
+      - name: Acquire and inspect actual Turbo clips
+        id: acquire
+        run: |
+          python production/videos/turbo-indy-reality-001/agent_a_acquire.py
+          cat out/turbo-agent-a/manifest.json
+      - name: Real artifact including playable MP4s and contact sheets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: yunex-turbo-agent-a-evidence-${{ github.run_id }}
+          path: out/turbo-agent-a/
+          retention-days: 14
+          compression-level: 0
+          if-no-files-found: warn
+      - name: Enforce honest delivered-media requirement
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open('out/turbo-agent-a/manifest.json'))
+          if not d['acquired_originals']:
+              raise SystemExit('No video downloaded: diagnostics-only artifact, not successful footage.')
+          print('Actual downloaded videos:',d['acquired_originals'])
+          PY
