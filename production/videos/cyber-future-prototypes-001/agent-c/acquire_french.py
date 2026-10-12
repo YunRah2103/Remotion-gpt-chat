@@ -13,6 +13,7 @@ CONTACT=ROOT/"contact_sheets"
 MAX_BYTES=240*1024*1024
 BASE="https://renault.com.cy/wp-content/uploads/"
 DIRECT=[
+ {"id":"filante_real_record_dec_2025","model":"Renault Filante Record 2025 (actual Dec 2025 test-record film)","url":"https://media.renault.ch/video-cdn/165350_web-renault-filante-record-2025.mp4","page":"https://media.renault.ch/de/101/article/22079","owner":"Renault Switzerland Media","type":"record-drive film (verify shots)"},
  {"id":"r5_turbo_2022_original","model":"Renault R5 Turbo 3E (2022 show car)","url":"https://download.screen9.com/IDD79AF6RIsl8A-dSh5Q5vpps9dl_GmgBJgM3y16_q5WYCU9wrbgLJIGOBBFAQXpy6mRCnr4-gzdxLF5CAPM7RRd9-CzOplK0wQRiMJoH1203DmmoU5ZZZjdRYvAMA0hRfmQUjMOCER8iPN-jvcbkKmCmRYtMUi3Clx36O35ER0nnhwBYhZdhn4TIYud_TEHbr-QsynH847XLeSpRW71qRLUKI3s_153iy25Ha8f_V6z1adEOY7TcNJdLP2--vj6.mp4","page":"https://www.mynewsdesk.com/se/renault/videos/show-car-r5-turbo-3e-original-punkt-mp4-116664","owner":"RN Nordic / Renault Sweden","type":"press original"},
  {"id":"alpenglow_hy4_roadshot","model":"Alpine Alpenglow Hy4 (2024 rolling prototype)","url":"https://pplware.sapo.pt/wp-content/uploads/2024/05/alpine_alpenglow_hy4_pplware01.mp4","page":"https://pplware.sapo.pt/motores/alpine-alpenglow-hy4-nao-se-intimide-que-o-motor-de-hidrogenio-nao-estraga-a-festa/","owner":"Alpine footage via Pplware","type":"unknown"},
  {"id":"filante_2025_record","model":"Renault Filante Record 2025","url":BASE+"2026/01/renault-filante-record-z41-concept-020.mp4","page":"https://renault.com.cy/renault-z41/","owner":"Renault Cyprus","type":"unknown"},
