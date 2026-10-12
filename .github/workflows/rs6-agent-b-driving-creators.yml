@@ -16,12 +16,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - key: green-rs6-driving
-            creator: luan_rs6
-          - key: professional-rs6-films
-            creator: auditographyofficial
-          - key: rs6-performance
-            creator: performance61.de
+          - key: c8-rs6-cinematography
+            creator: brm.media
+          - key: rs6-c8-streetspotting
+            creator: ashrafitaly7
+          - key: c8-tuned-rolling-shots
+            creator: audi_rs6_power_division
+          - key: rs6-dutch-owner
+            creator: rs6.exe
     steps:
       - uses: actions/checkout@v4
       - name: Install trusted QA tools
