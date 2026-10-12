@@ -29,7 +29,7 @@ def grab(url,timeout=35):
 def extract_urls(page,body):
  soup=BeautifulSoup(body,"html.parser");found=set()
  for el in soup.find_all(True):
-  for key in ("href","src","data-src","data-url","data-file","data-video","data-download","poster"):
+  for key in ("href","src","data-src","data-url","data-file","data-video","data-download","data-nodownload","data-download-original","data-download-hq","poster"):
    val=el.get(key)
    if val and isinstance(val,str) and not val.startswith(("javascript:","#","data:")):
     url=urllib.parse.urljoin(page,html.unescape(val))
