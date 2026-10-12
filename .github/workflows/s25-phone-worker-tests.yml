@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  issues: read
 
 jobs:
   validate-phone-worker:
@@ -27,6 +28,14 @@ jobs:
       - name: Run queue contract and real encoding tests
         run: |
           python -m unittest discover -s production/phone_footage -p test_worker.py -v
+      - name: Verify queued GitHub Issue is machine-readable (no phone download)
+        env:
+          YUNEX_READ_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          printf '%s' "$YUNEX_READ_TOKEN" > "$RUNNER_TEMP/yunex-issue-read-token"
+          chmod 600 "$RUNNER_TEMP/yunex-issue-read-token"
+          YUNEX_GH_TOKEN_FILE="$RUNNER_TEMP/yunex-issue-read-token" python production/phone_footage/worker.py --once --dry-run
       - name: Syntax compile phone worker
         run: |
           python -m py_compile production/phone_footage/worker.py
