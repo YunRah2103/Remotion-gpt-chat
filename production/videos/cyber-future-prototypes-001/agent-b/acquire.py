@@ -169,6 +169,12 @@ def acquire(s):
     # Space across source time; no slices from one viewpoint counted as distinct until manual QA.
     selected=sorted(spans,key=lambda ab:ab[1]-ab[0],reverse=True)[:7]
     selected.sort()
+    if sid=="bmw-i-vision-dee-running":
+        # Public manufacturer master has B-roll exterior before ~230s; the
+        # naive longest-scene selector concentrated on 230-450s interior,
+        # so explicitly sample distributed exterior-focused timestamps.
+        starts=[11,27,43,59,75,91,107,123,139,155,171,187,203,219]
+        selected=[(float(t),float(t+4.1)) for t in starts]
     records=[];photos=[]
     for idx,(a,b) in enumerate(selected,1):
         dur=min(4.0,b-a-.2)
