@@ -1,0 +1,138 @@
+{
+  "title": "YUNEX LÉGENDES FRANÇAISES 001 · 25-second cinematic recut",
+  "status": "User-requested superseding cut; no first 2CV or DS introduction",
+  "version": "C25-V1",
+  "sourceMutedPictureArtifactId": 11720519374,
+  "sourceOriginalClipPackageArtifactId": 11713925779,
+  "sourceVideo": "FRENCH_LEGENDS_C_MUTED_FAST_1080P.mp4 (Agent C V5, 60.000s)",
+  "output": "YUNEX_FR_LEGENDS_25SEC_MUTED_1080P.mp4",
+  "frameRate": 30,
+  "frameCount": 750,
+  "durationSeconds": 25,
+  "width": 1920,
+  "height": 1080,
+  "excludedFootage": [
+    "Original 2CV opening",
+    "All DS Paris intro shots",
+    "Old 2CV-to-DS transition"
+  ],
+  "music": {
+    "originalSHA256": "2334fc7c70a4320faf1b137b97ec9e2899ed325e01cc1fb954733a21d802ec55",
+    "sourceInSeconds": 35,
+    "sourceOutSeconds": 60,
+    "clipDurationSeconds": 25,
+    "originalSongUnchanged": true,
+    "fadeInSeconds": 0.18,
+    "publicGitMusicIncluded": false,
+    "notes": "Private review used exact original song at 35–60 seconds; Agent D owns final song mux. Song not stored in public GitHub."
+  },
+  "privateUserPreview1080pSHA256": "1e18f99f3f800b9ac6e78e88f442f19996e4d619a7b9e9bc83005940a3b3ed92",
+  "privateUserPreview720pSHA256": "6ad7c242d1ef2d45d9179ebff1877b3598fcae3a259c02a5004f7420d751d5e2",
+  "rights": "Reuse licenses for some manufacturer/third-party source footage not confirmed",
+  "shots": [
+    {
+      "index": 1,
+      "model": "Original Alpine A110 · mountain intro",
+      "sourceStartSeconds": 5.42,
+      "frames": 45,
+      "masterStartFrame": 0,
+      "masterEndFrame": 45
+    },
+    {
+      "index": 2,
+      "model": "Original Alpine A110 · winding road",
+      "sourceStartSeconds": 7.91,
+      "frames": 30,
+      "masterStartFrame": 45,
+      "masterEndFrame": 75
+    },
+    {
+      "index": 3,
+      "model": "Original Alpine A110 · snow road",
+      "sourceStartSeconds": 11.1,
+      "frames": 45,
+      "masterStartFrame": 75,
+      "masterEndFrame": 120
+    },
+    {
+      "index": 4,
+      "model": "Renault 5 Turbo 2 · rolling profile",
+      "sourceStartSeconds": 14.1,
+      "frames": 62,
+      "masterStartFrame": 120,
+      "masterEndFrame": 182
+    },
+    {
+      "index": 5,
+      "model": "Peugeot 205 GTI · approaching",
+      "sourceStartSeconds": 17.9,
+      "frames": 30,
+      "masterStartFrame": 182,
+      "masterEndFrame": 212
+    },
+    {
+      "index": 6,
+      "model": "Modern Alpine A110 R · blue-hour road",
+      "sourceStartSeconds": 23.72,
+      "frames": 76,
+      "masterStartFrame": 212,
+      "masterEndFrame": 288
+    },
+    {
+      "index": 7,
+      "model": "Alpine A110 R Ultime · orange",
+      "sourceStartSeconds": 27.03,
+      "frames": 76,
+      "masterStartFrame": 288,
+      "masterEndFrame": 364
+    },
+    {
+      "index": 8,
+      "model": "Alpine A290 Rallye · forest bend",
+      "sourceStartSeconds": 32.56,
+      "frames": 66,
+      "masterStartFrame": 364,
+      "masterEndFrame": 430
+    },
+    {
+      "index": 9,
+      "model": "Alpine A110 R Ultime · blue circuit",
+      "sourceStartSeconds": 38.28,
+      "frames": 88,
+      "masterStartFrame": 430,
+      "masterEndFrame": 518
+    },
+    {
+      "index": 10,
+      "model": "Bugatti Chiron · mountain aerial",
+      "sourceStartSeconds": 42.31,
+      "frames": 70,
+      "masterStartFrame": 518,
+      "masterEndFrame": 588
+    },
+    {
+      "index": 11,
+      "model": "Bugatti Chiron · mountain road",
+      "sourceStartSeconds": 46.1,
+      "frames": 66,
+      "masterStartFrame": 588,
+      "masterEndFrame": 654
+    },
+    {
+      "index": 12,
+      "model": "Bugatti Bolide · restrained track cameo",
+      "sourceStartSeconds": 52.7,
+      "frames": 44,
+      "masterStartFrame": 654,
+      "masterEndFrame": 698
+    },
+    {
+      "index": 13,
+      "model": "Bugatti Chiron · golden-hour ending",
+      "sourceStartSeconds": 58.23,
+      "frames": 52,
+      "masterStartFrame": 698,
+      "masterEndFrame": 750
+    }
+  ]
+}
