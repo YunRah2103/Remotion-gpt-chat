@@ -1,0 +1,42 @@
+name: CYBER FUTURE Agent C Alpine HY6 real Spa source check
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/c-french-footage
+    paths:
+      - ".github/workflows/cyber-c-alpine-hy6.yml"
+      - "production/videos/cyber-future-prototypes-001/agent-c/probe_alpine_hy6_spa.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  alpine-hy6-native-qc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install downloader and verified video probes
+        run: |
+          python -m pip install --quiet yt-dlp curl_cffi
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Verify real Alpine Hy6 2025 Spa footage formats and decode actual 1080p bytes if found
+        run: |
+          python -m py_compile production/videos/cyber-future-prototypes-001/agent-c/probe_alpine_hy6_spa.py
+          python production/videos/cyber-future-prototypes-001/agent-c/probe_alpine_hy6_spa.py
+      - name: Package video sources, decoded frame contacts and format rejects
+        if: always()
+        run: |
+          if [ -d out/agent_c_alpine_hy6 ]; then
+            cd out/agent_c_alpine_hy6 && zip -q -0 -r ../CYBER-C-ALPINE-HY6-SOURCE-QA.zip .
+            cd .. && sha256sum CYBER-C-ALPINE-HY6-SOURCE-QA.zip
+          fi
+      - name: Upload verified source or detailed rejection manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-C-ALPINE-HY6-SOURCE-QA
+          path: out/CYBER-C-ALPINE-HY6-SOURCE-QA.zip
+          if-no-files-found: warn
+          retention-days: 7
+          compression-level: 0
