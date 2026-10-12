@@ -48,7 +48,7 @@ async function pageState(page){
 async function clickPlayback(page){
  for(const f of page.frames()){
   try{await f.evaluate(()=>{
-    let v=document.querySelector('video'); if(v){v.muted=true;v.play().catch(()=>{});}
+    let v=document.querySelector('video'); if(v){v.muted=false;v.volume=1;v.play().catch(()=>{});}
     for(const sel of ['button.ytp-large-play-button','button.ytp-play-button']){
       const b=document.querySelector(sel);if(b && b.offsetWidth>0){b.click();break;}
     }
@@ -149,6 +149,10 @@ async function runTest(){
       file=convert;report.mp4Bytes=fs.statSync(file).size;
    }else report.convertError=x.stderr.slice(-500);
   }
+  const audioCheck=run('ffmpeg',['-hide_banner','-i',file,'-t','4','-map','0:a:0','-af','volumedetect','-f','null','-'],20000);
+  const maxVol=(audioCheck.stderr||'').match(/max_volume:\s*(-?[0-9.]+) dB/);
+  report.audioMaxDb=maxVol?Number(maxVol[1]):null;
+  report.audibleSoundVerified=Number.isFinite(report.audioMaxDb)&&report.audioMaxDb>-55;
   const decode=run('ffmpeg',['-hide_banner','-v','error','-xerror','-i',file,'-t','4',
      '-map','0:v:0','-f','null','-'],30000);
   report.decodePassed=decode.status===0;
