@@ -22,6 +22,7 @@ REPO = "YunRah2103/Remotion-gpt-chat"
 OWNER = "YunRah2103"
 TITLE_PREFIX = "[YUNEX PHONE JOB]"
 MARKER = "YUNEX_PHONE_JOB_V1"
+MARKER_V2 = "YUNEX_PHONE_JOB_V2"
 TEST_VIDEO = "https://www.youtube.com/watch?v=YE7VzlLtp-4"
 CAR_VIDEO = "https://www.youtube.com/watch?v=DqiKOr1aS9w"
 def load_approved_sources(path=None):
@@ -85,7 +86,8 @@ def issue_jobs(token):
 
 def parse_job(issue):
     body = issue.get("body") or ""
-    if not body.startswith(MARKER + "\n"):
+    marker = body.partition("\n")[0]
+    if marker not in (MARKER, MARKER_V2) or "\n" not in body:
         return None
     try:
         job = json.loads(body.split("\n",1)[1].strip())
@@ -98,7 +100,8 @@ def parse_job(issue):
     if (not approved or job.get("seconds") != 6 or
             job.get("license") != approved["license"] or
             type(height) is not int or height not in (720, 1080) or
-            height > approved["max_height"]):
+            height > approved["max_height"] or
+            (height == 1080 and marker != MARKER_V2)):
         return None
     return job
 

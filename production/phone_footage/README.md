@@ -1,6 +1,6 @@
 # YUNEX S25 autonomous footage worker
 
-**Status: prototype implemented; phone download not yet proven.**
+**Status:** The V1 phone-download approach is proven by [job #39](https://github.com/YunRah2103/Remotion-gpt-chat/issues/39) and [car job #40](https://github.com/YunRah2103/Remotion-gpt-chat/issues/40). Both released six-second 1280×720 MP4 assets. This V2 branch adds controlled 1080p job support and stronger validation; actual 1080p phone download remains UNPROVEN. See [README_V2.md](README_V2.md).
 This experimental branch does not change main.
 
 ## The goal

@@ -5,7 +5,7 @@ Branch: `experiments/s25-footage-worker-v2-20261012`. Original successful V1 rem
 ## Changes from proven V1
 - Sources stored in `approved_sources.json` rather than hardcoded in Python. Additional URLs require explicit review, verifiable rights, accurate author/license and a commit; **GitHub Issue assertions alone do not confer authorization**.
 - Backward compatible V1 job: `YUNEX_PHONE_JOB_V1\n{"url":"...","seconds":6,"license":"CC-BY-3.0"}` defaults to `height=720`.
-- V2 pilot optional `"height":1080` **only** when the registry authorizes 1080. The car-in-snow Creative Commons sample is presently authorized for a **test attempt**, not shown to actually offer 1080p on YouTube. Requesting 1080p fails rather than falling back to mislabeled 720p if source lacks 1080 frames.
+- V2 pilot optional `"height":1080` **only** when the registry authorizes 1080. The issue must begin with the distinct `YUNEX_PHONE_JOB_V2` marker so the old V1 script ignores it. V2 continues accepting V1-format 720p jobs. The car-in-snow Creative Commons sample is presently authorized for a **test attempt**, not shown to actually offer 1080p on YouTube. Requesting 1080p fails rather than falling back to mislabeled 720p if source lacks 1080 frames.
 - Input media probed before transcode; output resolution checked; entire video decoded with FFmpeg rather than first four seconds.
 - Local Termux advisory lock prevents multiple phone shells competing for the same job. Worker checks release tag before uploading again, preventing accidental duplicate GitHub release writes.
 - Preserves limits: owner-only Issues, verified CC BY catalog, six seconds per job, max 1080p, 30 MiB and a public GitHub prerelease. No unapproved large batches/HDR/movie footage supported.
@@ -14,6 +14,15 @@ Branch: `experiments/s25-footage-worker-v2-20261012`. Original successful V1 rem
 GitHub Actions offline tests validate registry, height gate, source checks and real H264 encoding. **These tests do not prove 1080p YouTube extraction on the phone.** No new physical-phone download has been attempted by this branch alone.
 
 ## Pilot
+For the authorised 1080p trial, the Issue body must be exactly:
+
+```text
+YUNEX_PHONE_JOB_V2
+{"url":"https://www.youtube.com/watch?v=DqiKOr1aS9w","seconds":6,"license":"CC-BY-3.0","height":1080}
+```
+
+The original V1 worker ignores this different marker. **Never post a 1080p request with the V1 marker**, or V1 could accept the old job and download only 720p.
+
 Once cloud tests pass: run one 720p V1 backward-compatibility check if needed, then issue a CC BY car clip test with `"height":1080` from an approved source, **while using the V2 script on the phone**. Check Issue completion comment, GitHub Release asset, real dimensions, full frame decode and checksum. If 1080p unavailable, report failure and find a different licensed source. Do not claim 1080 success just because an offline synthetic test passes.
 
 ## Android manual upgrade (only after review)

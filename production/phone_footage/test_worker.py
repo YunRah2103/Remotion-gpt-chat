@@ -39,8 +39,10 @@ class PhoneWorkerTests(unittest.TestCase):
     def test_1080p_jobs_require_registry_approval(self):
         car={"url":worker.CAR_VIDEO,"seconds":6,"license":"CC-BY-3.0","height":1080}
         bunny={**car,"url":worker.TEST_VIDEO}
-        mk=lambda j: {"body":worker.MARKER+"\n"+json.dumps(j)}
+        mk=lambda j: {"body":worker.MARKER_V2+"\n"+json.dumps(j)}
         self.assertEqual(worker.parse_job(mk(car)),car)
+        self.assertIsNone(worker.parse_job({
+            "body":worker.MARKER+"\n"+json.dumps(car)}))
         self.assertIsNone(worker.parse_job(mk(bunny)))
         for bad in (0, 360, 720.5, 2160, True):
             self.assertIsNone(worker.parse_job(mk({**car,"height":bad})))
