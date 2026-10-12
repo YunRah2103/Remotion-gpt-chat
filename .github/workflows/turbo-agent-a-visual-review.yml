@@ -1,4 +1,4 @@
-name: YUNEX Turbo A - Contact Sheet Visual Inspection
+name: YUNEX Turbo A - Final Clip Frame Review
 on:
   push:
     branches:
@@ -18,8 +18,8 @@ jobs:
       - name: Retrieve verified footage artifact and contact sheets
         uses: actions/download-artifact@v4
         with:
-          name: yunex-turbo-agent-a-indy500-focus-38270483310
-          run-id: 38270483310
+          name: YUNEX-Turbo-AgentA-Indy500-Selection-38274763279
+          run-id: 38274763279
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: out/visual
       - name: Install ImageMagick for smaller visual review frames
