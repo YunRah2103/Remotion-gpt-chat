@@ -1,0 +1,46 @@
+name: YUNEX Real Car Source Selection
+on:
+  push:
+    branches:
+      - automotive-edits/yunex-hdr-cinematic-001/a-hdr-footage
+    paths:
+      - .github/workflows/yunex-real-car-source.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  visual-source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install video QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install Pillow
+      - name: Download original licensed cars, classify HDR, inspect real frames
+        id: source
+        continue-on-error: true
+        run: python production/videos/yunex-hdr-cinematic-001/agent-a/acquire_mixkit_real_cars.py
+      - name: Show manifest even if no candidates
+        if: always()
+        run: |
+          cat out/yunex-car-real-source/manifest.json || true
+          du -sh out/yunex-car-real-source || true
+      - name: Upload unmodified candidates and contact sheet
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-real-car-candidates-with-originals
+          path: out/YUNEX-REAL-CAR-CANDIDATES.zip
+          compression-level: 0
+          retention-days: 5
+      - name: Verify at least one real source
+        if: always()
+        env:
+          RESULT: ${{ steps.source.outcome }}
+        run: test "$RESULT" = success
