@@ -9,7 +9,9 @@ OUT=Path("out/cyber-future-agent-a");(OUT/"clips").mkdir(parents=True,exist_ok=T
 SITES=[
  ("Hyundai N Vision 74 + RN22e","https://www.hyundai.news/eu/articles/press-releases/hyundais-n-brand-unveils-two-rolling-lab-concepts/video.html"),
  ("Hyundai N Vision 74 + RN22e","https://www.hyundai.news/eu/articles/press-releases/hyundai-releases-n-brand-rolling-lab-development-video/video.html"),
- ("Hyundai N Vision 74","https://www.hyundai.news/eu/articles/press-releases/hyundai-n-vision-74-a-ground-breaking-design-50-years-in-the-making/videos.html"),
+ ("Hyundai N Vision 74","https://www.hyundai.news/eu/articles/press-releases/hyundai-n-vision-74-a-ground-breaking-design-50-years-in-the-making/video.html"),
+ ("Hyundai INSTEROID","https://www.hyundai.news/eu/articles/press-releases/hyundai-motor-teases-insteroid/video.html"),
+ ("Hyundai INSTEROID","https://www.hyundai.news/eu/articles/press-releases/hyundai-insteroid-debuts-in-seoul/video.html"),
 ]
 session=requests.Session();session.headers["User-Agent"]="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/128.0 Safari/537.36"
 results=[];manifest=[];rejected=[]
