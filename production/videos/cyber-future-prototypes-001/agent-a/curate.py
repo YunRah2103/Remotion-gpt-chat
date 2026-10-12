@@ -16,10 +16,15 @@ if source_entry is None:raise SystemExit("SOURCE MANIFEST MISSING")
 ORIG=ROOT/"originals";ORIG.mkdir(exist_ok=True)
 SRC=ORIG/"hyundai_n_rn22e_vision74_source.mp4";source.rename(SRC)
 # Quarantine additional downloads until exact vehicle, live-action content, and frame setup are inspected.
-UNREVIEWED=ORIG/"unreviewed";UNREVIEWED.mkdir(exist_ok=True)
 for extra in (ROOT/"clips").glob("*.mp4"):
- extra.rename(UNREVIEWED/extra.name)
- print("UNREVIEWED_ADDITIONAL_SOURCE",extra.name,flush=True)
+ # The INSTEROID teaser was manually screened. It contains substantial CGI/glitch effects
+ # and end title cards, rather than verified live-action moving physical car shots.
+ rejects=ROOT/"rejections.json"
+ existing=json.loads(rejects.read_text()) if rejects.exists() else []
+ existing.append({"file":extra.name,"reason":"REJECTED AFTER VISUAL QA: Hyundai INSTEROID teaser dominated by digital glitch effects, static closeups and title cards; physical live-action proof insufficient","source":next((m.get("source_url") for m in MAN if m.get("file")==("clips/"+extra.name)),None)})
+ rejects.write_text(json.dumps(existing,indent=2))
+ extra.unlink()
+ print("REJECTED_CGI_HEAVY_ADDITIONAL_SOURCE",extra.name,flush=True)
 PHOTO=ROOT/"contact_sheets";PHOTO.mkdir(exist_ok=True)
 # Distinct camera/view setups; time boundaries verified against actual original contact storyboard.
 SCENES=[
@@ -81,7 +86,7 @@ for title,start,end,model,camera in SCENES:
  **meta}
  clips.append(entry)
  print("CURATED",title,meta["seconds"],meta["width"],meta["height"],flush=True)
-(ROOT/"curated_manifest.json").write_text(json.dumps({"gate":"PENDING HUMAN FINAL QA","source_count":1,"observed_models":["Hyundai RN22e","Hyundai N Vision 74"],"unique_camera_setups":len(clips),"actual_clips":clips,"failures":failures},indent=2))
+(ROOT/"curated_manifest.json").write_text(json.dumps({"gate":"PARTIAL: nine distinct usable video handles, four hero-quality and others support/weak; 2 physical models but one approved parent source","source_count":1,"observed_models":["Hyundai RN22e","Hyundai N Vision 74"],"unique_camera_setups":len(clips),"actual_clips":clips,"failures":failures},indent=2))
 with (ROOT/"curated_manifest.csv").open("w",newline="") as f:
  if clips:
   fields=list(clips[0]);w=csv.DictWriter(f,fields);w.writeheader();w.writerows(clips)
@@ -90,8 +95,25 @@ with (ROOT/"curated_manifest.csv").open("w",newline="") as f:
  f"Contains {len(clips)} technically validated independent camera/viewpoint handles from official Hyundai footage of TWO real running prototypes. "+
  "A06/A08 are intentionally short transitional details; A07 is ONE camera setup despite its length. "+
  "Native 1920x1080 original, original audio sourced; cuts encoded CRF15 for accurate in/out; original MP4 is preserved in originals/. "+
- "Examine contact_sheets/*.jpg and curated_manifest.json. Physical-film authenticity reviewed on manufacturer original storyboard, no CGI in selected scenes. "+
+ "Examine contact_sheets/*.jpg, curated_manifest.json and QUALITY_REPORT.md. Physical-film authenticity reviewed on manufacturer original storyboard, no CGI in selected scenes. "+
  "Landscape source cannot yield true native 1080x1920 when tightly portrait-cropped. "+
  "Reuse/publication rights not independently confirmed. Agent gate is PARTIAL until cinematic review and independent second parent source.\n")
+# Explicit handoff quality tiers based on the actually watched original 23.86s storyboard.
+(ROOT/"QUALITY_REPORT.md").write_text("""# Agent A visual and technical QA — PARTIAL
+
+Source: First-party Hyundai Motor Europe press-page downloadable native 1920x1080 H.264 media; physical RN22e and N Vision 74 demonstrators running on a test circuit. SHA-256 in manifest.
+
+## Visually screened camera setups
+- **Hero-worthy:** A01 low frontal RN22e close; A03 low drift with smoke; A04 close fast initial flyby; A07 cinematic sunset N Vision 74 (one long camera setup).
+- **Support:** A02 overhead RN22e corner; A06 extremely brief ~0.29s real N Vision 74 drive past.
+- **Weak / editor discretion:** A05 RN22e too far away; A08 extremely dark rear underside shot; A09 N Vision 74 small in a high aerial frame. Not recommended for premium hero reveals.
+
+## Integrity
+- All nine output files have actual video, native-size FFprobe data, source in/out points, SHA256, complete FFmpeg decode, contact screenshots, and preserved vehicle/source audio (AAC re-encode for accurate non-keyframe trims).
+- They are nine separate camera compositions, not repeats of one angle, although short-lived micro-shots must not be inflated into main hero shots. Original manufacturer video is retained unchanged under originals/ for recutting. No CGI from the INSTEROID teaser is included: it was examined and rejected.
+- Original source is 1920x1080 landscape, **not** native sharp 1080x1920 after portrait crop. No upscaling claim.
+- Only one qualifying independent parent footage film, two physical prototype models. **Gate PARTIAL**, not PASS for truly premium 8–12 shot goal. Four hero-worthy shots; three weak backups.
+- Permission for creative reuse/publication not independently confirmed.
+""")
 print("CURATED_OUTPUT_COUNT",len(clips),"FAIL",len(failures),flush=True)
 if len(clips)<5:sys.exit(3)
