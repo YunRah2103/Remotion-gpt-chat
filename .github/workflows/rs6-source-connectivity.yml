@@ -1,0 +1,35 @@
+name: RS6 source connectivity diagnostic
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/f-manager-qa
+    paths:
+      - '.github/workflows/rs6-source-connectivity.yml'
+  workflow_dispatch:
+jobs:
+  check-sources:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Check connectivity and source responses
+        shell: bash
+        run: |
+          set +e
+          python - <<'PY'
+          import socket,urllib.request
+          urls={
+           "audi_official":"https://audi-mediacenter.pl/film,48075,footage:-audi-rs-6-avant-performance-mythos-black-metallic-.html",
+           "audi_global":"https://www.audi.com/en/videos/video/audi-rs-6-avant-performance-dew-silver-matt-footage-on-location-6557",
+           "vimeo_creator":"https://vimeo.com/803836362",
+           "github":"https://github.com"
+          }
+          for label,url in urls.items():
+           host=urllib.request.urlparse(url).hostname
+           try:
+            print(f"{label} dns={socket.getaddrinfo(host,443)[0][4][0]}",flush=True)
+            req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0"},method="HEAD")
+            with urllib.request.urlopen(req,timeout=15) as res: print(f"{label} status={res.status} type={res.headers.get('Content-Type')} length={res.headers.get('Content-Length')}",flush=True)
+           except Exception as exc: print(f"{label} FAILED {type(exc).__name__}: {str(exc)[:300]}",flush=True)
+          PY
+      - name: Explain result
+        run: echo 'This is a metadata-only network diagnostic. No third-party footage is downloaded or published.'
