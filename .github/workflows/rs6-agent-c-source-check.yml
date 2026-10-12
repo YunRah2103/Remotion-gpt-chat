@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/rs6-agent-c-source-check.yml'
       - 'production/videos/rs6-no-mercy-001/agent_c_source_check.py'
+      - 'production/videos/rs6-no-mercy-001/agent_c_original_probe.py'
   workflow_dispatch:
 jobs:
   source-check:
@@ -15,6 +16,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install FFmpeg and FFprobe
         run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - name: Inspect original media endpoint and page download handler
+        run: python production/videos/rs6-no-mercy-001/agent_c_original_probe.py
       - name: Check official source reachability and media metadata
         run: |
           python production/videos/rs6-no-mercy-001/agent_c_source_check.py
