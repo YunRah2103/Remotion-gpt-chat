@@ -1,0 +1,29 @@
+name: CYBER FUTURE 001 - Agent A HMG Video URL Probe
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/a-asia-footage
+    paths:
+      - '.github/workflows/cyber-future-agent-a-hmg.yml'
+      - 'production/videos/cyber-future-prototypes-001/agent-a/hmg_media_probe.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install parser
+        run: python3 -m pip install --quiet --break-system-packages requests beautifulsoup4
+      - name: Inspect Hyundai original RN24 press + 4K player metadata
+        run: python3 -u production/videos/cyber-future-prototypes-001/agent-a/hmg_media_probe.py
+      - name: Upload verified probe findings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-FUTURE-001-A-HMG-RN24-PROBE
+          path: out/agent-a-hmg-media/
+          retention-days: 5
+          if-no-files-found: warn
