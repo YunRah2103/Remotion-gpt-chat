@@ -1,0 +1,97 @@
+name: Porsche Rain Cinematic - native 1080p
+on:
+  push:
+    branches: [automotive-edits/porsche-blender-reveal-001/rain-polish]
+    paths: ['.github/workflows/porsche-rain-cinematic.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        include:
+          - {part: 0, frames: '0:35', save: '--save'}
+          - {part: 1, frames: '36:71', save: ''}
+          - {part: 2, frames: '72:107', save: ''}
+          - {part: 3, frames: '108:143', save: ''}
+          - {part: 4, frames: '144:179', save: ''}
+          - {part: 5, frames: '180:213', save: ''}
+          - {part: 6, frames: '214:232', save: ''}
+          - {part: 7, frames: '233:251', save: ''}
+          - {part: 8, frames: '252:270', save: ''}
+          - {part: 9, frames: '271:289', save: ''}
+          - {part: 10, frames: '290:308', save: ''}
+          - {part: 11, frames: '309:327', save: ''}
+          - {part: 12, frames: '328:346', save: ''}
+          - {part: 13, frames: '347:365', save: ''}
+          - {part: 14, frames: '366:384', save: ''}
+          - {part: 15, frames: '385:403', save: ''}
+          - {part: 16, frames: '404:422', save: ''}
+          - {part: 17, frames: '423:441', save: ''}
+          - {part: 18, frames: '442:460', save: ''}
+          - {part: 19, frames: '461:478', save: ''}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - name: Install official native Blender
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg xvfb libxi6 libxrender1 libgl1 libxkbcommon0 libegl1 libegl-mesa0 libgles2 libgl1-mesa-dri libsm6 libxxf86vm1
+          curl -fLsS --retry 2 https://download.blender.org/release/Blender4.0/blender-4.0.2-linux-x64.tar.xz -o /tmp/blender.tar.xz
+          mkdir -p /tmp/blender
+          tar -xf /tmp/blender.tar.xz -C /tmp/blender --strip-components=1
+          mkdir -p /tmp/porsche out/frames
+          curl -fLsS --retry 2 https://raw.githubusercontent.com/YunRah2103/yunus-video-lab/main/cars/porsche-911-gt3-rs-992/model.glb -o /tmp/porsche/model.glb
+          echo '1c73fcb138c31e2b1d5ed126a2412074bb17f8e960b355436f28139bf518e1eb  /tmp/porsche/model.glb' | sha256sum -c -
+      - name: Verify corrected tyre roundness, hubs and axles
+        run: |
+          /tmp/blender/blender -b -t 4 --python-exit-code 1 --python production/videos/porsche-blender-reveal-001/wheel_qa.py -- /tmp/porsche/model.glb --correct > out/frames/wheel-qa-${{ matrix.part }}.log 2>&1
+      - name: Render actual rain, spray, wet road and reflections
+        env: {LIBGL_ALWAYS_SOFTWARE: '1'}
+        run: |
+          xvfb-run -a /tmp/blender/blender -b -t 4 --python-exit-code 1 --python production/videos/porsche-blender-reveal-001/scene.py -- --model /tmp/porsche/model.glb --out out/frames --frames '${{ matrix.frames }}' --samples 48 ${{ matrix.save }} > out/frames/render-${{ matrix.part }}.log 2>&1
+          echo '${{ github.sha }}' > out/frames/source-sha-${{ matrix.part }}.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: PORSCHE-RAIN-FRAMES-${{ matrix.part }}
+          path: out/frames/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
+  finish:
+    needs: render
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg python3-pil fonts-dejavu-core
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: PORSCHE-RAIN-FRAMES-*
+          path: out/frames
+          merge-multiple: true
+      - name: Encode and verify exact original audio
+        run: |
+          python3 production/videos/porsche-blender-reveal-001/finish.py --frames out/frames --audio production/videos/porsche-blender-reveal-001/reference-audio.m4a --out out/final
+          mv out/final/YUNEX_PORSCHE_BLENDER_REVEAL_1080P.mp4 out/final/YUNEX_PORSCHE_RAIN_CINEMATIC_1080P.mp4
+          ffmpeg -v error -y -i out/final/YUNEX_PORSCHE_RAIN_CINEMATIC_1080P.mp4 -vf 'fps=1,scale=270:480,tile=4x4' -frames:v 1 out/final/contact.jpg
+          cp out/frames/source-sha-0.txt out/final/source-sha.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-PORSCHE-RAIN-CINEMATIC-FINAL
+          path: out/final/
+          retention-days: 14
+          compression-level: 0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PORSCHE-RAIN-EDITABLE-SCENE
+          path: out/frames/Porsche_Blender_Reveal.blend
+          retention-days: 14
+          compression-level: 1
