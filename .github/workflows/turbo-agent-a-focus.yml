@@ -1,0 +1,41 @@
+name: YUNEX Turbo 001 - Agent A Indy 500 Focus
+on:
+  push:
+    branches:
+      - automotive-edits/turbo-indy-reality-001/a-turbo-film
+    paths:
+      - production/videos/turbo-indy-reality-001/agent_a_focus.py
+      - .github/workflows/turbo-agent-a-focus.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect-excerpts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 32
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install source-media QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg imagemagick
+          python -m pip install -U yt-dlp requests
+      - name: Download selected official Turbo Indy 500 excerpts
+        run: python production/videos/turbo-indy-reality-001/agent_a_focus.py
+      - name: Upload playable clip evidence even on source failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: yunex-turbo-agent-a-indy500-focus-${{ github.run_id }}
+          path: out/turbo-agent-a-focus/
+          retention-days: 14
+          compression-level: 0
+          if-no-files-found: warn
+      - name: Require real MP4 source
+        run: |
+          python - <<'PY'
+          import json
+          m=json.load(open('out/turbo-agent-a-focus/manifest.json'))
+          if m['downloaded']<1:raise SystemExit("No original movie clips acquired")
+          print('Downloaded original film excerpts:',m['downloaded'])
+          PY
