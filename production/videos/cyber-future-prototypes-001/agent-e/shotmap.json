@@ -40,14 +40,14 @@
     },
     {
       "order": 3,
-      "source": "B/clips/bmw-i-vision-dee-running-candidate-08.mp4",
-      "sha256": "33aa0d3170838e4c88d1f77b9912dcbf66f103d795a47a0fe0f104325d5d9f35",
+      "source": "B/clips/bmw-i-vision-dee-running-candidate-07.mp4",
+      "sha256": "5eb5ab10be163a5ff045e00f5e28ad1c1dc135bcd8fc19cd0a10ebc7cb5e5b91",
       "frames": 35,
       "reframe": "full",
       "source_speed": 1,
-      "source_seek_seconds": 0.14,
+      "source_seek_seconds": 0.1,
       "model": "BMW i Vision Dee",
-      "actual_motion": "physical studio; driving not claimed",
+      "actual_motion": "physical studio detail; stationary wheel and camera; no driving claimed",
       "start_frame": 72,
       "start_seconds": 2.4,
       "duration_seconds": 1.1666666666666667,
@@ -225,7 +225,7 @@
       "frames": 30,
       "reframe": "window",
       "source_speed": 1,
-      "source_seek_seconds": 0.22,
+      "source_seek_seconds": 0.6,
       "model": "Renault R5 Turbo 3E (2025)",
       "actual_motion": "real Corsica drift",
       "start_frame": 543,
@@ -248,5 +248,6 @@
       "duration_seconds": 1.9666666666666666,
       "publication_permission": "not verified"
     }
-  ]
+  ],
+  "editor_revision": "v2: wheel macro replaces illegible rear strip at 2.4s; Renault exterior-only at 18.1s"
 }
