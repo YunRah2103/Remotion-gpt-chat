@@ -11,6 +11,10 @@ CONTACTS=ROOT/"contact_sheets"
 REVIEW=Path("production/videos/cyber-future-prototypes-001/agent-b/review")
 NAME="CYBER-FUTURE-001-FOOTAGE-B"
 SOURCE_LIST=[
+ {"id":"mercedes-amg-gt-xx-embedded","model":"Mercedes-AMG Concept GT XX","publisher":"e-auto.pt (embedded vehicle footage; origin not independently established)",
+  "url":"https://video.wixstatic.com/video/f84172_da8b552d8bad46f0be79ae4d992ac7de/1080p/mp4/file.mp4",
+  "page":"https://www.e-auto.pt/post/mais-de-1360-cv-no-amg-gt-xx","method":"direct",
+  "rights":"Publisher embedded MP4, original rights and reuse not established; MUST inspect for GT XX identity and CGI"},
  {"id":"bmw-vision-m-next-driving","model":"BMW Vision M NEXT","publisher":"BMW PressClub",
   "url":"https://mediapool.bmwgroup.com/download/edown/tvFootageDownload?actEvent=tvFootageSceneHD&attachment=1&filmSceneFileId=18095",
   "page":"https://www.press.bmwgroup.com/global/tv-footage/detail/PF0006947/bmw-vision-m-next","method":"direct",
@@ -140,7 +144,7 @@ def acquire(s):
     for idx,(a,b) in enumerate(selected,1):
         dur=min(4.0,b-a-.2)
         t=a+max(.05,(b-a-dur)/2)
-        if dur<2.0:continue
+        if dur<2.0 or (sid=='bmw-vision-m-next-driving' and idx in (1,3)) or (sid=='bmw-vision-m-next-launch' and idx not in (1,4)):continue
         clip=CLIPS/(sid+"-candidate-"+str(idx).zfill(2)+path.suffix.lower())
         result=run(["ffmpeg","-hide_banner","-loglevel","error","-y",
            "-ss",str(round(t,3)),"-i",str(path),"-t",str(round(dur,3)),
