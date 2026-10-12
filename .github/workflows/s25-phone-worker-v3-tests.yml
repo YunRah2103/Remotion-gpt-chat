@@ -27,6 +27,8 @@ jobs:
           node --version && ffmpeg -version | head -1
       - name: Offline regression and real media encode
         run: python -m unittest discover -s production/phone_footage -p test_v3_worker.py -v
+      - name: Check Termux setup and Boot helper shell syntax
+        run: bash -n production/phone_footage/install_v3_termux.sh production/phone_footage/enable_v3_boot.sh
       - name: Compile all V3 Python source
         run: python -m py_compile production/phone_footage/v3_worker.py production/phone_footage/agent_jobs_v3.py
       - name: Verify job producer contract and source catalog
