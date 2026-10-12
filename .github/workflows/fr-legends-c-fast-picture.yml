@@ -5,6 +5,9 @@ on:
       - automotive-edits/french-icons-001/c-cinematic-edit
     paths:
       - '.github/workflows/fr-legends-c-fast-picture.yml'
+      - 'production/videos/french-icons-001/agent-c/shotmap.json'
+      - 'production/videos/french-icons-001/agent-c/render_fast_picture.py'
+      - 'src/FrenchLegendsFilm.tsx'
   workflow_dispatch:
 permissions:
   contents: read
