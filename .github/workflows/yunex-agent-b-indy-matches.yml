@@ -19,11 +19,14 @@ jobs:
       - name: Install FFmpeg and Python
         run: |
           python3 --version
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
           ffprobe -version | head -n 1
           ffmpeg -version | head -n 1
       - name: Fetch real video; decode, crop and validate
         id: acquire
         run: |
+          set -o pipefail
           python3 production/videos/turbo-indy-reality-001/agent_b_acquire.py | tee agent-b-run.log
       - name: Upload actual source media and QA ZIP
         if: always()
