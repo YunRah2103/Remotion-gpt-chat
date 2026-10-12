@@ -1,0 +1,38 @@
+name: YUNEX Agent B 2026 Native 4K Real IndyCar Pass
+on:
+  push:
+    branches:
+      - automotive-edits/turbo-indy-reality-001/b-indy-matches
+    paths:
+      - 'production/videos/turbo-indy-reality-001/agent_b_2026_close_pass.py'
+      - '.github/workflows/yunex-agent-b-2026-4k.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  deliver-real-4k:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install video downloader, decoder and frame inspector
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check -U yt-dlp pillow
+      - name: Download genuine 4K IndyCar video and verify decoded moving bytes
+        run: |
+          set -euo pipefail
+          python -u production/videos/turbo-indy-reality-001/agent_b_2026_close_pass.py | tee agent-b-2026-run.log
+      - name: Upload verified real playable footage ZIP, not logs-only
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-Agent-B-2026-Native-4K-IndyCar-${{ github.run_id }}
+          path: out/YUNEX_AGENT_B_INDY_2026_NATIVE4K_CLIP.zip
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
