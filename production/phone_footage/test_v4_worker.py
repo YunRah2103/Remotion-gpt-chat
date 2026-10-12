@@ -1,4 +1,4 @@
-"""Offline QA for V3 queue rights, bounds, disk safety and delivery manifest."""
+"""Offline QA for V4 queue rights, bounds, disk safety and delivery manifest."""
 import importlib.util
 import json
 from pathlib import Path
@@ -52,10 +52,10 @@ class WorkerV4Tests(unittest.TestCase):
     def test_catalog_refresh_preserves_local_sources_on_failure(self):
         import io
         with tempfile.TemporaryDirectory() as tmp:
-            p = Path(tmp) / "sources_v4.json"
-            original = (HERE / "sources_v4.json").read_bytes()
+            p = Path(tmp) / "sources_v3.json"
+            original = (HERE / "sources_v3.json").read_bytes()
             p.write_bytes(original)
-            with mock.patch.object(v3, "__file__", str(Path(tmp) / "v4_worker.py")), \
+            with mock.patch.object(v4, "__file__", str(Path(tmp) / "v4_worker.py")), \
                  mock.patch.object(v4.urllib.request, "urlopen", side_effect=OSError("offline")):
                 self.assertFalse(v4.refresh_sources())
             self.assertEqual(p.read_bytes(), original)
@@ -93,14 +93,14 @@ class WorkerV4Tests(unittest.TestCase):
             {"number": 13, "title": "[YUNEX PHONE JOB] PR",
              "user": {"login": v4.OWNER}, "pull_request": { "url": "test" }},
         ]
-        with mock.patch.object(v3, "api", return_value=records):
+        with mock.patch.object(v4, "api", return_value=records):
             self.assertEqual([x["number"] for x in v4.issue_jobs("token")], [11])
 
     def test_dry_run_is_safe(self):
         record = {**self.issue, "number": 51}
-        with mock.patch.object(v3, "issue_jobs", return_value=[record]), \
-             mock.patch.object(v3, "already_reported", return_value=False), \
-             mock.patch.object(v3, "download_proof") as downloader:
+        with mock.patch.object(v4, "issue_jobs", return_value=[record]), \
+             mock.patch.object(v4, "already_reported", return_value=False), \
+             mock.patch.object(v4, "download_proof") as downloader:
             self.assertTrue(v4.run_once("fake", dry_run=True))
             downloader.assert_not_called()
 
@@ -116,7 +116,7 @@ class WorkerV4Tests(unittest.TestCase):
             import os
             import time
             os.utime(old, (time.time() - 90000, time.time() - 90000))
-            with mock.patch.object(v3, "TEMP_ROOT", root):
+            with mock.patch.object(v4, "TEMP_ROOT", root):
                 self.assertEqual(v4.cleanup_stale(), 1)
             self.assertFalse(old.exists())
             self.assertTrue(recent.exists())
@@ -143,7 +143,7 @@ class WorkerV4Tests(unittest.TestCase):
                     return genuine_watch(command, timeout, folder, disk_budget or v4.MAX_WORKSPACE_BYTES)
             job = {"url": v4.TEST_VIDEO, "start": 0.0, "duration": 6.0,
                    "height": 720, "max_mb": 45}
-            with mock.patch.object(v3, "watched", side_effect=mock_download):
+            with mock.patch.object(v4, "watched", side_effect=mock_download):
                 movie, details = v4.download_proof(root, job)
             self.assertTrue(movie.is_file())
             self.assertEqual((details["width"], details["height"]), (640, 360))
