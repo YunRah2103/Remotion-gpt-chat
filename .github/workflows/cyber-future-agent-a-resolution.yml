@@ -1,0 +1,28 @@
+name: CYBER FUTURE 001 - Agent A RN24 Resolution Gate
+on:
+  push:
+    branches:
+      - automotive-edits/cyber-future-prototypes-001/a-asia-footage
+    paths:
+      - '.github/workflows/cyber-future-agent-a-resolution.yml'
+      - 'production/videos/cyber-future-prototypes-001/agent-a/rn24_resolution_probe.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install requests
+        run: python3 -m pip install --quiet --break-system-packages requests
+      - name: Probe HMG media original resolutions (HEAD)
+        run: python3 -u production/videos/cyber-future-prototypes-001/agent-a/rn24_resolution_probe.py
+      - name: Upload quality evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CYBER-FUTURE-A-RN24-RESOLUTION-GATE
+          path: out/agent-a-rn24-resolution/
+          retention-days: 5
