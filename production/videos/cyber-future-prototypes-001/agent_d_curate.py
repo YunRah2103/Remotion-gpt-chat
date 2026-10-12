@@ -26,7 +26,7 @@ for item in C["approved"]:
     if check.returncode:raise RuntimeError("Decoder failed "+basename+": "+check.stderr[-200:])
     row["clip"]="clips/"+basename
     row["contact"]="contact_sheets/"+basename.replace(".mp4",".jpg")
-    row["visual_approval"]="PASS_MANUALLY_REVIEWED_CONTACT_FRAMES"
+    row["visual_approval"]="PASS_STILL_AND_MULTIFRAME_REVIEW_NOT_DRIVING"
     row["visual_note"]=item["visual_note"]
     row["reality_confidence"]=item["physical_evidence"]
     row["actual_vehicle_motion"]=item.get("actual_vehicle_motion","not_proven")
@@ -35,7 +35,7 @@ for item in C["approved"]:
     print("INCLUDED_REAL_MEDIA",basename,digest,row["source_width"],row["source_height"],flush=True)
 models=sorted({x["model"] for x in rows})
 assert len(rows)>=5, "Hard fail: too few clips"
-status="PASS_TWO_PHYSICAL_MODELS" if len(models)>=2 and len(rows)>=8 else "PARTIAL_NOT_FULL_GATE"
+status="PARTIAL_PHYSICAL_SHOWCARS_NO_DRIVING" if len(models)>=2 and len(rows)>=8 else "PARTIAL_BELOW_TARGET"
 with (OUT/"manifest.json").open("w") as f:json.dump(rows,f,indent=2)
 with (OUT/"manifest.csv").open("w",newline="") as f:
     wr=csv.DictWriter(f,fieldnames=list(rows[0]));wr.writeheader();wr.writerows(rows)
@@ -57,7 +57,7 @@ report=dict(status=status,visually_approved_clips=len(rows),models=models,
     f"Gate: **{status}**. **{len(rows)}** individually decoded and manually still-inspected camera clips from {', '.join(models)}.\n\n"+
     "Actual MP4s: clips/; source/clip SHA and in/out points: manifest.json and SHA256SUMS.txt; "+
     "image evidence: contact_sheets/; rejection rationale: rejections.json; report: QA_REPORT.json.\n\n"+
-    "Real manufacturer/media physical-showcar source, not AI generated or upscaled. "+
+    "Manufacturer media shows physical studio/show cars; no synthetic footage has been approved or upscaled. "+
     "Vehicle driving not claimed. Some source footage contains studio camera moves rather than driven cars. "+
     "Retain source credit and separately clear rights before unrestricted reposting.\n")
 print("CURATED_PACKAGE",json.dumps({"status":status,"count":len(rows),"models":models}),flush=True)
