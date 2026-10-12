@@ -6,6 +6,10 @@ ROOT=Path("out/cyber-future-c");OUT=ROOT/"phase2";OUT.mkdir(parents=True,exist_o
 UA={"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/130.0 Safari/537.36","Accept":"*/*"}
 MAX=220*1024*1024
 SOURCES=[
+("r5_corsica_actual_drive","Renault 5 Turbo 3E physical prototype 2025 Corsica drive","https://www.auto-medienportal.net/artikel/detail/68630",["https://www.auto-medienportal.net/video/load/original/3469/"],"press credited Renault via Autoren-Union Mobilität, rights not confirmed"),
+("r5_reveal_2025_original","Renault 5 Turbo 3E promotional film 2025","https://www.auto-medienportal.net/artikel/detail/66690",["https://www.auto-medienportal.net/video/load/original/3203/"],"press credited Renault via Autoren-Union Mobilität, rights not confirmed"),
+("r5_press_becier","Renault 5 Turbo 3E video 2025","https://www.beciermobilitat.ad/renault-5-turbo-3e-obertura-de-reserves/",["https://www.beciervehicles.ad/wp-content/uploads/2025/04/v-2025-062-01.mp4"],"publisher media download, rights not confirmed"),
+("r5_publiracing","Renault 5 Turbo 3E concept 2025","https://www.publiracing.pt/post/renault-5-turbo-3e-a-reinven%C3%A7%C3%A3o-de-um-cl%C3%A1ssico-agora-100-el%C3%A9trico",["https://video.wixstatic.com/video/a18b40_3b4ae4e4bb3b4b19a550fb0f4bff22c9/1080p/mp4/file.mp4","https://video.wixstatic.com/video/a18b40_49835441857949c7835155a44fbc7aa4/1080p/mp4/file.mp4"],"third-party publisher, rights not established"),
 ("trezor_cc","Renault TreZor Concept 2016","https://www.mynewsdesk.com/se/renault/videos/trezor-video-25528",["https://www.mynewsdesk.com/se/renault/videos/trezor-video-25528/download"],"CC attribution stated on source page; exact license verify"),
 ("alpenglow_hy4_hd","Alpine Alpenglow Hy4","https://presse.alpinecars.de/alpine-alpenglow-hy4-prototyp-mit-wasserstoffbetriebenem-verbrennungsmotor/?lang=deu",["https://presse.alpinecars.de/download?n=v-2024-135-01"],"press use only; editing rights not proven"),
 ("peugeot_inception","Peugeot Inception 2023","https://www.media.stellantis.com/em-en/peugeot/media-library/press-videos/239203",[],"press use only; editing rights not proven"),
