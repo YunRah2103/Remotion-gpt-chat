@@ -27,6 +27,10 @@ for item in C["approved"]:
     row["clip"]="clips/"+basename
     row["contact"]="contact_sheets/"+basename.replace(".mp4",".jpg")
     row["visual_approval"]="PASS_STILL_AND_MULTIFRAME_REVIEW_NOT_DRIVING"
+    row["physically_real"]=True
+    row["true_physical_identity"]="VERIFIED_REAL_PHYSICAL_SHOWCAR_SOURCE"
+    row["filming_type"]="physical_studio" if label=="lotus" else "public_show"
+    row["portrait_crop_note"]="Landscape original; not native 1080x1920. Editor must individually reframe/crop."
     row["visual_note"]=item["visual_note"]
     row["reality_confidence"]=item["physical_evidence"]
     row["actual_vehicle_motion"]=item.get("actual_vehicle_motion","not_proven")
@@ -38,7 +42,9 @@ assert len(rows)>=5, "Hard fail: too few clips"
 status="PARTIAL_PHYSICAL_SHOWCARS_NO_DRIVING" if len(models)>=2 and len(rows)>=8 else "PARTIAL_BELOW_TARGET"
 with (OUT/"manifest.json").open("w") as f:json.dump(rows,f,indent=2)
 with (OUT/"manifest.csv").open("w",newline="") as f:
-    wr=csv.DictWriter(f,fieldnames=list(rows[0]));wr.writeheader();wr.writerows(rows)
+    # Different manufacturer source pipelines have different optional metadata keys.
+    fields=sorted({key for row in rows for key in row.keys()})
+    wr=csv.DictWriter(f,fieldnames=fields,extrasaction="ignore");wr.writeheader();wr.writerows(rows)
 rejections=C["rejected"]
 (OUT/"rejections.json").write_text(json.dumps(rejections,indent=2))
 source_files=list((OUT/"clips").glob("*.mp4"))+list((OUT/"contact_sheets").glob("*.jpg"))
