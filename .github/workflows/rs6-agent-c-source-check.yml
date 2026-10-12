@@ -1,0 +1,18 @@
+name: RS6 Agent C source connection QA
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/c-details-atmosphere
+    paths:
+      - '.github/workflows/rs6-agent-c-source-check.yml'
+      - 'production/videos/rs6-no-mercy-001/agent_c_source_check.py'
+  workflow_dispatch:
+jobs:
+  source-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check official source reachability and media metadata
+        run: |
+          python production/videos/rs6-no-mercy-001/agent_c_source_check.py
