@@ -46,5 +46,6 @@ jobs:
           path: |
             b2-lowdown-proof.txt
             b2-lowdown-proofs/*.json
+            b2-lowdown-review/*.jpg
           retention-days: 14
           if-no-files-found: warn
