@@ -153,7 +153,8 @@ def upload_media_file(path, token, file):
         raise RuntimeError("Upload exceeds maximum size")
     headers = {"Accept": "application/vnd.github+json", "Authorization": "Bearer " + token,
                "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "yunex-s25-v4",
-               "Content-Type": "video/mp4", "Content-Length": str(size)}
+               "Content-Type": "audio/mp4" if file.suffix.lower() == ".m4a" else "video/mp4",
+               "Content-Length": str(size)}
     # Slow mobile links need longer than 180 seconds for a 512 MiB upload.
     upload_timeout = min(3600, max(180, math.ceil(size / MIB) * 15))
     conn = http.client.HTTPSConnection("uploads.github.com", timeout=upload_timeout)
@@ -205,17 +206,18 @@ def parse_job(issue):
         job = json.loads(body[len(MARKER)+1:].strip())
     except (ValueError, TypeError):
         return None
-    if not isinstance(job, dict) or set(job) - {"url", "start", "duration", "height", "max_mb", "orientation"}:
+    if not isinstance(job, dict) or set(job) - {"url", "start", "duration", "height", "max_mb", "orientation", "media"}:
         return None
     url = job.get("url")
     if not valid_youtube_url(url):
         return None
     entry = LICENSED_PROOFS.get(url)
     source_height_limit = entry["max_height"] if entry else 1080
+    media = job.get("media", "video")
     start = job.get("start", 0)
     duration = job.get("duration", 6)
     height = job.get("height", 1080)
-    max_mb = job.get("max_mb", default_output_mb(duration) if type(duration) in (float, int) and math.isfinite(float(duration)) else 45)
+    max_mb = job.get("max_mb", (45 if media == "audio" else default_output_mb(duration)) if type(duration) in (float, int) and math.isfinite(float(duration)) else 45)
     orientation = job.get("orientation", "landscape")
     if (type(start) not in (float, int) or type(duration) not in (float, int)
             or type(height) is not int or type(max_mb) is not int
@@ -223,10 +225,11 @@ def parse_job(issue):
             or not 0 <= start <= 21600 or not 2 <= duration <= MAX_SECONDS
             or start + duration > 22200 or height not in (720, 1080)
             or height > source_height_limit or not 5 <= max_mb <= MAX_OUTPUT_MB
-            or orientation not in ("landscape", "portrait")):
+            or orientation not in ("landscape", "portrait")
+            or media not in ("video", "audio")):
         return None
     return {"url": job["url"], "start": float(start), "duration": float(duration),
-            "height": height, "max_mb": max_mb, "orientation": orientation}
+            "height": height, "max_mb": max_mb, "orientation": orientation, "media": media}
 
 def load_completed_issues():
     """Avoid rechecking the same completed jobs on every poll.
@@ -345,6 +348,8 @@ def download_proof(folder, job=None):
         raise RuntimeError(f"Need at least {math.ceil(free/MIB)} MiB free for this job")
     budget = workspace_limit(job)
     start, duration, height = job["start"], job["duration"], job["height"]
+    if job.get("media") == "audio":
+        return download_audio_proof(folder, job, budget)
     orientation = job.get("orientation", "landscape")
     segment = f"*{start:g}-{start + duration:g}"
     fmt = (f"bv*[width<={height}][height<={height*16//9}]+ba/b[width<={height}][height<={height*16//9}]/b"
@@ -407,6 +412,65 @@ def download_proof(folder, job=None):
                     "orientation": orientation, "start": start,
                     "full_decode": "PASS"}
 
+def download_audio_proof(folder, job, budget):
+    """Acquire just the original recording's audio, saving bandwidth and encoding.
+
+    The same bounded section and rights-aware GitHub release rules apply. AAC
+    output is verified by a full FFmpeg decode; no video stream is downloaded
+    or re-encoded for an audio job.
+    """
+    start, duration = job["start"], job["duration"]
+    segment = f"*{start:g}-{start + duration:g}"
+    command = [sys.executable, "-m", "yt_dlp", "--ignore-config",
+               "--no-playlist", "--no-progress", "--js-runtimes", "node",
+               "--socket-timeout", "25", "--retries", "2", "--fragment-retries", "2",
+               "--concurrent-fragments", "1", "--download-sections", segment,
+               "-f", "bestaudio/best", "--max-filesize", f"{budget // MIB}M",
+               "-o", str(folder / "source.%(ext)s"), job["url"]]
+    watched(command, min(3000, max(540, duration * 3 + 300)), folder, budget)
+    candidates = sorted((p for p in folder.iterdir()
+                         if p.is_file() and p.name.startswith("source.")
+                         and p.suffix.lower() in
+                         {".m4a", ".webm", ".mp4", ".opus", ".ogg", ".mp3", ".mkv"}),
+                        key=lambda p: p.stat().st_size, reverse=True)
+    if not candidates:
+        raise RuntimeError("yt-dlp did not create an audio file")
+    source_info = json.loads(checked(["ffprobe", "-v", "error", "-show_streams",
+                                      "-of", "json", str(candidates[0])], 25))
+    if not any(x.get("codec_type") == "audio" for x in source_info.get("streams", [])):
+        raise RuntimeError("Source section has no usable audio stream")
+    result = folder / "verified-phone-v4.m4a"
+    watched(["ffmpeg", "-y", "-v", "error", "-i", str(candidates[0]),
+             "-t", str(duration), "-map", "0:a:0", "-vn", "-ar", "48000",
+             "-ac", "2", "-c:a", "aac", "-b:a", "192k",
+             "-movflags", "+faststart", str(result)],
+            min(3000, max(540, duration * 3 + 300)), folder, budget)
+    size = result.stat().st_size if result.is_file() else 0
+    if not 4096 < size <= min(MAX_BYTES, job["max_mb"] * MIB):
+        raise RuntimeError("Audio output absent or exceeds budget")
+    probe = json.loads(checked(["ffprobe", "-v", "error", "-show_format",
+                                "-show_streams", "-of", "json", str(result)], 25))
+    audio = next((x for x in probe.get("streams", [])
+                  if x.get("codec_type") == "audio"), None)
+    seconds = float(probe.get("format", {}).get("duration") or 0)
+    if (not audio or audio.get("codec_name") != "aac"
+            or int(audio.get("sample_rate") or 0) != 48000
+            or int(audio.get("channels") or 0) != 2
+            or any(x.get("codec_type") == "video" for x in probe.get("streams", []))
+            or not max(1.5, duration - 1.2) <= seconds <= duration + 2):
+        raise RuntimeError("Decoded audio codec, layout or duration invalid")
+    checked(["ffmpeg", "-v", "error", "-xerror", "-i", str(result),
+             "-map", "0:a:0", "-f", "null", "-"], max(200, duration * 4))
+    digest = hashlib.sha256()
+    with result.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return result, {"bytes": size, "width": None, "height": None, "codec": "aac",
+                    "duration": round(seconds, 3), "sha256": digest.hexdigest(),
+                    "sample_rate": 48000, "channels": 2, "media": "audio",
+                    "start": start, "full_decode": "PASS"}
+
+
 def upload_release(token, number, file, job=None, meta=None):
     """Licensed media may be public; unknown-rights media is kept in an owner-only draft."""
     tag = f"yunex-phone-v4-{number}"
@@ -426,7 +490,9 @@ def upload_release(token, number, file, job=None, meta=None):
         "name": f"YUNEX S25 production footage #{number}",
         "draft": not rights_verified, "prerelease": True, "body": credit})
     rid = release["id"]
-    movie_name = f"yunex-v4-{number}.mp4"
+    media = job.get("media", "video")
+    suffix = ".m4a" if media == "audio" else ".mp4"
+    movie_name = f"yunex-v4-{number}{suffix}"
     upload = "/UPLOAD/repos/" + REPO + f"/releases/{rid}/assets?name=" + urllib.parse.quote(movie_name)
     asset = upload_media_file(upload, token, file)
     manifest = {"schema": "YUNEX_PHONE_RESULT_V4", "status": "PASS",
@@ -436,12 +502,19 @@ def upload_release(token, number, file, job=None, meta=None):
                 "attribution": entry["author"] if entry else None,
                 "license_evidence": entry["license_reference"] if entry else None,
                 "release_visibility": "public_prerelease" if rights_verified else "draft",
-                "release_id": rid, "mp4_asset_id": asset.get("id"),
-                "mp4_asset_api_url": asset.get("url"),
+                "release_id": rid, "media": media,
+                "asset_filename": movie_name,
+                "asset_id": asset.get("id"),
+                "asset_api_url": asset.get("url"),
+                "mp4_asset_id": asset.get("id") if media == "video" else None,
+                "mp4_asset_api_url": asset.get("url") if media == "video" else None,
+                "audio_asset_id": asset.get("id") if media == "audio" else None,
+                "audio_asset_api_url": asset.get("url") if media == "audio" else None,
                 "requested_start": job["start"], "requested_duration": job["duration"],
                 "requested_height": job["height"],
                 "requested_orientation": job.get("orientation", "landscape"), **meta,
-                "mp4_url": asset["browser_download_url"] if rights_verified else None,
+                "mp4_url": asset["browser_download_url"] if rights_verified and media == "video" else None,
+                "audio_url": asset["browser_download_url"] if rights_verified and media == "audio" else None,
                 "release_url": release["html_url"]}
     manifest_name = f"yunex-v4-{number}.json"
     manifest_upload = ("/UPLOAD/repos/" + REPO + f"/releases/{rid}/assets?name="
@@ -476,7 +549,7 @@ def run_once(token, dry_run=False):
         number = issue["number"]
         if already_reported(token, number):
             continue
-        print(f"V4 queued issue #{number}: {job['height']}p, {job['duration']}s", flush=True)
+        print(f"V4 queued issue #{number}: {job.get('media','video')}, {job['height']}p, {job['duration']}s", flush=True)
         if dry_run:
             print("DRY RUN: no download or upload", flush=True)
             return True
@@ -495,9 +568,11 @@ def run_once(token, dry_run=False):
             issue_comment(token, number, DONE + "\n\n~~~json\n"
                           + json.dumps(report, indent=2) + "\n~~~")
             mark_issue_completed(number)
-            print(f"PASS #{number} {meta['width']}x{meta['height']} "
+            details = (f"{meta['sample_rate']}Hz stereo" if report["media"] == "audio"
+                       else f"{meta['width']}x{meta['height']}")
+            print(f"PASS #{number} {details} "
                   f"{meta['bytes']} bytes ({report['release_visibility']})\n"
-                  f"{report['mp4_url'] or report['release_url']}", flush=True)
+                  f"{report.get('mp4_url') or report.get('audio_url') or report['release_url']}", flush=True)
         except Exception as exc:
             detail = str(exc).replace("\n", " ")[:300]
             print(f"FAILED #{number}: {detail}", flush=True)
