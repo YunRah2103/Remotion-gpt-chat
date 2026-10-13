@@ -9,12 +9,12 @@ import subprocess,json,time,hashlib
 URL="https://delivery-p123922-e1240369.adobeaemcloud.com/adobe/assets/urn:aaid:aem:99e86001-9bce-465b-b3ea-af573f2f3c0a/renditions/video_2160p.mp4/as/audi-rs-6-until-2025-daytona-grey-footage-on-location_2160p.mp4?accept-experimental=1"
 OUT=Path("rs6-g-audi-motion-scout");OUT.mkdir(parents=True,exist_ok=True)
 WINDOWS=[
-("ROAD_016",15.7,2.2),("HAIRPIN_039",38.5,2.5),("SWEEP_095",95.5,2.5),
-("CURVE_136",135.4,2.5),("CLOSEPASS_205",205.4,2.5),
-("COAST_222",221.5,2.5),("COAST_266",265.2,2.5),
-("ROAD_327",326.5,2.5),("ROAD_456",454.8,2.5),
-("DRIVING_498",497.5,2.5),("FRONT_520",519.5,2.5),
-("ROAD_575",574.5,2.5)]
+("EARLY_CORNER_031",30.6,2.5),("SIDE_CROSS_043",42.6,2.5),
+("LOW_CORNER_067",66.6,2.5),("FRONT_ROLL_085",84.6,2.5),
+("FRONT_119",118.4,2.5),("REVEAL_143",142.6,2.5),
+("COAST_151",150.6,2.5),("FRONT_175",174.6,2.5),
+("DRIVE_214",213.3,2.5),("FULL_CAR_278",276.7,2.5),
+("REAR_436",435.2,2.5)]
 FW,FH=640,360
 def scout(key,start,duration):
     cmd=["ffmpeg","-nostdin","-v","error","-rw_timeout","30000000",
