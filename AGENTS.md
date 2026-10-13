@@ -1,5 +1,8 @@
 # Repository agent guide
 
+> **NEW YUNEX AGENT? START HERE:** [S25 V4 agent quick-start](https://github.com/YunRah2103/Remotion-gpt-chat/blob/main/docs/YUNEX_V4_NEW_AGENT_START_HERE.md) — exact GitHub issue workflow, private draft retrieval, audio-only jobs, error handling and what counts as a delivered file. Then consult the [full agent protocol](https://github.com/YunRah2103/Remotion-gpt-chat/blob/main/docs/YUNEX_S25_V4_AGENT_GUIDE.md). **Do not modify or reinstall the working S25 worker unless the user explicitly asks for worker maintenance.**
+
+
 Work ONLY in `YunRah2103/Remotion-gpt-chat`. Never read, import, copy, or modify the old `YunRah2103/yunus-video-lab` repository or its assets. Keep engineering-documentary work separate from YUNEX footage/editing work **unless a user explicitly assigns YUNEX work in this repository**.
 
 Independent compositions currently registered in `src/Root.tsx`:
