@@ -1,0 +1,45 @@
+name: YUNEX RS6 authentic V8 acquisition and QA
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-landscape-loop/e-real-recorded-v8
+    paths:
+      - .github/workflows/yunex-rs6-autotopnl-v8.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect-authentic-engine:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install FFmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - name: Download private draft with authenticated gh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          gh release download yunex-phone-v4-56 --repo YunRah2103/Remotion-gpt-chat --pattern yunex-v4-56.mp4 --dir work || {
+            echo "gh release download failed; trying authenticated asset API"
+            gh api -H 'Accept: application/octet-stream' /repos/YunRah2103/Remotion-gpt-chat/releases/assets/637770966 > work/yunex-v4-56.mp4
+          }
+          test "$(stat -c%s work/yunex-v4-56.mp4)" -eq 15340800
+          echo 'Authentic AutoTopNL source downloaded, exact expected byte size'
+      - name: Probe source audio and extract private reference
+        run: |
+          set -euo pipefail
+          ffprobe -v error -show_streams -show_format -of json work/yunex-v4-56.mp4 > work/source-ffprobe.json
+          ffprobe -v error -select_streams a -show_entries stream=codec_name,sample_rate,channels -of json work/yunex-v4-56.mp4 | tee work/audio-probe.json
+          ffmpeg -hide_banner -loglevel error -i work/yunex-v4-56.mp4 -vn -ar 48000 -ac 2 -c:a pcm_s16le work/authentic-rs6-v8.wav
+          ffmpeg -hide_banner -loglevel error -i work/yunex-v4-56.mp4 -f null -
+          sha256sum work/yunex-v4-56.mp4 > work/source-sha256.txt
+      - name: Keep private diagnostics (do not upload source media)
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-authentic-v8-source-diagnostics
+          path: |
+            work/source-ffprobe.json
+            work/audio-probe.json
+            work/source-sha256.txt
+          retention-days: 7
