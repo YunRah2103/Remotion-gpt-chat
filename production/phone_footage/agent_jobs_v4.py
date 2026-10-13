@@ -24,7 +24,7 @@ def prepare(url, start, duration, height, max_mb, orientation="landscape"):
         job["max_mb"] = max_mb
     body = worker.MARKER + "\n" + json.dumps(job, separators=(",", ":"))
     if worker.parse_job({"body": body}) is None:
-        raise ValueError("Source unapproved or job exceeds V3 safety/quality limits")
+        raise ValueError("Invalid YouTube URL or V4 safety/quality limits exceeded")
     return body
 
 
@@ -78,7 +78,7 @@ def main():
     else:
         record = fetch_result(args.issue)
         if record is None:
-            print("No verified completed V3 asset for this issue", file=sys.stderr)
+            print("No verified completed V4 asset for this issue", file=sys.stderr)
             sys.exit(2)
         print(json.dumps(record, indent=2))
 
