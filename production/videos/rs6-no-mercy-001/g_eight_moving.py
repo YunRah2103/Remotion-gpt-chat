@@ -27,7 +27,7 @@ def extract(spec):
  name,start,duration,x,note=spec
  path=OUT/(name+".mp4")
  expr=x.replace(",","\\,")
- filt=f"crop=w=1215:h=2160:x='{expr}':y=0,scale=1080:1920:flags=lanczos,fps=30,format=yuv420p"
+ filt=f"setpts=PTS-STARTPTS,crop=w=1215:h=2160:x='{expr}':y=0,scale=1080:1920:flags=lanczos,fps=30,format=yuv420p"
  run(["ffmpeg","-nostdin","-hide_banner","-loglevel","error","-rw_timeout","30000000","-ss",str(start),"-i",URL,
  "-t",str(duration),"-an","-vf",filt,"-c:v","libx264","-preset","veryfast","-crf","16",
  "-pix_fmt","yuv420p","-movflags","+faststart","-y",str(path)],160)
