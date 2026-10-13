@@ -1,0 +1,31 @@
+name: RS6 A2 native GT six moving-shot temporal QA
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/a2-hero-cinema
+    paths:
+      - production/videos/rs6-no-mercy-001/agent-a2/a2_gt_hero_temporal.py
+      - .github/workflows/rs6-a2-gt-six-motion.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  six-real-gt-moving-shots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare moving-frame native video test
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install pillow numpy
+      - name: Decode and compare consecutive real 4K source frames plus 9x16 crops
+        run: python production/videos/rs6-no-mercy-001/agent-a2/a2_gt_hero_temporal.py
+      - name: Upload contact review and numeric frame QA only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-a2-gt-moving-frames-QA
+          path: a2_gt_hero_temporal/
+          retention-days: 10
