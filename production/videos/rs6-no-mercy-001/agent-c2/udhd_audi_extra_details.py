@@ -14,8 +14,6 @@ OUT=pathlib.Path("c2_audi_uhd_extra");OUT.mkdir(exist_ok=True)
 SHOTS=[
  {"id":"UHD_MATRIX_LED_FRONT_CORNER","start":358.87,"seconds":0.82,"crop_x":640,
   "creative":"C8 daytime Matrix LED and aggressive bumper inlet macro; use as monochrome sub-second flash"},
- {"id":"UHD_MOTION_BLUR_WHEEL","start":363.27,"seconds":0.32,"crop_x":720,
-  "creative":"Moving wheel blurred during very brief fast cut; check scene-splice edge carefully"},
  {"id":"UHD_RS6_RED_BRAKE_CALIPER","start":375.06,"seconds":0.82,"crop_x":1750,
   "creative":"C8 drilled disc, RS logo on caliper, silver multi-spoke wheel. Slow detail-camera push"}
 ]
@@ -65,7 +63,8 @@ manifest={"project":"YUNEX RS6 NO MERCY C2","as_of":datetime.now(timezone.utc).i
  "source":"official Audi C8 RS6 Avant Daytona Grey footage",
  "source_url":URL,"source_original_native_dimensions":[3840,2160],"source_original_fps":"25/1",
  "review_only":True,"rights":"not cleared for public redistribution",
- "shots":SHOTS}
+ "shots":SHOTS,
+ "rejected":[{"id":"UHD_MOTION_BLUR_WHEEL","reason":"Actual portrait contact frame was only an indistinct road smear without a legible wheel. Rejected on visual QA despite full decode."}]}
 (OUT/"UHD_EXTRA_MANIFEST.json").write_text(json.dumps(manifest,indent=2))
 (OUT/"UHD_EXTRA_SHA256SUMS.txt").write_text("".join(sha(x)+"  "+x.name+"\n" for x in sorted(OUT.iterdir()) if x.is_file()))
 with zipfile.ZipFile(OUT/"YUNEX_RS6_C2_UHD_EXTRA.zip","w",zipfile.ZIP_DEFLATED,compresslevel=4) as z:
