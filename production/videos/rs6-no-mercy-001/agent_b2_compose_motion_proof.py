@@ -19,11 +19,11 @@ FRAME=ROOT/"PROOF_12_FRAME_CONTACT.jpg"
 SPECS=[
     {"name":"A2_FAST_APPROACH","file":"A2_C8_RS6_FAST_APPROACH.mp4","start":0.05,"duration":0.92,
      "purpose":"real native-4K Audi frontal driving / fast approach"},
-    {"name":"B2_NIGHT_HEADLIGHT","file":"B2_LOWDOWN_NIGHT_07.mp4","start":1.02,"duration":0.64,
+    {"name":"B2_NIGHT_HEADLIGHT","file":"B2_LOWDOWN_NIGHT_07.mp4","start":1.30,"duration":0.79,
      "purpose":"cold night red RS6 front three-quarter, real film"},
-    {"name":"B2_RED_SIDE_TRACKING","file":"B2_LOWDOWN_NIGHT_03.mp4","start":2.02,"duration":0.91,
-     "purpose":"genuine red RS6 side tracking / moving shot"},
-    {"name":"A2_MOUNTAIN_SWEEP","file":"A2_C8_RS6_MOUNTAIN_SWEEP.mp4","start":0.10,"duration":0.66,
+    {"name":"B2_LED_ROLLING_MACRO","file":"B2_LOWDOWN_NIGHT_04.mp4","start":2.00,"duration":0.52,
+     "purpose":"genuine bright RS6 front headlamp / rolling macro without dead frames"},
+    {"name":"A2_MOUNTAIN_SWEEP","file":"A2_C8_RS6_MOUNTAIN_SWEEP.mp4","start":0.10,"duration":0.82,
      "purpose":"genuine original Audi native-4K moving bend"},
 ]
 def execute(cmd,timeout=100):
