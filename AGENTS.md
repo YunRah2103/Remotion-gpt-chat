@@ -1,6 +1,6 @@
 # Repository agent guide
 
-Work ONLY in `YunRah2103/Remotion-gpt-chat`. Never read, import, copy, or modify `YunRah2103/yunus-video-lab` or any YUNEX assets.
+Work ONLY in `YunRah2103/Remotion-gpt-chat`. Never read, import, copy, or modify the old `YunRah2103/yunus-video-lab` repository or its assets. Keep engineering-documentary work separate from YUNEX footage/editing work **unless a user explicitly assigns YUNEX work in this repository**.
 
 Independent compositions currently registered in `src/Root.tsx`:
 
@@ -26,3 +26,7 @@ Use the `production-render.yml` preview/stills workflow first and do actual movi
 ## Production pipeline, agent specialisms and captions
 
 For standalone automotive engineering explainer work, read `production/PIPELINE.md`, use `.github/skills/` as appropriate, verify cross-agent work with `production/tools/handoff.py`, and run `production/tools/production_pipeline.py` to ensure a real registered composition and contiguous storyboard exist before rendering. `GpuDriveFilmCaptioned` and `TurboDocumentaryCaptioned` add optional word-timed overlays while preserving originals. ABS-001 remains preproduction. Never access `yunus-video-lab` or YUNEX sources.
+
+## YUNEX Galaxy S25 V4 (required for phone footage agents)
+
+**First read the canonical [S25 V4 agent workflow on main](https://github.com/YunRah2103/Remotion-gpt-chat/blob/main/docs/YUNEX_S25_V4_AGENT_GUIDE.md).** This branch contains the implementation under `production/phone_footage/` and the exact `agent_jobs_v4.py` helper. Only owner-authored issues with approved canonical YouTube sources in `sources_v3.json` can be processed. Do not invent issues, bypass approval or claim a job is downloaded without `YUNEX_PHONE_DONE_V4` and a real decoded Release MP4. The user already installed V4 on the S25; a running `--loop` polls approximately every 60s, but Termux may be stopped to save battery. For accessible, properly licensed direct MP4 sources, use GitHub Actions instead. **Phone proof:** [#55](https://github.com/YunRah2103/Remotion-gpt-chat/issues/55) succeeded on an approved non-RS6 YouTube video. Specific RS6 URLs have not been phone-tested.
