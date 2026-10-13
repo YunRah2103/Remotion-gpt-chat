@@ -4,7 +4,7 @@ Branch: experiments/s25-footage-worker-v4-10min-20261012
 
 V4 is a separate experimental worker. Existing V1/V2/V3 and main are preserved.
 
-**Agent guide:** [Canonical S25 V4 workflow on main](https://github.com/YunRah2103/Remotion-gpt-chat/blob/main/docs/YUNEX_S25_V4_AGENT_GUIDE.md). The licence-registration gate has been removed: the owner can queue a canonical YouTube watch URL **without** cataloging rights first. For unverified sources, the resulting MP4 is stored in an **owner-only GitHub draft Release**, never a public download. [Previous S25 YouTube PASS #55](https://github.com/YunRah2103/Remotion-gpt-chat/issues/55) used a permitted snowy-car test, **not** RS6 footage. The revised unregistered-source behaviour still requires a live S25 test.
+**Agent guide:** [Canonical S25 V4 workflow on main](https://github.com/YunRah2103/Remotion-gpt-chat/blob/main/docs/YUNEX_S25_V4_AGENT_GUIDE.md). The licence-registration gate has been removed: the owner can queue a canonical YouTube watch URL **without** cataloging rights first. For unverified sources, the resulting MP4 is stored in an **owner-only GitHub draft Release**, never a public download. [Previous S25 YouTube PASS #55](https://github.com/YunRah2103/Remotion-gpt-chat/issues/55) used a permitted snowy-car test, **not** RS6 footage. Unregistered-source downloading is **phone-proven** by [AutoTopNL job #56](https://github.com/YunRah2103/Remotion-gpt-chat/issues/56): a 60-second H.264/AAC recording stored in a draft Release. Optional **audio-only mode** is tested offline with real FFmpeg AAC encoding/decoding; a phone-side audio-only job is still pending.
 
 ## What changed
 
@@ -13,7 +13,8 @@ The **duration ceiling is 600 seconds (10 minutes)**; normal projects should sti
 - Output size defaults dynamically to 45 MiB for short clips and up to 510 MiB for 600-second clips; hard maximum 512 MiB per job.
 - Working storage budget scales with requested output size up to 2,300 MiB. The worker requires that workspace budget plus 450 MiB free before starting, with at least 700 MiB for the smallest jobs. Download processes stop if phone free space drops under 400 MiB.
 - Timeout scales with length (up to 50 minutes for downloading and 50 minutes for transcoding). Full FFmpeg decode and resolution/codec/duration checks are required.
-- Large GitHub release MP4 uploads use file streaming instead of loading hundreds of megabytes into RAM.
+- Large media uploads stream from disk instead of loading hundreds of megabytes into RAM, with longer timeouts for slow mobile connections.
+- **Audio-only jobs** (`--media audio`) fetch only the needed soundtrack and export verified 48-kHz stereo AAC `.m4a` files. These avoid downloading/encoding 1080p video just to get engine sound; `--media video` remains the default.
 - On normal completion, temporary media is deleted. On later startups, V4 clears only its own abandoned temporary folders older than 24h; personal videos are never intentionally removed.
 - Agent handoff uses the existing owner-only GitHub issue queue, SHA256, JSON result manifest and verified MP4 Release assets. An agent can request **any valid canonical YouTube watch URL without adding source licence details**.
 - The existing source catalog supplies **optional** verified CC licence metadata. A listed licensed source retains public-prerelease delivery with proper attribution. An **unlisted source gets an owner-only GitHub draft** with `rights_status: unverified`, no invented licence and no public MP4 URL. Downloading for private review is separate from permission to republish.
@@ -28,7 +29,7 @@ With no other footage worker running, paste:
 curl -fLsS https://raw.githubusercontent.com/YunRah2103/Remotion-gpt-chat/experiments/s25-footage-worker-v4-10min-20261012/production/phone_footage/install_v4_termux.sh -o ~/yunex-install-v4.sh && bash ~/yunex-install-v4.sh
 ~~~
 
-The installer updates the V4 Python worker, optional known-licence catalog and agent helper in their separate folder. It checks dependencies and prints a doctor report, but does **not** automatically download a video or restart the loop.
+The installer checks that no V4 worker is running, validates both staged video and audio job parsing before replacement, and preserves the previous worker as a rollback copy. It updates the V4 Python worker, optional licence catalogue and agent helper without touching existing tokens or V1/V2/V3. It **does not** automatically download a video or restart the loop.
 
 Later commands:
 
@@ -39,7 +40,7 @@ Later commands:
 ~/yunex-v4 --clean
 ~~~
 
-The --once command processes at most one queued authorized V4 issue. The --loop command checks every 60 seconds **while Termux is running**. The --clean command removes only stale V4 temporary folders. Android may suspend Termux in the background. V4 does not automatically start after restart; existing V3 optional Boot helper is still V3-specific.
+The `--once` command processes at most one queued authorized V4 issue. The `--loop` command checks every **120 seconds by default**, configurable via `~/yunex-v4 --loop --interval 60` (60–900 seconds). Completed jobs are cached so old comments are not re-read every poll; catalogue refresh is limited to 30-minute intervals and idle messages appear no more than every ten minutes. The `--clean` command removes only stale V4 temporary folders. Android may suspend Termux in the background. V4 does not automatically start after restart; the optional V3 Boot helper is V3-specific.
 
 ## Agents: queue without licence registration
 
@@ -53,22 +54,35 @@ python production/phone_footage/agent_jobs_v4.py prepare \
   --start 20 --duration 12 --height 1080 --orientation landscape
 ~~~
 
-Create an **open, owner-authored** issue titled `[YUNEX PHONE JOB] RS6 excerpt`, with the exact printed two-line body. Valid job bounds: 2–600 seconds, offset up to 21600 seconds, 720/1080p, landscape or portrait. For already-listed test sources, `sources_v3.json` still provides known attribution and any catalogue-specific height limit.
+**For engine/audio sources, request audio-only:**
+
+~~~bash
+python production/phone_footage/agent_jobs_v4.py prepare \
+  --url 'https://www.youtube.com/watch?v=Exq6pB3IGyU' \
+  --start 8 --duration 13 --media audio
+~~~
+
+Create an **open, owner-authored** issue titled `[YUNEX PHONE JOB] RS6 excerpt`, with the exact printed two-line body. Valid job bounds: 2–600 seconds, offset up to 21600 seconds, 720/1080p when a video is requested, landscape or portrait. `--media video` is the default. Already-catalogued sources retain their verified attribution and catalogue-specific height caps.
 
 **Delivery classification:**
 
 - **Listed with verified licensing:** phone writes a public prerelease, downloadable MP4 URL and JSON manifest with credit. Never misstate rights.
-- **Unlisted/unknown rights (normal new RS6 case):** phone writes an **owner-only DRAFT Release**. The completed issue comment includes `YUNEX_PHONE_DONE_V4`, `release_visibility: draft`, `rights_status: unverified`, `release_id`, `mp4_asset_id`, `mp4_asset_api_url` and the verified SHA256. Public `mp4_url` is **null by design**, not a download failure.
+- **Unlisted/unknown rights (normal new RS6 case):** phone writes an **owner-only DRAFT Release**. The completed issue comment includes `YUNEX_PHONE_DONE_V4`, `release_visibility: draft`, `rights_status: unverified`, `release_id`, `asset_filename`, `asset_id`, `asset_api_url` and verified SHA256. Public `mp4_url` / `audio_url` remain **null by design**, not a download failure. An audio-only job stores `yunex-v4-ISSUE_NUMBER.m4a`, not `.mp4`.
 
-Agents authorized for the repository may retrieve draft-release MP4 assets **using authenticated GitHub access**, for example in a GitHub Actions job with an appropriately permissioned `GH_TOKEN`:
+Agents can retrieve draft assets **within authenticated GitHub Actions**, as demonstrated on [real AutoTopNL audio verification run #38441894486](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38441894486). **Important:** `contents: read` returned HTTP 403 for draft assets in this repository, while `contents: write` succeeded using the built-in token. Use the narrower `contents: write` workflow scope only where draft access is required; do not expose the token.
+
+~~~yaml
+permissions:
+  contents: write
+~~~
 
 ~~~bash
 gh release download "yunex-phone-v4-ISSUE_NUMBER" \
   --repo YunRah2103/Remotion-gpt-chat \
-  --pattern "yunex-v4-ISSUE_NUMBER.mp4" --dir .
+  --pattern "yunex-v4-ISSUE_NUMBER.*" --dir .
 ~~~
 
-Replace `ISSUE_NUMBER` with the completed job number and supply a token with repository read permissions. If your environment cannot fetch draft assets, report that access limitation; do not treat an inaccessible public link as missing video and do not publish the draft to work around it.
+Set `GH_TOKEN: ${{ github.token }}` in that step, replace `ISSUE_NUMBER`, and use the exact `asset_filename` from the issue result (either `.mp4` or `.m4a`). Agents must not publish the draft for convenience. Verify file SHA256 against the issue result and use the binary within the authorised editing workflow. GitHub connector text fetch alone does not supply the media bytes.
 
 The result helper can inspect a completed issue:
 
@@ -83,7 +97,7 @@ Then FFprobe, full-decode, hash-check, and **visually inspect** moving source fr
 - **10 minutes is a maximum, not the default.** Requests for 601 seconds or more are refused.
 - The output cap can reject complex high-bitrate 10-minute sources. Storage availability, source format and upload speed also matter.
 - The job may use gigabytes of temporary phone storage, even though successful runs clean it afterward. Mobile data and GitHub storage consumption still occur.
-- CI validates unregistered-source acceptance, strict YouTube URL validation, draft/private publication, 600-second maximum, adaptive storage, streaming upload, actual synthetic FFmpeg encode/decode and agent issue compatibility.
+- CI validates unregistered-source acceptance, strict YouTube URL validation, draft/private publication, 600-second maximum, adaptive storage, streaming upload, audio-only synthetic AAC encode/decode, video synthetic FFmpeg encode/decode, cached jobs and agent helper compatibility.
 - No real full ten-minute YouTube download has yet been claimed. Validate with a permitted longer source on the Galaxy S25 when necessary. The phone worker only runs when started by the user or configured as a background process.
 
 GitHub Actions: .github/workflows/s25-phone-worker-v4-tests.yml
