@@ -32,7 +32,7 @@ jobs:
           test -s c2_audi_uhd_addon/RS6_C8_NATIVE4K_AUDI_GRILLE.mp4
           test -s c2_audi_uhd_addon/YUNEX_RS6_C2_UHD_ADDON.zip
           python production/videos/rs6-no-mercy-001/agent-c2/udhd_audi_extra_details.py | tee c2_uhd_extra_build.log
-          test "$(find c2_audi_uhd_extra -maxdepth 1 -name '*.mp4' | wc -l)" -eq 3
+          test "$(find c2_audi_uhd_extra -maxdepth 1 -name '*.mp4' | wc -l)" -eq 2
           test -s c2_audi_uhd_extra/YUNEX_RS6_C2_UHD_EXTRA.zip
       - name: Upload to existing draft only, never an already-published release
         env:
@@ -53,6 +53,9 @@ jobs:
             c2_audi_uhd_extra/UHD_EXTRA_CONTACT.jpg \
             c2_audi_uhd_extra/UHD_EXTRA_MANIFEST.json \
             c2_audi_uhd_extra/UHD_EXTRA_SHA256SUMS.txt --clobber
+          if gh release view "$TAG" --json assets --jq '.assets[].name' | grep -qx 'UHD_MOTION_BLUR_WHEEL.mp4'; then
+            gh release delete-asset "$TAG" UHD_MOTION_BLUR_WHEEL.mp4 --yes
+          fi
           gh release view "$TAG" --json isDraft,assets --jq '{draft:.isDraft,files:[.assets[].name]}'
       - name: Upload metadata and review image (not source video)
         if: always()
