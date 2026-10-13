@@ -1,0 +1,35 @@
+name: YUNEX RS6 B2 Vimeo creator-direct QA
+
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/b2-youtube-driving
+    paths:
+      - .github/workflows/rs6-b2-vimeo-direct-qa.yml
+      - production/videos/rs6-no-mercy-001/agent_b2_vimeo_probe.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-direct-media-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFprobe FFmpeg and Python requests
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q requests
+      - name: Run independent publicly accessible Vimeo progressive QA
+        run: python production/videos/rs6-no-mercy-001/agent_b2_vimeo_probe.py
+      - name: Upload reports only, not third-party media
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-b2-vimeo-direct-technical-qa
+          path: b2-vimeo-evidence/
+          retention-days: 14
+          if-no-files-found: warn
