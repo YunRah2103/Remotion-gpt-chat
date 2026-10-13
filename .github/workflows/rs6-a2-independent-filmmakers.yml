@@ -1,0 +1,38 @@
+name: RS6 A2 independent premium filmmaker acquisition
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/a2-hero-cinema
+    paths:
+      - production/videos/rs6-no-mercy-001/agent-a2/a2_new_creator_probe.py
+      - .github/workflows/rs6-a2-independent-filmmakers.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  rs6-a2-creator-acquisition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg and yt-dlp
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install --disable-pip-version-check requests yt-dlp
+      - name: Try Vimeo original-upload public player, oEmbed and yt-dlp, then real short progressive decode
+        shell: bash
+        run: |
+          python production/videos/rs6-no-mercy-001/agent-a2/a2_new_creator_probe.py | tee a2-creator-summary.json
+      - name: Publish forensic metadata only, never original creator video
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-a2-independent-creator-QA-${{ github.run_id }}
+          path: |
+            a2_new_creators_qa/source_report.json
+            a2_new_creators_qa/RIGHTS.txt
+            a2-creator-summary.json
+          if-no-files-found: warn
+          retention-days: 7
