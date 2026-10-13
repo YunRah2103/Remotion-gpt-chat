@@ -1,0 +1,36 @@
+name: RS6 A2 six more original C8 driving timecode visual tests
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/a2-hero-cinema
+    paths:
+      - production/videos/rs6-no-mercy-001/agent-a2/a2_more_hero_temporal.py
+      - .github/workflows/rs6-a2-six-more-originals.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  six-new-moving-car-timecode-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg and native decoded-frame analysis
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install --disable-pip-version-check pillow numpy
+      - name: Decode six candidate full-car RS6 original 4K source sequences, 9x16 temporal QA
+        run: |
+          python production/videos/rs6-no-mercy-001/agent-a2/a2_more_hero_temporal.py | tee six-extra-scout.json
+      - name: Upload original video scene contact JPEG and JSON only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-a2-six-extra-4k-scene-QA-${{ github.run_id }}
+          path: |
+            a2_more_hero_temporal/*.jpg
+            a2_more_hero_temporal/report.json
+            six-extra-scout.json
+          if-no-files-found: warn
+          retention-days: 10
