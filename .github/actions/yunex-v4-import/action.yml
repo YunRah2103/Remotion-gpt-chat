@@ -1,0 +1,125 @@
+name: YUNEX V4 — verified phone asset
+description: Fetch a completed S25 V4 GitHub draft/public Release asset and validate real bytes before editing
+inputs:
+  issue_number:
+    description: Owner-authored completed [YUNEX PHONE JOB] issue number
+    required: true
+  token:
+    description: Built-in GitHub Actions token; draft releases in this repo require contents write
+    required: true
+  destination:
+    description: Relative working directory for the temporary private source media
+    required: false
+    default: work/yunex-phone
+outputs:
+  asset_path:
+    description: Absolute path to verified MP4 or M4A on this runner (not published)
+    value: ${{ steps.retrieve.outputs.asset_path }}
+  media:
+    description: video or audio
+    value: ${{ steps.retrieve.outputs.media }}
+  sha256:
+    description: Verified actual content SHA256
+    value: ${{ steps.retrieve.outputs.sha256 }}
+  rights_status:
+    description: Rights/redistribution metadata from the original phone result
+    value: ${{ steps.retrieve.outputs.rights_status }}
+  release_visibility:
+    description: draft or public_prerelease
+    value: ${{ steps.retrieve.outputs.release_visibility }}
+runs:
+  using: composite
+  steps:
+    - id: retrieve
+      name: Recover and verify owner-authored phone result
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        ISSUE_NUMBER: ${{ inputs.issue_number }}
+        DESTINATION: ${{ inputs.destination }}
+      run: |
+        set -euo pipefail
+        SOURCE_REPO="YunRah2103/Remotion-gpt-chat"
+
+        if ! [[ "$ISSUE_NUMBER" =~ ^[1-9][0-9]*$ ]]; then
+          echo "::error::Invalid YUNEX V4 issue number"
+          exit 2
+        fi
+        if [[ -z "$DESTINATION" || "$DESTINATION" == /* || "$DESTINATION" == *..* ]]; then
+          echo "::error::Destination must be a relative directory without parent traversal"
+          exit 2
+        fi
+        for tool in gh jq sha256sum ffprobe ffmpeg; do
+          if ! command -v "$tool" >/dev/null; then
+            echo "::error::Missing runner dependency: $tool"
+            exit 2
+          fi
+        done
+
+        # Trust the account-owner's completed phone report, not an agent-supplied hash.
+        comments="$(gh api "/repos/$SOURCE_REPO/issues/$ISSUE_NUMBER/comments?per_page=100")"
+        report="$(jq -rc --argjson number "$ISSUE_NUMBER" '
+          [.[] | select(.user.login == "YunRah2103") | .body
+            | select(startswith("YUNEX_PHONE_DONE_V4"))
+            | split("~~~json\n")[1] | select(. != null)
+            | split("\n~~~")[0] | fromjson
+            | select(.schema == "YUNEX_PHONE_RESULT_V4"
+                     and .status == "PASS" and .issue == $number)]
+          | .[-1] // empty
+        ' <<< "$comments")"
+        if [[ -z "$report" ]]; then
+          echo "::error::No validated owner-authored YUNEX_PHONE_DONE_V4 on issue #$ISSUE_NUMBER"
+          exit 3
+        fi
+        digest="$(jq -r '.sha256 // empty' <<< "$report")"
+        bytes="$(jq -r '.bytes // empty' <<< "$report")"
+        media="$(jq -r '.media // "video"' <<< "$report")"
+        rights="$(jq -r '.rights_status // "unverified"' <<< "$report")"
+        visibility="$(jq -r '.release_visibility // "draft"' <<< "$report")"
+        if ! [[ "$digest" =~ ^[0-9a-f]{64}$ && "$bytes" =~ ^[0-9]+$ ]]; then
+          echo "::error::Phone result is missing a valid SHA256 or file size"
+          exit 3
+        fi
+        if [[ "$media" != video && "$media" != audio ]]; then
+          echo "::error::Invalid result media type"
+          exit 3
+        fi
+        ext=mp4
+        if [[ "$media" == audio ]]; then ext=m4a; fi
+        expected="yunex-v4-$ISSUE_NUMBER.$ext"
+        filename="$(jq -r '.asset_filename // empty' <<< "$report")"
+        if [[ -z "$filename" ]]; then filename="$expected"; fi
+        if [[ "$filename" != "$expected" ]]; then
+          echo "::error::Unexpected result asset filename"
+          exit 3
+        fi
+
+        mkdir -p "$DESTINATION"
+        echo "Fetching confirmed phone job #$ISSUE_NUMBER ($media; $visibility)"
+        gh release download "yunex-phone-v4-$ISSUE_NUMBER" \
+          --repo "$SOURCE_REPO" --pattern "$filename" --dir "$DESTINATION"
+
+        asset="$DESTINATION/$filename"
+        if [[ ! -s "$asset" || "$(stat -c %s "$asset")" != "$bytes" ]]; then
+          echo "::error::Downloaded asset size does not match the phone result"
+          exit 4
+        fi
+        printf '%s  %s\n' "$digest" "$asset" | sha256sum --check --status || {
+          echo "::error::Downloaded media failed SHA256 verification"
+          exit 4
+        }
+
+        ffprobe -v error -show_entries format=duration -of default=nw=1 "$asset"
+        ffmpeg -hide_banner -loglevel error -xerror -i "$asset" -f null -
+        actual="$(sha256sum "$asset" | cut -d ' ' -f 1)"
+
+        # The binary remains only in this workflow's local workspace.
+        # Do NOT publish unknown-rights media as a public workflow artifact/release.
+        {
+          echo "asset_path=$(realpath "$asset")"
+          echo "media=$media"
+          echo "sha256=$actual"
+          echo "rights_status=$rights"
+          echo "release_visibility=$visibility"
+        } >> "$GITHUB_OUTPUT"
+        echo "YUNEX V4 job #$ISSUE_NUMBER: authenticated media verified (SHA256 + full decode)"
