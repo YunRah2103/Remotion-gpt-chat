@@ -1,0 +1,34 @@
+name: YUNEX P1 #74 verified motion scouting
+on:
+  push:
+    paths:
+      - '.github/workflows/p1-74-motion-scout.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  scout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Recover and verify private phone MP4
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p output
+          gh api -H "Accept: application/octet-stream" "/repos/$GITHUB_REPOSITORY/releases/assets/638215052" > output/yunex-v4-74.mp4
+          echo "c31e3980735a2517ad7e3bb491b0db48a5b554a9ef3cffea9caa098752e9ca39  output/yunex-v4-74.mp4" | sha256sum -c -
+          test "$(stat -c%s output/yunex-v4-74.mp4)" -eq 15517116
+          ffprobe -v error -show_format -show_streams -of json output/yunex-v4-74.mp4 > output/ffprobe.json
+          ffmpeg -v error -xerror -i output/yunex-v4-74.mp4 -f null -
+          ffmpeg -v error -i output/yunex-v4-74.mp4 -vf "fps=1,scale=320:-2,tile=6x10" -frames:v 1 -update 1 output/contact-1fps.jpg
+          ffmpeg -v error -i output/yunex-v4-74.mp4 -vf "fps=1/2,scale=480:-2,tile=5x6" -frames:v 1 -update 1 output/contact-large.jpg
+          printf 'P1 #74 phone source E9IWiTpWeiM original 45-105s; local 0-60s; visual identity/motion not yet reviewed.\n' > output/README.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yunex-p1-74-motion-scout
+          path: output/
+          retention-days: 7
+          if-no-files-found: error
