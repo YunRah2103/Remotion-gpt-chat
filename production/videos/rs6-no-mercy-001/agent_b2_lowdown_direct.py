@@ -123,7 +123,7 @@ def main():
                 pr["quality_gate"]="REJECT_NATIVE_SOURCE_UNDER_1080";continue
             for k,sec in enumerate((0,8,20),1):
                 sec=int(sec)
-                if (info.get("format",{}).get("duration") or 0)<sec+4:continue
+                if float(info.get("format",{}).get("duration") or 0)<sec+4:continue
                 row=excerpt(u,sec,k)
                 REPORT.setdefault("outputs",[]).append(row)
                 print("EXCERPT",row["name"],row["status"],flush=True)
