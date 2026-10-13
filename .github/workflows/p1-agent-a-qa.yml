@@ -1,0 +1,46 @@
+name: P1 Agent A draft footage QA
+on:
+  push:
+    paths:
+      - '.github/workflows/p1-agent-a-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install media tools
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Retrieve private draft assets and inspect
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p output
+          for id in 68 69 70; do
+            case "$id" in
+              68) tag=yunex-phone-v4-68; sha=d3fa45ce9bc013ae22c625032c4caf21db67060bf788010bd2c6797ecbf51fe6 ;;
+              69) tag=yunex-phone-v4-69; sha=8cbbbc4d99c37bafe1036d9406e499fc89c95741e0b7646dd37653583d91d288 ;;
+              70) tag=yunex-phone-v4-70; sha=4187db9c570792959e14eb57e76a49c1be63fef3d56f46870aa86c87ebbe05b0 ;;
+            esac
+            mkdir -p "output/$id"
+            gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern "yunex-v4-$id.mp4" --dir "output/$id"
+            file="output/$id/yunex-v4-$id.mp4"
+            echo "$sha  $file" | sha256sum -c -
+            ffprobe -v error -show_format -show_streams -of json "$file" > "output/$id/ffprobe.json"
+            ffmpeg -hide_banner -loglevel error -xerror -i "$file" -f null -
+            ffmpeg -hide_banner -loglevel error -i "$file" -vf "fps=1/2,scale=480:-2,tile=3x3" -frames:v 1 -update 1 "output/$id/contact-sheet.jpg"
+            ffmpeg -hide_banner -loglevel error -i "$file" -vf "fps=1/2,scale=480:-2" -vsync vfr "output/$id/frame-%03d.jpg"
+            printf "PASS issue %s source offset %s\n" "$id" "$([ "$id" = 68 ] && echo 0 || ([ "$id" = 69 ] && echo 12 || echo 26))" >> output/summary.txt
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p1-agent-a-private-qa
+          path: output/
+          retention-days: 7
