@@ -1,0 +1,35 @@
+name: YUNEX RS6 G new cinematic source check
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/g-director-rescue
+    paths:
+      - .github/workflows/rs6-g-night-scout.yml
+      - production/videos/rs6-no-mercy-001/g_night_scout.py
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-frame-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install requirements
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          pip install -q requests beautifulsoup4 pillow
+      - name: Actually test source downloads and inspect native frames
+        run: |
+          python production/videos/rs6-no-mercy-001/g_night_scout.py > night_scout.log 2>&1 || true
+          tail -100 night_scout.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: RS6_G_NEW_NIGHT_SOURCE_INSPECTION
+          path: |
+            rs6-g-new-night-scout/
+            night_scout.log
+          retention-days: 7
+          if-no-files-found: warn
