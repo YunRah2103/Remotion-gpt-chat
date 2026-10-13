@@ -1,0 +1,36 @@
+name: RS6 A2 ten-shot UHD visual contact QA
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/a2-hero-cinema
+    paths:
+      - production/videos/rs6-no-mercy-001/agent-a2/a2_frame_review.py
+      - .github/workflows/rs6-a2-ten-shot-qa.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ten-shot-contact-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg and Pillow
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install --disable-pip-version-check pillow
+      - name: Decode original RS6 UHD motion to 10 small 9x16 crop and full-frame review strips
+        run: |
+          python production/videos/rs6-no-mercy-001/agent-a2/a2_frame_review.py | tee a2-review-summary.json
+      - name: Upload review contact JPEGs and metadata, NEVER source MP4
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-a2-ten-shot-contact-qa-${{ github.run_id }}
+          path: |
+            a2_frame_review/*.jpg
+            a2_frame_review/metadata.json
+            a2-review-summary.json
+          if-no-files-found: warn
+          retention-days: 7
