@@ -40,7 +40,7 @@ def load_approved_sources(path=None):
                 or not urllib.parse.parse_qs(parsed.query).get("v")):
             raise RuntimeError("Source registry contains noncanonical YouTube URL")
         if (not isinstance(item, dict) or item.get("license") not in ("CC0-1.0", "CC-BY-3.0", "CC-BY-4.0") or item.get("approved") is not True or item.get("reviewed_by") != OWNER
-                or item.get("max_height") not in (720, 1080)
+                or item.get("max_height") not in (720, 1080, 2160)
                 or not all(item.get(k) for k in ("title", "author", "source",
                                                 "license_reference"))
                 or item["source"] != url):
