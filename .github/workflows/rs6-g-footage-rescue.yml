@@ -1,0 +1,57 @@
+name: YUNEX RS6 G footage rescue private source QA
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/g-director-rescue
+    paths:
+      - .github/workflows/rs6-g-footage-rescue.yml
+      - production/videos/rs6-no-mercy-001/g_source_rescue.py
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  source-rescue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm media tooling
+        run: |
+          ffmpeg -version | head -1
+          gh version
+      - name: Acquire actual A2 B2 C2 owner-review sources from unpublished drafts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          mkdir -p rs6-rescue-sources/{a2,b2,c2}
+          gh release download yunex-rs6-a2-hero-review-20261013 -p '*.mp4' -D rs6-rescue-sources/a2
+          gh release download yunex-rs6-b2-motion-review-20261013 -p '*.mp4' -D rs6-rescue-sources/b2
+          gh release download yunex-rs6-c2-details-review-20261013 -p '*.mp4' -D rs6-rescue-sources/c2
+          find rs6-rescue-sources -name '*.mp4' -type f -size +0c | sort
+          test "$(find rs6-rescue-sources -name '*.mp4' | wc -l)" -ge 20
+          du -sh rs6-rescue-sources
+      - name: Native quality review, actual shot contacts and silent 3.47s proof
+        run: |
+          set -euo pipefail
+          python production/videos/rs6-no-mercy-001/g_source_rescue.py | tee rs6-rescue-run.log
+      - name: Preserve private playable source review media and proof
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: RS6_G_PRIVATE_SOURCE_REVIEW_AND_PROOF
+          path: |
+            rs6-rescue-sources/**/*.mp4
+            rs6-rescue-review/
+            rs6-rescue-run.log
+          retention-days: 2
+          if-no-files-found: error
+      - name: Failure notes
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: RS6_G_RESCUE_FAILURE_LOG
+          path: rs6-rescue-run.log
+          retention-days: 7
+          if-no-files-found: ignore
