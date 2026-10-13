@@ -1,0 +1,41 @@
+name: YUNEX RS6 B2 creator-motion acquisition QA
+
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/b2-youtube-driving
+    paths:
+      - .github/workflows/rs6-b2-motion-acquisition.yml
+      - production/videos/rs6-no-mercy-001/agent_b2_acquire.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rs6-b2-creator-motion-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  creator-motion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install native media inspection and creator extractors
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --upgrade --quiet yt-dlp curl_cffi
+          ffprobe -version | head -n 1
+      - name: Attempt targeted creator acquisition with nonpublic transient samples
+        timeout-minutes: 16
+        run: python production/videos/rs6-no-mercy-001/agent_b2_acquire.py
+      - name: Upload rights-safe JSON evidence, never unapproved footage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-b2-creator-motion-metadata
+          path: b2-evidence/
+          if-no-files-found: warn
+          retention-days: 14
