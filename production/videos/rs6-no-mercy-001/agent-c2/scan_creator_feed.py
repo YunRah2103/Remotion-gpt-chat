@@ -3,7 +3,7 @@
 Source video stays transient. Public Actions artifacts contain QA metadata and review frames only.
 No rights granted or inferred by access, GitHub artifacts, or successful FFmpeg decoding.
 """
-import hashlib, json, pathlib, re, shutil, subprocess, tempfile
+import hashlib, json, os, pathlib, re, shutil, subprocess, tempfile
 from datetime import datetime, timezone
 
 OUT = pathlib.Path("c2_feed_qa")
@@ -11,7 +11,8 @@ OUT.mkdir(exist_ok=True)
 ACCOUNTS = ["https://www.tiktok.com/@glenmoreaudi"]
 SEEN = {"7482802812783512887"}  # Previously verified LED/wheel insert; do not duplicate.
 MAX_POSTS = 90
-MAX_TRIALS = 4
+MAX_TRIALS = max(1,min(8,int(os.getenv("C2_FEED_LIMIT","4"))))
+START_AT = max(0,int(os.getenv("C2_FEED_START","0")))
 def execute(cmd, seconds=120):
     try:
         r = subprocess.run(cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=seconds)
@@ -103,10 +104,10 @@ for account in ACCOUNTS:
     all_candidates.extend(candidates)
 unique={c["id"]:c for c in all_candidates}
 ranked=sorted(unique.values(),key=lambda x:(-x["score"],x["id"]))
-results=[probe(c) for c in ranked[:MAX_TRIALS]]
+results=[probe(c) for c in ranked[START_AT:START_AT+MAX_TRIALS]]
 report={"as_of":datetime.now(timezone.utc).isoformat(),"agent":"C2",
   "target":"additional non-duplicative C8 RS6 micro-cinematography","accounts":logs,
-  "candidate_count":len(ranked),"candidate_titles":ranked[:25],
+  "candidate_count":len(ranked),"start_at":START_AT,"candidate_titles":ranked[:25],
   "tested":results,"cleared_release_mp4s":0,
   "raw_media_uploaded":False,"source_media_deleted":True,
   "notes":"Native dimensions and valid decode are not C8 identity, shot quality or reuse permission. Human review required. Previous Glenmore source intentionally excluded."}
