@@ -5,10 +5,12 @@ on:
       - automotive-edits/rs6-no-mercy-001/c2-details-textures
     paths:
       - 'production/videos/rs6-no-mercy-001/agent-c2/udhd_audi_grille_addon.py'
+      - 'production/videos/rs6-no-mercy-001/agent-c2/udhd_audi_extra_details.py'
       - '.github/workflows/rs6-c2-audi-uhd-review.yml'
   pull_request:
     paths:
       - 'production/videos/rs6-no-mercy-001/agent-c2/udhd_audi_grille_addon.py'
+      - 'production/videos/rs6-no-mercy-001/agent-c2/udhd_audi_extra_details.py'
       - '.github/workflows/rs6-c2-audi-uhd-review.yml'
   workflow_dispatch:
 permissions:
@@ -29,6 +31,9 @@ jobs:
           python production/videos/rs6-no-mercy-001/agent-c2/udhd_audi_grille_addon.py | tee c2_uhd_build.log
           test -s c2_audi_uhd_addon/RS6_C8_NATIVE4K_AUDI_GRILLE.mp4
           test -s c2_audi_uhd_addon/YUNEX_RS6_C2_UHD_ADDON.zip
+          python production/videos/rs6-no-mercy-001/agent-c2/udhd_audi_extra_details.py | tee c2_uhd_extra_build.log
+          test "$(find c2_audi_uhd_extra -maxdepth 1 -name '*.mp4' | wc -l)" -eq 3
+          test -s c2_audi_uhd_extra/YUNEX_RS6_C2_UHD_EXTRA.zip
       - name: Upload to existing draft only, never an already-published release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -42,7 +47,15 @@ jobs:
             c2_audi_uhd_addon/RS6_C8_NATIVE4K_AUDI_GRILLE.mp4 \
             c2_audi_uhd_addon/UHD_GRILLE_CONTACT.jpg \
             c2_audi_uhd_addon/UHD_GRILLE_MANIFEST.json \
-            c2_audi_uhd_addon/UHD_GRILLE_SHA256SUMS.txt --clobber
+            c2_audi_uhd_addon/UHD_GRILLE_SHA256SUMS.txt
+            c2_audi_uhd_extra/UHD_EXTRA_CONTACT.jpg
+            c2_audi_uhd_extra/UHD_EXTRA_MANIFEST.json
+            c2_audi_uhd_extra/UHD_EXTRA_SHA256SUMS.txt --clobber
+          gh release upload "$TAG" c2_audi_uhd_extra/YUNEX_RS6_C2_UHD_EXTRA.zip \
+            c2_audi_uhd_extra/*.mp4 \
+            c2_audi_uhd_extra/UHD_EXTRA_CONTACT.jpg \
+            c2_audi_uhd_extra/UHD_EXTRA_MANIFEST.json \
+            c2_audi_uhd_extra/UHD_EXTRA_SHA256SUMS.txt --clobber
           gh release view "$TAG" --json isDraft,assets --jq '{draft:.isDraft,files:[.assets[].name]}'
       - name: Upload metadata and review image (not source video)
         if: always()
@@ -51,6 +64,7 @@ jobs:
           name: rs6-c2-native4k-grille-evidence-${{ github.run_id }}
           path: |
             c2_uhd_build.log
+            c2_uhd_extra_build.log
             c2_audi_uhd_addon/UHD_GRILLE_CONTACT.jpg
             c2_audi_uhd_addon/UHD_GRILLE_MANIFEST.json
             c2_audi_uhd_addon/UHD_GRILLE_SHA256SUMS.txt
