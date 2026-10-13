@@ -24,7 +24,7 @@ for key,page in PAGES:
   req=requests.get(page,timeout=20,headers=HEAD)
   rec["page_http"]=req.status_code; rec["page_bytes"]=len(req.content)
   s=req.text.replace("\\u002F","/").replace("\\/","/")
-  urls=re.findall(r'https?://[^"\'\s<>]+(?:video_2160p|renditions)[^"\'\s<>]*',s,re.I)
+  urls=re.findall(r'https?://[^\x22\x27\s<>]+(?:video_2160p|renditions)[^\x22\x27\s<>]*',s,re.I)
   assetids=list(dict.fromkeys(re.findall(r'urn:aaid:aem:[a-f0-9-]{36}',s,re.I)))
   rec["aem_asset_ids"]=assetids[:12]
   rec["video_2160p_embedded_urls"]=urls[:8]
