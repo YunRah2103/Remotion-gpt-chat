@@ -57,7 +57,11 @@ def accepted(media):
         "start": 0, "duration": 6, "height": 1080, "media": media})
     return worker.parse_job({"body": body})
 assert accepted("video") and accepted("audio")
-print("[YUNEX] Staged V4 verified: video, audio and optional source registry")
+uhd = worker.MARKER + "\n" + json.dumps({
+    "url": "https://www.youtube.com/watch?v=Exq6pB3IGyU",
+    "start": 0, "duration": 6, "height": 2160, "media": "video"})
+assert worker.parse_job({"body": uhd})["height"] == 2160
+print("[YUNEX] Staged V4 verified: 1080p video, native 4K, audio and optional source registry")
 PY
 if [ -d "$BACKUP" ]; then rm -rf "$BACKUP"; fi
 if [ -d "$TARGET" ]; then mv "$TARGET" "$BACKUP"; fi
