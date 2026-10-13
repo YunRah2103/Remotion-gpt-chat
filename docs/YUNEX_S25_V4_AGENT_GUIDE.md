@@ -51,6 +51,27 @@
 | Already in the verified CC source catalog | **Public GitHub prerelease** | `release_visibility: public_prerelease`, `mp4_url` or `audio_url`, `license`, `sha256` | Direct public media URL |
 | Any other canonical YouTube video | **Owner-only draft Release** | `release_visibility: draft`, `rights_status: unverified`, `release_id`, `asset_filename`, `asset_id`, `asset_api_url`, `sha256`; public media URL is null | Authenticated GitHub Actions with draft access; **not a public link** |
 
+**DEFAULT — one-step, tested import (new agents):** Use the shared [`yunex-v4-import` composite action](../.github/actions/yunex-v4-import/action.yml) inside your **editing** GitHub Actions job, instead of writing custom draft Release API or download code. It finds the owner's exact `YUNEX_PHONE_DONE_V4` JSON by issue number, downloads the original MP4/M4A, verifies expected file size and SHA256, probes and fully decodes it, and outputs `asset_path`, `media`, `sha256`, `rights_status` and `release_visibility`. The importer installs FFmpeg on the runner only when needed, and **does not publish source footage or upload an artifact**. [Real private #56 importer test: PASS](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38470166071).
+
+```yaml
+permissions:
+  contents: write
+  issues: read
+jobs:
+  edit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - id: phone
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with:
+          issue_number: '56' # replace with this project's completed S25 job
+          token: ${{ github.token }}
+      # Use ${{ steps.phone.outputs.asset_path }} in your actual edit step.
+```
+
+**This importer is the preferred path for new agents.** The manual `gh release download` instructions below are fallback diagnostics only. A completed phone job does not become a finished edit until the agent renders/QA-checks and delivers that edit. Do not publish unverified-source footage, and do not request another owner upload just because a connector cannot directly fetch draft binary bytes.
+
 **Confirmed GitHub Actions draft access fix:** `contents: read` caused HTTP **403 Resource not accessible by integration** for [AutoTopNL private draft #56](https://github.com/YunRah2103/Remotion-gpt-chat/issues/56). `contents: write` with GitHub Actions' **built-in `github.token`** succeeded in [run #38441894486](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38441894486). This does **not** mean the media must be published. Only grant `contents: write` to workflows that actually need private draft access.
 
 ```yaml
