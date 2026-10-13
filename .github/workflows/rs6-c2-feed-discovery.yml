@@ -1,5 +1,9 @@
 name: YUNEX RS6 C2 original creator feed QA
 on:
+  pull_request:
+    paths:
+      - 'production/videos/rs6-no-mercy-001/agent-c2/scan_creator_feed.py'
+      - '.github/workflows/rs6-c2-feed-discovery.yml'
   push:
     branches:
       - automotive-edits/rs6-no-mercy-001/c2-details-textures
