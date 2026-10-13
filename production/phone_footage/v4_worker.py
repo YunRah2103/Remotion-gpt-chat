@@ -93,6 +93,10 @@ MAX_OUTPUT_MB = 512
 MAX_BYTES = MAX_OUTPUT_MB * MIB
 MAX_WORKSPACE_BYTES = 2300 * MIB
 TEMP_ROOT = Path.home() / ".cache" / "yunex-v4-temp"
+COMPLETION_CACHE = Path.home() / ".cache" / "yunex-v4-completed.json"
+DEFAULT_POLL_SECONDS = 120
+CATALOG_REFRESH_SECONDS = 1800
+_LAST_IDLE_LOG = 0.0
 
 
 def default_output_mb(duration):
@@ -150,7 +154,9 @@ def upload_media_file(path, token, file):
     headers = {"Accept": "application/vnd.github+json", "Authorization": "Bearer " + token,
                "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "yunex-s25-v4",
                "Content-Type": "video/mp4", "Content-Length": str(size)}
-    conn = http.client.HTTPSConnection("uploads.github.com", timeout=180)
+    # Slow mobile links need longer than 180 seconds for a 512 MiB upload.
+    upload_timeout = min(3600, max(180, math.ceil(size / MIB) * 15))
+    conn = http.client.HTTPSConnection("uploads.github.com", timeout=upload_timeout)
     try:
         with file.open("rb") as video:
             conn.request("POST", destination, body=video, headers=headers)
@@ -222,11 +228,53 @@ def parse_job(issue):
     return {"url": job["url"], "start": float(start), "duration": float(duration),
             "height": height, "max_mb": max_mb, "orientation": orientation}
 
+def load_completed_issues():
+    """Avoid rechecking the same completed jobs on every poll.
+
+    An issue represents one immutable request. Retry/new footage = new issue.
+    """
+    try:
+        numbers = json.loads(COMPLETION_CACHE.read_text(encoding="utf-8"))
+        if isinstance(numbers, list):
+            return {n for n in numbers if type(n) is int and n > 0}
+    except (OSError, ValueError, TypeError):
+        pass
+    return set()
+
+
+def mark_issue_completed(number):
+    completed = load_completed_issues()
+    if number in completed:
+        return
+    completed.add(number)
+    try:
+        COMPLETION_CACHE.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+        temporary = COMPLETION_CACHE.with_suffix(".tmp")
+        with temporary.open("w", encoding="utf-8") as handle:
+            os.chmod(temporary, 0o600)
+            json.dump(sorted(completed)[-2500:], handle)
+        os.replace(temporary, COMPLETION_CACHE)
+    except OSError:
+        # Never turn a verified GitHub success into a failed job because a
+        # local battery-saving cache could not be written.
+        pass
+    finally:
+        try:
+            temporary.unlink(missing_ok=True)
+        except (OSError, UnboundLocalError):
+            pass
+
+
 def already_reported(token, number):
-    comments = api("GET",f"/repos/{REPO}/issues/{number}/comments?per_page=100",token)
-    return any((c.get("body") or "").startswith((DONE,FAILED)) and
-               c.get("user",{}).get("login","").casefold()==OWNER.casefold()
+    if number in load_completed_issues():
+        return True
+    comments = api("GET", f"/repos/{REPO}/issues/{number}/comments?per_page=100", token)
+    done = any((c.get("body") or "").startswith((DONE, FAILED)) and
+               c.get("user", {}).get("login", "").casefold() == OWNER.casefold()
                for c in comments)
+    if done:
+        mark_issue_completed(number)
+    return done
 
 
 def issue_comment(token, number, message):
@@ -259,7 +307,7 @@ def watched(command, timeout, folder, max_workspace_bytes=MAX_WORKSPACE_BYTES):
                     raise RuntimeError("Phone free-space reserve reached")
                 if time.monotonic() - beginning > timeout:
                     raise RuntimeError("Download or transcode timed out")
-                time.sleep(1)
+                time.sleep(3)
         except BaseException:
             if proc.poll() is None:
                 os.killpg(proc.pid, signal.SIGTERM)
@@ -446,6 +494,7 @@ def run_once(token, dry_run=False):
                 report = upload_release(token, number, movie, job, meta)
             issue_comment(token, number, DONE + "\n\n~~~json\n"
                           + json.dumps(report, indent=2) + "\n~~~")
+            mark_issue_completed(number)
             print(f"PASS #{number} {meta['width']}x{meta['height']} "
                   f"{meta['bytes']} bytes ({report['release_visibility']})\n"
                   f"{report['mp4_url'] or report['release_url']}", flush=True)
@@ -453,8 +502,12 @@ def run_once(token, dry_run=False):
             detail = str(exc).replace("\n", " ")[:300]
             print(f"FAILED #{number}: {detail}", flush=True)
             issue_comment(token, number, FAILED + "\n\n" + detail)
+            mark_issue_completed(number)
         return True
-    print("No pending approved V4 jobs", flush=True)
+    global _LAST_IDLE_LOG
+    if _LAST_IDLE_LOG == 0 or time.monotonic() - _LAST_IDLE_LOG >= 600:
+        print("V4 idle: no pending jobs (Ctrl+C to stop)", flush=True)
+        _LAST_IDLE_LOG = time.monotonic()
     return False
 
 def read_token():
@@ -473,14 +526,21 @@ def main():
     group.add_argument("--doctor",action="store_true")
     group.add_argument("--clean",action="store_true")
     p.add_argument("--dry-run",action="store_true")
+    p.add_argument("--interval",type=int,default=DEFAULT_POLL_SECONDS,
+                   help="Polling interval 60–900 seconds; default 120")
     args=p.parse_args()
+    if not 60 <= args.interval <= 900:
+        p.error("--interval must be 60..900 seconds")
     if args.doctor:
         print(json.dumps({"version":4,"approved_sources":len(LICENSED_PROOFS),
                           "node":bool(shutil.which("node")),
                           "ffmpeg":bool(shutil.which("ffmpeg")),
                           "ffprobe":bool(shutil.which("ffprobe")),
                           "free_mb":shutil.disk_usage(Path.home()).free//(1024*1024),
-                          "token_file":(Path.home()/".config/yunex/github-token").is_file()},indent=2))
+                          "token_file":(Path.home()/".config/yunex/github-token").is_file(),
+                          "poll_seconds":DEFAULT_POLL_SECONDS,
+                          "completed_jobs_cached":len(load_completed_issues()),
+                          "source_registration_required":False},indent=2))
         return
     # Avoid two Termux shells both uploading the same issue at once.
     lock_path=Path.home()/".cache/yunex-phone-worker.lock"
@@ -496,9 +556,13 @@ def main():
         print("Removed stale V4 media workspaces; other videos untouched")
         return
     token=read_token()
+    last_catalog_refresh=0.0
     while True:
         try:
-            refresh_sources()
+            now=time.monotonic()
+            if last_catalog_refresh == 0 or now - last_catalog_refresh >= CATALOG_REFRESH_SECONDS:
+                refresh_sources()
+                last_catalog_refresh=now
             run_once(token,args.dry_run)
         except Exception as err:
             print("Worker error:",str(err)[:200],flush=True)
@@ -506,7 +570,7 @@ def main():
                 raise
         if args.once:
             return
-        time.sleep(60)
+        time.sleep(args.interval)
 
 
 if __name__=="__main__":
