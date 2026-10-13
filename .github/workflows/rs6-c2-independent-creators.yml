@@ -1,0 +1,38 @@
+name: RS6 C2 independent filmmakers and night-detail acquisition QA
+on:
+  pull_request:
+    paths:
+      - 'production/videos/rs6-no-mercy-001/agent-c2/scan_independent_creators.py'
+      - '.github/workflows/rs6-c2-independent-creators.yml'
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/c2-details-textures
+    paths:
+      - 'production/videos/rs6-no-mercy-001/agent-c2/scan_independent_creators.py'
+      - '.github/workflows/rs6-c2-independent-creators.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  C2_INDEPENDENT_LIMIT: '8'
+jobs:
+  investigate-new-publishers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Acquire video verification tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install --upgrade yt-dlp curl-cffi --break-system-packages
+      - name: Inspect six independent original filmmaker/automotive creators
+        run: python production/videos/rs6-no-mercy-001/agent-c2/scan_independent_creators.py
+      - name: Publish FFprobe, SHA256 and visual evidence, but not unapproved source video
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-c2-independent-creator-qa-${{ github.run_id }}
+          path: c2_independent_qa/
+          retention-days: 10
+          if-no-files-found: warn
