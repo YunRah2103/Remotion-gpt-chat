@@ -1,0 +1,1 @@
+The Wikimedia Commons file Traffic on bridge at night.webm has a 1920x1080 original and an independently reviewed CC BY 3.0 licence. It is generic traffic, not Audi RS6. Source: https://commons.wikimedia.org/wiki/File:Traffic_on_bridge_at_night.webm. Author: Editor. Attribution is required. Actual video acquisition and visual QA remain pending.
