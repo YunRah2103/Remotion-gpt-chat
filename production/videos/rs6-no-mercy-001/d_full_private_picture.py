@@ -22,7 +22,7 @@ SHOTS=[
  ("A2_C8_RS6_HAIRPIN_REVEAL.mp4",0.08,30,"bw","hard monochrome switch at frame 84"),
  ("UHD_MATRIX_LED_FRONT_CORNER.mp4",0.03,24,"bw","real pixel-native Matrix LED macro"),
  ("RS6_C8_NATIVE4K_AUDI_GRILLE.mp4",0.15,22,"bw","chrome four-rings grille; 2f black punctuation"),
- ("B2_LOWDOWN_NIGHT_04.mp4",2.02,19,"bw_night","original-film rolling lamp accent"),
+ ("UHD_RS6_STEERING_MODE_CONTROL.mp4",0.00,19,"bw","real RS MODE steering-button action; tactile launch cue"),
  ("A2_GT_LOW_FRONT_SPEED_PASS.mp4",0.06,22,"bw","distinct white/red C8 RS6 GT; first main drop"),
  ("A2_GT_LOW_REAR_TRACK.mp4",0.09,30,"bw","genuine GT low rear track; 2f negative pulse"),
  ("B2_LOWDOWN_NIGHT_03.mp4",2.04,22,"night","real filmmaker C8 Tango Red side tracking"),
@@ -64,6 +64,7 @@ for i,(fn,st,frames,look,note) in enumerate(SHOTS):
   "bw":"hue=s=0,eq=contrast=1.23:brightness=-0.013:gamma=1.055",
   "bw_night":"hue=s=0,eq=contrast=1.15:gamma=1.34"
  }[look]
+ if fn=="B2_LOWDOWN_NIGHT_03.mp4": grade="eq=contrast=1.18:saturation=0.94:brightness=0.012:gamma=1.52"
  # Actual temporal frames. 0.25s clone extension ONLY where raw source has
  # fewer than target output frames, avoiding any half-empty encoded clip.
  filters.append(f"[{i}:v]trim=start={st:.3f},setpts=PTS-STARTPTS,"
