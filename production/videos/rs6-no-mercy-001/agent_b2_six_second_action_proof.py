@@ -19,7 +19,7 @@ SOURCES=[
  ("A2_C8_RS6_HAIRPIN_REVEAL.mp4",0.10,1.06,"ORIGINAL_4K_HAIRPIN","real grey C8 full-car bending corner"),
  ("UHD_RS6_RED_BRAKE_CALIPER.mp4",0.09,0.40,"AUDI_NATIVE4K_BRAKE","real RS6 brake macro"),
  ("UHD_RS6_REAR_LED_SIGNATURE.mp4",0.06,0.39,"AUDI_NATIVE4K_REAR_LIGHT","real rear LED accent"),
- ("B2_LOWDOWN_NIGHT_04.mp4",2.00,0.42,"B2_HEADLIGHT_MOTION","original red C8 forward-facing headlight shot"),
+ ("RS6_C8_NATIVE4K_AUDI_GRILLE.mp4",0.18,0.42,"AUDI_NATIVE4K_FOUR_RING_GRILLE","verified sharp four-ring C8 front grille, no dead frames"),
  ("UHD_RS6_OVAL_EXHAUST_REAR.mp4",0.05,0.40,"AUDI_NATIVE4K_OVAL_EXHAUST","real wide RS6 exhaust"),
  ("A2_C8_RS6_MOUNTAIN_SWEEP.mp4",0.02,0.96,"ORIGINAL_4K_MOUNTAIN","finish on complete visible RS6 moving around mountain bend")
 ]
