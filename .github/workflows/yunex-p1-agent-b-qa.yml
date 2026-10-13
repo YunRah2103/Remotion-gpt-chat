@@ -1,0 +1,38 @@
+name: YUNEX P1 Agent B private footage QA
+on:
+  push:
+    paths:
+      - '.github/workflows/yunex-p1-agent-b-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Download draft assets and validate source media
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p qa
+          for n in 66 71; do
+            if [ "$n" = 66 ]; then tag='untagged-e125cd8c04dbe53e6c9b'; expected='c11f8862f7d5d799b94a0b570fa36b1afda6034d839f451c36dc9a5d4d19d271'; else tag='untagged-9d5225b7fccba7cf1cb2'; expected='5e599084f60a0453a18de0b6e38a131a64d712aae07547e26bf7615033d08d9d'; fi
+            mkdir -p "qa/$n"
+            gh release download "$tag" --repo YunRah2103/Remotion-gpt-chat --pattern "yunex-v4-$n.mp4" --dir "qa/$n"
+            file="qa/$n/yunex-v4-$n.mp4"
+            echo "$expected  $file" | sha256sum -c -
+            ffprobe -v error -show_format -show_streams -of json "$file" > "qa/$n/ffprobe.json"
+            ffmpeg -hide_banner -v error -xerror -i "$file" -f null -
+            ffmpeg -hide_banner -v error -i "$file" -vf "fps=1/2,scale=480:-1,tile=5x3" -frames:v 1 -y "qa/$n/contact-sheet.jpg"
+            ffmpeg -hide_banner -v error -i "$file" -vf "fps=1,scale=320:-1,tile=6x5" -frames:v 1 -y "qa/$n/contact-sheet-1fps.jpg"
+            echo "PASS $n" | tee "qa/$n/validation.txt"
+          done
+      - name: Upload private footage and contact sheets
+        uses: actions/upload-artifact@v4
+        with:
+          name: yunex-p1-agent-b-verified-footage-and-sheets
+          path: qa/
+          retention-days: 14
