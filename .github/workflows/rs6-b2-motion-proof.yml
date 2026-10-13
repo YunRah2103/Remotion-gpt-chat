@@ -29,7 +29,7 @@ jobs:
           mkdir -p private-footage
           gh release download yunex-rs6-a2-hero-review-20261013 -p 'A2_C8_RS6_FAST_APPROACH.mp4' -D private-footage
           gh release download yunex-rs6-a2-hero-review-20261013 -p 'A2_C8_RS6_MOUNTAIN_SWEEP.mp4' -D private-footage
-          gh release download yunex-rs6-b2-motion-review-20261013 -p 'B2_LOWDOWN_NIGHT_03.mp4' -D private-footage
+          gh release download yunex-rs6-b2-motion-review-20261013 -p 'B2_LOWDOWN_NIGHT_04.mp4' -D private-footage
           gh release download yunex-rs6-b2-motion-review-20261013 -p 'B2_LOWDOWN_NIGHT_07.mp4' -D private-footage
           test "$(find private-footage -name '*.mp4' | wc -l)" -eq 4
       - name: Make genuine three-second cold-steel moving-car editing proof and full FFmpeg QA
