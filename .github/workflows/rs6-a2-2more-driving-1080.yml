@@ -1,0 +1,50 @@
+name: RS6 A2 two additional 1080p driving angles owner QA
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/a2-hero-cinema
+    paths:
+      - production/videos/rs6-no-mercy-001/agent-a2/a2_2more_driving_1080.py
+      - .github/workflows/rs6-a2-2more-driving-1080.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  a2-extra-real-c8-driving:
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install pillow
+      - name: Actual native Audi source acquisition, 1080 portrait renders and independent full decoder
+        run: |
+          python production/videos/rs6-no-mercy-001/agent-a2/a2_2more_driving_1080.py | tee a2-extra-summary.json
+      - name: Upload playable MP4 only to existing unpublished owner draft
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: yunex-rs6-a2-hero-review-20261013
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! compgen -G 'a2-extra-owner-review/*.mp4' >/dev/null; then
+            echo NO_PLAYABLE_C8_SOURCE_FOUND
+            exit 0
+          fi
+          test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
+          gh release upload "$TAG" a2-extra-owner-review/*.mp4 a2-extra-owner-review/*.json a2-extra-owner-review/*.txt a2-extra-owner-review/*.zip --clobber
+          test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
+      - name: QA-only contact pictures and source quality reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-a2-extra-driving-QA-${{ github.run_id }}
+          path: |
+            a2-extra-private-qa/
+            a2-extra-summary.json
+          if-no-files-found: warn
+          retention-days: 10
