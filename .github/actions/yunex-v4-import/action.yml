@@ -30,6 +30,15 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Ensure runner has FFmpeg
+      shell: bash
+      run: |
+        set -euo pipefail
+        if ! command -v ffprobe >/dev/null || ! command -v ffmpeg >/dev/null; then
+          echo 'Installing FFmpeg for media verification (one time on this runner)'
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+        fi
     - id: retrieve
       name: Recover and verify owner-authored phone result
       shell: bash
