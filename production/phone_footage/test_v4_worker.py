@@ -313,6 +313,93 @@ class WorkerV4Tests(unittest.TestCase):
         self.assertIsNone(out["mp4_url"])
         self.assertEqual(out["rights_status"], "unverified")
 
+    def test_native_4k_job_bounds_and_no_1080p_regressions(self):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("v4_agent_4k", HERE / "agent_jobs_v4.py")
+        agent = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(agent)
+        url = "https://www.youtube.com/watch?v=Exq6pB3IGyU"
+        body = agent.prepare(url, 12, 20, 2160, None, "landscape")
+        job = v4.parse_job({"body": body})
+        self.assertEqual(job["height"], 2160)
+        self.assertEqual(job["media"], "video")
+        self.assertEqual(job["max_mb"], 180)
+        self.assertGreaterEqual(v4.minimum_free(job), 2500 * v4.MIB)
+        self.assertLessEqual(v4.workspace_limit(job), 8192 * v4.MIB)
+        self.assertEqual(v4.parse_job({"body": agent.prepare(
+            url, 0, 600, 2160, None)})["max_mb"], 1536)
+        self.assertEqual(v4.parse_job({"body": agent.prepare(
+            url, 0, 20, 1080, None)})["max_mb"], 45)
+        for changes in ({"height": 4320}, {"max_mb": 1537},
+                        {"height": 1080, "max_mb": 513},
+                        {"height": 2160, "media": "audio"}):
+            payload = json.loads(body.split("\n", 1)[1])
+            payload.update(changes)
+            self.assertIsNone(v4.parse_job({
+                "body": v4.MARKER + "\n" + json.dumps(payload)}), str(changes))
+        # Previously reviewed 720p/1080p registry heights remain enforced.
+        payload = json.loads(body.split("\n", 1)[1])
+        payload["url"] = v4.CAR_VIDEO
+        self.assertIsNone(v4.parse_job({
+            "body": v4.MARKER + "\n" + json.dumps(payload)}))
+
+    def test_native_4k_full_resolution_lossless_remux_and_decode(self):
+        """Synthetic 4K frames are real video; all postprocessing is real FFmpeg."""
+        if not all(shutil.which(x) for x in ("node", "ffmpeg", "ffprobe")):
+            self.skipTest("node and FFmpeg needed")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            # Sparse 5 fps solid-color frames keep CI fast without faking
+            # dimensions or bypassing the native 4K FFmpeg output checks.
+            subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "lavfi",
+                            "-i", "color=c=green:size=3840x2160:rate=5",
+                            "-t", "3", "-c:v", "libx264", "-preset", "ultrafast",
+                            "-crf", "30", "-threads", "2", "-pix_fmt", "yuv420p",
+                            str(root / "source.mp4")], check=True, timeout=100)
+            real_watched = v4.watched
+            received_commands = []
+            def fake_download(command, timeout, folder, disk_budget=None):
+                received_commands.append(command)
+                if "-m" in command and "yt_dlp" in command:
+                    self.assertIn("2160", " ".join(command))
+                    self.assertNotIn("--force-keyframes-at-cuts", command)
+                    return
+                self.assertIn("-c:v", command)
+                self.assertEqual(command[command.index("-c:v") + 1], "copy")
+                return real_watched(command, timeout, folder,
+                                    disk_budget or v4.MAX_WORKSPACE_BYTES)
+            job = {"url": "https://www.youtube.com/watch?v=Exq6pB3IGyU",
+                   "start": 0, "duration": 3, "height": 2160,
+                   "max_mb": 180, "orientation": "landscape", "media": "video"}
+            with mock.patch.object(v4, "watched", side_effect=fake_download):
+                movie, meta = v4.download_proof(root, job)
+            self.assertEqual((meta["width"], meta["height"]), (3840, 2160))
+            self.assertEqual(meta["source_codec_preserved"], True)
+            self.assertEqual(meta["native_4k"], True)
+            self.assertEqual(meta["codec"], "h264")
+            self.assertEqual(meta["full_decode"], "PASS")
+            self.assertEqual(movie.suffix, ".mp4")
+            self.assertLess(movie.stat().st_size, 180 * v4.MIB)
+            self.assertEqual(len(received_commands), 2)
+
+    def test_fake_1080p_source_rejected_for_2160p(self):
+        if not all(shutil.which(x) for x in ("node", "ffmpeg", "ffprobe")):
+            self.skipTest("node and FFmpeg needed")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "lavfi",
+                            "-i", "color=c=blue:size=1920x1080:rate=5",
+                            "-t", "3", "-c:v", "libx264", "-preset", "ultrafast",
+                            "-crf", "30", "-threads", "2", "-pix_fmt", "yuv420p",
+                            str(root / "source.mp4")], check=True, timeout=75)
+            job = {"url": "https://www.youtube.com/watch?v=Exq6pB3IGyU",
+                   "start": 0, "duration": 3, "height": 2160,
+                   "max_mb": 180, "orientation": "landscape", "media": "video"}
+            with mock.patch.object(v4, "watched") as watcher:
+                with self.assertRaisesRegex(RuntimeError, "not native 4K"):
+                    v4.download_proof(root, job)
+                self.assertEqual(watcher.call_count, 1)
+
     def test_stream_upload_uses_file_handle_not_read_bytes(self):
         from unittest import mock
         from io import BytesIO
