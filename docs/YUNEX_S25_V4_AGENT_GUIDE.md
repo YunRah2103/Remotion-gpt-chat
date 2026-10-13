@@ -1,5 +1,8 @@
 # YUNEX — S25 V4 Phone Worker: Agent Guide
 
+**New agent? Read [START HERE: 60-second agent quick-start](YUNEX_V4_NEW_AGENT_START_HERE.md) first.** This file is the detailed protocol reference, not an instruction to rebuild the worker or ask the user for files.
+
+
 **Repository:** [`YunRah2103/Remotion-gpt-chat`](https://github.com/YunRah2103/Remotion-gpt-chat) (never use the obsolete `yunus-video-lab` repository).
 
 **Worker implementation branch:** [`experiments/s25-footage-worker-v4-10min-20261012`](https://github.com/YunRah2103/Remotion-gpt-chat/tree/experiments/s25-footage-worker-v4-10min-20261012/production/phone_footage).
@@ -27,7 +30,7 @@
    ```
 
    Agents using a non-owner GitHub account cannot make accepted jobs by copying this payload. Send a ready-to-post issue for the owner instead. **Do not impersonate the issue author or bypass the queue control.**
-5. **Phone processing:** The Galaxy S25 already has V4 installed, but to activate this new no-registration behaviour the owner must **update the worker once** with the V4 installer **after stopping the old loop**. The old Python process cannot hot-reload code. If `~/yunex-v4 --loop` is active after updating, it polls every **120 seconds** by default (use `--interval 60` for faster checks). Completed jobs are cached and idle output is throttled to save battery and GitHub API requests. Creating an issue does not remotely start Termux. Agents must not ask for the phone's GitHub token or duplicate per-job installations.
+5. **Phone processing:** The Galaxy S25 **already has V4 installed and has successfully downloaded unregistered RS6 video (#56)**. Do not reflexively request another installation, token, or user upload. The **latest repo revision** supports quiet 120-second polling, an optional `--media audio` mode, caching and safer updates; **those specific improvements apply on the phone only after its owner updates it**. Do not assume that the currently running Termux process is the latest version. If it is running, it handles jobs sequentially; otherwise, the owner may start `~/yunex-v4 --loop` when an actual job is queued. Creating an issue cannot remotely start Termux. Never ask the user to keep the phone awake for an unqueued job.
 6. **Wait for a real result** on the job issue:
    - `YUNEX_PHONE_DONE_V4`: verified H.264 MP4 **or** AAC M4A uploaded, manifest/checksum, full FFmpeg decode PASS.
    - `YUNEX_PHONE_FAILED_V4`: actual phone-side error; stop retrying blindly and switch to another source or direct MP4.
@@ -61,7 +64,7 @@ You may inspect the owner-authored issue comment, or run:
 python production/phone_footage/agent_jobs_v4.py result --issue ISSUE_NUMBER
 ```
 
-Then verify **actual playable bytes**, full FFmpeg decode, FFprobe codec, duration and SHA256. For videos also inspect the actual moving frames and dimensions; for audio listen to the required acceleration sections. Handoff to production [RS6 issue #44](https://github.com/YunRah2103/Remotion-gpt-chat/issues/44) with job number, exact source/timecodes, acquired asset location, result metadata and visual QA verdict. A metadata report or an issue by itself is **not** the MP4.
+Then verify **actual playable bytes**, full FFmpeg decode, FFprobe codec, duration and SHA256. For videos, inspect moving frames and dimensions; for audio, listen to the actual target passages. Handoff to the **relevant project tracking issue** (for the original RS6 production, [#44](https://github.com/YunRah2103/Remotion-gpt-chat/issues/44)) with issue number, source/timecodes, authenticated asset location, metadata and visual/audio QA. Do **not** assume every future YUNEX project is RS6 #44. Metadata or a queue issue alone is **not** a delivered MP4 or M4A.
 
 ## Limits and evidence
 
@@ -69,7 +72,7 @@ Then verify **actual playable bytes**, full FFmpeg decode, FFprobe codec, durati
 - Start `0–21600s`, clip length `2–600s` (ten-minute maximum), `720` or `1080` vertical resolution limit for landscape (width limit for portrait); no native 4K; 512 MiB output cap and phone free-space safeguards.
 - **One phone job at a time**. Phone can stop to save battery; `Ctrl+C` stops the loop, `~/yunex-v4 --loop` starts it after installation. Polling defaults to two minutes, configurable with `--interval 60..900`. A running old-version process **must be stopped before upgrading**; the installer now refuses hot-update and retains a rollback copy.
 - [**Actual S25 V4 PASS #55**](https://github.com/YunRah2103/Remotion-gpt-chat/issues/55): approved **non-RS6** snowy-car YouTube clip, **1920×1080**, 8.008 seconds, 9,179,358 bytes, full-decoded H.264 MP4: [playable file](https://github.com/YunRah2103/Remotion-gpt-chat/releases/download/yunex-phone-v4-55/yunex-v4-55.mp4).
-- [**Actual S25 V4 PASS #56**](https://github.com/YunRah2103/Remotion-gpt-chat/issues/56): *unregistered* AutoTopNL RS6 recording successfully downloaded on the phone: 60 seconds, 1920×1080, 15,340,800 bytes, full decode PASS and private draft media asset #637770966. It **proved** unregistered RS6 footage acquisition on the phone. The **new audio-only mode** has passed offline encode/decode QA; phone-side audio-only download still needs live validation.
+- [**Actual S25 V4 PASS #56**](https://github.com/YunRah2103/Remotion-gpt-chat/issues/56): *unregistered* AutoTopNL RS6 recording successfully downloaded on the phone: 60 seconds, 1920×1080, 15,340,800 bytes, full decode PASS and private draft media asset #637770966. It **proved** unregistered RS6 footage acquisition on the phone. The **new audio-only mode** has passed offline encode/decode QA; phone-side audio-only download still needs live validation. This distinction must remain in new-agent status reports.
 - **Rights are not assumed:** a successful private technical download is not permission to publicly publish the source or a finished edit using it.
 
 **Read** the [detailed V4 README](https://github.com/YunRah2103/Remotion-gpt-chat/blob/experiments/s25-footage-worker-v4-10min-20261012/production/phone_footage/README_V4.md) and actual worker source for error handling. The guide does not authorize publishing someone else's content.
