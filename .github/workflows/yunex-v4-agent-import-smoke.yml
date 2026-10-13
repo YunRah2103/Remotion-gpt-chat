@@ -19,8 +19,7 @@ jobs:
         run: |
           command -v gh
           command -v jq
-          command -v ffprobe
-          command -v ffmpeg
+          # The composite action installs FFmpeg when absent.
       - name: Import owner-verified S25 V4 job 56
         id: phone
         uses: ./.github/actions/yunex-v4-import
