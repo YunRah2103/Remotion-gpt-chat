@@ -1,0 +1,55 @@
+name: RS6 A2 THE-LOWDOWN direct source night edit proof
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/a2-hero-cinema
+    paths:
+      - production/videos/rs6-no-mercy-001/agent-a2/a2_lowdown_night_motion_proof.py
+      - .github/workflows/rs6-a2-lowdown-night-proof.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  rs6-night-source-short-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: automotive-edits/rs6-no-mercy-001/b2-youtube-driving
+          path: b2-seed
+      - name: Install original direct media tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install --disable-pip-version-check requests pillow
+      - name: Download real original RS6 filmmaker MP4 via direct source, render 1080p preview, fully decode and hash
+        run: |
+          python production/videos/rs6-no-mercy-001/agent-a2/a2_lowdown_night_motion_proof.py | tee a2-night-proof-summary.json
+      - name: Add playable media only to existing unpublished A2 owner draft
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: yunex-rs6-a2-hero-review-20261013
+        shell: bash
+        run: |
+          set -euo pipefail
+          if test ! -f a2-lowdown-proof/YUNEX_A2_LOWDOWN_4S_NIGHT_MOTION_PROOF.mp4; then
+            echo "No verified night-edit media; no media upload"
+            exit 0
+          fi
+          test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
+          gh release upload "$TAG" a2-lowdown-proof/*.mp4 a2-lowdown-proof/*.json a2-lowdown-proof/*.txt a2-lowdown-proof/*.zip --clobber
+          test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
+          gh release view "$TAG" --json isDraft,assets --jq '{draft:.isDraft,assets:[.assets[].name]}'
+      - name: Publish source QA contact images and technical metadata only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-a2-lowdown-actual-night-QA-${{ github.run_id }}
+          path: |
+            a2-lowdown-qa/
+            a2-night-proof-summary.json
+          if-no-files-found: warn
+          retention-days: 12
