@@ -1,0 +1,45 @@
+name: YUNEX P1 C mechanical private review
+on:
+  push:
+    paths:
+      - '.github/workflows/yunex-p1-c-mechanical-review.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Install ffmpeg and GitHub CLI
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Retrieve private draft P1 clips and verify
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: YunRah2103/Remotion-gpt-chat
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p review
+          for id in 62 63 65; do
+            mkdir -p "review/$id"
+            gh release download "yunex-phone-v4-$id" --repo "$GH_REPO" --pattern "yunex-v4-$id.mp4" --dir "review/$id"
+            f="review/$id/yunex-v4-$id.mp4"
+            test -s "$f"
+            ffprobe -v error -show_entries format=duration,size:stream=codec_name,width,height,r_frame_rate -of json "$f" > "review/$id/ffprobe.json"
+            ffmpeg -v error -xerror -i "$f" -f null -
+            sha256sum "$f" > "review/$id/SHA256SUMS.txt"
+            ffmpeg -y -v error -i "$f" -vf "fps=1,scale=480:-1,tile=4x3" -frames:v 1 "review/$id/contact.jpg"
+            ffmpeg -y -v error -ss 2 -i "$f" -frames:v 1 "review/$id/frame-02s.jpg"
+            ffmpeg -y -v error -ss 6 -i "$f" -frames:v 1 "review/$id/frame-06s.jpg"
+            ffmpeg -y -v error -ss 10 -i "$f" -frames:v 1 "review/$id/frame-10s.jpg"
+            echo "PASS $id"
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: yunex-p1-c-private-review
+          path: review/
+          retention-days: 7
