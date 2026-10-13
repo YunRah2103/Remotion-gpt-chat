@@ -10,6 +10,7 @@ sources=[
 ("pixabay_barracuda","https://pixabay.com/sound-effects/search/motor%20v8/"),
 ("pixabay_v8_flyby","https://pixabay.com/sound-effects/film-special-effects-v8-supercar-fly-by-103237/"),
 ("freesound_maserati_real_v8","https://freesound.org/people/myeclecticself/sounds/585214/"),
+("freesound_maserati_v8_launch","https://freesound.org/people/myeclecticself/sounds/585215/"),
 ("bigsoundbank_aston","https://bigsoundbank.com/acceleration-aston-martin-s0600.html"),
 ]
 sess=requests.Session()
