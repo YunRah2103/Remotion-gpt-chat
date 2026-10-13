@@ -13,15 +13,15 @@ INPUT=Path("private_sources")
 OUT=Path("b2-action-proof");OUT.mkdir(exist_ok=True)
 VIDEO=OUT/"YUNEX_RS6_B2_SIX_SECOND_ACTION_PROOF.mp4"
 SOURCES=[
- ("B2_LOWDOWN_NIGHT_07.mp4",1.15,1.03,"NIGHT_REVEAL_RED","moving camera, strong red front 3/4"),
- ("A2_C8_RS6_FAST_APPROACH.mp4",0.06,1.17,"ORIGINAL_4K_FAST_ROLL","grey original Audi real forward C8 motion"),
- ("UHD_MATRIX_LED_FRONT_CORNER.mp4",0.08,0.42,"AUDI_NATIVE4K_LED","sharp component flash"),
+ ("A2_C8_RS6_FAST_APPROACH.mp4",0.06,1.17,"ORIGINAL_4K_FAST_ROLL","begin on real moving C8, car instantly legible"),
+ ("UHD_MATRIX_LED_FRONT_CORNER.mp4",0.08,0.42,"AUDI_NATIVE4K_LED","sharp close-up flash"),
+ ("B2_LOWDOWN_NIGHT_07.mp4",1.45,0.86,"NIGHT_REVEAL_RED","premium red C8 night front three-quarter, no initial dead taillight"),
  ("A2_C8_RS6_HAIRPIN_REVEAL.mp4",0.10,1.06,"ORIGINAL_4K_HAIRPIN","real grey C8 full-car bending corner"),
- ("UHD_RS6_RED_BRAKE_CALIPER.mp4",0.09,0.40,"AUDI_NATIVE4K_BRAKE","real moving visual brake macro"),
- ("A2_C8_RS6_MOUNTAIN_SWEEP.mp4",0.02,0.96,"ORIGINAL_4K_MOUNTAIN","grey car driving forward in mountain bend"),
- ("UHD_RS6_REAR_LED_SIGNATURE.mp4",0.06,0.39,"AUDI_NATIVE4K_REAR_LIGHT","rear RS6 light"),
- ("UHD_RS6_OVAL_EXHAUST_REAR.mp4",0.05,0.40,"AUDI_NATIVE4K_OVAL_EXHAUST","full RS6 oval exhaust"),
- ("B2_LOWDOWN_NIGHT_07.mp4",2.08,0.62,"NIGHT_REPRISE_RED","final red RS6 front 3/4 night car")
+ ("UHD_RS6_RED_BRAKE_CALIPER.mp4",0.09,0.40,"AUDI_NATIVE4K_BRAKE","real RS6 brake macro"),
+ ("UHD_RS6_REAR_LED_SIGNATURE.mp4",0.06,0.39,"AUDI_NATIVE4K_REAR_LIGHT","real rear LED accent"),
+ ("B2_LOWDOWN_NIGHT_04.mp4",2.00,0.42,"B2_HEADLIGHT_MOTION","original red C8 forward-facing headlight shot"),
+ ("UHD_RS6_OVAL_EXHAUST_REAR.mp4",0.05,0.40,"AUDI_NATIVE4K_OVAL_EXHAUST","real wide RS6 exhaust"),
+ ("A2_C8_RS6_MOUNTAIN_SWEEP.mp4",0.02,0.96,"ORIGINAL_4K_MOUNTAIN","finish on complete visible RS6 moving around mountain bend")
 ]
 def run(cmd,timeout=100):
     p=subprocess.run(cmd,capture_output=True,text=True,timeout=timeout)
