@@ -25,6 +25,13 @@ jobs:
           echo "script_exit=$?" >> "$GITHUB_STEP_SUMMARY"
           cat a2_audit/report.json >> "$GITHUB_STEP_SUMMARY" || true
           exit 0
+      - name: Inspect official 2160p Adobe originals and attempt a real 1.5s technical acquisition
+        shell: bash
+        run: |
+          set +e
+          python production/videos/rs6-no-mercy-001/agent-a2/a2_aem_4k.py > a2-uhd-stdout.json 2> a2-uhd-error.txt
+          echo "aem_script_exit=$?" >> "$GITHUB_STEP_SUMMARY"
+          exit 0
       - name: Save source rights and forensic metadata ONLY (no press video or frames)
         if: always()
         uses: actions/upload-artifact@v4
@@ -33,6 +40,9 @@ jobs:
           path: |
             a2_audit/report.json
             a2_audit/RIGHTS_AND_LIMITS.txt
+            a2_uhd_audit/report.json
+            a2-uhd-stdout.json
+            a2-uhd-error.txt
             a2-stdout.json
             a2-error.txt
           if-no-files-found: warn
