@@ -1,0 +1,65 @@
+name: YUNEX RS6 V8 final private render
+on:
+  push:
+    branches: [automotive-edits/rs6-landscape-loop/e-real-recorded-v8]
+    paths: [.github/workflows/yunex-rs6-final-render.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg unzip
+      - name: Acquire genuine AutoTopNL audio and approved edit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          gh release download yunex-phone-v4-56 --repo "$GITHUB_REPOSITORY" --pattern yunex-v4-56.mp4 --dir work || gh api -H 'Accept: application/octet-stream' /repos/YunRah2103/Remotion-gpt-chat/releases/assets/637770966 > work/yunex-v4-56.mp4
+          test "$(stat -c%s work/yunex-v4-56.mp4)" = 15340800
+          ffprobe -v error -show_entries stream=index,codec_type,codec_name -of json work/yunex-v4-56.mp4 | tee work/source-probe.json
+          ffprobe -v error -select_streams a -show_entries stream=index -of csv=p=0 work/yunex-v4-56.mp4 | grep -q .
+          echo 'Searching private releases for exact approved edit'
+          for id in $(gh api --paginate /repos/"$GITHUB_REPOSITORY"/releases --jq '.[].id'); do
+            for asset in $(gh api /repos/"$GITHUB_REPOSITORY"/releases/"$id"/assets --jq '.[] | select(.name=="YUNEX_RS6_13S_CINEMATIC_VISUAL_POLISH.mp4") | .id'); do
+              gh api -H 'Accept: application/octet-stream' /repos/"$GITHUB_REPOSITORY"/releases/assets/"$asset" > work/approved.mp4
+              break 2
+            done
+          done
+          if [ ! -s work/approved.mp4 ]; then
+            echo 'Searching Actions artifacts for approved edit'
+            gh api --paginate /repos/"$GITHUB_REPOSITORY"/actions/artifacts --jq '.artifacts[] | select(.expired==false) | [.id,.name] | @tsv' > work/artifact-index.tsv
+            while IFS=$'\t' read -r id name; do
+              case "$name" in *RS6*|*rs6*) gh api /repos/"$GITHUB_REPOSITORY"/actions/artifacts/"$id"/zip > work/candidate.zip || continue
+                unzip -p work/candidate.zip YUNEX_RS6_13S_CINEMATIC_VISUAL_POLISH.mp4 > work/approved.mp4 2>/dev/null || true
+                if [ -s work/approved.mp4 ]; then break; fi ;;
+              esac
+            done < work/artifact-index.tsv
+          fi
+          if [ ! -s work/approved.mp4 ]; then
+            echo 'ERROR: Exact approved picture master not present in repository releases or Actions artifacts. No substitution allowed.'
+            exit 12
+          fi
+          ffprobe -v error -show_entries format=duration -of default=nw=1 work/approved.mp4
+      - name: Mix authentic acceleration into picture-locked master
+        run: |
+          set -euo pipefail
+          ffmpeg -y -hide_banner -loglevel error -ss 7 -i work/yunex-v4-56.mp4 -t 13.166667 -vn -ar 48000 -ac 2 -c:a pcm_s16le work/genuine-v8.wav
+          ffmpeg -y -hide_banner -loglevel error -i work/approved.mp4 -i work/genuine-v8.wav -filter_complex '[0:a]volume=0.75[music];[1:a]highpass=f=45,volume=1.4[engine];[music][engine]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.95[out]' -map 0:v:0 -map '[out]' -c:v copy -c:a aac -b:a 256k -t 13.166667 -movflags +faststart work/YUNEX_RS6_13S_AUTOTOPNL_V8_PRIVATE_FINAL.mp4
+          ffmpeg -v error -i work/YUNEX_RS6_13S_AUTOTOPNL_V8_PRIVATE_FINAL.mp4 -f null -
+          ffprobe -v error -show_streams -show_format -of json work/YUNEX_RS6_13S_AUTOTOPNL_V8_PRIVATE_FINAL.mp4 > work/final-probe.json
+      - name: Upload private review artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-RS6-AutoTopNL-V8-PRIVATE-REVIEW
+          path: |
+            work/YUNEX_RS6_13S_AUTOTOPNL_V8_PRIVATE_FINAL.mp4
+            work/source-probe.json
+            work/final-probe.json
+          retention-days: 7
