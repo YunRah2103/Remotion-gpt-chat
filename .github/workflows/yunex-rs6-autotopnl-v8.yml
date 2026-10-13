@@ -31,15 +31,19 @@ jobs:
           set -euo pipefail
           ffprobe -v error -show_streams -show_format -of json work/yunex-v4-56.mp4 > work/source-ffprobe.json
           ffprobe -v error -select_streams a -show_entries stream=codec_name,sample_rate,channels -of json work/yunex-v4-56.mp4 | tee work/audio-probe.json
+          ffmpeg -hide_banner -loglevel error -i work/yunex-v4-56.mp4 -map 0:a:0 -vn -c:a copy work/autotopnl-rs6-original-audio.m4a
+          ffprobe -v error -show_entries stream=codec_name,sample_rate,channels -of json work/autotopnl-rs6-original-audio.m4a > work/original-audio-stream.json
           ffmpeg -hide_banner -loglevel error -i work/yunex-v4-56.mp4 -vn -ar 48000 -ac 2 -c:a pcm_s16le work/authentic-rs6-v8.wav
           ffmpeg -hide_banner -loglevel error -i work/yunex-v4-56.mp4 -f null -
           sha256sum work/yunex-v4-56.mp4 > work/source-sha256.txt
-      - name: Keep private diagnostics (do not upload source media)
+      - name: Upload temporary private audio reference and diagnostics
         uses: actions/upload-artifact@v4
         with:
-          name: rs6-authentic-v8-source-diagnostics
+          name: rs6-autotopnl-authentic-audio-private
           path: |
+            work/autotopnl-rs6-original-audio.m4a
+            work/original-audio-stream.json
             work/source-ffprobe.json
             work/audio-probe.json
             work/source-sha256.txt
-          retention-days: 7
+          retention-days: 1
