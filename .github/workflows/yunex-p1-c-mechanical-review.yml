@@ -23,7 +23,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p review
-          for id in 62 63 65; do
+          for id in 61 62 63 65; do
             mkdir -p "review/$id"
             gh release download "yunex-phone-v4-$id" --repo "$GH_REPO" --pattern "yunex-v4-$id.mp4" --dir "review/$id"
             f="review/$id/yunex-v4-$id.mp4"
