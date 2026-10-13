@@ -1,0 +1,35 @@
+name: YUNEX RS6 B2 Mythos Black direct official-footage scout
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/b2-youtube-driving
+    paths:
+      - .github/workflows/rs6-b2-mythos-black-source-qa.yml
+      - production/videos/rs6-no-mercy-001/agent_b2_mythos_black_original.py
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual-native-source-footage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFprobe/FFmpeg image QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q --upgrade requests pillow
+      - name: Attempt actual public Audi C8 RS6 Performance 69MB original; temporal sample 18 real frames
+        timeout-minutes: 13
+        run: python production/videos/rs6-no-mercy-001/agent_b2_mythos_black_original.py | tee b2-mythos-proof.log
+      - name: Upload source evidence ONLY (no media public redistribution)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-b2-mythos-black-18-source-frames
+          path: |
+            b2-mythos-proof.log
+            b2-mythos-technical-qa/
+          retention-days: 14
+          if-no-files-found: warn
