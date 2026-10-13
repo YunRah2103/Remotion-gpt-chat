@@ -1,4 +1,5 @@
 name: P1 Agent A draft footage QA
+run-name: Agent A private MP4 and contact sheet validation
 on:
   push:
     paths:
@@ -44,3 +45,4 @@ jobs:
           name: p1-agent-a-private-qa
           path: output/
           retention-days: 7
+          if-no-files-found: error
