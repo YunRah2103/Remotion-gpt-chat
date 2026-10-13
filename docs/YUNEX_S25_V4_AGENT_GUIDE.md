@@ -17,6 +17,8 @@
    python production/phone_footage/agent_jobs_v4.py prepare --url 'https://www.youtube.com/watch?v=a38sqC7k2iw' --start 20 --duration 12 --height 1080 --orientation landscape
    ```
 
+   For **soundtrack-only requests** (genuine exhaust/V8 acceleration, soundtrack references, voiceover), use `--media audio` to get a verified **48 kHz stereo AAC .m4a** instead of wasting battery and mobile data on a 1080p video. For normal video clips omit `--media` or set `--media video`.
+
    The CLI **prints a two-line issue body only**. It does not create an issue or download media. Use a GitHub connector authenticated **as `YunRah2103`** to create an **open issue** with title starting `[YUNEX PHONE JOB]` and body exactly as generated:
 
    ```text
@@ -25,26 +27,33 @@
    ```
 
    Agents using a non-owner GitHub account cannot make accepted jobs by copying this payload. Send a ready-to-post issue for the owner instead. **Do not impersonate the issue author or bypass the queue control.**
-5. **Phone processing:** The Galaxy S25 already has V4 installed, but to activate this new no-registration behaviour the owner must **update the worker once** with the V4 installer **after stopping the old loop**. The old Python process cannot hot-reload code. If `~/yunex-v4 --loop` is active after updating, it polls approximately every 60 seconds. Creating an issue does not remotely start Termux. Agents must not ask for the phone's GitHub token or duplicate per-job installations.
+5. **Phone processing:** The Galaxy S25 already has V4 installed, but to activate this new no-registration behaviour the owner must **update the worker once** with the V4 installer **after stopping the old loop**. The old Python process cannot hot-reload code. If `~/yunex-v4 --loop` is active after updating, it polls every **120 seconds** by default (use `--interval 60` for faster checks). Completed jobs are cached and idle output is throttled to save battery and GitHub API requests. Creating an issue does not remotely start Termux. Agents must not ask for the phone's GitHub token or duplicate per-job installations.
 6. **Wait for a real result** on the job issue:
-   - `YUNEX_PHONE_DONE_V4`: verified H.264 MP4 uploaded, manifest/checksum, full FFmpeg decode PASS.
+   - `YUNEX_PHONE_DONE_V4`: verified H.264 MP4 **or** AAC M4A uploaded, manifest/checksum, full FFmpeg decode PASS.
    - `YUNEX_PHONE_FAILED_V4`: actual phone-side error; stop retrying blindly and switch to another source or direct MP4.
-   - `No pending approved V4 jobs` on the screen is the **legacy loop's idle text**, not a failed download. The newer worker prints `No pending approved V4 jobs` too, but accepts unlisted URLs once updated.
+   - `No pending approved V4 jobs` is **older V4 idle output**. The optimised worker prints `V4 idle: no pending jobs` at most every ten minutes. Neither means a failed download.
 
 ## Private vs public delivery (crucial)
 
 | Source | Destination | Completion metadata | How agents access |
 |---|---|---|---|
-| Already in the verified CC source catalog | **Public GitHub prerelease** | `release_visibility: public_prerelease`, `mp4_url`, `license`, `sha256` | MP4 URL directly |
-| Any other canonical YouTube video | **Owner-only draft Release** | `release_visibility: draft`, `rights_status: unverified`, `release_id`, `mp4_asset_id`, `mp4_asset_api_url`, `sha256`, `mp4_url: null` | Authenticated GitHub repository access; **not a public link** |
+| Already in the verified CC source catalog | **Public GitHub prerelease** | `release_visibility: public_prerelease`, `mp4_url` or `audio_url`, `license`, `sha256` | Direct public media URL |
+| Any other canonical YouTube video | **Owner-only draft Release** | `release_visibility: draft`, `rights_status: unverified`, `release_id`, `asset_filename`, `asset_id`, `asset_api_url`, `sha256`; public media URL is null | Authenticated GitHub Actions with draft access; **not a public link** |
 
-To retrieve an unverified draft MP4, the agent's GitHub Actions step can use an appropriately permissioned `GH_TOKEN`:
+**Confirmed GitHub Actions draft access fix:** `contents: read` caused HTTP **403 Resource not accessible by integration** for [AutoTopNL private draft #56](https://github.com/YunRah2103/Remotion-gpt-chat/issues/56). `contents: write` with GitHub Actions' **built-in `github.token`** succeeded in [run #38441894486](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38441894486). This does **not** mean the media must be published. Only grant `contents: write` to workflows that actually need private draft access.
 
-```bash
-gh release download yunex-phone-v4-ISSUE_NUMBER --repo YunRah2103/Remotion-gpt-chat --pattern 'yunex-v4-ISSUE_NUMBER.mp4' --dir .
+```yaml
+permissions:
+  contents: write
 ```
 
-Replace `ISSUE_NUMBER` in both positions. Do not quote or expose access tokens in issues or logs. If your connector cannot access a draft's binary, use an authorized GitHub Actions step. **Never make the draft public merely for easier downloading.**
+Within that Actions job, set `GH_TOKEN: ${{ github.token }}` and run:
+
+```bash
+gh release download yunex-phone-v4-ISSUE_NUMBER --repo YunRah2103/Remotion-gpt-chat --pattern 'yunex-v4-ISSUE_NUMBER.*' --dir .
+```
+
+Replace `ISSUE_NUMBER` in the tag and pattern. Prefer the exact `asset_filename` field from the completed issue result: video `.mp4`, or audio-only `.m4a`. Verify the SHA256 and use it within the authorised edit. **Do not ask the user to attach an already-acquired S25 recording.** If a connector cannot return draft binary bytes, use this proven Actions route. Never make the draft public merely for convenience.
 
 You may inspect the owner-authored issue comment, or run:
 
@@ -52,15 +61,15 @@ You may inspect the owner-authored issue comment, or run:
 python production/phone_footage/agent_jobs_v4.py result --issue ISSUE_NUMBER
 ```
 
-Then verify **actual playable bytes**, source framing, full FFmpeg decode, FFprobe dimensions, duration and SHA256. Handoff to production [RS6 issue #44](https://github.com/YunRah2103/Remotion-gpt-chat/issues/44) with job number, exact source/timecodes, acquired asset location, result metadata and visual QA verdict. A metadata report or an issue by itself is **not** the MP4.
+Then verify **actual playable bytes**, full FFmpeg decode, FFprobe codec, duration and SHA256. For videos also inspect the actual moving frames and dimensions; for audio listen to the required acceleration sections. Handoff to production [RS6 issue #44](https://github.com/YunRah2103/Remotion-gpt-chat/issues/44) with job number, exact source/timecodes, acquired asset location, result metadata and visual QA verdict. A metadata report or an issue by itself is **not** the MP4.
 
 ## Limits and evidence
 
 - Owner-authored GitHub issue only; strictly canonical YouTube watch URL. No licence-registration prerequisite for private draft review.
 - Start `0–21600s`, clip length `2–600s` (ten-minute maximum), `720` or `1080` vertical resolution limit for landscape (width limit for portrait); no native 4K; 512 MiB output cap and phone free-space safeguards.
-- **One phone job at a time**. Phone can stop to save battery; `Ctrl+C` stops the loop, `~/yunex-v4 --loop` starts it after installation.
+- **One phone job at a time**. Phone can stop to save battery; `Ctrl+C` stops the loop, `~/yunex-v4 --loop` starts it after installation. Polling defaults to two minutes, configurable with `--interval 60..900`. A running old-version process **must be stopped before upgrading**; the installer now refuses hot-update and retains a rollback copy.
 - [**Actual S25 V4 PASS #55**](https://github.com/YunRah2103/Remotion-gpt-chat/issues/55): approved **non-RS6** snowy-car YouTube clip, **1920×1080**, 8.008 seconds, 9,179,358 bytes, full-decoded H.264 MP4: [playable file](https://github.com/YunRah2103/Remotion-gpt-chat/releases/download/yunex-phone-v4-55/yunex-v4-55.mp4).
-- The two *specific* RS6 YouTube URLs previously failed **old registry validation**, not phone download. The revised unregistered source workflow **still requires a real device-side test** before anyone can claim RS6 YouTube acquisition worked.
+- [**Actual S25 V4 PASS #56**](https://github.com/YunRah2103/Remotion-gpt-chat/issues/56): *unregistered* AutoTopNL RS6 recording successfully downloaded on the phone: 60 seconds, 1920×1080, 15,340,800 bytes, full decode PASS and private draft media asset #637770966. It **proved** unregistered RS6 footage acquisition on the phone. The **new audio-only mode** has passed offline encode/decode QA; phone-side audio-only download still needs live validation.
 - **Rights are not assumed:** a successful private technical download is not permission to publicly publish the source or a finished edit using it.
 
 **Read** the [detailed V4 README](https://github.com/YunRah2103/Remotion-gpt-chat/blob/experiments/s25-footage-worker-v4-10min-20261012/production/phone_footage/README_V4.md) and actual worker source for error handling. The guide does not authorize publishing someone else's content.
