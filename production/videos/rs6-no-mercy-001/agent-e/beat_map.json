@@ -1,0 +1,162 @@
+{
+  "project": "YUNEX RS6 // NO MERCY 001",
+  "analysis_status": "Measured REAL reference audio; SHA256 verified",
+  "source": {
+    "original_filename": "YUNEX_RS6_Reference_Audio.m4a",
+    "source_sha256": "5ea5b0250728557eca23ea4123665ba01e5bc4ab3eba4689e7bfefc7b0e6e55b",
+    "container_duration_s": 13.165011,
+    "decoded_duration_s": 13.16712,
+    "sample_rate": 44100,
+    "publication_rights": "unconfirmed; do not distribute source track"
+  },
+  "analysis": {
+    "method": "44.1kHz PCM decode; log-positive spectral flux via 1024-point STFT, hop 256; peaks with frame-level RMS; least-squares periodic fit",
+    "measured_bpm": 122.0525756,
+    "quarter_seconds": 0.49159143,
+    "anchor_seconds": 5.25858571,
+    "mean_beat_fit_residual_ms": 1.698
+  },
+  "output": {
+    "fps": 30,
+    "frame_count": 395,
+    "last_frame": 394,
+    "duration_s": 13.166666666666666,
+    "aac_hz": 48000,
+    "channels": 2
+  },
+  "onsets": [
+    {
+      "seconds": 0,
+      "nearest_frame": 0,
+      "type": "open",
+      "note": "cold moving-car reveal"
+    },
+    {
+      "seconds": 2.839,
+      "nearest_frame": 85,
+      "type": "pickup",
+      "note": "switch into hard cuts"
+    },
+    {
+      "seconds": 3.988,
+      "nearest_frame": 120,
+      "type": "accent",
+      "note": "brief one-frame inversion"
+    },
+    {
+      "seconds": 4.768,
+      "nearest_frame": 143,
+      "type": "pre_drop",
+      "note": "short black anticipation (no audio silence)"
+    },
+    {
+      "seconds": 5.259,
+      "nearest_frame": 158,
+      "type": "DROP_A",
+      "note": "main moving-car impact"
+    },
+    {
+      "seconds": 5.997,
+      "nearest_frame": 180,
+      "type": "punch",
+      "note": "kick on moving car"
+    },
+    {
+      "seconds": 6.24,
+      "nearest_frame": 187,
+      "type": "punch",
+      "note": "wheel transition"
+    },
+    {
+      "seconds": 6.734,
+      "nearest_frame": 202,
+      "type": "accent",
+      "note": "one-frame negative pulse"
+    },
+    {
+      "seconds": 7.715,
+      "nearest_frame": 231,
+      "type": "gap",
+      "note": "hard section change"
+    },
+    {
+      "seconds": 8.208,
+      "nearest_frame": 246,
+      "type": "return",
+      "note": "full-car reset"
+    },
+    {
+      "seconds": 8.458,
+      "nearest_frame": 254,
+      "type": "accent",
+      "note": "LED/body cut"
+    },
+    {
+      "seconds": 9.189,
+      "nearest_frame": 276,
+      "type": "DROP_B",
+      "note": "second/strongest moving car action"
+    },
+    {
+      "seconds": 9.927,
+      "nearest_frame": 298,
+      "type": "punch",
+      "note": "ramp speed impact"
+    },
+    {
+      "seconds": 10.176,
+      "nearest_frame": 305,
+      "type": "punch",
+      "note": "low-angle roll"
+    },
+    {
+      "seconds": 10.664,
+      "nearest_frame": 320,
+      "type": "transition",
+      "note": "motion-matched cut"
+    },
+    {
+      "seconds": 11.401,
+      "nearest_frame": 342,
+      "type": "run",
+      "note": "hard late cut"
+    },
+    {
+      "seconds": 11.651,
+      "nearest_frame": 350,
+      "type": "run",
+      "note": "late cut"
+    },
+    {
+      "seconds": 12.138,
+      "nearest_frame": 364,
+      "type": "run",
+      "note": "late cut"
+    },
+    {
+      "seconds": 12.388,
+      "nearest_frame": 372,
+      "type": "run",
+      "note": "late cut"
+    },
+    {
+      "seconds": 12.632,
+      "nearest_frame": 379,
+      "type": "run",
+      "note": "late cut"
+    },
+    {
+      "seconds": 12.881,
+      "nearest_frame": 386,
+      "type": "run",
+      "note": "late cut"
+    },
+    {
+      "seconds": 13.125,
+      "nearest_frame": 394,
+      "type": "end",
+      "note": "cut off on last frame"
+    }
+  ],
+  "note": "These are measured spectral onsets; frame indices are quantized to 30fps, not promises of actual source video cuts."
+}
