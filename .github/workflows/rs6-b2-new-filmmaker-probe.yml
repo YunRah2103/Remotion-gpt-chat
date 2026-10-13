@@ -1,0 +1,51 @@
+name: YUNEX RS6 B2 independent filmmaker direct acquisition
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/b2-youtube-driving
+    paths:
+      - production/videos/rs6-no-mercy-001/agent_b2_independent_filmmaker_scout.py
+      - .github/workflows/rs6-b2-new-filmmaker-probe.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  filmmaker-source-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install independent creator extraction + native media QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q --upgrade yt-dlp curl_cffi requests pillow
+      - name: Acquire and validate new creator-media originals if accessible
+        timeout-minutes: 18
+        run: |
+          python production/videos/rs6-no-mercy-001/agent_b2_independent_filmmaker_scout.py | tee b2-new-creator-proof.txt
+      - name: Append truly playable MP4s to existing owner-only UNPUBLISHED draft
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: yunex-rs6-b2-motion-review-20261013
+        run: |
+          set -euo pipefail
+          if compgen -G 'b2_new_creator_private/mp4/*.mp4' >/dev/null; then
+            test "$(gh release view "$TAG" --json isDraft --jq '.isDraft')" = true
+            gh release upload "$TAG" b2_new_creator_private/mp4/*.mp4 b2_new_creator_private/contact/*.jpg b2_new_creator_private/B2_NEW_CREATORS_DRAFT.zip --clobber
+            gh release view "$TAG" --json isDraft,assets --jq '{draft:.isDraft,assets:[.assets[].name]}'
+          else
+            echo 'No downloadable high-resolution new creator originals; existing draft left unchanged.'
+          fi
+      - name: Upload technical QA records only, excluding third-party MP4s
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-b2-new-filmmakers-technical-QA
+          path: |
+            b2-new-creator-proof.txt
+            b2_new_creator_evidence/
+            b2_new_creator_private/contact/
+          retention-days: 14
+          if-no-files-found: warn
