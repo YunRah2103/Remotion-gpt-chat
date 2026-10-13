@@ -14,12 +14,12 @@ SPECS=[
  {"id":"A2_GT_LOW_REAR_TRACK","start":117.40,"length":1.95,
  "note":"C8 RS6 Avant GT white/red genuine moving rear-quarter tracking shot",
  "crop_x":"max(0,min(in_w-out_w,1680+105*t))"},
- {"id":"A2_GT_LOW_FRONT_SPEED_PASS","start":216.08,"length":1.27,
+ {"id":"A2_GT_LOW_FRONT_SPEED_PASS","start":216.63,"length":1.03,
  "note":"C8 RS6 GT actual front-left fast motion across camera and low wheel",
- "crop_x":"max(0,min(in_w-out_w,365-120*t))"},
+ "crop_x":"max(0,min(in_w-out_w,1200+150*t))"},
  {"id":"A2_GT_FRONT_FAST_APPROACH","start":267.58,"length":1.72,
  "note":"C8 RS6 GT white/red front driving with camera-relative speed on mountain road",
- "crop_x":"max(0,min(in_w-out_w,1360+370*t))"},
+ "crop_x":"max(0,min(in_w-out_w,1860+70*t))"},
 ]
 def run(cmd,timeout):
     p=subprocess.run(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,timeout=timeout)
@@ -86,11 +86,11 @@ good=[x for x in report["clips"] if x.get("status")=="PLAYABLE_PRIVATE_REVIEW_MP
 report["verified_private_mp4_count"]=len(good)
 (STATUS/"report.json").write_text(json.dumps(report,indent=2))
 if good:
-    (ROOT/"SOURCE_RIGHTS.txt").write_text(
+    (ROOT/"GT_SOURCE_RIGHTS.txt").write_text(
        "Source Audi AG original on-location C8 RS6 footage. Source rights are NOT cleared for public redistribution.\n"
        "Keep ALL assets in OWNER-ONLY DRAFT Release. Use for private evaluation only until permission is documented.\n")
-    (ROOT/"MANIFEST.json").write_text(json.dumps(report,indent=2))
-    (ROOT/"SHA256SUMS.txt").write_text("".join(f"{sha(ROOT/(x['name']+'.mp4'))}  {x['name']}.mp4\n" for x in good))
+    (ROOT/"GT_MANIFEST.json").write_text(json.dumps(report,indent=2))
+    (ROOT/"GT_SHA256SUMS.txt").write_text("".join(f"{sha(ROOT/(x['name']+'.mp4'))}  {x['name']}.mp4\n" for x in good))
     z=ROOT/"YUNEX_RS6_GT_A2_OWNER_ONLY.zip"
     with zipfile.ZipFile(z,"w",zipfile.ZIP_DEFLATED) as dst:
       for f in sorted(ROOT.iterdir()):
