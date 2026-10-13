@@ -1,0 +1,38 @@
+name: YUNEX V4 agent import smoke test
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/actions/yunex-v4-import/**
+      - .github/workflows/yunex-v4-agent-import-smoke.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: read
+jobs:
+  verified-import:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify local tooling
+        run: |
+          command -v gh
+          command -v jq
+          command -v ffprobe
+          command -v ffmpeg
+      - name: Import owner-verified S25 V4 job 56
+        id: phone
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '56'
+          token: ${{ github.token }}
+      - name: Confirm private draft was not republished
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "${{ steps.phone.outputs.media }}" == "video" ]]
+          [[ "${{ steps.phone.outputs.rights_status }}" == "unverified" ]]
+          [[ "${{ steps.phone.outputs.release_visibility }}" == "draft" ]]
+          test -s "${{ steps.phone.outputs.asset_path }}"
+          echo 'PASS: verified private draft bytes stayed on the runner; no public media artifacts created.'
