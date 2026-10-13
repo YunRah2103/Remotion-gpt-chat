@@ -18,8 +18,8 @@ SHOTS=[
   "creative":"Native 4K oval RS sports exhaust, rear bumper and sharp housing; verified static image frame"},
  {"id":"UHD_RS6_REAR_LED_SIGNATURE","start":465.90,"seconds":0.86,"crop_x":880,
   "creative":"Tight genuine C8 red rear LED signature, silver body, no cheap fake illumination"},
- {"id":"UHD_RS6_REAL_GEAR_SELECTOR","start":515.88,"seconds":0.86,"crop_x":1120,
-  "creative":"Authentic interior shift selector, carbon and brushed finish; discreet atmosphere bridge"}
+ {"id":"UHD_RS6_STEERING_MODE_CONTROL","start":525.90,"seconds":0.62,"crop_x":1450,
+  "creative":"Hand on authentic C8 steering-wheel RS mode and multifunction control. Original 4K close-up, not synthetic HUD."}
 ]
 def run(argv,seconds=140):
  p=subprocess.run(argv,capture_output=True,text=True,timeout=seconds)
