@@ -1,0 +1,68 @@
+name: YUNEX RS6 D private 13s complete cinematic picture
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/d-cinematic-editor
+    paths:
+      - .github/workflows/rs6-d-private-full-film.yml
+      - production/videos/rs6-no-mercy-001/d_full_private_picture.py
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  rs6-private-film:
+    runs-on: ubuntu-latest
+    timeout-minutes: 19
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install media validators
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q pillow
+      - name: Download ACTUAL source MP4 from owner-only unpublished review drafts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          mkdir -p d-rs6-sources
+          for f in A2_C8_RS6_FAST_APPROACH A2_C8_RS6_HAIRPIN_REVEAL A2_C8_RS6_MOUNTAIN_SWEEP A2_GT_LOW_FRONT_SPEED_PASS A2_GT_LOW_REAR_TRACK A2_GT_FRONT_FAST_APPROACH; do
+            gh release download yunex-rs6-a2-hero-review-20261013 -p "$f.mp4" -D d-rs6-sources
+          done
+          for f in B2_LOWDOWN_NIGHT_03 B2_LOWDOWN_NIGHT_04 B2_LOWDOWN_NIGHT_07; do
+            gh release download yunex-rs6-b2-motion-review-20261013 -p "$f.mp4" -D d-rs6-sources
+          done
+          for f in UHD_MATRIX_LED_FRONT_CORNER RS6_C8_NATIVE4K_AUDI_GRILLE UHD_RS6_RED_BRAKE_CALIPER UHD_RS6_OVAL_EXHAUST_REAR UHD_RS6_REAR_LED_SIGNATURE; do
+            gh release download yunex-rs6-c2-details-review-20261013 -p "$f.mp4" -D d-rs6-sources
+          done
+          echo "Actual MP4 source files: $(find d-rs6-sources -name '*.mp4' | wc -l)"
+          test "$(find d-rs6-sources -name '*.mp4' | wc -l)" -eq 14
+          du -sh d-rs6-sources
+      - name: Render FULL 395 native frames, complete decode, and genuine visual contacts
+        timeout-minutes: 9
+        run: |
+          set -euo pipefail
+          python production/videos/rs6-no-mercy-001/d_full_private_picture.py | tee d-rs6-run.log
+          test -s d-rs6-picture/YUNEX_RS6_NO_MERCY_001_PICTURE.mp4
+      - name: PRIVATE owner-only workflow artifact (rights uncleared; not public release)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX_RS6_NO_MERCY_001_FULL_PRIVATE_PICTURE
+          path: |
+            d-rs6-picture/YUNEX_RS6_NO_MERCY_001_PICTURE.mp4
+            d-rs6-picture/FULL_CONTACT.jpg
+            d-rs6-picture/EDIT_QA.json
+            d-rs6-picture/SHA256SUMS.txt
+            d-rs6-run.log
+          retention-days: 14
+          if-no-files-found: error
+      - name: Error diagnostics (no third-party video)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX_RS6_D_ERROR_ONLY
+          path: d-rs6-run.log
+          retention-days: 7
+          if-no-files-found: ignore
