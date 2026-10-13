@@ -1,0 +1,35 @@
+name: RS6 C2 unclaimed genuine 4K details gap scout
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/c2-details-textures
+    paths:
+      - 'production/videos/rs6-no-mercy-001/agent-c2/c2_gap_storyboard.py'
+      - '.github/workflows/rs6-c2-4k-gap-storyboard.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect-audi-real-4k:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install image and real-video tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install pillow --break-system-packages
+      - name: Extract actual native UHD source images with bounded concurrent seeks
+        run: |
+          python production/videos/rs6-no-mercy-001/agent-c2/c2_gap_storyboard.py | tee c2_gap_status.txt
+      - name: Publish contact sheets and seek/decode evidence (no source video)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-c2-original-4k-gap-review-${{ github.run_id }}
+          path: |
+            c2_gap_storyboard/
+            c2_gap_status.txt
+          retention-days: 9
+          if-no-files-found: warn
