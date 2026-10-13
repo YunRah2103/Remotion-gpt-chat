@@ -13,6 +13,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+env:
+  C2_FEED_START: '4'
+  C2_FEED_LIMIT: '6'
 jobs:
   c2-originals:
     runs-on: ubuntu-latest
