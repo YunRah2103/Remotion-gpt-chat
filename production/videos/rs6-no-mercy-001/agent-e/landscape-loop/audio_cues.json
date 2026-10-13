@@ -1,0 +1,58 @@
+{
+  "project": "YUNEX RS6 landscape 13s cinematic audio",
+  "fps": 30,
+  "frames": 395,
+  "duration_seconds": 13.166666666666666,
+  "music_preservation": "original soundtrack at same timeline",
+  "engine_origin": "procedural V8-like sound design; genuine RS6 field recording unavailable",
+  "events": [
+    {
+      "time_seconds": 1.47,
+      "frame_nearest": 44,
+      "description": "night rolling approach"
+    },
+    {
+      "time_seconds": 4.41,
+      "frame_nearest": 132,
+      "description": "side tunnel"
+    },
+    {
+      "time_seconds": 5.259,
+      "frame_nearest": 158,
+      "description": "major music drop"
+    },
+    {
+      "time_seconds": 6.5,
+      "frame_nearest": 195,
+      "description": "designed throttle lift"
+    },
+    {
+      "time_seconds": 7.61,
+      "frame_nearest": 228,
+      "description": "rear tunnel"
+    },
+    {
+      "time_seconds": 9.189,
+      "frame_nearest": 276,
+      "description": "second music drop and front approach"
+    },
+    {
+      "time_seconds": 10.19,
+      "frame_nearest": 306,
+      "description": "designed throttle lift"
+    },
+    {
+      "time_seconds": 11.51,
+      "frame_nearest": 345,
+      "description": "garage return"
+    }
+  ],
+  "mix": {
+    "LUFS_integrated": -14.31,
+    "dbTP": -2.27,
+    "source_hash": "8953d022cfdcbe2cd7305d5a6ea28a63b193f7422da3347372f113811f306296",
+    "output_hash": "87ca31944dbed243484da8b906c233da06e48bfa4112be7b9c73a30505de5151",
+    "video_hash_preserved": "038f2e1a4915c425b9e6f6ead791d7157d64bbca672bf31bb542553e4a003550",
+    "final_full_decode": "PASS"
+  }
+}
