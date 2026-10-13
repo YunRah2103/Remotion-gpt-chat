@@ -41,6 +41,22 @@ def extract():
     for u in urls:
         u=html.unescape(u)
         if "player.vimeo.com/external/" in u and u not in result: result.append(u)
+    if not result:
+        # Replay the original direct MP4 URL recovered in an earlier successful
+        # GitHub Actions diagnostic artifact, which came from the creator's
+        # own public HTML. This avoids publishing tokens in source control and
+        # survives transient changes to the creator site/HTML caching.
+        seed=Path("b2-seed/b2_candidate_reports/lowdown.json")
+        if seed.is_file():
+            try:
+                old=json.loads(seed.read_text())
+                for value in old.get("creator_embedded_public_media_urls",[]):
+                    value=html.unescape(value)
+                    if value.startswith("https://player.vimeo.com/external/450095160.") and ".mp4?" in value:
+                        result.append(value)
+                REPORT["source_from_verified_prior_capture"]=bool(result)
+            except Exception as e:
+                REPORT["seed_read_error"]=str(e)[-250:]
     return result[:5]
 def probe(url,i):
     r={"index":i,"url_host":"player.vimeo.com","source_is_creator_embed":True}
