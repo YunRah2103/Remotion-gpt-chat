@@ -206,6 +206,33 @@ class WorkerV4Tests(unittest.TestCase):
             self.assertEqual(cache.stat().st_mode & 0o777, 0o600)
             self.assertEqual(json.loads(cache.read_text()), [5001])
 
+    def test_private_release_success_report_retries_without_redownload(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            report = {"schema": "YUNEX_PHONE_RESULT_V4", "status": "PASS",
+                      "issue": 10051, "release_visibility": "draft",
+                      "asset_filename": "yunex-v4-10051.mp4", "sha256": "demo"}
+            with mock.patch.object(v4, "PENDING_REPORTS", root / "pending"), \
+                 mock.patch.object(v4, "COMPLETION_CACHE", root / "completed.json"):
+                v4.save_pending_report(10051, report)
+                request = dict(self.issue, number=10051)
+                with mock.patch.object(v4, "issue_jobs", return_value=[request]), \
+                     mock.patch.object(v4, "already_reported", return_value=False), \
+                     mock.patch.object(v4, "issue_comment",
+                                       side_effect=[OSError("network down"), None]) as comment, \
+                     mock.patch.object(v4, "download_proof") as downloader, \
+                     mock.patch.object(v4, "upload_release") as upload:
+                    self.assertTrue(v4.run_once("token"))
+                    self.assertEqual(v4.load_pending_report(10051), report)
+                    self.assertTrue(v4.run_once("token"))
+                    self.assertIsNone(v4.load_pending_report(10051))
+                    self.assertEqual(v4.load_completed_issues(), {10051})
+                    self.assertEqual(comment.call_count, 2)
+                    self.assertTrue(all(call.args[2].startswith(v4.DONE)
+                                        for call in comment.call_args_list))
+                    downloader.assert_not_called()
+                    upload.assert_not_called()
+
     def test_audio_only_job_and_helper_keep_legacy_video_default(self):
         url = "https://www.youtube.com/watch?v=a38sqC7k2iw"
         helper_spec = importlib.util.spec_from_file_location(
