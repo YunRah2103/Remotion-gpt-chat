@@ -13,12 +13,18 @@ AUDI=("https://delivery-p123922-e1240369.adobeaemcloud.com/adobe/assets/"
 "audi-rs-6-until-2025-daytona-grey-footage-on-location_2160p.mp4?accept-experimental=1")
 H="Referer: https://www.the-lowdown.com/\r\nUser-Agent: Mozilla/5.0\r\n"
 SEGS=[
- {"id":"01_C8_RS6_REAL_SIDE_DRIVE","source":"LOWDOWN","source_start":22.05,"seconds":1.10,"category":"genuine rolling C8 RS6 in dark city blue"},
- {"id":"02_RS6_NATIVE4K_OVAL_EXHAUST","source":"AUDI","source_start":425.90,"seconds":.53,"crop_x":2200,"category":"oval sports exhaust cut-to"},
- {"id":"03_LOW_DOWN_LED_MOVING","source":"LOWDOWN","source_start":14.05,"seconds":.48,"category":"original filmmaker genuine red C8 LED moving macro"},
- {"id":"04_RS6_NATIVE4K_RED_TAIL","source":"AUDI","source_start":465.90,"seconds":.66,"crop_x":880,"category":"original UHD C8 rear LED detail"},
- {"id":"05_RS6_NATIVE4K_RS_MODE","source":"AUDI","source_start":525.90,"seconds":.53,"crop_x":1450,"category":"hand touching RS MODE wheel control"},
+ {"id":"01_AUDI_NATIVE4K_C8_FAST_APPROACH","source":"AUDI_DRIVE","source_start":205.91,"seconds":1.06,
+  "category":"real native-UHD C8 RS6 moving front approach; A2 hero crop tracked"},
+ {"id":"02_LOW_DOWN_RS6_NIGHT_HAZE","source":"LOWDOWN","source_start":29.10,"seconds":.75,
+  "category":"original filmmaker night city LED/front 3/4 readable RS6"},
+ {"id":"03_RS6_NATIVE4K_OVAL_EXHAUST","source":"AUDI","source_start":425.90,"seconds":.53,"crop_x":2200,
+  "category":"oval sports exhaust cut-to"},
+ {"id":"04_RS6_NATIVE4K_RED_TAIL","source":"AUDI","source_start":465.90,"seconds":.66,"crop_x":880,
+  "category":"original UHD C8 rear LED detail"},
+ {"id":"05_RS6_NATIVE4K_RS_MODE","source":"AUDI","source_start":525.90,"seconds":.53,"crop_x":1450,
+  "category":"hand touching RS MODE wheel control"},
 ]
+
 def run(cmd,timeout=180):
  p=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=timeout)
  if p.returncode:raise RuntimeError(f"exit {p.returncode}: {cmd[0]} {p.stderr[-1300:]}")
@@ -57,8 +63,12 @@ for i,seg in enumerate(SEGS):
  f=ROOT/(seg["id"]+".mp4")
  if seg["source"]=="LOWDOWN":
   url=lowdown_url
-  filters="fps=30,scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,format=yuv420p"
+  filters="fps=30,scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=contrast=1.05:gamma=1.13,format=yuv420p"
   opts=["-headers",H]
+ elif seg["source"]=="AUDI_DRIVE":
+  url=AUDI
+  filters="crop=w=1215:h=2160:x='max(0\\,min(in_w-out_w\\,1500+480*t))':y=0,scale=1080:1920:flags=lanczos,fps=30,format=yuv420p"
+  opts=["-rw_timeout","30000000"]
  else:
   url=AUDI
   filters=f"crop=1215:2160:{seg['crop_x']}:0,scale=1080:1920:flags=lanczos,fps=30,format=yuv420p"
