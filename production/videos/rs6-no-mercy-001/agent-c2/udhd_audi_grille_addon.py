@@ -44,7 +44,7 @@ clip=OUT/TITLE
 cmd=["ffmpeg","-hide_banner","-nostdin","-loglevel","error","-rw_timeout","30000000",
      "-ss",str(SRC_START),"-i",URL,"-t",str(SRC_DURATION),
      "-map","0:v:0","-an","-vf",
-     "crop=1215:2160:950:0,scale=1080:1920:flags=lanczos,fps=30,format=yuv420p",
+     "crop=1215:2160:1850:0,scale=1080:1920:flags=lanczos,fps=30,format=yuv420p",
      "-c:v","libx264","-preset","medium","-crf","15",
      "-movflags","+faststart","-y",str(clip)]
 invoke(cmd,210)
