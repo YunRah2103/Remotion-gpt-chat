@@ -38,6 +38,7 @@ jobs:
           python production/phone_footage/agent_jobs_v4.py list
           python production/phone_footage/agent_jobs_v4.py prepare --url 'https://www.youtube.com/watch?v=DqiKOr1aS9w' --start 12 --duration 600 --height 1080 > /tmp/v4-issue.txt
           python production/phone_footage/agent_jobs_v4.py prepare --url 'https://www.youtube.com/watch?v=Exq6pB3IGyU' --start 0 --duration 60 --media audio > /tmp/v4-audio-issue.txt
+          python production/phone_footage/agent_jobs_v4.py prepare --url 'https://www.youtube.com/watch?v=Exq6pB3IGyU' --start 0 --duration 20 --height 2160 > /tmp/v4-4k-issue.txt
           python - <<'PY'
           import importlib.util
           from pathlib import Path
@@ -50,7 +51,10 @@ jobs:
           audio=Path("/tmp/v4-audio-issue.txt").read_text()
           assert m.parse_job({"body":audio})["media"]=="audio"
           assert m.parse_job({"body":audio})["max_mb"]==45
-          print("Video and audio agent payloads PASS")
+          uhd=Path("/tmp/v4-4k-issue.txt").read_text()
+          assert m.parse_job({"body":uhd})["height"]==2160
+          assert m.parse_job({"body":uhd})["max_mb"]==180
+          print("720/1080 legacy, audio-only and native 4K job contracts PASS")
           PY
       - name: Dry-run queue without downloading footage
         env:
