@@ -1,0 +1,35 @@
+name: RS6 A2 new GT native quality renditions technical probe
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/a2-hero-cinema
+    paths:
+      - production/videos/rs6-no-mercy-001/agent-a2/a2_gt_native_quality_probe.py
+      - .github/workflows/rs6-a2-gt-native-quality.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-alternate-c8-gt-original-source-quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFprobe and requests
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install --disable-pip-version-check requests
+      - name: Check actual original 720/1080/2160 availability and native file metadata
+        run: |
+          python production/videos/rs6-no-mercy-001/agent-a2/a2_gt_native_quality_probe.py | tee audi-gt-new-source-report.json
+      - name: Upload verified media source metadata only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-a2-gt-native-mp4-QA-${{ github.run_id }}
+          path: |
+            a2_gt_1080_probe/report.json
+            audi-gt-new-source-report.json
+          retention-days: 10
+          if-no-files-found: warn
