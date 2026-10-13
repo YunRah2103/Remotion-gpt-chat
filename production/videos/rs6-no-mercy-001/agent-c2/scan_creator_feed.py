@@ -15,7 +15,7 @@ MAX_TRIALS = 4
 def execute(cmd, seconds=120):
     try:
         r = subprocess.run(cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=seconds)
-        return {"rc":r.returncode, "stdout":r.stdout[-18000:], "stderr":r.stderr[-1800:]}
+        return {"rc":r.returncode, "stdout":r.stdout[-1500000:], "stderr":r.stderr[-1800:]}
     except Exception as e:
         return {"rc":-1, "stdout":"", "stderr":str(e)}
 
@@ -34,7 +34,7 @@ def discover(account):
         if not isinstance(item,dict): continue
         vid=str(item.get("id") or "")
         descr=" ".join(str(item.get(k) or "") for k in ("title","description","alt_title","fulltitle"))
-        if vid in SEEN or not re.search(r"(?i)(?:\\brs\\s*6\\b|\\brs6\\b)", descr):continue
+        if vid in SEEN or not re.search(r"(?i)(?:\brs\s*6\b|\brs6\b)", descr):continue
         score=sum(int(bool(re.search(term,descr,re.I)))*points for term,points in (
           (r"headlight|led|light",5),(r"wheel|rim|brake|caliper",5),(r"exhaust|tail|grille|front|detail",4),
           (r"night|dark|black|cinematic|close",3),(r"avant|c8|202[0-6]",2)))
