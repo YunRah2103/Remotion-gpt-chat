@@ -50,6 +50,10 @@ with open(concat_path,"w") as listfile:
   original=probe(origin)
   if (original["width"],original["height"]) != (1080,1920):
    raise RuntimeError("BAD_SOURCE_PIXEL_COUNT "+fname)
+  # Some genuine source windows are only 0.2-0.3 seconds.
+  # Never create fake freeze frames: clamp to available original frames.
+  count=min(count,int(original["frames"]))
+  if count<4:raise RuntimeError("TOO_SHORT_SOURCE "+fname)
   output=OUT/f"cut_{i:02}.mp4"
   run(["ffmpeg","-hide_banner","-v","error","-nostdin","-i",str(origin),
     "-map","0:v:0","-an","-vf","fps=30,format=yuv420p",
@@ -67,7 +71,7 @@ with open(concat_path,"w") as listfile:
   events.append({"source":fname,"frames":count,"note":note,"start_frame":frames_total,
      "first_source_ffprobe":original,"decoded":True,"source_sha256":h(origin)})
   frames_total+=count
-preview=OUT/"YUNEX_RS6_C2_REAL_FOOTAGE_SELECTS_4S.mp4"
+preview=OUT/"YUNEX_RS6_C2_REAL_FOOTAGE_SELECTS.mp4"
 run(["ffmpeg","-hide_banner","-v","error","-f","concat","-safe","0","-i",str(concat_path),
      "-map","0:v:0","-an","-c:v","libx264","-preset","medium","-crf","17",
      "-pix_fmt","yuv420p","-r","30","-movflags","+faststart","-y",str(preview)],120)
