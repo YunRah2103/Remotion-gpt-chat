@@ -44,7 +44,9 @@ jobs:
         run: |
           set -euo pipefail
           test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
-          gh release upload "$TAG" b2-motion-proof/YUNEX_RS6_NO_MERCY_3S_MOTION_PROOF.mp4 b2-motion-proof/PROOF_12_FRAME_CONTACT.jpg             b2-motion-proof/MANIFEST.json b2-motion-proof/SHA256SUMS.txt --clobber
+          cp b2-motion-proof/MANIFEST.json b2-motion-proof/B2_MOTION_PROOF_MANIFEST.json
+          cp b2-motion-proof/SHA256SUMS.txt b2-motion-proof/B2_MOTION_PROOF_SHA256SUMS.txt
+          gh release upload "$TAG" b2-motion-proof/YUNEX_RS6_NO_MERCY_3S_MOTION_PROOF.mp4 b2-motion-proof/PROOF_12_FRAME_CONTACT.jpg b2-motion-proof/B2_MOTION_PROOF_MANIFEST.json b2-motion-proof/B2_MOTION_PROOF_SHA256SUMS.txt --clobber
           gh release view "$TAG" --json isDraft,assets --jq '{draft:.isDraft,assets:[.assets[].name]}'
       - name: Publish proof metadata+visual contact only, excluding copyrighted MP4
         if: always()
