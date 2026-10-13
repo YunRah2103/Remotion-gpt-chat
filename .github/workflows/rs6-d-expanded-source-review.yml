@@ -1,0 +1,44 @@
+name: YUNEX RS6 D expanded footage source review
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/d-cinematic-editor
+    paths:
+      - .github/workflows/rs6-d-expanded-source-review.yml
+      - production/videos/rs6-no-mercy-001/d_expanded_source_review.py
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  source-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install review tools
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q pillow
+      - name: Download all existing original MP4 source assets from owner draft releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          for category in A2 B2 C2; do mkdir -p "rs6-d-expanded/$category"; done
+          gh release download yunex-rs6-a2-hero-review-20261013 -p '*.mp4' -D rs6-d-expanded/A2
+          gh release download yunex-rs6-b2-motion-review-20261013 -p '*.mp4' -D rs6-d-expanded/B2
+          gh release download yunex-rs6-c2-details-review-20261013 -p '*.mp4' -D rs6-d-expanded/C2
+          echo "Total original RS6 video sources: $(find rs6-d-expanded -name '*.mp4' | wc -l)"
+          test "$(find rs6-d-expanded -name '*.mp4' | wc -l)" -ge 25
+      - name: Inspect temporal footage contact frames
+        run: python production/videos/rs6-no-mercy-001/d_expanded_source_review.py
+      - name: Owner-only source editing set and contact samples
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX_RS6_D_ALL_SOURCE_PRIVATE_REVIEW
+          path: |
+            rs6-d-expanded/**/*.mp4
+            rs6-d-expanded-review/*
+          retention-days: 2
+          if-no-files-found: error
