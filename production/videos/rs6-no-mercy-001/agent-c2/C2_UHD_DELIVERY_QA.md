@@ -1,0 +1,17 @@
+# Agent C2 — original native-4K Audi C8 grille beat, corrected and verified
+
+## Real media result — 13 October 2026
+- Car/source: authentic **C8 Audi RS6 Avant**, Daytona Grey, official manufacturer original footage. Parent: https://www.audi.com/en/videos/video/audi-rs-6-until-2025-daytona-grey-footage-on-location-4874
+- **Original source verified by A2 independently at 3840x2160 / 25fps**, Adobe AEM 2160p, and C2 successfully fetched exact source bytes for our excerpt.
+- Source timestamp **367.05s (06:07.05)** for **1.05s**. A2 independently had identified 06:07 as a grille/emblem close-up and *not* an A2 hero shot; thus no role duplication.
+- **Corrected native crop:** 1215x2160 original pixels positioned at x=1850, scaled to 1080x1920 for a usable portrait view of all four Audi rings. First C2 render at x=950 was visibly wrong (nearly all four rings offscreen); it was fully replaced after actual visual QA. See corrected [run 38372372941](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38372372941) PASS and [contact evidence artifact 11799044627](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38372372941/artifacts/11799044627). Inspected three real frames at source 367.17, 367.45, 367.80s: all chrome rings framed completely, legible grille, sharp original texture, no injected text.
+- Final **RS6_C8_NATIVE4K_AUDI_GRILLE.mp4** is **1080x1920 / 30fps / H.264 yuv420p / 1.066667s / 1,502,086 bytes**. Entire final MP4 FFmpeg decoded without error. **SHA256: `94f38bf36809c1e254769a43d199cdac58cffa5a3b77e03eb62693ed0c44e66b`.**
+- Added as separate playable MP4 + ZIP `YUNEX_RS6_C2_UHD_ADDON.zip` + manifest + source timecodes + photo contact to the existing owner-review DRAFT release `yunex-rs6-c2-details-review-20261013` [GitHub draft link](https://github.com/YunRah2103/Remotion-gpt-chat/releases/tag/untagged-3c7ddbde3865a6f7f945). Previously verified eight detail clips remain present. The 4K asset is the ninth distinct playable excerpt.
+- Rights: Audi publishing/re-hosting status unconfirmed; source rights review and public release still pending. Draft-only is not general-public distribution and is not an assertion of authorization. Manager F can assess and select frames from the technically verified pack.
+- Cinematic verdict: **short sub-second cut-in/beat accent**, not moving-wheel, aggressive driving, or long hero. Crucial independent strength: real *native-4K* manufacturer image without degrading portrait crop. Video content is not synthesized.
+- Extra acquisition diversity: standalone six-creator TikTok investigation [run 38371483996](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38371483996) completed; produced **0 new RS6 samples** (brand feeds had no RS6 caption hits or user extraction blocked). C2 switched to native-4K OEM delivery rather than fabricating sources. New 14-window original UHD micro-storyboard around 05:55–06:47 is separately in Actions for further C2 coverage; results require inspection.
+
+## Production selection
+Use primarily black RS6 LED/wheel/rear from the prior eight shot pack, then consider **UHD Audi rings** for a brief high-detail logo-to-grille transition. The source silver vehicle may differ from black car; for colour continuity use extremely brief high-contrast monochrome cut as appropriate. Do not imply 9 clips means 9 high-speed shots.
+
+No edit/music work on C2 branch. Editor D and manager F own full film.
