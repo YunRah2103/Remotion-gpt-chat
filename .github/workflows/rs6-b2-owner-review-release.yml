@@ -1,0 +1,77 @@
+name: YUNEX RS6 B2 playable owner-only review release
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/b2-youtube-driving
+    paths:
+      - .github/workflows/rs6-b2-owner-review-release.yml
+      - production/videos/rs6-no-mercy-001/agent_b2_expand_draft.py
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  b2-footage-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install real media acquisition and video QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --upgrade -q yt-dlp curl_cffi pillow requests
+      - name: Acquire additional C8 owner clips and create real playable MP4s
+        timeout-minutes: 19
+        run: |
+          python production/videos/rs6-no-mercy-001/agent_b2_expand_draft.py | tee b2-expand-proof.log
+          test -s b2_review_pack/YUNEX_RS6_B2_OWNER_REVIEW.zip
+          test "$(find b2_review_pack/mp4 -maxdepth 1 -name '*.mp4' | wc -l)" -ge 2
+      - name: Prepare private owner review release notes
+        run: |
+          cat > b2-release-notes.md <<'EOF'
+          # YUNEX RS6 / B2 — REAL MOTION FOOTAGE OWNER REVIEW
+          Actual native-HD source samples acquired by GitHub Actions and independently
+          transcoded to 1080x1920 H.264 30 fps MP4s, full FFmpeg decode verified,
+          checksums, per-source ffprobe and contact sheets in the ZIP.
+          
+          **DRAFT - NOT PUBLISHED.** This release is available only to the
+          repository owner for private production source review. Copyright/creator
+          redistribution permissions not established. Do NOT convert this to public.
+          Only B2_LUAN2_REAL_STREET_PASS is a previously visually checked modern
+          C8 moving vehicle; B2_FE78_ROLLING_WAGON has unresolved model generation
+          and other new sources need full visual vetting. Not editor-approved.
+          
+          New high-quality filmmaker source review: #54 (THE-LOWDOWN 2020 RS6 C8).
+          Tracking: #44. No soundtrack mixed or final YUNEX film claimed.
+          EOF
+      - name: Create actual UNPUBLISHED GH draft Release with playable MP4 assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: yunex-rs6-b2-motion-review-20261013
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --json isDraft >/dev/null 2>&1; then
+            DRAFT="$(gh release view "$TAG" --json isDraft --jq .isDraft)"
+            test "$DRAFT" = true || { echo "Refusing to modify publicly released media"; exit 1; }
+            gh release upload "$TAG" b2_review_pack/YUNEX_RS6_B2_OWNER_REVIEW.zip b2_review_pack/mp4/*.mp4 b2_review_pack/manifest.json b2_review_pack/SHA256SUMS.txt --clobber
+            gh release edit "$TAG" --notes-file b2-release-notes.md
+          else
+            gh release create "$TAG" b2_review_pack/YUNEX_RS6_B2_OWNER_REVIEW.zip b2_review_pack/mp4/*.mp4 b2_review_pack/manifest.json b2_review_pack/SHA256SUMS.txt \
+              --draft --title "YUNEX RS6 B2 | playable motion owner review ONLY" \
+              --target "$GITHUB_SHA" --notes-file b2-release-notes.md --latest=false
+          fi
+          gh release view "$TAG" --json id,tagName,isDraft,assets --jq '{id:.id,tag:.tagName,draft:.isDraft,assets:[.assets[].name]}'
+      - name: Publish public diagnostic evidence (NO SOURCE MEDIA)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-b2-expanded-private-draft-evidence
+          path: |
+            b2-expand-proof.log
+            b2_candidate_reports/*.json
+            b2_review_pack/manifest.json
+            b2_review_pack/SHA256SUMS.txt
+            b2-release-notes.md
+          retention-days: 14
+          if-no-files-found: warn
