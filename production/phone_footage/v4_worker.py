@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """YUNEX production mobile footage worker V4 (600-second ceiling).
-Only owner-created GitHub jobs for independently reviewed sources are accepted.
-Downloads are temporary; verified MP4 + machine-readable manifest are GitHub assets.
+Owner-created GitHub jobs may request any canonical YouTube watch URL.
+Known licensed sources may publish; unknown-rights media stays in owner-only draft Releases.
 """
 import argparse
 import fcntl
@@ -172,8 +172,26 @@ def issue_jobs(token):
             and "pull_request" not in i]
 
 
+def valid_youtube_url(url):
+    """Only canonical HTTPS YouTube watch URLs, never arbitrary hosts or URL tricks."""
+    if not isinstance(url, str) or len(url) > 150 or url != url.strip():
+        return False
+    try:
+        parsed = urllib.parse.urlsplit(url)
+        if (parsed.scheme != "https" or parsed.netloc not in ("youtube.com", "www.youtube.com")
+                or parsed.path != "/watch" or parsed.fragment):
+            return False
+        query = urllib.parse.parse_qs(parsed.query, strict_parsing=True)
+        video_id = query.get("v", [None])[0]
+        return (len(query) == 1 and isinstance(video_id, str) and len(video_id) == 11
+                and parsed.query == "v=" + video_id
+                and all(char.isascii() and (char.isalnum() or char in "-_") for char in video_id))
+    except (ValueError, TypeError):
+        return False
+
+
 def parse_job(issue):
-    """Strict, capped production job. Unreviewed issue URLs cannot authorize media."""
+    """Strict owner-only job; licence registry is no longer a job requirement."""
     body = issue.get("body") or ""
     if not body.startswith(MARKER + "\n") or len(body) > 4000:
         return None
@@ -183,9 +201,11 @@ def parse_job(issue):
         return None
     if not isinstance(job, dict) or set(job) - {"url", "start", "duration", "height", "max_mb", "orientation"}:
         return None
-    entry = LICENSED_PROOFS.get(job.get("url"))
-    if not entry:
+    url = job.get("url")
+    if not valid_youtube_url(url):
         return None
+    entry = LICENSED_PROOFS.get(url)
+    source_height_limit = entry["max_height"] if entry else 1080
     start = job.get("start", 0)
     duration = job.get("duration", 6)
     height = job.get("height", 1080)
@@ -196,7 +216,7 @@ def parse_job(issue):
             or not math.isfinite(float(start)) or not math.isfinite(float(duration))
             or not 0 <= start <= 21600 or not 2 <= duration <= MAX_SECONDS
             or start + duration > 22200 or height not in (720, 1080)
-            or height > entry["max_height"] or not 5 <= max_mb <= MAX_OUTPUT_MB
+            or height > source_height_limit or not 5 <= max_mb <= MAX_OUTPUT_MB
             or orientation not in ("landscape", "portrait")):
         return None
     return {"url": job["url"], "start": float(start), "duration": float(duration),
@@ -340,28 +360,40 @@ def download_proof(folder, job=None):
                     "full_decode": "PASS"}
 
 def upload_release(token, number, file, job=None, meta=None):
-    """Publish binary plus machine-readable result that GitHub agents can ingest."""
+    """Licensed media may be public; unknown-rights media is kept in an owner-only draft."""
     tag = f"yunex-phone-v4-{number}"
-    entry = LICENSED_PROOFS[job["url"]]
-    credit = (f"{entry['title']} by {entry['author']}\n"
-              f"Source: {job['url']}\nLicense: {entry['license']}\n"
-              f"Evidence: {entry['license_reference']}\n"
-              f"Excerpt {job['start']}s for {job['duration']}s; H.264/AAC conversion.")
+    entry = LICENSED_PROOFS.get(job["url"])
+    rights_verified = entry is not None
+    if rights_verified:
+        credit = (f"{entry['title']} by {entry['author']}\n"
+                  f"Source: {job['url']}\nLicense: {entry['license']}\n"
+                  f"Evidence: {entry['license_reference']}\n"
+                  f"Excerpt {job['start']}s for {job['duration']}s; H.264/AAC conversion.")
+    else:
+        credit = (f"Source: {job['url']}\nRights: not verified; review-only draft. "
+                  f"Do not publish this media without permission.\n"
+                  f"Excerpt {job['start']}s for {job['duration']}s; H.264/AAC conversion.")
     release = api("POST", f"/repos/{REPO}/releases", token, {
         "tag_name": tag, "target_commitish": "main",
         "name": f"YUNEX S25 production footage #{number}",
-        "draft": False, "prerelease": True, "body": credit})
+        "draft": not rights_verified, "prerelease": True, "body": credit})
     rid = release["id"]
     movie_name = f"yunex-v4-{number}.mp4"
     upload = "/UPLOAD/repos/" + REPO + f"/releases/{rid}/assets?name=" + urllib.parse.quote(movie_name)
     asset = upload_media_file(upload, token, file)
     manifest = {"schema": "YUNEX_PHONE_RESULT_V4", "status": "PASS",
-                "issue": number, "source_url": job["url"], "license": entry["license"],
-                "attribution": entry["author"], "license_evidence": entry["license_reference"],
+                "issue": number, "source_url": job["url"],
+                "rights_status": "approved_cc_license" if rights_verified else "unverified",
+                "license": entry["license"] if entry else None,
+                "attribution": entry["author"] if entry else None,
+                "license_evidence": entry["license_reference"] if entry else None,
+                "release_visibility": "public_prerelease" if rights_verified else "draft",
+                "release_id": rid, "mp4_asset_id": asset.get("id"),
+                "mp4_asset_api_url": asset.get("url"),
                 "requested_start": job["start"], "requested_duration": job["duration"],
                 "requested_height": job["height"],
                 "requested_orientation": job.get("orientation", "landscape"), **meta,
-                "mp4_url": asset["browser_download_url"],
+                "mp4_url": asset["browser_download_url"] if rights_verified else None,
                 "release_url": release["html_url"]}
     manifest_name = f"yunex-v4-{number}.json"
     manifest_upload = ("/UPLOAD/repos/" + REPO + f"/releases/{rid}/assets?name="
@@ -369,7 +401,8 @@ def upload_release(token, number, file, job=None, meta=None):
     report = api("POST", manifest_upload, token,
                  binary=(json.dumps(manifest, indent=2) + "\n").encode(),
                  content_type="application/json")
-    manifest["manifest_url"] = report["browser_download_url"]
+    manifest["manifest_url"] = report["browser_download_url"] if rights_verified else None
+    manifest["manifest_asset_api_url"] = report.get("url")
     return manifest
 
 def previous_release_asset(token, number):
@@ -395,7 +428,7 @@ def run_once(token, dry_run=False):
         number = issue["number"]
         if already_reported(token, number):
             continue
-        print(f"V4 approved issue #{number}: {job['height']}p, {job['duration']}s", flush=True)
+        print(f"V4 queued issue #{number}: {job['height']}p, {job['duration']}s", flush=True)
         if dry_run:
             print("DRY RUN: no download or upload", flush=True)
             return True
@@ -414,7 +447,8 @@ def run_once(token, dry_run=False):
             issue_comment(token, number, DONE + "\n\n~~~json\n"
                           + json.dumps(report, indent=2) + "\n~~~")
             print(f"PASS #{number} {meta['width']}x{meta['height']} "
-                  f"{meta['bytes']} bytes\n{report['mp4_url']}", flush=True)
+                  f"{meta['bytes']} bytes ({report['release_visibility']})\n"
+                  f"{report['mp4_url'] or report['release_url']}", flush=True)
         except Exception as exc:
             detail = str(exc).replace("\n", " ")[:300]
             print(f"FAILED #{number}: {detail}", flush=True)
