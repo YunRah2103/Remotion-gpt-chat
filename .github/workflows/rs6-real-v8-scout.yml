@@ -1,0 +1,31 @@
+name: YUNEX RS6 genuine V8 source scout
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-landscape-loop/e-real-recorded-v8
+    paths:
+      - production/videos/rs6-no-mercy-001/agent-e/real-v8/**
+      - .github/workflows/rs6-real-v8-scout.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  scout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install decoding and fetch packages
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q requests beautifulsoup4
+      - name: Probe recorded V8 audio previews
+        run: python production/videos/rs6-no-mercy-001/agent-e/real-v8/scan.py
+      - name: Upload real sampled media and source report PRIVATELY
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX_REAL_V8_ACQUISITION_REPORT_PRIVATE
+          path: real-v8-acquisition/
+          retention-days: 5
+          if-no-files-found: error
