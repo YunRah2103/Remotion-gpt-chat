@@ -62,7 +62,8 @@ def main():
     prepare_parser.add_argument("--url", required=True)
     prepare_parser.add_argument("--start", type=float, default=0)
     prepare_parser.add_argument("--duration", type=float, default=6)
-    prepare_parser.add_argument("--height", type=int, choices=(720, 1080), default=1080)
+    prepare_parser.add_argument("--height", type=int, choices=(720, 1080, 2160), default=1080,
+                                help="2160 = native 4K only, no upscale; default is 1080")
     prepare_parser.add_argument("--max-mb", type=int, default=None)
     prepare_parser.add_argument("--orientation", choices=("landscape", "portrait"), default="landscape")
     prepare_parser.add_argument("--media", choices=("video", "audio"), default="video",
