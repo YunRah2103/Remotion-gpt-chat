@@ -30,7 +30,7 @@ jobs:
               70) tag=yunex-phone-v4-70; sha=4187db9c570792959e14eb57e76a49c1be63fef3d56f46870aa86c87ebbe05b0 ;;
             esac
             mkdir -p "output/$id"
-            gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern "yunex-v4-$id.mp4" --dir "output/$id"
+            gh api -H "Accept: application/octet-stream" "/repos/${GITHUB_REPOSITORY}/releases/assets/$(case "$id" in 68) echo 638005226;; 69) echo 638034079;; 70) echo 638019718;; esac)" > "output/$id/yunex-v4-$id.mp4"
             file="output/$id/yunex-v4-$id.mp4"
             echo "$sha  $file" | sha256sum -c -
             ffprobe -v error -show_format -show_streams -of json "$file" > "output/$id/ffprobe.json"
