@@ -11,9 +11,9 @@ SOURCE="https://delivery-p123922-e1240369.adobeaemcloud.com/adobe/assets/urn:aai
 ROOT=Path("a2-extra-owner-review");ROOT.mkdir(exist_ok=True)
 STATUS=Path("a2-extra-private-qa");STATUS.mkdir(exist_ok=True)
 SPECS=[
-    {"id":"A2_C8_RS6_HAIRPIN_REVEAL","start":39.00,"length":1.75,
+    {"id":"A2_C8_RS6_HAIRPIN_REVEAL","start":39.40,"length":1.33,
      "note":"genuine C8 RS6 moving oncoming hairpin, original Audi 4K",
-     "crop_x":"max(0,min(in_w-out_w,2380-260*t))"},
+     "crop_x":"900"},
 ]
 def run(cmd,timeout):
     p=subprocess.run(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,timeout=timeout)
