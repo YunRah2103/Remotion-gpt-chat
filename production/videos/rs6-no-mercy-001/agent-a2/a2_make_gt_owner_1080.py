@@ -54,7 +54,7 @@ for spec in SPECS:
     name=spec["id"];path=ROOT/(name+".mp4")
     crop=spec["crop_x"].replace(",","\\,")
     # x/y evaluated per frame; native 1215x2160 crop preserves genuine source pixels.
-    filt=f"crop=w=1215:h=2160:x='{crop}':y=0,scale=1080:1920:flags=lanczos,fps=30,format=yuv420p"
+    filt=f"setpts=PTS-STARTPTS,crop=w=1215:h=2160:x='{crop}':y=0,scale=1080:1920:flags=lanczos,fps=30,format=yuv420p"
     row={"name":name,"source_start_sec":spec["start"],"source_duration_req":spec["length"],
         "notes":spec["note"],"crop_expression":spec["crop_x"],
         "source_original_native":"3840x2160 25 fps","output":"1080x1920 30 fps"}
