@@ -1,0 +1,66 @@
+name: YUNEX P1 footage QA
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/yunex-p1-footage-qa.yml'
+permissions:
+  contents: write
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Install FFmpeg and GitHub CLI
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Recover, decode and contact-sheet verified phone assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p review/media review/sheets review/reports
+          cat > /tmp/p1-assets.tsv <<'EOF'
+          A 68 638005226 d3fa45ce9bc013ae22c625032c4caf21db67060bf788010bd2c6797ecbf51fe6
+          A 69 638034079 8cbbbc4d99c37bafe1036d9406e499fc89c95741e0b7646dd37653583d91d288
+          A 70 638019718 4187db9c570792959e14eb57e76a49c1be63fef3d56f46870aa86c87ebbe05b0
+          B 66 638017472 c11f8862f7d5d799b94a0b570fa36b1afda6034d839f451c36dc9a5d4d19d271
+          B 71 638027593 5e599084f60a0453a18de0b6e38a131a64d712aae07547e26bf7615033d08d9d
+          C 62 638063363 74b853ab881a6175da4fd27d2a90354c51dee88a101536b14d79148c65777aa5
+          C 63 638053178 d1ef57dc1421ccbbb52bee65753a99a53424be98e5987cab88c3bfaa0d12f39a
+          C 65 638039995 a7bb48834146f530ea8cf1233c13b17f831990e802b00a34608fe0b3a4cfd949
+          EOF
+          printf 'agent,job,asset,download,sha256,decode,width,height,duration\n' > review/reports/results.csv
+          while read -r agent job asset expected; do
+            file="review/media/p1-${agent}-${job}.mp4"
+            status=PASS
+            if ! gh api -H "Accept: application/octet-stream" "/repos/${GH_REPO}/releases/assets/${asset}" > "$file"; then
+              status=DOWNLOAD_FAILED
+            elif ! echo "$expected  $file" | sha256sum -c -; then
+              status=HASH_FAILED
+            fi
+            if [ "$status" = PASS ]; then
+              if ! ffmpeg -v error -xerror -i "$file" -f null - 2>"review/reports/${job}-decode.log"; then status=DECODE_FAILED; fi
+            fi
+            if [ "$status" = PASS ]; then
+              ffprobe -v error -show_format -show_streams -of json "$file" > "review/reports/${job}-probe.json"
+              dims=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 "$file")
+              duration=$(ffprobe -v error -show_entries format=duration -of default=nk=1:nw=1 "$file")
+              IFS=, read -r width height <<< "$dims"
+              printf '%s,%s,%s,PASS,PASS,PASS,%s,%s,%s\n' "$agent" "$job" "$asset" "$width" "$height" "$duration" >> review/reports/results.csv
+              ffmpeg -v error -y -i "$file" -vf "fps=1/2,scale=320:-2,tile=4x3" -frames:v 1 "review/sheets/p1-${agent}-${job}.jpg" || true
+            else
+              printf '%s,%s,%s,%s,UNKNOWN,UNKNOWN,,,\n' "$agent" "$job" "$asset" "$status" >> review/reports/results.csv
+              rm -f "$file"
+            fi
+          done < /tmp/p1-assets.tsv
+          cat review/reports/results.csv >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: yunex-p1-footage-review
+          path: review/
+          retention-days: 7
