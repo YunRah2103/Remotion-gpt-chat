@@ -17,11 +17,13 @@ worker = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(worker)
 
 
-def prepare(url, start, duration, height, max_mb, orientation="landscape"):
+def prepare(url, start, duration, height, max_mb, orientation="landscape", media="video"):
     job = {"url": url, "start": start, "duration": duration,
            "height": height, "orientation": orientation}
     if max_mb is not None:
         job["max_mb"] = max_mb
+    if media != "video":
+        job["media"] = media
     body = worker.MARKER + "\n" + json.dumps(job, separators=(",", ":"))
     if worker.parse_job({"body": body}) is None:
         raise ValueError("Invalid YouTube URL or V4 safety/quality limits exceeded")
@@ -29,7 +31,7 @@ def prepare(url, start, duration, height, max_mb, orientation="landscape"):
 
 
 def fetch_result(issue):
-    """Public issue comments contain a machine-readable completion payload."""
+    """Owner-authored issue comments contain a machine-readable completion payload."""
     found = None
     for page in range(1, 4):
         url = (f"https://api.github.com/repos/{worker.REPO}/issues/{issue}/comments"
@@ -63,6 +65,8 @@ def main():
     prepare_parser.add_argument("--height", type=int, choices=(720, 1080), default=1080)
     prepare_parser.add_argument("--max-mb", type=int, default=None)
     prepare_parser.add_argument("--orientation", choices=("landscape", "portrait"), default="landscape")
+    prepare_parser.add_argument("--media", choices=("video", "audio"), default="video",
+                                help="Request audio-only AAC M4A instead of a video MP4")
     result_parser = sub.add_parser("result", help="Read confirmed GitHub Issue result.")
     result_parser.add_argument("--issue", required=True, type=int)
     args = parser.parse_args()
@@ -74,7 +78,7 @@ def main():
         print(json.dumps(rows, indent=2))
     elif args.cmd == "prepare":
         print(prepare(args.url, args.start, args.duration, args.height,
-                      args.max_mb, args.orientation))
+                      args.max_mb, args.orientation, args.media))
     else:
         record = fetch_result(args.issue)
         if record is None:
