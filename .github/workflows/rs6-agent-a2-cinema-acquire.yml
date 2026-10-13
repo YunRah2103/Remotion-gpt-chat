@@ -9,14 +9,14 @@ permissions:
 jobs:
   a2-executable-source-audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
       - name: Prepare FFmpeg and Python dependencies
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y ffmpeg
-          python -m pip install --disable-pip-version-check requests beautifulsoup4
+          python -m pip install --disable-pip-version-check requests beautifulsoup4 numpy
       - name: Attempt original Audi C8 footage acquisition and fully decode if accessible
         shell: bash
         run: |
@@ -32,6 +32,14 @@ jobs:
           python production/videos/rs6-no-mercy-001/agent-a2/a2_aem_4k.py > a2-uhd-stdout.json 2> a2-uhd-error.txt
           echo "aem_script_exit=$?" >> "$GITHUB_STEP_SUMMARY"
           exit 0
+      - name: Sample decoded motion from actual original Audi C8 4K reel
+        shell: bash
+        run: |
+          set +e
+          python production/videos/rs6-no-mercy-001/agent-a2/a2_4k_shot_scan.py > a2-scan-stdout.json 2> a2-scan-error.txt
+          echo "shot_scan_exit=$?" >> "$GITHUB_STEP_SUMMARY"
+          cat a2-scan-stdout.json >> "$GITHUB_STEP_SUMMARY" || true
+          exit 0
       - name: Save source rights and forensic metadata ONLY (no press video or frames)
         if: always()
         uses: actions/upload-artifact@v4
@@ -40,6 +48,10 @@ jobs:
           path: |
             a2_audit/report.json
             a2_audit/RIGHTS_AND_LIMITS.txt
+            a2_shot_audit/report.json
+            a2_shot_audit/rights.txt
+            a2-scan-stdout.json
+            a2-scan-error.txt
             a2_uhd_audit/report.json
             a2-uhd-stdout.json
             a2-uhd-error.txt
