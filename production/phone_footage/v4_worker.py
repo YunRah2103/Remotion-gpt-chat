@@ -94,6 +94,7 @@ MAX_BYTES = MAX_OUTPUT_MB * MIB
 MAX_WORKSPACE_BYTES = 2300 * MIB
 TEMP_ROOT = Path.home() / ".cache" / "yunex-v4-temp"
 COMPLETION_CACHE = Path.home() / ".cache" / "yunex-v4-completed.json"
+PENDING_REPORTS = Path.home() / ".cache" / "yunex-v4-pending"
 DEFAULT_POLL_SECONDS = 120
 CATALOG_REFRESH_SECONDS = 1800
 _LAST_IDLE_LOG = 0.0
@@ -266,6 +267,44 @@ def mark_issue_completed(number):
             temporary.unlink(missing_ok=True)
         except (OSError, UnboundLocalError):
             pass
+
+
+def pending_report_path(number):
+    if type(number) is not int or number < 1:
+        raise ValueError("Invalid GitHub issue number")
+    return PENDING_REPORTS / f"issue-{number}.json"
+
+
+def save_pending_report(number, report):
+    """Store a small GitHub handoff *before* posting its success comment."""
+    PENDING_REPORTS.mkdir(parents=True, exist_ok=True, mode=0o700)
+    destination = pending_report_path(number)
+    temporary = destination.with_suffix(".tmp")
+    try:
+        with temporary.open("w", encoding="utf-8") as handle:
+            os.chmod(temporary, 0o600)
+            json.dump(report, handle)
+        os.replace(temporary, destination)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def load_pending_report(number):
+    try:
+        report = json.loads(pending_report_path(number).read_text(encoding="utf-8"))
+        if (isinstance(report, dict) and report.get("schema") == "YUNEX_PHONE_RESULT_V4"
+                and report.get("status") == "PASS" and report.get("issue") == number):
+            return report
+    except (OSError, ValueError, TypeError):
+        pass
+    return None
+
+
+def clear_pending_report(number):
+    try:
+        pending_report_path(number).unlink(missing_ok=True)
+    except OSError:
+        pass
 
 
 def already_reported(token, number):
@@ -548,7 +587,23 @@ def run_once(token, dry_run=False):
             continue
         number = issue["number"]
         if already_reported(token, number):
+            clear_pending_report(number)
             continue
+        pending = load_pending_report(number)
+        if pending:
+            # A verified release already exists: repair only its GitHub comment.
+            # Never download/encode/upload the same media twice.
+            print(f"V4 #{number}: retrying completed handoff comment", flush=True)
+            try:
+                issue_comment(token, number, DONE + "\n\n~~~json\n"
+                              + json.dumps(pending, indent=2) + "\n~~~")
+            except Exception as exc:
+                print("Report handoff temporarily unavailable:", str(exc)[:140],
+                      flush=True)
+                return True
+            clear_pending_report(number)
+            mark_issue_completed(number)
+            return True
         print(f"V4 queued issue #{number}: {job.get('media','video')}, {job['height']}p, {job['duration']}s", flush=True)
         if dry_run:
             print("DRY RUN: no download or upload", flush=True)
@@ -565,8 +620,16 @@ def run_once(token, dry_run=False):
             with tempfile.TemporaryDirectory(prefix="yunex-v4-", dir=TEMP_ROOT) as tmp:
                 movie, meta = download_proof(Path(tmp), job)
                 report = upload_release(token, number, movie, job, meta)
-            issue_comment(token, number, DONE + "\n\n~~~json\n"
-                          + json.dumps(report, indent=2) + "\n~~~")
+            save_pending_report(number, report)
+            try:
+                issue_comment(token, number, DONE + "\n\n~~~json\n"
+                              + json.dumps(report, indent=2) + "\n~~~")
+            except Exception as exc:
+                # Preserve PASS metadata; next poll repairs only the comment.
+                print("Media uploaded; pending GitHub report retry:", str(exc)[:140],
+                      flush=True)
+                return True
+            clear_pending_report(number)
             mark_issue_completed(number)
             details = (f"{meta['sample_rate']}Hz stereo" if report["media"] == "audio"
                        else f"{meta['width']}x{meta['height']}")
