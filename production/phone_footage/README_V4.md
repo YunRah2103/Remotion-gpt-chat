@@ -4,6 +4,8 @@ Branch: experiments/s25-footage-worker-v4-10min-20261012
 
 V4 is a separate experimental worker. Existing V1/V2/V3 and main are preserved.
 
+**Required reading for any AI footage agent:** [Canonical S25 V4 agent workflow (on main)](https://github.com/YunRah2103/Remotion-gpt-chat/blob/main/docs/YUNEX_S25_V4_AGENT_GUIDE.md). That guide gives the owner-reviewed source procedure, exact owner-authored issue creation, current Termux loop expectations, real MP4 handoff and demonstrated [S25 V4 YouTube PASS #55](https://github.com/YunRah2103/Remotion-gpt-chat/issues/55). The successful clip is an approved snowy-driving test, **not** RS6 footage. Unapproved RS6 URLs were rejected before an S25 download could run.
+
 ## What changed
 
 The **duration ceiling is 600 seconds (10 minutes)**; normal projects should still request short clips. Clips can begin at offsets up to 6 hours into the source. V4 supports landscape or portrait, up to genuine 1080p (not 4K or HDR).
