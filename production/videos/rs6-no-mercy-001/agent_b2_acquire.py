@@ -107,6 +107,6 @@ def main():
     discovered=discover()
     (OUT/"youtube_discovery.json").write_text(json.dumps(discovered,indent=2))
     (OUT/"README.txt").write_text("Technical QA metadata only. All creator media processed privately and deleted immediately; not rights cleared. No playable video asset is delivered. Source approvals must follow #44 and V4 registry process.\n")
-    print("DISCOVERY_ENTRIES",len(discovered))
+    print("DISCOVERY_ENTRIES",len(discovered)); print("CANDIDATES_START"); print(json.dumps(discovered,indent=2)); print("CANDIDATES_END")
 if __name__=="__main__":
     main()
