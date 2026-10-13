@@ -30,10 +30,10 @@ jobs:
           for f in A2_C8_RS6_FAST_APPROACH A2_C8_RS6_HAIRPIN_REVEAL A2_C8_RS6_MOUNTAIN_SWEEP A2_GT_LOW_FRONT_SPEED_PASS A2_GT_LOW_REAR_TRACK A2_GT_FRONT_FAST_APPROACH; do
             gh release download yunex-rs6-a2-hero-review-20261013 -p "$f.mp4" -D d-rs6-sources
           done
-          for f in B2_LOWDOWN_NIGHT_03 B2_LOWDOWN_NIGHT_04 B2_LOWDOWN_NIGHT_07; do
+          for f in B2_LOWDOWN_NIGHT_03 B2_LOWDOWN_NIGHT_07; do
             gh release download yunex-rs6-b2-motion-review-20261013 -p "$f.mp4" -D d-rs6-sources
           done
-          for f in UHD_MATRIX_LED_FRONT_CORNER RS6_C8_NATIVE4K_AUDI_GRILLE UHD_RS6_RED_BRAKE_CALIPER UHD_RS6_OVAL_EXHAUST_REAR UHD_RS6_REAR_LED_SIGNATURE; do
+          for f in UHD_MATRIX_LED_FRONT_CORNER RS6_C8_NATIVE4K_AUDI_GRILLE UHD_RS6_RED_BRAKE_CALIPER UHD_RS6_OVAL_EXHAUST_REAR UHD_RS6_REAR_LED_SIGNATURE UHD_RS6_STEERING_MODE_CONTROL; do
             gh release download yunex-rs6-c2-details-review-20261013 -p "$f.mp4" -D d-rs6-sources
           done
           echo "Actual MP4 source files: $(find d-rs6-sources -name '*.mp4' | wc -l)"
