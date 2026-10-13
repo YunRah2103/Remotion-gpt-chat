@@ -1,0 +1,40 @@
+name: RS6 A2 real YouTube V4 eligibility and download test
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/a2-hero-cinema
+    paths:
+      - production/videos/rs6-no-mercy-001/agent-a2/a2_youtube_v4_trial.py
+      - .github/workflows/rs6-a2-youtube-v4-trial.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual-v4-check-and-youtube-alternate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: experiments/s25-footage-worker-v4-10min-20261012
+          path: v4
+      - name: Install FFmpeg and latest yt-dlp
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg nodejs
+          python -m pip install --disable-pip-version-check --upgrade yt-dlp
+      - name: Check exact V4 source URL eligibility and independently try YouTube real download
+        shell: bash
+        run: |
+          python production/videos/rs6-no-mercy-001/agent-a2/a2_youtube_v4_trial.py | tee a2-yt-summary.json
+      - name: Upload audit evidence ONLY, never unapproved source clips
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-a2-youtube-v4-tested-${{ github.run_id }}
+          path: |
+            a2_youtube_v4/V4_YT_RESULT.json
+            a2-yt-summary.json
+          if-no-files-found: warn
+          retention-days: 7
