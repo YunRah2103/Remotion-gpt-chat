@@ -3,9 +3,8 @@ on:
   push:
     branches:
       - automotive-edits/rs6-no-mercy-001/c2-details-textures
-  pull_request:
     paths:
-      - 'production/videos/rs6-no-mercy-001/agent-c2/**'
+      - 'production/videos/rs6-no-mercy-001/agent-c2/*.py'
       - '.github/workflows/rs6-c2-detail-probe.yml'
   workflow_dispatch:
 jobs:
