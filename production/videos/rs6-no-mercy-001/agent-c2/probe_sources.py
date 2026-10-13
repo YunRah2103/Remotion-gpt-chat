@@ -10,6 +10,9 @@ SOURCES=[
  {"id":"victor-braam-detail-2021","url":"https://vimeo.com/690531160","note":"Purpose-built RS6 detail cinematic, unique C2 scope, publisher Victor Braam; licence unknown"},
  {"id":"pixabay-rs6-exhaust-126186","url":"https://pixabay.com/ru/videos/%D0%B0%D1%83%D0%B4%D0%B8-rs6-audi-%D0%B7%D0%B2%D1%83%D0%BA-%D0%B2%D1%8B%D1%85%D0%BB%D0%BE%D0%BF%D0%B0-126186/","note":"Pixabay license page states 1080x1920 59 FPS; generation & motion unconfirmed"},
  {"id":"video-broker-rs6-2021","url":"https://vimeo.com/1175902245","note":"Potential C8 moving details, Vimeo creator Video.Broker; rights unknown"},
+ {"id":"tim-automotives-swiss-rs6","url":"https://www.tiktok.com/@tim.automotives/video/7637948603545275670","note":"New C8 Swiss Spec creator lead; component close ups/motion to inspect; rights unknown"},
+ {"id":"performance61-c8-details","url":"https://www.tiktok.com/@performance61.de/video/7643332983386033440","note":"Creator documents actual C8 development, possible tuning detail close-ups; rights unknown"},
+ {"id":"drvz-american-c8","url":"https://www.tiktok.com/@drvzcars/video/7611992785985539361","note":"New original creator C8 footage candidate; detail aesthetic and rights unknown"},
 ]
 def call(cmd, timeout=120):
     t=time.time()
@@ -27,6 +30,7 @@ for s in SOURCES:
         for method,options in [
            ("yt-dlp-best",["-S","res:2160,codec:h264","-f","bv*+ba/best","--download-sections","*0-8"]),
            ("yt-dlp-single",["-f","best","--download-sections","*0-8"]),
+           ("chrome-impersonation",["--impersonate","chrome","--extractor-args","generic:impersonate","-f","bv*+ba/best","--download-sections","*0-8"]),
         ]:
             pre=[ "yt-dlp","--no-playlist","--no-progress","--no-overwrites","--socket-timeout","15","--retries","2","--fragment-retries","2","--add-header","User-Agent:Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/130.0.0.0 Safari/537.36","--merge-output-format","mp4","-o",str(folder/"source.%(ext)s") ]
             r=call(pre+options+[s["url"]],timeout=125)
