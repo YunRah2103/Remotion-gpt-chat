@@ -1,0 +1,33 @@
+name: YUNEX RS6 B2 motion visual audit
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/b2-youtube-driving
+    paths:
+      - production/videos/rs6-no-mercy-001/agent_b2_motion_visual_audit.py
+      - .github/workflows/rs6-b2-visual-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-action-shots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 23
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg and source QA dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q -U yt-dlp curl_cffi pillow
+      - name: Reacquire source excerpts privately, full-decode, generate review contact sheets
+        timeout-minutes: 19
+        run: python production/videos/rs6-no-mercy-001/agent_b2_motion_visual_audit.py
+      - name: Upload reduced visual QA only (no source video)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-b2-eight-clip-visual-contact-qa
+          path: b2-visual-audit/
+          retention-days: 14
+          if-no-files-found: warn
