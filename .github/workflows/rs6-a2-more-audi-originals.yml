@@ -1,0 +1,35 @@
+name: RS6 A2 alternate official RS6 performance GT media discovery
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/a2-hero-cinema
+    paths:
+      - production/videos/rs6-no-mercy-001/agent-a2/a2_discover_more_audi_originals.py
+      - .github/workflows/rs6-a2-more-audi-originals.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  rs6-original-source-investigation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up source metadata/FFprobe analysis
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install --disable-pip-version-check beautifulsoup4 requests
+      - name: Discover and probe original Audi 4K RS6 performance GT video pages
+        run: |
+          python production/videos/rs6-no-mercy-001/agent-a2/a2_discover_more_audi_originals.py | tee a2-more-originals-summary.json
+      - name: Upload source QA metadata only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-a2-new-official-sources-${{ github.run_id }}
+          path: |
+            a2_other_audi_originals/report.json
+            a2-more-originals-summary.json
+          retention-days: 14
+          if-no-files-found: warn
