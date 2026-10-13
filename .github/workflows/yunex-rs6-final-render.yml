@@ -5,7 +5,7 @@ on:
     paths: [.github/workflows/yunex-rs6-final-render.yml]
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
   actions: read
 jobs:
   render:
@@ -23,6 +23,7 @@ jobs:
           mkdir -p work
           gh release download yunex-phone-v4-56 --repo "$GITHUB_REPOSITORY" --pattern yunex-v4-56.mp4 --dir work || gh api -H 'Accept: application/octet-stream' /repos/YunRah2103/Remotion-gpt-chat/releases/assets/637770966 > work/yunex-v4-56.mp4
           test "$(stat -c%s work/yunex-v4-56.mp4)" = 15340800
+          echo '812fd32410f89a2fd67ddfe7ca0a0a28c4ddfdb617def14da0a788efde8e6ef9  work/yunex-v4-56.mp4' | sha256sum -c -
           ffprobe -v error -show_entries stream=index,codec_type,codec_name -of json work/yunex-v4-56.mp4 | tee work/source-probe.json
           ffprobe -v error -select_streams a -show_entries stream=index -of csv=p=0 work/yunex-v4-56.mp4 | grep -q .
           echo 'Searching private releases for exact approved edit'
@@ -47,11 +48,18 @@ jobs:
             exit 12
           fi
           ffprobe -v error -show_entries format=duration -of default=nw=1 work/approved.mp4
+          ffprobe -v error -show_entries stream=codec_name,width,height,r_frame_rate -select_streams v:0 -of json work/approved.mp4 | tee work/approved-probe.json
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of csv=p=0 work/approved.mp4)" = 395
       - name: Mix authentic acceleration into picture-locked master
         run: |
           set -euo pipefail
           ffmpeg -y -hide_banner -loglevel error -ss 7 -i work/yunex-v4-56.mp4 -t 13.166667 -vn -ar 48000 -ac 2 -c:a pcm_s16le work/genuine-v8.wav
-          ffmpeg -y -hide_banner -loglevel error -i work/approved.mp4 -i work/genuine-v8.wav -filter_complex '[0:a]volume=0.75[music];[1:a]highpass=f=45,volume=1.4[engine];[music][engine]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.95[out]' -map 0:v:0 -map '[out]' -c:v copy -c:a aac -b:a 256k -t 13.166667 -movflags +faststart work/YUNEX_RS6_13S_AUTOTOPNL_V8_PRIVATE_FINAL.mp4
+          # The approved MP4 may already contain an engine layer. Prefer its independent music-only backup, never layer new V8 over the old engine.
+          if [ ! -s work/ORIGINAL_MUSIC_BACKUP_48K.wav ]; then
+            echo 'ERROR: independent original music-only stem not available in Actions; refusing to retain the old engine underneath.'
+            exit 13
+          fi
+          ffmpeg -y -hide_banner -loglevel error -i work/approved.mp4 -i work/ORIGINAL_MUSIC_BACKUP_48K.wav -i work/genuine-v8.wav -filter_complex '[1:a]volume=0.55[music];[2:a]highpass=f=45,volume=1.4[engine];[music][engine]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.95[out]' -map 0:v:0 -map '[out]' -c:v copy -c:a aac -b:a 256k -t 13.166667 -movflags +faststart work/YUNEX_RS6_13S_AUTOTOPNL_V8_PRIVATE_FINAL.mp4
           ffmpeg -v error -i work/YUNEX_RS6_13S_AUTOTOPNL_V8_PRIVATE_FINAL.mp4 -f null -
           ffprobe -v error -show_streams -show_format -of json work/YUNEX_RS6_13S_AUTOTOPNL_V8_PRIVATE_FINAL.mp4 > work/final-probe.json
       - name: Upload private review artifact
