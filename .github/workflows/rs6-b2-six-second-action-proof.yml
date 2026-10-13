@@ -34,7 +34,8 @@ jobs:
             gh release download yunex-rs6-c2-details-review-20261013 -p "$name.mp4" -D private_sources
           done
           gh release download yunex-rs6-b2-motion-review-20261013 -p 'B2_LOWDOWN_NIGHT_07.mp4' -D private_sources
-          test "$(find private_sources -name '*.mp4' | wc -l)" -eq 8
+          gh release download yunex-rs6-b2-motion-review-20261013 -p 'B2_LOWDOWN_NIGHT_04.mp4' -D private_sources
+          test "$(find private_sources -name '*.mp4' | wc -l)" -eq 9
       - name: Actually render+decode the 6s real 1080x1920 edit; sample frame luma & contact sheets
         timeout-minutes: 7
         run: python production/videos/rs6-no-mercy-001/agent_b2_six_second_action_proof.py | tee b2-six-proof.log
