@@ -1,6 +1,6 @@
 # Repository agent guide
 
-Work ONLY in `YunRah2103/Remotion-gpt-chat`. Never read, import, copy, or modify `YunRah2103/yunus-video-lab` or any YUNEX assets.
+Work ONLY in `YunRah2103/Remotion-gpt-chat`. Never read, import, copy, or modify the *old* `YunRah2103/yunus-video-lab` repository or its assets. Keep the engineering-documentary productions below separate from YUNEX footage/editing work **unless a user explicitly assigns YUNEX work in this repository**.
 
 Independent compositions currently registered in `src/Root.tsx`:
 
@@ -26,3 +26,9 @@ Use the `production-render.yml` preview/stills workflow first and do actual movi
 ## Production pipeline, agent specialisms and captions
 
 For standalone automotive engineering explainer work, read `production/PIPELINE.md`, use `.github/skills/` as appropriate, verify cross-agent work with `production/tools/handoff.py`, and run `production/tools/production_pipeline.py` to ensure a real registered composition and contiguous storyboard exist before rendering. `GpuDriveFilmCaptioned` and `TurboDocumentaryCaptioned` add optional word-timed overlays while preserving originals. ABS-001 remains preproduction. Never access `yunus-video-lab` or YUNEX sources.
+
+## YUNEX Galaxy S25 V4 footage jobs (when explicitly assigned)
+
+**Required agent instructions:** [docs/YUNEX_S25_V4_AGENT_GUIDE.md](docs/YUNEX_S25_V4_AGENT_GUIDE.md). Read this before proposing, queuing, monitoring or reporting any S25 V4 footage job. The V4 implementation, approved YouTube source registry and exact issue-body generator live on branch `experiments/s25-footage-worker-v4-10min-20261012`, not in main. Do **not** improvise job payloads or approve unverified copyrighted sources.
+
+The S25 has a verified phone-side YouTube download: issue [#55](https://github.com/YunRah2103/Remotion-gpt-chat/issues/55), an **approved non-RS6 snowy-car test source**. The specific RS6 YouTube links have **not** been tested on the phone. Before saying a video is acquired, verify its real playable GitHub Release MP4, the `YUNEX_PHONE_DONE_V4` report and quality. Direct licensed creator MP4 downloads via GitHub Actions remain preferable when available. The phone may be idle/off to save battery; creating a job does not start Termux.
