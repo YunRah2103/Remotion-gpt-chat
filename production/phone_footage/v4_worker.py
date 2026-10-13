@@ -89,9 +89,10 @@ def refresh_sources():
 DONE, FAILED = "YUNEX_PHONE_DONE_V4", "YUNEX_PHONE_FAILED_V4"
 MIB = 1024 * 1024
 MAX_SECONDS = 600
-MAX_OUTPUT_MB = 512
-MAX_BYTES = MAX_OUTPUT_MB * MIB
-MAX_WORKSPACE_BYTES = 2300 * MIB
+MAX_OUTPUT_MB = 512            # Unchanged legacy 720p/1080p and audio cap.
+MAX_OUTPUT_MB_4K = 1536        # Separate explicit 4K budget: 1.5 GiB per job.
+MAX_BYTES = MAX_OUTPUT_MB_4K * MIB
+MAX_WORKSPACE_BYTES = 8192 * MIB  # 4K can temporarily need multiple GiB.
 TEMP_ROOT = Path.home() / ".cache" / "yunex-v4-temp"
 COMPLETION_CACHE = Path.home() / ".cache" / "yunex-v4-completed.json"
 PENDING_REPORTS = Path.home() / ".cache" / "yunex-v4-pending"
@@ -100,16 +101,24 @@ CATALOG_REFRESH_SECONDS = 1800
 _LAST_IDLE_LOG = 0.0
 
 
-def default_output_mb(duration):
-    """Larger clips get a larger safe output budget automatically."""
+def default_output_mb(duration, height=1080):
+    """4K defaults favour source-quality preservation; 1080p stays unchanged."""
+    if height == 2160:
+        return min(MAX_OUTPUT_MB_4K, max(180, math.ceil(duration * 9.0)))
     return min(MAX_OUTPUT_MB, max(45, math.ceil(duration * 0.85)))
 
 
 def workspace_limit(job):
-    return min(MAX_WORKSPACE_BYTES, max(350 * MIB, job["max_mb"] * 4 * MIB))
+    """4K source + native remux may require much more space than the result."""
+    if job.get("media") != "audio" and job.get("height") == 2160:
+        return min(MAX_WORKSPACE_BYTES,
+                   max(1024 * MIB, (job["max_mb"] * 4 + 512) * MIB))
+    return min(2300 * MIB, max(350 * MIB, job["max_mb"] * 4 * MIB))
 
 
 def minimum_free(job):
+    if job.get("media") != "audio" and job.get("height") == 2160:
+        return workspace_limit(job) + 1500 * MIB
     return max(700 * MIB, workspace_limit(job) + 450 * MIB)
 
 
@@ -139,7 +148,7 @@ def api(method, path, token, payload=None, binary=None, content_type="applicatio
 
 
 def upload_media_file(path, token, file):
-    """Stream large MP4 uploads from disk; do not allocate a second video in RAM.
+    """Stream large MP4/M4A uploads from disk; do not duplicate media in RAM.
 
     HTTPSConnection accepts a file object with explicit Content-Length and sends
     bounded chunks internally, unlike reading the entire MP4 into Python bytes.
@@ -156,7 +165,7 @@ def upload_media_file(path, token, file):
                "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "yunex-s25-v4",
                "Content-Type": "audio/mp4" if file.suffix.lower() == ".m4a" else "video/mp4",
                "Content-Length": str(size)}
-    # Slow mobile links need longer than 180 seconds for a 512 MiB upload.
+    # Slow mobile links may need substantial time for a large 4K upload.
     upload_timeout = min(3600, max(180, math.ceil(size / MIB) * 15))
     conn = http.client.HTTPSConnection("uploads.github.com", timeout=upload_timeout)
     try:
@@ -213,19 +222,24 @@ def parse_job(issue):
     if not valid_youtube_url(url):
         return None
     entry = LICENSED_PROOFS.get(url)
-    source_height_limit = entry["max_height"] if entry else 1080
+    source_height_limit = entry["max_height"] if entry else 2160
     media = job.get("media", "video")
     start = job.get("start", 0)
     duration = job.get("duration", 6)
     height = job.get("height", 1080)
-    max_mb = job.get("max_mb", (45 if media == "audio" else default_output_mb(duration)) if type(duration) in (float, int) and math.isfinite(float(duration)) else 45)
+    max_mb = job.get(
+        "max_mb",
+        (45 if media == "audio" else default_output_mb(duration, height))
+        if type(duration) in (float, int) and math.isfinite(float(duration)) else 45)
+    output_cap = MAX_OUTPUT_MB_4K if media == "video" and height == 2160 else MAX_OUTPUT_MB
     orientation = job.get("orientation", "landscape")
     if (type(start) not in (float, int) or type(duration) not in (float, int)
             or type(height) is not int or type(max_mb) is not int
             or not math.isfinite(float(start)) or not math.isfinite(float(duration))
             or not 0 <= start <= 21600 or not 2 <= duration <= MAX_SECONDS
-            or start + duration > 22200 or height not in (720, 1080)
-            or height > source_height_limit or not 5 <= max_mb <= MAX_OUTPUT_MB
+            or start + duration > 22200 or height not in (720, 1080, 2160)
+            or (media == "audio" and height == 2160)
+            or height > source_height_limit or not 5 <= max_mb <= output_cap
             or orientation not in ("landscape", "portrait")
             or media not in ("video", "audio")):
         return None
@@ -397,10 +411,15 @@ def download_proof(folder, job=None):
     command = [sys.executable, "-m", "yt_dlp", "--ignore-config", "--no-playlist",
                "--no-progress", "--js-runtimes", "node", "--socket-timeout", "25",
                "--retries", "2", "--fragment-retries", "2", "--concurrent-fragments", "1",
-               "--download-sections", segment, "--force-keyframes-at-cuts",
-               "--merge-output-format", "mp4",
-               "-f", fmt,
-               "--max-filesize", f"{budget // MIB}M", "-o", str(folder/"source.%(ext)s"), job["url"]]
+               "--download-sections", segment]
+    if height != 2160:
+        # Legacy <=1080 workflow keeps precise cut boundaries through encoding.
+        command.append("--force-keyframes-at-cuts")
+    # 4K keeps the original source codec; a phone-side UHD re-encode is too
+    # slow, power-hungry and can artificially degrade the original pixels.
+    command += ["--merge-output-format", "mp4", "-f", fmt,
+                "--max-filesize", f"{budget // MIB}M",
+                "-o", str(folder/"source.%(ext)s"), job["url"]]
     watched(command, min(3000, max(540, duration * 4 + 300)), folder, budget)
     candidates = sorted((p for p in folder.iterdir() if p.is_file()
                          and p.name.startswith("source.")
@@ -413,15 +432,30 @@ def download_proof(folder, job=None):
     source_video = next((x for x in source_probe.get("streams", [])
                          if x.get("codec_type") == "video"), None)
     source_short = (source_video or {}).get("width" if orientation == "portrait" else "height", 0)
-    if (not source_video or (height == 1080 and source_short < 1080)
-            or (orientation == "portrait" and source_video.get("width", 0) >= source_video.get("height", 0))):
+    source_long = (source_video or {}).get("height" if orientation == "portrait" else "width", 0)
+    if not source_video or (orientation == "portrait"
+                            and source_video.get("width", 0) >= source_video.get("height", 0)):
+        raise RuntimeError("Source video missing or source orientation mismatched")
+    if height == 2160:
+        if source_short < 2160 or source_long < 3840:
+            raise RuntimeError("Source is not native 4K (needs >=3840x2160, no upscaling)")
+        if source_video.get("codec_name") not in ("h264", "hevc", "vp9", "av1"):
+            raise RuntimeError("Source 4K codec cannot be losslessly remuxed to MP4")
+    elif height == 1080 and source_short < 1080:
         raise RuntimeError("Source lacks genuine 1080p frames")
     result = folder / "verified-phone-v4.mp4"
-    watched(["ffmpeg", "-y", "-v", "error", "-i", str(candidates[0]),
-             "-t", str(duration), "-map", "0:v:0", "-map", "0:a:0?",
-             "-c:v", "libx264", "-preset", "veryfast", "-crf", "21",
-             "-pix_fmt", "yuv420p", "-threads", "3", "-c:a", "aac",
-             "-b:a", "160k", "-movflags", "+faststart", str(result)], min(3000, max(540, duration * 5 + 300)), folder, budget)
+    output_command = ["ffmpeg", "-y", "-v", "error", "-i", str(candidates[0]),
+                      "-t", str(duration), "-map", "0:v:0", "-map", "0:a:0?"]
+    if height == 2160:
+        # Native 4K is copied bit-for-bit instead of re-encoded on the phone.
+        # VP9/AV1 may be retained inside MP4; downstream editing can transcode.
+        output_command += ["-c:v", "copy"]
+    else:
+        output_command += ["-c:v", "libx264", "-preset", "veryfast", "-crf", "21",
+                           "-pix_fmt", "yuv420p", "-threads", "3"]
+    output_command += ["-c:a", "aac", "-b:a", "160k",
+                       "-movflags", "+faststart", str(result)]
+    watched(output_command, min(3000, max(540, duration * 5 + 300)), folder, budget)
     size = result.stat().st_size if result.is_file() else 0
     if not 4096 < size <= min(MAX_BYTES, job["max_mb"] * MIB):
         raise RuntimeError("Output absent or exceeds approved size budget")
@@ -432,12 +466,20 @@ def download_proof(folder, job=None):
     seconds = float(video_probe.get("format", {}).get("duration") or 0)
     short = (video or {}).get("width" if orientation == "portrait" else "height", 0)
     long = (video or {}).get("height" if orientation == "portrait" else "width", 0)
-    if (not video or video.get("codec_name") != "h264"
-            or short > height or (height == 1080 and short != 1080)
+    if (not video or short > height
+            or (height == 1080 and short != 1080)
             or short < 320 or long < 320
             or (orientation == "portrait" and video.get("width", 0) >= video.get("height", 0))
             or not max(1.5, duration-1.2) <= seconds <= duration+2):
         raise RuntimeError("Decoded video codec, dimensions or duration invalid")
+    if height == 2160:
+        if (short < 2160 or long < 3840
+                or video.get("width") != source_video.get("width")
+                or video.get("height") != source_video.get("height")
+                or video.get("codec_name") != source_video.get("codec_name")):
+            raise RuntimeError("4K remux changed source resolution or video codec")
+    elif video.get("codec_name") != "h264":
+        raise RuntimeError("1080p/720p output must remain H.264")
     checked(["ffmpeg", "-v", "error", "-xerror", "-i", str(result),
              "-map", "0:v:0", "-f", "null", "-"], max(200, duration * 4))
     digest = hashlib.sha256()
@@ -449,6 +491,8 @@ def download_proof(folder, job=None):
                     "sha256": digest.hexdigest(), "requested_height": height,
                     "source_height": source_video["height"], "source_width": source_video["width"],
                     "orientation": orientation, "start": start,
+                    "native_4k": height == 2160,
+                    "source_codec_preserved": height == 2160,
                     "full_decode": "PASS"}
 
 def download_audio_proof(folder, job, budget):
