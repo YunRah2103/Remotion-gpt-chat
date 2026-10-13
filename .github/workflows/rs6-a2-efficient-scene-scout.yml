@@ -1,0 +1,36 @@
+name: RS6 A2 efficient UHD range-based car shot scout
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/a2-hero-cinema
+    paths:
+      - production/videos/rs6-no-mercy-001/agent-a2/a2_range_storyboard.py
+      - .github/workflows/rs6-a2-efficient-scene-scout.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  twenty-four-4k-actual-scenes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg and Pillow
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install --disable-pip-version-check pillow
+      - name: Extract actual RS6 native 4K source frames in bounded parallel range requests
+        run: |
+          python production/videos/rs6-no-mercy-001/agent-a2/a2_range_storyboard.py | tee a2-efficient-summary.json
+      - name: Upload visual contact sheets and metadata only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-a2-24-scene-contact-QA-${{ github.run_id }}
+          path: |
+            a2_range_storyboard/contact_*.jpg
+            a2_range_storyboard/report.json
+            a2-efficient-summary.json
+          if-no-files-found: warn
+          retention-days: 7
