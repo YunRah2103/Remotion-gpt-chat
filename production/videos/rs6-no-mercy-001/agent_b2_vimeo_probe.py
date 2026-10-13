@@ -88,7 +88,7 @@ def main():
     for source in SOURCES:
         try: rec=record(*source)
         except Exception as e: rec={"key":source[0],"status":"UNEXPECTED_ERROR","error":str(e)[-300:]}
-        print(rec["key"],rec["status"],rec.get("title"),flush=True)
+        print(rec["key"],rec["status"],rec.get("title"),rec.get("error",""),flush=True)
         result.append(rec)
     (OUT/"vimeo_probe.json").write_text(json.dumps(result,indent=2))
     (OUT/"README.txt").write_text(
