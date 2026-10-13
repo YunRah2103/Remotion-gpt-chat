@@ -27,20 +27,16 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
-          TAG: yunex-rs6-a2-gt-owner-review-20261013
+          TAG: yunex-rs6-a2-hero-review-20261013
         shell: bash
         run: |
           set -euo pipefail
           if ! compgen -G 'a2-gt-owner-review/*.mp4' >/dev/null; then
             echo 'ZERO_GT_MEDIA_DELIVERED'; exit 0
           fi
-          if gh release view "$TAG" --json isDraft --jq .isDraft >/dev/null 2>&1; then
-            test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
-          else
-            gh release create "$TAG" --draft --title "RS6 GT A2 separate 1080p private review - distinct C8 variant" \
-              --notes "Audi RS6 Avant GT white/red model, not standard Daytona Grey. Owner-only moving-film proof pending redistribution permission." --target "$GITHUB_SHA"
-          fi
+          # Use the pre-existing unpublished owner A2 release, avoiding 403 creation.
           test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
+          # GT and standard C8 are distinct; GT filenames/manifest cannot clobber originals.
           gh release upload "$TAG" a2-gt-owner-review/*.mp4 a2-gt-owner-review/*.txt a2-gt-owner-review/*.json a2-gt-owner-review/*.zip --clobber
           test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
           gh release view "$TAG" --json isDraft,assets --jq '{draft:.isDraft,assets:[.assets[].name]}'
