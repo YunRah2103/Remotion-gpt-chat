@@ -192,6 +192,100 @@ class WorkerV4Tests(unittest.TestCase):
         self.assertEqual(parsed["max_mb"], 510)
         self.assertNotIn("max_mb", json.loads(issue_body.split("\n", 1)[1]))
 
+    def test_completed_issue_cache_avoids_repeated_github_calls(self):
+        with tempfile.TemporaryDirectory() as temp:
+            cache = Path(temp) / "completed.json"
+            valid_comments = [{"body": v4.DONE + "\n\n~~~json\n{}\n~~~",
+                               "user": {"login": v4.OWNER}}]
+            with mock.patch.object(v4, "COMPLETION_CACHE", cache), \
+                 mock.patch.object(v4, "api", return_value=valid_comments) as api:
+                self.assertTrue(v4.already_reported("token", 5001))
+                self.assertEqual(v4.load_completed_issues(), {5001})
+                self.assertTrue(v4.already_reported("token", 5001))
+                api.assert_called_once()
+            self.assertEqual(cache.stat().st_mode & 0o777, 0o600)
+            self.assertEqual(json.loads(cache.read_text()), [5001])
+
+    def test_audio_only_job_and_helper_keep_legacy_video_default(self):
+        url = "https://www.youtube.com/watch?v=a38sqC7k2iw"
+        helper_spec = importlib.util.spec_from_file_location(
+            "v4_audio_agent", HERE / "agent_jobs_v4.py")
+        helper = importlib.util.module_from_spec(helper_spec)
+        helper_spec.loader.exec_module(helper)
+        body = helper.prepare(url, 0, 12, 1080, None, "landscape", "audio")
+        parsed = v4.parse_job({"body": body})
+        self.assertEqual(parsed["media"], "audio")
+        self.assertEqual(parsed["max_mb"], 45)
+        self.assertEqual(json.loads(body.split("\n", 1)[1])["media"], "audio")
+        legacy = helper.prepare(url, 0, 12, 1080, None, "landscape")
+        self.assertNotIn("media", json.loads(legacy.split("\n", 1)[1]))
+        self.assertEqual(v4.parse_job({"body": legacy})["media"], "video")
+        payload = json.loads(body.split("\n", 1)[1])
+        payload["media"] = "shell"
+        self.assertIsNone(v4.parse_job({"body": v4.MARKER + "\n" +
+                                        json.dumps(payload)}))
+
+    def test_audio_only_real_synthetic_aac_and_full_decode(self):
+        if not all(shutil.which(x) for x in ("node", "ffmpeg", "ffprobe")):
+            self.skipTest("node and FFmpeg required")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            genuine_watched = v4.watched
+            def synthetic_audio(command, timeout, folder, disk_budget=None):
+                if "-m" in command and "yt_dlp" in command:
+                    self.assertIn("bestaudio/best", command)
+                    self.assertEqual(command[command.index("--download-sections") + 1],
+                                     "*0-6")
+                    subprocess.run(["ffmpeg", "-y", "-v", "error",
+                                    "-f", "lavfi", "-i", "sine=frequency=200:sample_rate=48000",
+                                    "-t", "6", "-c:a", "aac", "-b:a", "128k",
+                                    str(root / "source.m4a")],
+                                   check=True, timeout=40)
+                else:
+                    return genuine_watched(command, timeout, folder,
+                                           disk_budget or v4.MAX_WORKSPACE_BYTES)
+            job = {"url": v4.CAR_VIDEO, "start": 0, "duration": 6,
+                   "height": 1080, "max_mb": 45, "media": "audio"}
+            with mock.patch.object(v4, "watched", side_effect=synthetic_audio):
+                movie, meta = v4.download_proof(root, job)
+            self.assertEqual(movie.suffix, ".m4a")
+            self.assertEqual(meta["codec"], "aac")
+            self.assertEqual(meta["sample_rate"], 48000)
+            self.assertEqual(meta["channels"], 2)
+            self.assertEqual(meta["full_decode"], "PASS")
+            self.assertEqual(meta["media"], "audio")
+            self.assertIsNone(meta["width"])
+            self.assertTrue(4.8 < meta["duration"] <= 7)
+
+    def test_unregistered_audio_upload_is_private_m4a(self):
+        calls = []
+        def fake_api(method, path, token, payload=None, binary=None,
+                     content_type="application/json"):
+            calls.append((path, payload))
+            if path.endswith("/releases"):
+                return {"id": 150, "html_url": "https://github.com/private/draft"}
+            return {"id": 990, "url": "https://api.github.com/assets/990",
+                    "browser_download_url": "https://github.com/private/file"}
+        job = dict(v4.parse_job(self.issue))
+        job["url"] = "https://www.youtube.com/watch?v=a38sqC7k2iw"
+        job["media"] = "audio"
+        with tempfile.TemporaryDirectory() as temp:
+            movie = Path(temp) / "proof.m4a"
+            movie.write_bytes(b"fake_aac_content")
+            with mock.patch.object(v4, "api", side_effect=fake_api), \
+                 mock.patch.object(v4, "upload_media_file",
+                                   return_value={"id": 989,
+                                    "url": "https://api.github.com/assets/989",
+                                    "browser_download_url": "https://github.com/private/aac"}):
+                out = v4.upload_release("fake", 60, movie, job,
+                                        {"duration": 8, "codec": "aac"})
+        self.assertTrue(calls[0][1]["draft"])
+        self.assertEqual(out["asset_filename"], "yunex-v4-60.m4a")
+        self.assertEqual(out["audio_asset_id"], 989)
+        self.assertIsNone(out["audio_url"])
+        self.assertIsNone(out["mp4_url"])
+        self.assertEqual(out["rights_status"], "unverified")
+
     def test_stream_upload_uses_file_handle_not_read_bytes(self):
         from unittest import mock
         from io import BytesIO
