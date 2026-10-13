@@ -1,0 +1,37 @@
+name: YUNEX RS6 B2 real owner-motion acquisition QA
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/b2-youtube-driving
+    paths:
+      - production/videos/rs6-no-mercy-001/agent_b2_owner_feed_motion.py
+      - .github/workflows/rs6-b2-owner-motion-qa.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: rs6-b2-owner-motion-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  owner-motion-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg and public creator extractor
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q --upgrade yt-dlp curl_cffi
+          ffprobe -version | head -n 1
+      - name: Run transient RS6 C8 motion-footage discovery and actual decode
+        timeout-minutes: 13
+        run: python production/videos/rs6-no-mercy-001/agent_b2_owner_feed_motion.py
+      - name: Publish source/codec/sha reports only; never unapproved media
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-b2-owner-motion-technical-report
+          path: b2-owner-motion-evidence/
+          retention-days: 14
+          if-no-files-found: warn
