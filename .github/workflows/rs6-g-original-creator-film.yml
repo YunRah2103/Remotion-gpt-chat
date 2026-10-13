@@ -1,0 +1,35 @@
+name: YUNEX RS6 recover 1080p original YouTube film from creator master
+on:
+  push:
+    branches: [automotive-edits/rs6-no-mercy-001/g-director-rescue]
+    paths:
+      - .github/workflows/rs6-g-original-creator-film.yml
+      - production/videos/rs6-no-mercy-001/g_original_creator_full.py
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  full-original-private-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install media tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          pip install -q pillow requests
+      - name: Actually recover and validate complete original native MP4
+        run: |
+          python production/videos/rs6-no-mercy-001/g_original_creator_full.py > creator-original.log 2>&1 || true
+          tail -60 creator-original.log
+      - name: Owner-only proof artifact; never a public Release
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: THE_LOWDOWN_RS6_C8_CREATOR_SOURCE_NATIVE1080
+          path: |
+            rs6-original-film-private/
+            creator-original.log
+          retention-days: 1
+          if-no-files-found: warn
