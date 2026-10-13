@@ -4,6 +4,7 @@ import requests,re,html,json,subprocess,hashlib,os,time
 from pathlib import Path
 out=Path('v8-aggressive-verified');out.mkdir(exist_ok=True)
 S={
+ 'recorded_ford_v8_accelerating':('https://freesound.org/people/noiseloop/sounds/455926/','Real Ford V8 5L under-load acceleration 11.46s, CC BY 3 attribution required'),
  'cc0_v8_throttle_binaural':('https://freesound.org/people/overmedium/sounds/651534/','V8 throttle blip binaural real field recording CC0'),
  'cc0_mustang_302_1969':('https://freesound.org/people/FlaxGod/sounds/653226/','1969 Mustang 302 actual rev CC0'),
  'cc0_audi_v8':('https://freesound.org/people/FFKoenigsegg20012017/sounds/339703/','Audi V8 acceleration recording CC0; Audi model unspecified'),
