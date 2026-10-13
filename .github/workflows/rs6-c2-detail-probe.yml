@@ -20,7 +20,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y ffmpeg
-          python -m pip install --upgrade yt-dlp --break-system-packages
+          python -m pip install --upgrade yt-dlp curl-cffi --break-system-packages
           ffmpeg -version | head -n 1
           yt-dlp --version
       - name: Execute independent C2 source acquisition attempts
