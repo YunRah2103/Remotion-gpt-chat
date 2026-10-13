@@ -40,10 +40,13 @@ jobs:
             c2_audi_uhd_novel/UHD_RS6_MOVING_RPM_CLUSTER.mp4 \
             c2_audi_uhd_novel/UHD_RS6_OVAL_EXHAUST_REAR.mp4 \
             c2_audi_uhd_novel/UHD_RS6_REAR_LED_SIGNATURE.mp4 \
-            c2_audi_uhd_novel/UHD_RS6_REAL_GEAR_SELECTOR.mp4 \
+            c2_audi_uhd_novel/UHD_RS6_STEERING_MODE_CONTROL.mp4 \
             c2_audi_uhd_novel/UHD_NOVEL_CONTACT.jpg \
             c2_audi_uhd_novel/UHD_NOVEL_MANIFEST.json \
             c2_audi_uhd_novel/UHD_NOVEL_SHA256SUMS.txt --clobber
+          if gh release view "$TAG" --json assets --jq '.assets[].name' | grep -qx 'UHD_RS6_REAL_GEAR_SELECTOR.mp4'; then
+            gh release delete-asset "$TAG" UHD_RS6_REAL_GEAR_SELECTOR.mp4 --yes
+          fi
           gh release view "$TAG" --json isDraft,assets --jq '{draft:.isDraft,videos:[.assets[].name|select(endswith(".mp4"))]}'
       - name: Save independent video verification and one-frame-per-shot review evidence
         if: always()
