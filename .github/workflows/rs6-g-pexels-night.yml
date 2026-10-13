@@ -1,0 +1,39 @@
+name: YUNEX RS6 C8 night-tunnel original motion source
+on:
+  push:
+    branches: [automotive-edits/rs6-no-mercy-001/g-director-rescue]
+    paths: [.github/workflows/rs6-g-pexels-night.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  true-night-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Install FFmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Download actual creator-authored vertical 1080p genuine tunnel footage
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p rs6-night-source
+          curl -fLsS --connect-timeout 15 --max-time 140 --retry 3 -o rs6-night-source/pexels_original.mp4 'https://videos.pexels.com/video-files/10816903/10816903-hd_1080_1920_30fps.mp4'
+          ffprobe -v error -show_entries stream=codec_name,width,height,r_frame_rate:format=duration,size -of json rs6-night-source/pexels_original.mp4 > rs6-night-source/NATIVE_PROBE.json
+          ffmpeg -nostdin -v error -i rs6-night-source/pexels_original.mp4 -t 4.5 -an -c:v libx264 -preset fast -crf 18 -pix_fmt yuv420p -r 30 -movflags +faststart rs6-night-source/PEXELS_TUNNEL_NIGHT_4s.mp4
+          ffmpeg -nostdin -v error -xerror -i rs6-night-source/PEXELS_TUNNEL_NIGHT_4s.mp4 -f null -
+          rm rs6-night-source/pexels_original.mp4
+          cat > rs6-night-source/SOURCE.txt <<'EOF'
+          SOURCE: https://www.pexels.com/video/point-of-view-of-a-car-driving-through-a-tunnel-10816903/
+          AUTHOR: Fatih Dogrul
+          LICENSE: Pexels Free License; see https://www.pexels.com/license/
+          USE: Night tunnel ambience only; not falsely presented as RS6.
+          EOF
+          cat rs6-night-source/NATIVE_PROBE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: RS6_G_TRUE_NIGHT_VERTICAL_SOURCE
+          path: rs6-night-source/
+          retention-days: 7
+          if-no-files-found: warn
