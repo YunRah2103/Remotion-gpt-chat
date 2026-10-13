@@ -36,6 +36,7 @@ jobs:
             exit 0
           fi
           test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
+          gh release delete-asset "$TAG" "A2_C8_RS6_REAR_CHASE_EXIT.mp4" --yes || true
           gh release upload "$TAG" a2-extra-owner-review/*.mp4 a2-extra-owner-review/*.json a2-extra-owner-review/*.txt a2-extra-owner-review/*.zip --clobber
           test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
       - name: QA-only contact pictures and source quality reports
