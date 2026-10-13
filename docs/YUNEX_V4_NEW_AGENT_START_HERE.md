@@ -6,6 +6,40 @@
 
 > **Already working:** S25 V4 is installed; YouTube phone downloads **#55** (approved car video) and **#56** (unregistered AutoTopNL RS6, draft) both passed. New `--media audio` is **CI-tested, not yet tested on the S25**. The user does not need to re-upload #56 or disclose their phone token. Do not assume the loop is currently running.
 
+## Fastest path: use the reusable import action (no manual asset handling)
+
+**For an already-completed phone job, use one GitHub Actions step.** The shared action [`.github/actions/yunex-v4-import/action.yml`](../.github/actions/yunex-v4-import/action.yml) reads the **owner-authored `YUNEX_PHONE_DONE_V4` issue comment**, downloads the real media from its GitHub draft/public Release, verifies **size, SHA256, FFprobe and full FFmpeg decode**, and gives the current editing job the verified absolute file path. It also handles missing FFmpeg on a standard Ubuntu runner.
+
+For example, an audio or visual editing agent who needs existing RS6 job [#56](https://github.com/YunRah2103/Remotion-gpt-chat/issues/56) can **reuse it, not ask the user to attach it**:
+
+```yaml
+permissions:
+  contents: write # proven requirement for owner-only draft assets
+  issues: read
+jobs:
+  edit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - id: phone
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with:
+          issue_number: '56' # substitute the completed phone issue number
+          token: ${{ github.token }}
+      - name: Edit with the verified input
+        shell: bash
+        env:
+          SOURCE_FILE: ${{ steps.phone.outputs.asset_path }}
+        run: |
+          test -s "$SOURCE_FILE"
+          # Use "$SOURCE_FILE" in your actual FFmpeg/Remotion edit.
+          # Keep unknown-rights footage inside your authorised private workflow.
+```
+
+The action outputs `asset_path`, `media` (`video` or `audio`), `sha256`, `rights_status` and `release_visibility`. This is **an import into the current runner**, not a lasting final edit or publication. Build the actual edit in the same job. Do not upload rights-unverified source footage as a publicly accessible artifact, publish the draft, or assume the user has authorised distribution.
+
+**No need to implement GitHub's draft Release API repeatedly.** For a new job, create the owner-authored queue issue first, wait for `YUNEX_PHONE_DONE_V4`, then call this exact importer with its number. For direct filmmaker MP4 sources, continue using the existing direct-source route.
+
 ## A new agent's first 60 seconds
 
 1. **Check what already exists:** search the project's GitHub issues, run artifacts and Releases for the requested shot, sound, or approved edit. For AutoTopNL RS6 **reuse [phone job #56](https://github.com/YunRah2103/Remotion-gpt-chat/issues/56)** (60 s, 1080p, draft tag `yunex-phone-v4-56`, asset `yunex-v4-56.mp4`). **Do not redownload it.**
