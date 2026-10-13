@@ -15,8 +15,10 @@ jobs:
     timeout-minutes: 24
     steps:
       - uses: actions/checkout@v4
-      - name: Confirm media tooling
+      - name: Install FFmpeg and inspect tooling
         run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
           ffmpeg -version | head -1
           gh version
       - name: Acquire actual A2 B2 C2 owner-review sources from unpublished drafts
