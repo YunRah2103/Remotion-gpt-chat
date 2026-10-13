@@ -1,4 +1,4 @@
-"""Offline QA for V4 queue rights, bounds, disk safety and delivery manifest."""
+"""Offline QA for V4 queue inputs, private draft safety, disk and delivery."""
 import importlib.util
 import json
 from pathlib import Path
@@ -27,8 +27,22 @@ class WorkerV4Tests(unittest.TestCase):
         self.assertTrue(all(x["reviewed_by"] == v4.OWNER for x in v4.LICENSED_PROOFS.values()))
         self.assertEqual(v4.parse_job(self.issue)["duration"], 14)
 
-    def test_refuse_unreviewed_source_and_untrusted_marker(self):
-        for bad in ({"url": "https://www.youtube.com/watch?v=UNAPPROVED"},
+    def test_arbitrary_canonical_youtube_is_accepted_without_license(self):
+        for url in ("https://www.youtube.com/watch?v=a38sqC7k2iw",
+                    "https://www.youtube.com/watch?v=pzhKoJAb1ek"):
+            payload = json.loads(self.issue["body"].split("\n", 1)[1])
+            payload["url"] = url
+            job = v4.parse_job({"body": v4.MARKER + "\n" + json.dumps(payload)})
+            self.assertIsNotNone(job)
+            self.assertNotIn(url, v4.LICENSED_PROOFS)
+
+    def test_refuse_bad_urls_bounds_and_untrusted_marker(self):
+        for bad in ({"url": "https://www.youtube.com/watch?v=SHORT"},
+                    {"url": "http://www.youtube.com/watch?v=a38sqC7k2iw"},
+                    {"url": "https://www.youtube.com.evil.org/watch?v=a38sqC7k2iw"},
+                    {"url": "https://www.youtube.com/watch?v=a38sqC7k2iw&list=PLdemo"},
+                    {"url": "https://www.youtube.com/watch?v=a38sqC7k2iw#t=10"},
+                    {"url": "https://www.youtube.com:443/watch?v=a38sqC7k2iw"},
                     {"height": 2160}, {"max_mb": 999}, {"start": -1},
                     {"duration": 601}, {"duration": 0}, {"height": True},
                     {"duration": True}, {"max_mb": 1}, {"start": 23000},
@@ -216,6 +230,36 @@ class WorkerV4Tests(unittest.TestCase):
             self.assertEqual(calls["host"], "uploads.github.com")
             self.assertIn("asset.mp4", result["browser_download_url"])
 
+    def test_unregistered_source_upload_uses_draft_with_no_fabricated_rights(self):
+        calls = []
+        def fake_api(method, path, token, payload=None, binary=None, content_type="application/json"):
+            calls.append((method, path, payload, binary, content_type))
+            if path.endswith("/releases"):
+                return {"id": 141, "html_url": "https://github.com/owner/draft"}
+            return {"id": 920, "url": "https://api.github.com/repos/owner/repo/releases/assets/920",
+                    "browser_download_url": "https://github.com/release/private-asset"}
+        job = dict(v4.parse_job(self.issue))
+        job["url"] = "https://www.youtube.com/watch?v=a38sqC7k2iw"
+        with tempfile.TemporaryDirectory() as root:
+            movie = Path(root) / "sample.mp4"
+            movie.write_bytes(b"mock-movie-bytes")
+            with mock.patch.object(v4, "api", side_effect=fake_api), \
+                 mock.patch.object(v4, "upload_media_file",
+                      return_value={"id": 919, "url": "https://api.github.com/repos/owner/repo/releases/assets/919",
+                                    "browser_download_url": "https://github.com/release/private-clip.mp4"}):
+                result = v4.upload_release("token", 57, movie, job,
+                                           {"width": 1920, "height": 1080, "sha256": "demo"})
+        self.assertTrue(calls[0][2]["draft"])
+        self.assertEqual(calls[0][2]["prerelease"], True)
+        self.assertEqual(result["rights_status"], "unverified")
+        self.assertEqual(result["release_visibility"], "draft")
+        self.assertIsNone(result["license"])
+        self.assertIsNone(result["mp4_url"])
+        self.assertIsNone(result["manifest_url"])
+        self.assertEqual(result["mp4_asset_id"], 919)
+        self.assertTrue(result["mp4_asset_api_url"].endswith("/919"))
+        self.assertEqual(json.loads(calls[1][3])["mp4_url"], None)
+
     def test_uploads_mp4_and_json_manifest(self):
         calls = []
         def fake_api(method,path,token,payload=None,binary=None,content_type="application/json"):
@@ -235,6 +279,8 @@ class WorkerV4Tests(unittest.TestCase):
                 upload.assert_called_once()
         self.assertEqual(len(calls), 2)
         self.assertEqual(calls[0][2]["tag_name"], "yunex-phone-v4-52")
+        self.assertFalse(calls[0][2]["draft"])
+        self.assertEqual(result["release_visibility"], "public_prerelease")
         self.assertEqual(calls[1][4], "application/json")
         self.assertEqual(json.loads(calls[1][3])["schema"], "YUNEX_PHONE_RESULT_V4")
         self.assertIn("manifest_url", result)
