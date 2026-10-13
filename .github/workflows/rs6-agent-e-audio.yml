@@ -9,6 +9,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  actions: read
 jobs:
   render-original-score:
     runs-on: ubuntu-latest
@@ -53,3 +54,46 @@ jobs:
             gh release upload "$tag" rs6_audio_out/YUNEX_RS6_NO_MERCY_CLEARED_SCORE_48K.m4a rs6_audio_out/YUNEX_RS6_NO_MERCY_CLEARED_SCORE_48K.wav rs6_audio_out/mix_manifest.json --clobber
           fi
           gh release view "$tag" --json isDraft,url,assets | python -c 'import sys,json;d=json.load(sys.stdin); print("DRAFT_RELEASE",d["isDraft"],d["url"],len(d["assets"]))'
+      - name: Download Agent D actual 395-frame private picture artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p rs6_d_picture_in
+          gh run download 38383804317 --repo "${{ github.repository }}" --name YUNEX_RS6_NO_MERCY_001_FULL_PRIVATE_PICTURE --dir rs6_d_picture_in
+          test -s rs6_d_picture_in/d-rs6-picture/YUNEX_RS6_NO_MERCY_001_PICTURE.mp4
+          sha256sum rs6_d_picture_in/d-rs6-picture/YUNEX_RS6_NO_MERCY_001_PICTURE.mp4
+      - name: Produce verified actual D picture plus E stereo mixed MP4
+        run: |
+          set -euo pipefail
+          mkdir -p rs6_full_mix_out
+          pic=rs6_d_picture_in/d-rs6-picture/YUNEX_RS6_NO_MERCY_001_PICTURE.mp4
+          score=rs6_audio_out/YUNEX_RS6_NO_MERCY_CLEARED_SCORE_48K.m4a
+          final=rs6_full_mix_out/YUNEX_RS6_NO_MERCY_001_D_E_PRIVATE_REVIEW.mp4
+          ffmpeg -hide_banner -loglevel error -y -i "$pic" -i "$score" -map 0:v:0 -map 1:a:0 -c:v copy -c:a aac -b:a 256k -ar 48000 -ac 2 -t 13.166667 -movflags +faststart "$final"
+          ffprobe -v error -show_entries stream=codec_name,width,height,nb_frames,avg_frame_rate,sample_rate,channels -show_entries format=duration,size -of json "$final" | tee rs6_full_mix_out/FINAL_FFPROBE.json
+          ffmpeg -v error -xerror -i "$final" -f null -
+          python -c 'import json; j=json.load(open("rs6_full_mix_out/FINAL_FFPROBE.json")); v,a=j["streams"]; assert (v["codec_name"],int(v["width"]),int(v["height"]),v["avg_frame_rate"],int(v["nb_frames"]))==("h264",1080,1920,"30/1",395); assert (a["codec_name"],int(a["sample_rate"]),int(a["channels"]))==("aac",48000,2); assert abs(float(j["format"]["duration"])-395/30)<.015'
+          sha256sum "$final" | tee rs6_full_mix_out/SHA256SUMS.txt
+          cp rs6_audio_out/mix_manifest.json rs6_full_mix_out/ORIGINAL_SCORE_MANIFEST.json
+          cp rs6_d_picture_in/d-rs6-picture/EDIT_QA.json rs6_full_mix_out/D_PICTURE_QA.json
+          echo "FULL MIX: VALIDATED actual D 395f + E independent composition, not user reference song."
+      - name: OWNER-only full mixed MP4 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX_RS6_D_E_FULL_MIX_PRIVATE_REVIEW
+          path: rs6_full_mix_out/
+          if-no-files-found: error
+          retention-days: 14
+      - name: OWNER-only unpublished final mixed preview draft Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=yunex-rs6-e-private-mux-20261013-v1
+          final=rs6_full_mix_out/YUNEX_RS6_NO_MERCY_001_D_E_PRIVATE_REVIEW.mp4
+          if ! gh release view "$tag" >/dev/null 2>&1; then
+            gh release create "$tag" --draft --title "YUNEX RS6 full 13s D+E mix - PRIVATE approval only" --notes "PRIVATE REVIEW ONLY. Actual D full moving-car picture plus independently composed E score. Third-party footage rights NOT cleared, do not publish. Reference song is not included." "$final" rs6_full_mix_out/FINAL_FFPROBE.json rs6_full_mix_out/SHA256SUMS.txt
+          else
+            gh release upload "$tag" "$final" rs6_full_mix_out/FINAL_FFPROBE.json rs6_full_mix_out/SHA256SUMS.txt --clobber
+          fi
+          gh release view "$tag" --json isDraft,url,assets | python -c 'import sys,json;d=json.load(sys.stdin);assert d["isDraft"];print("PRIVATE_D_E_MIX_DRAFT",d["url"],len(d["assets"]))'
