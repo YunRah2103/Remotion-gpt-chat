@@ -11,9 +11,9 @@ SOURCE="https://delivery-p123922-e1240369.adobeaemcloud.com/adobe/assets/urn:aai
 ROOT=Path("a2-owner-review");ROOT.mkdir(exist_ok=True)
 STATUS=Path("a2-private-qa");STATUS.mkdir(exist_ok=True)
 SPECS=[
-    {"id":"A2_C8_RS6_MOUNTAIN_SWEEP","start":95.83,"length":1.35,
+    {"id":"A2_C8_RS6_MOUNTAIN_SWEEP","start":96.34,"length":1.04,
      "note":"real C8 RS6 approaching in right-hand mountainside bend; source daylight",
-     "crop_x":"max(0,min(in_w-out_w,1460+360*t))"},
+     "crop_x":"max(0,min(in_w-out_w,1840-120*t))"},
     {"id":"A2_C8_RS6_FAST_APPROACH","start":205.91,"length":1.39,
      "note":"actual RS6 forward road approach and fast lens pass; 9:16 tracked crop",
      "crop_x":"max(0,min(in_w-out_w,1500+480*t))"},
