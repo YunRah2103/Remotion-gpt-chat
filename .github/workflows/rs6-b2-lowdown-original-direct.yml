@@ -1,0 +1,50 @@
+name: YUNEX RS6 B2 THE LOWDOWN original direct-MP4 acquisition
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/b2-youtube-driving
+    paths:
+      - .github/workflows/rs6-b2-lowdown-original-direct.yml
+      - production/videos/rs6-no-mercy-001/agent_b2_lowdown_direct.py
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  acquire-original-creator-media:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFprobe, FFmpeg and Python direct source helpers
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q --upgrade requests pillow
+      - name: Acquire legitimate published creator-website MP4, probe, decode, extract frames
+        timeout-minutes: 9
+        run: |
+          python production/videos/rs6-no-mercy-001/agent_b2_lowdown_direct.py | tee b2-lowdown-proof.txt
+      - name: If and only if real playable media exists, append to owner-only draft release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: yunex-rs6-b2-motion-review-20261013
+        run: |
+          set -euo pipefail
+          if compgen -G 'b2-lowdown-review/*.mp4' > /dev/null; then
+            test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
+            gh release upload "$TAG" b2-lowdown-review/*.mp4 b2-lowdown-review/*.jpg b2-lowdown-review/B2_LOWDOWN_ORIGINAL_OWNER_REVIEW.zip --clobber
+            gh release view "$TAG" --json isDraft,assets --jq '{draft:.isDraft,assets:[.assets[].name]}'
+          else
+            echo "NO_REAL_CREATOR_MP4_YET - leave existing draft untouched"
+          fi
+      - name: Publish technical status only, never uncleared creator video
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-b2-lowdown-original-technical-probe
+          path: |
+            b2-lowdown-proof.txt
+            b2-lowdown-proofs/*.json
+          retention-days: 14
+          if-no-files-found: warn
