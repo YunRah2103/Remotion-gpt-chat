@@ -1,0 +1,77 @@
+name: YUNEX RS6 original filmmakers Vimeo reality scout
+on:
+  push:
+    branches: [automotive-edits/rs6-no-mercy-001/g-director-rescue]
+    paths: [.github/workflows/rs6-g-vimeo-scout.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-cinematographers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    steps:
+      - name: Install media tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          pip install -q yt-dlp pillow
+      - name: Test public original-creator Vimeo files and visual crops
+        shell: bash
+        run: |
+          python - <<'PY'
+          import subprocess,json,pathlib,hashlib
+          from PIL import Image,ImageDraw
+          root=pathlib.Path('rs6-g-vimeo-original-scout');root.mkdir(exist_ok=True)
+          targets=[
+            ('BRAM_MTM_NIGHT','https://vimeo.com/1164115588'),
+            ('FUME_ART_GARAGE','https://vimeo.com/761014676'),
+            ('TWO_N_TWO','https://vimeo.com/803836362'),
+            ('VICTOR_CINEMATIC','https://vimeo.com/690531160'),
+          ]
+          result=[]
+          for name,url in targets:
+            record={'id':name,'url':url,'rights':'Creator-authored public Vimeo, reuse unapproved; frame QA only'}
+            try:
+              mp4=root/(name+'.mp4')
+              cmd=['yt-dlp','--no-playlist','--no-part','--socket-timeout','12','--retries','1','--fragment-retries','1','--concurrent-fragments','2','-f','bv*[height<=1080][ext=mp4]+ba[ext=m4a]/b[height<=1080][ext=mp4]/best[height<=1080]', '--merge-output-format','mp4','--max-filesize','180M','-o',str(mp4),url]
+              p=subprocess.run(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,timeout=120)
+              record['download_log_tail']=p.stdout[-600:]
+              files=list(root.glob(name+'*.mp4'));print('SOURCE',name,'CODE',p.returncode,'FILES',len(files),flush=True)
+              if p.returncode or not files:raise RuntimeError(p.stdout[-500:])
+              file=files[0]; meta=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(file)],timeout=30))
+              v=next(x for x in meta['streams'] if x['codec_type']=='video')
+              record.update(status='REAL_MP4_PASS',bytes=file.stat().st_size,width=v['width'],height=v['height'],duration=meta['format'].get('duration'),fps=v.get('avg_frame_rate'))
+              duration=min(float(meta['format']['duration']),120);step=max(2.5,duration/12)
+              frames=[]
+              for i in range(12):
+                at=min(duration-.1,i*step+step/2)
+                if at<0:break
+                cmd=['ffmpeg','-nostdin','-v','error','-ss',str(at),'-i',str(file),'-frames:v','1','-vf','scale=640:360','-f','image2pipe','-vcodec','mjpeg','-']
+                a=subprocess.run(cmd,capture_output=True,timeout=20)
+                if a.returncode:continue
+                from io import BytesIO
+                im=Image.open(BytesIO(a.stdout)).convert('RGB')
+                frames.append((at,im))
+              sw,sh=202,360;sheet=Image.new('RGB',(sw*12,(sh+26)),'#111622');d=ImageDraw.Draw(sheet)
+              for j,(at,im) in enumerate(frames):
+                x=(640-sw)//2;im=im.crop((x,0,x+sw,360));sheet.paste(im,(j*sw,26))
+                d.text((j*sw+3,4),f'{name} {at:.1f}s',fill='white')
+              sheet.save(root/(name+'_PORTRAIT.jpg'),quality=87)
+              record['qa_frames']=len(frames)
+              file.unlink(missing_ok=True)
+              print('PASS',json.dumps({k:v for k,v in record.items() if k!='download_log_tail'}),flush=True)
+            except Exception as e:
+              record.update(status='NOT_ACQUIRED',error=str(e)[-450:]);print('FAIL',name,record['error'],flush=True)
+            for file in root.glob(name+'*.mp4'):file.unlink(missing_ok=True)
+            result.append(record)
+          (root/'REPORT.json').write_text(json.dumps(result,indent=2))
+          print('END',json.dumps(result,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: RS6_G_ORIGINAL_VIMEO_CINEMATIC_SOURCE_REVIEW
+          path: rs6-g-vimeo-original-scout/
+          retention-days: 7
+          if-no-files-found: warn
