@@ -1,0 +1,31 @@
+name: GT footage scene check
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/a2-hero-cinema
+    paths:
+      - production/videos/rs6-no-mercy-001/agent-a2/a2_gt_storyboard.py
+      - .github/workflows/rs6-a2-gt-24-original-scenes.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  scout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install pillow
+      - name: Extract source previews
+        run: python production/videos/rs6-no-mercy-001/agent-a2/a2_gt_storyboard.py
+      - name: Upload shot-selection evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-a2-gt-visual-qa
+          path: a2_gt_storyboard/
+          retention-days: 10
