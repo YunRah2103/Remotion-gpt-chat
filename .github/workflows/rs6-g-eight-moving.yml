@@ -1,0 +1,34 @@
+name: YUNEX RS6 G 8 native UHD moving C8 moments private
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/g-director-rescue
+    paths:
+      - .github/workflows/rs6-g-eight-moving.yml
+      - production/videos/rs6-no-mercy-001/g_eight_moving.py
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  moving-sources:
+    runs-on: ubuntu-latest
+    timeout-minutes: 19
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install transcoder and validate binaries
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Pull real Audi UHD 4K selected source windows and convert + decode
+        run: |
+          set -euo pipefail
+          python production/videos/rs6-no-mercy-001/g_eight_moving.py | tee rs6-g-8-real-source.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: RS6_G_EIGHT_PRIVATE_UHD_REAL_MOVING_SOURCES
+          path: |
+            rs6-g-motion-extractions/
+            rs6-g-8-real-source.log
+          retention-days: 5
+          if-no-files-found: warn
