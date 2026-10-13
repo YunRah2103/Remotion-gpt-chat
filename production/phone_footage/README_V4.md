@@ -1,4 +1,4 @@
-# YUNEX Galaxy S25 Footage Bridge V4 — Up to 10 Minutes
+# YUNEX Galaxy S25 Footage Bridge V4 — Up to 10 Minutes, Optional Native 4K
 
 Branch: experiments/s25-footage-worker-v4-10min-20261012
 
@@ -8,11 +8,12 @@ V4 is a separate experimental worker. Existing V1/V2/V3 and main are preserved.
 
 ## What changed
 
-The **duration ceiling is 600 seconds (10 minutes)**; normal projects should still request short clips. Clips can begin at offsets up to 6 hours into the source. V4 supports landscape or portrait, up to genuine 1080p (not 4K or HDR).
+The **duration ceiling is 600 seconds (10 minutes)**; normal projects should still request short clips. Clips can begin at offsets up to 6 hours into the source. V4 supports landscape and portrait with **720p, 1080p (default), or optional native 2160p / 4K**. For landscape, 4K must really contain at least **3840×2160** source pixels; for portrait, at least **2160×3840**. No fake upscaling. 4K is not yet certified on the actual S25; existing 1080p downloads are phone-proven.
 
-- Output size defaults dynamically to 45 MiB for short clips and up to 510 MiB for 600-second clips; hard maximum 512 MiB per job.
-- Working storage budget scales with requested output size up to 2,300 MiB. The worker requires that workspace budget plus 450 MiB free before starting, with at least 700 MiB for the smallest jobs. Download processes stop if phone free space drops under 400 MiB.
-- Timeout scales with length (up to 50 minutes for downloading and 50 minutes for transcoding). Full FFmpeg decode and resolution/codec/duration checks are required.
+- **720p/1080p/audio** retain the original output limit of 512 MiB and normal default size budgets. **Explicit 4K video** gets a separate cap of **1,536 MiB (1.5 GiB)** and an adaptive budget up to that cap; long/high-bitrate 4K can still exceed it and fail safely. Agents should request brief 4K excerpts first.
+- **720p/1080p** working storage stays capped at 2,300 MiB with the original free-space reserve. **4K** may require up to **8 GiB** temporary workspace and the whole calculated workspace **plus 1,500 MiB** free before starting; a job is rejected if the phone lacks space. Download/transcode processes stop if free storage falls below 400 MiB.
+- Timeout scales with length (up to 50 minutes for downloading and 50 minutes for remuxing/transcoding). Full FFmpeg decode and source/output resolution/codec/duration checks are required.
+- **4K video uses native codec stream-copy to MP4** (H.264, HEVC, VP9 or AV1), not slow 4K software H.264 encoding. This avoids battery-intensive upscaling/re-encoding and preserves original source detail. The MP4 may contain VP9/AV1/HEVC instead of H.264; agents should use FFprobe and transcode on a desktop/cloud editor only if required. 1080p/720p retains the existing H.264 export and precise cut path. 4K stream-copy can have keyframe-based cut boundaries; inspect the actual beginning/end frames and duration.
 - Large media uploads stream from disk instead of loading hundreds of megabytes into RAM, with longer timeouts for slow mobile connections.
 - **Audio-only jobs** (`--media audio`) fetch only the needed soundtrack and export verified 48-kHz stereo AAC `.m4a` files. These avoid downloading/encoding 1080p video just to get engine sound; `--media video` remains the default.
 - On normal completion, temporary media is deleted. On later startups, V4 clears only its own abandoned temporary folders older than 24h; personal videos are never intentionally removed.
@@ -54,6 +55,16 @@ python production/phone_footage/agent_jobs_v4.py prepare \
   --start 20 --duration 12 --height 1080 --orientation landscape
 ~~~
 
+**Native 4K (only when the original YouTube video genuinely has 4K frames):**
+
+~~~bash
+python production/phone_footage/agent_jobs_v4.py prepare \
+  --url 'https://www.youtube.com/watch?v=Exq6pB3IGyU' \
+  --start 8 --duration 12 --height 2160 --orientation landscape
+~~~
+
+The URL here is only a job-format example: **do not claim this specific recording is 4K** or queue it without first verifying that the source offers true UHD. For portrait sources use `--orientation portrait --height 2160`; V4 checks that the original source is natively at least 2160 pixels wide and 3840 pixels high. Default requests remain `--height 1080`.
+
 **For engine/audio sources, request audio-only:**
 
 ~~~bash
@@ -62,7 +73,7 @@ python production/phone_footage/agent_jobs_v4.py prepare \
   --start 8 --duration 13 --media audio
 ~~~
 
-Create an **open, owner-authored** issue titled `[YUNEX PHONE JOB] RS6 excerpt`, with the exact printed two-line body. Valid job bounds: 2–600 seconds, offset up to 21600 seconds, 720/1080p when a video is requested, landscape or portrait. `--media video` is the default. Already-catalogued sources retain their verified attribution and catalogue-specific height caps.
+Create an **open, owner-authored** issue titled `[YUNEX PHONE JOB] RS6 excerpt`, with the exact printed two-line body. Valid job bounds: 2–600 seconds, offset up to 21600 seconds, 720/1080/**2160p** when video is requested, landscape or portrait. Explicit 4K has larger disk/data demands and is validated against source pixels rather than upscaled. `--media video` is the default. Already-catalogued sources retain their verified attribution and catalogue-specific height caps.
 
 **Delivery classification:**
 
@@ -94,10 +105,10 @@ Then FFprobe, full-decode, hash-check, and **visually inspect video** or **liste
 
 ## Honest limits and testing
 
-- **10 minutes is a maximum, not the default.** Requests for 601 seconds or more are refused.
+- **10 minutes is a maximum, not the default.** Requests for 601 seconds or more are refused. Although 4K is permitted within this duration, high-bitrate sources will hit the 1.5 GiB output cap or disk constraints; short native 4K clips are strongly preferred.
 - The output cap can reject complex high-bitrate 10-minute sources. Storage availability, source format and upload speed also matter.
 - The job may use gigabytes of temporary phone storage, even though successful runs clean it afterward. Mobile data and GitHub storage consumption still occur.
 - CI validates unregistered-source acceptance, strict YouTube URL validation, draft/private publication, 600-second maximum, adaptive storage, streaming upload, audio-only synthetic AAC encode/decode, video synthetic FFmpeg encode/decode, cached jobs and agent helper compatibility.
-- No real full ten-minute YouTube download has yet been claimed. Validate with a permitted longer source on the Galaxy S25 when necessary. The phone worker only runs when started by the user or configured as a background process.
+- Phone-proven jobs #55/#56 are **1080p**. Synthetic 3840×2160 FFmpeg remux/full-decode tests and negative 1080p-upscale tests pass in GitHub CI. **No real S25 native 4K or full 10-minute YouTube job has yet been verified**; start with a short, available 4K source. The phone worker only runs when started by the user or configured as a background process.
 
 GitHub Actions: .github/workflows/s25-phone-worker-v4-tests.yml
