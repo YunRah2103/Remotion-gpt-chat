@@ -42,7 +42,11 @@ def make_original_segment(url,name,start,length):
  # Preserve C8 movement at 30fps, no original soundtrack. Native frame content:
  # original 1920x1080 landscape; portrait derives ~608 source px horizontally.
  # Gently cool highlights and deepen shadows; avoid HDR or false native pixels.
- vf="fps=30,scale=1080:1920:force_original_aspect_ratio=increase:flags=lanczos,crop=1080:1920,eq=contrast=1.10:saturation=0.83:brightness=-0.01,format=yuv420p"
+ vf=("fps=30,scale=1080:1920:force_original_aspect_ratio=increase:flags=lanczos,crop=1080:1920,"
+        + ("eq=contrast=1.05:saturation=1.00:gamma=1.48:brightness=0.016"
+           if name=="A2_RED_RS6_DRIVE" else
+           "eq=contrast=1.10:saturation=0.83:brightness=-0.01")
+        + ",format=yuv420p")
  rc,_,err=run(["ffmpeg","-nostdin","-hide_banner","-loglevel","error","-y",
   "-headers",FFHEADERS,"-ss",str(start),"-i",url,"-t",str(length),
   "-an","-vf",vf,"-c:v","libx264","-preset","veryfast","-crf","18","-movflags","+faststart",str(outfile)],130)
@@ -77,7 +81,7 @@ REPORT={"agent":"A2","role":"short-night-motion-cut-proof not finished 13-16-sec
  "source_site":SITE,"source_provenance":"THE-LOWDOWN original C8 Tango Red RS6 filmmaker project",
  "native_source":"1920x1080/30000:1001fps", "output":"1080x1920/30fps H264 yuv420p (portrait crop is not native 1080-wide sharpness)",
  "rights":"creator permission to republish unconfirmed; unpublished owner-only draft ONLY",
- "original_music":"excluded; preview is silent","status":"NO_MEDIA"}
+ "original_music":"excluded; preview is silent", "side_drive_lift":"selective gamma 1.48/brightness +0.016 to preserve recognisable red car at night without falsely implying HDR","status":"NO_MEDIA"}
 try:
  sources=find_originals();REPORT["candidate_original_count"]=len(sources)
  media=None;probe={}
