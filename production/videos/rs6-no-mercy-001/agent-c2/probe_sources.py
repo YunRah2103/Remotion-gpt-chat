@@ -13,6 +13,10 @@ SOURCES=[
  {"id":"tim-automotives-swiss-rs6","url":"https://www.tiktok.com/@tim.automotives/video/7637948603545275670","note":"New C8 Swiss Spec creator lead; component close ups/motion to inspect; rights unknown"},
  {"id":"performance61-c8-details","url":"https://www.tiktok.com/@performance61.de/video/7643332983386033440","note":"Creator documents actual C8 development, possible tuning detail close-ups; rights unknown"},
  {"id":"drvz-american-c8","url":"https://www.tiktok.com/@drvzcars/video/7611992785985539361","note":"New original creator C8 footage candidate; detail aesthetic and rights unknown"},
+ {"id":"glenmore-audi-black","url":"https://www.tiktok.com/@glenmoreaudi/video/7482802812783512887","note":"Original Audi dealership genuine C8 Mythos Black Satin PPF installation film; detail wrap/grille/LED candidate, permission unknown"},
+ {"id":"aboutbold-yellow-c8","url":"https://www.tiktok.com/@aboutbold/video/6778845122596556038","note":"Original BOLD filmmaker distinctive yellow RS6 C8 filmed new 2020; close motion candidate, color mismatch, reuse unknown"},
+ {"id":"john-infinite-yellow-rs6","url":"https://www.tiktok.com/@john_infinite/video/6774682856955464966","note":"Original John filmmaker C8 yellow RS6 cinematography, 2020, potential design closeups; reuse unknown"},
+ {"id":"clydebank-black-rs6","url":"https://www.tiktok.com/@clydebank.car.sales/video/7657564818022354179","note":"UK dealer 2020 verified C8 Mythos Black RS6 wheel/LED/quad cam walkaround; motion/rights need QA"},
 ]
 def call(cmd, timeout=120):
     t=time.time()
@@ -40,7 +44,7 @@ for s in SOURCES:
         if not files:
             obj["result"]="no_source_bytes"
         else:
-            orig=files[0]; obj["download_bytes"]=orig.stat().st_size
+            orig=files[0]; obj["download_bytes"]=orig.stat().st_size;obj["original_source_sha256"]=hashlib.sha256(orig.read_bytes()).hexdigest()
             probe=call(["ffprobe","-v","error","-show_entries","format=duration,size:stream=index,codec_type,codec_name,width,height,r_frame_rate,avg_frame_rate","-of","json",str(orig)],timeout=30)
             obj["ffprobe_process"]=probe
             if probe["rc"]==0:
@@ -64,6 +68,13 @@ for s in SOURCES:
                         fr=call(["ffmpeg","-hide_banner","-loglevel","error","-ss",str(ts),"-i",str(sample),"-frames:v","1","-vf","scale=640:-2","-q:v","4","-y",str(dest)],timeout=20)
                         if fr["rc"]==0 and dest.exists(): frames.append(dest.name)
                     obj["qa_frames"]=frames
+                    if len(frames)==3:
+                        contact=OUT/f"{name}-contact.jpg"
+                        joined=call(["ffmpeg","-hide_banner","-loglevel","error","-y",
+                          "-i",str(OUT/frames[0]),"-i",str(OUT/frames[1]),"-i",str(OUT/frames[2]),
+                          "-filter_complex","hstack=inputs=3","-frames:v","1",str(contact)],timeout=45)
+                        if joined["rc"]==0 and contact.exists():
+                            obj["contact_sheet"]=contact.name
                     obj["result"]="sample_decoded" if decode["rc"]==0 else "decode_failed"
                 else: obj["result"]="sample_encode_failed"
             else: obj["result"]="ffprobe_failed"
