@@ -3,6 +3,11 @@ on:
   push:
     branches:
       - automotive-edits/rs6-no-mercy-001/a2-hero-cinema
+    paths:
+      - production/videos/rs6-no-mercy-001/agent-a2/a2_acquire.py
+      - production/videos/rs6-no-mercy-001/agent-a2/a2_aem_4k.py
+      - production/videos/rs6-no-mercy-001/agent-a2/a2_4k_shot_scan.py
+      - .github/workflows/rs6-agent-a2-cinema-acquire.yml
   workflow_dispatch:
 permissions:
   contents: read
