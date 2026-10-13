@@ -137,7 +137,7 @@ def main():
             v=videos[0]
             if min(v.get("width",0),v.get("height",0))<1080:
                 pr["quality_gate"]="REJECT_NATIVE_SOURCE_UNDER_1080";continue
-            for k,sec in enumerate((0,8,20),1):
+            for k,sec in ((1,0),(2,8),(3,20),(4,12),(5,16),(6,24),(7,28)):
                 sec=int(sec)
                 if float(info.get("format",{}).get("duration") or 0)<sec+4:continue
                 row=excerpt(u,sec,k)
