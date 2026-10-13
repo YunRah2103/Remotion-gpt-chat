@@ -4,7 +4,7 @@ Branch: experiments/s25-footage-worker-v4-10min-20261012
 
 V4 is a separate experimental worker. Existing V1/V2/V3 and main are preserved.
 
-**Agent guide:** [Canonical S25 V4 workflow on main](https://github.com/YunRah2103/Remotion-gpt-chat/blob/main/docs/YUNEX_S25_V4_AGENT_GUIDE.md). The licence-registration gate has been removed: the owner can queue a canonical YouTube watch URL **without** cataloging rights first. For unverified sources, the resulting MP4 is stored in an **owner-only GitHub draft Release**, never a public download. [Previous S25 YouTube PASS #55](https://github.com/YunRah2103/Remotion-gpt-chat/issues/55) used a permitted snowy-car test, **not** RS6 footage. Unregistered-source downloading is **phone-proven** by [AutoTopNL job #56](https://github.com/YunRah2103/Remotion-gpt-chat/issues/56): a 60-second H.264/AAC recording stored in a draft Release. Optional **audio-only mode** is tested offline with real FFmpeg AAC encoding/decoding; a phone-side audio-only job is still pending.
+**NEW AI AGENT — READ FIRST:** [YUNEX V4 Quick-Start](https://github.com/YunRah2103/Remotion-gpt-chat/blob/main/docs/YUNEX_V4_NEW_AGENT_START_HERE.md) → [Full S25 V4 workflow](https://github.com/YunRah2103/Remotion-gpt-chat/blob/main/docs/YUNEX_S25_V4_AGENT_GUIDE.md). **Do not rebuild or reinstall the phone worker, request access tokens, or ask the owner to attach media already present in GitHub drafts.** The licence-registration gate has been removed: the owner can queue a canonical YouTube watch URL **without** cataloging rights first. For unverified sources, the resulting MP4 is stored in an **owner-only GitHub draft Release**, never a public download. [Previous S25 YouTube PASS #55](https://github.com/YunRah2103/Remotion-gpt-chat/issues/55) used a permitted snowy-car test, **not** RS6 footage. Unregistered-source downloading is **phone-proven** by [AutoTopNL job #56](https://github.com/YunRah2103/Remotion-gpt-chat/issues/56): a 60-second H.264/AAC recording stored in a draft Release. Optional **audio-only mode** is tested offline with real FFmpeg AAC encoding/decoding; a phone-side audio-only job is still pending.
 
 ## What changed
 
@@ -21,7 +21,7 @@ The **duration ceiling is 600 seconds (10 minutes)**; normal projects should sti
 
 ## Install or upgrade the existing V4 installation
 
-**The already-running phone process cannot update its own Python code.** After this no-licence-registration change passes CI, stop the old V4 loop with **Ctrl+C**. Then use the same safe installer command once to update V4. It retains the existing private token and V1/V2 setup. Start the loop again with `~/yunex-v4 --loop` if you want to accept jobs.
+**This section is for phone maintenance, not for new footage agents.** The owner has V4 installed and successfully used it on #55 and #56. Only when the owner specifically wants the latest V4 upgrades, first stop the existing loop with **Ctrl+C**, run the safe installer once, then start `~/yunex-v4 --loop` when actual jobs are queued. Never imply the GitHub commit automatically updated a running Termux process.
 
 With no other footage worker running, paste:
 
@@ -90,7 +90,7 @@ The result helper can inspect a completed issue:
 python production/phone_footage/agent_jobs_v4.py result --issue ISSUE_NUMBER
 ~~~
 
-Then FFprobe, full-decode, hash-check, and **visually inspect** moving source frames before handing the editor a real asset. A queue issue, cloud anti-bot error or green workflow is not an acquired MP4. Permission to publicly post an edit containing a source is a separate rights decision; **do not publish rights-unverified draft footage**.
+Then FFprobe, full-decode, hash-check, and **visually inspect video** or **listen to audio** before handing the editor a real asset. A queue issue, cloud anti-bot error or green workflow is not an acquired MP4. Permission to publicly post an edit containing a source is a separate rights decision; **do not publish rights-unverified draft footage**.
 
 ## Honest limits and testing
 
