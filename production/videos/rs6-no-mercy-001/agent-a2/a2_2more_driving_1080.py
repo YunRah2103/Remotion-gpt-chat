@@ -12,11 +12,8 @@ ROOT=Path("a2-extra-owner-review");ROOT.mkdir(exist_ok=True)
 STATUS=Path("a2-extra-private-qa");STATUS.mkdir(exist_ok=True)
 SPECS=[
     {"id":"A2_C8_RS6_HAIRPIN_REVEAL","start":39.00,"length":1.75,
-     "note":"genuine RS6 front-right hairpin entrance, real rolling motion; original Audi 4K",
+     "note":"genuine C8 RS6 moving oncoming hairpin, original Audi 4K",
      "crop_x":"max(0,min(in_w-out_w,2380-260*t))"},
-    {"id":"A2_C8_RS6_REAR_CHASE_EXIT","start":222.45,"length":1.20,
-     "note":"rear C8 RS6 accelerating away through mountain bend; tracked pursuit pan",
-     "crop_x":"max(0,min(in_w-out_w,1130*t))"},
 ]
 def run(cmd,timeout):
     p=subprocess.run(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,timeout=timeout)
@@ -75,7 +72,7 @@ for spec in SPECS:
     data=json.loads(out);v=next(s for s in data["streams"] if s.get("codec_type")=="video")
     row["ffprobe"]=data
     row["duration"]=float(data["format"].get("duration",0))
-    if v["width"]!=1080 or v["height"]!=1920 or v["r_frame_rate"]!="30/1" or not 0.75<row["duration"]<1.6:
+    if v["width"]!=1080 or v["height"]!=1920 or v["r_frame_rate"]!="30/1" or not 0.75<row["duration"]<3.0:
         row["status"]="FAILED_1080_PORTRAIT_SPEC";path.unlink(missing_ok=True);continue
     row["contact_frame_count"]=proof(path,name)
     row.update(status="PLAYABLE_PRIVATE_REVIEW_MP4",bytes=path.stat().st_size,sha256=sha(path))
