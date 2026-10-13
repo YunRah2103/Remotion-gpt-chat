@@ -8,7 +8,7 @@ on:
       - production/videos/rs6-no-mercy-001/d_full_private_picture.py
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   rs6-private-film:
     runs-on: ubuntu-latest
