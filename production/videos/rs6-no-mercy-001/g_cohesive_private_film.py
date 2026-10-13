@@ -21,8 +21,8 @@ SHOTS=[
 ("g/G_RS6_C8_085_LOW_CORNER.mp4",29, "native real road motion"),
 ("c2/UHD_RS6_REAR_LED_SIGNATURE.mp4",15, "brief taillight punctuation"),
 ("a2/A2_C8_RS6_HAIRPIN_REVEAL.mp4",30,"car visibly rounds road bend"),
-("g/G_RS6_C8_043_ROLLING_DRIVEBY.mp4",55,"DROP B: genuine fast moving side follow"),
-("g/G_RS6_C8_278_COASTAL_REAR.mp4",28,"unbroken flowing rear full-car driving"),
+("g/G_RS6_C8_043_ROLLING_DRIVEBY.mp4",46,"DROP B: genuine fast moving side follow"),
+("g/G_RS6_C8_278_COASTAL_REAR.mp4",37,"unbroken flowing rear full-car driving"),
 ("a2/A2_C8_RS6_FAST_APPROACH.mp4",36, "conclusive full-car direct acceleration"),
 ]
 assert sum(n for _,n,_ in SHOTS)==395
@@ -35,14 +35,22 @@ for fn,frames,note in SHOTS:
 if not REF.exists():raise FileNotFoundError("PRIVATE musical reference missing; do not substitute synthesized audio")
 # Mild filmic low-chroma steel grade across *all* source shots; deliberate continuity.
 # Keep actual source motion. No generic zooms/animated shakes, text or letterboxing.
-GRADE="eq=contrast=1.10:brightness=-0.013:saturation=0.72,colorbalance=rs=-0.015:bs=0.032:rm=-0.005:bm=0.016"
+GRADE="eq=contrast=1.09:brightness=-0.009:saturation=0.76,colorbalance=rs=-0.01:bs=0.018"
 inputs=["ffmpeg","-nostdin","-hide_banner","-loglevel","error","-y"]
 for fn,frames,note in SHOTS:inputs+=["-i",str(ROOT/fn)]
 inputs+=["-i",str(REF)]
 filters=[]
-for i,(_,frames,note) in enumerate(SHOTS):
- filters.append(f"[{i}:v]fps=30,tpad=stop_mode=clone:stop_duration=0.12,trim=end_frame={frames},"
-                f"setpts=N/(30*TB),scale=1080:1920:flags=lanczos,{GRADE},format=yuv420p,setsar=1[v{i}]")
+START_FRAMES={"G_RS6_C8_143_ROAD_REVEAL":19,
+              "G_RS6_C8_175_GRILLE_SURGE":4,
+              "G_RS6_C8_436_TAIL_FOLLOW":6,
+              "G_RS6_C8_031_HILLSIDE_LUNGE":5,
+              "G_RS6_C8_085_LOW_CORNER":5,
+              "G_RS6_C8_043_ROLLING_DRIVEBY":9}
+for i,(fn,frames,note) in enumerate(SHOTS):
+ start_frame=START_FRAMES.get(Path(fn).stem,0)
+ filters.append(f"[{i}:v]fps=30,tpad=stop_mode=clone:stop_duration=0.20,"
+                f"trim=start_frame={start_frame}:end_frame={start_frame+frames},"
+                f"setpts=N/(30*TB),scale=1080:1920:flags=fast_bilinear,{GRADE},format=yuv420p,setsar=1[v{i}]")
 filters.append("".join(f"[v{i}]" for i in range(len(SHOTS)))+f"concat=n={len(SHOTS)}:v=1:a=0[main]")
 # Sparse 1 frame visual negatives at reference audio’s 6.734 and 9.927 peaks; black only on 7.715 onset.
 # 395 frames precisely. A black intentional frame may be 0.0333s, no black runs.
