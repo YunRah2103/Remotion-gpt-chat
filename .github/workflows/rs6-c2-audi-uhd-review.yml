@@ -47,10 +47,7 @@ jobs:
             c2_audi_uhd_addon/RS6_C8_NATIVE4K_AUDI_GRILLE.mp4 \
             c2_audi_uhd_addon/UHD_GRILLE_CONTACT.jpg \
             c2_audi_uhd_addon/UHD_GRILLE_MANIFEST.json \
-            c2_audi_uhd_addon/UHD_GRILLE_SHA256SUMS.txt
-            c2_audi_uhd_extra/UHD_EXTRA_CONTACT.jpg
-            c2_audi_uhd_extra/UHD_EXTRA_MANIFEST.json
-            c2_audi_uhd_extra/UHD_EXTRA_SHA256SUMS.txt --clobber
+            c2_audi_uhd_addon/UHD_GRILLE_SHA256SUMS.txt --clobber
           gh release upload "$TAG" c2_audi_uhd_extra/YUNEX_RS6_C2_UHD_EXTRA.zip \
             c2_audi_uhd_extra/*.mp4 \
             c2_audi_uhd_extra/UHD_EXTRA_CONTACT.jpg \
@@ -68,5 +65,8 @@ jobs:
             c2_audi_uhd_addon/UHD_GRILLE_CONTACT.jpg
             c2_audi_uhd_addon/UHD_GRILLE_MANIFEST.json
             c2_audi_uhd_addon/UHD_GRILLE_SHA256SUMS.txt
+            c2_audi_uhd_extra/UHD_EXTRA_CONTACT.jpg
+            c2_audi_uhd_extra/UHD_EXTRA_MANIFEST.json
+            c2_audi_uhd_extra/UHD_EXTRA_SHA256SUMS.txt
           if-no-files-found: warn
           retention-days: 10
