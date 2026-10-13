@@ -1,0 +1,60 @@
+name: YUNEX RS6 B2 genuine 3-second motion-cut proof
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/b2-youtube-driving
+    paths:
+      - .github/workflows/rs6-b2-motion-proof.yml
+      - production/videos/rs6-no-mercy-001/agent_b2_compose_motion_proof.py
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  owner-only-prototype:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg and image QA tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --upgrade -q pillow
+      - name: Fetch FOUR REAL playable source shots from existing OWNER-ONLY draft releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          mkdir -p private-footage
+          gh release download yunex-rs6-a2-hero-review-20261013 -p 'A2_C8_RS6_FAST_APPROACH.mp4' -D private-footage
+          gh release download yunex-rs6-a2-hero-review-20261013 -p 'A2_C8_RS6_MOUNTAIN_SWEEP.mp4' -D private-footage
+          gh release download yunex-rs6-b2-motion-review-20261013 -p 'B2_LOWDOWN_NIGHT_03.mp4' -D private-footage
+          gh release download yunex-rs6-b2-motion-review-20261013 -p 'B2_LOWDOWN_NIGHT_07.mp4' -D private-footage
+          test "$(find private-footage -name '*.mp4' | wc -l)" -eq 4
+      - name: Make genuine three-second cold-steel moving-car editing proof and full FFmpeg QA
+        run: |
+          python production/videos/rs6-no-mercy-001/agent_b2_compose_motion_proof.py | tee b2-motion-proof-build.log
+          test -s b2-motion-proof/YUNEX_RS6_NO_MERCY_3S_MOTION_PROOF.mp4
+      - name: Add the actual playable prototype ONLY to private draft, no public release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: yunex-rs6-b2-motion-review-20261013
+        run: |
+          set -euo pipefail
+          test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
+          gh release upload "$TAG" b2-motion-proof/YUNEX_RS6_NO_MERCY_3S_MOTION_PROOF.mp4 b2-motion-proof/PROOF_12_FRAME_CONTACT.jpg             b2-motion-proof/MANIFEST.json b2-motion-proof/SHA256SUMS.txt --clobber
+          gh release view "$TAG" --json isDraft,assets --jq '{draft:.isDraft,assets:[.assets[].name]}'
+      - name: Publish proof metadata+visual contact only, excluding copyrighted MP4
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-b2-motion-prototype-visual-evidence
+          path: |
+            b2-motion-proof-build.log
+            b2-motion-proof/PROOF_12_FRAME_CONTACT.jpg
+            b2-motion-proof/MANIFEST.json
+            b2-motion-proof/SHA256SUMS.txt
+          retention-days: 14
+          if-no-files-found: warn
