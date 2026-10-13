@@ -9,7 +9,7 @@
 ## A new agent's first 60 seconds
 
 1. **Check what already exists:** search the project's GitHub issues, run artifacts and Releases for the requested shot, sound, or approved edit. For AutoTopNL RS6 **reuse [phone job #56](https://github.com/YunRah2103/Remotion-gpt-chat/issues/56)** (60 s, 1080p, draft tag `yunex-phone-v4-56`, asset `yunex-v4-56.mp4`). **Do not redownload it.**
-2. **Choose the source route:** use a legitimate, direct original MP4 through GitHub Actions when available (including source 4K). Use S25 V4 for YouTube where the cloud downloader is blocked. The phone outputs video up to **1080p**, never native 4K.
+2. **Choose the source route:** use a legitimate, direct original MP4 through GitHub Actions when available (including source 4K). Use S25 V4 for YouTube where the cloud downloader is blocked. **Optional native 4K** is now supported by the *latest* V4 code with explicit `--height 2160`; **1080p remains default**. 4K is CI-tested but not yet tested on the S25, so do not claim a phone 4K success until there is an actual completed UHD job.
 3. **For a new YouTube URL:** determine the exact 2–600 s excerpt and canonical URL `https://www.youtube.com/watch?v=VIDEO_ID` (11-character ID; no `&t=`, `youtu.be`, playlists or other domains). **No licence form/registry entry is required for private review**. Rights-unverified footage remains in an owner-only *draft* Release. Do not publish it without verified permission.
 4. **Generate the exact issue payload** using `agent_jobs_v4.py prepare` on the V4 branch; **this command only prints** the body. Create an open GitHub issue with title `[YUNEX PHONE JOB] <specific shot>`, exact two-line body starting `YUNEX_PHONE_JOB_V4`, **authenticated as account `YunRah2103`**. A non-owner's issue is ignored.
 5. **Do not ask for another installation, token, or upload.** GitHub issue creation alone cannot remotely turn on Termux. If a correctly queued job needs the phone and the loop is actually stopped, the user can run `~/yunex-v4 --loop` once for that session. Default polling is ~120s; Android may suspend background Termux.
@@ -27,6 +27,16 @@ python production/phone_footage/agent_jobs_v4.py prepare \
   --url 'https://www.youtube.com/watch?v=Exq6pB3IGyU' \
   --start 8 --duration 13 --height 1080 --orientation landscape
 ```
+
+**Native 4K excerpt (requires a genuinely UHD source; no upscaling):**
+
+```bash
+python production/phone_footage/agent_jobs_v4.py prepare \
+  --url 'https://www.youtube.com/watch?v=VIDEO_ID' \
+  --start 20 --duration 10 --height 2160 --orientation landscape
+```
+
+Replace `VIDEO_ID` with a real 11-character YouTube video ID for a verified 3840×2160 source. **Do not request 4K from the known 1080p-only AutoTopNL #56 recording.** Native 4K has a separate 1.5 GiB output cap and greater disk/data needs. V4 preserves original H.264/HEVC/VP9/AV1 streams in MP4; an editor may need to transcode the downloaded video in GitHub Actions if H.264 is required. 4K stream-copy may affect exact keyframe cut positions, so check the first/last frames. The current phone must be upgraded before 2160p requests will be accepted.
 
 **Engine sound only (recommended for V8 audio edits; AAC M4A, not MP4):**
 
@@ -75,12 +85,13 @@ For another job, use **its own** `release_id`, `asset_filename`, `sha256` and ta
 |---|---|
 | `No pending approved V4 jobs` / `V4 idle` | Worker is polling but finds no eligible new issue; not a download failure |
 | Cloud GitHub Actions YouTube `Sign in to confirm you're not a bot` | Cloud downloader failed; **does not** mean S25 failed; use approved job protocol |
-| Phone refuses a queued issue | Confirm owner login, issue open/title, marker, canonical URL, numeric time bounds, and whether the phone uses an updated V4 installation |
+| Phone refuses a queued issue | Confirm owner login, issue open/title, marker, canonical URL, numeric time bounds, and whether the phone uses an updated V4 installation. **2160p requires the latest V4 code on the phone** |
 | `release not found` or draft asset HTTP 403 | Check the Release **is a draft**; use `contents: write` with built-in token in Actions, as proven on #56 |
 | `mp4_url: null` for a draft | Intentional: retrieve `asset_filename` from private draft; no public link |
 | `YUNEX_PHONE_FAILED_V4` | Read the actual error; do not repeat the same failing approach forever |
 | Agent has the source but not the approved edit | Search existing GitHub artifacts/Releases and the project's ChatGPT Library; do not ask for an upload before checking |
 | New audio-only job | Expects AAC `.m4a`; feature passed CI but still requires a first live-device proof |
+| New native 4K job | Set `--height 2160` only on verified UHD footage; no upscaling, 1.5 GiB output cap, potentially more disk/battery. Real 4K FFmpeg test PASS in CI; **phone UHD download not yet proven** |
 
 ## Definition of done
 
