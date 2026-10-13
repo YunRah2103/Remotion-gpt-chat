@@ -1,0 +1,36 @@
+name: RS6 A2 full 4K original storyboard scout
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/a2-hero-cinema
+    paths:
+      - production/videos/rs6-no-mercy-001/agent-a2/a2_wholefilm_storyboard.py
+      - .github/workflows/rs6-a2-wholefilm-storyboard.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  rs6-c8-shot-by-shot-visual-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg and photo tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install --disable-pip-version-check pillow requests
+      - name: Download actual original UHD to ephemeral runner only and sample every 5 seconds
+        run: |
+          python production/videos/rs6-no-mercy-001/agent-a2/a2_wholefilm_storyboard.py | tee a2-wholefilm-summary.json
+      - name: Upload downsampled contact sheets for editorial shot critique — not the source video
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-a2-full-reel-storyboard-${{ github.run_id }}
+          path: |
+            a2_wholefilm_qa/*.jpg
+            a2_wholefilm_qa/report.json
+            a2-wholefilm-summary.json
+          if-no-files-found: warn
+          retention-days: 7
