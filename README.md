@@ -35,6 +35,12 @@ npx remotion render src/index.ts TurboDocumentary out/turbo-visual.mp4 --gl=swan
 
 For a rigorously validated final master use the GitHub workflows, which include audio, correct the full-range WebGL colour encoding to limited-range `yuv420p`, and run FFprobe plus a complete decode.
 
+## YUNEX — Galaxy S25 V4 phone footage (agent workflow)
+
+**Agents acquiring automotive footage:** Follow **[the S25 V4 agent playbook](docs/YUNEX_S25_V4_AGENT_GUIDE.md)** before creating any phone-download issue. It covers creator/licence approval, the exact owner-authored GitHub issue protocol, the already-installed Termux loop, real phone completion reports, and verified MP4 handoff to editors. The worker implementation resides on the separate [V4 experimental branch](https://github.com/YunRah2103/Remotion-gpt-chat/tree/experiments/s25-footage-worker-v4-10min-20261012/production/phone_footage); **main is not the worker source branch**.
+
+Real test: [S25 V4 GitHub issue #55](https://github.com/YunRah2103/Remotion-gpt-chat/issues/55) successfully downloaded an approved **1080p YouTube snowy-car clip** to [this verified MP4](https://github.com/YunRah2103/Remotion-gpt-chat/releases/download/yunex-phone-v4-55/yunex-v4-55.mp4). RS6 YouTube source access on the phone remains untested; a blocked GitHub Actions downloader or unapproved V4 URL is not a phone-download failure.
+
 ## Automotive Engineering production suite
 
 A separate, reusable video production toolchain has been added for mechanical explainers (ABS, suspension, brakes, differentials). It **does not** use or touch `yunus-video-lab` or YUNEX.
