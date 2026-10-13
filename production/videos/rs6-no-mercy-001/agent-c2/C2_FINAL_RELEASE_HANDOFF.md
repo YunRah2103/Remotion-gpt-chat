@@ -26,3 +26,25 @@ The independent 4K source-wide targeted storyboard [run 38372544093](https://git
 The GitHub release is deliberately an **unpublished draft** because footage from Audi and Glenmore Audi has no documented general-public source redistribution authorization. That does not change proof of actual playable media and independent technical verification. Agent F can review available materials as owner. Do not claim the film is finished or public. This C2 asset handoff is ready for visual/editor inspection, subject to permissions and main editorial selection.
 
 **DO NOT** edit `yunus-video-lab` or change A2, B2, D, E, F branches. C2 scope only.
+
+
+## Follow-up C2 original UHD expansion — 15 genuine individual MP4s (13 October 2026)
+
+The above *11 MP4* milestone was real but has now been superseded by **15 separately playable H.264 MP4s** in the same owner-only GitHub draft, including one more owner-review ZIP `YUNEX_RS6_C2_UHD_NOVEL.zip`. All are **1080×1920/30fps H.264 yuv420p**, video-only, fully decoded via FFmpeg.
+
+**Newly audited unique original Audi 3840×2160/25 source windows:**
+
+| Actual new portrait MP4 | Source timestamp | Output duration | Size (bytes) | SHA256 |
+| --- | --- | ---: | ---: | --- |
+| `UHD_RS6_MOVING_RPM_CLUSTER.mp4` | 03:34.90 | 0.800000s | 590263 | `eab314db3d3a30a71b8fcde60da48adb50230776ceb407a285f43a50ba3969e8` |
+| `UHD_RS6_OVAL_EXHAUST_REAR.mp4` | 07:05.90 | 0.866667s | 1111652 | `7fe1ecd065cc7a5333c9e5c42733457fe6e6dcf880589c62caec5e01564ba8d7` |
+| `UHD_RS6_REAR_LED_SIGNATURE.mp4` | 07:45.90 | 0.866667s | 1153711 | `4b5bbef88677b0c430bc10031caba87c8b332486ba6e95ea5f36967a3274d492` |
+| `UHD_RS6_STEERING_MODE_CONTROL.mp4` | 08:45.90 | 0.633333s | 306652 | `8a812e3aeccea8f5c2a58b883ebc8e6f9f2366ae6ec505fc03e1ddf0034952b9` |
+
+Evidence: [real 62-frame original-4K gap scan](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38376142730) successfully decoded **61/62** source timestamps across 10m original film (one seek failed at 02:16, no false sample counted); source-page contact artifacts [11801646436](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38376142730/artifacts/11801646436). Source spans in this expansion are novel component footage rather than duplicate A2 hero-moving shots. The exact portrait-crop selection was pre-examined against *actual* remote frames.
+
+**New final release build [38377498297](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38377498297) PASS** plus independent visual/FFprobe/decode audit artifact [11801763471](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38377498297/artifacts/11801763471). Inspect contact JPEG `UHD_NOVEL_CONTACT.jpg` (four source-derived samples): visible RS driver screen with real '26 MPH' / rev graphic, full oval exhaust and rear lamp, and sharp steering-wheel physical **RS MODE** button under a driver's hand.
+
+**Visual quality correction (not just a tool pass):** The initial fourth window, misnamed `UHD_RS6_REAL_GEAR_SELECTOR.mp4`, visibly cut mid-window to an air vent/console rather than the claimed shifter. C2 independently inspected the actual delivered JPEG, **REJECTED and DELETED** that video, then re-acquired real C8 RS MODE steering control at source 08:45.90 and reran FFmpeg with a **0.633333s** clean excerpt. Final QA image inspected and strong. Previous 8+3 clips unchanged. Final GitHub release API confirms draft=true and exactly **15** individually playable .mp4 source assets, not 16.
+
+**Availability:** [Owner-only draft release](https://github.com/YunRah2103/Remotion-gpt-chat/releases/tag/untagged-3c7ddbde3865a6f7f945), **four ZIP packs** in total. All actual 15 MP4s playable individually for internal editor. Note the short-source edits are **not** the 13–16s final soundtrack-synced YUNEX film, and most C2 shots remain static or slow-camera component shots; A2/B2 still supply driving hero action. Audio not muxed. No assertion of public footage reuse permission. Do not publicly publish draft until rights resolved.
