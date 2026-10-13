@@ -6,20 +6,15 @@ Samples are owner-only draft release material; not cleared for public publicatio
 import pathlib,subprocess,hashlib,json,zipfile
 from PIL import Image,ImageDraw
 from datetime import datetime,timezone
-IN=pathlib.Path("c2_private_sources")
+IN=pathlib.Path("c2_audi_uhd_novel")
 OUT=pathlib.Path("c2_real_selects_preview"); OUT.mkdir(parents=True,exist_ok=True)
 # Source exact filenames and independently viewed component-specific editorial notes.
 # Frames exactly matched at 30fps; no freeze/slomo/upscale/repeat.
 PICKS=[
- ("BLACK_MATRIX_LED_REVEAL.mp4",11,"Dark C8 signature Matrix LED reveal"),
- ("UHD_MATRIX_LED_FRONT_CORNER.mp4",19,"Native-4K Audi source front LED and intake"),
- ("BLACK_WHEEL_BRAKE.mp4",8,"Brief cut-wheel detail, real black C8"),
- ("UHD_RS6_RED_BRAKE_CALIPER.mp4",19,"Native-4K RS red brake and drilled-disc detail"),
- ("BLUE_CABIN_AMBIENT.mp4",17,"C8 cool cabin lighting bridge"),
- ("BLACK_LED_MACRO.mp4",8,"Black C8 tight light accent"),
- ("RS6_C8_NATIVE4K_AUDI_GRILLE.mp4",21,"Native-4K Audi rings, manually corrected crop"),
- ("BLUE_OVAL_EXHAUST.mp4",18,"Authentic oval RS exhaust detail"),
- ("BLACK_RS6_TAIL_LIGHT.mp4",16,"C8 rear lit signature final cut"),
+ ("UHD_RS6_OVAL_EXHAUST_REAR.mp4",23,"Actual C8 RS6 oval exhaust, original 4K"),
+ ("UHD_RS6_REAR_LED_SIGNATURE.mp4",23,"Real manufacturer-native C8 LED taillight closeup"),
+ ("UHD_RS6_REAL_GEAR_SELECTOR.mp4",23,"Real C8 RS6 drive selector and carbon interior"),
+ ("UHD_RS6_MOVING_RPM_CLUSTER.mp4",20,"Actual vehicle RS6 instrument panel; not fabricated HUD"),
 ]
 def run(args, timeout=90):
  p=subprocess.run(args,capture_output=True,text=True,timeout=timeout)
