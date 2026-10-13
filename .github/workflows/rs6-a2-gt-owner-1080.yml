@@ -1,0 +1,56 @@
+name: RS6 A2 verified GT 1080p distinct owner-only footage
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/a2-hero-cinema
+    paths:
+      - production/videos/rs6-no-mercy-001/agent-a2/a2_make_gt_owner_1080.py
+      - .github/workflows/rs6-a2-gt-owner-1080.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  gt-owner-only-1080-media:
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install pillow
+      - name: Real 4K source decode, 1080 portrait clip encoding, hashes and full decode verification
+        run: |
+          python production/videos/rs6-no-mercy-001/agent-a2/a2_make_gt_owner_1080.py | tee gt-delivery-qa.json
+      - name: Save verified GT moving shots to distinct unpublished draft only
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: yunex-rs6-a2-gt-owner-review-20261013
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! compgen -G 'a2-gt-owner-review/*.mp4' >/dev/null; then
+            echo 'ZERO_GT_MEDIA_DELIVERED'; exit 0
+          fi
+          if gh release view "$TAG" --json isDraft --jq .isDraft >/dev/null 2>&1; then
+            test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
+          else
+            gh release create "$TAG" --draft --title "RS6 GT A2 separate 1080p private review - distinct C8 variant" \
+              --notes "Audi RS6 Avant GT white/red model, not standard Daytona Grey. Owner-only moving-film proof pending redistribution permission." --target "$GITHUB_SHA"
+          fi
+          test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
+          gh release upload "$TAG" a2-gt-owner-review/*.mp4 a2-gt-owner-review/*.txt a2-gt-owner-review/*.json a2-gt-owner-review/*.zip --clobber
+          test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
+          gh release view "$TAG" --json isDraft,assets --jq '{draft:.isDraft,assets:[.assets[].name]}'
+      - name: Publish video-free contact JPG and decode checks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-a2-gt-owner1080-QA-${{ github.run_id }}
+          path: |
+            a2-gt-private-qa/
+            gt-delivery-qa.json
+          retention-days: 10
+          if-no-files-found: warn
