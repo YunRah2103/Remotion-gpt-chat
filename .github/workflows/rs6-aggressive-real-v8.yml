@@ -1,0 +1,31 @@
+name: YUNEX aggressive real V8 source scan
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-landscape-loop/e-real-recorded-v8
+    paths:
+      - production/videos/rs6-no-mercy-001/agent-e/real-v8/scan_aggressive.py
+      - .github/workflows/rs6-aggressive-real-v8.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquisition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install media tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q requests
+      - name: Download and verify REAL CC0 V8 takes (not guesses)
+        run: python production/videos/rs6-no-mercy-001/agent-e/real-v8/scan_aggressive.py
+      - name: Owner-only working samples & verified report
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX_RS6_ACTUAL_AGGRESSIVE_V8_RECORDINGS
+          path: v8-aggressive-verified/
+          retention-days: 5
+          if-no-files-found: error
