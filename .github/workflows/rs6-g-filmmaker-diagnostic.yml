@@ -1,0 +1,36 @@
+name: YUNEX RS6 new filmmaker source diagnostic
+on:
+  push:
+    branches: [automotive-edits/rs6-no-mercy-001/g-director-rescue]
+    paths: [.github/workflows/rs6-g-filmmaker-diagnostic.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  filmmaker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Inspect direct film URLs and native media
+        shell: bash
+        run: |
+          python - <<'PY'
+          import requests,re,html
+          U='https://141-productionz.com/case-studies/perform-car-rent'
+          r=requests.get(U,timeout=25)
+          print('PAGE',r.status_code,len(r.content),r.url)
+          t=r.text
+          pat=re.compile(r'(?i)perform|rs6|\.mp4|<video|<iframe|vimeo|cloudinary')
+          matches=list(pat.finditer(t)); print('MATCHES',len(matches))
+          for m in matches[:65]:
+              print('---',m.group(),html.unescape(t[max(0,m.start()-140):m.end()+200]).replace('\n',' ')[:430])
+          print('MP4 paths')
+          print('\n'.join(sorted(set(re.findall(r'[\w/._-]+\.mp4(?:\?[^\s"<>]+)?',t,re.I))))[:5000])
+          for path in ['/assets/projet/perform/rs6.mp4','/assets/projet/perform/RS6.mp4','/assets/projet/perform/rs6.MP4','/assets/hero/hero.mp4','/assets/projet/paris/rs5.mp4']:
+              x='https://141-productionz.com'+path
+              try:
+                  q=requests.get(x,timeout=15,headers={'Range':'bytes=0-1023'},stream=True)
+                  print('ASSET',path,q.status_code,q.headers.get('content-type'),q.headers.get('content-length'),q.url)
+                  q.close()
+              except Exception as e:print('ASSET_FAIL',path,str(e))
+          PY
