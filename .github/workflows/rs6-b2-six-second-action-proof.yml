@@ -30,11 +30,10 @@ jobs:
           for name in A2_C8_RS6_FAST_APPROACH A2_C8_RS6_HAIRPIN_REVEAL A2_C8_RS6_MOUNTAIN_SWEEP; do
             gh release download yunex-rs6-a2-hero-review-20261013 -p "$name.mp4" -D private_sources
           done
-          for name in UHD_MATRIX_LED_FRONT_CORNER UHD_RS6_RED_BRAKE_CALIPER UHD_RS6_REAR_LED_SIGNATURE UHD_RS6_OVAL_EXHAUST_REAR; do
+          for name in UHD_MATRIX_LED_FRONT_CORNER UHD_RS6_RED_BRAKE_CALIPER UHD_RS6_REAR_LED_SIGNATURE UHD_RS6_OVAL_EXHAUST_REAR RS6_C8_NATIVE4K_AUDI_GRILLE; do
             gh release download yunex-rs6-c2-details-review-20261013 -p "$name.mp4" -D private_sources
           done
           gh release download yunex-rs6-b2-motion-review-20261013 -p 'B2_LOWDOWN_NIGHT_07.mp4' -D private_sources
-          gh release download yunex-rs6-b2-motion-review-20261013 -p 'B2_LOWDOWN_NIGHT_04.mp4' -D private_sources
           test "$(find private_sources -name '*.mp4' | wc -l)" -eq 9
       - name: Actually render+decode the 6s real 1080x1920 edit; sample frame luma & contact sheets
         timeout-minutes: 7
