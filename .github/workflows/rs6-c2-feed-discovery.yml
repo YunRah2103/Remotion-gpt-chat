@@ -1,0 +1,32 @@
+name: YUNEX RS6 C2 original creator feed QA
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/c2-details-textures
+    paths:
+      - 'production/videos/rs6-no-mercy-001/agent-c2/scan_creator_feed.py'
+      - '.github/workflows/rs6-c2-feed-discovery.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  c2-originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Video analysis dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install --upgrade yt-dlp curl-cffi --break-system-packages
+      - name: Search creator originals, acquire only transient sample footage, full decode/QA
+        run: python production/videos/rs6-no-mercy-001/agent-c2/scan_creator_feed.py
+      - name: Upload QA metadata and contact JPEGs only (never public raw video)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-c2-originals-qa-${{ github.run_id }}
+          path: c2_feed_qa/
+          if-no-files-found: warn
+          retention-days: 7
