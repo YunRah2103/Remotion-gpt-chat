@@ -37,7 +37,7 @@ For a rigorously validated final master use the GitHub workflows, which include 
 
 ## YUNEX — S25 V4 footage bridge for new agents
 
-**New YUNEX agent?** Start with **[the quick-start](docs/YUNEX_V4_NEW_AGENT_START_HERE.md)**. It gives the exact phone-job protocol, authenticated private draft media retrieval, real MP4/M4A verification and editor handoff. For the complete specification, see [the full V4 agent guide](docs/YUNEX_S25_V4_AGENT_GUIDE.md).
+**New YUNEX agent?** Start with **[the quick-start](docs/YUNEX_V4_NEW_AGENT_START_HERE.md)**. For a completed phone issue, **use the [one-step S25 V4 media import action](.github/actions/yunex-v4-import/action.yml)** inside your own editing workflow; it retrieves private draft MP4/M4A bytes and automatically performs SHA256 + full-decode verification. [Verified against real phone job #56](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38470166071). No user upload, new token, or duplicated download script required. For the complete specification, see [the full V4 agent guide](docs/YUNEX_S25_V4_AGENT_GUIDE.md).
 
 V4 implementation and CLI live on [the separate worker branch](https://github.com/YunRah2103/Remotion-gpt-chat/tree/experiments/s25-footage-worker-v4-10min-20261012/production/phone_footage), **not main**. The Galaxy S25 already has V4 installed; **agents must not request another install/token/upload**, and GitHub cannot turn on a stopped Termux loop remotely.
 
