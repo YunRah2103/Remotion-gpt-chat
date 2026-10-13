@@ -1,0 +1,51 @@
+name: YUNEX P1 missing footage recovery
+on:
+  push:
+    paths:
+      - '.github/workflows/p1-single-agent-recovery.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Install FFmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Recover approved existing phone assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          mkdir -p output
+          printf "job,status,bytes,sha256\n" > output/summary.csv
+          for spec in "69:638034079:8cbbbc4d99c37bafe1036d9406e499fc89c95741e0b7646dd37653583d91d288" "70:638019718:4187db9c570792959e14eb57e76a49c1be63fef3d56f46870aa86c87ebbe05b0" "71:638027593:5e599084f60a0453a18de0b6e38a131a64d712aae07547e26bf7615033d08d9d"; do
+            IFS=: read -r id asset expected <<< "$spec"
+            mkdir -p "output/$id"
+            f="output/$id/yunex-v4-$id.mp4"
+            if ! gh api -H "Accept: application/octet-stream" "/repos/$GITHUB_REPOSITORY/releases/assets/$asset" > "$f"; then
+              echo "$id,DOWNLOAD_FAILED,0," >> output/summary.csv; rm -f "$f"; continue
+            fi
+            actual=$(sha256sum "$f" | cut -d' ' -f1)
+            bytes=$(stat -c%s "$f")
+            if [ "$actual" != "$expected" ]; then
+              echo "$id,HASH_MISMATCH,$bytes,$actual" >> output/summary.csv; rm -f "$f"; continue
+            fi
+            if ! ffprobe -v error -show_format -show_streams -of json "$f" > "output/$id/ffprobe.json"; then
+              echo "$id,PROBE_FAILED,$bytes,$actual" >> output/summary.csv; continue
+            fi
+            if ! ffmpeg -hide_banner -loglevel error -xerror -i "$f" -f null -; then
+              echo "$id,DECODE_FAILED,$bytes,$actual" >> output/summary.csv; continue
+            fi
+            ffmpeg -hide_banner -loglevel error -i "$f" -vf "fps=1/2,scale=400:-2,tile=5x4" -frames:v 1 -update 1 "output/$id/contact.jpg" || true
+            echo "$id,PASS,$bytes,$actual" >> output/summary.csv
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p1-single-agent-recovered-69-70-71
+          path: output/
+          retention-days: 7
+          if-no-files-found: error
