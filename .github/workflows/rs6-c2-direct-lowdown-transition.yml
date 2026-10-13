@@ -1,0 +1,57 @@
+name: RS6 C2 real THE-LOWDOWN plus Audi UHD transition proof
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/c2-details-textures
+    paths:
+      - 'production/videos/rs6-no-mercy-001/agent-c2/c2_direct_lowdown_bridge.py'
+      - '.github/workflows/rs6-c2-direct-lowdown-transition.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  lowdown-audi-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      TAG: yunex-rs6-c2-lowdown-bridge-review-20261013
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare FFmpeg and film-page parser
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install requests pillow --break-system-packages
+      - name: Extract genuine direct THE-LOWDOWN filmmaker video and original 4K Audi macro frames
+        run: |
+          set -euo pipefail
+          python production/videos/rs6-no-mercy-001/agent-c2/c2_direct_lowdown_bridge.py | tee c2_direct_lowdown_bridge.log
+          test -s c2_lowdown_bridge/C2_LOWDOWN_AUDI_TRANSITION_PROOF.mp4
+          test -s c2_lowdown_bridge/EVIDENCE.json
+          test -s c2_lowdown_bridge/CONTACT_4FPS.jpg
+          ffmpeg -v error -xerror -i c2_lowdown_bridge/C2_LOWDOWN_AUDI_TRANSITION_PROOF.mp4 -f null -
+      - name: Upload real MP4 only into OWNER-ONLY unpublished draft (do NOT publish)
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --json isDraft >/dev/null 2>&1; then
+            test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
+            gh release upload "$TAG" c2_lowdown_bridge/C2_LOWDOWN_AUDI_TRANSITION_PROOF.mp4 c2_lowdown_bridge/CONTACT_4FPS.jpg c2_lowdown_bridge/EVIDENCE.json c2_lowdown_bridge/SHA256SUMS.txt --clobber
+          else
+            gh release create "$TAG" c2_lowdown_bridge/C2_LOWDOWN_AUDI_TRANSITION_PROOF.mp4 c2_lowdown_bridge/CONTACT_4FPS.jpg c2_lowdown_bridge/EVIDENCE.json c2_lowdown_bridge/SHA256SUMS.txt --draft --latest=false --target "$GITHUB_SHA" --title "YUNEX RS6 C2 + B2 / source transition proof ONLY" --notes "OWNER-ONLY UNPUBLISHED review. Real THE-LOWDOWN original creator film plus real native Audi 4K close-ups. Rights to publicly republish source/film NOT established. No soundtrack. Not final 13s video. DO NOT PUBLISH."
+          fi
+          test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
+          gh release view "$TAG" --json isDraft,assets --jq '{draft:.isDraft,files:[.assets[].name]}'
+      - name: Independent QA evidence only (never publicly attach third-party MP4)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-c2-lowdown-audi-visual-qa-${{ github.run_id }}
+          path: |
+            c2_direct_lowdown_bridge.log
+            c2_lowdown_bridge/EVIDENCE.json
+            c2_lowdown_bridge/SHA256SUMS.txt
+            c2_lowdown_bridge/CONTACT_4FPS.jpg
+          if-no-files-found: warn
+          retention-days: 14
