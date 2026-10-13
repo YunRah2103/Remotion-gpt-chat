@@ -1,0 +1,62 @@
+name: YUNEX RS6 B2 six-second genuine action editorial proof
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/b2-youtube-driving
+    paths:
+      - .github/workflows/rs6-b2-six-second-action-proof.yml
+      - production/videos/rs6-no-mercy-001/agent_b2_six_second_action_proof.py
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  six-second-original-motion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg and perceptual frame QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q --upgrade pillow
+      - name: Fetch verified A2 and C2 original 4K-source RS6 files, plus B2 night film
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          mkdir -p private_sources
+          for name in A2_C8_RS6_FAST_APPROACH A2_C8_RS6_HAIRPIN_REVEAL A2_C8_RS6_MOUNTAIN_SWEEP; do
+            gh release download yunex-rs6-a2-hero-review-20261013 -p "$name.mp4" -D private_sources
+          done
+          for name in UHD_MATRIX_LED_FRONT_CORNER UHD_RS6_RED_BRAKE_CALIPER UHD_RS6_REAR_LED_SIGNATURE UHD_RS6_OVAL_EXHAUST_REAR; do
+            gh release download yunex-rs6-c2-details-review-20261013 -p "$name.mp4" -D private_sources
+          done
+          gh release download yunex-rs6-b2-motion-review-20261013 -p 'B2_LOWDOWN_NIGHT_07.mp4' -D private_sources
+          test "$(find private_sources -name '*.mp4' | wc -l)" -eq 8
+      - name: Actually render+decode the 6s real 1080x1920 edit; sample frame luma & contact sheets
+        timeout-minutes: 7
+        run: python production/videos/rs6-no-mercy-001/agent_b2_six_second_action_proof.py | tee b2-six-proof.log
+      - name: Owner-only unpublished GitHub draft MP4 handoff (never public)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: yunex-rs6-b2-motion-review-20261013
+        run: |
+          set -euo pipefail
+          test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
+          gh release upload "$TAG" b2-action-proof/YUNEX_RS6_B2_SIX_SECOND_ACTION_PROOF.mp4 b2-action-proof/SIX_SECOND_CONTACT.jpg b2-action-proof/SIX_SECOND_MANIFEST.json b2-action-proof/SIX_SECOND_SHA256SUMS.txt --clobber
+          gh release view "$TAG" --json isDraft,assets --jq '{draft:.isDraft,assets:[.assets[].name]}'
+      - name: Publish independent low-res frame QA only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-b2-six-second-visual-audit
+          path: |
+            b2-six-proof.log
+            b2-action-proof/SIX_SECOND_CONTACT.jpg
+            b2-action-proof/SIX_SECOND_MANIFEST.json
+            b2-action-proof/SIX_SECOND_SHA256SUMS.txt
+          retention-days: 14
+          if-no-files-found: warn
