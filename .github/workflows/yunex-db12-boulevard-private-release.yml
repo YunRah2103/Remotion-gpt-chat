@@ -1,0 +1,71 @@
+name: YUNEX DB12 Boulevard 4K - Preserve Private Source
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/yunex-db12-boulevard-private-release.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+jobs:
+  private-draft-source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    steps:
+      - name: Recover verified native source from successful GitHub artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p db12-private
+          gh run download 38592931834 --repo "$GITHUB_REPOSITORY" --name "YUNEX-DB12-BOULEVARD-PRIVATE-FOOTAGE-QA" --dir db12-private
+          test -s db12-private/BOULEVARD_DB12_FILM.mp4
+          printf '%s  %s\n' '1d4c8e1e93582cddf85012ab4ab8e524ebbe268225f58b0383ce40dc37421ccf' 'db12-private/BOULEVARD_DB12_FILM.mp4' | sha256sum -c
+          test -s db12-private/BOULEVARD_DB12_MANIFEST.json
+          ls -lh db12-private/
+      - name: Prepare editor timecode and rights-warning handoff
+        shell: bash
+        run: |
+          cat > db12-private/EDIT_SHOT_TIMECODES.md <<'EOF'
+          # YUNEX MIDNIGHT EMERALD — supplementary source (private review only)
+
+          Genuine native 3840 x 2160, 25fps H264, 63.68s DB12 film from Boulevard Australia.
+          Source: https://boulevard.co/post/videos/aston-martin-db12-video/
+          Publisher/creator permission to use in a public edit has NOT been confirmed.
+          Watermark "BOULEVARD" is embedded in original footage.
+          CAR APPEARS ALMOST BLACK, not consistent with emerald green South-of-France aerial shots.
+          Owner-only research/selection source. No public redistribution authorization is implied.
+          This is NOT the verified Aston Martin South-of-France FPV source.
+
+          | Source IN-OUT | Camera/visual | Suggested use |
+          | --- | --- | --- |
+          | 13.10-15.00 | Full side profile, gentle drift | Opening phrase |
+          | 15.30-17.55 | Rear 3/4 exit on road | Strings rise |
+          | 18.10-19.90 | Romantic golden backlit rear | Lyrical musical accent |
+          | 24.60-26.20 | Mirror reflection, shallow depth | Gentle detail bridge |
+          | 32.70-34.55 | Low rear on forecourt | Brief setup |
+          | 41.25-42.80 | Rear light closeup | Musical accent |
+          | 45.45-46.80 | Side vent and grille body details | Precise short insert |
+          | 46.85-48.18 | Cockpit and steering wheel | Luxury interlude |
+          | 49.12-50.58 | Interior leather/audio speaker | Quiet detail |
+          | 51.45-54.82 | Low full front DB12 hero | Climax or closing |
+
+          Original SHA256: 1d4c8e1e93582cddf85012ab4ab8e524ebbe268225f58b0383ce40dc37421ccf
+
+          Trim source with native 4K source and preserve music separately. The ten preview extracts were separately fully decoded and packaged in the corresponding ChatGPT footage specialist session; do not assume crop/regrade can remove watermarks without rights.
+          EOF
+      - name: Preserve source in owner-only GitHub DRAFT release (never publish)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG=yunex-db12-boulevard-private-evaluation-20261014
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft --latest=false               --title "YUNEX DB12 Boulevard source - private unlicensed footage review"               --notes "OWNER ONLY DRAFT: raw copyrighted Boulevard luxury 4K DB12 film; license pending; near-black car differs from Iridescent Emerald. Do not publish or distribute." 
+          fi
+          test "$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isDraft --jq '.isDraft')" = true
+          gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" --clobber             db12-private/BOULEVARD_DB12_FILM.mp4             db12-private/BOULEVARD_DB12_CONTACT_24.jpg             db12-private/BOULEVARD_DB12_MANIFEST.json             db12-private/EDIT_SHOT_TIMECODES.md
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isDraft,assets,tagName,url --jq '{tagName,isDraft,url,assets:(.assets|map({name,size}))}'
