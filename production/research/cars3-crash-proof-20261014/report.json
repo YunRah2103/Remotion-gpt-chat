@@ -1,0 +1,263 @@
+{
+  "source_issue": 87,
+  "animated_duration": 100.016583,
+  "animated_original_audio_streams": 1,
+  "original_audio_preserved": true,
+  "real_crash_type": "nighttime short-track multi-car spin with smoke; physical collision point unverified",
+  "red_car": "Pexels 18447538 original night stock-car, user previously approved footage",
+  "candidate_impact_analysis": [
+    [
+      2.9102530259017185,
+      81.76,
+      1.562,
+      0.345,
+      0.198
+    ],
+    [
+      2.369366471734893,
+      78.79,
+      0.98,
+      0.411,
+      0.175
+    ],
+    [
+      2.2486045944191364,
+      46.78,
+      1.745,
+      0.176,
+      0.041
+    ],
+    [
+      2.071808205970379,
+      66.58,
+      1.364,
+      0.233,
+      0.02
+    ],
+    [
+      1.9252196048172354,
+      62.62,
+      1.333,
+      0.197,
+      0.024
+    ],
+    [
+      1.8870753289200333,
+      62.95,
+      0.582,
+      0.312,
+      0.181
+    ],
+    [
+      1.8777629249230554,
+      63.94,
+      1.086,
+      0.24,
+      0.041
+    ],
+    [
+      1.869598062290908,
+      90.01,
+      0.662,
+      0.322,
+      0.099
+    ],
+    [
+      1.8623902497483724,
+      79.12,
+      0.316,
+      0.288,
+      0.55
+    ],
+    [
+      1.8324057924203272,
+      61.96,
+      0.616,
+      0.464,
+      0.035
+    ],
+    [
+      1.7543351082635785,
+      48.43,
+      0.639,
+      0.174,
+      0.4
+    ],
+    [
+      1.7478342364992159,
+      47.11,
+      1.739,
+      0.04,
+      0.028
+    ],
+    [
+      1.6955801064252862,
+      60.31,
+      0.664,
+      0.151,
+      0.402
+    ],
+    [
+      1.6805428165093197,
+      61.63,
+      0.206,
+      0.27,
+      0.367
+    ],
+    [
+      1.6627096862151167,
+      60.64,
+      0.602,
+      0.176,
+      0.336
+    ],
+    [
+      1.6523646665456304,
+      82.09,
+      0.667,
+      0.298,
+      0.007
+    ],
+    [
+      1.6461240053227724,
+      64.6,
+      1.116,
+      0.156,
+      0.064
+    ],
+    [
+      1.6319495472150702,
+      59.32,
+      0.92,
+      0.206,
+      0.055
+    ],
+    [
+      1.628249355939355,
+      81.1,
+      0.444,
+      0.188,
+      0.439
+    ],
+    [
+      1.5943879357298474,
+      56.35,
+      0.281,
+      0.22,
+      0.5
+    ],
+    [
+      1.556857188916435,
+      29.62,
+      0.427,
+      0.259,
+      0.177
+    ],
+    [
+      1.5546365630474832,
+      80.44,
+      0.318,
+      0.2,
+      0.546
+    ],
+    [
+      1.5527826343500362,
+      60.97,
+      0.675,
+      0.125,
+      0.338
+    ],
+    [
+      1.5314138176638177,
+      80.77,
+      0.308,
+      0.408,
+      0.02
+    ],
+    [
+      1.5145092721306321,
+      39.19,
+      0.455,
+      0.208,
+      0.252
+    ],
+    [
+      1.500686749377592,
+      35.23,
+      0.631,
+      0.11,
+      0.366
+    ],
+    [
+      1.4729398758850212,
+      34.9,
+      0.635,
+      0.1,
+      0.368
+    ],
+    [
+      1.4720313179165303,
+      35.56,
+      0.63,
+      0.103,
+      0.362
+    ],
+    [
+      1.4672346311700886,
+      29.29,
+      1.197,
+      0.094,
+      0.04
+    ],
+    [
+      1.4274793179617526,
+      53.38,
+      0.173,
+      0.232,
+      0.307
+    ]
+  ],
+  "candidates": [
+    {
+      "filename": "cars3_to_real_crash_original_audio_1.mp4",
+      "movie_start": 72.41,
+      "movie_cut_impact": 76.76,
+      "real_spin": [
+        1.32,
+        3.97
+      ],
+      "real_race": [
+        1.4,
+        4.2
+      ],
+      "duration": 10.267,
+      "bytes": 4969131,
+      "sha256": "3dce1724b7dc6abff1e545a269481450b9c53af9ea24aed86a4ff5b7bd81faf6",
+      "audio_codec": "aac",
+      "real_source_audio": true,
+      "full_audio_video_decode": "PASS"
+    },
+    {
+      "filename": "cars3_to_real_crash_original_audio_2.mp4",
+      "movie_start": 77.41,
+      "movie_cut_impact": 81.76,
+      "real_spin": [
+        1.32,
+        3.97
+      ],
+      "real_race": [
+        1.4,
+        4.2
+      ],
+      "duration": 10.233,
+      "bytes": 5882466,
+      "sha256": "66fea4e1603d30550bf75b60da87e865a8e57adde10b0c7097a319c9f554d4b3",
+      "audio_codec": "aac",
+      "real_source_audio": true,
+      "full_audio_video_decode": "PASS"
+    }
+  ],
+  "editorial_qualification": "Automatic scene-rotation heuristic guesses candidate times; actual movie crash visual QA must be confirmed before publishing or final edit.",
+  "rights": "Pixar source and previews are in private owner-only draft release. Public redistribution not authorized.",
+  "music": "No music supplied for Cars concept; transition preview retains original McQueen audio and actual real audio if present."
+}
