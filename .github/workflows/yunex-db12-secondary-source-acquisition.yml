@@ -1,0 +1,94 @@
+name: YUNEX DB12 Alternative 1080p Source Acquisition
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/yunex-db12-secondary-source-acquisition.yml']
+permissions:
+  contents: read
+jobs:
+  acquire-review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: denoland/setup-deno@v2
+        with: {deno-version: v2.x}
+      - name: Install extraction and probe tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q -U 'yt-dlp[default]' curl-cffi
+      - name: Recover alternative publisher and filmmaker footage for private editorial rights review
+        shell: bash
+        run: |
+          cat > /tmp/db12.py <<'PY'
+          import pathlib, subprocess,json,hashlib,os,shutil
+          d=pathlib.Path('out/db12-alternatives'); d.mkdir(parents=True,exist_ok=True)
+          sources=[
+            ('dailymotion-driving-official','https://www.dailymotion.com/video/x8mmld9','Auto driving news; publisher/licence pending'),
+            ('dailymotion-dubai','https://www.dailymotion.com/video/xa2ixm8','Iconic Concierge Magazine; licence pending'),
+            ('vimeo-revolux-filmmaker','https://vimeo.com/870887642','Revolux Studios; photographer-owned copyright; permission pending')
+          ]
+          res=[]
+          for name,url,owner in sources:
+            x={'id':name,'url':url,'publisher':owner,'rights':'Private review only; NO public redistribution until authorized'}
+            out=d/(name+'.%(ext)s')
+            cmd=['timeout','175','python','-m','yt_dlp','--no-playlist','--no-progress','--no-part','--socket-timeout','12','--retries','1','--fragment-retries','1','-f','bv*[height<=2160]+ba/b[height<=2160]','--merge-output-format','mp4','-o',str(out),url]
+            try:
+              rr=subprocess.run(cmd,capture_output=True,text=True,timeout=185)
+              x['fetch_exit_code']=rr.returncode;x['fetch_log']=(rr.stdout+'\n'+rr.stderr)[-2800:]
+            except Exception as e:x['fetch_exit_code']=-1;x['fetch_log']=str(e)
+            files=[f for f in d.glob(name+'.*') if f.suffix in ('.mp4','.mov','.webm','.mkv') and f.stat().st_size>100000]
+            if not files:
+              x['verdict']='NOT_DOWNLOADED';res.append(x);continue
+            f=max(files,key=lambda f:f.stat().st_size)
+            x['filename']=f.name;x['bytes']=f.stat().st_size;x['sha256']=hashlib.sha256(f.read_bytes()).hexdigest()
+            p=subprocess.run(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(f)],capture_output=True,text=True)
+            try:
+              m=json.loads(p.stdout)
+              v=next(q for q in m['streams'] if q.get('codec_type')=='video')
+              x['stream']={k:v.get(k) for k in ('width','height','r_frame_rate','codec_name')}
+              x['duration']=m['format'].get('duration')
+              x['verdict']='1080P_OR_HIGHER_PENDING_VISUAL_REVIEW' if v.get('width',0)>=1920 and v.get('height',0)>=1080 else 'BELOW_1080P'
+            except Exception as e:
+              x['verdict']='PROBE_FAILED';x['error']=str(e);res.append(x);continue
+            try:
+              vv=subprocess.run(['timeout','65','ffmpeg','-hide_banner','-nostdin','-v','error','-xerror','-i',str(f),'-map','0:v:0','-f','null','-'],capture_output=True,text=True,timeout=70)
+              x['full_decode']='PASS' if vv.returncode==0 else 'FAIL '+vv.stderr[-300:]
+            except Exception as e:x['full_decode']='FAIL '+str(e)
+            duration=float(x.get('duration') or 0)
+            stamps=[round((k+.5)*min(duration,100)/15,2) for k in range(15)]
+            x['contact_timestamps']=stamps
+            frames=[]
+            for k,t in enumerate(stamps):
+              fn=d/f'{name}_shot_{k:02d}.jpg'
+              try:
+                z=subprocess.run(['ffmpeg','-hide_banner','-v','error','-ss',str(t),'-i',str(f),'-frames:v','1','-vf','scale=480:-2','-y',str(fn)],capture_output=True,timeout=12)
+                if z.returncode==0 and fn.exists():frames.append(fn)
+              except:pass
+            if frames:
+              # Pillow contact sheet with exact source timestamps
+              from PIL import Image,ImageDraw
+              sheet=Image.new('RGB',(2400,round(len(frames)/5+.99)*315),'#111111')
+              draw=ImageDraw.Draw(sheet)
+              for k,fn in enumerate(frames):
+                img=Image.open(fn)
+                img.thumbnail((470,270))
+                col,row=k%5,k//5
+                sheet.paste(img,(col*480,(row*315)))
+                draw.text((col*480+6,row*315+275),f'{name} at {stamps[k]:.2f}s',fill='white')
+              sheet.save(d/f'{name}_CONTACT.jpg',quality=91)
+            for q in frames:q.unlink(missing_ok=True)
+            res.append(x)
+          (d/'ACQUISITION_MANIFEST.json').write_text(json.dumps(res,indent=2))
+          print(json.dumps([{k:v for k,v in r.items() if k!='fetch_log'} for r in res],indent=2))
+          PY
+          python -m pip install -q Pillow
+          python /tmp/db12.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-DB12-SECONDARY-NATIVE-FOOTAGE-OWNER-REVIEW
+          path: out/db12-alternatives/
+          retention-days: 2
+          compression-level: 0
+          if-no-files-found: warn
