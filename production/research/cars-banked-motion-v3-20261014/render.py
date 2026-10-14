@@ -41,8 +41,8 @@ def clip_frames(path,t0,t1):
 
 # Keep user's chosen banked McQueen scene & real footage unchanged.
 # A full movie segment includes >1 built-in camera view; choose its coherent final action
-# and preserve preceding 1.6-2.1s of visible banking rather than cut to an unrelated opening.
-A=clip_frames(MOVIE,11.58,14.12)
+# and preserve preceding 1.3-1.9s of visible banking rather than cut to an unrelated opening.
+A=clip_frames(MOVIE,10.55,14.12)
 B=clip_frames(REAL,1.16,3.98)
 def frame_at(seq,t):
  return min(seq,key=lambda v:abs(v[0]-t))[1]
@@ -80,7 +80,7 @@ def energy_and_motion(src,t):
 # Cut evaluation is deliberately restricted to final moving section of banked clip,
 # not the original near-static front-on frame at 8.2s.
 candidates=[]
-for ta in np.arange(12.93,13.96,.13):
+for ta in np.arange(11.88,12.62,.09):
  fa=crop_at(frame_at(A,float(ta)))
  ma=red_info(fa)
  for tb in np.arange(1.24,2.90,.12):
@@ -106,7 +106,7 @@ print("MATCH_CANDIDATES",json.dumps([
  for z in candidates[:9]]),flush=True)
 
 # Preserve visible banking as a ~2s build, then carry the real-car approach to its flyby.
-START_A=11.63
+START_A=10.75
 END_B=3.82
 MOVIE_N=int(round((CUT_A-START_A)*30))
 REAL_N=int(round((END_B-CUT_B)*30))
