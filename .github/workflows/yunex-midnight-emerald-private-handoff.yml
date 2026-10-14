@@ -1,0 +1,53 @@
+name: YUNEX Midnight Emerald - Private Verified Footage Handoff
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/yunex-midnight-emerald-private-handoff.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  handoff:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare local tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Retrieve already verified Aston Emerald ORIGINAL from owner-only draft
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p out/source out/qa
+          gh release download yunex-midnight-emerald-green-db12-private-20261014 \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern 'ASTON_DB12_EMERALD_OFFICIAL_1.mp4' \
+            --pattern '*-contact.jpg' \
+            --pattern 'manifest.json' \
+            --dir out/source
+          test -s out/source/ASTON_DB12_EMERALD_OFFICIAL_1.mp4
+          echo '29bb83cd8a70c4e166393e57286aab94630cb16354db0057a02cba5ae3b17aa9  out/source/ASTON_DB12_EMERALD_OFFICIAL_1.mp4' | sha256sum -c -
+          ffprobe -v error -show_entries stream=width,height,codec_name,avg_frame_rate -show_entries format=duration,size -of json out/source/ASTON_DB12_EMERALD_OFFICIAL_1.mp4
+          ffmpeg -v error -xerror -i out/source/ASTON_DB12_EMERALD_OFFICIAL_1.mp4 -f null -
+          cp out/source/manifest.json out/qa/manifest.json
+          cp out/source/*-contact.jpg out/qa/
+          echo 'PRIVATE_ORIGINAL_FULL_DECODE_PASS' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Source: Aston Martin Iridescent Emerald South of France official B-roll (1920x1080, 25fps, 62.40s).' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Original remains unedited. Original use: personal/editorial review, not a public final film.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Owner-access-only temporary deliverable: real MP4, contact, manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX_DB12_EMERALD_ORIGINAL_FOOTAGE_HANDOFF
+          path: |
+            out/source/ASTON_DB12_EMERALD_OFFICIAL_1.mp4
+            out/qa/manifest.json
+            out/qa/*-contact.jpg
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
