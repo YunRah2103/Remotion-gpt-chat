@@ -1,0 +1,57 @@
+name: YUNEX P1 V10 Private Audio Sources
+run-name: Recover verified private P1 V8 recordings for V10 sound mix
+on:
+  push:
+    paths:
+      - '.github/workflows/p1-v10-audio-source-rescue.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: read
+  actions: write
+jobs:
+  private-source-rescue:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Import authentic P1 Dubai sound
+        id: dubai
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '82'
+          token: ${{ github.token }}
+      - name: Import authentic P1 GTspirit sound
+        id: gtspirit
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '85'
+          token: ${{ github.token }}
+      - name: Private full-decode checks, manifest and copy
+        shell: bash
+        env:
+          DUBAI: ${{ steps.dubai.outputs.asset_path }}
+          GTSPIRIT: ${{ steps.gtspirit.outputs.asset_path }}
+        run: |
+          set -euo pipefail
+          mkdir -p p1-private-audio
+          cp "$DUBAI" p1-private-audio/p1-dubai-65s.m4a
+          cp "$GTSPIRIT" p1-private-audio/p1-gtspirit-18s.m4a
+          for f in p1-private-audio/*.m4a; do
+            ffprobe -v error -show_entries format=duration:stream=codec_name,sample_rate,channels -of json "$f"
+            ffmpeg -v error -xerror -i "$f" -f null -
+          done
+          (cd p1-private-audio && sha256sum *.m4a > SHA256SUMS.txt)
+      - uses: actions/upload-artifact@v4
+        id: bundle
+        with:
+          name: yunex-p1-v10-private-audio-sources
+          path: p1-private-audio/
+          retention-days: 3
+          if-no-files-found: error
+      - name: Log authenticated source artifacts to P1 dashboard
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ steps.bundle.outputs.artifact-id }}
+        shell: bash
+        run: |
+          gh issue comment 72 --body "P1 V10 SOUND SOURCE RESCUE COMPLETE — 14 Oct 2026. Private audio source artifacts recovered/validated from #82 and #85. Actions run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }} | artifact_id: $ARTIFACT_ID | rights: UNVERIFIED; for private creative review only. Final film audio mix not yet complete."
