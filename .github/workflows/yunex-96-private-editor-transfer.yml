@@ -24,6 +24,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p transfer
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
           gh release download yunex-phone-v4-96 \
             --repo YunRah2103/Remotion-gpt-chat \
             --pattern 'yunex-v4-96.mp4' --dir transfer
