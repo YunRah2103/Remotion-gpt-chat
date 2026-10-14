@@ -35,8 +35,8 @@ jobs:
                 except Exception as e:x['error']=str(e);x['body']=r.text[:500]
               else:
                 text=html.unescape(r.text)
-                x['iframes']=re.findall(r'<iframe[^>]+(?:src|data-src)=["\\']([^"\\']+)',text,re.I)[:30]
-                x['video_sources']=list(dict.fromkeys(re.findall(r'https?[^"\\'<> ]{0,200}(?:\\.mp4|\\.m3u8|vimeo.com/video/\\d+|youtube.com/embed/[^"\\'<> ]+)[^"\\'<> ]*',text,re.I)))[:35]
+                x['iframes']=re.findall(r'<iframe[^>]*src=\\S+',text,re.I)[:30]
+                x['video_sources']=[u[:500] for u in re.findall(r'https?://\\S+',text,re.I) if any(t in u.lower() for t in ['.mp4','.m3u8','vimeo.com/video/','youtube.com/embed/'])][:35]
                 x['embedded_contexts']=[text[max(0,m.start()-200):m.start()+200] for m in list(re.finditer('youtube|vimeo|iframe|\\.mp4|\\.m3u8',text,re.I))[:15]]
             except Exception as e:x['error']=str(e)
             result[src]=x
