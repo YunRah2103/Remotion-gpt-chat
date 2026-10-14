@@ -60,7 +60,7 @@ jobs:
           else:
             b=file.open('rb').read(128)
             if b.find(b'ftyp')<0 and not b.startswith(b'\x1a\x45\xdf\xa3'):
-              print('NON_VIDEO_RESPONSE',repr(b),flush=True)
+              print('NON_VIDEO_RESPONSE',repr(file.read_text(encoding='utf-8',errors='replace')[:2500]),flush=True)
               raise RuntimeError('Press endpoint did not return an MP4/MOV/MKV or ZIP')
             file.rename(src/'ASTON_DB12_EMERALD_OFFICIAL_1.mp4')
           PY
