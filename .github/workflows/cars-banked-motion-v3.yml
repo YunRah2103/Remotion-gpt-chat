@@ -1,0 +1,56 @@
+name: YUNEX Cars V3 Motion-Connected Banked Match QA
+on:
+  push:
+    branches: [yunex-cars-banked-motion-bridge-v3-20261014]
+    paths:
+      - '.github/workflows/cars-banked-motion-v3.yml'
+      - 'production/research/cars-banked-motion-v3-20261014/render.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare verified local FFmpeg and OpenCV
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python3 -m pip install --disable-pip-version-check numpy opencv-python-headless
+      - name: Securely retrieve original Pixar source
+        uses: ./.github/actions/yunex-v4-import
+        id: pixar
+        with:
+          issue_number: '79'
+          token: ${{ github.token }}
+      - name: Frame/motion matching and 2 private V3 test videos
+        env:
+          CARS_SOURCE: ${{ steps.pixar.outputs.asset_path }}
+        run: python3 production/research/cars-banked-motion-v3-20261014/render.py
+      - name: Put animated derivatives ONLY in private owner-only draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create "yunex-cars-banking-v3-${GITHUB_RUN_ID}" \
+            work/cars_v3/cars_banked_connected_soft.mp4 \
+            work/cars_v3/cars_banked_connected_whip.mp4 \
+            --repo YunRah2103/Remotion-gpt-chat \
+            --title "Private Cars banked racing V3 motion-bridge trials" \
+            --notes "Owner review only: moving McQueen banking to original real red stock car; no soundtrack. Copyrighted animation/publication rights not verified." \
+            --draft --target "${GITHUB_SHA}"
+          gh release view "yunex-cars-banking-v3-${GITHUB_RUN_ID}" --repo YunRah2103/Remotion-gpt-chat --json url,isDraft,assets
+      - name: Publish QA metrics only on feature branch (no movie frames)
+        if: always()
+        run: |
+          test -s production/research/cars-banked-motion-v3-20261014/report.json || exit 0
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add production/research/cars-banked-motion-v3-20261014/report.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Cars V3 private transition QA metrics"
+            git push
+          fi
