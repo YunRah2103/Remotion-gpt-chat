@@ -1,0 +1,64 @@
+{
+  "transition": "banked Pixar race footage -> original red #15 real short-track footage",
+  "source_movie": "owner-only Pixar issue 79 (1920x1080)",
+  "real_source": "Pexels #18447538 original 1920x1080 ~59.94fps, unchanged footage identity",
+  "cut_animated_offset": 13.84,
+  "cut_real_offset": 1.96,
+  "movie_start_offset": 11.63,
+  "real_end_offset": 3.82,
+  "animated_red": {
+    "cx": 0.5036791489491412,
+    "cy": 0.6099841113803667,
+    "area": 0.3797048611111111,
+    "wide": 1.0,
+    "height": 0.509375
+  },
+  "real_red": {
+    "cx": 0.5274134790528233,
+    "cy": 0.6132711389128559,
+    "area": 0.06036458333333333,
+    "wide": 0.8,
+    "height": 0.584375
+  },
+  "camera_pan_x": [
+    -3.267,
+    -4.433
+  ],
+  "alignment_shift_original_pixels": 14.43,
+  "mean_luma_correction_bgr": [
+    -3.28,
+    -7.47,
+    15.0
+  ],
+  "match_cost": 0.9014,
+  "results": [
+    {
+      "variant": "soft",
+      "filename": "cars_banked_connected_soft.mp4",
+      "bytes": 2291203,
+      "sha256": "c8e171d549f14c519cd901a9ff107e908d896e629fff5513e24263a9aee0f506",
+      "duration": 4.067,
+      "resolution": [
+        720,
+        1280
+      ],
+      "fps": "30/1",
+      "full_decode": "PASS"
+    },
+    {
+      "variant": "whip",
+      "filename": "cars_banked_connected_whip.mp4",
+      "bytes": 2252334,
+      "sha256": "ded4e8dabee5bf4945d1d1f38631bf9503053701039a12231df9064968c6ea72",
+      "duration": 4.067,
+      "resolution": [
+        720,
+        1280
+      ],
+      "fps": "30/1",
+      "full_decode": "PASS"
+    }
+  ],
+  "privacy": "All MP4s stay private GitHub DRAFT release; metrics only committed",
+  "qualifications": "Camera match is not a true continuous take. No 3D morph, no fake car footage, no soundtrack."
+}
