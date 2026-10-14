@@ -1,0 +1,94 @@
+name: YUNEX Cars3 Genuine Airborne NASCAR Flip with McQueen Audio
+on:
+  push:
+    branches: [yunex-cars3-real-nascar-airborne-v4-20261014]
+    paths:
+      - '.github/workflows/cars3-real-nascar-airborne-v4.yml'
+      - 'production/research/cars3-nascar-airborne-20261014/render.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: read
+jobs:
+  private_airborne_crash:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare video/audio tools
+        run: |
+          if ! command -v ffprobe >/dev/null || ! command -v ffmpeg >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
+      - name: Choose owner-verified ACTUAL airborne NASCAR race from phone jobs
+        id: source
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 48); do
+            for issue in 88 89; do
+              latest="$(gh api --paginate "repos/YunRah2103/Remotion-gpt-chat/issues/${issue}/comments?per_page=100" \
+                --jq '[.[] | select(.user.login == "YunRah2103") | .body | select(startswith("YUNEX_PHONE_DONE_V4") or startswith("YUNEX_PHONE_FAILED_V4"))] | last // ""')"
+              if [[ "$latest" == YUNEX_PHONE_DONE_V4* ]]; then
+                echo "source_issue=${issue}" >> "$GITHUB_OUTPUT"
+                echo "NASCAR source issue #${issue} verified"
+                exit 0
+              fi
+              if [[ "$latest" == YUNEX_PHONE_FAILED_V4* ]]; then
+                echo "NASCAR source issue #${issue} failed, trying alternative"
+              fi
+            done
+            echo "Waiting for real NASCAR airborne flip source, attempt ${attempt}/48"
+            sleep 15
+          done
+          echo "::error::Neither real airborne NASCAR clip acquired. No fake flip or wrong-footage edit will be rendered."
+          exit 4
+      - name: Recover authenticated owner-private Disney source with real audio
+        id: movie
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '87'
+          token: ${{ github.token }}
+          destination: work/yunex-private-original-cars3
+      - name: Recover authentic owner-verified NASCAR racing airborne source
+        id: nascar
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: ${{ steps.source.outputs.source_issue }}
+          token: ${{ github.token }}
+          destination: work/yunex-private-real-airborne
+      - name: Match real airborne crash to McQueen original sound / preview 2 windows
+        env:
+          ANIMATED_SOURCE: ${{ steps.movie.outputs.asset_path }}
+          NASCAR_SOURCE: ${{ steps.nascar.outputs.asset_path }}
+          NASCAR_PHONE_ISSUE: ${{ steps.source.outputs.source_issue }}
+        run: python3 production/research/cars3-nascar-airborne-20261014/render.py
+      - name: PRIVATE-only video release, never public raw film frames
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create "yunex-cars3-real-flip-${GITHUB_RUN_ID}" \
+            work/yunex-cars3-nascar-airborne/CARS3_REAL_NASCAR_BARREL_ROLL_v1.mp4 \
+            work/yunex-cars3-nascar-airborne/CARS3_REAL_NASCAR_BARREL_ROLL_v2.mp4 \
+            --repo YunRah2103/Remotion-gpt-chat \
+            --title "PRIVATE YUNEX: Real NASCAR dramatic flip / McQueen original audio" \
+            --notes "User-facing proof only: actual verified Daytona airborne NASCAR flips, not spin/smoke; source movie original soundtrack preserved. Private owner draft, rights not cleared for publication. Not full film." \
+            --draft --target "$GITHUB_SHA"
+          gh release view "yunex-cars3-real-flip-${GITHUB_RUN_ID}" --repo YunRah2103/Remotion-gpt-chat --json url,isDraft,assets
+      - name: Commit source QA and file checksums only to separate branch
+        if: always()
+        shell: bash
+        run: |
+          test -f production/research/cars3-nascar-airborne-20261014/report.json || exit 0
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add production/research/cars3-nascar-airborne-20261014/report.json
+          if ! git diff --cached --quiet; then
+            git commit -m "YUNEX Cars3 real airborne Daytona crash preview QA"
+            git push
+          fi
