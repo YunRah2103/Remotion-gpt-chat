@@ -2,42 +2,42 @@
   "transition": "banked Pixar race footage -> original red #15 real short-track footage",
   "source_movie": "owner-only Pixar issue 79 (1920x1080)",
   "real_source": "Pexels #18447538 original 1920x1080 ~59.94fps, unchanged footage identity",
-  "cut_animated_offset": 13.84,
-  "cut_real_offset": 1.96,
-  "movie_start_offset": 11.63,
+  "cut_animated_offset": 12.6,
+  "cut_real_offset": 2.8,
+  "movie_start_offset": 10.75,
   "real_end_offset": 3.82,
   "animated_red": {
-    "cx": 0.5036791489491412,
-    "cy": 0.6099841113803667,
-    "area": 0.3797048611111111,
-    "wide": 1.0,
-    "height": 0.509375
+    "cx": 0.5460672215400009,
+    "cy": 0.4551593839541547,
+    "area": 0.21206597222222223,
+    "wide": 0.9444444444444444,
+    "height": 0.365625
   },
   "real_red": {
-    "cx": 0.5274134790528233,
-    "cy": 0.6132711389128559,
-    "area": 0.06036458333333333,
-    "wide": 0.8,
-    "height": 0.584375
+    "cx": 0.42115729421352893,
+    "cy": 0.42752597799511005,
+    "area": 0.03550347222222222,
+    "wide": 1.0,
+    "height": 0.23125
   },
   "camera_pan_x": [
-    -3.267,
-    -4.433
+    0.51,
+    -1.088
   ],
-  "alignment_shift_original_pixels": 14.43,
+  "alignment_shift_original_pixels": -75.95,
   "mean_luma_correction_bgr": [
-    -3.28,
-    -7.47,
-    15.0
+    -15.0,
+    -15.0,
+    -15.0
   ],
-  "match_cost": 2.5572,
+  "match_cost": 2.701,
   "results": [
     {
       "variant": "soft",
       "filename": "cars_banked_connected_soft.mp4",
-      "bytes": 2291203,
-      "sha256": "c8e171d549f14c519cd901a9ff107e908d896e629fff5513e24263a9aee0f506",
-      "duration": 4.067,
+      "bytes": 1370597,
+      "sha256": "6cedbdd0b831307b3070d5f7ed1d0043025bee40e622f4bf774677c125fd450f",
+      "duration": 2.867,
       "resolution": [
         720,
         1280
@@ -48,9 +48,9 @@
     {
       "variant": "whip",
       "filename": "cars_banked_connected_whip.mp4",
-      "bytes": 2252334,
-      "sha256": "ded4e8dabee5bf4945d1d1f38631bf9503053701039a12231df9064968c6ea72",
-      "duration": 4.067,
+      "bytes": 1355442,
+      "sha256": "7fe12fb5d60df45945723407ddfb18cc9f33bc8aa96847163280deb9d6d64dff",
+      "duration": 2.867,
       "resolution": [
         720,
         1280
