@@ -1,0 +1,48 @@
+name: YUNEX DB12 1080p Original Source Scout
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/yunex-db12-original-source-scout.yml]
+permissions:
+  contents: read
+jobs:
+  source-scout:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Install extraction clients
+        run: python -m pip install -q 'yt-dlp[default]' requests
+      - name: Inspect original 1080p sources and manufacturer-owned URL assets
+        shell: bash
+        run: |
+          mkdir -p output
+          cat > /tmp/scout.py <<'PY'
+          import subprocess,requests,re,json,html
+          out={}
+          command=['timeout','40','python','-m','yt_dlp','--list-formats','--no-playlist','--socket-timeout','10','--referer','https://media.astonmartin.com/db12-227972/','https://player.vimeo.com/video/1031864127']
+          try:
+            r=subprocess.run(command,capture_output=True,text=True,timeout=45)
+            out['press_vimeo_formats']={'return_code':r.returncode,'stdout_tail':r.stdout[-18000:],'stderr_tail':r.stderr[-2500:]}
+          except Exception as e:out['press_vimeo_formats']={'error':str(e)}
+          sites=['https://www.astonmartin.com/en/models/db12','https://www.astonmartin.com/en/models/db12-coupe','https://media.astonmartin.com/db12-227972/?lang=eng','https://media.astonmartin.com/introducing-the-aston-martin-db12the-worlds-first-super-tourer/?lang=eng']
+          for u in sites:
+            try:
+              r=requests.get(u,timeout=15,headers={'User-Agent':'Mozilla/5.0'},allow_redirects=True)
+              body=html.unescape(r.text)
+              matches=re.findall(r'''(?:https?:)?//[^'"<>\\\s]{6,250}?(?:\\.mp4|\\.m3u8|\\.mov|\\.webm|/video/\\d{6,}|vimeo.com/\\d{6,})[^'"<>\\\s]{0,150}''',body,re.I)
+              urls=re.findall(r'''https?://[^"'<>\\\s]{8,200}''',body)
+              assetlike=[x for x in urls if re.search(r'video|video-id|mp4|m3u8|vimeo|storyblok|cloudinary|mux|brightcove|jwplayer|akamai|mediaasset',x,re.I)]
+              out[u]={'status':r.status_code,'final_url':r.url,'html_bytes':len(r.content),'video_matches':list(dict.fromkeys(matches))[:70],'asset_matches':list(dict.fromkeys(assetlike))[:60]}
+            except Exception as e:out[u]={'error':str(e)}
+          open('output/FORMAT_AND_MANUFACTURER_MEDIA_SCAN.json','w').write(json.dumps(out,indent=2))
+          print(json.dumps({k:{'status':v.get('status'),'html_bytes':v.get('html_bytes'),'video_matches':v.get('video_matches',[])[:10],'formats_tail':v.get('stdout_tail','')[-1000:]} for k,v in out.items()},indent=2))
+          PY
+          python /tmp/scout.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-DB12-SOURCE-FORMAT-SCOUT
+          path: output/
+          retention-days: 2
