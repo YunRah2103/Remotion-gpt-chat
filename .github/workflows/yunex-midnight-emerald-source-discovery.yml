@@ -15,8 +15,10 @@ jobs:
       - name: Install verification tools
         run: |
           set -euo pipefail
-          ffprobe -version | head -1
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
           python -m pip install --disable-pip-version-check pillow
+          ffprobe -version | head -1
       - name: Download via Aston Martin's official public press-kit button endpoint for private editorial review
         run: |
           set -euo pipefail
