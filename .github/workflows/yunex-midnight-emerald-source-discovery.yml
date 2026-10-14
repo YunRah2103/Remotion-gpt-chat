@@ -59,10 +59,40 @@ jobs:
             file.unlink()
           else:
             b=file.open('rb').read(128)
-            if b.find(b'ftyp')<0 and not b.startswith(b'\x1a\x45\xdf\xa3'):
-              print('NON_VIDEO_RESPONSE',repr(file.read_text(encoding='utf-8',errors='replace')[:2500]),flush=True)
-              raise RuntimeError('Press endpoint did not return an MP4/MOV/MKV or ZIP')
-            file.rename(src/'ASTON_DB12_EMERALD_OFFICIAL_1.mp4')
+            if b.find(b'ftyp')>=0 or b.startswith(b'\x1a\x45\xdf\xa3'):
+              file.rename(src/'ASTON_DB12_EMERALD_OFFICIAL_1.mp4')
+            else:
+              from html.parser import HTMLParser
+              from urllib.parse import urlparse
+              class Videos(HTMLParser):
+                def __init__(self):super().__init__();self.urls=[]
+                def handle_starttag(self,tag,attrs):
+                  if tag=='iframe':
+                    link=dict(attrs).get('src','')
+                    if link.startswith('https://player.vimeo.com/progressive_redirect/download/'):
+                      self.urls.append(link)
+              page=file.read_text(encoding='utf-8',errors='replace')
+              v=Videos();v.feed(page)
+              print('OFFICIAL_EMBEDDED_DOWNLOADS',len(v.urls),flush=True)
+              if not v.urls:raise RuntimeError('Official press response had no downloadable native video')
+              for i,link in enumerate(v.urls[:8]):
+                out=src/('ASTON_DB12_EMERALD_OFFICIAL_'+str(i+1)+'.mp4')
+                request=urllib.request.Request(link,headers={'User-Agent':'Mozilla/5.0','Referer':'https://media.astonmartin.com/'})
+                with urllib.request.urlopen(request,timeout=100) as remote:
+                  print('VIDEO_HTTP',remote.status,'MIME',remote.headers.get('Content-Type'),'DECLARED_BYTES',remote.headers.get('Content-Length'),'FINAL_MEDIA_HOST',urlparse(remote.url).hostname,flush=True)
+                  size=0
+                  with out.open('wb') as saved:
+                    while True:
+                      chunk=remote.read(1048576)
+                      if not chunk:break
+                      size+=len(chunk)
+                      if size>1073741824:raise RuntimeError('Source file exceeds 1GiB cap')
+                      saved.write(chunk)
+                print('NATIVE_DOWNLOAD_BYTES',out.name,size,flush=True)
+                with out.open('rb') as ff: header=ff.read(64)
+                if b'ftyp' not in header and not header.startswith(b'\x1a\x45\xdf\xa3'):
+                  raise RuntimeError('Downloaded link is not an actual video')
+              file.unlink()
           PY
           python out/get.py
       - name: Native FFprobe, complete video decode, source timecode hints and real contact sheets
