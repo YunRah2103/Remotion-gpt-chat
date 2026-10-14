@@ -1,0 +1,61 @@
+name: YUNEX Cars Private Animation To Reality Match Test
+on:
+  push:
+    branches: [agent-b-cars-transition-test-20261014]
+    paths:
+      - '.github/workflows/cars-transition-match-qa.yml'
+      - 'production/research/cars-transition-private-test-20261014/test.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: read
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install OpenCV, NumPy and FFmpeg
+        run: |
+          python3 -m pip install --disable-pip-version-check opencv-python-headless numpy
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Import verified owner-only Disney source #79
+        id: pixar
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '79'
+          token: ${{ github.token }}
+          destination: work/yunex-private-animation
+      - name: Compare frame positions, camera direction and build private hard-cut tests
+        env:
+          CARS_SOURCE: ${{ steps.pixar.outputs.asset_path }}
+        run: python3 production/research/cars-transition-private-test-20261014/test.py
+      - name: Save 2 PRIVATE previews as owner-only DRAFT release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="yunex-cars-match-qa-${GITHUB_RUN_ID}"
+          gh release create "$tag" \
+            work/cars-transition/cars_vs_red_night.mp4 \
+            work/cars-transition/cars_vs_night_impact.mp4 \
+            --repo YunRah2103/Remotion-gpt-chat \
+            --title "PRIVATE YUNEX Cars match-cut test - ${GITHUB_RUN_ID}" \
+            --notes "PRIVATE OWNER REVIEW. Pixar footage rights unverified. Two soundless 2.1s hard-cut transition tests only; not film, not cleared to publish." \
+            --draft --target "$GITHUB_SHA"
+          gh release view "$tag" --repo YunRah2103/Remotion-gpt-chat --json url,isDraft,assets
+          echo "OWNER_PRIVATE_DRAFT_TAG=$tag"
+      - name: Commit METRICS ONLY to research branch
+        if: always()
+        shell: bash
+        run: |
+          test -f production/research/cars-transition-private-test-20261014/report.json || exit 0
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add production/research/cars-transition-private-test-20261014/report.json
+          if ! git diff --cached --quiet; then
+            git commit -m "YUNEX: transition red-car match metrics (no copyrighted frames)"
+            git push
+          fi
