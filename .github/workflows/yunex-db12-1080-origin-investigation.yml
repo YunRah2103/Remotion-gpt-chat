@@ -44,8 +44,8 @@ jobs:
             result.setdefault(video,{})
             try:
               r=subprocess.run(['timeout','40','python','-m','yt_dlp','--list-formats','--socket-timeout','10',video],capture_output=True,text=True,timeout=42)
-              result[video]['available_yt_dlp_formats']=r.stdout[-14000:]
-              result[video]['formats_error']=r.stderr[-1500:]
+              result.setdefault(video,{})['available_yt_dlp_formats']=r.stdout[-14000:]
+              result.setdefault(video,{})['formats_error']=r.stderr[-1500:]
             except Exception as e:result[video]['formats_error']=str(e)
           open('out/DB12_FORMATS_AND_EMBEDS.json','w').write(json.dumps(result,indent=2))
           print(json.dumps({k:{'http':v.get('http'),'length':v.get('length'),'iframes':v.get('iframes'),'formats':v.get('available_yt_dlp_formats','')[-1900:],'qualities':list(v.get('qualities',{}).keys()),'error':v.get('error')} for k,v in result.items()},indent=2))
