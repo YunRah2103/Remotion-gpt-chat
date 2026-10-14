@@ -1,0 +1,55 @@
+name: YUNEX Cars Banked Section Private Transition Review
+on:
+  push:
+    branches: [yunex-cars-banked-section-qa-20261014]
+    paths:
+      - '.github/workflows/cars-banked-private-review.yml'
+      - 'production/research/cars-banked-20261014/render.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: FFmpeg dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Private Pixar source import (already verified phone job 79)
+        uses: ./.github/actions/yunex-v4-import
+        id: pixar
+        with:
+          issue_number: '79'
+          token: ${{ github.token }}
+      - name: Render banked-McQueen-to-red-stockcar test variants
+        env:
+          CARS_SOURCE: ${{ steps.pixar.outputs.asset_path }}
+        run: python3 production/research/cars-banked-20261014/render.py
+      - name: Upload review videos ONLY to private DRAFT release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create "yunex-banked-cars-qa-${GITHUB_RUN_ID}" \
+            work/banked-preview/yunex_banked_to_real_tight.mp4 \
+            work/banked-preview/yunex_banked_to_real_wide.mp4 \
+            --repo YunRah2103/Remotion-gpt-chat \
+            --title "PRIVATE Cars banking transition review" \
+            --notes "Owner review only. Real #15 driving footage kept; replacement Pixar shot should visibly show banked oval. Not cleared for public release." \
+            --draft --target "$GITHUB_SHA"
+          gh release view "yunex-banked-cars-qa-${GITHUB_RUN_ID}" --repo YunRah2103/Remotion-gpt-chat --json url,isDraft,assets
+      - name: Commit technical manifest only, never protected movie bytes
+        if: always()
+        run: |
+          test -f production/research/cars-banked-20261014/report.json || exit 0
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add production/research/cars-banked-20261014/report.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Private banking QA metadata"
+            git push
+          fi
