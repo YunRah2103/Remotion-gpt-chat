@@ -1,0 +1,57 @@
+name: YUNEX DB12 Native HD Origin Investigation
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/yunex-db12-1080-origin-investigation.yml']
+permissions:
+  contents: read
+jobs:
+  scan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 14
+    steps:
+      - uses: denoland/setup-deno@v2
+        with: {deno-version: v2.x}
+      - name: Install investigation tool
+        run: python -m pip install -q -U 'yt-dlp[default]' requests
+      - name: Inspect native public source formats and source-site embeds
+        shell: bash
+        run: |
+          mkdir -p out
+          cat > /tmp/a.py <<'PY'
+          import requests,json,re,subprocess,html
+          result={}
+          headers={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131.0.0.0 Safari/537.36'}
+          for src in ['https://www.dailymotion.com/video/x8mmld9','https://www.dailymotion.com/player/metadata/video/x8mmld9','https://www.dailymotion.com/player/metadata/video/xa2ixm8','https://boulevard.co/post/videos/aston-martin-db12-video/','https://boulevard.co/post/aston-martin-db12/']:
+            x={}
+            try:
+              r=requests.get(src,headers=headers,timeout=17)
+              x['http']=r.status_code;x['length']=len(r.content);x['final']=r.url
+              if '/metadata/' in src:
+                try:
+                  j=r.json()
+                  x['qualities']={k:[{'type':i.get('type'),'url':i.get('url','')[:400]} for i in v[:2]] for k,v in j.get('qualities',{}).items()}
+                  x['title']=j.get('title')
+                except Exception as e:x['error']=str(e);x['body']=r.text[:500]
+              else:
+                text=html.unescape(r.text)
+                x['iframes']=re.findall(r'<iframe[^>]+(?:src|data-src)=["\\']([^"\\']+)',text,re.I)[:30]
+                x['video_sources']=list(dict.fromkeys(re.findall(r'https?[^"\\'<> ]{0,200}(?:\\.mp4|\\.m3u8|vimeo.com/video/\\d+|youtube.com/embed/[^"\\'<> ]+)[^"\\'<> ]*',text,re.I)))[:35]
+                x['embedded_contexts']=[text[max(0,m.start()-200):m.start()+200] for m in list(re.finditer('youtube|vimeo|iframe|\\.mp4|\\.m3u8',text,re.I))[:15]]
+            except Exception as e:x['error']=str(e)
+            result[src]=x
+          for video in ['https://www.dailymotion.com/video/x8mmld9','https://www.dailymotion.com/video/xa2ixm8']:
+            try:
+              r=subprocess.run(['timeout','40','python','-m','yt_dlp','--list-formats','--socket-timeout','10',video],capture_output=True,text=True,timeout=42)
+              result[video]['available_yt_dlp_formats']=r.stdout[-14000:]
+              result[video]['formats_error']=r.stderr[-1500:]
+            except Exception as e:result[video]['formats_error']=str(e)
+          open('out/DB12_FORMATS_AND_EMBEDS.json','w').write(json.dumps(result,indent=2))
+          print(json.dumps({k:{'http':v.get('http'),'length':v.get('length'),'iframes':v.get('iframes'),'formats':v.get('available_yt_dlp_formats','')[-1900:],'qualities':list(v.get('qualities',{}).keys()),'error':v.get('error')} for k,v in result.items()},indent=2))
+          PY
+          python /tmp/a.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-DB12-1080P-SOURCE-METADATA
+          path: out/
+          retention-days: 2
