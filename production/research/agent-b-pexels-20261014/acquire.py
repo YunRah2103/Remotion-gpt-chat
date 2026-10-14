@@ -8,7 +8,10 @@ sources=[
  ('red_night','18447538','18447538-hd_1920_1080_60fps.mp4','Jaxon Matthew Willis','red racecar night'),
  ('pack','18446606','18446606-hd_1920_1080_60fps.mp4','Jaxon Matthew Willis','racecar pack 11s'),
  ('pack_two','15368700','15368700-hd_1920_1080_60fps.mp4','Jaxon Matthew Willis','stock-car short track'),
- ('circuit_4k','15634326','15634326-uhd_3840_2160_30fps.mp4','Sean P. Twomey','racing international circuit 4k; confirm actual vehicle class')]
+ ('circuit_4k','15634326','15634326-uhd_3840_2160_30fps.mp4','Sean P. Twomey','racing international circuit 4k; confirm actual vehicle class'),
+ ('night_race','18447536','18447536-hd_1920_1080_60fps.mp4','Jaxon Matthew Willis','night oval second action angle'),
+ ('night_impact','18447537','18447537-hd_1920_1080_60fps.mp4','Jaxon Matthew Willis','night race speed/crash alternate avoid collision glamour'),
+ ('portrait_crew','18446021','18446021-hd_1080_1920_60fps.mp4','Jaxon Matthew Willis','vertical trackside race day mechanical detail')]
 report=[]
 for slug,idx,fname,creator,description in sources:
  url='https://videos.pexels.com/video-files/'+idx+'/'+fname
