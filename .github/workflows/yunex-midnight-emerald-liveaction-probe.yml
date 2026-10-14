@@ -1,0 +1,48 @@
+name: YUNEX Midnight Emerald - Public Original Source Probe
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/yunex-midnight-emerald-liveaction-probe.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public-source-probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect official public video endpoints without login, bypass or downloads
+        run: |
+          python - <<'PY'
+          import json,urllib.request,urllib.error,re
+          urls={
+          "filmmaker_db12_newbury":"https://player.vimeo.com/video/1120993354/config",
+          "live_db12_launch":"https://player.vimeo.com/video/870887642/config",
+          "db12_tv_commercial":"https://player.vimeo.com/video/854378299/config",
+          "official_db12_media":"https://media.astonmartin.com/aston-martin-db12-iridescent-emerald-south-of-france-b-roll/?lang=eng",
+          "official_db12_press":"https://media.astonmartin.com/db12-227972/?lang=eng",
+          }
+          for name,url in urls.items():
+              print("SOURCE_START",name,url,flush=True)
+              try:
+                  req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0","Accept":"application/json,text/html;q=0.9,*/*;q=0.6"})
+                  with urllib.request.urlopen(req,timeout=20) as r:
+                      head=r.read(450000).decode("utf-8",errors="replace")
+                      print("SOURCE_HTTP",r.status,r.headers.get("content-type"),"bytes_read",len(head))
+                      if '/config' in url:
+                          try:
+                              j=json.loads(head)
+                              print("CONFIG_KEYS",sorted(j.keys()))
+                              q=j.get('request',{}).get('files',{})
+                              print("VIDEO_FILE_TYPES",sorted(q.keys()))
+                              print("PROGRESSIVE_VARIANTS",[(x.get("width"),x.get("height"),x.get("fps"),x.get("mime")) for x in q.get('progressive',[])])
+                          except Exception as e:print("CONFIG_PARSE_ERROR",str(e)[:180])
+                      else:
+                          links=re.findall(r'https?[^" ]+\.(?:mp4|mov)(?:\?[^" ]*)?',head,re.I)
+                          print('DIRECT_MEDIA_COUNT',len(links))
+                          print('MEDIA_DOMAINS',[x.split('/')[2] for x in links[:8]])
+                          print('VIDEO_IFRAMES',re.findall(r'<iframe[^>]+src=["\x27]([^"\x27]+)',head,re.I)[:8])
+              except Exception as e:print("SOURCE_FAIL",type(e).__name__,str(e)[:250])
+              print("SOURCE_END",name,flush=True)
+          PY
