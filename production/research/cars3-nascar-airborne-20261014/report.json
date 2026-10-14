@@ -3,11 +3,11 @@
   "source_movie_issue": 87,
   "source_nascar_issue": 89,
   "rights": "Owner-private research drafts only, NASCAR network footage and Pixar film use not cleared for public redistribution",
-  "actual_nascar_event": "2023 Ryan Preece Daytona aerial barrel rolls, source official NBC coverage",
+  "actual_nascar_event": "2025 Ryan Preece Daytona 500 airborne flip, source official NASCAR channel",
   "movie_original_audio": "verified original stereo AAC 48 kHz; preserved without voice replacement",
   "normal_racing": "Original verified #15 short track Pexels #18447538 as originally liked",
   "orientation": "1080x1920 30fps, center full 16:9 footage with moving blurred derived-background to keep ALL rolls in shot",
-  "audio": "Original Cars 3 soundtrack in first segment, real NBC NASCAR broadcast/track sound in flipping footage, original track ambience for normal footage",
+  "audio": "Original Cars 3 soundtrack in first segment, real NASCAR broadcast/track sound in flipping footage, original track ambience for normal footage",
   "validation": "Video+audio decode and SHA256 verified; exact flip time/frame still requires visual approval",
   "source_real_file_info": {
     "sha256": "4c80859aa6ced994f4599d086337ff6fd86f9077b3efc68b33930acd457706ff",
