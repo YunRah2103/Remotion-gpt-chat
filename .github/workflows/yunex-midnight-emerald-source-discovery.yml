@@ -1,0 +1,53 @@
+name: YUNEX Midnight Emerald - Aston Press Asset Discovery
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/yunex-midnight-emerald-source-discovery.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  press-assets:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check published Aston Martin press and third-party video media endpoints
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import re,json,html,urllib.request,urllib.parse,urllib.error
+          from html.parser import HTMLParser
+          urls={
+            "official_green_DB12_broll":"https://media.astonmartin.com/aston-martin-db12-iridescent-emerald-south-of-france-b-roll/?lang=eng",
+            "official_DB12_press_video":"https://media.astonmartin.com/db12-227972/?lang=eng",
+            "official_DB12_green_photos":"https://media.astonmartin.com/aston-martin-db12-iridescent-emerald-south-of-france-photography/?lang=eng",
+            "official_cannes_press_video":"https://media.astonmartin.com/aston-martin-launches-db12-with-stunning-premiere-during-the-cannes-international-film-festival/?lang=eng",
+            "alternative_DB12_public_video":"https://manuals.plus/video/ad0c4374b27956aa5727fd853f8250adb139342b94d6947a74297673f63ffec6"}
+          class Tags(HTMLParser):
+            def __init__(self):super().__init__();self.found=[]
+            def handle_starttag(self,tag,attrs):
+              if tag not in ('a','video','source','iframe','script','button','link'):return
+              a=dict(attrs)
+              v={k:str(w) for k,w in a.items() if any(z in k for z in ('href','src','data','download','class','id','type','onclick','title'))}
+              if v:self.found.append((tag,v))
+          for name,url in urls.items():
+            print("SOURCE_START",name,url,flush=True)
+            try:
+              rq=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0","Accept":"text/html,application/xhtml+xml,*/*;q=0.7"})
+              with urllib.request.urlopen(rq,timeout=22) as rr:
+                page=rr.read(700000).decode("utf-8",errors="replace")
+                print("HTTP",rr.status,"SIZE",len(page),"FINAL",rr.url,flush=True)
+              p=Tags();p.feed(page)
+              for tag,a in p.found:
+                val=str(a)
+                if any(word in val.lower() for word in ("mp4","mov","zip","vimeo","press-kit","download","video","wp-json","globalmediacentre","terms","media", "presskit")):
+                  print("TAG",tag,val[:440],flush=True)
+              print("DIRECT_MEDIA",re.findall(r'https?[^\"\\s<>]+?\\.(?:mp4|mov|zip)(?:\\?[^\"\\s<>]*)?',page,re.I)[:16],flush=True)
+              for term in ("press-kit","download-press","download-all","presskit","wp-json","content-disposition","data-attachment","video/mp4"):
+                for m in list(re.finditer(term,page,re.I))[:3]:
+                  print("CONTEXT",term,re.sub(r'\\s+',' ',page[max(0,m.start()-140):m.end()+180])[:430],flush=True)
+            except Exception as e:print("SOURCE_ERROR",type(e).__name__,str(e)[:250],flush=True)
+            print("SOURCE_END",name,flush=True)
+          PY
