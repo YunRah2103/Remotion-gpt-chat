@@ -31,15 +31,17 @@ jobs:
           import subprocess, pathlib, json, hashlib, time, glob, shutil
           p=pathlib.Path("out/DB12_PREMIUM")
           sources=[
-            {"id":"vimeo-director-campaign","source":"https://vimeo.com/854378299","creator":"Aston Martin campaign / Director Anders Jedenfors; Vimeo uploader henanX the music guy","method":"Vimeo public native progressive/HLS via yt-dlp","status":"private review only; commercial reuse permission NOT confirmed","real_filming":"Professional directed campaign; footage authenticity to verify frame-by-frame"},
-            {"id":"youtube-db12-alternative-client","source":"https://www.youtube.com/watch?v=nKe98FGACoU","creator":"Aston Martin official","method":"YouTube via alternative publicly available extractor clients; old S25 phone jobs #93/#94 failed","status":"private review only; commercial reuse permission NOT confirmed","real_filming":"Official DB12 film; confirm not same as old France FPV"},
+            {"id":"official-press-embed","source":"https://player.vimeo.com/video/1031864127","creator":"Aston Martin official media DB12 10 second hook film","method":"Public media.astonmartin.com player embed with origin referer","status":"private press-media review only; reuse permission NOT confirmed","real_filming":"Official DB12 footage; require visual verification"},
+            {"id":"director-campaign-embed","source":"https://player.vimeo.com/video/854378299","creator":"Director Anders Jedenfors, film producer Martin Coceres, for Aston Martin; Vimeo campaign","method":"Vimeo embedded player with director site referrer; alternative to account-gated webpage","status":"private review only; commercial reuse permission NOT confirmed","real_filming":"Professional directed campaign, shot for Aston Martin; require visual verification"},
           ]
           for s in sources:
             base=p/s["id"]
             out=str(base)+".%(ext)s"
             cmd=["timeout","115","python","-m","yt_dlp","--no-playlist","--no-part","--no-write-info-json","--socket-timeout","15","--retries","1","--fragment-retries","1","--no-progress","-f","bv*[height<=2160]+ba/b[height<=2160]","--merge-output-format","mp4","-o",out]
-            if s["id"].startswith("youtube"):
-              cmd+=["--extractor-args","youtube:player_client=tv_embedded,web_safari"]
+            if s["id"]=="official-press-embed":
+              cmd+=["--referer","https://media.astonmartin.com/db12-227972/"]
+            if s["id"]=="director-campaign-embed":
+              cmd+=["--referer","https://kitchen.video/director/anders-jedenfors/"]
             cmd.append(s["source"])
             t=time.time()
             try:
@@ -85,7 +87,7 @@ jobs:
             for t in thumbs: t.unlink(missing_ok=True)
           (p/"ACQUISITION_REPORT.json").write_text(json.dumps({"project":"YUNEX Midnight Emerald","existing_france_fpvs":"DO NOT RE-DOWNLOAD, archive #92","review_only":True,"sources":sources},indent=2))
           (p/"README.txt").write_text("Original creator copyrighted work. Assets only for authenticated owner editorial inspection. No redistribution or publication approval implied. Review visual contacts, model, colour, and cinematic source timecodes before editing.\n")
-          print(json.dumps({"source_status":[{k:v for k,v in s.items() if k not in ["download_log_tail"]} for s in sources]},indent=2))
+          print(json.dumps({"source_status":sources},indent=2))
           PY
           python /tmp/acquire.py
       - name: Upload actual media, contact sheets and FFprobe report for owner evaluation
