@@ -1,0 +1,15 @@
+name: YUNEX NASCAR Primary Pro Source Check
+on:
+  push:
+    branches: [yunex-cars-nascar-pro-source-probe-20261014]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe official race cinema references (metadata only)
+        run: python3 production/research/cars-nascar-source-check-20261014/probe.py
