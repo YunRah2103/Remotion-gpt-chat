@@ -41,6 +41,7 @@ jobs:
             except Exception as e:x['error']=str(e)
             result[src]=x
           for video in ['https://www.dailymotion.com/video/x8mmld9','https://www.dailymotion.com/video/xa2ixm8']:
+            result.setdefault(video,{})
             try:
               r=subprocess.run(['timeout','40','python','-m','yt_dlp','--list-formats','--socket-timeout','10',video],capture_output=True,text=True,timeout=42)
               result[video]['available_yt_dlp_formats']=r.stdout[-14000:]
