@@ -1,0 +1,56 @@
+{
+  "user_correction": "Preserve previously liked real footage. Show Lightning McQueen DRIVING on steeply banked Piston Cup oval before transforming to real stock car.",
+  "source": "Private original Disney Jr excerpt job #79, 18s from 10:24; not public",
+  "selected_scene_note": "#79 11.55-14.05 covers source-indexed McQueen rear tracking at 10:35.7-10:36.7 and forward tracking at 10:36.7-10:38.1; exact banked angle still subject to end-user visual confirmation.",
+  "results": [
+    {
+      "style": "tight",
+      "file": "yunex_banked_to_real_tight.mp4",
+      "pixar_offset": [
+        11.55,
+        14.05
+      ],
+      "pixar_official_upload_time": [
+        635.55,
+        638.05
+      ],
+      "real_time": [
+        1.72,
+        3.92
+      ],
+      "duration": 4.733333,
+      "width": 720,
+      "height": 1280,
+      "fps": "30/1",
+      "sha256": "0fd8de1b7a8d43b0af2dd1a42765d9ce63e2b8f715a14ba661fa10d96004e5e4",
+      "bytes": 2246880,
+      "full_decode": "PASS"
+    },
+    {
+      "style": "wide",
+      "file": "yunex_banked_to_real_wide.mp4",
+      "pixar_offset": [
+        11.55,
+        14.05
+      ],
+      "pixar_official_upload_time": [
+        635.55,
+        638.05
+      ],
+      "real_time": [
+        1.72,
+        3.92
+      ],
+      "duration": 4.733333,
+      "width": 720,
+      "height": 1280,
+      "fps": "30/1",
+      "sha256": "793aed33fd39f77894d48fedcc012415e477ff4f62a9c03eeb09773d699816a3",
+      "bytes": 1511101,
+      "full_decode": "PASS"
+    }
+  ],
+  "music": "none; transition-only preview",
+  "rights": "copyrighted source in owner-only draft; no public film bytes",
+  "note": "This does NOT imply final match is seamless. Use user's visual review; do not restore old rejected cut."
+}
