@@ -40,7 +40,7 @@ jobs:
           echo 'PRIVATE_ORIGINAL_FULL_DECODE_PASS' >> "$GITHUB_STEP_SUMMARY"
           echo 'Source: Aston Martin Iridescent Emerald South of France official B-roll (1920x1080, 25fps, 62.40s).' >> "$GITHUB_STEP_SUMMARY"
           echo 'Original remains unedited. Original use: personal/editorial review, not a public final film.' >> "$GITHUB_STEP_SUMMARY"
-      - name: Owner-access-only temporary deliverable: real MP4, contact, manifest
+      - name: 'Owner-access-only deliverable — MP4, contact, manifest'
         uses: actions/upload-artifact@v4
         with:
           name: YUNEX_DB12_EMERALD_ORIGINAL_FOOTAGE_HANDOFF
