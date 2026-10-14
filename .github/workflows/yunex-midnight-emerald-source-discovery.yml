@@ -1,56 +1,130 @@
-name: YUNEX Midnight Emerald - Aston Press Asset Discovery
+name: YUNEX Midnight Emerald - Official Emerald B-roll Private Review
 on:
   push:
     branches: [main]
     paths: ['.github/workflows/yunex-midnight-emerald-source-discovery.yml']
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
-  press-assets:
+  official-emerald-broll:
     runs-on: ubuntu-24.04
-    timeout-minutes: 12
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
-      - name: Inspect Aston official public press-kit download mechanics and available video
+      - name: Install verification tools
+        run: |
+          set -euo pipefail
+          ffprobe -version | head -1
+          python -m pip install --disable-pip-version-check pillow
+      - name: Download via Aston Martin's official public press-kit button endpoint for private editorial review
+        run: |
+          set -euo pipefail
+          mkdir -p out/source out/qa
+          cat > out/get.py <<'PY'
+          import json,urllib.request,urllib.error,zipfile,hashlib,shutil,pathlib
+          root=pathlib.Path('out');src=root/'source'
+          url='https://media.astonmartin.com/download/?vidLot=1&lot=75134'
+          print('OFFICIAL_SOURCE_PAGE https://media.astonmartin.com/aston-martin-db12-iridescent-emerald-south-of-france-b-roll/?lang=eng')
+          print('OFFICIAL_PUBLIC_PRESS_DOWNLOAD',url,flush=True)
+          print('RIGHTS_NOTICE personal non-commercial and/or editorial use only. No YUNEX public/social licence.',flush=True)
+          req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Referer':'https://media.astonmartin.com/aston-martin-db12-iridescent-emerald-south-of-france-b-roll/?lang=eng'})
+          try:
+            with urllib.request.urlopen(req,timeout=55) as response:
+              print('HTTP',response.status,'CONTENT_TYPE',response.headers.get('Content-Type'),'CONTENT_LENGTH',response.headers.get('Content-Length'),'CONTENT_DISPOSITION',response.headers.get('Content-Disposition'),'FINAL_URL',response.url,flush=True)
+              file=src/'official_press_download.bin';total=0
+              with file.open('wb') as w:
+                while True:
+                  chunk=response.read(1024*1024)
+                  if not chunk:break
+                  total+=len(chunk)
+                  if total>1073741824:raise RuntimeError('Download exceeds 1GiB source safety cap')
+                  w.write(chunk)
+              print('REAL_DOWNLOADED_BYTES',total,flush=True)
+          except Exception as e:
+            print('DOWNLOAD_BLOCKED',type(e).__name__,str(e)[:500],flush=True)
+            raise
+          if file.read_bytes()[:4]==b'PK\x03\x04':
+            with zipfile.ZipFile(file) as z:
+              targets=[f for f in z.infolist() if f.filename.lower().endswith(('.mp4','.mov','.m4v','.mkv')) and f.file_size>100000]
+              if not targets:raise RuntimeError('Official ZIP contains no video sources: '+str(z.namelist()[:25]))
+              for i,item in enumerate(targets[:8]):
+                if item.file_size>1024*1024*1024:raise RuntimeError('Compressed video too large')
+                name='ASTON_DB12_EMERALD_OFFICIAL_'+str(i+1)+pathlib.Path(item.filename).suffix.lower()
+                output=src/name
+                with z.open(item) as inp, output.open('wb') as dest:shutil.copyfileobj(inp,dest)
+                print('EXTRACTED_NATIVE_VIDEO',name,output.stat().st_size,flush=True)
+            file.unlink()
+          else:
+            b=file.open('rb').read(128)
+            if b.find(b'ftyp')<0 and not b.startswith(b'\x1a\x45\xdf\xa3'):
+              print('NON_VIDEO_RESPONSE',repr(b),flush=True)
+              raise RuntimeError('Press endpoint did not return an MP4/MOV/MKV or ZIP')
+            file.rename(src/'ASTON_DB12_EMERALD_OFFICIAL_1.mp4')
+          PY
+          python out/get.py
+      - name: Native FFprobe, complete video decode, source timecode hints and real contact sheets
+        run: |
+          set -euo pipefail
+          cat > out/inspect.py <<'PY'
+          import pathlib,subprocess,json,hashlib,re,math
+          from PIL import Image, ImageDraw
+          root=pathlib.Path('out');src=root/'source'; qa=root/'qa'
+          results=[]
+          for file in sorted(src.iterdir()):
+            if file.suffix.lower() not in ('.mp4','.mov','.mkv','.m4v'):continue
+            proc=subprocess.run(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(file)],text=True,capture_output=True,check=True)
+            info=json.loads(proc.stdout);v=next((i for i in info['streams'] if i.get('codec_type')=='video'),None)
+            if not v:raise RuntimeError('No video stream '+file.name)
+            dur=float(v.get('duration') or info['format']['duration']);w,h=int(v['width']),int(v['height'])
+            if dur<2 or h<720:raise RuntimeError('Source fails quality gate '+file.name)
+            print('DECODE_START',file.name,flush=True)
+            dec=subprocess.run(['ffmpeg','-nostdin','-hide_banner','-v','error','-xerror','-i',str(file),'-f','null','-'],text=True,capture_output=True)
+            if dec.returncode:raise RuntimeError('Full video decode failed '+dec.stderr[-400:])
+            print('FULL_DECODE_PASS',file.name,flush=True)
+            frames=[]
+            for i,t in enumerate([dur*x for x in (0.05,0.15,0.28,0.4,0.53,0.66,0.78,0.9)]):
+              jpg=qa/(file.stem+'-'+str(i).zfill(2)+'.jpg')
+              p=subprocess.run(['ffmpeg','-nostdin','-hide_banner','-v','error','-ss',str(t),'-i',str(file),'-frames:v','1','-vf','scale=440:-1','-q:v','3','-y',str(jpg)],text=True,capture_output=True)
+              if p.returncode or not jpg.exists():raise RuntimeError('Cannot make frame '+str(jpg))
+              frames.append((t,jpg))
+            canvas=Image.new('RGB',(880,4*280),(10,10,10));d=ImageDraw.Draw(canvas)
+            for n,(t,jpg) in enumerate(frames):
+              img=Image.open(jpg).convert('RGB');img.thumbnail((440,247))
+              x=(n%2)*440;y=(n//2)*280
+              canvas.paste(img,(x,y+30));d.text((x+9,y+8),f'{file.name}  @  {t:.2f}s',fill='white')
+            contact=qa/(file.stem+'-contact.jpg');canvas.save(contact,quality=90)
+            with file.open('rb') as fh:sha=hashlib.file_digest(fh,'sha256').hexdigest()
+            shot=subprocess.run(['ffmpeg','-nostdin','-hide_banner','-i',str(file),'-vf','select=gt(scene\\,0.26),showinfo','-an','-f','null','-'],text=True,capture_output=True)
+            cuts=sorted({round(float(x),2) for x in re.findall(r'pts_time:\s*([0-9.]+)',shot.stderr) if 0.3<float(x)<dur-0.3})
+            boundaries=[0]+cuts+[round(dur,2)]
+            segments=[{'source_in_s':boundaries[i],'source_out_s':boundaries[i+1],'confidence':'automatic scene-change only; editorial shot must be visually approved'} for i in range(len(boundaries)-1) if boundaries[i+1]-boundaries[i]>=0.5]
+            row={'source_file':file.name,'download_url':'https://media.astonmartin.com/download/?vidLot=1&lot=75134','owner':'Aston Martin','source_page':'https://media.astonmartin.com/aston-martin-db12-iridescent-emerald-south-of-france-b-roll/?lang=eng','declared_car':'Aston Martin DB12 Iridescent Emerald','visually_confirmed':'pending independent review of contact sheets','usage_limit':'private personal noncommercial/editorial review; public YUNEX social licence unverified','bytes':file.stat().st_size,'sha256':sha,'duration_s':dur,'width':w,'height':h,'fps':v.get('avg_frame_rate'),'codec':v.get('codec_name'),'full_decode':'PASS','contact_sheet':contact.name,'scene_change_hints':segments}
+            results.append(row)
+            print('VERIFIED_VIDEO',file.name,w,h,dur,sha,'SCENES',len(segments),flush=True)
+          if not results:raise RuntimeError('No playable video extracted')
+          (qa/'manifest.json').write_text(json.dumps({'project':'YUNEX MIDNIGHT EMERALD','distribution':'owner-only private draft; public use NOT licensed','sources':results},indent=2))
+          PY
+          python out/inspect.py
+      - name: Preserve original source and contact sheets as PRIVATE DRAFT only
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
-          import re,base64,json,urllib.request,urllib.error
-          base='https://media.astonmartin.com'
-          targets={
-            'green_article':base+'/aston-martin-db12-iridescent-emerald-south-of-france-b-roll/?lang=eng',
-            'video_JS':base+'/wp-content/themes/epp-root/lib/modules/flux_data/assets/js/fluxVid.js?ver=1.0',
-            'cart_JS':base+'/wp-content/themes/astonmartin-2024/lib/modules/attachment_cart/assets/js/fluxCart.js?ver=1.1.7',
-            'green_media_rest':base+'/wp-json/wp/v2/media/75134',
-            'green_download_vidid':base+'/download/?vidid=75134',
-            'green_download_id':base+'/download/?id=75134',
-            'green_download_videoid':base+'/download/?videoid=75134',
-            'wordpress_video_post':base+'/?p=75134',
-            'terms':base+'/terms-amp-conditions/',
-          }
-          for name,url in targets.items():
-            print('TARGET',name,url,flush=True)
-            try:
-              headers={'User-Agent':'Mozilla/5.0','Accept':'*/*'}
-              if 'download_' in name:headers['Range']='bytes=0-8191'
-              req=urllib.request.Request(url,headers=headers)
-              with urllib.request.urlopen(req,timeout=20) as rr:
-                data=rr.read(75000)
-                txt=data.decode('utf-8','replace')
-                print('RESPONSE',rr.status,'CTYPE',rr.headers.get('Content-Type'),'SIZE_HEADER',rr.headers.get('Content-Length'),'DISPOSITION',rr.headers.get('Content-Disposition'),'PARTIAL_BYTES',len(data),'FINAL',rr.url,flush=True)
-              if name.endswith('_JS'):
-                for term in ['download','dl-vid','data-epp','ajax','action','href','get_vid','video']:
-                  pos=[m.start() for m in re.finditer(term,txt,re.I)][:5]
-                  for n in pos:
-                    print('JS_MATCH',term,repr(txt[max(0,n-180):n+350])[:560],flush=True)
-              elif name=='green_article':
-                for term in ['75134','NzUxMzQ','flux_video-js-extra','video-content','video-gallery','video','download']:
-                  for m in list(re.finditer(term,txt,re.I))[:3]:
-                    print('HTML_MATCH',term,repr(txt[max(0,m.start()-200):m.end()+320])[:610],flush=True)
-              elif name=='green_media_rest':print('MEDIA_REST_SNIP',repr(txt[:1500]))
-              elif name=='terms':print('TERMS_MATCH',[(term,txt.lower().find(term.lower())) for term in ('copyright','permission','licen','editorial','media','redistribut')])
-              elif 'download_' in name:print('DOWNLOAD_HEAD',repr(data[:100]))
-            except Exception as e:print('TARGET_FAIL',name,type(e).__name__,str(e)[:230],flush=True)
-          PY
+          tag='yunex-midnight-emerald-green-db12-private-20261014'
+          if ! gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$tag" --repo "$GITHUB_REPOSITORY" --draft \
+              --title 'YUNEX Midnight Emerald DB12 original press footage - private review' \
+              --notes 'PERSONAL/NON-COMMERCIAL/EDITORIAL REVIEW ONLY. Original Aston Martin press video, rights for TikTok/Reels/Shorts publication NOT established. Not a released YUNEX film.'
+          fi
+          gh release upload "$tag" out/source/* out/qa/*-contact.jpg out/qa/manifest.json --repo "$GITHUB_REPOSITORY" --clobber
+          echo "PRIVATE_PRESS_SOURCE_PASS https://github.com/$GITHUB_REPOSITORY/releases/tag/$tag" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: midnight-emerald-official-diagnostics
+          path: |
+            out/qa/manifest.json
+          retention-days: 7
+          if-no-files-found: warn
