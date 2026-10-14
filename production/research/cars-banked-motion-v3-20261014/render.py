@@ -83,7 +83,7 @@ candidates=[]
 for ta in np.arange(12.93,13.96,.13):
  fa=crop_at(frame_at(A,float(ta)))
  ma=red_info(fa)
- for tb in np.arange(1.24,2.44,.12):
+ for tb in np.arange(1.24,2.90,.12):
   fb=crop_at(frame_at(B,float(tb)))
   mb=red_info(fb)
   if ma["area"]<.012 or mb["area"]<.015:continue
@@ -94,7 +94,7 @@ for ta in np.arange(12.93,13.96,.13):
   pan_error=min(3.5,abs(vx1-vx2)/2)
   area_error=abs(math.log((ma["area"]+.015)/(mb["area"]+.015)))
   score=(abs(ma["cx"]-mb["cx"])*3.0+
-   abs(ma["cy"]-mb["cy"])*1.4+area_error*.3+
+   abs(ma["cy"]-mb["cy"])*1.4+area_error*1.3+
    pan_error*.35 + abs(vy1-vy2)*.08)
   candidates.append((score,round(float(ta),3),round(float(tb),3),ma,mb,round(float(vx1),3),round(float(vx2),3)))
 if not candidates:raise RuntimeError("No source-matched moving red car cut")
@@ -102,7 +102,7 @@ candidates.sort(key=lambda x:x[0])
 best=candidates[0]
 _,CUT_A,CUT_B,ra,rb,vxa,vxb=best
 print("MATCH_CANDIDATES",json.dumps([
- {"score":round(float(z[0]),3),"pixar_end":z[1],"real_start":z[2],"pixar_motion_x":z[5],"real_motion_x":z[6]}
+ {"score":round(float(z[0]),3),"pixar_end":z[1],"real_start":z[2],"pixar_motion_x":z[5],"real_motion_x":z[6],"pixar_red_area":round(z[3]["area"],3),"real_red_area":round(z[4]["area"],3)}
  for z in candidates[:9]]),flush=True)
 
 # Preserve visible banking as a ~2s build, then carry the real-car approach to its flyby.
