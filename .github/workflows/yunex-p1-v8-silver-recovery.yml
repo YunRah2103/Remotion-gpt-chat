@@ -1,0 +1,43 @@
+name: YUNEX P1 V8 Silver Footage Recovery
+on:
+  push:
+    paths:
+      - '.github/workflows/yunex-p1-v8-silver-recovery.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: write
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Retrieve verified silver P1 footage job 71
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p recovery
+          gh api -H "Accept: application/octet-stream" "/repos/${GH_REPO}/releases/assets/638027593" > recovery/yunex-v4-71.mp4
+          printf '5e599084f60a0453a18de0b6e38a131a64d712aae07547e26bf7615033d08d9d  recovery/yunex-v4-71.mp4\n' | sha256sum --check -
+          ffprobe -v error -show_format -show_streams -of json recovery/yunex-v4-71.mp4 > recovery/ffprobe-71.json
+          ffmpeg -hide_banner -v error -xerror -i recovery/yunex-v4-71.mp4 -f null -
+          ffmpeg -hide_banner -loglevel error -y -i recovery/yunex-v4-71.mp4 -vf 'fps=1,scale=320:180,tile=6x5:padding=3:margin=3:color=black' -frames:v 1 recovery/contact-71.jpg
+      - name: Upload reviewer source footage
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: yunex-p1-v8-silver-71
+          path: recovery/
+          retention-days: 7
+      - name: Announce exact workflow run to dashboard
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          CONCLUSION: ${{ job.status }}
+        shell: bash
+        run: |
+          gh api --method POST "/repos/${GH_REPO}/issues/72/comments" -f body="YUNEX V8 silver-footage recovery: ${CONCLUSION}; run https://github.com/${GH_REPO}/actions/runs/${GITHUB_RUN_ID}; expected artifact yunex-p1-v8-silver-71; source issue #71. No rights verified, reviewer only."
