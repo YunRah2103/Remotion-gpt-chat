@@ -1,0 +1,35 @@
+name: YUNEX Cars Editor 91 - Private V2 Recovery
+on:
+  push:
+    branches:
+      - yunex-cars-editor-91-20261014
+    paths:
+      - .github/workflows/yunex-cars-editor-source-91.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  verified_private_recovery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch user-approved V2 from owner-only draft
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p work/cars91
+          gh release download yunex-cars3-real-flip-38554831995 --repo YunRah2103/Remotion-gpt-chat --pattern CARS3_REAL_NASCAR_BARREL_ROLL_v2.mp4 --dir work/cars91
+          echo '57b78f98c50a58da85c6294dc81214ba584af65625edff93b37259109775d223  work/cars91/CARS3_REAL_NASCAR_BARREL_ROLL_v2.mp4' | sha256sum -c -
+          ffprobe -v error -show_entries format=duration,size:stream=index,codec_type,codec_name,width,height,r_frame_rate,sample_rate -of json work/cars91/CARS3_REAL_NASCAR_BARREL_ROLL_v2.mp4 | tee work/cars91/v2_probe.json
+          ffmpeg -hide_banner -v error -xerror -i work/cars91/CARS3_REAL_NASCAR_BARREL_ROLL_v2.mp4 -f null -
+          echo "APPROVED_V2_VERIFIED_FULL_DECODE"
+      - name: Private artifact for editor - do not make public
+        uses: actions/upload-artifact@v4
+        with:
+          name: yunex-cars91-approved-v2-private
+          path: work/cars91/
+          retention-days: 3
+          if-no-files-found: error
