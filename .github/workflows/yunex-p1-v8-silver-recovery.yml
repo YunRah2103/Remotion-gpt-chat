@@ -27,11 +27,23 @@ jobs:
           ffprobe -v error -show_format -show_streams -of json recovery/yunex-v4-71.mp4 > recovery/ffprobe-71.json
           ffmpeg -hide_banner -v error -xerror -i recovery/yunex-v4-71.mp4 -f null -
           ffmpeg -hide_banner -loglevel error -y -i recovery/yunex-v4-71.mp4 -vf 'fps=1,scale=320:180,tile=6x5:padding=3:margin=3:color=black' -frames:v 1 recovery/contact-71.jpg
+      - name: Retrieve new V4 silver P1 footage job 76
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api -H "Accept: application/octet-stream" "/repos/${GH_REPO}/releases/assets/639897135" > recovery/yunex-v4-76.mp4
+          printf 'e903e4070f41faf7d5adb144e9b16cc521f234a8383296a987bce9ac71387f40  recovery/yunex-v4-76.mp4\n' | sha256sum --check -
+          ffprobe -v error -show_format -show_streams -of json recovery/yunex-v4-76.mp4 > recovery/ffprobe-76.json
+          ffmpeg -hide_banner -v error -xerror -i recovery/yunex-v4-76.mp4 -f null -
+          ffmpeg -hide_banner -loglevel error -y -i recovery/yunex-v4-76.mp4 -vf 'fps=1,scale=320:180,tile=10x6:padding=3:margin=3:color=black' -frames:v 1 recovery/contact-76.jpg
       - name: Upload reviewer source footage
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: yunex-p1-v8-silver-71
+          name: yunex-p1-v8-silver-71-76
           path: recovery/
           retention-days: 7
       - name: Announce exact workflow run to dashboard
@@ -42,4 +54,4 @@ jobs:
           CONCLUSION: ${{ job.status }}
         shell: bash
         run: |
-          gh api --method POST "/repos/${GH_REPO}/issues/72/comments" -f body="YUNEX V8 silver-footage recovery: ${CONCLUSION}; run https://github.com/${GH_REPO}/actions/runs/${GITHUB_RUN_ID}; expected artifact yunex-p1-v8-silver-71; source issue #71. No rights verified, reviewer only."
+          gh api --method POST "/repos/${GH_REPO}/issues/72/comments" -f body="YUNEX V8 silver-footage recovery: ${CONCLUSION}; run https://github.com/${GH_REPO}/actions/runs/${GITHUB_RUN_ID}; expected artifact yunex-p1-v8-silver-71-76; source issues #71 and #76. No rights verified, reviewer only."
