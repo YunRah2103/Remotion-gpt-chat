@@ -1,0 +1,90 @@
+name: YUNEX DB12 Real 1080p Filmmaker Review
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/yunex-db12-premium-source-round3.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 23
+    steps:
+      - uses: denoland/setup-deno@v2
+        with: {deno-version: v2.x}
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q 'yt-dlp[default]' pillow
+      - name: Probe Vimeo filmmaker files and download native 1080p for private owner review
+        shell: bash
+        run: |
+          mkdir -p out/db12-highres
+          cat >/tmp/verify.py <<'PY'
+          import subprocess,os,json,pathlib,hashlib
+          from PIL import Image, ImageDraw
+          d=pathlib.Path('out/db12-highres')
+          sources=[
+          ('boulevard-original','https://player.vimeo.com/video/1006099458?h=efc07e05d4','https://boulevard.co/post/aston-martin-db12/','Boulevard Magazine production'),
+          ('anton-filmmaker-A','https://vimeo.com/1053073090','https://vimeo.com/1053073090','Anton Shavkero original film; verify CGI vs real'),
+          ('anton-filmmaker-B','https://vimeo.com/1053036298','https://vimeo.com/1053036298','Anton Shavkero original film; verify CGI vs real')]
+          results=[]
+          for name,url,ref,owner in sources:
+            rec={'id':name,'url':url,'publisher':owner,'reuse_license':'NOT CONFIRMED; PRIVATE REVIEW ONLY'}
+            try:
+              p=subprocess.run(['timeout','35','python','-m','yt_dlp','--list-formats','--no-playlist','--socket-timeout','8','--referer',ref,url],capture_output=True,text=True,timeout=40)
+              rec['formats']=p.stdout[-6500:];rec['format_error']=p.stderr[-1300:]
+              # Reject if high resolution not advertised or sign-in needed
+              import re
+              has_hd=bool(re.search(r'1920x1080|2560x1440|3840x2160|1080p|2160p|1440p',p.stdout))
+              rec['hd_format_advertised']=has_hd
+              if not has_hd:
+                rec['result']='NO_PUBLIC_NATIVE_1080P_FORMAT';results.append(rec);continue
+              out=d/(name+'.%(ext)s')
+              q=subprocess.run(['timeout','180','python','-m','yt_dlp','--no-playlist','--no-part','--no-progress','--socket-timeout','12','--retries','1','--fragment-retries','1','--referer',ref,'-f','bv*[height>=1080][height<=2160]+ba/b[height>=1080][height<=2160]','--merge-output-format','mp4','-o',str(out),url],capture_output=True,text=True,timeout=185)
+              rec['download_exit_code']=q.returncode;rec['download_log']=(q.stdout+q.stderr)[-1500:]
+              candidates=[f for f in d.glob(name+'.*') if f.suffix in ('.mp4','.mov','.mkv','.webm') and f.stat().st_size>150000]
+              if not candidates:
+                rec['result']='DOWNLOAD_FAILED';results.append(rec);continue
+              f=max(candidates,key=lambda x:x.stat().st_size)
+              rec['file']=f.name;rec['bytes']=f.stat().st_size
+              rec['sha256']=hashlib.sha256(f.read_bytes()).hexdigest()
+              x=subprocess.run(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(f)],capture_output=True,text=True)
+              meta=json.loads(x.stdout)
+              video=next(v for v in meta['streams'] if v.get('codec_type')=='video')
+              rec['probe']={k:video.get(k) for k in ['width','height','codec_name','avg_frame_rate']}
+              rec['duration']=meta['format']['duration']
+              ff=subprocess.run(['timeout','85','ffmpeg','-v','error','-xerror','-i',str(f),'-map','0:v:0','-f','null','-'],capture_output=True,text=True,timeout=90)
+              rec['full_decode']='PASS' if ff.returncode==0 else 'FAIL '+ff.stderr[-400:]
+              rec['result']='NATIVE_1080P_PENDING_VISUAL_AND_RIGHTS_QA' if video['width']>=1920 and video['height']>=1080 and ff.returncode==0 else 'REJECTED_TECHNICAL_QA'
+              dur=float(rec['duration'])
+              if dur>0:
+                temps=[]
+                for idx in range(12):
+                  sec=(idx+0.5)*min(dur,80)/12
+                  fp=d/f'{name}_{idx:02d}.jpg'
+                  a=subprocess.run(['ffmpeg','-hide_banner','-nostdin','-v','error','-ss',str(sec),'-i',str(f),'-frames:v','1','-vf','scale=480:-2','-y',str(fp)],capture_output=True,timeout=18)
+                  if a.returncode==0 and fp.exists():temps.append((sec,fp))
+                grid=Image.new('RGB',(480*4,310*3),'#151515')
+                draw=ImageDraw.Draw(grid)
+                for idx,(sec,fp) in enumerate(temps):
+                  img=Image.open(fp);img.thumbnail((480,270));col=idx%4;row=idx//4
+                  grid.paste(img,(col*480,row*310))
+                  draw.text((col*480+5,row*310+276),f'{sec:.2f}s',fill='white')
+                grid.save(d/f'{name}_CONTACT.jpg',quality=90)
+                rec['contacts']=[round(t,3) for t,f in temps]
+                for t,fp in temps:fp.unlink(missing_ok=True)
+            except Exception as e:rec['result']='ERROR';rec['error']=str(e)
+            results.append(rec)
+          (d/'PROBE_AND_PROVENANCE.json').write_text(json.dumps(results,indent=2))
+          print(json.dumps([{k:v for k,v in x.items() if k not in ['formats','format_error','download_log']} for x in results],indent=2))
+          PY
+          python /tmp/verify.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-DB12-FILMMAKER-NATIVE-HIGHRES-REVIEW
+          path: out/db12-highres/
+          retention-days: 3
+          if-no-files-found: warn
+          compression-level: 0
