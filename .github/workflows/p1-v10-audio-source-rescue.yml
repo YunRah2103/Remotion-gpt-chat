@@ -1,5 +1,4 @@
 name: YUNEX P1 V10 Private Audio Sources
-run-name: Recover verified private P1 V8 recordings for V10 sound mix
 on:
   push:
     paths:
@@ -8,50 +7,37 @@ on:
 permissions:
   contents: write
   issues: read
-  actions: write
 jobs:
-  private-source-rescue:
-    runs-on: ubuntu-24.04
+  rescue:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Import authentic P1 Dubai sound
-        id: dubai
-        uses: ./.github/actions/yunex-v4-import
-        with:
-          issue_number: '82'
-          token: ${{ github.token }}
-      - name: Import authentic P1 GTspirit sound
-        id: gtspirit
-        uses: ./.github/actions/yunex-v4-import
-        with:
-          issue_number: '85'
-          token: ${{ github.token }}
-      - name: Private full-decode checks, manifest and copy
+      - name: Retrieve two previously verified P1 source M4As from private draft-release assets
         shell: bash
         env:
-          DUBAI: ${{ steps.dubai.outputs.asset_path }}
-          GTSPIRIT: ${{ steps.gtspirit.outputs.asset_path }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           mkdir -p p1-private-audio
-          cp "$DUBAI" p1-private-audio/p1-dubai-65s.m4a
-          cp "$GTSPIRIT" p1-private-audio/p1-gtspirit-18s.m4a
+          curl -fLsS --retry 3 --retry-delay 2 -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/octet-stream" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${{ github.repository }}/releases/assets/639995280" -o p1-private-audio/yunex-v4-82.m4a
+          curl -fLsS --retry 3 --retry-delay 2 -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/octet-stream" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${{ github.repository }}/releases/assets/640033480" -o p1-private-audio/yunex-v4-85.m4a
+          echo 'f6559fdb34b2455644f18f4bfa6490ecd2128fa8d3e0eb78b8c52beaeb66d2d9  p1-private-audio/yunex-v4-82.m4a' | sha256sum -c
+          echo '585b0027f9081e30f14fae09714d87be1b4d10fe3fccc242115b6e2816bab805  p1-private-audio/yunex-v4-85.m4a' | sha256sum -c
           for f in p1-private-audio/*.m4a; do
-            ffprobe -v error -show_entries format=duration:stream=codec_name,sample_rate,channels -of json "$f"
-            ffmpeg -v error -xerror -i "$f" -f null -
+            ffprobe -v error -show_entries stream=codec_name,sample_rate,channels:format=duration -of json "$f"
+            ffmpeg -hide_banner -v error -xerror -i "$f" -f null -
           done
           (cd p1-private-audio && sha256sum *.m4a > SHA256SUMS.txt)
       - uses: actions/upload-artifact@v4
-        id: bundle
+        id: proof
         with:
-          name: yunex-p1-v10-private-audio-sources
+          name: yunex-p1-v10-verified-audio-private
           path: p1-private-audio/
-          retention-days: 3
+          retention-days: 2
           if-no-files-found: error
-      - name: Log authenticated source artifacts to P1 dashboard
+      - name: Report verified private artifact reference
+        shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          ARTIFACT_ID: ${{ steps.bundle.outputs.artifact-id }}
-        shell: bash
+          ARTIFACT_ID: ${{ steps.proof.outputs.artifact-id }}
         run: |
-          gh issue comment 72 --body "P1 V10 SOUND SOURCE RESCUE COMPLETE — 14 Oct 2026. Private audio source artifacts recovered/validated from #82 and #85. Actions run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }} | artifact_id: $ARTIFACT_ID | rights: UNVERIFIED; for private creative review only. Final film audio mix not yet complete."
+          gh issue comment 72 --repo "${{ github.repository }}" --body "P1 V10 PRIVATE AUDIO RECOVERED — source #82 + #85 SHA256/full decode PASS. Artifact ID: $ARTIFACT_ID; run https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}. For owner-only evaluation (publishing rights unverified)."
