@@ -110,7 +110,7 @@ def append_preview(i,impact_t):
  fade_start=max(.1,original_audio_len-.44)
  run(["ffmpeg","-hide_banner","-loglevel","error","-y",
   "-ss",round(movie_start,3),"-t",round(original_audio_len,3),"-i",str(ANIMATED),
-  "-vn","-af",f"aresample=48000,afade=t=out:st={fade_start:.3f}:d=.44",
+  "-vn","-af",f"aresample=48000,afade=t=out:st={fade_start:.3f}:d=0.44",
   "-ac","2","-ar","48000",str(orig_sound)])
  # Does real #15 recording itself have real audio?
  real_a=[s for s in probe(ROOT/"night_impact.mp4")["streams"] if s["codec_type"]=="audio"]
