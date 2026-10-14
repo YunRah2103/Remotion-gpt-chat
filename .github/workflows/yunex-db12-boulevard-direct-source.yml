@@ -23,7 +23,7 @@ jobs:
           mkdir -p out
           set +e
           python -m yt_dlp --list-formats --socket-timeout 15 --referer 'https://boulevard.co/post/videos/aston-martin-db12-video/' 'https://player.vimeo.com/video/1006099458?h=efc07e05d4' >out/AVAILABLE_FORMATS.txt 2>&1
-          python -m yt_dlp --no-playlist --socket-timeout 15 --retries 2 --fragment-retries 2 --no-part --no-progress -f 'bv*[height<=2160]+ba/b[height<=2160]' --merge-output-format mp4 -o out/BOULEVARD_DB12_FILM.%(ext)s --referer 'https://boulevard.co/post/videos/aston-martin-db12-video/' 'https://player.vimeo.com/video/1006099458?h=efc07e05d4' >out/DOWNLOAD_LOG.txt 2>&1
+          python -m yt_dlp --no-playlist --socket-timeout 15 --retries 2 --fragment-retries 2 --no-part --no-progress -f 'bv*[height<=2160]+ba/b[height<=2160]' --merge-output-format mp4 -o "out/BOULEVARD_DB12_FILM.%(ext)s" --referer 'https://boulevard.co/post/videos/aston-martin-db12-video/' 'https://player.vimeo.com/video/1006099458?h=efc07e05d4' >out/DOWNLOAD_LOG.txt 2>&1
           echo ${PIPESTATUS[0]} > out/DOWNLOAD_EXIT_CODE.txt
           ls -lh out
       - name: Verify files, actual contact sheet, full decode
