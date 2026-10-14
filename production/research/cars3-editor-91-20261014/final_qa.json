@@ -1,0 +1,30 @@
+{
+  "title": "YUNEX Cars 3 to NASCAR #91 - final master QA",
+  "status": "FINAL_MP4_RENDERED_AND_VERIFIED_LOCAL_DELIVERY",
+  "approved_reference": {
+    "asset": "CARS3_REAL_NASCAR_BARREL_ROLL_v2.mp4",
+    "sha256": "57b78f98c50a58da85c6294dc81214ba584af65625edff93b37259109775d223",
+    "source": "owner-only draft release; 2025 Ryan Preece Daytona / original Cars 3 AAC"
+  },
+  "output": {
+    "filename": "YUNEX_CARS_91_CINEMATIC_FINAL.mp4",
+    "duration_seconds": 23.7,
+    "width": 1080,
+    "height": 1920,
+    "video_codec": "H.264",
+    "video_fps": 30,
+    "video_frames": 711,
+    "audio_codec": "AAC",
+    "audio_sample_rate": 48000,
+    "audio_channels": 2,
+    "bytes": 40376682,
+    "sha256": "6f9167f982c97f8721a67636d4d26d6590bda43aad945073b87aa301a04f6b20",
+    "full_ffmpeg_decode": "PASS"
+  },
+  "source_protection": "Approved source V2 audio restored at original level for opening 230 frames / 7.667 seconds. Preserve V2 exact crash visual transition.",
+  "edit_description": "23.7s film opening with approved Cars 3 to 2025 Ryan Preece actual airborne crash, followed by 16 quick authentic stock-car shots including banked packs, cars close-ups, dynamic passes, original NASCAR Clash and night racing. Original race ambience layered under original score and effects. No AI voiceover.",
+  "full_visual_inspection": "Preview sampled with contact sheets and frames; final output same video timeline with full decode",
+  "original_source_rights": "Pixar and broadcast source copyrights/public redistribution not cleared. Delivered privately in ChatGPT; intentionally not published to GitHub releases.",
+  "branch": "yunex-cars-editor-91-20261014",
+  "issue_url": "https://github.com/YunRah2103/Remotion-gpt-chat/issues/91"
+}
