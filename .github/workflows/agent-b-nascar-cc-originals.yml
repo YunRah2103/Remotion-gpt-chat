@@ -1,0 +1,40 @@
+name: Agent B NASCAR CC originals and shot contact sheets
+on:
+  push:
+    branches: [agent-b-nascar-cc-footage-20261014]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg python3-pil
+      - name: Acquire and verify genuine CC BY NASCAR footage
+        run: python3 production/research/agent-b-nascar-20261014/acquire.py
+      - name: Save contact sheets and metadata to research branch
+        if: always()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add production/research/agent-b-nascar-20261014/
+          if ! git diff --cached --quiet; then
+            git commit -m "Agent B: verified NASCAR footage manifest and shot contact sheets"
+            git push
+          fi
+      - name: Upload real licensed NASCAR sources and evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-b-nascar-cc-originals-and-qa
+          path: |
+            nascar_media/*.webm
+            production/research/agent-b-nascar-20261014/
+          if-no-files-found: warn
+          retention-days: 7
+          compression-level: 0
