@@ -1,28 +1,28 @@
 {
   "creative": "McQueen visibly flips, cut into ACTUAL real NASCAR airborne multi-roll wreck, then original red racing",
   "source_movie_issue": 87,
-  "source_nascar_issue": 89,
+  "source_nascar_issue": 88,
   "rights": "Owner-private research drafts only, NASCAR network footage and Pixar film use not cleared for public redistribution",
-  "actual_nascar_event": "2025 Ryan Preece Daytona 500 airborne flip, source official NASCAR channel",
+  "actual_nascar_event": "2023 Ryan Preece Daytona aerial barrel rolls, source official NBC coverage",
   "movie_original_audio": "verified original stereo AAC 48 kHz; preserved without voice replacement",
   "normal_racing": "Original verified #15 short track Pexels #18447538 as originally liked",
   "orientation": "1080x1920 30fps, center full 16:9 footage with moving blurred derived-background to keep ALL rolls in shot",
-  "audio": "Original Cars 3 soundtrack in first segment, real NASCAR broadcast/track sound in flipping footage, original track ambience for normal footage",
+  "audio": "Original Cars 3 soundtrack in first segment, real NBC NASCAR broadcast/track sound in flipping footage, original track ambience for normal footage",
   "validation": "Video+audio decode and SHA256 verified; exact flip time/frame still requires visual approval",
   "source_real_file_info": {
-    "sha256": "4c80859aa6ced994f4599d086337ff6fd86f9077b3efc68b33930acd457706ff",
+    "sha256": "60797c4693200590526f084559649e08057f1dd123e960035cb9b1c6ab62677c",
     "resolution": [
       1920,
       1080
     ],
-    "duration": 42.008633
+    "duration": 65.031633
   },
   "outputs": [
     {
       "filename": "CARS3_REAL_NASCAR_BARREL_ROLL_v1.mp4",
-      "size": 14395459,
+      "size": 13575617,
       "duration": 20.221,
-      "sha256": "35ec64637f64498a8deddffd7a571945dbecb8ee9d8ac251fa3a1eed592ab103",
+      "sha256": "10122cf5cdd9b5ff96ed9190f710ff5054e50aadf064fab713c1e229f3a4350c",
       "width": 1080,
       "height": 1920,
       "fps": "36300/1211",
@@ -39,9 +39,9 @@
     },
     {
       "filename": "CARS3_REAL_NASCAR_BARREL_ROLL_v2.mp4",
-      "size": 13304423,
+      "size": 11865403,
       "duration": 20.421,
-      "sha256": "57b78f98c50a58da85c6294dc81214ba584af65625edff93b37259109775d223",
+      "sha256": "9a383246900d7b804a313c90ac01143678980d034514d99a6372aaa9c87c19a3",
       "width": 1080,
       "height": 1920,
       "fps": "36660/1223",
