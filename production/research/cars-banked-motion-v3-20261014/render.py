@@ -102,7 +102,7 @@ candidates.sort(key=lambda x:x[0])
 best=candidates[0]
 _,CUT_A,CUT_B,ra,rb,vxa,vxb=best
 print("MATCH_CANDIDATES",json.dumps([
- {"score":round(z[0],3),"pixar_end":z[1],"real_start":z[2],"pixar_motion_x":z[5],"real_motion_x":z[6]}
+ {"score":round(float(z[0]),3),"pixar_end":z[1],"real_start":z[2],"pixar_motion_x":z[5],"real_motion_x":z[6]}
  for z in candidates[:9]]),flush=True)
 
 # Preserve visible banking as a ~2s build, then carry the real-car approach to its flyby.
