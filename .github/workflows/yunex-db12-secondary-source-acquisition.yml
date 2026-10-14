@@ -24,15 +24,13 @@ jobs:
           import pathlib, subprocess,json,hashlib,os,shutil
           d=pathlib.Path('out/db12-alternatives'); d.mkdir(parents=True,exist_ok=True)
           sources=[
-            ('dailymotion-driving-official','https://www.dailymotion.com/video/x8mmld9','Auto driving news; publisher/licence pending'),
-            ('dailymotion-dubai','https://www.dailymotion.com/video/xa2ixm8','Iconic Concierge Magazine; licence pending'),
-            ('vimeo-revolux-filmmaker','https://vimeo.com/870887642','Revolux Studios; photographer-owned copyright; permission pending')
+            ('boulevard-db12-editorial','https://player.vimeo.com/video/1006099458?h=efc07e05d4','Boulevard Magazine editorial Aston Martin DB12 film; publication rights pending')
           ]
           res=[]
           for name,url,owner in sources:
             x={'id':name,'url':url,'publisher':owner,'rights':'Private review only; NO public redistribution until authorized'}
             out=d/(name+'.%(ext)s')
-            cmd=['timeout','175','python','-m','yt_dlp','--no-playlist','--no-progress','--no-part','--socket-timeout','12','--retries','1','--fragment-retries','1','-f','bv*[height<=2160]+ba/b[height<=2160]','--merge-output-format','mp4','-o',str(out),url]
+            cmd=['timeout','175','python','-m','yt_dlp','--no-playlist','--no-progress','--no-part','--socket-timeout','12','--retries','1','--fragment-retries','1','--referer','https://boulevard.co/post/videos/aston-martin-db12-video/','-f','bv*[height<=2160]+ba/b[height<=2160]','--merge-output-format','mp4','-o',str(out),url]
             try:
               rr=subprocess.run(cmd,capture_output=True,text=True,timeout=185)
               x['fetch_exit_code']=rr.returncode;x['fetch_log']=(rr.stdout+'\n'+rr.stderr)[-2800:]
