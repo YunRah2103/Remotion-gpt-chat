@@ -1,0 +1,67 @@
+name: YUNEX DB12 Boulevard Direct Film Verified Acquisition
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/yunex-db12-boulevard-direct-source.yml']
+permissions:
+  contents: read
+jobs:
+  private-source-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    steps:
+      - uses: denoland/setup-deno@v2
+        with: {deno-version: v2.x}
+      - name: Prepare media tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q -U 'yt-dlp[default]' Pillow curl-cffi
+      - name: Extract standalone DB12 luxury film at best original resolution
+        shell: bash
+        run: |
+          mkdir -p out
+          set +e
+          python -m yt_dlp --list-formats --socket-timeout 15 --referer 'https://boulevard.co/post/videos/aston-martin-db12-video/' 'https://player.vimeo.com/video/1006099458?h=efc07e05d4' >out/AVAILABLE_FORMATS.txt 2>&1
+          python -m yt_dlp --no-playlist --socket-timeout 15 --retries 2 --fragment-retries 2 --no-part --no-progress -f 'bv*[height<=2160]+ba/b[height<=2160]' --merge-output-format mp4 -o out/BOULEVARD_DB12_FILM.%(ext)s --referer 'https://boulevard.co/post/videos/aston-martin-db12-video/' 'https://player.vimeo.com/video/1006099458?h=efc07e05d4' >out/DOWNLOAD_LOG.txt 2>&1
+          echo ${PIPESTATUS[0]} > out/DOWNLOAD_EXIT_CODE.txt
+          ls -lh out
+      - name: Verify files, actual contact sheet, full decode
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess,json,hashlib
+          from PIL import Image,ImageDraw
+          d=Path('out'); files=[x for x in d.iterdir() if x.suffix.lower() in ['.mp4','.mov','.mkv','.webm']]
+          m={'project':'MIDNIGHT EMERALD - independent cinematography','original_publisher':'Boulevard luxury Australia','source_page':'https://boulevard.co/post/videos/aston-martin-db12-video/','video_embed':'https://player.vimeo.com/video/1006099458?h=efc07e05d4','rights':'private evaluation only. Contact Boulevard/filmmaker for public republishing rights; no grant verified','download_status':'NO_MEDIA'}
+          if files:
+            f=max(files,key=lambda x:x.stat().st_size)
+            m['download_status']='GOT_VIDEO';m['filename']=f.name;m['bytes']=f.stat().st_size;m['sha256']=hashlib.sha256(f.read_bytes()).hexdigest()
+            q=subprocess.run(['ffprobe','-v','error','-show_format','-show_streams','-of','json',str(f)],capture_output=True,text=True)
+            try:
+              j=json.loads(q.stdout);v=next(s for s in j['streams'] if s.get('codec_type')=='video')
+              m['duration']=float(j['format']['duration']);m['video_stream']={k:v.get(k) for k in ['codec_name','width','height','r_frame_rate','avg_frame_rate']}
+              m['resolution_status']='NATIVE_HD_1080_OR_HIGHER' if v.get('width',0)>=1920 and v.get('height',0)>=1080 else 'LOW_RESOLUTION_SOURCE'
+              r=subprocess.run(['timeout','100','ffmpeg','-nostdin','-v','error','-xerror','-i',str(f),'-map','0:v:0','-f','null','-'],capture_output=True,text=True,timeout=110)
+              m['full_decode']='PASS' if r.returncode==0 else 'FAIL '+r.stderr[-500:]
+              duration=m['duration'];times=[round(duration*(i+.5)/24,2) for i in range(24)];m['contact_source_times']=times
+              sheet=Image.new('RGB',(1600,round(24/4)*247),'#101010');dr=ImageDraw.Draw(sheet)
+              for i,t in enumerate(times):
+                p=subprocess.run(['ffmpeg','-nostdin','-loglevel','error','-ss',str(t),'-i',str(f),'-frames:v','1','-vf','scale=384:216:force_original_aspect_ratio=decrease','-f','image2pipe','-vcodec','mjpeg','-'],capture_output=True,timeout=12)
+                if p.returncode==0 and p.stdout:
+                  from io import BytesIO
+                  im=Image.open(BytesIO(p.stdout));im.thumbnail((384,216));col,row=i%4,i//4;sheet.paste(im,(col*400,row*247))
+                  dr.text((col*400+8,row*247+217),f'{t:.2f} sec',fill='white')
+              sheet.save(d/'BOULEVARD_DB12_CONTACT_24.jpg',quality=90)
+            except Exception as e:m['error']=str(e)
+          (d/'BOULEVARD_DB12_MANIFEST.json').write_text(json.dumps(m,indent=2))
+          print(json.dumps(m,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-DB12-BOULEVARD-PRIVATE-FOOTAGE-QA
+          path: out/
+          retention-days: 2
+          compression-level: 0
