@@ -5,7 +5,7 @@ on:
     paths: ['.github/workflows/yunex-gtr-sealed-transfer.yml']
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   sealed-transfer:
     runs-on: ubuntu-24.04
