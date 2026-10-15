@@ -15,7 +15,7 @@ permissions:
 
 concurrency:
   group: yunex-gtr-attesa-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   picture-only:
