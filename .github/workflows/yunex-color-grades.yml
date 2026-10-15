@@ -1,0 +1,132 @@
+name: YUNEX Cinematic Colour Grades — 8 LUTs + real video QA
+
+on:
+  push:
+    paths:
+      - production/toolkits/yunex_color_grades.py
+      - production/tests/test_yunex_color_grades.py
+      - .github/workflows/yunex-color-grades.yml
+  pull_request:
+    paths:
+      - production/toolkits/yunex_color_grades.py
+      - production/tests/test_yunex_color_grades.py
+      - .github/workflows/yunex-color-grades.yml
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Preview all styles, grade source video, or just export LUT pack
+        type: choice
+        required: true
+        default: preview
+        options: [preview, apply, pack]
+      media_run:
+        description: Existing GitHub Actions run with the real car footage (not needed for pack)
+        required: false
+        type: string
+      media_artifact:
+        description: Exact media artifact name containing one MP4/MOV
+        required: false
+        type: string
+      grade:
+        description: Choose the look for apply or single-preview (all for comparison)
+        required: true
+        type: choice
+        default: emerald-noir
+        options:
+          - emerald-noir
+          - monaco-gold
+          - arctic-silver
+          - midnight-cobalt
+          - track-attack
+          - heritage-film
+          - sunset-rose
+          - studio-clean
+          - all
+      strength:
+        description: How much colour grade to mix with original, from 0 to 1
+        required: true
+        type: string
+        default: '0.82'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  tests-and-luts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg and Pillow only
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages 'Pillow>=10,<13'
+      - name: Test authentic original video and original audio
+        run: |
+          python -m unittest discover -s production/tests -p test_yunex_color_grades.py -v
+      - name: Generate eight importable 33-point 3D LUTs
+        run: |
+          python production/toolkits/yunex_color_grades.py export --preset all --size 33 --output-dir out/yunex-looks-33
+          test "$(find out/yunex-looks-33 -name '*.cube' | wc -l)" -eq 8
+          sha256sum out/yunex-looks-33/*.cube > out/yunex-looks-33/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-8-CINEMATIC-33-CUBE-LUTS
+          path: out/yunex-looks-33/
+          retention-days: 30
+          if-no-files-found: error
+
+  preview-or-grade:
+    if: github.event_name == 'workflow_dispatch' && inputs.operation != 'pack'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg and Pillow
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages 'Pillow>=10,<13'
+      - uses: actions/download-artifact@v4
+        if: inputs.media_run != '' && inputs.media_artifact != ''
+        with:
+          run-id: ${{ inputs.media_run }}
+          name: ${{ inputs.media_artifact }}
+          github-token: ${{ github.token }}
+          path: input/footage
+      - name: Source-matched A/B contact sheet or non-destructive graded MP4
+        shell: bash
+        env:
+          OPERATION: ${{ inputs.operation }}
+          MEDIA_RUN: ${{ inputs.media_run }}
+          MEDIA_ARTIFACT: ${{ inputs.media_artifact }}
+          GRADE: ${{ inputs.grade }}
+          STRENGTH: ${{ inputs.strength }}
+        run: |
+          set -euo pipefail
+          [[ "$MEDIA_RUN" =~ ^[0-9]+$ && -n "$MEDIA_ARTIFACT" ]] || {
+            echo "Provide a real Actions run ID + exact artifact name"; exit 1;
+          }
+          [[ "$STRENGTH" =~ ^(0(\.[0-9]+)?|1(\.0+)?)$ ]] || {
+            echo "Strength must be 0.0 through 1.0"; exit 1;
+          }
+          mapfile -d '' -t clips < <(find input/footage -type f \( -iname '*.mp4' -o -iname '*.mov' \) -print0)
+          [[ "${#clips[@]}" -eq 1 ]] || { echo "Exactly one video required"; exit 1; }
+          mkdir -p out/yunex-colour
+          if [[ "$OPERATION" == preview ]]; then
+            python production/toolkits/yunex_color_grades.py preview --video "${clips[0]}" \
+              --preset "$GRADE" --strength "$STRENGTH" --output-dir out/yunex-colour
+          elif [[ "$OPERATION" == apply ]]; then
+            [[ "$GRADE" != all ]] || { echo "Select a specific filter for final render"; exit 1; }
+            python production/toolkits/yunex_color_grades.py apply --video "${clips[0]}" \
+              --preset "$GRADE" --strength "$STRENGTH" --output out/yunex-colour/YUNEX-COLOUR-GRADED.mp4
+          else
+            echo "Unsupported operation"; exit 1
+          fi
+          printf "Original audio preserved; original file never overwritten.\n" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-COLOUR-GRADE-${{ github.run_id }}
+          path: out/yunex-colour/
+          retention-days: 14
+          if-no-files-found: error
