@@ -76,7 +76,7 @@ jobs:
           python -m venv "$RUNNER_TEMP/shot-scout-test"
           "$RUNNER_TEMP/shot-scout-test/bin/python" -m pip install -q \
              bundle/Tools/PySceneDetect/scenedetect_headless-0.7.2-py3-none-any.whl
-          "$RUNNER_TEMP/shot-scout-test/bin/scenedetect" --version
+          "$RUNNER_TEMP/shot-scout-test/bin/python" -c 'import scenedetect; print("PySceneDetect", scenedetect.__version__)'
           if ! command -v ffmpeg >/dev/null; then
             sudo apt-get update -qq
             sudo apt-get install -y -qq ffmpeg
