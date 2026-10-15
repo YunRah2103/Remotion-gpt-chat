@@ -106,7 +106,7 @@ const CameraDirector:React.FC<{f:number;stage:number}>=({f,stage})=>{
   else if(stage===2){const q=ease((f-344)/56);p=[rng(5.2,2.8,q),rng(8.4,10,q),rng(-5.5,-3.3,q)];}
   else{const q=ease((f-617)/62);p=[rng(2.8,7.3,q),rng(10,6.4,q),rng(-3.3,-9.2,q)];}
   camera.position.set(...p);camera.lookAt(0,.65,0);
-  if(camera instanceof THREE.PerspectiveCamera){camera.fov=37;camera.updateProjectionMatrix();}
+  if(camera instanceof THREE.PerspectiveCamera){camera.fov=49;camera.updateProjectionMatrix();}
  },[camera,f,stage]);return null;
 };
 
@@ -131,7 +131,7 @@ export const AttesaVoxelFilm:React.FC<{withVoiceover?:boolean}>=({withVoiceover=
  const t=f/30; const torque=50*ease((f-416)/80);
  const sub=captions.find(c=>f>=c[0]&&f<c[1])?.[2]??'';
  return <AbsoluteFill style={{background:INK,color:SNOW,overflow:'hidden',fontFamily:'DejaVu Sans Mono, monospace'}}>
-  <ThreeCanvas width={width} height={height} shadows camera={{position:[7,7,-10],fov:37,near:.1,far:160}} gl={{antialias:false,preserveDrawingBuffer:true}}>
+  <ThreeCanvas width={width} height={height} shadows camera={{position:[7,7,-10],fov:49,near:.1,far:160}} gl={{antialias:false,preserveDrawingBuffer:true}}>
    <CameraDirector f={f} stage={stage}/>
    <color attach="background" args={['#071522']}/>
    <ambientLight intensity={1.35}/>
