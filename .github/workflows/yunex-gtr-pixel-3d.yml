@@ -1,0 +1,50 @@
+name: YUNEX GT-R - native 3D voxel proof
+on:
+  push:
+    paths:
+      - 'src/yunex/AttesaVoxelFilm.tsx'
+      - 'src/yunex/attesa-index.tsx'
+      - '.github/workflows/yunex-gtr-pixel-3d.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-3d:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Dependencies and FFmpeg
+        run: |
+          npm install --no-fund --no-audit
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: TypeScript and composition registration
+        run: |
+          npm run check
+          npx remotion compositions src/yunex/attesa-index.tsx --gl=swangle > compositions.txt
+          grep -q AttesaVoxelFilm compositions.txt
+      - name: Native animated 3D scene proofs (not still mockups)
+        run: |
+          mkdir -p out
+          npx remotion render src/yunex/attesa-index.tsx AttesaVoxelFilm out/hero.mp4 --frames=60-83 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          npx remotion render src/yunex/attesa-index.tsx AttesaVoxelFilm out/rear-drive.mp4 --frames=235-258 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          npx remotion render src/yunex/attesa-index.tsx AttesaVoxelFilm out/active-awd.mp4 --frames=505-528 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          npx remotion render src/yunex/attesa-index.tsx AttesaVoxelFilm out/payoff.mp4 --frames=697-720 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          for f in hero rear-drive active-awd payoff; do
+            ffmpeg -v error -xerror -i "out/$f.mp4" -f null -
+            n=$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=noprint_wrappers=1:nokey=1 "out/$f.mp4")
+            test "$n" = 24
+            ffmpeg -v error -y -ss 0.35 -i "out/$f.mp4" -frames:v 1 "out/$f.png"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GT-R-ATTESA-native-3D-previews
+          path: |
+            out/
+            compositions.txt
+          retention-days: 30
+          if-no-files-found: error
