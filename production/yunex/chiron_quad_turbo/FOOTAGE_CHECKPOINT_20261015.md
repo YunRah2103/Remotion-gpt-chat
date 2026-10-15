@@ -1,0 +1,27 @@
+# YUNEX Episode 002 — Bugatti Chiron Four Turbos | Footage acquisition checkpoint
+**15 October 2026 — issue [#104](https://github.com/YunRah2103/Remotion-gpt-chat/issues/104)**
+
+## What is complete
+
+- Read the task issue, production pipeline instructions, V4 protocol, previous GT-R evidence and source registry. No previous Chiron source assets existed when this assignment started.
+- Queued three canonical, **owner-authored** S25 V4 jobs. No alternative agent and no video-edit changes.
+- **#107 REAL DOWNLOAD PASS**: official Bugatti 0–400–0 Chiron film, `https://www.youtube.com/watch?v=PkkV1vLHUvQ`, 00:00–00:45; 1920×1080 H.264; 45.000 s; 17,380,734 bytes; full decode PASS; SHA256 `d7a83781d83d8de40fc318030d21fb65b9244ed93c40189bafaef6f8a14116ec`. Private draft [release](https://github.com/YunRah2103/Remotion-gpt-chat/releases/tag/untagged-c766ffb1bc7f43285300).
+- **#106 REAL DOWNLOAD PASS**: official W16 historic Bugatti film, `https://www.youtube.com/watch?v=gwrQ3cXttio`, 00:00–01:30; 1920×1080 H.264; 90.000 s; 31,081,879 bytes; full decode PASS; SHA256 `93b333fa1e737b1d82c34551de5bddbca76ba9691d59f479340da8e25d3a3c5b`. Private draft [release](https://github.com/YunRah2103/Remotion-gpt-chat/releases/tag/untagged-26676228cfa0331a134c). **This film includes earlier W16/Veyron history, so visually approve every hardware cut against Chiron identity before use.**
+- **#105 AWAITING REAL PHONE RESULT** at checkpoint: original blue Chiron trailer via YOUCAR `https://www.youtube.com/watch?v=vIy2KFeGLtg` source requested 00:00–01:00; do not count it as downloaded or visually verified.
+- Committed [auto private-review workflow](https://github.com/YunRah2103/Remotion-gpt-chat/blob/main/.github/workflows/yunex-chiron-ep002-private-review.yml), commit `5cd8bd04255f187ac711f29c51a296542cb44892`. This listens for #105–107 `YUNEX_PHONE_DONE_V4` completion, checks all three, authenticated-imports actual private MP4s via the already-proven `yunex-v4-import`, generates frame contact sheets and 9:16 centre-crop comparisons, picks up to ten **machine scene-based** 2–4s candidate excerpts (four from #105, three each from #106/#107), full-decodes and hashes each video, and zips files, source timestamps, clip manifest, contact sheets in an **OWNER-ONLY DRAFT RELEASE**: `yunex-chiron-ep002-private-review`. On success automatically comments issue #104 with the authenticated release and workflow run. This is evidence-gated, not a promise that the phone is permanently running.
+
+## Strongest anticipated opening
+
+The preferred **opening candidate** must be chosen from actual #105 frames after completed acquisition: blue original Chiron, low front-three-quarter approach/tracking, prominent horseshoe grille and four square LED signatures, clear outer/top text-safe area, continuous motion. Alternative is an actual #107 approaching/parallel-camera Chiron frame. No visual review or exact shot timecodes are yet proven; don't invent them.
+
+## Technical / visual review still required
+
+The MP4 data above comes from phone-side SHA256 + FFprobe + full decode: not an independent artistic/identity screening. The contact-sheet pipeline generates real pixel evidence when all three assets exist, but scene-based excerpt picking **does not prove** premium image quality, suitable 9:16 reframe or genuine Chiron turbo close-up. Confirm each actual clip's car/colour, motion/screen direction, 2–4-second original source in/out, baked graphics/black bars, vertical subject-safe crop, continuous photographic exposure and absence of Veyron-labelled-as-Chiron. Prefer 6–10 outstanding extracts over any blindly produced 10.
+
+Do not infer turbo engagement from generic on-road acceleration pictures. Per Bugatti, original Chiron uses an 8.0L W16 with **four turbos in two stages**: two at lower engine speeds; second two come into operation near **3,800 RPM** (official Bugatti: https://newsroom.bugatti.com/press-releases/geneva-international-motor-show-2016 and https://newsroom.bugatti.com/press-releases/bugatti-w16-engine-the-last-of-its-kind). Engineering diagram is a separate job for Master Editor.
+
+## Rights and handoff
+
+All source videos © third-party manufacturer / filmmaker, **reuse rights UNVERIFIED**; they remain in owner-only GitHub **DRAFT Releases** and must not be publicly mirrored/distributed or labelled licensed. Technical private copying does not grant publication rights for TikTok/Shorts/Reels. Obtain source permissions or replacements before public distribution.
+
+**Current completion:** two authentic complete source MP4s technically PASS; third unconfirmed; no 6–10-shot **visually approved, editor-ready** package yet. Once all three DONE and auto workflow succeeds, retrieve and screen the real private package. Do not tell the owner to type 'continue', restart Termux, or download from YouTube again unless a specific verified error requires it.
