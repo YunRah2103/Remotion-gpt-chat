@@ -1,0 +1,52 @@
+name: YUNEX Chiron encrypted scene review transfer
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/yunex-chiron-private-scene-review-bridge.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  transfer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Import already-generated #104 private footage review package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p private
+          gh release download yunex-chiron-ep002-private-review --repo "$GITHUB_REPOSITORY" \
+            --pattern YUNEX_CHIRON_EP002_PRIVATE_10_MP4S.zip --dir private
+          test -s private/YUNEX_CHIRON_EP002_PRIVATE_10_MP4S.zip
+          unzip -tq private/YUNEX_CHIRON_EP002_PRIVATE_10_MP4S.zip
+      - name: Encrypt transfer with random key private to DRAFT release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag=yunex-chiron-ep002-private-review
+          secret="$(openssl rand -hex 32)"
+          openssl enc -aes-256-cbc -pbkdf2 -iter 100000 -salt \
+            -in private/YUNEX_CHIRON_EP002_PRIVATE_10_MP4S.zip \
+            -out private/YUNEX_CHIRON_EP002_SOURCE.enc -pass "pass:$secret"
+          gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json body --jq '.body' > private/release-notes.txt
+          {
+             printf '\n\n### OWNER-ONLY ENCRYPTED SOURCE ARTIFACT TRANSFER\n'
+             printf 'Chiron private ten-source review package. Encrypted artifact contains copyrighted media and cannot be decoded without this key.\n'
+             printf 'Source bridge AES-256-CBC passphrase: `%s`\n' "$secret"
+             printf 'Plaintext source ZIP SHA256: `%s`\n' "$(sha256sum private/YUNEX_CHIRON_EP002_PRIVATE_10_MP4S.zip | cut -d' ' -f1)"
+          } >> private/release-notes.txt
+          gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --notes-file private/release-notes.txt --draft
+          rm -f private/YUNEX_CHIRON_EP002_PRIVATE_10_MP4S.zip private/release-notes.txt
+          echo 'Encrypted verified scene package stored; key owner-only.'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-CHIRON-ENCRYPTED-SCENE-PACKAGE
+          path: private/YUNEX_CHIRON_EP002_SOURCE.enc
+          retention-days: 1
+          if-no-files-found: error
