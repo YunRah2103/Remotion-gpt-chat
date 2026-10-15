@@ -95,9 +95,30 @@ jobs:
         run: |
           set -euo pipefail
           tag="yunex-gtr-r35-attesa-private-picture-${{ github.run_id }}"
-          gh release create "$tag" out/attesa-film/GTR_ATTESA_PICTURE_ONLY.mp4 out/attesa-film/report.json out/attesa-film/frame-*.jpg \
-            --repo "$GITHUB_REPOSITORY" \
-            --title "OWNER ONLY - Nissan GT-R R35 ATTESA silent picture proof" \
-            --notes "Picture proof, NOT the narrated master. GT-R originals #97-#99 have unverified publication rights. All footage and frames are in this owner-only DRAFT Release. The approved user voice/audio is NOT present on the GitHub runner: do not claim finished narrated film or post publicly. Needs human creative and rights review." \
-            --draft
+          # GitHub API occasionally times out after the native render. Retry only
+          # this private release operation; tolerate releases created by a timed-out request.
+          export GH_HTTP_TIMEOUT=120
+          uploaded=0
+          for attempt in 1 2 3 4 5; do
+            if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+              if gh release upload "$tag" out/attesa-film/GTR_ATTESA_PICTURE_ONLY.mp4 out/attesa-film/report.json out/attesa-film/frame-*.jpg --repo "$GITHUB_REPOSITORY" --clobber; then
+                uploaded=1
+                break
+              fi
+            else
+              if gh release create "$tag" out/attesa-film/GTR_ATTESA_PICTURE_ONLY.mp4 out/attesa-film/report.json out/attesa-film/frame-*.jpg \
+                  --repo "$GITHUB_REPOSITORY" \
+                  --title "OWNER ONLY - Nissan GT-R R35 ATTESA silent picture proof" \
+                  --notes "Private technical proof; not narrated master. Source rights and visual approval still pending. Never publicize." \
+                  --draft; then
+                uploaded=1
+                break
+              fi
+            fi
+            echo "::warning::GitHub private delivery attempt $attempt failed; will retry"
+            sleep $((attempt * 9))
+          done
+          test "$uploaded" -eq 1
+          gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json isDraft,assets \
+            --jq '(.isDraft == true) and (any(.assets[]; .name == "GTR_ATTESA_PICTURE_ONLY.mp4" and .size > 1000000))' | grep -qx true
           echo "OWNER_ONLY_PICTURE=https://github.com/$GITHUB_REPOSITORY/releases/tag/$tag" >> "$GITHUB_STEP_SUMMARY"
