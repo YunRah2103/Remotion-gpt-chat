@@ -1,0 +1,48 @@
+name: YUNEX Agent C - Extra Indy 500 Source Probe
+on:
+  push:
+    branches:
+      - automotive-edits/turbo-indy-reality-001/c-indy-racing
+    paths:
+      - .github/workflows/yunex-agent-c-extra-2025.yml
+      - production/videos/turbo-indy-reality-001/agent_c_extra_2025_probe.py
+  pull_request:
+    paths:
+      - .github/workflows/yunex-agent-c-extra-2025.yml
+      - production/videos/turbo-indy-reality-001/agent_c_extra_2025_probe.py
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-acquisition:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install ffmpeg actual scene decoder and media downloading tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check --upgrade "yt-dlp[default]" curl-cffi Pillow
+      - name: Acquire, verify native 1080p, generate actual moving clips, probe source and make contact sheets
+        run: python production/videos/turbo-indy-reality-001/agent_c_extra_2025_probe.py
+      - name: Preserve real video ZIP or failure diagnostics
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: yunex-agent-c-2025-newsource-review
+          path: out/agent-c-extra-qualifying/agent-c-extra-shots.zip
+          if-no-files-found: warn
+          retention-days: 7
+          compression-level: 0
+      - name: Summarise actual acquisition result
+        if: always()
+        run: |
+          if [ -f out/agent-c-extra-qualifying/REPORT.md ]; then
+            cat out/agent-c-extra-qualifying/REPORT.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No acquisition report created." >> "$GITHUB_STEP_SUMMARY"
+          fi

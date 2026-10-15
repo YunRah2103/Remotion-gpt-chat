@@ -1,0 +1,66 @@
+name: YUNEX Turbo Indy - Agent C Racing Footage
+on:
+  push:
+    branches:
+      - automotive-edits/turbo-indy-reality-001/c-indy-racing
+    paths:
+      - .github/workflows/yunex-indy-agent-c.yml
+      - production/videos/turbo-indy-reality-001/agent_c/**
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/yunex-indy-agent-c.yml
+      - production/videos/turbo-indy-reality-001/agent_c/**
+
+permissions:
+  contents: read
+
+jobs:
+  acquire-racing:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install actual frame and stream verification software
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check --upgrade "yt-dlp[default]" curl-cffi Pillow
+          ffmpeg -version | head -1
+          yt-dlp --version
+      - name: Download REAL racing media; verify native dimensions, decoded motion, SHA-256 and contact sheets
+        id: acquisition
+        run: |
+          python production/videos/turbo-indy-reality-001/agent_c/acquire.py
+      - name: Expose actual source and clip counts in job summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -f out/yunex-indy-c/REPORT.md ]; then
+            cat out/yunex-indy-c/REPORT.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Agent C failed before generating report." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload one ZIP with playable real clips, ffprobe QA, manifest, frames and checksums
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: yunex-turbo-indy-agent-c-footage
+          path: out/yunex-indy-c/agent-c-indycar-footage.zip
+          retention-days: 7
+          if-no-files-found: error
+          compression-level: 0
+      - name: Preserve readable QA manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: yunex-turbo-indy-agent-c-QA
+          path: |
+            out/yunex-indy-c/manifest.json
+            out/yunex-indy-c/REPORT.md
+            out/yunex-indy-c/ALL_CONTACT_SHEETS.jpg
+          retention-days: 7
+          if-no-files-found: warn
