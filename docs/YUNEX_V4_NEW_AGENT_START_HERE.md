@@ -6,6 +6,18 @@
 
 > **Already working:** S25 V4 is installed; YouTube phone downloads **#55** (approved car video) and **#56** (unregistered AutoTopNL RS6, draft) both passed. New `--media audio` is **CI-tested, not yet tested on the S25**. The user does not need to re-upload #56 or disclose their phone token. Do not assume the loop is currently running.
 
+## Pick your workflow (do this before asking the user for anything)
+
+| Your assignment | Start with | Avoid |
+| --- | --- | --- |
+| **Video editor / sound designer:** needs a previously downloaded source | Find its completed `[YUNEX PHONE JOB]` issue; import directly into **your existing GitHub Actions editing job** using the shared action below | Asking for a ChatGPT attachment, re-downloading the source, or substituting old audio |
+| **Footage/acquisition specialist:** needs original moving shots | Search the current project's GitHub footage/Release assets; prefer legitimate direct creator files where available; use V4 for YouTube-only links | A new phone job when the exact media already exists |
+| **New phone job producer:** has a new canonical YouTube URL | Run the worker-branch `agent_jobs_v4.py prepare`; submit an **owner-authored open GitHub issue** with the exact two-line body | Editing the worker code, improvising an issue body or claiming `prepare` uploaded media |
+| **QA/integration agent:** verifying handoff | Import the exact completed job; inspect its real decoded audio/video and record source SHA256, timecodes and rights status | Treating `PASS` metadata alone as proof of a finished film |
+| **Worker maintainer:** explicitly tasked with V4 implementation | Follow the V4 branch, test suite and safe installer procedure | Upgrading a running phone loop or touching unrelated approved projects |
+
+**Common rule:** The phone worker is a *media acquisition bridge*, **not** the final editor. The import action returns real verified source bytes, **not** a finished film. An agent assigned editing must still perform the requested edit and deliver a playable result. For task-specific conventions, use [the dedicated V4 agent skill](../.github/skills/yunex-v4-footage/SKILL.md).
+
 ## Fastest path: use the reusable import action (no manual asset handling)
 
 **For an already-completed phone job, use one GitHub Actions step.** The shared action [`.github/actions/yunex-v4-import/action.yml`](../.github/actions/yunex-v4-import/action.yml) reads the **owner-authored `YUNEX_PHONE_DONE_V4` issue comment**, downloads the real media from its GitHub draft/public Release, verifies **size, SHA256, FFprobe and full FFmpeg decode**, and gives the current editing job the verified absolute file path. It also handles missing FFmpeg on a standard Ubuntu runner.
@@ -126,6 +138,25 @@ For another job, use **its own** `release_id`, `asset_filename`, `sha256` and ta
 | Agent has the source but not the approved edit | Search existing GitHub artifacts/Releases and the project's ChatGPT Library; do not ask for an upload before checking |
 | New audio-only job | Expects AAC `.m4a`; feature passed CI but still requires a first live-device proof |
 | New native 4K job | Set `--height 2160` only on verified UHD footage; no upscaling, 1.5 GiB output cap, potentially more disk/battery. Real 4K FFmpeg test PASS in CI; **phone UHD download not yet proven** |
+
+## Handoff report — minimum useful status
+
+After completing the actual work, report this compact evidence (do **not** spam intermediate status messages):
+
+```text
+YUNEX V4 HANDOFF
+Role: <footage | audio | video editor | QA>
+Source: <creator URL and exact excerpt timecodes>
+Phone issue: #<number> | not used (direct creator source)
+Result: <queued | PASS | FAILED> (be precise)
+Asset: <verified filename and authenticated Release/Actions artifact>
+Quality: <native dimensions or audio sample rate, duration, visual/audio inspection>
+Verification: <SHA256; FFprobe; FFmpeg full decode; workflow run ID>
+Rights: <verified licence or unverified/private-review>
+Next: <actual deliverable produced, or one specific blocker>
+```
+
+For **editing tasks**, include a link to the **actual final playable MP4** and distinguish a source-acquisition PASS from an editorial/render QA PASS. Do not say an asset is absent just because its draft Release has no public `mp4_url`.
 
 ## Definition of done
 
