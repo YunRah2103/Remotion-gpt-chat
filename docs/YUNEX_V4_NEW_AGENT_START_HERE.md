@@ -1,32 +1,28 @@
-# YUNEX S25 V4 — START HERE (new AI agents)
+# YUNEX V4 — START HERE (new footage, audio and video agents)
 
-**Your goal:** acquire the requested real video or engine audio, recover its actual GitHub asset, inspect it, and hand a **usable verified file** to the editor. **Do not stop after obtaining a URL or an issue number.**
+**Read this before starting.** Repo: `YunRah2103/Remotion-gpt-chat` (**never** the old `yunus-video-lab`). Phone V4 implementation lives on branch `experiments/s25-footage-worker-v4-10min-20261012` under `production/phone_footage/`, **not main**.
 
-**Canonical repo:** `YunRah2103/Remotion-gpt-chat` (not the old `yunus-video-lab`). **Worker source and CLI:** branch `experiments/s25-footage-worker-v4-10min-20261012`, directory `production/phone_footage/`. **Full protocol:** [YUNEX_S25_V4_AGENT_GUIDE.md](YUNEX_S25_V4_AGENT_GUIDE.md).
+**The S25 worker already works.** Phone downloads [#55](https://github.com/YunRah2103/Remotion-gpt-chat/issues/55) (approved car video) and [#56](https://github.com/YunRah2103/Remotion-gpt-chat/issues/56) (unregistered AutoTopNL RS6 video, **private draft**) passed. A [GitHub Actions import of real private #56 media also PASSED](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38470166071). **Do not ask the user to attach it, reinstall Termux, share credentials or re-download existing footage.**
 
-> **Already working:** S25 V4 is installed; YouTube phone downloads **#55** (approved car video) and **#56** (unregistered AutoTopNL RS6, draft) both passed. New `--media audio` is **CI-tested, not yet tested on the S25**. The user does not need to re-upload #56 or disclose their phone token. Do not assume the loop is currently running.
+## Your first decision
 
-## Pick your workflow (do this before asking the user for anything)
-
-| Your assignment | Start with | Avoid |
+| Assigned job | Start here | Deliver |
 | --- | --- | --- |
-| **Video editor / sound designer:** needs a previously downloaded source | Find its completed `[YUNEX PHONE JOB]` issue; import directly into **your existing GitHub Actions editing job** using the shared action below | Asking for a ChatGPT attachment, re-downloading the source, or substituting old audio |
-| **Footage/acquisition specialist:** needs original moving shots | Search the current project's GitHub footage/Release assets; prefer legitimate direct creator files where available; use V4 for YouTube-only links | A new phone job when the exact media already exists |
-| **New phone job producer:** has a new canonical YouTube URL | Run the worker-branch `agent_jobs_v4.py prepare`; submit an **owner-authored open GitHub issue** with the exact two-line body | Editing the worker code, improvising an issue body or claiming `prepare` uploaded media |
-| **QA/integration agent:** verifying handoff | Import the exact completed job; inspect its real decoded audio/video and record source SHA256, timecodes and rights status | Treating `PASS` metadata alone as proof of a finished film |
-| **Worker maintainer:** explicitly tasked with V4 implementation | Follow the V4 branch, test suite and safe installer procedure | Upgrading a running phone loop or touching unrelated approved projects |
+| **Video editor / audio specialist** needs an existing phone asset | Find its `YUNEX_PHONE_DONE_V4` issue and use the reusable **GitHub Actions importer** below | Actual imported MP4/M4A **and the finished verified edit** |
+| **Footage researcher** needs new driving shots | Search existing project assets and legitimate direct creator MP4s first; use V4 for needed YouTube clips | Real verified file, exact footage timecodes and quality assessment |
+| **Phone job submitter** has a new YouTube URL | Generate the issue body using the **V4 branch** `agent_jobs_v4.py prepare` | An owner-authored open job; then the actual phone PASS asset |
+| **QA/integration agent** checks delivery | Use the importer, inspect actual media and validate the required edit | SHA256 + FFprobe + full decode + visual/audio judgment + final artifact |
+| **Worker maintainer** | Only when expressly assigned, consult V4 branch code/tests/safe installer | Tested code; **no claim** that a running phone updated itself |
 
-**Common rule:** The phone worker is a *media acquisition bridge*, **not** the final editor. The import action returns real verified source bytes, **not** a finished film. An agent assigned editing must still perform the requested edit and deliver a playable result. For task-specific conventions, use [the dedicated V4 agent skill](../.github/skills/yunex-v4-footage/SKILL.md).
+**The worker acquires source media; it does not finish video editing.** An agent assigned to create an edit must render and inspect a new playable MP4, preserving already approved picture/music/loop unless the user says otherwise.
 
-## Fastest path: use the reusable import action (no manual asset handling)
+## A. Need an already downloaded source? One-step import
 
-**For an already-completed phone job, use one GitHub Actions step.** The shared action [`.github/actions/yunex-v4-import/action.yml`](../.github/actions/yunex-v4-import/action.yml) reads the **owner-authored `YUNEX_PHONE_DONE_V4` issue comment**, downloads the real media from its GitHub draft/public Release, verifies **size, SHA256, FFprobe and full FFmpeg decode**, and gives the current editing job the verified absolute file path. It also handles missing FFmpeg on a standard Ubuntu runner.
-
-For example, an audio or visual editing agent who needs existing RS6 job [#56](https://github.com/YunRah2103/Remotion-gpt-chat/issues/56) can **reuse it, not ask the user to attach it**:
+In **your own editing workflow**, use [the reusable V4 import action](../.github/actions/yunex-v4-import/action.yml). It reads the owner-authored issue completion, retrieves the **real private/public Release asset**, verifies **size, SHA256, FFprobe and full FFmpeg decode**, and gives you `asset_path` on the runner.
 
 ```yaml
 permissions:
-  contents: write # proven requirement for owner-only draft assets
+  contents: write # tested requirement for draft-release access in this repo
   issues: read
 jobs:
   edit:
@@ -36,130 +32,65 @@ jobs:
       - id: phone
         uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
         with:
-          issue_number: '56' # substitute the completed phone issue number
+          issue_number: '56' # replace with the completed issue for THIS job
           token: ${{ github.token }}
-      - name: Edit with the verified input
-        shell: bash
+      - name: Work with verified footage
         env:
           SOURCE_FILE: ${{ steps.phone.outputs.asset_path }}
         run: |
           test -s "$SOURCE_FILE"
-          # Use "$SOURCE_FILE" in your actual FFmpeg/Remotion edit.
-          # Keep unknown-rights footage inside your authorised private workflow.
+          # Continue your real edit/mix here, in the same Actions job.
 ```
 
-The action outputs `asset_path`, `media` (`video` or `audio`), `sha256`, `rights_status` and `release_visibility`. This is **an import into the current runner**, not a lasting final edit or publication. Build the actual edit in the same job. Do not upload rights-unverified source footage as a publicly accessible artifact, publish the draft, or assume the user has authorised distribution.
+Outputs: `asset_path`, `media`, `sha256`, `rights_status`, `release_visibility`. For rights-unverified source media, **keep the source and draft private**; an import PASS does not authorise publication. Do not rewrite this importer or tell the user their existing source is inaccessible merely because your local workspace cannot reach `api.github.com`.
 
-**No need to implement GitHub's draft Release API repeatedly.** For a new job, create the owner-authored queue issue first, wait for `YUNEX_PHONE_DONE_V4`, then call this exact importer with its number. For direct filmmaker MP4 sources, continue using the existing direct-source route.
+## B. Need a new YouTube download? Queue properly
 
-## A new agent's first 60 seconds
+1. Pick the **exact requested vehicle/action**, source and excerpt timecodes. Check that existing files/jobs do not already contain the needed footage. For accessible original creator MP4s, prefer the existing direct acquisition workflow.
+2. Normalise the URL to `https://www.youtube.com/watch?v=VIDEO_ID` (11-character ID; no `youtu.be`, extra parameters or playlists).
+3. On a checkout of **`experiments/s25-footage-worker-v4-10min-20261012`**, generate a job body (this **only prints text**):
 
-1. **Check what already exists:** search the project's GitHub issues, run artifacts and Releases for the requested shot, sound, or approved edit. For AutoTopNL RS6 **reuse [phone job #56](https://github.com/YunRah2103/Remotion-gpt-chat/issues/56)** (60 s, 1080p, draft tag `yunex-phone-v4-56`, asset `yunex-v4-56.mp4`). **Do not redownload it.**
-2. **Choose the source route:** use a legitimate, direct original MP4 through GitHub Actions when available (including source 4K). Use S25 V4 for YouTube where the cloud downloader is blocked. **Optional native 4K** is now supported by the *latest* V4 code with explicit `--height 2160`; **1080p remains default**. 4K is CI-tested but not yet tested on the S25, so do not claim a phone 4K success until there is an actual completed UHD job.
-3. **For a new YouTube URL:** determine the exact 2–600 s excerpt and canonical URL `https://www.youtube.com/watch?v=VIDEO_ID` (11-character ID; no `&t=`, `youtu.be`, playlists or other domains). **No licence form/registry entry is required for private review**. Rights-unverified footage remains in an owner-only *draft* Release. Do not publish it without verified permission.
-4. **Generate the exact issue payload** using `agent_jobs_v4.py prepare` on the V4 branch; **this command only prints** the body. Create an open GitHub issue with title `[YUNEX PHONE JOB] <specific shot>`, exact two-line body starting `YUNEX_PHONE_JOB_V4`, **authenticated as account `YunRah2103`**. A non-owner's issue is ignored.
-5. **Do not ask for another installation, token, or upload.** GitHub issue creation alone cannot remotely turn on Termux. If a correctly queued job needs the phone and the loop is actually stopped, the user can run `~/yunex-v4 --loop` once for that session. Default polling is ~120s; Android may suspend background Termux.
-6. **Read the job's completion comment**: `YUNEX_PHONE_DONE_V4` is a validated GitHub Release asset, `YUNEX_PHONE_FAILED_V4` is a real failed phone attempt, idle messages are not failures. For draft jobs `mp4_url: null` is **normal**; use authenticated GitHub Actions to retrieve the asset bytes.
-7. **Verify actual media** (size, SHA256 from DONE JSON, FFprobe, FFmpeg full decode, and visual inspection/listening). Deliver the real file/artifact location to the project, then finish the user's requested edit. **An agent who only has metadata has not acquired the file.**
+   ```bash
+   python production/phone_footage/agent_jobs_v4.py prepare \
+     --url 'https://www.youtube.com/watch?v=Exq6pB3IGyU' \
+     --start 8 --duration 13 --height 1080 --orientation landscape
+   ```
 
-## Copyable new-job examples
+   Engine/V8 audio only: add `--media audio` (produces AAC M4A instead of video; this feature is CI-tested but its live-phone operation must still be confirmed). For **source-verified genuine native UHD only**, optionally specify `--height 2160`; that is also CI-tested but **not yet phone-proven**. 1080p is the dependable default.
+4. Create an **open issue** in this repo with title `[YUNEX PHONE JOB] <meaningful shot>`, body **exactly the generated two-line output**, starting `YUNEX_PHONE_JOB_V4`, **authored by `YunRah2103`**. Non-owner accounts cannot queue valid phone jobs; do not impersonate the owner. If your GitHub connection cannot author the required issue, provide the prepared body and report the specific permission blocker.
+5. **No licence registration form is required to queue for private review.** Unverified-source footage is uploaded only to an owner-only **draft Release**; downloading does **not** grant redistribution or editing-publication rights.
+6. Phone process `~/yunex-v4 --loop` handles eligible jobs **only while actually running**. A GitHub issue cannot turn Termux on remotely. Ask the owner to start the loop only when a valid job is queued and you have established it is stopped; never request another install/token.
+7. Read `YUNEX_PHONE_DONE_V4` (success, manifest, SHA256, Release), or `YUNEX_PHONE_FAILED_V4` (real phone error). An idle message or queued GitHub issue **is not failure or success**. Then use the importer in section A.
 
-Run these **on the V4 branch** (never from `main`):
+**Limits:** 2–600 s, max start offset 21,600 s; 720/1080p video (default 1080p), optional *native* 2160p with larger resource costs, or `--media audio`. Only request 4K when native source pixels genuinely qualify; codecs may need editing-side conversion. See the [full guide](YUNEX_S25_V4_AGENT_GUIDE.md) for exact technical rules.
 
-**Video excerpt, 1080p landscape:**
+## C. Troubleshooting — don't send normal GitHub work back to the user
 
-```bash
-python production/phone_footage/agent_jobs_v4.py prepare \
-  --url 'https://www.youtube.com/watch?v=Exq6pB3IGyU' \
-  --start 8 --duration 13 --height 1080 --orientation landscape
-```
+| Symptom | Response |
+| --- | --- |
+| `mp4_url: null` on a PASS draft | **Expected**: there is no public link. Use the shared importer with `contents: write` and `github.token`. |
+| `release not found` or HTTP 403 | Check draft permissions, issue number, action output and authenticated GitHub Actions; do **not** publish the draft to fix access. |
+| GitHub Actions YouTube says “not a bot” | That's a **cloud download failure**, not evidence the phone failed. |
+| No pending V4 jobs | Normal idle state. Confirm issue title, author, marker, source format and whether Termux is running. |
+| Audio-only / 4K request rejected | Confirm **the phone has the latest installed V4 code**, not merely that its GitHub branch passed CI. Do not silently replace with an inferior file. |
+| You can fetch a source but not the approved picture master | Search GitHub Releases, workflow artifacts and the user’s Library before asking for another upload. |
+| An agent claims “done” after creating a job/workflow | **Not done** until genuine media is downloaded, quality checked, and the assigned edit (if any) has a playable output. |
 
-**Native 4K excerpt (requires a genuinely UHD source; no upscaling):**
-
-```bash
-python production/phone_footage/agent_jobs_v4.py prepare \
-  --url 'https://www.youtube.com/watch?v=VIDEO_ID' \
-  --start 20 --duration 10 --height 2160 --orientation landscape
-```
-
-Replace `VIDEO_ID` with a real 11-character YouTube video ID for a verified 3840×2160 source. **Do not request 4K from the known 1080p-only AutoTopNL #56 recording.** Native 4K has a separate 1.5 GiB output cap and greater disk/data needs. V4 preserves original H.264/HEVC/VP9/AV1 streams in MP4; an editor may need to transcode the downloaded video in GitHub Actions if H.264 is required. 4K stream-copy may affect exact keyframe cut positions, so check the first/last frames. The current phone must be upgraded before 2160p requests will be accepted.
-
-**Engine sound only (recommended for V8 audio edits; AAC M4A, not MP4):**
-
-```bash
-python production/phone_footage/agent_jobs_v4.py prepare \
-  --url 'https://www.youtube.com/watch?v=Exq6pB3IGyU' \
-  --start 8 --duration 13 --media audio
-```
-
-Examples use an **existing** AutoTopNL source for illustration; before creating a job, check whether [#56](https://github.com/YunRah2103/Remotion-gpt-chat/issues/56) already supplies the relevant segment. For new sources replace URL and exact timecodes. The helper emits the issue body; use your GitHub connector to **create** the owner-authored issue. Don't claim a queued job is a completed download.
-
-## How to recover a private draft without asking the user
-
-**The fix is confirmed in [GitHub Actions run #38441894486](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38441894486).** `contents: read` got HTTP 403 for draft #56, but a workflow with **`contents: write`** and its built-in `github.token` successfully downloaded the media. Use this permission **only in workflows needing draft Release access**; no personal token or public release is required.
-
-In the *specific* authenticated Actions job:
-
-```yaml
-permissions:
-  contents: write
-jobs:
-  ingest:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Recover private phone footage (example: job 56)
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p work
-          gh release download yunex-phone-v4-56 \
-            --repo YunRah2103/Remotion-gpt-chat \
-            --pattern 'yunex-v4-56.mp4' --dir work
-          test "$(stat -c%s work/yunex-v4-56.mp4)" -eq 15340800
-          echo '812fd32410f89a2fd67ddfe7ca0a0a28c4ddfdb617def14da0a788efde8e6ef9  work/yunex-v4-56.mp4' | sha256sum -c -
-          ffprobe -v error -show_streams -show_format work/yunex-v4-56.mp4
-          ffmpeg -v error -xerror -i work/yunex-v4-56.mp4 -f null -
-```
-
-For another job, use **its own** `release_id`, `asset_filename`, `sha256` and tag `yunex-phone-v4-ISSUE_NUMBER` from the `DONE` comment (e.g., `.m4a` for audio jobs). Avoid blindly copying the #56 checksum or 15,340,800-byte size. Download within the authorised editing workflow; keep unverified source footage private. **Do not publish a draft just to obtain a public URL.**
-
-## Fast troubleshooting table
-
-| Situation | Meaning / action |
-|---|---|
-| `No pending approved V4 jobs` / `V4 idle` | Worker is polling but finds no eligible new issue; not a download failure |
-| Cloud GitHub Actions YouTube `Sign in to confirm you're not a bot` | Cloud downloader failed; **does not** mean S25 failed; use approved job protocol |
-| Phone refuses a queued issue | Confirm owner login, issue open/title, marker, canonical URL, numeric time bounds, and whether the phone uses an updated V4 installation. **2160p requires the latest V4 code on the phone** |
-| `release not found` or draft asset HTTP 403 | Check the Release **is a draft**; use `contents: write` with built-in token in Actions, as proven on #56 |
-| `mp4_url: null` for a draft | Intentional: retrieve `asset_filename` from private draft; no public link |
-| `YUNEX_PHONE_FAILED_V4` | Read the actual error; do not repeat the same failing approach forever |
-| Agent has the source but not the approved edit | Search existing GitHub artifacts/Releases and the project's ChatGPT Library; do not ask for an upload before checking |
-| New audio-only job | Expects AAC `.m4a`; feature passed CI but still requires a first live-device proof |
-| New native 4K job | Set `--height 2160` only on verified UHD footage; no upscaling, 1.5 GiB output cap, potentially more disk/battery. Real 4K FFmpeg test PASS in CI; **phone UHD download not yet proven** |
-
-## Handoff report — minimum useful status
-
-After completing the actual work, report this compact evidence (do **not** spam intermediate status messages):
+## Final handoff (one compact report)
 
 ```text
 YUNEX V4 HANDOFF
-Role: <footage | audio | video editor | QA>
-Source: <creator URL and exact excerpt timecodes>
-Phone issue: #<number> | not used (direct creator source)
-Result: <queued | PASS | FAILED> (be precise)
-Asset: <verified filename and authenticated Release/Actions artifact>
-Quality: <native dimensions or audio sample rate, duration, visual/audio inspection>
-Verification: <SHA256; FFprobe; FFmpeg full decode; workflow run ID>
-Rights: <verified licence or unverified/private-review>
-Next: <actual deliverable produced, or one specific blocker>
+Role / task: ...
+Source + exact timecodes: ...
+Phone issue / direct source: ...
+Job result: queued | PASS | FAILED
+Verified media: <exact MP4/M4A and authenticated asset/workflow location>
+Quality: <codec/resolution/duration, and what was actually seen/heard>
+Evidence: <SHA256, FFprobe/full decode, exact workflow run>
+Rights: <verified permission or private/unverified>
+Final edit: <playable MP4 artifact, or a specific unresolved blocker>
 ```
 
-For **editing tasks**, include a link to the **actual final playable MP4** and distinguish a source-acquisition PASS from an editorial/render QA PASS. Do not say an asset is absent just because its draft Release has no public `mp4_url`.
+If the task was editing, **a verified source is only an input**, not the final deliverable. Avoid repeated status-only replies.
 
-## Definition of done
-
-Give the project/editor **real video or audio bytes**, original source and excerpt timecodes, **downloadable authenticated asset/workflow artifact**, SHA256/FFprobe/full-decode evidence, visual/audio assessment and any rights limits. If delivering a finished edit, **protect approved footage/music/timing unless specifically asked to change them**, and provide an actual playable final MP4, not merely source code or a promise.
-
-**For full details and update/Termux instructions, read the [canonical V4 guide](YUNEX_S25_V4_AGENT_GUIDE.md).** This quick-start is for **new agents**, not a new worker or a new installation.
+For more: [full V4 agent protocol](YUNEX_S25_V4_AGENT_GUIDE.md) · [task-triggered V4 agent skill](../.github/skills/yunex-v4-footage/SKILL.md) · [proven one-step importer](../.github/actions/yunex-v4-import/action.yml). **Do not modify the worker unless the user specifically requests worker maintenance.**
