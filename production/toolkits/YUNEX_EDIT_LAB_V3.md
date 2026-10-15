@@ -87,3 +87,7 @@ Creative quality is not established by a green CI run. Avoid recycled aerial ang
 - FFmpeg filters and setpts / concat: https://ffmpeg.org/ffmpeg-filters.html
 - EBU R128 audio measurement: https://ffmpeg.org/ffmpeg-filters.html#loudnorm
 - Remotion timing and dynamic text: https://www.remotion.dev/docs/animating-properties
+
+## New colour filter system
+
+Use the [YUNEX Premium Colour Grades](YUNEX_PREMIUM_COLOR_GRADES.md) guide after source shot scouting. Choose one of eight original cinematic .cube LUT looks, make a source-matched before/after comparison, select a restrained intensity and render an isolated MP4 with original encoded audio intact. Do not apply SDR looks to HDR/Log sources; use explicit colour management first.
