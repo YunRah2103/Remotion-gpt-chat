@@ -1,0 +1,118 @@
+name: YUNEX GT-R ATTESA - full native voxel pixel master
+on:
+  push:
+    branches: [yunex/gtr-attesae-native-pixel-master-20261015]
+    paths:
+      - '.github/workflows/yunex-gtr-attesae-native-master.yml'
+      - 'src/yunex/AttesaVoxelFilm.tsx'
+      - 'src/yunex/attesa-index.tsx'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install stable Remotion dependencies
+        run: |
+          npm ci --no-audit --no-fund
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Typecheck existing authored scene
+        run: npm run check
+      - name: Genuine software WebGL render at pixel-art source resolution
+        env:
+          PART: ${{ matrix.part }}
+        run: |
+          mkdir -p out
+          START=$((PART * 204))
+          END=$((START + 203))
+          if [ "$END" -gt 813 ]; then END=813; fi
+          COUNT=$((END - START + 1))
+          echo "Global frames $START-$END ($COUNT frames), faithful 360x640 native voxel render"
+          npx remotion render src/yunex/attesa-index.tsx AttesaVoxelFilm "out/chunk-$PART.mp4" \
+            --frames="$START-$END" --scale=0.3333333333333333 \
+            --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          ffmpeg -hide_banner -loglevel error -xerror -i "out/chunk-$PART.mp4" -f null -
+          ffprobe -v error -select_streams v:0 -show_entries stream=width,height,nb_frames,r_frame_rate -of json "out/chunk-$PART.mp4" > "out/chunk-$PART.json"
+          python3 - "$PART" "$COUNT" <<'PY'
+          import sys,json
+          part,count=map(int,sys.argv[1:])
+          v=json.load(open(f'out/chunk-{part}.json'))['streams'][0]
+          assert v['width']==360 and v['height']==640,v
+          assert v['nb_frames']==str(count) and v['r_frame_rate']=='30/1',v
+          print(f'PASS: chunk {part}, {count} native Remotion/Three.js 3D frames')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gtr-native-pixel-chunk-${{ matrix.part }}
+          path: out/chunk-*.mp4
+          if-no-files-found: error
+          retention-days: 30
+
+  assemble:
+    needs: render
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: gtr-native-pixel-chunk-*
+          path: out/parts
+          merge-multiple: true
+      - name: Stitch exact frames and scale with nearest-neighbour pixel integrity
+        run: |
+          mkdir -p out
+          for i in 0 1 2 3; do
+            test -s "out/parts/chunk-$i.mp4"
+            echo "file 'parts/chunk-$i.mp4'" >> out/concat.txt
+          done
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i out/concat.txt -c copy out/native-pixel-360.mp4
+          ffmpeg -hide_banner -loglevel error -y -i out/native-pixel-360.mp4 \
+            -vf 'scale=1080:1920:flags=neighbor,format=yuv420p' -r 30 \
+            -c:v libx264 -preset medium -crf 17 -movflags +faststart -an \
+            out/YUNEX-GTR-ATTESA-REMOTION-PIXEL-VISUAL.mp4
+      - name: Full MP4 decoder / frame count / native stills verification
+        run: |
+          ffmpeg -hide_banner -loglevel error -xerror -i out/YUNEX-GTR-ATTESA-REMOTION-PIXEL-VISUAL.mp4 -f null -
+          ffprobe -v error -show_streams -show_format -of json out/YUNEX-GTR-ATTESA-REMOTION-PIXEL-VISUAL.mp4 > out/probe.json
+          python3 - <<'PY'
+          import json
+          p=json.load(open('out/probe.json'))
+          v=next(s for s in p['streams'] if s['codec_type']=='video')
+          assert v['width']==1080 and v['height']==1920 and v['nb_frames']=='814', v
+          assert v['codec_name']=='h264' and v['r_frame_rate']=='30/1',v
+          assert abs(float(p['format']['duration'])-814/30)<.075,p['format']
+          print('PASS: 814 genuine Remotion+Three.js frames, 1080x1920 30fps pixel master')
+          PY
+          for t in 2 8 17 25; do
+            ffmpeg -hide_banner -loglevel error -y -ss "$t" -i out/YUNEX-GTR-ATTESA-REMOTION-PIXEL-VISUAL.mp4 -frames:v 1 -update 1 "out/still-$t.png"
+          done
+          sha256sum out/YUNEX-GTR-ATTESA-REMOTION-PIXEL-VISUAL.mp4 > out/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-GTR-ATTESA-REMOTION-PIXEL-MASTER-VIDEO-ONLY
+          path: |
+            out/YUNEX-GTR-ATTESA-REMOTION-PIXEL-VISUAL.mp4
+            out/still-*.png
+            out/probe.json
+            out/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
