@@ -1,6 +1,9 @@
 name: YUNEX Chiron encrypted owner-only artifact bridge
 
 on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/yunex-chiron-private-encrypted-bridge.yml]
   workflow_run:
     workflows: ["YUNEX Chiron EP002 V2 private native lookdev then picture"]
     types: [completed]
@@ -24,7 +27,7 @@ jobs:
       - name: Download EXISTING owner-only draft picture (no re-render or footage redownload)
         env:
           GH_TOKEN: ${{ github.token }}
-          SOURCE_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.source_run_id || github.event.workflow_run.id }}
+          SOURCE_RUN: ${{ (github.event_name == 'workflow_dispatch' && inputs.source_run_id) || (github.event_name == 'workflow_run' && github.event.workflow_run.id) || '38811812110' }}
         run: |
           set -euo pipefail
           mkdir -p private
@@ -35,6 +38,7 @@ jobs:
           echo "SOURCE_TAG=$tag" >> "$GITHUB_ENV"
       - name: Verify original picture before encrypting private transfer
         run: |
+          if ! command -v ffmpeg >/dev/null; then sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg; fi
           set -euo pipefail
           src=private/YUNEX_CHIRON_EP002_V2_PRIVATE_PICTURE_MIX.mp4
           ffmpeg -hide_banner -loglevel error -xerror -i "$src" -f null -
