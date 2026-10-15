@@ -1,0 +1,103 @@
+name: YUNEX GT-R R35 - private cinematic picture proof
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/yunex/GtrAttesaFilm.tsx'
+      - 'src/Root.tsx'
+      - '.github/workflows/yunex-gtr-attesa-picture.yml'
+
+permissions:
+  contents: write
+  issues: read
+
+concurrency:
+  group: yunex-gtr-attesa-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  picture-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 175
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install project and validate TSX
+        run: |
+          npm ci --no-audit --no-fund
+          npm run check
+      - name: Authenticated private import of three ORIGINAL GT-R recordings
+        id: g97
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '97'
+          token: ${{ github.token }}
+          destination: work/gtr97
+      - id: g98
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '98'
+          token: ${{ github.token }}
+          destination: work/gtr98
+      - id: g99
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '99'
+          token: ${{ github.token }}
+          destination: work/gtr99
+      - name: Create deterministic silent source scenes
+        env:
+          GT97: ${{ steps.g97.outputs.asset_path }}
+          GT98: ${{ steps.g98.outputs.asset_path }}
+          GT99: ${{ steps.g99.outputs.asset_path }}
+        run: |
+          set -euo pipefail
+          python3 production/yunex/gtr_r35_attesa/pack_private_clips.py \
+            --out out/private-candidates \
+            --source 97 "$GT97" \
+            --source 98 "$GT98" \
+            --source 99 "$GT99"
+          mkdir -p public/gtr
+          cp out/private-candidates/*.mp4 public/gtr/
+          test "$(find public/gtr -name '*.mp4' | wc -l)" -eq 9
+      - name: Native full-length 1920x1080 silent picture render
+        run: |
+          set -euo pipefail
+          mkdir -p out/attesa-film
+          npx remotion render src/index.ts GtrAttesaFilm out/attesa-film/GTR_ATTESA_PICTURE_ONLY.mp4 \
+            --gl=swangle --concurrency=2 --codec=h264 --pixel-format=yuv420p --crf=18
+      - name: FFprobe and full decode
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,hashlib,subprocess,pathlib
+          p=pathlib.Path('out/attesa-film/GTR_ATTESA_PICTURE_ONLY.mp4')
+          probe=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_format','-show_streams','-of','json',str(p)]))
+          v=next(s for s in probe['streams'] if s['codec_type']=='video')
+          assert (v['width'],v['height'],v['codec_name'])==(1920,1080,'h264'),v
+          assert float(probe['format']['duration']) >= 27.4,probe['format']['duration']
+          assert not any(s['codec_type']=='audio' for s in probe['streams']),'Picture-only pass must remain silent'
+          subprocess.run(['ffmpeg','-v','error','-xerror','-nostdin','-i',str(p),'-f','null','-'],check=True)
+          d={'status':'PASS / picture decode only, NOT a narrated final','source_revision':'${{ github.sha }}','sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'frame_rate':v['avg_frame_rate'],'duration_s':float(probe['format']['duration']),'width':v['width'],'height':v['height'],'audio':'INTENTIONALLY ABSENT: approved user audio is attached to ChatGPT, not the GitHub runner','source_rights':'UNVERIFIED; no publication permission established','visual_curation':'Needs actual visual review of shots, transitions and framing'}
+          (p.parent/'report.json').write_text(json.dumps(d,indent=2))
+          print(json.dumps(d,indent=2))
+          PY
+          for sec in 1 5 9 12 15 18 23 26; do
+            ffmpeg -v error -ss "$sec" -i out/attesa-film/GTR_ATTESA_PICTURE_ONLY.mp4 -frames:v 1 -y "out/attesa-film/frame-${sec}s.jpg"
+          done
+      - name: Deliver privately in a DRAFT Release (never public artifact)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="yunex-gtr-r35-attesa-private-picture-${{ github.run_id }}"
+          gh release create "$tag" out/attesa-film/GTR_ATTESA_PICTURE_ONLY.mp4 out/attesa-film/report.json out/attesa-film/frame-*.jpg \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "OWNER ONLY - Nissan GT-R R35 ATTESA silent picture proof" \
+            --notes "Picture proof, NOT the narrated master. GT-R originals #97-#99 have unverified publication rights. All footage and frames are in this owner-only DRAFT Release. The approved user voice/audio is NOT present on the GitHub runner: do not claim finished narrated film or post publicly. Needs human creative and rights review." \
+            --draft
+          echo "OWNER_ONLY_PICTURE=https://github.com/$GITHUB_REPOSITORY/releases/tag/$tag" >> "$GITHUB_STEP_SUMMARY"
