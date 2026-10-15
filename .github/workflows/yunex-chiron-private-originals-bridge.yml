@@ -1,0 +1,72 @@
+name: YUNEX Chiron encrypted originals handoff
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/yunex-chiron-private-originals-bridge.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: read
+
+jobs:
+  owner-only-originals:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Import existing verified S25 #105 (no fresh footage download)
+        id: c105
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '105'
+          token: ${{ github.token }}
+          destination: scratch/original-105
+      - name: Import existing verified S25 #106
+        id: c106
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '106'
+          token: ${{ github.token }}
+          destination: scratch/original-106
+      - name: Import existing verified S25 #107
+        id: c107
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '107'
+          token: ${{ github.token }}
+          destination: scratch/original-107
+      - name: Pack and encrypt three original S25-verified videos using owner-only draft key
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_105: ${{ steps.c105.outputs.asset_path }}
+          SOURCE_106: ${{ steps.c106.outputs.asset_path }}
+          SOURCE_107: ${{ steps.c107.outputs.asset_path }}
+        run: |
+          set -euo pipefail
+          mkdir -p scratch/clean
+          cp "$SOURCE_105" scratch/clean/CHIRON_SOURCE_105.mp4
+          cp "$SOURCE_106" scratch/clean/CHIRON_SOURCE_106.mp4
+          cp "$SOURCE_107" scratch/clean/CHIRON_SOURCE_107.mp4
+          tar -cf scratch/chiron-three-originals.tar -C scratch/clean .
+          pass="$(openssl rand -hex 32)"
+          openssl enc -aes-256-cbc -pbkdf2 -iter 100000 -salt \
+            -in scratch/chiron-three-originals.tar -out scratch/three_originals.enc -pass "pass:$pass"
+          tag=yunex-chiron-ep002-private-review
+          gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json body --jq '.body' > scratch/draft-notes.txt
+          {
+            echo
+            echo '### OWNER-ONLY Three S25 Originals Encrypted Handoff'
+            printf 'Originals bridge AES-256-CBC passphrase: `%s`\n' "$pass"
+            printf 'Original tar SHA256: `%s`\n' "$(sha256sum scratch/chiron-three-originals.tar | cut -d' ' -f1)"
+          } >> scratch/draft-notes.txt
+          gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --notes-file scratch/draft-notes.txt --draft
+          rm -rf scratch/clean scratch/chiron-three-originals.tar scratch/draft-notes.txt
+          echo 'Three original videos encrypted and awaiting authorized owner transfer'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-CHIRON-PRIVATE-THREE-ORIGINALS-ENCRYPTED
+          path: scratch/three_originals.enc
+          retention-days: 1
+          if-no-files-found: error
