@@ -65,6 +65,8 @@ const CarVoxel:React.FC<{f:number;stage:number}>=({f,stage})=>{
        multi-plate clutch routes adjustable torque to front axle. */}
    <Block at={[0,.44,-1.28]} dim={[1.16,.34,1.20]} color="#607784" opacity={internal}/>
    <Block at={[0,.36,0]} dim={[.22,.17,4.34]} color={ORANGE} opacity={internal} glow={.25}/>
+   {/* Separate forward drive path from electronically controlled rear transfer coupling. */}
+   <Block at={[.47,.27,0]} dim={[.13,.13,3.87]} color={MINT} opacity={internal*front} glow={.5}/>
    <Block at={[0,.45,1.89]} dim={[1.7,.28,.40]} color={ORANGE} opacity={internal} glow={.25}/>
    <Block at={[0,.45,-1.85]} dim={[1.65,.28,.40]} color="#45c5c9" opacity={internal} glow={front*.6}/>
    {[-1,1].map(s=><React.Fragment key={s}>
@@ -74,7 +76,7 @@ const CarVoxel:React.FC<{f:number;stage:number}>=({f,stage})=>{
    {stage===1||stage===2?Array.from({length:26},(_,i)=>{
     const rear=i<13; const u=((i%13)/13+f*(rear?.019:.016))%1;
     const z=rear?-1.45+3.34*u:1.84-3.70*u;
-    return <Block key={i} at={[Math.sin(i*2)*.075,.29,z]} dim={[.13,.13,.13]} color={rear?ORANGE:MINT} opacity={rear?1:front} glow={1.7}/>;
+    return <Block key={i} at={[rear?Math.sin(i*2)*.075:.47+Math.sin(i*2)*.028,.29,z]} dim={[.13,.13,.13]} color={rear?ORANGE:MINT} opacity={rear?1:front} glow={1.7}/>;
    }):null}
   </group>
  </group>;
