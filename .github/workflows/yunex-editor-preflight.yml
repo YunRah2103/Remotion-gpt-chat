@@ -1,0 +1,111 @@
+name: YUNEX editor preflight and transition checks
+
+on:
+  push:
+    paths:
+      - production/toolkits/yunex_edit_audit.py
+      - production/tests/test_yunex_edit_audit.py
+      - src/yunex/CinematicTransition.tsx
+      - .github/workflows/yunex-editor-preflight.yml
+  pull_request:
+    paths:
+      - production/toolkits/**
+      - production/tests/test_yunex_edit_audit.py
+      - src/yunex/CinematicTransition.tsx
+      - .github/workflows/yunex-editor-preflight.yml
+  workflow_dispatch:
+    inputs:
+      video_run:
+        description: Existing Actions run containing an MP4 asset
+        required: false
+        type: string
+      video_artifact:
+        description: Exact artifact name containing one MP4
+        required: false
+        type: string
+      music_run:
+        description: Optional existing Actions run containing user music
+        required: false
+        type: string
+      music_artifact:
+        description: Exact artifact name containing one MP3/WAV/M4A
+        required: false
+        type: string
+      analysis_mode:
+        description: Inspect source media or vertical final master
+        required: true
+        type: choice
+        options: [source, final]
+        default: source
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install FFmpeg and test against a real synthetic MP4
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python -m unittest discover -s production/tests -p test_yunex_edit_audit.py -v
+      - name: Typecheck native cinematic transitions in existing Remotion project
+        run: |
+          npm ci --no-audit --no-fund
+          npm run check
+
+  analyze:
+    if: github.event_name == 'workflow_dispatch' && inputs.video_run != '' && inputs.video_artifact != ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ inputs.video_run }}
+          name: ${{ inputs.video_artifact }}
+          github-token: ${{ github.token }}
+          path: input/video
+      - uses: actions/download-artifact@v4
+        if: inputs.music_run != '' && inputs.music_artifact != ''
+        with:
+          run-id: ${{ inputs.music_run }}
+          name: ${{ inputs.music_artifact }}
+          github-token: ${{ github.token }}
+          path: input/music
+      - name: Audit original file without changing its bytes
+        shell: bash
+        env:
+          VIDEO_RUN: ${{ inputs.video_run }}
+          MUSIC_RUN: ${{ inputs.music_run }}
+          MUSIC_ARTIFACT: ${{ inputs.music_artifact }}
+          ANALYSIS_MODE: ${{ inputs.analysis_mode }}
+        run: |
+          set -euo pipefail
+          [[ "$VIDEO_RUN" =~ ^[0-9]+$ ]] || exit 1
+          mapfile -d '' -t vids < <(find input/video -type f -iname '*.mp4' -print0)
+          [[ "${#vids[@]}" -eq 1 ]] || { echo 'Expected exactly one video'; exit 1; }
+          args=(--video "${vids[0]}" --mode "$ANALYSIS_MODE" --full-decode --output out/yunex-preflight)
+          if [[ -n "$MUSIC_RUN" || -n "$MUSIC_ARTIFACT" ]]; then
+            [[ "$MUSIC_RUN" =~ ^[0-9]+$ && -n "$MUSIC_ARTIFACT" ]] || exit 1
+            mapfile -d '' -t music < <(find input/music -type f \( -iname '*.mp3' -o -iname '*.wav' -o -iname '*.m4a' \) -print0)
+            [[ "${#music[@]}" -eq 1 ]] || { echo 'Expected exactly one music file'; exit 1; }
+            args+=(--music "${music[0]}")
+          fi
+          python production/toolkits/yunex_edit_audit.py "${args[@]}"
+          cat out/yunex-preflight/preflight.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-EDITOR-PREFLIGHT-${{ github.run_id }}
+          path: out/yunex-preflight/
+          retention-days: 14
+          if-no-files-found: error
