@@ -1,0 +1,67 @@
+name: YUNEX GT-R R35 - private clip extraction
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/yunex-gtr-r35-private-extracts.yml'
+
+permissions:
+  contents: write
+  issues: read
+
+jobs:
+  private-clips:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Recover verified original #97
+        id: s97
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '97'
+          token: ${{ github.token }}
+          destination: work/gtr97
+      - name: Recover verified original #98
+        id: s98
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '98'
+          token: ${{ github.token }}
+          destination: work/gtr98
+      - name: Recover verified original #99
+        id: s99
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '99'
+          token: ${{ github.token }}
+          destination: work/gtr99
+      - name: Create and full-decode nine exact-source scene options
+        env:
+          SRC97: ${{ steps.s97.outputs.asset_path }}
+          SRC98: ${{ steps.s98.outputs.asset_path }}
+          SRC99: ${{ steps.s99.outputs.asset_path }}
+        run: |
+          set -euo pipefail
+          python3 production/yunex/gtr_r35_attesa/pack_private_clips.py \
+            --out out/private-gtr \
+            --source 97 "$SRC97" \
+            --source 98 "$SRC98" \
+            --source 99 "$SRC99"
+          test "$(find out/private-gtr -name '*.mp4' | wc -l)" -eq 9
+      - name: Deliver zipped MP4s in OWNER-ONLY DRAFT Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="yunex-gtr-r35-private-extracts-${{ github.run_id }}"
+          (cd out/private-gtr && zip -q -1 ../yunex-gtr-nine-private-candidates.zip *.mp4 manifest.json README.txt)
+          gh release create "$tag" out/yunex-gtr-nine-private-candidates.zip \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "PRIVATE GT-R R35 - 9 source excerpt candidates - run ${{ github.run_id }}" \
+            --notes "UNVERIFIED RIGHTS; not publicly downloadable or releasable. Technical QA only. Nine H.264 muted scene-based extracts (not human visually approved) from owner-only source #97 #98 #99." \
+            --draft
+          echo "OWNER_ONLY_EXCERPTS=https://github.com/$GITHUB_REPOSITORY/releases/tag/$tag"
+          echo "9 PRIVATE MEDIA CLIPS VERIFIED. NO PUBLIC ARTIFACTS."
