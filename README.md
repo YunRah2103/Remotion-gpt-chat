@@ -58,3 +58,7 @@ See [production/PIPELINE.md](production/PIPELINE.md) for a real preflight-to-fin
 ## Advanced Studio production tools
 
 Six additional native tools are described in [production/advanced/README.md](production/advanced/README.md): Blender-to-GLB rig export with preserved named parts, browser-only A/B video comparison, per-frame Blender AABB clearance warnings, source-locked recovery of failed render chunks, real AO/high-to-low normal texture baking, and two distinct 3D studio/circuit Remotion MP4 variants. Existing projects remain untouched. ABS-001 is still preproduction; AI agents require separate access and explicit execution.
+
+## YUNEX cinematic editing tools
+
+See the [working editor preflight and transition guide](production/toolkits/YUNEX_EDITOR_UPGRADE.md) for a no-dependency FFmpeg QA script, original music accent suggestions, reusable native Remotion transitions, and a [GitHub Actions test/asset audit](.github/workflows/yunex-editor-preflight.yml). The existing [six optional external research tools](production/toolkits/YUNEX_CINEMATIC_EDITING_TOOLS.md) and [download workflow](.github/workflows/yunex-cinematic-toolkit-download.yml) are also available; some require dedicated GPU/model installations. These tools are non-destructive and never automatically edit a finished YUNEX film.

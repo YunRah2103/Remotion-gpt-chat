@@ -1,0 +1,123 @@
+name: YUNEX Cinematic Editor Tool Downloads
+
+on:
+  push:
+    branches: [experiments/yunex-cinematic-toolkit-20261015]
+    paths:
+      - .github/workflows/yunex-cinematic-toolkit-download.yml
+      - production/toolkits/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-toolkit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download official GitHub tools into isolated toolkit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p bundle/Tools bundle/metadata "$RUNNER_TEMP/yunex-tool-sources"
+          cp production/toolkits/YUNEX_CINEMATIC_EDITING_TOOLS.md bundle/START_HERE.md
+          checkout_sparse() {
+            local source="$1" name="$2" dest="$3"
+            shift 3
+            echo "::group::Fetching $source (sparse)"
+            git clone -q --depth 1 --filter=blob:none --sparse "https://github.com/$source.git" "$RUNNER_TEMP/yunex-tool-sources/$name"
+            git -C "$RUNNER_TEMP/yunex-tool-sources/$name" sparse-checkout set "$@"
+            git -C "$RUNNER_TEMP/yunex-tool-sources/$name" rev-parse HEAD > "bundle/metadata/$name.gitsha"
+            mkdir -p "bundle/Tools/$dest"
+            rsync -a --exclude=.git "$RUNNER_TEMP/yunex-tool-sources/$name/" "bundle/Tools/$dest/"
+            echo "::endgroup::"
+          }
+          checkout_sparse Breakthrough/PySceneDetect pyscenedetect PySceneDetect scenedetect packaging
+          checkout_sparse CPJKU/beat_this beat_this beat_this beat_this
+          checkout_sparse gl-transitions/gl-transitions gl_transitions gl-transitions transitions
+          checkout_sparse nihui/rife-ncnn-vulkan rife RIFE src models/rife-v4.6
+          mkdir -p bundle/Tools/PySceneDetect bundle/Tools/auto-editor bundle/Tools/Real-ESRGAN
+          gh release download v0.7.2 -R Breakthrough/PySceneDetect \
+            -p 'scenedetect_headless-0.7.2-py3-none-any.whl' \
+            -D bundle/Tools/PySceneDetect
+          gh release download 31.7.2 -R WyattBlue/auto-editor \
+            -p 'auto-editor-linux-x86_64' -p 'auto-editor-windows-x86_64.exe' \
+            -D bundle/Tools/auto-editor
+          gh release download v0.2.0 -R xinntao/Real-ESRGAN-ncnn-vulkan \
+            -p 'realesrgan-ncnn-vulkan-v0.2.0-ubuntu.zip' \
+            -p 'realesrgan-ncnn-vulkan-v0.2.0-windows.zip' \
+            -D bundle/Tools/Real-ESRGAN
+          chmod +x bundle/Tools/auto-editor/auto-editor-linux-x86_64
+          printf '%s\n' 'PySceneDetect: v0.7.2' 'Beat This: GitHub main sparse source' \
+            'auto-editor: 31.7.2 Linux + Windows x86_64' \
+            'gl-transitions: GitHub master GLSL source' \
+            'RIFE ncnn Vulkan: GitHub master source + rife-v4.6 model only' \
+            'Real-ESRGAN ncnn Vulkan: v0.2.0 Linux + Windows portable' \
+            > bundle/TOOL_VERSIONS.txt
+          du -sh bundle/Tools/*
+      - name: Check downloaded files and executable functionality
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s bundle/Tools/PySceneDetect/scenedetect_headless-0.7.2-py3-none-any.whl
+          test -s bundle/Tools/beat_this/beat_this/inference.py
+          test -s bundle/Tools/RIFE/models/rife-v4.6/flownet.bin
+          test "$(find bundle/Tools/gl-transitions/transitions -name '*.glsl' -type f | wc -l)" -ge 50
+          test -s bundle/Tools/auto-editor/auto-editor-linux-x86_64
+          unzip -tq bundle/Tools/Real-ESRGAN/realesrgan-ncnn-vulkan-v0.2.0-ubuntu.zip > /dev/null
+          unzip -tq bundle/Tools/Real-ESRGAN/realesrgan-ncnn-vulkan-v0.2.0-windows.zip > /dev/null
+          file bundle/Tools/auto-editor/auto-editor-linux-x86_64 \
+               bundle/Tools/auto-editor/auto-editor-windows-x86_64.exe
+          timeout 20 bundle/Tools/auto-editor/auto-editor-linux-x86_64 --version
+          python -m venv "$RUNNER_TEMP/shot-scout-test"
+          "$RUNNER_TEMP/shot-scout-test/bin/python" -m pip install -q \
+             bundle/Tools/PySceneDetect/scenedetect_headless-0.7.2-py3-none-any.whl
+          "$RUNNER_TEMP/shot-scout-test/bin/python" -c 'import scenedetect; print("PySceneDetect", scenedetect.__version__)'
+          if ! command -v ffmpeg >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
+          ffmpeg -hide_banner -loglevel error -y -f lavfi -i color=c=red:s=320x180:d=2:r=15 \
+            -f lavfi -i color=c=blue:s=320x180:d=2:r=15 \
+            -filter_complex '[0:v][1:v]concat=n=2:v=1:a=0[v]' -map '[v]' \
+            -c:v libx264 -pix_fmt yuv420p "$RUNNER_TEMP/test-scenes.mp4"
+          "$RUNNER_TEMP/shot-scout-test/bin/scenedetect" \
+             -i "$RUNNER_TEMP/test-scenes.mp4" detect-content list-scenes \
+             -o "$RUNNER_TEMP/scene-results"
+          find "$RUNNER_TEMP/scene-results" -type f -maxdepth 2 -print
+          echo 'PySceneDetect real scene detection and auto-editor CLI PASS'
+      - name: Inventory and package real downloaded content
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd bundle && find Tools -type f -print0 | sort -z | xargs -0 sha256sum > CHECKSUMS.sha256)
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          root=Path("bundle")
+          items=[]
+          for item in sorted((root/"Tools").rglob("*")):
+              if item.is_file():
+                  items.append({"file":str(item.relative_to(root)),
+                                "bytes":item.stat().st_size,
+                                "sha256":hashlib.sha256(item.read_bytes()).hexdigest()})
+          (root/"MANIFEST.json").write_text(json.dumps({"schema":"YUNEX_EDITING_TOOLKIT_V1",
+              "source":"verified official GitHub repositories and release assets",
+              "files":items}, indent=2))
+          print(f"Downloaded {len(items)} real files, {sum(x['bytes'] for x in items)/1048576:.1f} MiB")
+          PY
+          (cd bundle && zip -q -r "$RUNNER_TEMP/YUNEX_CINEMATIC_EDITING_TOOLKIT.zip" .)
+          unzip -tq "$RUNNER_TEMP/YUNEX_CINEMATIC_EDITING_TOOLKIT.zip" > /dev/null
+          ls -lh "$RUNNER_TEMP/YUNEX_CINEMATIC_EDITING_TOOLKIT.zip"
+          mkdir -p dist
+          cp "$RUNNER_TEMP/YUNEX_CINEMATIC_EDITING_TOOLKIT.zip" dist/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-CINEMATIC-EDITING-TOOLS-20261015
+          path: dist/YUNEX_CINEMATIC_EDITING_TOOLKIT.zip
+          retention-days: 30
+          if-no-files-found: error
