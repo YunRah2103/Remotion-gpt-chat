@@ -21,7 +21,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 --version
-          ffprobe -version | head -1
+          # FFmpeg is installed by the verified V4 importer if absent
       - name: Import #97 - R35 cinematic hero
         id: source97
         uses: ./.github/actions/yunex-v4-import
