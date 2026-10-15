@@ -1,7 +1,7 @@
 import React from 'react';
 import {AbsoluteFill,Audio,Easing,interpolate,OffthreadVideo,Sequence,staticFile,useCurrentFrame} from 'remotion';
 
-/** YUNEX Episode 002. 1080×1920/30fps/870 frames. Original Chiron media is
+/** YUNEX Episode 002. 1080×1920/30fps/858 frames. Original Chiron media is
  * imported into public/chiron at runner time, never committed or public.
  * Chiron narration master NOT PRESENT; set includeVoice only when approved file exists.
  * Turbo symbols are deliberately schematic: no asserted OEM component geometry. */
@@ -19,7 +19,7 @@ const CUTS=[
  ['CHIRON_107_01.mp4',513,90,-3],
  ['CHIRON_105_04.mp4',603,75,3],
  ['CHIRON_107_02.mp4',678,111,-2],
- ['CHIRON_107_03.mp4',789,81,2]
+ ['CHIRON_107_03.mp4',789,69,2]
 ] as const;
 
 const Picture:React.FC<{file:string;frames:number;pan:number}>=({file,frames,pan})=>{
