@@ -1,0 +1,148 @@
+name: YUNEX Chiron EP002 V2 private native lookdev then picture
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/yunex-chiron-ep002-master-v2.yml'
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 85
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install locked Remotion and picture QA dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg unzip zip
+          npm ci --no-audit --no-fund
+          python3 -m pip install --break-system-packages 'Pillow>=10,<13' 'numpy>=1.24,<3'
+          npm run check
+      - name: Import existing owner-only 10-MP4 review ZIP (NO source redownload)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p public/chiron scratch out
+          gh release download yunex-chiron-ep002-private-review --repo "$GITHUB_REPOSITORY" \
+            --pattern 'YUNEX_CHIRON_EP002_PRIVATE_10_MP4S.zip' --dir scratch
+          unzip -q scratch/YUNEX_CHIRON_EP002_PRIVATE_10_MP4S.zip -d public/chiron
+          python3 - <<'PY'
+          import json,hashlib,pathlib,subprocess
+          root=pathlib.Path('public/chiron')
+          meta=json.loads((root/'chiron-clip-manifest.json').read_text())
+          assert len(meta['clips'])==10
+          for rec in meta['clips']:
+            p=root/rec['file']
+            assert p.is_file() and p.stat().st_size==rec['bytes']
+            assert hashlib.sha256(p.read_bytes()).hexdigest()==rec['sha256']
+          print('ACTUAL_PRIVATE_MP4_IMPORT_SHA256_PASS',len(meta['clips']))
+          PY
+      - name: LOOKDEV 01 — three NATIVE 1080x1920 still frames from ACTUAL video
+        run: |
+          set -euo pipefail
+          npx remotion still src/index.ts ChironFourTurbosFilm out/lookdev_opening.png --frame=27 --gl=swangle
+          npx remotion still src/index.ts ChironFourTurbosFilm out/lookdev_turbo.png --frame=459 --gl=swangle
+          npx remotion still src/index.ts ChironFourTurbosFilm out/lookdev_payoff.png --frame=720 --gl=swangle
+      - name: LOOKDEV 02 — four-second MOVING vertical proof
+        run: |
+          set -euo pipefail
+          npx remotion render src/index.ts ChironFourTurbosFilm out/lookdev_motion_4s.mp4 \
+            --frames=0-119 --scale=0.5 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=2
+          ffmpeg -hide_banner -loglevel error -xerror -i out/lookdev_motion_4s.mp4 -f null -
+          python3 production/yunex/chiron_quad_turbo/check_lookdev.py out
+          echo 'LOOKDEV TECHNICAL PASS; aesthetic review still requires a person'
+      - name: FULL MASTER PICTURE — only after actual lookdev & technical screen gate
+        run: |
+          set -euo pipefail
+          npx remotion render src/index.ts ChironFourTurbosFilm out/chiron_ep002_picture.mp4 \
+            --codec=h264 --pixel-format=yuv420p --crf=18 --gl=swangle --concurrency=2
+          ffmpeg -hide_banner -loglevel error -xerror -i out/chiron_ep002_picture.mp4 -f null -
+      - name: Generate NEW original non-vocal understated provisional soundtrack
+        run: |
+          set -euo pipefail
+          python3 production/yunex/chiron_quad_turbo/generate_private_score.py \
+            --output out/original_chiron_underscore.wav
+      - name: Import already-completed official Chiron recording #107 for authentic source audio
+        id: original107
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '107'
+          token: ${{ github.token }}
+          destination: scratch/chiron-original-107
+      - name: Mix source-recorded engine only if original actually has an audio stream
+        env:
+          SOURCE107: ${{ steps.original107.outputs.asset_path }}
+        run: |
+          set -euo pipefail
+          if ffprobe -v error -select_streams a:0 -show_entries stream=codec_name \
+               -of csv=p=0 "$SOURCE107" | grep -q .; then
+            ffmpeg -hide_banner -loglevel error -y -ss 7.88 -i "$SOURCE107" -vn -t 3.04 \
+              -af 'highpass=f=65,lowpass=f=2600,volume=0.17' -ar 48000 -ac 2 out/engine17.wav
+            ffmpeg -hide_banner -loglevel error -y -ss 20.42 -i "$SOURCE107" -vn -t 3.70 \
+              -af 'highpass=f=65,lowpass=f=2600,volume=0.16' -ar 48000 -ac 2 out/engine22.wav
+            ffmpeg -hide_banner -loglevel error -y -i out/original_chiron_underscore.wav \
+              -i out/engine17.wav -i out/engine22.wav \
+              -filter_complex '[1:a]adelay=17100|17100[a1];[2:a]adelay=22600|22600[a2];[0:a][a1][a2]amix=inputs=3:duration=first:normalize=0,alimiter=limit=0.85[m]' \
+              -map '[m]' -ar 48000 -ac 2 -c:a aac -b:a 192k out/chiron_sound.m4a
+            echo 'Source Bugatti audio stream mixed provisionally; not independently listened for vocals'
+          else
+            ffmpeg -hide_banner -loglevel error -y -i out/original_chiron_underscore.wav \
+              -ar 48000 -ac 2 -c:a aac -b:a 192k out/chiron_sound.m4a
+            echo 'No source engine audio stream; score-only provisional master'
+          fi
+          ffmpeg -hide_banner -loglevel error -y -i out/chiron_ep002_picture.mp4 \
+            -i out/chiron_sound.m4a -map 0:v:0 -map 1:a:0 \
+            -c:v copy -c:a aac -b:a 192k -ar 48000 -t 28.6 \
+            -movflags +faststart out/YUNEX_CHIRON_EP002_V2_PRIVATE_PICTURE_MIX.mp4
+      - name: FULL MP4 Q.A. — ffprobe, frame count, aspect, stereo AAC and decode
+        run: |
+          set -euo pipefail
+          ffmpeg -hide_banner -loglevel error -xerror -i out/YUNEX_CHIRON_EP002_V2_PRIVATE_PICTURE_MIX.mp4 -f null -
+          python3 - <<'PY'
+          import json,pathlib,subprocess,hashlib
+          p=pathlib.Path('out/YUNEX_CHIRON_EP002_V2_PRIVATE_PICTURE_MIX.mp4')
+          info=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(p)]))
+          v=next(s for s in info['streams'] if s['codec_type']=='video')
+          a=next(s for s in info['streams'] if s['codec_type']=='audio')
+          assert (v['width'],v['height'])==(1080,1920)
+          assert (v['codec_name'],a['codec_name'],a['sample_rate'])==('h264','aac','48000')
+          assert 28.45<float(info['format']['duration'])<28.80
+          frames=subprocess.check_output(['ffprobe','-v','error','-count_frames','-select_streams','v:0',
+            '-show_entries','stream=nb_read_frames','-of','csv=p=0',str(p)]).decode().strip()
+          assert frames=='858',frames
+          report={'status':'PASS_TECHNICALLY_VERIFIED_PRIVATE_PICTURE_MASTER',
+            'size_bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),
+            'resolution':'1080x1920','fps':30,'frames':858,'duration_seconds':28.6,
+            'aac_sample_rate':48000,'narration':'APPROVED RECORDING MISSING; NOT FINAL-NARRATED',
+            'music':'newly generated provisional original instrumental',
+            'engine':'only source #107 if actual audio existed; further listening needed',
+            'source_rights':'UNVERIFIED, private use only','aesthetic_review':'NOT INDEPENDENTLY APPROVED'}
+          pathlib.Path('out/private-QA.json').write_text(json.dumps(report,indent=2)+'\n')
+          print('EP002_PRIVATE_MASTER_PASS',json.dumps(report),flush=True)
+          PY
+      - name: PRIVATE delivery of verified MP4 plus 3 frames and 4s proof
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="yunex-chiron-ep002-v2-private-${{ github.run_id }}"
+          (cd out && zip -q -1 YUNEX_CHIRON_EP002_V2_LOOKDEV.zip \
+            lookdev_opening.png lookdev_turbo.png lookdev_payoff.png \
+            lookdev_motion_4s.mp4 lookdev-technical-check.json)
+          gh release create "$tag" \
+            out/YUNEX_CHIRON_EP002_V2_PRIVATE_PICTURE_MIX.mp4 \
+            out/YUNEX_CHIRON_EP002_V2_LOOKDEV.zip out/private-QA.json \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "PRIVATE Chiron EP002 V2 — lookdev and native portrait picture master" \
+            --notes "Not a rights-cleared narrated final. Real existing S25 source clips #105–107. Lookdev 3 stills + moving preview + 1080x1920 28.6s MP4 checked by FFmpeg. APPROVED CHIRON VO MISSING. Soundtrack provisional. Human aesthetic/audio review required." \
+            --draft
+          gh issue comment 108 --repo "$GITHUB_REPOSITORY" --body \
+            "V2 picture master technical PASS: three real portrait lookdev images, 4s moving proof, 28.6s 1080x1920 AAC/H264 MP4. OWNER-ONLY draft: https://github.com/$GITHUB_REPOSITORY/releases/tag/$tag . [Render logs](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID). NO approved Chiron voiceover available; privately review the footage/model identity and rights before publishing."
