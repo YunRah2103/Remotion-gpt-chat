@@ -1,0 +1,77 @@
+name: YUNEX GT-R R35 - private narration mastering
+
+on:
+  workflow_dispatch:
+    inputs:
+      picture_release_tag:
+        description: Owner-only GT-R silent-picture draft tag
+        required: true
+        type: string
+        default: yunex-gtr-r35-attesa-private-picture-38730994442
+      audio_asset_name:
+        description: Approved 27.5s user narration + music mix asset uploaded to same draft Release
+        required: true
+        type: string
+        default: YUNEX_GTR_ATTESA_APPROVED_AUDIO_BED.m4a
+
+permissions:
+  contents: write
+
+jobs:
+  mux-and-verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Recover private picture and exact approved mixed soundtrack
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.picture_release_tag }}
+          AUDIO: ${{ inputs.audio_asset_name }}
+        run: |
+          set -euo pipefail
+          mkdir -p work/gtr-merge out/gtr-final
+          [[ "$TAG" == yunex-gtr-r35-attesa-private-picture-* ]] || { echo "Invalid GT-R source draft tag" >&2; exit 3; }
+          [[ "$AUDIO" == "YUNEX_GTR_ATTESA_APPROVED_AUDIO_BED.m4a" ]] || { echo "Expected approved mixed soundtrack filename" >&2; exit 3; }
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern 'GTR_ATTESA_PICTURE_ONLY.mp4' --dir work/gtr-merge
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "$AUDIO" --dir work/gtr-merge
+          test -s work/gtr-merge/GTR_ATTESA_PICTURE_ONLY.mp4
+          test -s "work/gtr-merge/$AUDIO"
+      - name: Mux real H.264 film with ORIGINAL approved narrator and peaceful music
+        run: |
+          set -euo pipefail
+          ffmpeg -hide_banner -loglevel error -xerror -y \
+            -i work/gtr-merge/GTR_ATTESA_PICTURE_ONLY.mp4 \
+            -i work/gtr-merge/YUNEX_GTR_ATTESA_APPROVED_AUDIO_BED.m4a \
+            -map 0:v:0 -map 1:a:0 -c:v copy -c:a aac -b:a 192k -ar 48000 \
+            -ac 2 -t 27.5 -movflags +faststart \
+            out/gtr-final/YUNEX_GTR_ATTESA_MASTER_REVIEW.mp4
+      - name: Verify native H.264, AAC 48kHz, exact duration, full decoding and EBU R128
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import subprocess,json,pathlib,hashlib
+          p=pathlib.Path('out/gtr-final/YUNEX_GTR_ATTESA_MASTER_REVIEW.mp4')
+          d=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_format','-show_streams','-of','json',str(p)]))
+          v=next(x for x in d['streams'] if x['codec_type']=='video')
+          a=next(x for x in d['streams'] if x['codec_type']=='audio')
+          assert (v['width'],v['height'],v['codec_name'])==(1920,1080,'h264'),v
+          assert a['codec_name']=='aac' and a['sample_rate']=='48000',a
+          assert abs(float(d['format']['duration'])-27.5)<.2,d['format']['duration']
+          subprocess.run(['ffmpeg','-v','error','-xerror','-nostdin','-i',str(p),'-f','null','-'],check=True)
+          (p.parent/'media-validation.json').write_text(json.dumps({'full_decode':'PASS','width':1920,'height':1080,'fps':v['avg_frame_rate'],'duration':d['format']['duration'],'audio':'ACTUAL USER-APPROVED MIX, NOT GENERATED OR REPLACED','audio_codec':'aac','sample_rate':a['sample_rate'],'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'visual_approval':'PENDING','third_party_publication_rights':'UNVERIFIED'},indent=2))
+          PY
+          python3 production/toolkits/yunex_edit_lab.py meter \
+            --file out/gtr-final/YUNEX_GTR_ATTESA_MASTER_REVIEW.mp4 \
+            --output out/gtr-final/audio-meter.json
+      - name: Private owner-only master review delivery
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="yunex-gtr-attesa-narrated-review-${{ github.run_id }}"
+          gh release create "$tag" out/gtr-final/* \
+            --repo "$GITHUB_REPOSITORY" --draft \
+            --title "OWNER ONLY / YUNEX Nissan GT-R narrated master REVIEW" \
+            --notes "Actual user-supplied alloy narration and Killswitch Lullaby mix, private picture proof, AAC48k MP4. Technical full decode and EBU R128 checked. Visual approval and source/publication rights NOT established. Not for public release."
+          echo "OWNER_ONLY_REVIEW=https://github.com/$GITHUB_REPOSITORY/releases/tag/$tag" >> "$GITHUB_STEP_SUMMARY"
