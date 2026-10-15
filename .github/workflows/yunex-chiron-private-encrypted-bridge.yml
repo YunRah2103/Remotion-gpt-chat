@@ -1,0 +1,70 @@
+name: YUNEX Chiron encrypted owner-only artifact bridge
+
+on:
+  workflow_run:
+    workflows: ["YUNEX Chiron EP002 V2 private native lookdev then picture"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: "Successful Chiron picture render run number"
+        required: true
+        default: "38811812110"
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  private-encrypted-transfer:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Download EXISTING owner-only draft picture (no re-render or footage redownload)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.source_run_id || github.event.workflow_run.id }}
+        run: |
+          set -euo pipefail
+          mkdir -p private
+          tag="yunex-chiron-ep002-v2-private-${SOURCE_RUN}"
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" \
+            --pattern YUNEX_CHIRON_EP002_V2_PRIVATE_PICTURE_MIX.mp4 --dir private
+          test -s private/YUNEX_CHIRON_EP002_V2_PRIVATE_PICTURE_MIX.mp4
+          echo "SOURCE_TAG=$tag" >> "$GITHUB_ENV"
+      - name: Verify original picture before encrypting private transfer
+        run: |
+          set -euo pipefail
+          src=private/YUNEX_CHIRON_EP002_V2_PRIVATE_PICTURE_MIX.mp4
+          ffmpeg -hide_banner -loglevel error -xerror -i "$src" -f null -
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of csv=p=0 "$src")" = 1080
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=p=0 "$src")" = 1920
+          printf "Original source decoded at 1080x1920\n"
+      - name: Encrypt video with fresh random key and save key ONLY in owner-only DRAFT notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          secret="$(openssl rand -hex 32)"
+          openssl enc -aes-256-cbc -pbkdf2 -iter 100000 -salt \
+            -in private/YUNEX_CHIRON_EP002_V2_PRIVATE_PICTURE_MIX.mp4 \
+            -out private/YUNEX_CHIRON_EP002_PICTURE.enc -pass "pass:$secret"
+          gh release view "$SOURCE_TAG" --repo "$GITHUB_REPOSITORY" --json body --jq '.body' > private/release-notes.txt
+          {
+             printf '\n\n### OWNER-ONLY ENCRYPTED ARTIFACT HANDOFF\n'
+             printf 'Video in Actions artifact is AES-256-CBC encrypted; never post decrypt key in public logs/comments.\n'
+             printf 'Decryption passphrase: `%s`\n' "$secret"
+             printf 'Command: openssl enc -d -aes-256-cbc -pbkdf2 -iter 100000 -in YUNEX_CHIRON_EP002_PICTURE.enc -out private-picture.mp4 -pass pass:YOUR_KEY\n'
+             printf 'SHA256 of unencrypted video: `%s`\n' "$(sha256sum private/YUNEX_CHIRON_EP002_V2_PRIVATE_PICTURE_MIX.mp4 | cut -d' ' -f1)"
+          } >> private/release-notes.txt
+          gh release edit "$SOURCE_TAG" --repo "$GITHUB_REPOSITORY" --notes-file private/release-notes.txt --draft
+          echo 'OWNER-ONLY KEY STORED, ENCRYPTED VIDEO READY'
+          rm -f private/YUNEX_CHIRON_EP002_V2_PRIVATE_PICTURE_MIX.mp4 private/release-notes.txt
+      - name: Deliver encrypted, unusable-without-key transfer artifact for owner
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-CHIRON-PRIVATE-ENCRYPTED-TRANSFER
+          path: private/YUNEX_CHIRON_EP002_PICTURE.enc
+          retention-days: 1
+          if-no-files-found: error
