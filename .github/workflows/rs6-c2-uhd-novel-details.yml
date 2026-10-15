@@ -1,0 +1,62 @@
+name: RS6 C2 four new authentic Audi UHD detail clips
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/c2-details-textures
+    paths:
+      - 'production/videos/rs6-no-mercy-001/agent-c2/udhd_audi_novel_details.py'
+      - '.github/workflows/rs6-c2-uhd-novel-details.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  make-four-original-c8-detail-inserts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      TAG: yunex-rs6-c2-details-review-20261013
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg and image verifier
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install pillow --break-system-packages
+      - name: Decode genuine Audi 2160p sections and deliver four 1080p portrait clips
+        run: |
+          set -euo pipefail
+          python production/videos/rs6-no-mercy-001/agent-c2/udhd_audi_novel_details.py | tee c2_novel_uhd_build.log
+          test "$(find c2_audi_uhd_novel -maxdepth 1 -type f -name 'UHD_RS6_*.mp4' | wc -l)" -eq 4
+          test -s c2_audi_uhd_novel/YUNEX_RS6_C2_UHD_NOVEL.zip
+          test -s c2_audi_uhd_novel/UHD_NOVEL_CONTACT.jpg
+      - name: Append verified playable MP4s to owner-only GitHub draft and refuse public publishing
+        run: |
+          set -euo pipefail
+          draft=$(gh release view "$TAG" --json isDraft --jq '.isDraft')
+          test "$draft" = true
+          gh release upload "$TAG" c2_audi_uhd_novel/YUNEX_RS6_C2_UHD_NOVEL.zip \
+            c2_audi_uhd_novel/UHD_RS6_MOVING_RPM_CLUSTER.mp4 \
+            c2_audi_uhd_novel/UHD_RS6_OVAL_EXHAUST_REAR.mp4 \
+            c2_audi_uhd_novel/UHD_RS6_REAR_LED_SIGNATURE.mp4 \
+            c2_audi_uhd_novel/UHD_RS6_STEERING_MODE_CONTROL.mp4 \
+            c2_audi_uhd_novel/UHD_NOVEL_CONTACT.jpg \
+            c2_audi_uhd_novel/UHD_NOVEL_MANIFEST.json \
+            c2_audi_uhd_novel/UHD_NOVEL_SHA256SUMS.txt --clobber
+          if gh release view "$TAG" --json assets --jq '.assets[].name' | grep -qx 'UHD_RS6_REAL_GEAR_SELECTOR.mp4'; then
+            gh release delete-asset "$TAG" UHD_RS6_REAL_GEAR_SELECTOR.mp4 --yes
+          fi
+          gh release view "$TAG" --json isDraft,assets --jq '{draft:.isDraft,videos:[.assets[].name|select(endswith(".mp4"))]}'
+      - name: Save independent video verification and one-frame-per-shot review evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-c2-genuine-new-4k-details-${{ github.run_id }}
+          path: |
+            c2_novel_uhd_build.log
+            c2_audi_uhd_novel/UHD_NOVEL_CONTACT.jpg
+            c2_audi_uhd_novel/UHD_NOVEL_MANIFEST.json
+            c2_audi_uhd_novel/UHD_NOVEL_SHA256SUMS.txt
+          if-no-files-found: warn
+          retention-days: 10

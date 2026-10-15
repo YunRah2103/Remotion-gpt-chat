@@ -1,0 +1,75 @@
+name: YUNEX RS6 C2 playable detail draft release
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/c2-details-textures
+    paths:
+      - '.github/workflows/rs6-c2-review-release.yml'
+      - 'production/videos/rs6-no-mercy-001/agent-c2/build_review_release.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  c2-draft-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install real footage acquisition and QA tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install --upgrade yt-dlp curl-cffi pillow --break-system-packages
+      - name: Extract original-source beat inserts, fully decode, hash, contact-sheet, ZIP
+        run: |
+          python production/videos/rs6-no-mercy-001/agent-c2/build_review_release.py | tee c2-build-proof.log
+          test "$(find c2_review_release -maxdepth 1 -name '*.mp4' | wc -l)" -eq 8
+          test -s c2_review_release/YUNEX_RS6_C2_DETAILS_REVIEW.zip
+      - name: Prepare rights-transparent release notes
+        run: |
+          cat > c2_release_notes.md <<'EOF'
+          # YUNEX RS6 NO MERCY / C2 DETAIL SHOTS — UNPUBLISHED REVIEW
+          Eight short original-source C8 RS6 detail excerpts extracted to H.264 1080x1920, 30fps, no audio.
+          Genuine source videos acquired on the GitHub runner; the archive contains playable MP4s, contact sheet,
+          FFprobe metadata, timecodes, original-source and output SHA256, full FFmpeg-decode verification.
+          
+          **DRAFT RELEASE / RIGHTS NOT VERIFIED.** External creator: Glenmore Audi.
+          This draft is for repository-owner review and production staging, not an assertion of permission
+          to republish third-party footage or an approved media handoff. Source reviews: #52 and #53.
+          Do not change to public without obtaining redistribution permissions.
+          
+          Creative notes: black Matrix LEDs, wheel/caliper, rear taillight, green wheel/grille, blue-lit cabin,
+          blue RS6 oval exhaust. These are stationary-car detail edits, not rolling or high-speed footage.
+          Do not use visually duplicate green creator post.
+          EOF
+      - name: Create or update OWNER-ONLY draft GitHub release containing actual MP4 media
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: yunex-rs6-c2-details-review-20261013
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --json isDraft >/dev/null 2>&1; then
+            STATUS=$(gh release view "$TAG" --json isDraft --jq '.isDraft')
+            test "$STATUS" = true || { echo "Refusing to replace already-public release"; exit 1; }
+            gh release upload "$TAG" c2_review_release/YUNEX_RS6_C2_DETAILS_REVIEW.zip c2_review_release/*.mp4 c2_review_release/CONTACT_SHEET.jpg c2_review_release/manifest.json c2_review_release/SHA256SUMS.txt --clobber
+            gh release edit "$TAG" --notes-file c2_release_notes.md
+          else
+            gh release create "$TAG" c2_review_release/YUNEX_RS6_C2_DETAILS_REVIEW.zip c2_review_release/*.mp4 c2_review_release/CONTACT_SHEET.jpg c2_review_release/manifest.json c2_review_release/SHA256SUMS.txt \
+              --draft --title "YUNEX RS6 C2 | playable details — review only" --target "$GITHUB_SHA" \
+              --notes-file c2_release_notes.md --latest=false
+          fi
+          gh release view "$TAG" --json tagName,isDraft,assets --jq '{tag:.tagName,draft:.isDraft,assets:[.assets[].name]}'
+      - name: Upload public technical evidence (excluding playable media)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-c2-draft-release-evidence-${{ github.run_id }}
+          path: |
+            c2-build-proof.log
+            c2_review_release/manifest.json
+            c2_review_release/SHA256SUMS.txt
+            c2_review_release/CONTACT_SHEET.jpg
+            c2_release_notes.md
+          if-no-files-found: warn
+          retention-days: 14
