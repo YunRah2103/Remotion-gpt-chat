@@ -1,0 +1,76 @@
+name: YUNEX GT-R - sealed private picture transfer
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/yunex-gtr-sealed-transfer.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sealed-transfer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 14
+    steps:
+      - name: Retrieve and verify owner-only corrected picture
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p work/gtr out/sealed
+          for attempt in 1 2 3 4; do
+            if gh release download yunex-gtr-r35-attesa-private-picture-38736311624 \
+              --repo "$GITHUB_REPOSITORY" \
+              --pattern 'GTR_ATTESA_PICTURE_ONLY.mp4' --dir work/gtr; then break; fi
+            sleep $((attempt*5))
+          done
+          test -s work/gtr/GTR_ATTESA_PICTURE_ONLY.mp4
+          ffprobe -v error -show_entries format=duration -of default=nw=1 work/gtr/GTR_ATTESA_PICTURE_ONLY.mp4
+          ffmpeg -v error -xerror -i work/gtr/GTR_ATTESA_PICTURE_ONLY.mp4 -map 0:v:0 -f null -
+          actual="$(sha256sum work/gtr/GTR_ATTESA_PICTURE_ONLY.mp4 | cut -d ' ' -f1)"
+          echo "Native private picture verified, SHA256: $actual"
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of csv=p=0 work/gtr/GTR_ATTESA_PICTURE_ONLY.mp4)" = 1920
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=p=0 work/gtr/GTR_ATTESA_PICTURE_ONLY.mp4)" = 1080
+          (cd work/gtr && sha256sum GTR_ATTESA_PICTURE_ONLY.mp4 > SHA256SUMS)
+      - name: Seal private picture with public-key encryption
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > work/gtr-editor-cert.pem <<'CERT'
+          -----BEGIN CERTIFICATE-----
+          MIIEOzCCAqOgAwIBAgIUWBvYMKkh9AuVljvrMcYJ8EjJs1IwDQYJKoZIhvcNAQEL
+          BQAwLTErMCkGA1UEAwwiWVVORVggR1QtUiBwcml2YXRlIHJlbmRlciB0cmFuc2Zl
+          cjAeFw0yNjEwMTUxNDAxMTNaFw0yNjEwMTcxNDAxMTNaMC0xKzApBgNVBAMMIllV
+          TkVYIEdULVIgcHJpdmF0ZSByZW5kZXIgdHJhbnNmZXIwggGiMA0GCSqGSIb3DQEB
+          AQUAA4IBjwAwggGKAoIBgQCSh0RHzdHnBZ2TTj6Fu+6Z6b7LhZiG0DuMqs95MS4J
+          Iy8Le+2e8r6Wc9BmN7ZTNBboMDd5nijrVdguy0WEjTji/A9z2u7b0iIbFdrfMpju
+          x8XfmX8yob2hb6wlybkGCMHJOyTiTTG+mlfh2yqybVTvnGeF9olEk4jukNj3FZ4b
+          S8J9ah4wUdjiirAT3Y7gKDXKVQbUNLUkNHTZs/qGJjErcpId4b6mjEuIHaSvwSA9
+          1kDCwTb8c+EascW1bLY8Ynv6hkA2tZiQMEUCT/qRkQf1u26biKoDlwq/uP8SLWGW
+          qCwYaVGtQU7Td3ERODhvtCOz1eSnxnMm5Nclx9TkmvBiD5UyF3BxONNgtcBo9Z//
+          oAzARHaJ+nXlSBdDQMMJ2RKOyFyuWnxufN1DbJoWc0LaTZrB2ph7EjJlX9JO7zHI
+          e8SYKD1HxDZuYL2Hkb4kdL7PxsHsvPztFLkEWBqvVRq6dBGVl4sDUAO3TKnCQNJf
+          bUZeMJbNZEhQbicSlt9NIT8CAwEAAaNTMFEwHQYDVR0OBBYEFKTbdpTEHXuAODA7
+          81lDt1TsiY1mMB8GA1UdIwQYMBaAFKTbdpTEHXuAODA781lDt1TsiY1mMA8GA1Ud
+          EwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggGBAEABR8UgzZacY+WpVGdWHXC1
+          CFL/p31DkZeRTKwoNb66Z5osVF4NmzLf53+P16LgP0UNEKHT8bhJg3aEqjHnCJGP
+          pSTasRXM4GfD5hG1Q0NZDqNPF+zucUUznvaFo5qijyZl+FxQTHyeel5ZRUHxjn/O
+          8kwzz+aP7pzqU4JvGOKTTUxi1XYHr1crg7eIHmArsl6dFHs/XpGasCEGC/tvMEoJ
+          5Kc4F0dOOfnEoD41HMnlyPhoV982WTgxc8cF55WGTOjLEEFjFsz57ziXSp4vPGvM
+          XDg8yMgTLVDeR/opglnBQCQi3okwwoV/V33aZlynm2cpVWEuDB8ZYVJTffHwHTMb
+          xZAB6ptpTDaHAw2SE31L6R9nUHZurEYX5hq0x58nK9mbu+sGkmIOvyPjWVgJe6C7
+          FBRjjsGQ6dFrfINYCWJcU3mP5XsZcPvLL91iH3NxPoPnRjAaGu5NzT65Vu1vn1yM
+          szQvF6Gdx2YKe5TQAW7Jh7xBf8ZbxVoeE4fvhyM+VQ==
+          -----END CERTIFICATE-----
+          CERT
+          tar -czf work/gtr.tar.gz -C work/gtr GTR_ATTESA_PICTURE_ONLY.mp4 SHA256SUMS
+          openssl cms -encrypt -binary -aes-256-cbc -in work/gtr.tar.gz \
+            -out out/sealed/GTR_PICTURE_ENCRYPTED.p7m -outform DER work/gtr-editor-cert.pem
+          test -s out/sealed/GTR_PICTURE_ENCRYPTED.p7m
+          echo 'Private footage encrypted with editor-owned public key; no unencrypted source in artifact.'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yunex-gtr-sealed-film
+          path: out/sealed/GTR_PICTURE_ENCRYPTED.p7m
+          retention-days: 1
+          if-no-files-found: error
