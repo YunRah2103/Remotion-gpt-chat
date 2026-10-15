@@ -59,3 +59,6 @@ For a classical Aston Martin film, favour strong framing, matched direction, har
 **One worthwhile later option:** official [`@remotion/transitions`](https://www.remotion.dev/docs/transitions/) for richer `TransitionSeries` effects. If installing, pin it to the repository's existing `4.0.533` Remotion versions and update the npm lockfile together. **It is not installed here** because the native code above delivers a ready-to-use subset without another dependency. Never introduce preset effects just to increase a tool count.
 
 **Final standard:** actual full-length playable MP4; correct source car, original music timing, native user-requested format and visual/audio inspection. A successful toolkit smoke test does not certify a finished film.
+
+---
+**New V3 complementary tools:** [YUNEX Edit Lab V3](YUNEX_EDIT_LAB_V3.md) adds shot contact sheets (variety and repeated-composition hints), original-source variable-speed H.264 excerpts, EBU R128 original-audio measurement, and restrained animated explanatory typography. See that guide and [`yunex-editor-lab.yml`](../../.github/workflows/yunex-editor-lab.yml). All changes remain opt-in and require actual video/audio review.
