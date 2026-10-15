@@ -1,0 +1,80 @@
+name: YUNEX GT-R R35 - private footage shot review
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/yunex-gtr-r35-private-qa.yml'
+
+permissions:
+  contents: write
+  issues: read
+
+jobs:
+  source-inspection:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify dependencies
+        run: |
+          set -euo pipefail
+          python3 --version
+          ffprobe -version | head -1
+      - name: Import #97 - R35 cinematic hero
+        id: source97
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '97'
+          token: ${{ github.token }}
+          destination: work/gtr97
+      - name: Import #98 - R35 launch
+        id: source98
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '98'
+          token: ${{ github.token }}
+          destination: work/gtr98
+      - name: Import #99 - Nissan official R35
+        id: source99
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '99'
+          token: ${{ github.token }}
+          destination: work/gtr99
+      - name: Install inspection tools
+        run: |
+          python3 -m pip install --break-system-packages 'scenedetect[opencv]>=0.6.5,<0.8' 'Pillow>=10,<13'
+      - name: Run scene and portrait-crop inspection
+        env:
+          SRC97: ${{ steps.source97.outputs.asset_path }}
+          SRC98: ${{ steps.source98.outputs.asset_path }}
+          SRC99: ${{ steps.source99.outputs.asset_path }}
+        run: |
+          set -euo pipefail
+          python3 production/yunex/gtr_r35_attesa/inspect_sources.py \
+            --out out/private-r35 \
+            --source 97 "$SRC97" \
+            --source 98 "$SRC98" \
+            --source 99 "$SRC99"
+          test -s out/private-r35/manifest.json
+          test -s out/private-r35/contact_97.jpg
+          test -s out/private-r35/contact_98.jpg
+          test -s out/private-r35/contact_99.jpg
+      - name: Store contact sheets only in OWNER-ONLY draft Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="yunex-gtr-r35-private-qa-${{ github.run_id }}"
+          cd out/private-r35
+          zip -q -j ../gtr-private-contact-review.zip contact_97.jpg contact_98.jpg contact_99.jpg manifest.json readme.txt
+          cd ../..
+          gh release create "$tag" out/gtr-private-contact-review.zip \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "PRIVATE QA - GT-R R35 scene contact sheets - run ${{ github.run_id }}" \
+            --notes "Owner-only research draft: contact sheets from phone jobs #97-99. Unverified third-party footage rights. Do NOT publish." \
+            --draft
+          echo "Owner-only preview draft: https://github.com/$GITHUB_REPOSITORY/releases/tag/$tag"
+          echo "NO VIDEO ORIGINALS OR FRAME PREVIEWS WERE COMMITTED OR PUBLISHED."
