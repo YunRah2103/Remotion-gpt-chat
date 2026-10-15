@@ -21,13 +21,13 @@ const SHOTS=[
  ['B01_98_scene02.mp4',11.55,13.93],
  ['C01_99_scene11.mp4',13.93,16.84],
  ['B02_98_scene06.mp4',16.84,20.64],
- ['C02_99_scene88.mp4',20.64,26.44],
+ ['C02_99_scene88.mp4',20.64,27.50],
 ] as const;
 const Picture:React.FC<{file:string;duration:number}>=({file,duration})=>{
  const f=useCurrentFrame();
  const z=interpolate(f,[0,sec(duration)],[1.005,1.055],{extrapolateLeft:'clamp',extrapolateRight:'clamp'});
  return <AbsoluteFill style={{overflow:'hidden'}}>
-   <OffthreadVideo muted src={staticFile('gtr/'+file)} style={{width:'100%',height:'100%',objectFit:'cover',transform:'scale('+z+')'}}/>
+   <OffthreadVideo muted playbackRate={file==='C02_99_scene88.mp4'?0.84:1} src={staticFile('gtr/'+file)} style={{width:'100%',height:'100%',objectFit:'cover',transform:'scale('+z+')'}}/>
    <AbsoluteFill style={{background:'linear-gradient(90deg,rgba(4,8,11,.58),rgba(4,8,11,.10) 50%,rgba(4,8,11,.31))'}}/>
    <AbsoluteFill style={{background:'linear-gradient(0deg,rgba(0,0,0,.56),transparent 30%,transparent 80%,rgba(0,0,0,.20))'}}/>
  </AbsoluteFill>;
