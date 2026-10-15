@@ -1,3 +1,5 @@
+> **SUPERSEDED — TECHNICAL ACQUISITION COMPLETE.** All three S25 originals PASS, ten physical source MP4s fully decoded and privately delivered. See [the final per-clip verified footage handoff](EDITOR_FOOTAGE_HANDOFF_20261015.md), [owner-only MP4 ZIP](https://github.com/YunRah2103/Remotion-gpt-chat/releases/tag/yunex-chiron-ep002-private-review), and [GitHub Actions PASS run 38806038293](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38806038293). Visual cinematography, Chiron engine hardware identity and public-use rights **still need review**; below is only the initial checkpoint state.
+
 # YUNEX Episode 002 — Bugatti Chiron Four Turbos | Footage acquisition checkpoint
 **15 October 2026 — issue [#104](https://github.com/YunRah2103/Remotion-gpt-chat/issues/104)**
 
