@@ -1,0 +1,25 @@
+{
+  "description": "EXAMPLE ONLY — replace times after scouting a real source clip. Silent video export; keep original soundtrack separately.",
+  "segments": [
+    {
+      "start": 0,
+      "end": 0.85,
+      "speed": 1
+    },
+    {
+      "start": 0.85,
+      "end": 1.75,
+      "speed": 2.5
+    },
+    {
+      "start": 1.75,
+      "end": 2.65,
+      "speed": 0.5
+    },
+    {
+      "start": 2.65,
+      "end": 3.5,
+      "speed": 1.3
+    }
+  ]
+}

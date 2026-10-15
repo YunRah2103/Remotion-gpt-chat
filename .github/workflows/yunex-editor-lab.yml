@@ -1,0 +1,115 @@
+name: YUNEX editorial lab — scenes, speed ramps and audio metering
+
+on:
+  push:
+    paths:
+      - production/toolkits/yunex_edit_lab.py
+      - production/tests/test_yunex_edit_lab.py
+      - src/yunex/KineticTitle.tsx
+      - .github/workflows/yunex-editor-lab.yml
+  pull_request:
+    paths:
+      - production/toolkits/yunex_edit_lab.py
+      - production/tests/test_yunex_edit_lab.py
+      - src/yunex/KineticTitle.tsx
+      - .github/workflows/yunex-editor-lab.yml
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Choose how to process an existing Actions media artifact
+        required: true
+        type: choice
+        options: [scout, ramp, meter]
+        default: scout
+      media_run:
+        description: Existing GitHub Actions run ID containing one source media file
+        required: false
+        type: string
+      media_artifact:
+        description: Exact Actions artifact name containing the media file
+        required: false
+        type: string
+      ramp_plan:
+        description: A committed production/toolkits/plans/<name>.json (ramp only)
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install FFmpeg + image tooling
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages 'Pillow>=10,<13'
+      - name: Produce test footage and verify real edit outputs
+        run: python -m unittest discover -s production/tests -p test_yunex_edit_lab.py -v
+      - name: Typecheck kinetic titles
+        run: |
+          npm ci --no-audit --no-fund
+          npm run check
+
+  run-editor-operation:
+    if: github.event_name == 'workflow_dispatch' && inputs.media_run != '' && inputs.media_artifact != ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg and pillow
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages 'Pillow>=10,<13'
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ inputs.media_run }}
+          name: ${{ inputs.media_artifact }}
+          github-token: ${{ github.token }}
+          path: input/media
+      - name: Inspect or create an isolated edit preparation output
+        shell: bash
+        env:
+          OPERATION: ${{ inputs.operation }}
+          MEDIA_RUN: ${{ inputs.media_run }}
+          RAMP_PLAN: ${{ inputs.ramp_plan }}
+        run: |
+          set -euo pipefail
+          [[ "$MEDIA_RUN" =~ ^[0-9]+$ ]] || { echo "Invalid run ID"; exit 1; }
+          case "$OPERATION" in
+            scout|ramp) mapfile -d '' -t media < <(find input/media -type f \( -iname '*.mp4' -o -iname '*.mov' -o -iname '*.mkv' \) -print0) ;;
+            meter) mapfile -d '' -t media < <(find input/media -type f \( -iname '*.mp4' -o -iname '*.mp3' -o -iname '*.m4a' -o -iname '*.wav' -o -iname '*.mov' \) -print0) ;;
+            *) exit 1 ;;
+          esac
+          [[ "${#media[@]}" -eq 1 ]] || { echo "Expected exactly one video/audio input"; exit 1; }
+          mkdir -p out/editor-lab
+          case "$OPERATION" in
+            scout)
+              python production/toolkits/yunex_edit_lab.py scout --video "${media[0]}" --output out/editor-lab
+              ;;
+            ramp)
+              [[ "$RAMP_PLAN" =~ ^production/toolkits/plans/[a-zA-Z0-9_-]+\.json$ ]] && test -f "$RAMP_PLAN" || {
+                echo "Use a reviewed committed ramp plan"; exit 1;
+              }
+              python production/toolkits/yunex_edit_lab.py ramp --video "${media[0]}" --plan "$RAMP_PLAN" --output out/editor-lab/ramped-silent.mp4
+              ;;
+            meter)
+              python production/toolkits/yunex_edit_lab.py meter --file "${media[0]}" --output out/editor-lab/audio-meter.json
+              ;;
+          esac
+          echo "Operation: $OPERATION" >> "$GITHUB_STEP_SUMMARY"
+          echo "Prepared real output in Actions artifact, not a changed original." >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-EDITOR-LAB-${{ github.run_id }}
+          path: out/editor-lab/
+          retention-days: 14
+          if-no-files-found: error

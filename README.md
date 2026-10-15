@@ -62,3 +62,7 @@ Six additional native tools are described in [production/advanced/README.md](pro
 ## YUNEX cinematic editing tools
 
 See the [working editor preflight and transition guide](production/toolkits/YUNEX_EDITOR_UPGRADE.md) for a no-dependency FFmpeg QA script, original music accent suggestions, reusable native Remotion transitions, and a [GitHub Actions test/asset audit](.github/workflows/yunex-editor-preflight.yml). The existing [six optional external research tools](production/toolkits/YUNEX_CINEMATIC_EDITING_TOOLS.md) and [download workflow](.github/workflows/yunex-cinematic-toolkit-download.yml) are also available; some require dedicated GPU/model installations. These tools are non-destructive and never automatically edit a finished YUNEX film.
+
+## YUNEX Editor Lab V3 — shot variety, real speed ramps and clean animated text
+
+The [editor upgrade guide](production/toolkits/YUNEX_EDIT_LAB_V3.md) explains how to use [the command-line editing utilities](production/toolkits/yunex_edit_lab.py) for actual footage scene discovery/contact sheets, silent source-based speed ramp exports, and EBU R128 music/mix measurement. [`KineticTitle`](src/yunex/KineticTitle.tsx) provides restrained native Remotion editorial, technical and impact text overlays, and [the Actions editorial lab](.github/workflows/yunex-editor-lab.yml) exposes the tools for verified existing Actions artifacts. Real synthetic-footage smoke and TS tests run in CI. Original YUNEX films, source audio and S25 V4 phone worker stay unchanged.
