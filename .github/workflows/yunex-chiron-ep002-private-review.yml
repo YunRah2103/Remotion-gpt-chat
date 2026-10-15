@@ -1,0 +1,150 @@
+name: YUNEX Chiron EP002 private footage review
+on:
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: yunex-chiron-ep002-private-source-review
+  cancel-in-progress: false
+
+jobs:
+  private-review:
+    if: github.event_name != 'issue_comment' || ((github.event.issue.number == 105 || github.event.issue.number == 106 || github.event.issue.number == 107) && startsWith(github.event.comment.body, 'YUNEX_PHONE_DONE_V4'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Wait until all three original phone recordings are real and available
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ready=true
+          for num in 105 106 107; do
+            n=$(gh api "repos/${GITHUB_REPOSITORY}/issues/${num}/comments?per_page=100" --jq '[.[] | select(.user.login=="YunRah2103" and (.body | startswith("YUNEX_PHONE_DONE_V4")))] | length')
+            if [ "$n" -lt 1 ]; then echo "Not yet completed: #$num"; ready=false; fi
+          done
+          if gh release view yunex-chiron-ep002-private-review --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'An owner-only review already exists; avoid duplicate work.'
+            ready=false
+          fi
+          echo "ready=$ready" >> "$GITHUB_OUTPUT"
+      - name: Import phone source 105 — 2016 Chiron hero
+        if: steps.gate.outputs.ready == 'true'
+        id: v105
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '105'
+          token: ${{ github.token }}
+          destination: work/chiron105
+      - name: Import phone source 106 — Bugatti W16 documentary
+        if: steps.gate.outputs.ready == 'true'
+        id: v106
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '106'
+          token: ${{ github.token }}
+          destination: work/chiron106
+      - name: Import phone source 107 — Chiron 0–400–0
+        if: steps.gate.outputs.ready == 'true'
+        id: v107
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '107'
+          token: ${{ github.token }}
+          destination: work/chiron107
+      - name: Install source scene inspector
+        if: steps.gate.outputs.ready == 'true'
+        run: python3 -m pip install --break-system-packages 'scenedetect[opencv]>=0.6.5,<0.8' 'Pillow>=10,<13'
+      - name: Detect source shots; make real contact sheets and center-crop comparisons
+        if: steps.gate.outputs.ready == 'true'
+        env:
+          SRC105: ${{ steps.v105.outputs.asset_path }}
+          SRC106: ${{ steps.v106.outputs.asset_path }}
+          SRC107: ${{ steps.v107.outputs.asset_path }}
+        run: |
+          set -euo pipefail
+          python3 production/yunex/gtr_r35_attesa/inspect_sources.py --out out/chiron-private \
+            --source 105 "$SRC105" --source 106 "$SRC106" --source 107 "$SRC107"
+      - name: Extract ten verified private MP4 candidate shots
+        if: steps.gate.outputs.ready == 'true'
+        env:
+          SRC105: ${{ steps.v105.outputs.asset_path }}
+          SRC106: ${{ steps.v106.outputs.asset_path }}
+          SRC107: ${{ steps.v107.outputs.asset_path }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,os,subprocess,pathlib
+          root=pathlib.Path('out/chiron-private')
+          data=json.loads((root/'manifest.json').read_text())
+          sources={105:os.environ['SRC105'],106:os.environ['SRC106'],107:os.environ['SRC107']}
+          counts={105:4,106:3,107:3}
+          captions={105:'possible blue Chiron hero/detail',106:'possible W16 hardware — exclude Veyron or CGI',107:'possible Chiron acceleration/closing'}
+          clips=[]
+          def call(cmd):
+            return subprocess.run(cmd,check=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE).stdout
+          def sha(path):
+            h=hashlib.sha256()
+            with path.open('rb') as f:
+              for block in iter(lambda:f.read(1048576),b''):h.update(block)
+            return h.hexdigest()
+          for source in data['sources']:
+            job=int(source['job']);n=counts[job];dur=float(source['duration'])
+            scenes=[s for s in source['scenes'] if s['out']-s['in']>=2.0]
+            if not scenes:scenes=[{'in':0.,'out':dur}]
+            for k in range(n):
+              center=(k+.5)*dur/n
+              scene=min(scenes,key=lambda s:max(float(s['in'])-center,0,center-float(s['out'])))
+              a=float(scene['in']);b=float(scene['out']);length=min(3.7,b-a)
+              if length<1.8:
+                print('SKIP_SHORT_SCENE',job,k,flush=True);continue
+              start=max(a,min(center-length/2,b-length))
+              end=start+length
+              out=root/f'CHIRON_{job}_{k+1:02d}.mp4'
+              call(['ffmpeg','-hide_banner','-loglevel','error','-xerror',
+                    '-ss',f'{start:.3f}','-i',sources[job],'-t',f'{length:.3f}',
+                    '-an','-c:v','libx264','-preset','fast','-crf','19',
+                    '-pix_fmt','yuv420p','-movflags','+faststart','-y',str(out)])
+              call(['ffmpeg','-hide_banner','-loglevel','error','-xerror','-i',str(out),'-f','null','-'])
+              meta=json.loads(call(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(out)]))
+              v=next(x for x in meta['streams'] if x['codec_type']=='video')
+              c={'file':out.name,'phone_source_job':job,'original_source_in':round(start,3),
+                 'original_source_out':round(end,3),'duration':float(meta['format']['duration']),
+                 'width':v['width'],'height':v['height'],'fps':v['avg_frame_rate'],
+                 'codec':v['codec_name'],'bytes':out.stat().st_size,'sha256':sha(out),
+                 'full_decode':'PASS','audio':'removed','candidate_only_not_visually_approved':captions[job],
+                 'reuse_rights':'UNVERIFIED, PRIVATE ONLY'}
+              clips.append(c);print('CHIRON_PRIVATE_VIDEO_PASS',json.dumps(c),flush=True)
+          manifest={'project':'YUNEX Chiron why four turbos','state':'real technically verified MP4s; visual/model/crop quality not yet approved',
+                    'permission':'reuse unknown; owner-only draft; DO NOT publish',
+                    'source_probe_and_scene_boundaries':data['sources'],'clips':clips}
+          (root/'chiron-clip-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+          (root/'CHIRON-README.txt').write_text(
+            'OWNER-ONLY. MP4s from three actually completed Samsung S25 V4 sources; each FFprobe/full-decoded with SHA256. '
+            'Automated timecode candidates are NOT yet visually confirmed to be beautiful shots or safe 9:16 crops. '
+            'The Bugatti W16 film includes multiple generations; do not call a Veyron engine a Chiron engine. '
+            'Source reuse rights unverified; no publication permission.\\n')
+          if len(clips)<6:raise RuntimeError('Insufficient verified source-scene candidates')
+          print('CHIRON_VERIFIED_TECHNICAL_CANDIDATES',len(clips),flush=True)
+          PY
+      - name: Save clips and previews ONLY as an owner-only DRAFT Release
+        if: steps.gate.outputs.ready == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          (cd out/chiron-private && zip -q -1 ../YUNEX_CHIRON_EP002_PRIVATE_10_MP4S.zip CHIRON_*.mp4 contact_*.jpg manifest.json chiron-clip-manifest.json CHIRON-README.txt)
+          gh release create yunex-chiron-ep002-private-review out/YUNEX_CHIRON_EP002_PRIVATE_10_MP4S.zip \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "PRIVATE Chiron EP002 — 10 source clip candidates and real contact sheets" \
+            --notes "OWNER-ONLY. Real FFmpeg-verified MP4s, SHA256 and source in/out; visual model/shot quality and publication rights NOT approved." \
+            --draft
+          gh issue comment 104 --repo "$GITHUB_REPOSITORY" --body \
+            "Three actual S25 Chiron recordings imported and review footage package produced. This package contains privately verified MP4 excerpt candidates, FFprobe/SHA256 records, source timecodes and contact sheets. [OWNER-ONLY DRAFT release](https://github.com/$GITHUB_REPOSITORY/releases/tag/yunex-chiron-ep002-private-review). [QA run](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID). **Visual quality, precise car/engine identity per frame and source publication rights still need review.**"
