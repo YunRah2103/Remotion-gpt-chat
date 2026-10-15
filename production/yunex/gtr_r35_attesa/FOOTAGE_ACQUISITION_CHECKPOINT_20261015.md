@@ -1,3 +1,5 @@
+> **SUPERSEDED — RECOVERY COMPLETE:** See [the current 9-MP4 GT-R footage handoff](EDITOR_FOOTAGE_HANDOFF_20261015.md). The original 'zero media' state below described the initial checkpoint only. As of the latest run, S25 phone jobs #97–99 all PASS, 9 silent cut scene candidates were uploaded privately and fully decoded. Individual shot angle/crop selection and licensing still await visual/rights review.
+
 # YUNEX Nissan GT-R R35 — ATTESA E-TS footage acquisition checkpoint
 Date: 2026-10-15
 Role: Sole footage researcher/acquisition/verification, not final editor.
