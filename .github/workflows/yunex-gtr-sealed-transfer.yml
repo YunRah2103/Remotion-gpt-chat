@@ -30,7 +30,13 @@ jobs:
           test "$(stat -c %s work/gtr/GTR_ATTESA_PICTURE_ONLY.mp4)" -gt 14000000
           actual="$(sha256sum work/gtr/GTR_ATTESA_PICTURE_ONLY.mp4 | cut -d ' ' -f1)"
           echo "Native private picture verified, SHA256: $actual"
-          (cd work/gtr && sha256sum GTR_ATTESA_PICTURE_ONLY.mp4 > SHA256SUMS)
+          # Recover the exact three owner-verified source recordings for REAL visual curation.
+          for job in 97 98 99; do
+            gh release download "yunex-phone-v4-$job" --repo "$GITHUB_REPOSITORY" \
+              --pattern "yunex-v4-$job.mp4" --dir work/gtr
+            test -s "work/gtr/yunex-v4-$job.mp4"
+          done
+          (cd work/gtr && sha256sum GTR_ATTESA_PICTURE_ONLY.mp4 yunex-v4-97.mp4 yunex-v4-98.mp4 yunex-v4-99.mp4 > SHA256SUMS)
       - name: Seal private picture with public-key encryption
         shell: bash
         run: |
@@ -62,7 +68,7 @@ jobs:
           szQvF6Gdx2YKe5TQAW7Jh7xBf8ZbxVoeE4fvhyM+VQ==
           -----END CERTIFICATE-----
           CERT
-          tar -czf work/gtr.tar.gz -C work/gtr GTR_ATTESA_PICTURE_ONLY.mp4 SHA256SUMS
+          tar -czf work/gtr.tar.gz -C work/gtr GTR_ATTESA_PICTURE_ONLY.mp4 yunex-v4-97.mp4 yunex-v4-98.mp4 yunex-v4-99.mp4 SHA256SUMS
           openssl cms -encrypt -binary -aes-256-cbc -in work/gtr.tar.gz \
             -out out/sealed/GTR_PICTURE_ENCRYPTED.p7m -outform DER work/gtr-editor-cert.pem
           test -s out/sealed/GTR_PICTURE_ENCRYPTED.p7m
