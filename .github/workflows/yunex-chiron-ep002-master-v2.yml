@@ -117,7 +117,7 @@ jobs:
           assert 28.45<float(info['format']['duration'])<28.80
           frames=subprocess.check_output(['ffprobe','-v','error','-count_frames','-select_streams','v:0',
             '-show_entries','stream=nb_read_frames','-of','csv=p=0',str(p)]).decode().strip()
-          assert frames=='858',frames
+          assert frames.split(',')[0].strip()=='858',repr(frames)
           report={'status':'PASS_TECHNICALLY_VERIFIED_PRIVATE_PICTURE_MASTER',
             'size_bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),
             'resolution':'1080x1920','fps':30,'frames':858,'duration_seconds':28.6,
