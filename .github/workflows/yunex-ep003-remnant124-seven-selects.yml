@@ -1,0 +1,65 @@
+name: YUNEX EP003 Remnant P1 7-shot owner private selects
+on:
+  push:
+    paths: ['.github/workflows/yunex-ep003-remnant124-seven-selects.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: read
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - id: source
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '124'
+          token: ${{ github.token }}
+          destination: private/p1-night
+      - name: Source-frame-exact cinematic selects, dual 16:9 / 9:16, complete QA
+        shell: bash
+        env:
+          SOURCE: ${{ steps.source.outputs.asset_path }}
+          S25_HASH: ${{ steps.source.outputs.sha256 }}
+        run: |
+          set -euo pipefail
+          mkdir -p export/MP4_ORIGINAL_FRAME export/MP4_PORTRAIT_PREVIEW export/CONTACT_SHEETS export/FFPROBE
+          printf '%s\n' "Source https://www.youtube.com/watch?v=z_U29fm1nkk" "Original film Remnant Media (Sony FX3 + MOVMAX RAZR according to filmmaker)." "Full original acquired by S25 V4 job #124: 1920x1080, 120s, H264, full decode PASS. Source SHA256: $S25_HASH" "Video excerpt rights UNVERIFIED: material for OWNER PRIVATE review; no social platform upload until authorization." "The orange McLaren P1 differs visually from earlier silver P1 source; to keep continuity, use as a deliberate cohesive ORANGE NIGHT sequence, not interspersed every half-second with silver daytime footage." "Stationary wing detail is NOT evidence of live airbrake pitch/actuation under braking. No source shot proves braking wing motion." "MP4_ORIGINAL_FRAME are genuine source-based 1920x1080 selects. MP4_PORTRAIT_PREVIEW are 540x960 encoded crop of an original center 608x1080 window, NOT native 1080x1920 source footage." "Detailed exact master video timecodes below, not clip-local timecodes." > export/README_EDITOR.md
+          cat >> export/README_EDITOR.md <<'EOF'
+          | Clip | Master in | Master out | Editorial role | Caveat |
+          | --- | --- | --- | --- | --- |
+          | P1_O01_NEON_FRONT_APPROACH | 62.30 | 64.40 | Hook: close low tracking nose / lights, real moving P1 | Subject moves toward vertical edge; avoid late frame |
+          | P1_M01_ORANGE_REAR_PURSUIT | 54.65 | 57.90 | Rear chase, blue night road reflections, motion | Other traffic nearby |
+          | P1_M02_FLUID_SIDE_ROLL | 58.70 | 60.85 | Rolling profile, actual car movement and parallax | Very narrow vertical crop |
+          | P1_M03_WING_HARDWARE_STATIC | 33.15 | 34.50 | Macro detail of physical raised rear wing | Car parked, wing not operating under braking |
+          | P1_M04_FRONT_QUARTER_ROAD | 66.20 | 68.90 | Continuous front 3/4 car-rig movement, blue lights | Car moderately sized |
+          | P1_E01_RED_TAIL_FLYOUT | 88.85 | 90.95 | Rear 3/4 exit with vivid red road spill | Short; passing traffic |
+          | P1_E02_NEON_REAR_TRACK_OUT | 105.45 | 108.85 | Alternative ending, sustained rear car rolling | Car never extremely large |
+          EOF
+          while IFS=, read -r name start end; do
+            duration="$(awk -v a="$end" -v b="$start" 'BEGIN {printf "%.3f", b-a}')"
+            ffmpeg -hide_banner -loglevel error -y -ss "$start" -t "$duration" -i "$SOURCE" -an -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -movflags +faststart "export/MP4_ORIGINAL_FRAME/${name}.mp4"
+            ffmpeg -hide_banner -loglevel error -y -i "export/MP4_ORIGINAL_FRAME/${name}.mp4" -vf "crop=608:1080:656:0,scale=540:960:flags=lanczos" -an -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -movflags +faststart "export/MP4_PORTRAIT_PREVIEW/${name}_9x16.mp4"
+            ffprobe -v error -show_format -show_streams -of json "export/MP4_ORIGINAL_FRAME/${name}.mp4" > "export/FFPROBE/${name}.json"
+            ffmpeg -hide_banner -loglevel error -xerror -i "export/MP4_ORIGINAL_FRAME/${name}.mp4" -f null -
+            ffmpeg -hide_banner -loglevel error -xerror -i "export/MP4_PORTRAIT_PREVIEW/${name}_9x16.mp4" -f null -
+            ffmpeg -hide_banner -loglevel error -y -i "export/MP4_PORTRAIT_PREVIEW/${name}_9x16.mp4" -vf "fps=3,scale=180:320,tile=8x4:padding=2:margin=2" -frames:v 1 -update 1 "export/CONTACT_SHEETS/${name}.jpg"
+          done <<'SHOTS'
+          P1_O01_NEON_FRONT_APPROACH,62.30,64.40
+          P1_M01_ORANGE_REAR_PURSUIT,54.65,57.90
+          P1_M02_FLUID_SIDE_ROLL,58.70,60.85
+          P1_M03_WING_HARDWARE_STATIC,33.15,34.50
+          P1_M04_FRONT_QUARTER_ROAD,66.20,68.90
+          P1_E01_RED_TAIL_FLYOUT,88.85,90.95
+          P1_E02_NEON_REAR_TRACK_OUT,105.45,108.85
+          SHOTS
+          ( cd export && find MP4_ORIGINAL_FRAME MP4_PORTRAIT_PREVIEW -name '*.mp4' -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt )
+          printf '%s\n' "PASS: all 14 source-derived MP4 files full-decode; probes, contacts, sha256 sums attached" >> export/README_EDITOR.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yunex-ep003-p1-remnant124-seven-private-selects
+          path: export/
+          retention-days: 2
+          if-no-files-found: error
