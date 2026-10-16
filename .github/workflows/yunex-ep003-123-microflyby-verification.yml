@@ -1,0 +1,49 @@
+name: YUNEX EP003 #123 trackside peak flyby proof
+on:
+  push:
+    paths:
+      - '.github/workflows/yunex-ep003-123-microflyby-verification.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - id: original
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '123'
+          token: ${{ github.token }}
+          destination: private/p1-123
+      - name: Inspect fast trackside P1 flybys at 6fps and moving real 9:16
+        shell: bash
+        env:
+          SOURCE: ${{ steps.original.outputs.asset_path }}
+        run: |
+          set -euo pipefail
+          mkdir -p proof/MP4_SELECTS proof/PORTRAIT_CROPS proof/SHEETS proof/FFPROBE
+          for spec in "FIRST 7.0 12.5" "SECOND 23.0 30.0"; do
+            set -- $spec
+            name="$1"; offset="$2"; end="$3"
+            duration="$(awk -v a="$end" -v b="$offset" 'BEGIN {print a-b}')"
+            ffmpeg -hide_banner -loglevel error -y -ss "$offset" -t "$duration" -i "$SOURCE" -an -c:v libx264 -preset fast -crf 18 -pix_fmt yuv420p -movflags +faststart "proof/MP4_SELECTS/${name}.mp4"
+            ffmpeg -hide_banner -loglevel error -y -i "proof/MP4_SELECTS/${name}.mp4" -vf 'crop=608:1080:656:0,scale=540:960:flags=lanczos' -an -c:v libx264 -preset fast -crf 19 -pix_fmt yuv420p "proof/PORTRAIT_CROPS/${name}_9x16.mp4"
+            ffmpeg -hide_banner -loglevel error -y -ss "$offset" -t "$duration" -i "$SOURCE" -vf 'fps=6,scale=384:-2,tile=6x8:padding=3:margin=3' -frames:v 1 -update 1 "proof/SHEETS/${name}_LANDSCAPE_6fps.jpg"
+            ffmpeg -hide_banner -loglevel error -y -i "proof/PORTRAIT_CROPS/${name}_9x16.mp4" -vf 'fps=6,scale=180:320,tile=6x8:padding=3:margin=3' -frames:v 1 -update 1 "proof/SHEETS/${name}_PORTRAIT_6fps.jpg"
+            ffprobe -v error -show_streams -show_format -of json "proof/MP4_SELECTS/${name}.mp4" > "proof/FFPROBE/${name}.json"
+            ffmpeg -hide_banner -loglevel error -xerror -i "proof/MP4_SELECTS/${name}.mp4" -f null -
+            ffmpeg -hide_banner -loglevel error -xerror -i "proof/PORTRAIT_CROPS/${name}_9x16.mp4" -f null -
+          done
+          find proof -name '*.mp4' -print0 | xargs -0 sha256sum > proof/SHA256SUMS.txt
+          printf '%s\n' 'Original video: https://www.youtube.com/watch?v=Z2CHtZZFTDY' 'Original creator: Visual Car Reviews (verify source attribution before public use).' 'Original source: issue #123; first 5.5s proof covers 7.0-12.5s; second 7s proof covers 23.0-30.0s.' 'No claim of real on-track P1 wing movement while braking.' 'Source video full phone decode PASS, and short trims/portrait crops individually fully decoded.' 'Source and all output video third-party rights UNVERIFIED; package OWNER-ONLY for temporary review, no public repo mirroring.' 'Portrait crop is from 1920x1080 landscape, upscaled preview, NOT native vertical resolution.' > proof/README.txt
+      - name: Temporarily deliver review evidence only
+        uses: actions/upload-artifact@v4
+        with:
+          name: yunex-ep003-p1-123-microflyby-private-review
+          path: proof/
+          retention-days: 1
+          if-no-files-found: error
