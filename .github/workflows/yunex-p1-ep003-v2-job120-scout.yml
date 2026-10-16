@@ -1,0 +1,49 @@
+name: YUNEX P1 EP003 #120 Sterling Grey cinematic visual QA
+on:
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: read
+jobs:
+  review:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.issue.number == 120 && github.event.comment.user.login == 'YunRah2103' && startsWith(github.event.comment.body, 'YUNEX_PHONE_DONE_V4')) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - id: source
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '120'
+          token: ${{ github.token }}
+          destination: private/p1-120
+      - name: Make timecoded frame contact sheets (original never uploaded)
+        shell: bash
+        env:
+          ORIGINAL: ${{ steps.source.outputs.asset_path }}
+          RIGHTS: ${{ steps.source.outputs.rights_status }}
+        run: |
+          set -euo pipefail
+          test "$RIGHTS" = 'unverified' || echo "source rights status: $RIGHTS"
+          mkdir -p reviews
+          ffprobe -v error -show_streams -show_format -of json "$ORIGINAL" > reviews/ffprobe.json
+          sha256sum "$ORIGINAL" > reviews/SHA256SUMS
+          ffmpeg -hide_banner -v error -xerror -i "$ORIGINAL" -f null -
+          for i in 0 1 2 3; do
+            start=$((i*30))
+            ffmpeg -hide_banner -v error -ss "$start" -t 30 -i "$ORIGINAL" -vf "fps=1,scale=440:-2,tile=6x5:padding=2:margin=2" -frames:v 1 -update 1 "reviews/section-$start-$((start+30)).jpg"
+          done
+          for i in 0 1 2 3; do
+            start=$((i*30))
+            ffmpeg -hide_banner -v error -ss "$start" -t 30 -i "$ORIGINAL" -vf "fps=1,crop=607:1080:(iw-607)/2:0,scale=210:374,tile=5x6:padding=3:margin=3" -frames:v 1 -update 1 "reviews/portrait-center-$start-$((start+30)).jpg"
+          done
+          printf '%s\n' 'Source: https://www.youtube.com/watch?v=DOZ3HZSSU2Q' 'Original source offset: 0s' 'Phone job: #120' 'Source is for private evaluation only; rights unverified.' 'This source contains two McLaren models (P1 and MSO HS): verify identity of EACH selected shot. All grids sample one frame per second; examine real 9:16 frame proofs before acceptance.' 'Only source metadata and contact sheets are in this workflow artifact; no original MP4 included.' > reviews/HANDOFF.txt
+      - name: Upload short-lived visual QA
+        uses: actions/upload-artifact@v4
+        with:
+          name: yunex-p1-ep003-job120-contact-review
+          path: reviews/
+          retention-days: 1
+          if-no-files-found: error
