@@ -1,4 +1,4 @@
-name: YUNEX P1 EP003 Blonde Films independent Vimeo preview
+name: YUNEX P1 EP003 Blonde Films producer-embed preview
 on:
   push:
     paths:
@@ -20,10 +20,25 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p private previews
+          # Producer's own publicly embedded video, rather than blocked Vimeo account-only client.
+          curl --fail --location --silent --show-error --max-time 25 --retry 1 -A 'Mozilla/5.0' \
+            'https://weareblonde.com/mclaren-p1-dubai/' > private/producer.html
+          WISTIA_ID="$(python3 - <<'PY'
+          import re
+          html=open('private/producer.html',encoding='utf-8',errors='ignore').read()
+          patterns=[r'wistia_async_([a-z0-9]{10})',r'fast\\.wistia\\.(?:com|net)/embed/iframe/([a-z0-9]{10})',r'media-id=[\x22\x27]([a-z0-9]{10})']
+          ids=[v for p in patterns for v in re.findall(p,html,re.I)]
+          print(ids[0] if ids else '')
+          PY
+          )"
+          if [[ ! "$WISTIA_ID" =~ ^[a-z0-9]{10}$ ]]; then
+            echo '::error::No publicly embedded producer Wistia media ID found'; exit 2
+          fi
+          echo 'Located original embedded video ID from producer page'
           timeout 300s "$HOME/.local/bin/yt-dlp" --no-playlist --no-progress --retries 1 --fragment-retries 1 --socket-timeout 20 \
             -f 'bv*[height<=1080]+ba/b[height<=1080]/best[height<=1080]' \
             --merge-output-format mp4 --remux-video mp4 \
-            -o 'private/p1-blonde.%(ext)s' 'https://vimeo.com/180582813'
+            -o 'private/p1-blonde.%(ext)s' "https://fast.wistia.net/embed/iframe/$WISTIA_ID"
           file="$(find private -maxdepth 1 -name '*.mp4' -print -quit)"
           test -n "$file" && test -s "$file"
           ffprobe -v error -show_streams -show_format -of json "$file" > previews/probe.json
@@ -39,7 +54,7 @@ jobs:
             ffmpeg -hide_banner -v error -ss 60 -y -i "$file" -vf 'fps=0.5,scale=380:-2,tile=5x6:padding=3:margin=3' -frames:v 1 -update 1 previews/landscape-60-120.jpg
             ffmpeg -hide_banner -v error -ss 60 -y -i "$file" -vf 'fps=0.5,crop=ih*9/16:ih:(iw-ih*9/16)/2:0,scale=216:384,tile=5x6:padding=3:margin=3' -frames:v 1 -update 1 previews/portrait-60-120.jpg
           fi
-          printf '%s\n' 'Original filmmaker: Blonde Films, video hosted by Hashmukh Kerai on Vimeo.' 'Source: https://vimeo.com/180582813' 'Original source starts 00:00; contact grids sampled 1 frame every 2s. Actual event timecodes require independent visual inspection.' 'No permission obtained for redistribution. This QA artifact only contains watermarked-if-original preview grids and metadata, NOT the original third-party MP4. No film edits.' > previews/README.txt
+          printf '%s\n' 'Original filmmaker: Blonde Films, video embedded on own producer page.' 'Source: https://weareblonde.com/mclaren-p1-dubai/' 'Original source starts 00:00; contact grids sampled 1 frame every 2s. Actual event timecodes require independent visual inspection.' 'No permission obtained for redistribution. This QA artifact only contains watermarked-if-original preview grids and metadata, NOT the original third-party MP4. No film edits.' > previews/README.txt
       - uses: actions/upload-artifact@v4
         with:
           name: yunex-p1-v2-blonde-vimeo-private-visual-qa
