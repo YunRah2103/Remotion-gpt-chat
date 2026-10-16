@@ -1,0 +1,41 @@
+name: YUNEX EP003 Remnant P1 cinematic precision QA
+on:
+  push:
+    paths: ['.github/workflows/yunex-ep003-124-precision-timeline-qa.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: read
+jobs:
+  timeline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - id: source
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '124'
+          token: ${{ github.token }}
+          destination: private/p1-124-precise
+      - name: Verify all 10s shots at 4fps, wide and 9:16, preserve source privately
+        env:
+          VIDEO: ${{ steps.source.outputs.asset_path }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p review
+          ffprobe -v error -show_format -show_streams -of json "$VIDEO" > review/ffprobe.json
+          sha256sum "$VIDEO" > review/SOURCE_SHA256.txt
+          ffmpeg -hide_banner -loglevel error -xerror -i "$VIDEO" -f null -
+          for i in 20 30 40 50 60 70 80 90 100; do
+            ffmpeg -hide_banner -loglevel error -y -ss "$i" -t 10 -i "$VIDEO" -vf 'fps=4,scale=320:180,tile=8x5:padding=2:margin=2' -frames:v 1 -update 1 "review/source-wide-${i}-10.jpg"
+            ffmpeg -hide_banner -loglevel error -y -ss "$i" -t 10 -i "$VIDEO" -vf 'fps=4,crop=608:1080:656:0,scale=160:284,tile=8x5:padding=2:margin=2' -frames:v 1 -update 1 "review/source-portrait-${i}-10.jpg"
+          done
+          printf '%s\n' 'REVIEW ONLY: Remnant Media original #124; 20..110 seconds at 4fps sampled; source video 1080p decoded.' 'Contact grids read left to right row after row. No proof of active braking wing pitch unless directly seen.' 'Rights unverified. Do not publish or distribute without rights.' > review/README.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p1-remnant124-precision-private-timelines
+          path: review/
+          retention-days: 2
+          if-no-files-found: error
