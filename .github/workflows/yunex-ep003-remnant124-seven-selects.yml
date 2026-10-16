@@ -39,7 +39,7 @@ jobs:
           | P1_E02_NEON_REAR_TRACK_OUT | 105.45 | 108.85 | Alternative ending, sustained rear car rolling | Car never extremely large |
           EOF
           while IFS=, read -r name start end; do
-            duration="$(awk -v a="$end" -v b="$start" 'BEGIN {printf "%.3f", b-a}')"
+            duration="$(awk -v a="$end" -v b="$start" 'BEGIN {printf "%.3f", a-b}')"
             ffmpeg -hide_banner -loglevel error -y -ss "$start" -t "$duration" -i "$SOURCE" -an -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -movflags +faststart "export/MP4_ORIGINAL_FRAME/${name}.mp4"
             ffmpeg -hide_banner -loglevel error -y -i "export/MP4_ORIGINAL_FRAME/${name}.mp4" -vf "crop=608:1080:656:0,scale=540:960:flags=lanczos" -an -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -movflags +faststart "export/MP4_PORTRAIT_PREVIEW/${name}_9x16.mp4"
             ffprobe -v error -show_format -show_streams -of json "export/MP4_ORIGINAL_FRAME/${name}.mp4" > "export/FFPROBE/${name}.json"
