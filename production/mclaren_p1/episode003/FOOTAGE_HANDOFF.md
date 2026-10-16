@@ -39,3 +39,14 @@ For 01/04/05/06, phone source issue #75, private draft asset **639908614**, sour
 **Publication rights have not been cleared** for either official McLaren or Shmee footage; files are provided for private review, not approved public redistribution. All 8 selections exist as playable MP4s in the owner's ChatGPT attachment package with contact sheets, true source in/out times, hashes and 9:16 still proofs. Public repo receives metadata only, never third-party MP4s.
 
 **No film was edited or rendered by the footage specialist.**
+
+
+## Final airbrake hunt result — #117 (16 October 2026)
+
+Follow-up S25 [#117](https://github.com/YunRah2103/Remotion-gpt-chat/issues/117) **PASS**. Recovered actual original 120–360s of Shmee150's orange customer P1 source `https://www.youtube.com/watch?v=6fLjjnU7REQ`, 1920×1080 H.264, SHA256 `c5aec8c89df3dc15e9ac2229211192a88ad70362e4233800f58b5240ad86413d`, original phone draft asset 647140991. Private authenticated [Actions run 38895034269](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38895034269) FULL QA PASS. Contact sheets in artifact [12043112824](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38895034269/artifacts/12043112824) frame-sampled across all 240 seconds and visually inspected.
+
+**Negative finding, important:** local 0–18s shows an orange P1 parked with raised wing, local 18–~160s is passenger-facing forward road footage without wing visible, local 160–180s is parked exterior and drive-off, local 180–240s is presenter/end cards. No shot proves wing pitch change *during real braking*. It would harm colour/visual continuity with the silver Nürburgring P1. **Reject for the 8-select final; do not imply this is a braking-airbrake shot.** This result supersedes the earlier pending #117 status.
+
+Also source tests #113 Motor Trend private-video failure, #114 GTspirit invalid decode/metadata, and #115 BBC Spa HLS connection reset generated no usable footage. No more redundant jobs on failed URLs.
+
+**Editor decision:** the eight existing silver P1 private-review clips are the final technical shortlist. Use mechanically authentic silver wing deployment (#112, original source 156–165s) as a truthful *stationary Race Mode deployment* visual, and an authentic silver track brake/turn-in performance shot for driving context. Manufacturer explanation of airbrake pitch and rear downforce may be narrated/diagrammed separately, but footage alone does not document a live track-braking wing pitch. Third-party redistribution rights for every candidate remain **unverified**.
