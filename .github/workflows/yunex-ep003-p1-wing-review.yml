@@ -1,0 +1,37 @@
+name: YUNEX EP003 P1 wing private source verification
+on:
+  push:
+    paths:
+      - '.github/workflows/yunex-ep003-p1-wing-review.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Verify saved original P1 wing demonstration issue 111
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p review/sheets
+          gh api -H "Accept: application/octet-stream" "/repos/$GITHUB_REPOSITORY/releases/assets/647006320" > review/p1-111-original.mp4
+          echo "96eb013b041fffc5795d7cd90880a917b512b86eff40ccf8c17d1ca3689443b2  review/p1-111-original.mp4" | sha256sum -c -
+          test "$(stat -c%s review/p1-111-original.mp4)" -eq 44602799
+          ffprobe -v error -show_streams -show_format -of json review/p1-111-original.mp4 > review/ffprobe.json
+          ffmpeg -hide_banner -v error -xerror -i review/p1-111-original.mp4 -f null -
+          for n in 0 1 2 3 4 5; do
+            start=$((n*15))
+            ffmpeg -hide_banner -v error -ss "$start" -t 15 -i review/p1-111-original.mp4 -vf "fps=2,scale=480:-2,drawtext=text='%{pts\\:hms}':x=8:y=8:fontsize=26:fontcolor=white:box=1:boxcolor=black@0.7,tile=6x5:padding=2:margin=2" -frames:v 1 -update 1 "review/sheets/wing-$start-$((start+15)).jpg"
+          done
+          ffmpeg -hide_banner -v error -i review/p1-111-original.mp4 -vf "fps=1,scale=320:-2,tile=9x10:padding=2:margin=2" -frames:v 1 -update 1 review/sheets/all-1fps.jpg
+          printf 'Source: https://www.youtube.com/watch?v=SsOChgy6ZPU\nGitHub phone issue: 111\nUse: owner-only review; publishing rights unverified.\nPhone source in: 0s\nPhone source duration: 90s\nNo automatic claim of wing motion or braking.\n' > review/SOURCE.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yunex-ep003-p1-wing-private-review
+          path: review/
+          retention-days: 7
+          if-no-files-found: error
