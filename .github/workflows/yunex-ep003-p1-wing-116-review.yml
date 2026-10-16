@@ -1,0 +1,39 @@
+name: YUNEX EP003 Shmee P1 #116 active wing visual QA
+on:
+  push:
+    paths:
+      - '.github/workflows/yunex-ep003-p1-wing-116-review.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Install FFmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Authenticated private asset and frame QA
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p review/sheets
+          gh api -H "Accept: application/octet-stream" "/repos/$GITHUB_REPOSITORY/releases/assets/647086828" > review/p1-116-original.mp4
+          echo "718d431258f796dc3143d93edcd1298ff76ff27d3ea79f562317869ebbb1c42f  review/p1-116-original.mp4" | sha256sum -c -
+          test "$(stat -c%s review/p1-116-original.mp4)" -eq 50142513
+          ffprobe -v error -show_streams -show_format -of json review/p1-116-original.mp4 > review/probe.json
+          ffmpeg -hide_banner -v error -xerror -i review/p1-116-original.mp4 -f null -
+          for n in 0 1 2 3 4 5 6 7; do
+            start=$((n*15))
+            ffmpeg -hide_banner -v error -ss "$start" -t 15 -i review/p1-116-original.mp4 -vf "fps=2,scale=440:-2,tile=6x5:padding=3:margin=3" -frames:v 1 -update 1 "review/sheets/segment-$start-$((start+15)).jpg"
+          done
+          ffmpeg -hide_banner -v error -i review/p1-116-original.mp4 -vf "fps=1,scale=300:-2,tile=10x12:padding=2:margin=2" -frames:v 1 -update 1 review/sheets/overview.jpg
+          printf 'Creator: Shmee150. Source: https://www.youtube.com/watch?v=6fLjjnU7REQ\nRequested original 0-120s, phone issue #116. Genuine movement and braking require visual proof.\nLicense and public reuse rights unverified. Private owner-only review.\n' > review/README.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yunex-p1-ep003-116-private-visual-qa
+          path: review/
+          retention-days: 7
+          if-no-files-found: error
