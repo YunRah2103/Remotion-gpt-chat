@@ -1,4 +1,4 @@
-name: YUNEX P1 EP003 Blonde Films producer-embed preview
+name: YUNEX P1 EP003 Blonde Films original private QA
 on:
   push:
     paths:
@@ -13,9 +13,10 @@ jobs:
     steps:
       - name: Install source inspection dependencies
         run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
           python3 -m pip install -q --user -U yt-dlp
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-      - name: Try one public original Vimeo source for owner-only review
+      - name: Inspect publicly embedded original film in private runner
         shell: bash
         run: |
           set -euo pipefail
