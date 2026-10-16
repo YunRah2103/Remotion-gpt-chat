@@ -1,0 +1,50 @@
+name: YUNEX EP003 Remnant Media P1 original cinematic QA
+on:
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: read
+jobs:
+  private_review:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.issue.number == 124 && github.event.comment.user.login == 'YunRah2103' && startsWith(github.event.comment.body, 'YUNEX_PHONE_DONE_V4')) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - id: source
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '124'
+          token: ${{ github.token }}
+          destination: private/124
+      - name: Full decoded metadata and visual photo crop checks
+        shell: bash
+        env:
+          VIDEO: ${{ steps.source.outputs.asset_path }}
+          ORIGINAL_SHA: ${{ steps.source.outputs.sha256 }}
+        run: |
+          set -euo pipefail
+          mkdir -p qa
+          ffprobe -v error -show_format -show_streams -of json "$VIDEO" > qa/ffprobe.json
+          echo "$ORIGINAL_SHA" > qa/SHA256.txt
+          ffmpeg -hide_banner -loglevel error -xerror -i "$VIDEO" -f null -
+          width="$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of csv=p=0 "$VIDEO")"
+          height="$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=p=0 "$VIDEO")"
+          duration="$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$VIDEO")"
+          [[ "$width" -ge 1920 && "$height" -ge 1080 ]] || { echo "Wrong native dimensions"; exit 3; }
+          for start in 0 30 60 90; do
+            if awk -v x="$duration" -v s="$start" 'BEGIN {exit !(s<x)}'; then
+              ffmpeg -hide_banner -loglevel error -y -ss "$start" -t 30 -i "$VIDEO" -vf "fps=1,scale=384:-2,tile=6x5:padding=3:margin=3" -frames:v 1 -update 1 "qa/wide-${start}.jpg"
+              ffmpeg -hide_banner -loglevel error -y -ss "$start" -t 30 -i "$VIDEO" -vf "fps=1,crop=608:1080:656:0,scale=216:384,tile=6x5:padding=3:margin=3" -frames:v 1 -update 1 "qa/mobile-center-${start}.jpg"
+            fi
+          done
+          ffmpeg -hide_banner -loglevel info -ss 5 -i "$VIDEO" -frames:v 1 -vf cropdetect=24:16:0 -f null - 2>&1 | grep -o 'crop=[^ ]*' | tail -1 > qa/detected-photo-bounds.txt || true
+          printf '%s\n' 'Source https://www.youtube.com/watch?v=z_U29fm1nkk' 'Filmmaker Remnant Media. Camera rig Sony FX3/MOVMAX according to filmmaker description. Verify actual footage.' 'The video is PRIVATE OWNER REVIEW only, no publication rights established.' '1 fps sampled previews; inspect exact frames and motion before recommending shot timestamps. Portrait previews are centered landscape crops only, not native 9:16.' 'Original MP4 is an authenticated draft release, not included in this short-lived contact sheet artifact.' > qa/README.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yunex-ep003-remnant124-private-cinematic-scout
+          path: qa/
+          retention-days: 2
+          if-no-files-found: error
