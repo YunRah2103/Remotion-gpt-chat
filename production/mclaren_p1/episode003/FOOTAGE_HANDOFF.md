@@ -50,3 +50,27 @@ Follow-up S25 [#117](https://github.com/YunRah2103/Remotion-gpt-chat/issues/117)
 Also source tests #113 Motor Trend private-video failure, #114 GTspirit invalid decode/metadata, and #115 BBC Spa HLS connection reset generated no usable footage. No more redundant jobs on failed URLs.
 
 **Editor decision:** the eight existing silver P1 private-review clips are the final technical shortlist. Use mechanically authentic silver wing deployment (#112, original source 156–165s) as a truthful *stationary Race Mode deployment* visual, and an authentic silver track brake/turn-in performance shot for driving context. Manufacturer explanation of airbrake pitch and rear downforce may be narrated/diagrammed separately, but footage alone does not document a live track-braking wing pitch. Third-party redistribution rights for every candidate remain **unverified**.
+
+
+## 16 October — refreshed 8-MP4 owner-only package, independently reverified in current ChatGPT session
+
+The archived source MP4 bytes were recovered **from existing GitHub Actions artifacts only**, without new S25 downloads, and a refreshed private editor ZIP was created in the current ChatGPT working session: `YUNEX_EP003_P1_PRIVATE_EDITOR_READY.zip` (14,750,559 bytes, 31 ZIP members, archive test PASS). The ZIP is **delivered to the owner in ChatGPT**; it is *not uploaded into GitHub, and the sandbox path is not a persistent GitHub asset*. Folder structure: `MP4_SELECTS/` (eight H.264/AAC 1920x1080, 25fps excerpts), `CONTACT_SHEETS/` (4-point original timeline sheets plus wing before/after progression), `PORTRAIT_CROP_PROOFS/` (9:16 example stills), `EDITOR_READY_INVENTORY.csv`, `SOURCE_AND_HASH_MANIFEST.json`, `SHA256SUMS.txt`, `README_EDITOR_HANDOFF.md`. Every selection independently FFprobe checked, FFmpeg `-xerror` full decoded, SHA256 recalculated; all PASS. ZIP CRC/integrity PASS.
+
+### Final verified selection manifest
+
+| # | Exact original source interval | Duration | Context | SHA256 of **selection MP4** |
+|---|---|---:|---|---|
+| 01 | McLaren official `E9IWiTpWeiM` 131.60–135.35 | 3.76s | P1 wing visible during track footage; **NO verified on-road pitch change** | `0` (consult ZIP SHA256SUMS — hash not replicated here) |
+| 02 | Same 78.66–79.14 | 0.48s | Recut: fast low rear trackside pass, preferred immediate driving action | ZIP SHA256SUMS |
+| 03 | Same 89.15–90.15 | 1.00s | Recut: fast rear 3/4 track pass from distinct camera; not proven braking | ZIP SHA256SUMS |
+| 04 | Same 105.60–108.55 | 2.96s | Aerial hairpin, conditionally poor 9:16 subject scale | ZIP SHA256SUMS |
+| 05 | Same 114.75–118.05 | 3.32s | Overhead genuine on-track movement | ZIP SHA256SUMS |
+| 06 | Same 161.45–163.50 | 2.08s | Recut: near-lens approach/flyby; recommended cinematic outro | ZIP SHA256SUMS |
+| 07 | Same 170.10–172.10 | 2.00s | Authentic driver/steering; no brake-pedal proof | ZIP SHA256SUMS |
+| 08 | Shmee150 `SsOChgy6ZPU` 156.00–165.00 | 9.00s | **Physical rear-wing rise confirmed from still sequence at 157–164s; P1 STATIONARY in Race Mode, NOT braking at speed** | ZIP SHA256SUMS |
+
+Source original hashes independently matched the archive record: #74 `c31e3980735a2517ad7e3bb491b0db48a5b554a9ef3cffea9caa098752e9ca39`; #75 `9ec858abddc3182f195b40339f1ea9253cb785788879cdeb1bb57c7c357a0245`; #76 `e903e4070f41faf7d5adb144e9b16cc521f234a8383296a987bce9ac71387f40`; #112 `6188773e4892ce8a728e5776794b77aed6df1d1522201f940794ee6b7b52310e`. Native 25fps and 1920×1080 for these four source files. The footage was recoded at 25fps without misleading speed changes.
+
+**Portrait limitation:** McLaren source has baked cinematic mattes and yields about 407×724 source-photo pixels after removing bars and composing 9:16; portrait stills are upscaled previews, *not* evidence of native 1080×1920 resolution. Tracked reframing required for fast passes. Stationary Shmee footage has no baked bars; crop is about 608×1080. **Creator watermark is retained**. Source redistribution rights remain unconfirmed; no upload of third-party video to public repository.
+
+**Scientific/creative open dependency:** despite #113–#117 searches and live QA, **NO actual P1 wing pitch-change under real circuit braking has been authenticated**. The 0–1 second hook may show the fast genuine parked wing mechanism rising (clearly contextualized) or cut to the separate real driving footage; do not intercut deceptively as a single filmed on-track braking event.
