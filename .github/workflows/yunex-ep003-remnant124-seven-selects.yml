@@ -40,12 +40,12 @@ jobs:
           EOF
           while IFS=, read -r name start end; do
             duration="$(awk -v a="$end" -v b="$start" 'BEGIN {printf "%.3f", a-b}')"
-            ffmpeg -hide_banner -loglevel error -y -ss "$start" -t "$duration" -i "$SOURCE" -an -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -movflags +faststart "export/MP4_ORIGINAL_FRAME/${name}.mp4"
-            ffmpeg -hide_banner -loglevel error -y -i "export/MP4_ORIGINAL_FRAME/${name}.mp4" -vf "crop=608:1080:656:0,scale=540:960:flags=lanczos" -an -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -movflags +faststart "export/MP4_PORTRAIT_PREVIEW/${name}_9x16.mp4"
+            ffmpeg -nostdin -hide_banner -loglevel error -y -ss "$start" -t "$duration" -i "$SOURCE" -an -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -movflags +faststart "export/MP4_ORIGINAL_FRAME/${name}.mp4"
+            ffmpeg -nostdin -hide_banner -loglevel error -y -i "export/MP4_ORIGINAL_FRAME/${name}.mp4" -vf "crop=608:1080:656:0,scale=540:960:flags=lanczos" -an -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -movflags +faststart "export/MP4_PORTRAIT_PREVIEW/${name}_9x16.mp4"
             ffprobe -v error -show_format -show_streams -of json "export/MP4_ORIGINAL_FRAME/${name}.mp4" > "export/FFPROBE/${name}.json"
-            ffmpeg -hide_banner -loglevel error -xerror -i "export/MP4_ORIGINAL_FRAME/${name}.mp4" -f null -
-            ffmpeg -hide_banner -loglevel error -xerror -i "export/MP4_PORTRAIT_PREVIEW/${name}_9x16.mp4" -f null -
-            ffmpeg -hide_banner -loglevel error -y -i "export/MP4_PORTRAIT_PREVIEW/${name}_9x16.mp4" -vf "fps=3,scale=180:320,tile=8x4:padding=2:margin=2" -frames:v 1 -update 1 "export/CONTACT_SHEETS/${name}.jpg"
+            ffmpeg -nostdin -hide_banner -loglevel error -xerror -i "export/MP4_ORIGINAL_FRAME/${name}.mp4" -f null -
+            ffmpeg -nostdin -hide_banner -loglevel error -xerror -i "export/MP4_PORTRAIT_PREVIEW/${name}_9x16.mp4" -f null -
+            ffmpeg -nostdin -hide_banner -loglevel error -y -i "export/MP4_PORTRAIT_PREVIEW/${name}_9x16.mp4" -vf "fps=3,scale=180:320,tile=8x4:padding=2:margin=2" -frames:v 1 -update 1 "export/CONTACT_SHEETS/${name}.jpg"
           done <<'SHOTS'
           P1_O01_NEON_FRONT_APPROACH,62.30,64.40
           P1_M01_ORANGE_REAR_PURSUIT,54.65,57.90
