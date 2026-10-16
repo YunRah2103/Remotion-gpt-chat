@@ -1,0 +1,46 @@
+name: YUNEX EP003 Joel Theodore original P1 Vimeo scout
+on:
+  push:
+    paths: ['.github/workflows/yunex-ep003-v3-joel-p1-vimeo-scout.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  scout:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Install source reader and confirm Vimeo allows straightforward viewing
+        run: |
+          python -m pip install -q yt-dlp
+          sudo apt-get update -qq >/dev/null
+          sudo apt-get install -y -qq ffmpeg >/dev/null
+      - name: Fetch public original in ordinary yt-dlp mode; do not bypass access controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p private scout
+          yt-dlp --no-playlist -f 'bv*[height<=1080]+ba/b[height<=1080]/best' --merge-output-format mp4 -o 'private/p1-joel.%(ext)s' 'https://vimeo.com/187982143'
+          video="$(find private -maxdepth 1 -type f | head -1)"
+          test -s "$video"
+          ffprobe -v error -show_streams -show_format -of json "$video" > scout/FFPROBE.json
+          ffmpeg -nostdin -hide_banner -loglevel error -xerror -i "$video" -f null -
+          sha256sum "$video" > scout/SOURCE_SHA256.txt
+          dur="$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$video")"
+          width="$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of csv=p=0 "$video")"
+          height="$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=p=0 "$video")"
+          for start in 0 20 40 60 80 100; do
+            if awk -v d="$dur" -v s="$start" 'BEGIN {exit !(s<d)}'; then
+              ffmpeg -nostdin -hide_banner -loglevel error -y -ss "$start" -t 20 -i "$video" -vf "fps=1,scale=320:-2,tile=5x4:padding=3:margin=3" -frames:v 1 -update 1 "scout/WIDE_${start}.jpg"
+              if [ "$width" -ge 608 ] && [ "$height" -ge 1080 ]; then
+                ffmpeg -nostdin -hide_banner -loglevel error -y -ss "$start" -t 20 -i "$video" -vf "fps=1,crop=608:1080:(iw-608)/2:(ih-1080)/2,scale=170:302,tile=5x4:padding=3:margin=3" -frames:v 1 -update 1 "scout/PORTRAIT_${start}.jpg"
+              fi
+            fi
+          done
+          printf '%s\n' 'Original creator Joel Theodore: https://vimeo.com/187982143' 'Public Vimeo download if accessible; creator reuse rights UNVERIFIED.' 'Private scouting only; no video repost/public project commit or DRM/login circumvention.' 'This is one original P1 film; verify appearance, car movement and 9:16 quality before adding to shortlist.' > scout/README.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yunex-p1-joel-original-vimeo-scout
+          path: scout/
+          retention-days: 1
+          if-no-files-found: error
