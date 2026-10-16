@@ -60,14 +60,14 @@ The archived source MP4 bytes were recovered **from existing GitHub Actions arti
 
 | # | Exact original source interval | Duration | Context | SHA256 of **selection MP4** |
 |---|---|---:|---|---|
-| 01 | McLaren official `E9IWiTpWeiM` 131.60–135.35 | 3.76s | P1 wing visible during track footage; **NO verified on-road pitch change** | `0` (consult ZIP SHA256SUMS — hash not replicated here) |
-| 02 | Same 78.66–79.14 | 0.48s | Recut: fast low rear trackside pass, preferred immediate driving action | ZIP SHA256SUMS |
-| 03 | Same 89.15–90.15 | 1.00s | Recut: fast rear 3/4 track pass from distinct camera; not proven braking | ZIP SHA256SUMS |
-| 04 | Same 105.60–108.55 | 2.96s | Aerial hairpin, conditionally poor 9:16 subject scale | ZIP SHA256SUMS |
-| 05 | Same 114.75–118.05 | 3.32s | Overhead genuine on-track movement | ZIP SHA256SUMS |
-| 06 | Same 161.45–163.50 | 2.08s | Recut: near-lens approach/flyby; recommended cinematic outro | ZIP SHA256SUMS |
-| 07 | Same 170.10–172.10 | 2.00s | Authentic driver/steering; no brake-pedal proof | ZIP SHA256SUMS |
-| 08 | Shmee150 `SsOChgy6ZPU` 156.00–165.00 | 9.00s | **Physical rear-wing rise confirmed from still sequence at 157–164s; P1 STATIONARY in Race Mode, NOT braking at speed** | ZIP SHA256SUMS |
+| 01 | McLaren official `E9IWiTpWeiM` 131.60–135.35 | 3.76s | P1 wing visible during track footage; **NO verified on-road pitch change** | `af31c0fe043f448d6b6f0a1d7d16f1920c3291e59b9d3cca1502e35856c86356` |
+| 02 | Same 78.66–79.14 | 0.48s | Recut: fast low rear trackside pass, preferred immediate driving action | `8cf3e9ad0fefe4c9ffd3538ceada803769900cb6cdc6c607f9339dbe0765d6e4` |
+| 03 | Same 89.15–90.15 | 1.00s | Recut: fast rear 3/4 track pass from distinct camera; not proven braking | `00ccc45611c592c459ac81b5c8ca92c8b101bb2d59926bd583f5767e6026e0d0` |
+| 04 | Same 105.60–108.55 | 2.96s | Aerial hairpin, conditionally poor 9:16 subject scale | `e3e1473e6488fc137140a87f09b77a0d2915bd434f4abf1dcf7fcafc97f89859` |
+| 05 | Same 114.75–118.05 | 3.32s | Overhead genuine on-track movement | `839357c6fbdeb0c175a3ea26a2edd95c195382df9aaecd9349feec4d63c56bc9` |
+| 06 | Same 161.45–163.50 | 2.08s | Recut: near-lens approach/flyby; recommended cinematic outro | `243931f5f621604f8ccd21e56233d7c0739d4407376bdd7e1cd3cc5677728891` |
+| 07 | Same 170.10–172.10 | 2.00s | Authentic driver/steering; no brake-pedal proof | `a9cdbe511f14770b0e2b85633566b31d07e0fce20776809fb834052617055c2e` |
+| 08 | Shmee150 `SsOChgy6ZPU` 156.00–165.00 | 9.00s | **Physical rear-wing rise confirmed from still sequence at 157–164s; P1 STATIONARY in Race Mode, NOT braking at speed** | `c9307330d90eaceb26880be558c69ee2d0aed0cf11f99794e7a14bbf128c60aa` |
 
 Source original hashes independently matched the archive record: #74 `c31e3980735a2517ad7e3bb491b0db48a5b554a9ef3cffea9caa098752e9ca39`; #75 `9ec858abddc3182f195b40339f1ea9253cb785788879cdeb1bb57c7c357a0245`; #76 `e903e4070f41faf7d5adb144e9b16cc521f234a8383296a987bce9ac71387f40`; #112 `6188773e4892ce8a728e5776794b77aed6df1d1522201f940794ee6b7b52310e`. Native 25fps and 1920×1080 for these four source files. The footage was recoded at 25fps without misleading speed changes.
 
