@@ -1,0 +1,48 @@
+name: YUNEX P1 EP003 Blonde Films independent Vimeo preview
+on:
+  push:
+    paths:
+      - '.github/workflows/yunex-ep003-blonde-vimeo-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  vimeo-preview:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - name: Install source inspection dependencies
+        run: |
+          python3 -m pip install -q --user -U yt-dlp
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Try one public original Vimeo source for owner-only review
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p private previews
+          timeout 300s "$HOME/.local/bin/yt-dlp" --no-playlist --no-progress --retries 1 --fragment-retries 1 --socket-timeout 20 \
+            -f 'bv*[height<=1080]+ba/b[height<=1080]/best[height<=1080]' \
+            --merge-output-format mp4 --remux-video mp4 \
+            -o 'private/p1-blonde.%(ext)s' 'https://vimeo.com/180582813'
+          file="$(find private -maxdepth 1 -name '*.mp4' -print -quit)"
+          test -n "$file" && test -s "$file"
+          ffprobe -v error -show_streams -show_format -of json "$file" > previews/probe.json
+          sha256sum "$file" > previews/source-sha256.txt
+          ffmpeg -hide_banner -v error -xerror -i "$file" -f null -
+          duration="$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$file")"
+          echo "Verified source video, duration=$duration seconds, file=$(basename "$file")"
+          ffmpeg -hide_banner -v error -y -i "$file" -vf 'fps=0.5,scale=380:-2,tile=5x6:padding=3:margin=3' \
+            -frames:v 1 -update 1 previews/landscape-0-60.jpg
+          ffmpeg -hide_banner -v error -y -i "$file" -vf 'fps=0.5,crop=ih*9/16:ih:(iw-ih*9/16)/2:0,scale=216:384,tile=5x6:padding=3:margin=3' \
+            -frames:v 1 -update 1 previews/portrait-0-60.jpg
+          if awk "BEGIN {exit !($duration > 60)}"; then
+            ffmpeg -hide_banner -v error -ss 60 -y -i "$file" -vf 'fps=0.5,scale=380:-2,tile=5x6:padding=3:margin=3' -frames:v 1 -update 1 previews/landscape-60-120.jpg
+            ffmpeg -hide_banner -v error -ss 60 -y -i "$file" -vf 'fps=0.5,crop=ih*9/16:ih:(iw-ih*9/16)/2:0,scale=216:384,tile=5x6:padding=3:margin=3' -frames:v 1 -update 1 previews/portrait-60-120.jpg
+          fi
+          printf '%s\n' 'Original filmmaker: Blonde Films, video hosted by Hashmukh Kerai on Vimeo.' 'Source: https://vimeo.com/180582813' 'Original source starts 00:00; contact grids sampled 1 frame every 2s. Actual event timecodes require independent visual inspection.' 'No permission obtained for redistribution. This QA artifact only contains watermarked-if-original preview grids and metadata, NOT the original third-party MP4. No film edits.' > previews/README.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yunex-p1-v2-blonde-vimeo-private-visual-qa
+          path: previews/
+          retention-days: 2
+          if-no-files-found: error
