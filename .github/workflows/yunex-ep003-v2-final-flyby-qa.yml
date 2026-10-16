@@ -1,0 +1,52 @@
+name: YUNEX EP003 V2 final ending flyby source visual QA
+on:
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: read
+jobs:
+  qa:
+    if: ${{ github.event_name == 'workflow_dispatch' || (contains(fromJSON('[122,123]'), github.event.issue.number) && github.event.comment.user.login == 'YunRah2103' && startsWith(github.event.comment.body, 'YUNEX_PHONE_DONE_V4')) }}
+    strategy:
+      fail-fast: false
+      matrix:
+        phone_issue: [122,123]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - id: source
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '${{ matrix.phone_issue }}'
+          token: ${{ github.token }}
+          destination: private/p1-${{ matrix.phone_issue }}
+      - name: FFprobe, decode, original and vertical close flyby contact grids
+        shell: bash
+        env:
+          VIDEO: ${{ steps.source.outputs.asset_path }}
+          JOB_ID: ${{ matrix.phone_issue }}
+          SHA: ${{ steps.source.outputs.sha256 }}
+        run: |
+          set -euo pipefail
+          mkdir -p review
+          ffprobe -v error -show_format -show_streams -of json "$VIDEO" > review/ffprobe.json
+          echo "SHA256 $SHA" > review/sha256.txt
+          ffmpeg -hide_banner -loglevel error -xerror -i "$VIDEO" -f null -
+          duration="$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$VIDEO")"
+          for i in 0 1 2 3; do
+            start=$((i*30))
+            if awk "BEGIN {exit !($start < $duration)}"; then
+              ffmpeg -hide_banner -loglevel error -y -ss "$start" -i "$VIDEO" -t 30 -vf "fps=1,scale=320:-2,tile=6x5:padding=2:margin=2" -frames:v 1 -update 1 "review/wide-${start}.jpg"
+              ffmpeg -hide_banner -loglevel error -y -ss "$start" -i "$VIDEO" -t 30 -vf "fps=1,crop=608:1080:(iw-608)/2:0,scale=200:355,tile=6x5:padding=2:margin=2" -frames:v 1 -update 1 "review/portrait-${start}.jpg"
+            fi
+          done
+          echo "Source V4 #$JOB_ID. 1fps contact grids = scouting, NOT evidence of exact peak flyby timing. Full MP4 held owner-only in draft Release. 1080p may include baked bars. Source rights unverified." > review/README.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p1-flyby-${{ matrix.phone_issue }}-review
+          path: review/
+          retention-days: 1
+          if-no-files-found: error
