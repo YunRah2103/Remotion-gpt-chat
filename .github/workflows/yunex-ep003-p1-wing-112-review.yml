@@ -1,0 +1,39 @@
+name: YUNEX EP003 P1 #112 wing deployment visual QA
+on:
+  push:
+    paths:
+      - '.github/workflows/yunex-ep003-p1-wing-112-review.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Install FFmpeg tools
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Retrieve existing private S25 clip and generate contact sheets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p review/contacts
+          gh api -H "Accept: application/octet-stream" "/repos/$GITHUB_REPOSITORY/releases/assets/647028735" > review/p1-wing-112-original.mp4
+          echo "6188773e4892ce8a728e5776794b77aed6df1d1522201f940794ee6b7b52310e  review/p1-wing-112-original.mp4" | sha256sum -c -
+          test "$(stat -c%s review/p1-wing-112-original.mp4)" -eq 35580810
+          ffprobe -v error -show_streams -show_format -of json review/p1-wing-112-original.mp4 > review/ffprobe.json
+          ffmpeg -hide_banner -v error -xerror -i review/p1-wing-112-original.mp4 -f null -
+          for n in 0 1 2 3 4 5; do
+            start=$((n*15))
+            ffmpeg -hide_banner -v error -ss "$start" -t 15 -i review/p1-wing-112-original.mp4 -vf "fps=2,scale=480:-2,tile=6x5:padding=3:margin=3" -frames:v 1 -update 1 "review/contacts/segment-$start-$((start+15)).jpg"
+          done
+          ffmpeg -hide_banner -v error -i review/p1-wing-112-original.mp4 -vf 'fps=1,scale=320:-2,tile=9x10:padding=2:margin=2' -frames:v 1 -update 1 review/contacts/overview.jpg
+          printf 'Shmee150 genuine P1 Race Mode demo. Original source https://www.youtube.com/watch?v=SsOChgy6ZPU . Clip local 0-90s = original 90-180s. Publication rights unverified. Screenshots are contact-sheet samples, not wing motion proof.\n' > review/SOURCE.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yunex-ep003-p1-112-private-wing-qa
+          path: review/
+          retention-days: 7
+          if-no-files-found: error
