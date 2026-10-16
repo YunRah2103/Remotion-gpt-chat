@@ -1,0 +1,56 @@
+name: YUNEX EP003 120 P1 identity and portrait proof
+on:
+  push:
+    paths:
+      - '.github/workflows/yunex-ep003-120-identity-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: read
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - id: phone
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '120'
+          token: ${{ github.token }}
+          destination: private/p1-120
+      - name: Extract selected full-resolution source stills and true portrait crops
+        shell: bash
+        env:
+          SOURCE: ${{ steps.phone.outputs.asset_path }}
+        run: |
+          set -euo pipefail
+          mkdir -p qa/full qa/portrait
+          for s in 56 58 60 62 68 70 72 74 76 78 80 82 84 86 88 90 92 94 96 98 100 102 104 106 108 110 112 114 116; do
+            ffmpeg -hide_banner -loglevel error -y -ss "$s" -i "$SOURCE" -frames:v 1 -q:v 3 "qa/full/frame_${s}.jpg"
+            ffmpeg -hide_banner -loglevel error -y -ss "$s" -i "$SOURCE" -vf "crop=608:1080:656:0,scale=608:1080" -frames:v 1 -q:v 3 "qa/portrait/frame_${s}_center.jpg"
+          done
+          python3 - <<'PY'
+          from PIL import Image,ImageOps,ImageDraw
+          from pathlib import Path
+          for part in ['full','portrait']:
+            files=sorted(Path('qa/'+part).glob('frame_*.jpg'),key=lambda p:int(p.stem.split('_')[1]))
+            W,H=(400,225) if part=='full' else (225,400)
+            out=Image.new('RGB',(W*5,(H+26)*((len(files)+4)//5)),'#121212')
+            d=ImageDraw.Draw(out)
+            for k,f in enumerate(files):
+              im=Image.open(f).convert('RGB')
+              im=ImageOps.fit(im,(W,H))
+              x=(k%5)*W;y=(k//5)*(H+26)
+              out.paste(im,(x,y));d.text((x+8,y+H+4),f.stem,fill='white')
+            out.save('qa/'+part+'_ANNOTATED_CONTACT.jpg',quality=92)
+          PY
+          ffprobe -v error -show_entries stream=codec_name,width,height,r_frame_rate,duration -of json "$SOURCE" > qa/ffprobe.json
+          sha256sum "$SOURCE" > qa/SHA256SUMS
+          printf 'Only frame references. Original: https://www.youtube.com/watch?v=DOZ3HZSSU2Q. Source shows BOTH Sterling Grey P1 and MSO HS. Identify model carefully. Owner-only QA; rights unverified.\n' > qa/README.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yunex-ep003-p1-120-identity-portrait-QA
+          path: qa/
+          retention-days: 1
+          if-no-files-found: error
