@@ -1,0 +1,95 @@
+name: YUNEX EP003 V2 private cinematic footage selects
+on:
+  push:
+    paths:
+      - '.github/workflows/yunex-ep003-v2-private-selects.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: read
+jobs:
+  footage:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - id: p1
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '120'
+          token: ${{ github.token }}
+          destination: private/p1-120
+      - name: Recover original Blonde Films brand film for private review
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q --user -U yt-dlp
+          mkdir -p private/blonde
+          curl --fail --location --silent --show-error --max-time 25 --retry 1 -A 'Mozilla/5.0' 'https://weareblonde.com/mclaren-p1-dubai/' > private/blonde/producer.html
+          WISTIA_ID="$(python3 - <<'PY'
+          import re
+          html=open('private/blonde/producer.html',encoding='utf-8',errors='ignore').read()
+          patterns=[r'wistia_async_([a-z0-9]{10})',r'fast\\.wistia\\.(?:com|net)/embed/iframe/([a-z0-9]{10})',r'media-id=[\x22\x27]([a-z0-9]{10})']
+          ids=[v for p in patterns for v in re.findall(p,html,re.I)]
+          print(ids[0] if ids else '')
+          PY
+          )"
+          [[ "$WISTIA_ID" =~ ^[a-z0-9]{10}$ ]] || { echo 'No producer Wistia ID'; exit 2; }
+          timeout 300s "$HOME/.local/bin/yt-dlp" --no-playlist --no-progress --retries 1 --fragment-retries 1 --socket-timeout 20 -f 'bv*[height<=1080]+ba/b[height<=1080]/best[height<=1080]' --merge-output-format mp4 --remux-video mp4 -o 'private/blonde/source.%(ext)s' "https://fast.wistia.net/embed/iframe/$WISTIA_ID"
+          test -s private/blonde/source.mp4
+          ffprobe -v error -show_format -show_streams -of json private/blonde/source.mp4 > private/blonde/source_probe.json
+          ffmpeg -hide_banner -v error -xerror -i private/blonde/source.mp4 -f null -
+      - name: Make honest cinema previews, complete verified MP4 selects and hashes
+        shell: bash
+        env:
+          P1: ${{ steps.p1.outputs.asset_path }}
+        run: |
+          set -euo pipefail
+          mkdir -p deliver/MP4_SELECTS deliver/PORTRAIT_PREVIEWS deliver/CONTACT_SHEETS deliver/PROBES
+          export BLONDE="$PWD/private/blonde/source.mp4"
+          python3 - <<'PY'
+          import subprocess as sp,os,json,hashlib,pathlib
+          root=pathlib.Path('deliver')
+          # Timecodes refer to ORIGINAL source video in seconds, not film timeline.
+          selections=[
+            ('P1_120_A01_LOW_ROAD_APPROACH','p1',56.3,59.3,'MIDDLE','Sterling Grey P1 approaching low camera on tree-lined road; not braking proof','conditional'),
+            ('P1_120_A02_FRONT_TRACKING_HERO','p1',74.2,78.2,'OPENING','Sterling Grey P1 front road tracking with moving background; first frame P1 in view','preferred'),
+            ('P1_120_A03_CLOSE_DRIVEBY','p1',89.2,92.4,'ENDING','Sterling Grey P1 near-lens tracking, strong scale; not on-track braking','preferred'),
+            ('BLONDE_B01_DESERT_SIDE','blonde',50.0,54.5,'MIDDLE','Silver P1 desert side move at sunset; small subject in portrait, watermarked','conditional'),
+            ('BLONDE_B02_DESERT_FRONT','blonde',63.3,66.6,'ENDING_ALT','Silver P1 front-three-quarter sunset tracking; embedded creator branding/overlays may appear','conditional')]
+          data=[]
+          def run(a):
+            p=sp.run(a,text=True,stdout=sp.PIPE,stderr=sp.PIPE)
+            if p.returncode: raise RuntimeError(' '.join(a)+'\n'+p.stderr[-2000:])
+            return p.stdout
+          for name,kind,start,end,role,note,grade in selections:
+            src=os.environ['P1'] if kind=='p1' else os.environ['BLONDE']
+            out=root/'MP4_SELECTS'/(name+'.mp4')
+            run(['ffmpeg','-hide_banner','-loglevel','error','-y','-i',src,'-ss',str(start),'-t',str(round(end-start,3)),'-an','-c:v','libx264','-preset','fast','-crf','18','-pix_fmt','yuv420p','-movflags','+faststart',str(out)])
+            # Source 120 has baked 128px top/bottom mattes; real picture 1920x824.
+            # Blonde source has actual 1920x804 picture. No fake claims of native portrait resolution.
+            crop='crop=464:824:728:128' if kind=='p1' else 'crop=452:804:734:0'
+            pov=root/'PORTRAIT_PREVIEWS'/(name+'_9x16_UPSCALED.mp4')
+            run(['ffmpeg','-hide_banner','-loglevel','error','-y','-i',str(out),'-an','-vf',crop+',scale=540:960:flags=lanczos,setsar=1','-c:v','libx264','-preset','fast','-crf','20','-pix_fmt','yuv420p',str(pov)])
+            sheet=root/'CONTACT_SHEETS'/(name+'.jpg')
+            run(['ffmpeg','-hide_banner','-loglevel','error','-y','-i',str(pov),'-vf','fps=1,scale=270:480,tile=4x1:padding=3:margin=3','-frames:v','1','-update','1',str(sheet)])
+            run(['ffmpeg','-hide_banner','-v','error','-xerror','-i',str(out),'-f','null','-'])
+            run(['ffmpeg','-hide_banner','-v','error','-xerror','-i',str(pov),'-f','null','-'])
+            probe=json.loads(run(['ffprobe','-v','error','-show_format','-show_streams','-of','json',str(out)]))
+            (root/'PROBES'/(name+'.json')).write_text(json.dumps(probe,indent=2))
+            sha=hashlib.sha256(out.read_bytes()).hexdigest()
+            data.append(dict(filename=out.name,portrait_preview=pov.name,source_url='https://www.youtube.com/watch?v=DOZ3HZSSU2Q' if kind=='p1' else 'https://weareblonde.com/mclaren-p1-dubai/',creator='Krispy Media / Miller Motorcars' if kind=='p1' else 'Blonde Films',role=role,start_original_s=start,end_original_s=end,duration_s=round(end-start,3),sha256=sha,bytes=out.stat().st_size,technical='FFprobe and full decode PASS',rights='unverified - PRIVATE OWNER REVIEW ONLY',portrait_source_pixel_crop='464x824 (from 1920x1080 H264 with baked matte)' if kind=='p1' else '452x804 (from 1920x804 widescreen H264)',editorial_status=grade,description=note,actual_track_braking_wing_pitch_proven=False))
+          (root/'SELECT_INVENTORY.json').write_text(json.dumps(data,indent=2))
+          (root/'README.md').write_text('# YUNEX Episode 003 — V2 replacement footage review\n\nContains FIVE private-review real MP4 extracts, real cropped vertical motion previews, contact JPEGs, source timestamps and FFprobe reports. The project film was not edited. 9x16 previews are **upscaled** from actual limited source pixels (specified per clip); DO NOT claim native 1080x1920 acquisition. Source #120 includes **both P1 and MSO HS**; ensure final editor confirms vehicle model for any wider shot. No on-track moving-airbrake pitch proof exists. The source #120 car is Sterling Grey with autumn trees; Blonde desert silver car is a different P1/lighting condition, so avoid treating both as continuous driving. Some Blonde shots have creator branding, which must not be falsely described as watermark-free. Rights to redistribute any third-party footage have NOT been obtained. All selections owner-only for private evaluation. Use these as candidates, NOT blanket creative approval.\n')
+          with (root/'SHA256SUMS.txt').open('w') as f:
+            for d in data:f.write(d['sha256']+'  MP4_SELECTS/'+d['filename']+'\n')
+          print(json.dumps([{k:d[k] for k in ['filename','start_original_s','end_original_s','sha256','bytes']} for d in data],indent=2))
+          PY
+          sha256sum -c --ignore-missing deliver/SHA256SUMS.txt || true
+      - name: Upload ephemeral owner-review selects (not public source repository)
+        uses: actions/upload-artifact@v4
+        with:
+          name: yunex-ep003-v2-cinematic-selects-owner-review
+          path: deliver/
+          retention-days: 1
+          if-no-files-found: error
