@@ -30,6 +30,7 @@ jobs:
             ffmpeg -hide_banner -loglevel error -y -ss "$s" -i "$SOURCE" -frames:v 1 -q:v 3 "qa/full/frame_${s}.jpg"
             ffmpeg -hide_banner -loglevel error -y -ss "$s" -i "$SOURCE" -vf "crop=608:1080:656:0,scale=608:1080" -frames:v 1 -q:v 3 "qa/portrait/frame_${s}_center.jpg"
           done
+          python3 -m pip install -q --user pillow
           python3 - <<'PY'
           from PIL import Image,ImageOps,ImageDraw
           from pathlib import Path
