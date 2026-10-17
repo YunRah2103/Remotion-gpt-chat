@@ -1,0 +1,76 @@
+name: YUNEX A5 — isolated native moving lookdev proofs
+
+on:
+  pull_request:
+    branches: [production/yunex-turbo-3d-ep001]
+    paths:
+      - 'src/yunex/turbo3d/lookdev/**'
+      - 'production/yunex/turbo_3d_001/agents/lookdev/**'
+      - '.github/workflows/yunex-a5-lookdev-proof.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  moving-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies and video probes
+        run: |
+          set -euo pipefail
+          if test -s package-lock.json; then npm ci --no-audit --no-fund; else npm install --no-audit --no-fund; fi
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: TypeScript
+        run: npm run check
+      - name: Confirm isolated composition registration
+        run: |
+          npx remotion compositions src/yunex/turbo3d/lookdev/preview.entry.tsx --gl=swangle | tee compositions.txt
+          grep -q 'YunexA5LookdevProof' compositions.txt
+      - name: Render real frame-driven Three.js animated car, turbine and charge clips
+        run: |
+          set -euo pipefail
+          mkdir -p out/a5
+          npx remotion render src/yunex/turbo3d/lookdev/preview.entry.tsx YunexA5LookdevProof out/a5/01-teal-road.mp4 --frames=12-35 --scale=0.33 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
+          npx remotion render src/yunex/turbo3d/lookdev/preview.entry.tsx YunexA5LookdevProof out/a5/02-turbine-metal.mp4 --frames=102-125 --scale=0.33 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
+          npx remotion render src/yunex/turbo3d/lookdev/preview.entry.tsx YunexA5LookdevProof out/a5/03-cool-charge.mp4 --frames=192-215 --scale=0.33 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
+      - name: Decode videos, prove frames change, and capture actual stills
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import subprocess, json, hashlib
+          root=Path('out/a5')
+          manifest={}
+          for video in sorted(root.glob('*.mp4')):
+              subprocess.run(['ffmpeg','-hide_banner','-loglevel','error','-xerror','-i',str(video),'-f','null','-'],check=True)
+              meta=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(video)]))
+              s=next(s for s in meta['streams'] if s['codec_type']=='video')
+              assert s['codec_name']=='h264' and s['pix_fmt']=='yuv420p',s
+              assert s['r_frame_rate']=='30/1' and int(s['nb_frames'])==24,s
+              frames=[]
+              for f in (0,12,23):
+                  out=root/(video.stem+'-f'+str(f).zfill(2)+'.png')
+                  subprocess.run(['ffmpeg','-hide_banner','-loglevel','error','-y','-i',str(video),'-vf',f'select=eq(n\\,{f})','-vsync','0','-frames:v','1',str(out)],check=True)
+                  frames.append(hashlib.sha256(out.read_bytes()).hexdigest())
+              assert len(set(frames))>1,'Preview is static: '+video.name
+              manifest[video.name]={'sha256':hashlib.sha256(video.read_bytes()).hexdigest(),'bytes':video.stat().st_size,'width':s['width'],'height':s['height'],'frames':s['nb_frames'],'fps':s['r_frame_rate'],'decoded':True,'distinctFrameImages':len(set(frames))}
+          assert len(manifest)==3,manifest
+          (root/'manifest.json').write_text(json.dumps(manifest,indent=2))
+          print(json.dumps(manifest,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-A5-native-moving-lookdev
+          path: |
+            out/a5/
+            compositions.txt
+          if-no-files-found: warn
+          retention-days: 30
