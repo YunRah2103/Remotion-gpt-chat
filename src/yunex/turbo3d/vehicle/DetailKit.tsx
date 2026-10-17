@@ -41,7 +41,7 @@ export const LightShell:React.FC<{side:number}>=({side})=>{
 };
 
 /** Recess on the +Z front face, including real sidewalls and slats rather than a black sticker. */
-export const FrontDuct:React.FC<{side:number}>=({side})=><group name="FRONT_BUMPER_RECESSED_DUCT" position={[side*.45,.535,2.305]}>
+export const FrontDuct:React.FC<{side:number}>=({side})=><group name="FRONT_BUMPER_RECESSED_DUCT" position={[side*.42,.535,2.36]}>
   <mesh position={[0,0,-.112]}><boxGeometry args={[.340,.116,.010]}/>
     <meshStandardMaterial name="FRONT_DUCT_DEPTH_BACK" color="#020A0D" roughness={1}/></mesh>
   <mesh position={[0,-.071,.005]}><boxGeometry args={[.405,.023,.213]}/>
