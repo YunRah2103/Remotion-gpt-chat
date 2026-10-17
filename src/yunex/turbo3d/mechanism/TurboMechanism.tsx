@@ -73,7 +73,9 @@ const Housing:React.FC<{compressor:boolean;x:number;cutaway:number}>=({compresso
   </group>;
 };
 const Engine:React.FC=()=> <group name="FOUR_CYLINDER_ENGINE" position={[0,-1.65,-3.15]}>
-  <mesh castShadow><boxGeometry args={[2.8,1.25,1.30]}/><Mat color="#354B59"/></mesh>
+  <mesh castShadow><boxGeometry args={[2.8,1.25,1.30]}/><Mat color="#667E8A" roughness={.42}/></mesh>
+  {[-1.05,-.35,.35,1.05].map(x=><mesh key={x} position={[x,0,.668]}>
+    <boxGeometry args={[.075,.84,.045]}/><Mat color="#B6C5CA" roughness={.29}/></mesh>)}
   <mesh castShadow position={[0,.74,0]}><boxGeometry args={[3,.30,1.42]}/><Mat color="#83949C"/></mesh>
   {[-1.05,-.35,.35,1.05].map(x=><group key={x} position={[x,.9,0]}>
    <CylinderX a={[-.11,0,0]} b={[.11,0,0]} r={.14} color="#D9E0DF" sides={18}/>
@@ -102,11 +104,9 @@ const compressedPipe:readonly (readonly number[])[]=[
  TURBO_PORTS.COMPRESSED_AIR_OUT,[1.46,1.16,.49],[2.13,1.31,-.10],[2.82,.76,-.88],TURBO_PORTS.INTERCOOLER_IN];
 const cooledPipe:readonly (readonly number[])[]=[
  TURBO_PORTS.INTERCOOLER_OUT,[2.55,-1.42,-2.18],[1.80,-1.20,-2.75],TURBO_PORTS.ENGINE_INTAKE];
+/** Exported ports are named coordinate anchors, NOT floating decorative spheres. */
 const PortDot:React.FC<{where:readonly number[];name:string}>=({where,name})=>
- <group name={name} position={p(where)}>
-  <mesh><sphereGeometry args={[.065,12,9]}/><meshBasicMaterial
-    color={name.startsWith('EXHAUST')?C.exhaust:name==='CLEAN_AIR_IN'?C.compressor:C.cooled}/></mesh>
- </group>;
+ <group name={name} position={p(where)}/>;
 
 /** Local shaft +X, negative turbine, positive compressor. Both rotors share EXACT phase. */
 export const TurboMechanism:React.FC<TurboMechanismProps>=({
