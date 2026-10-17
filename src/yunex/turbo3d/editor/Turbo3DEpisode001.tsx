@@ -65,13 +65,32 @@ const OccludedAirflow:React.FC<{children:React.ReactNode}>=({children})=>{
  },[]);
  return <group ref={group}>{children}</group>;
 };
-/** A6 camera for a real cylinder close-up; no edits to Agent 4 camera trajectories. */
+/** Editorial camera corrections in A6's exclusive path, never alter A4's source rigs.
+ * Looking forward from z=-1.10 at the actual cylinder X-ray mounted at z=-2.37
+ * avoids the large turbo housing intersecting the line of sight.
+ */
 const EngineCamera:React.FC<{frame:number;duration:number}>=({frame,duration})=>{
  const {camera}=useThree();
  useLayoutEffect(()=>{
   const t=Math.min(1,frame/Math.max(1,duration-1));
-  camera.position.set(1.60-.62*t,-.34+.16*t,.35-.3*t);
-  camera.lookAt(-.30,-.68,-2.41);
+  camera.position.set(.25-.37*t,-.12+.05*t,-.60-.45*t);
+  camera.up.set(0,1,0);
+  camera.lookAt(-.35,-.63,-2.38);
+  if(camera instanceof THREE.PerspectiveCamera){camera.fov=46-5*t;camera.updateProjectionMatrix();}
+  camera.updateMatrixWorld();
+ },[camera,frame,duration]);
+ return null;
+};
+/** Keep the full compressor and its clean-air port in frame: previous macro cut off
+ * the majority of the rotor and hid the physical intake connection.
+ */
+const CompressorCamera:React.FC<{frame:number;duration:number}>=({frame,duration})=>{
+ const {camera}=useThree();
+ useLayoutEffect(()=>{
+  const t=Math.min(1,frame/Math.max(1,duration-1));
+  camera.position.set(3.95-.45*t,1.10-.18*t,4.55-.35*t);
+  camera.up.set(0,1,0);
+  camera.lookAt(1.62+.32*t,.15+.10*t,-.12);
   if(camera instanceof THREE.PerspectiveCamera){camera.fov=40;camera.updateProjectionMatrix();}
   camera.updateMatrixWorld();
  },[camera,frame,duration]);
@@ -98,8 +117,8 @@ const EnginePowerWindow:React.FC<{frame:number}>=({frame})=>{
  </group>;
 };
 const FilmMechanics:React.FC<{shot:FilmShot;frame:number;duration:number}>=({shot,frame,duration})=>{
- const road=shot==='road',full=['power','cooler'].includes(shot);
- const cameraShot:Shot=shot==='hook'?'hookOrbit':shot==='exhaust'?'hookRush':shot==='shaft'?'shaftFollow':shot==='compressor'?'compressorReveal':'chargeGlide';
+ const road=shot==='road',full=['exhaust','power','cooler'].includes(shot);
+ const cameraShot:Shot=shot==='hook'?'hookOrbit':shot==='exhaust'?'exhaustTrack':shot==='shaft'?'shaftFollow':shot==='compressor'?'compressorReveal':'chargeGlide';
  const phase:TurboFlowPhase=shot==='exhaust'?'exhaust':shot==='hook'?'turbine':shot==='shaft'?'turbine':shot==='compressor'?'compressor':shot==='power'?'combustion':'intercooler';
  if(road)return <>
   <YunexReflectionEnvironment variant="road" intensity={.88}/>
@@ -124,7 +143,7 @@ const FilmMechanics:React.FC<{shot:FilmShot;frame:number;duration:number}>=({sho
   </OccludedAirflow>}
   {(shot==='hook'||shot==='exhaust')&&<ExhaustHeat frame={frame} intensity={shot==='exhaust'?.8:.48}/>}
   {shot==='power'&&<EnginePowerWindow frame={frame}/>}
-  {shot==='power'?<EngineCamera frame={frame} duration={duration}/>:<CameraDirector frame={frame} shot={cameraShot} anchors={MECH_ANCHORS} durationInFrames={duration}/>}
+  {shot==='power'?<EngineCamera frame={frame} duration={duration}/>:shot==='compressor'?<CompressorCamera frame={frame} duration={duration}/>:<CameraDirector frame={shot==='cooler'?Math.floor(55+frame*.60):frame} shot={cameraShot} anchors={MECH_ANCHORS} durationInFrames={duration}/>}
  </>;
 };
 const AccentTag:React.FC<{name:string;color:string;frame:number;duration:number}>=({name,color,frame,duration})=>{
