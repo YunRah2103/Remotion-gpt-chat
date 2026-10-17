@@ -6,6 +6,7 @@ const Root:React.FC=()=><>
  <Composition id="YunexA4RealExhaust" component={()=><RealModelPreview variant="realExhaust"/>} width={1080} height={1920} fps={30} durationInFrames={90}/>
  <Composition id="YunexA4RealShaft" component={()=><RealModelPreview variant="realShaft"/>} width={1080} height={1920} fps={30} durationInFrames={120}/>
  <Composition id="YunexA4RealCharge" component={()=><RealModelPreview variant="realCharge"/>} width={1080} height={1920} fps={30} durationInFrames={120}/>
+ <Composition id="YunexA4RealChargeFlow" component={()=><RealModelPreview variant="realChargeFlow"/>} width={1080} height={1920} fps={30} durationInFrames={120}/>
  <Composition id="YunexA4RealRoad" component={()=><RealModelPreview variant="realRoad"/>} width={1080} height={1920} fps={30} durationInFrames={120}/>
  </>;
 registerRoot(Root);
