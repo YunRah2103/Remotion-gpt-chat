@@ -129,15 +129,15 @@ const Cabin:React.FC=()=>{
    return <group key={side}>
     <Panel vertices={front} name="FRONT_DOOR_WINDOW" glass/>
     <Panel vertices={back} name="REAR_QUARTER_WINDOW" glass/>
-    <Trim name="WINDSCREEN_A_PILLAR" color="#164547" radius={.025}
+    <Trim name="WINDSCREEN_A_PILLAR" color="#19383B" radius={.013}
       points={[[side*.75,.884,.97],[side*.59,1.10,.61],[side*.55,1.35,.22]]}/>
-    <Trim name="ROOF_SIDE_EDGE" color={PAINT} radius={.025}
+    <Trim name="ROOF_SIDE_EDGE" color="#20474A" radius={.010}
       points={[[side*.55,1.35,.22],[side*.565,1.35,-.29],[side*.56,1.35,-.70]]}/>
-    <Trim name="REAR_C_PILLAR" color="#164547" radius={.028}
+    <Trim name="REAR_C_PILLAR" color="#19383B" radius={.014}
       points={[[side*.56,1.35,-.70],[side*.64,1.14,-.98],[side*.73,.87,-1.34]]}/>
-    <Trim name="CENTRE_WINDOW_DIVIDER" color="#16383B" radius={.021}
+    <Trim name="CENTRE_WINDOW_DIVIDER" color="#183F41" radius={.011}
       points={[[side*.56,1.344,-.31],[side*.776,.902,-.33]]}/>
-    <Trim name="WINDOW_SILL" color="#244F53" radius={.015}
+    <Trim name="WINDOW_SILL" color="#224D4E" radius={.011}
       points={[[side*.745,.899,.91],[side*.777,.899,-.32],[side*.73,.883,-1.27]]}/>
    </group>;
   })}
