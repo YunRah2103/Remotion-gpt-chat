@@ -35,7 +35,7 @@ const clamp=(x:number,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const wrap=(z:number,travel:number,extent=190)=>((z+travel+extent/2)%extent+extent)%extent-extent/2;
 
 /** Shape loft: real bevel-like varying cross-sections, not overlapping car boxes. */
-function loft(sections:ReadonlyArray<readonly [number,number,number,number]>):THREE.BufferGeometry {
+function loft(sections:ReadonlyArray<readonly [number,number,number,number]>,openFront=false):THREE.BufferGeometry {
   const vertices:number[]=[]; const indices:number[]=[];
   for(const [z,halfW,low,high] of sections){
     vertices.push(-halfW,low,z, halfW,low,z, halfW,high,z, -halfW,high,z);
@@ -50,7 +50,7 @@ function loft(sections:ReadonlyArray<readonly [number,number,number,number]>):TH
   }
   indices.push(0,2,1,0,3,2);
   const n=4*(sections.length-1);
-  indices.push(n,n+1,n+2,n,n+2,n+3);
+  if(!openFront) indices.push(n,n+1,n+2,n,n+2,n+3);
   const g=new THREE.BufferGeometry();
   g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));
   g.setIndex(indices); g.computeVertexNormals();
@@ -59,7 +59,7 @@ function loft(sections:ReadonlyArray<readonly [number,number,number,number]>):TH
 const BODY_SECTIONS:ReadonlyArray<readonly [number,number,number,number]>=[
   [-2.30,.66,.48,.63],[-2.09,.83,.41,.77],[-1.58,.97,.43,.85],
   [-.75,.955,.42,.80],[.25,.94,.41,.83],[1.29,.96,.40,.76],
-  [1.98,.79,.44,.64],[2.30,.62,.48,.59]
+  [1.98,.79,.44,.65],[2.30,.62,.40,.68]
 ];
 const ROOF_SECTIONS:ReadonlyArray<readonly [number,number,number,number]>=[
   [-1.38,.72,.80,.82],[-.91,.63,.82,1.17],[-.60,.58,.82,1.25],
@@ -69,7 +69,18 @@ const ROOF_SECTIONS:ReadonlyArray<readonly [number,number,number,number]>=[
 
 export const VehicleModel:React.FC<{frame:number;variant?:VehicleVariant;revealProgress?:number;travelMeters?:number}>=
 ({frame,variant='opaque',revealProgress=0,travelMeters=0})=>{
-  const chassis=useMemo(()=>loft(BODY_SECTIONS),[]);
+  const chassis=useMemo(()=>loft(BODY_SECTIONS,true),[]);
+  // The two openings are real holes in the front fascia, not black decals over a body cap.
+  const fascia=useMemo(()=>{
+    const shape=new THREE.Shape();
+    shape.moveTo(-.62,.40);shape.lineTo(.62,.40);shape.lineTo(.62,.68);shape.lineTo(-.62,.68);shape.closePath();
+    for(const side of [-1,1]){
+      const cx=side*.42, p=new THREE.Path(),x0=cx-.18,x1=cx+.18;
+      p.moveTo(x0,.46);p.lineTo(x0,.61);p.lineTo(x1,.61);p.lineTo(x1,.46);p.closePath();
+      shape.holes.push(p);
+    }
+    return new THREE.ExtrudeGeometry(shape,{depth:.07,steps:1,bevelEnabled:false,curveSegments:3});
+  },[]);
   const canopy=useMemo(()=>loft(ROOF_SECTIONS),[]);
   const r=clamp(revealProgress);
   const panelOpen=variant==='reveal'?r:0;
@@ -79,6 +90,9 @@ export const VehicleModel:React.FC<{frame:number;variant?:VehicleVariant;revealP
     <group name="CAR_BODY">
       <mesh geometry={chassis} castShadow receiveShadow>
         <meshPhysicalMaterial name="BODY_TEAL_ENAMEL" color={C.paint} metalness={.67} roughness={.24} clearcoat={.85} clearcoatRoughness={.17}/>
+      </mesh>
+      <mesh geometry={fascia} position={[0,0,2.265]} castShadow>
+        <meshPhysicalMaterial name="ACTUAL_PERFORATED_BUMPER_FASCIA" color={C.paint} metalness={.67} roughness={.24} clearcoat={.85}/>
       </mesh>
       <mesh geometry={canopy} castShadow>
         <meshPhysicalMaterial name="DARK_TINTED_GLASS" color={C.glass} roughness={.10} metalness={.54} transparent opacity={.9} clearcoat={1}/>
