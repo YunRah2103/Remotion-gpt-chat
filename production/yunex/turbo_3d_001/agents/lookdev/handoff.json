@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "task": "YUNEX_TURBO_3D_EP001_AGENT_5_LOOKDEV",
+  "branch": "agent/turbo-3d-001-lookdev",
+  "sourceSha": "dd0787bb016ed322b2e770df029c09dbbf964c9d",
+  "owner": "director",
+  "summary": "Original cinematic Three.js/R3F lookdev library with physical metallic/teal materials, reproducible PMREM studio reflections, deterministic lighting/VFX, three native proxy previews and two successful real A1/A2 pinned-model compatibility previews.",
+  "status": "review",
+  "files": [
+    "src/yunex/turbo3d/lookdev/YunexLookdev.tsx",
+    "src/yunex/turbo3d/lookdev/YunexReflectionEnvironment.tsx",
+    "src/yunex/turbo3d/lookdev/YunexLookdevPreview.tsx",
+    "src/yunex/turbo3d/lookdev/preview.entry.tsx",
+    "production/yunex/turbo_3d_001/agents/lookdev/README.md",
+    "production/yunex/turbo_3d_001/agents/lookdev/manifest.json",
+    "production/yunex/turbo_3d_001/agents/lookdev/handoff.json"
+  ],
+  "evidence": [
+    "Native Three.js 3x24f + real A1/A2 2x12f H264 proof PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39045212574",
+    "Actual preview artifact 12105561449: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39045212574/artifacts/12105561449",
+    "Preview media SHA256, source commits, renderer specification and manual visual QA: production/yunex/turbo_3d_001/agents/lookdev/manifest.json",
+    "Dedicated draft PR #140: https://github.com/YunRah2103/Remotion-gpt-chat/pull/140"
+  ],
+  "blockers": [
+    "Awaiting explicit Agent 0 review/approval before A6 integrates lookdev; do not merge automatically.",
+    "Real A2 shaft/housings are horizontally small in a portrait composition; A4/A6 should compose an angled macro shot while respecting +X local shaft. No claims of final film/picture lock.",
+    "A3 visual-flow overlays and A4 locked camera choreography are on separate branches and require joint integration QC by A6; no claim they have already been combined with this A5 library."
+  ],
+  "notes": "Swangle CPU WebGL tested. A5 source is ONLY lookdev; A1/A2 source was temporarily copied read-only at pinned commits in CI, not modified or included in the PR. All five MP4 previews decoded and show actual frame motion. This is REVIEW and not manager-approved or final EP001."
+}
