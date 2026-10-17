@@ -1,6 +1,6 @@
 # YUNEX EP001 — SHARED 3D PRODUCTION CONTRACT v1
 
-All five specialists MUST follow this contract before modifying files. The manager owns it. No uncoordinated contract edits.
+All **seven** specialists MUST follow this contract before modifying files. The manager owns it. **Five visual agents A1–A5 contribute genuine on-screen animation in parallel**; A6 integrates only their approved outputs, A7 completes narration/audio and verified final MP4. No uncoordinated contract edits.
 
 ## Output and tools
 
@@ -28,14 +28,16 @@ All five specialists MUST follow this contract before modifying files. The manag
 
 ## Modules, source ownership and branches
 
-Working branch per session: `agent/turbo-3d-001-vehicle`, `agent/turbo-3d-001-mechanism`, `agent/turbo-3d-001-airflow`, `agent/turbo-3d-001-editor`, `agent/turbo-3d-001-audio`. Base each on this production branch (not historical branches).
+Recommended separate branches **based on this production branch**: `agent/turbo-3d-001-vehicle`, `agent/turbo-3d-001-mechanism`, `agent/turbo-3d-001-airflow`, `agent/turbo-3d-001-cinematics`, `agent/turbo-3d-001-lookdev` (five parallel visual producers), then `agent/turbo-3d-001-editor` and `agent/turbo-3d-001-audio` sequentially.
 
-- A1: `production/yunex/turbo_3d_001/agents/vehicle/`, optional components in `src/yunex/turbo3d/vehicle/`.
-- A2: `.../agents/mechanism/`, optional components in `src/yunex/turbo3d/mechanism/`.
-- A3: `.../agents/airflow/`, optional components in `src/yunex/turbo3d/airflow/`.
-- A4: `.../agents/editor/`, integrated composition/shot runtime in `src/yunex/turbo3d/editor/`. **Only A4** edits `src/Root.tsx` to register the new composition and `src/yunex/turbo3d/Turbo3DEpisode001.tsx`. Do not modify existing composition IDs.
-- A5: `.../agents/audio/`; mix outputs, timings, credit/license manifest, audio pipeline. A5 does not alter geometry/scene files.
-- Do not overwrite teammates' folders, change `package.json` globally or merge unapproved work; request cross-owner changes with an issue comment and a focused PR.
+- **A1:** `production/yunex/turbo_3d_001/agents/vehicle/` and optional `src/yunex/turbo3d/vehicle/` — original car, wheels, road and world. Provide named material slots to A5.
+- **A2:** `.../agents/mechanism/` and optional `src/yunex/turbo3d/mechanism/` — genuine 3D turbo and engine model, cutaways, two gas paths and exact named flow ports; inform A3 of any port transform changes and A5 of material slots.
+- **A3:** `.../agents/airflow/` and optional `src/yunex/turbo3d/airflow/` — hot exhaust, clean intake, intercooler effects and fuel/combustion animation. Use A2 immutable actual ports; temporary placeholders labeled as unverified.
+- **A4:** `.../agents/cinematics/` and optional `src/yunex/turbo3d/cinematics/` — animated deterministic camera rigs, first-second turbo hook, motion typography, match-cut transition prototypes, shot choreography. NOT the master editor; no Root changes.
+- **A5:** `.../agents/lookdev/` and optional `src/yunex/turbo3d/lookdev/` — coherent materials, cinematic lighting rigs, shader/art-direction and tasteful environmental/motion VFX (different from gas engineering physics). Use compatible named slots, no edits to A1/A2 geometry; no sound ownership.
+- **A6:** `.../agents/editor/`, `src/yunex/turbo3d/editor/` and `src/yunex/turbo3d/Turbo3DEpisode001.tsx` — integrates **all five APPROVED visual packages**. **Only A6** modifies `src/Root.tsx` to register the new composition, without altering historical IDs.
+- **A7:** `.../agents/audio/` — actual permitted voice/music/SFX, real word timings, audio sync and final H.264/AAC mastered MP4. A7 does not alter geometry; for picture timing fixes request a focused A6 re-lock.
+- Agent 0 manager owns contract, review and `STATUS.md`. Do not overwrite teammates' folders, globally mutate `package.json` or merge unapproved contributions; request cross-owner changes with an issue comment and focused PR. A1–A5 work truly in parallel only when sessions are actually launched in an agent-capable platform.
 
 ## Component and timing interfaces
 
@@ -61,7 +63,7 @@ Approved initial voiceover (do not change science):
 >
 > That's how a turbocharger works.
 
-Shot pacing plan **provisional only**: 0–3s immediate spinning turbo; 3–7s exhaust routes turbine; 7–12s shaft to clean compressor; 12–17s compressed air via intercooler/cylinders; 17–22s richer combustion/power; 22–26s car-on-road payoff. Align cuts and on-screen visuals to **actual narration audio**, not guessed word timings. If audio changes shot timing, A5 requests a precise A4 correction before final mux.
+Shot pacing plan **provisional only**: 0–3s immediate spinning turbo; 3–7s exhaust routes turbine; 7–12s shaft to clean compressor; 12–17s compressed air via intercooler/cylinders; 17–22s richer combustion/power; 22–26s car-on-road payoff. Align cuts and on-screen visuals to **actual narration audio**, not guessed word timings. If audio changes shot timing, A7 requests a precise A6 correction before final mux.
 
 ## Mechanical/scientific truth conditions
 
@@ -74,8 +76,10 @@ Shot pacing plan **provisional only**: 0–3s immediate spinning turbo; 3–7s e
 
 ## Review and evidence gates
 
-A1/A2/A3 must each deliver source, asset manifest, a **moving rendered preview**, reproduction command, verified source SHA, actual artifact hash, and a filled handoff copy from `production/contracts/handoff.template.json` checked via `python production/tools/handoff.py`. Manager explicitly approves each; no automatic approval based on CI.
+**Parallel production gate:** EACH of **A1–A5** must deliver actual source files, verifiable original moving previews, an asset/material/animation manifest with exact exports/ports/props, reproduction command, actual source SHA and artifact hash, and a filled `production/contracts/handoff.template.json` checked with `python production/tools/handoff.py`. Manager reviews science/craft/camera/look; five separate explicit APPROVED states are required before final A6 integration. A GitHub issue, prompt or unrendered test is NOT a delivered animation.
 
-A4 produces genuine native 1080x1920 moving picture lock, accurate shot list + real-frame visual QC, TypeScript check, actual `ffprobe` metadata, fully decoded video. A5 adds licensed/authorised narration/music/SFX with time-aligned voice, stereo audio, EBU R128 loudness, clipping/silence checks, actual final full MP4 decode. Use `production/toolkits/yunex_edit_audit.py` when relevant.
+**A6 picture editor gate:** Pin approved immutable A1–A5 versions; produce new actual native 1080x1920 moving Remotion composition picture lock, actual shot list + video frames, TypeScript/test proof, `ffprobe` metadata, full video decode and true visual QA. Do not silently omit weak contributions or disguise a static slide show.
 
-Statuses only: NOT STARTED / IN PROGRESS / REVIEW / APPROVED / BLOCKED / COMPLETE. Post truthfully to related agent issue and #126, and maintain `STATUS.md` with real evidence. **Creating these files does not launch agents.**
+**A7 sound and final delivery gate:** After approved A6 lock, obtain licensed or otherwise genuinely authorised natural spoken narration; synchronize real word timestamps with scene events, music and restrained mechanical effects; render/mux AAC stereo audio, meter EBU R128 loudness/true peak, inspect clipping/silence, FFprobe metadata, audio+video full decode, actual listening/visual check and working final MP4 link. `production/studio/voice_sync.py` is not a TTS solution. Use `production/toolkits/yunex_edit_audit.py` where relevant.
+
+Statuses: NOT STARTED / IN PROGRESS / REVIEW / APPROVED / BLOCKED / COMPLETE. Post actual evidence to the specialist issue and #126, and maintain `STATUS.md`. **Creating an issue, branch, PR or document never launches an AI worker or proves an animation was rendered.**
