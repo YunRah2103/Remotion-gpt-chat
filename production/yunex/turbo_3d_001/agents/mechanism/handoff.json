@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "task": "YUNEX-TURBO-3D-EP001-A2-128",
+  "branch": "agent/turbo-3d-001-mechanism",
+  "sourceSha": "301957b4f46936c6120f07573395d79038237bae",
+  "owner": "engineering",
+  "summary": "Upgraded original deterministic R3F turbo+engine, tapered spiral-scroll casting, bearing fins, casting bolts, detailed engine/intercooler, closer fully framed moving macro previews; native render, full decode, 40/40 unique frames per clip and independent nine-frame visual inspection passed; READY FOR MANAGER REVIEW (not approved).",
+  "status": "ready",
+  "files": [
+    "src/yunex/turbo3d/mechanism/TurboMechanism.tsx",
+    "src/yunex/turbo3d/mechanism/ports.ts",
+    "src/yunex/turbo3d/mechanism/TurboPreviewHarness.tsx",
+    "src/yunex/turbo3d/mechanism/preview.entry.tsx",
+    "src/yunex/turbo3d/mechanism/index.ts",
+    "production/yunex/turbo_3d_001/agents/mechanism/README.md",
+    "production/yunex/turbo_3d_001/agents/mechanism/asset-manifest.json"
+  ],
+  "evidence": [
+    "Exact immutable source SHA 301957b4f46936c6120f07573395d79038237bae",
+    "Three fresh native Remotion moving previews 540x960 @30fps 40 frames each: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39044425407/artifacts/12105187562",
+    "GitHub Actions run 39044425407 SUCCESS: npm ci, npm run check, three renders, FFprobe, full FFmpeg decode, each 40/40 distinct frame hashes",
+    "SHA256 cutaway d5ad915ab1c57e33cddee21473d91eaf1a04b43b63ac33d9d41ade6a5fad7427; exploded 5dc9f4d9fff27cc58fe98999ee3346d21c48b052e9a123a695722d0f2dd5ce29; full engine c82c3796cee42372134cceefbc7caae2171579b4855bae0850b7e35a78d8cf09",
+    "Nine native actual video frames individually inspected on downloaded exact ZIP (opening, middle, ending per clip): scroll and engine within vertical frame",
+    "Immutable ports.ts remains unchanged: eight A3 locations preserved; turbine and compressor phase remains frame*.165"
+  ],
+  "blockers": [],
+  "notes": "External manager creative/engineering approval still REQUIRED. A2 preview is not A6 picture lock or final MP4. Source geometry and camera code latest source SHA 301957b4...; documentation-only commits follow. Visual preview artifact verified and download available."
+}

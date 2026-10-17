@@ -1,0 +1,71 @@
+name: YUNEX A2 - native mechanical 3D previews
+
+on:
+  push:
+    branches:
+      - agent/turbo-3d-001-mechanism
+    paths:
+      - 'src/yunex/turbo3d/mechanism/**'
+      - '.github/workflows/yunex-turbo-a2-native-preview.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-a2-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Check all source types
+        run: npm run check
+      - name: Render actual A2 mechanism - cutaway
+        run: |
+          mkdir -p out/yunex-a2
+          npx remotion render src/yunex/turbo3d/mechanism/preview.entry.tsx A2TurboCutaway out/yunex-a2/cutaway-native.mp4 --frames=0-39 --gl=swangle --codec=h264 --pixel-format=yuv420p --scale=0.5 --concurrency=1
+      - name: Render actual A2 mechanism - exploded
+        run: |
+          npx remotion render src/yunex/turbo3d/mechanism/preview.entry.tsx A2TurboExploded out/yunex-a2/exploded-native.mp4 --frames=0-39 --gl=swangle --codec=h264 --pixel-format=yuv420p --scale=0.5 --concurrency=1
+      - name: Render actual A2 mechanism - complete charge path
+        run: |
+          npx remotion render src/yunex/turbo3d/mechanism/preview.entry.tsx A2EnginePlumbing out/yunex-a2/engine-native.mp4 --frames=0-39 --gl=swangle --codec=h264 --pixel-format=yuv420p --scale=0.5 --concurrency=1
+      - name: Install FFmpeg and FFprobe for full moving video audit
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Verify MP4 metadata, complete decode, unique moving frames and SHA256
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import subprocess,json,hashlib,pathlib
+          for name in ('cutaway','exploded','engine'):
+              p=pathlib.Path(f'out/yunex-a2/{name}-native.mp4')
+              raw=subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(p)])
+              info=json.loads(raw)
+              stream=next(x for x in info['streams'] if x['codec_type']=='video')
+              assert stream['codec_name']=='h264',(name,stream['codec_name'])
+              assert (stream['width'],stream['height'])==(540,960),(name,stream['width'],stream['height'])
+              assert stream['r_frame_rate']=='30/1',(name,stream['r_frame_rate'])
+              assert int(stream['nb_frames'])==40,(name,stream['nb_frames'])
+              subprocess.run(['ffmpeg','-hide_banner','-v','error','-i',str(p),'-f','null','-'],check=True)
+              data=subprocess.check_output(['ffmpeg','-hide_banner','-v','error','-i',str(p),'-f','framemd5','-'])
+              hashes=[x.split(b',')[-1].strip() for x in data.splitlines() if x and not x.startswith(b'#')]
+              assert len(hashes)==40 and len(set(hashes))>=30,(name,len(hashes),len(set(hashes)))
+              sha=hashlib.sha256(p.read_bytes()).hexdigest()
+              print('A2_NATIVE_PASS',name,'frames=40 fps=30 size=540x960 unique=',len(set(hashes)),'sha256=',sha,flush=True)
+          PY
+      - name: Upload independently reviewed-candidate WebGL MP4s
+        uses: actions/upload-artifact@v4
+        with:
+          name: yunex-turbo-a2-native-mechanical-previews
+          path: out/yunex-a2/*.mp4
+          retention-days: 30
+          if-no-files-found: error
