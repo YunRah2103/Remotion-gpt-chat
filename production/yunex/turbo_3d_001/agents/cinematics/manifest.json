@@ -33,11 +33,18 @@
     "Original procedural source; no footage or third-party 3D models; project uses package.json installed Remotion/Three dependencies"
   ],
   "evidence": [
-    "GitHub production-ci run 39041778306: passed after branch source commit 6288c739b4546bb89393d98c9178a76f5b15f686; includes TypeScript compile and older GpuDriveFilm WebGL smoke, NOT new Agent 4 scene renders.",
-    "Four 432x768, 30fps, 3s each real moving independent software 3D proxy MP4s produced in active ChatGPT workspace; FFprobe and full ffmpeg decode PASS; NOT native Remotion previews. No GitHub-hosted A4 preview artifact yet."
+    "GitHub native source commit cfc02e8d6d9276e5990b9beae29a24c637cb12fb; https://github.com/YunRah2103/Remotion-gpt-chat/pull/135",
+    "Five verified 100% native Remotion/Three/WebGL moving previews in workflow run https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39046325972, five successful jobs: 600/600 decoded distinct frames, 432x768/30fps/H264 limited yuv420p. Verified full ffmpeg decode and FFprobe/framemd5; reviewer inspected real first/middle/last and contact-sheet frames in current ChatGPT session.",
+    "Per-clip SHA256 and exact GitHub Actions artifact IDs available under previewMedia."
   ],
   "sha256": {
-    "nativePreviews": null,
+    "nativePreviews": {
+      "hook-orbit": "cc96390d97e2771c2b62f3ea0375a00f15b284275d5290eb904fee8381598e0a",
+      "hook-rush": "9e973a20758c6c059a5624b26125de2e889a56b01913a6c3fa20248c77df5963",
+      "shaft-follow": "874c29db63a0b42a6c2cc344a6fb64d22d0db2ed453311d2c5b02e268f9ad8e1",
+      "charge-glide": "3e2ca18583e5cc23b6d021c90c843ae433b4a780cf74a2651000f6d45bf5ff04",
+      "road-hero": "93f3e2a708743e764942d5291393dcac96c2258d6423d11b76c8fcd77f15322c"
+    },
     "localProxyConcepts": {
       "hook_orbit": "6455ccd0a76d1d2d2679955af1e64de40c8347cb5937aef3a47d60c0ed8a81e7",
       "hook_rush": "88913a65c605b078cc45ffa5f6375d46165bb9b7528779d7e8797a4c162e7144",
@@ -45,7 +52,7 @@
       "road_hero": "77594d5b73b5e20b33c4c6fadb62b2ed629bad2e199829e7a8170fa787966334"
     }
   },
-  "sourceCommit": "6288c739b4546bb89393d98c9178a76f5b15f686",
+  "sourceCommit": "cfc02e8d6d9276e5990b9beae29a24c637cb12fb",
   "shots": [
     {
       "variant": "hookOrbit",
@@ -99,5 +106,82 @@
       "Resolve A2 turbine/casing occlusion and camera clearance in actual WebGL native previews.",
       "Render 0–3s,7–12s,22–26s via render-previews.sh and inspect 30fps motion."
     ]
-  }
+  },
+  "previewMedia": [
+    {
+      "name": "hook-orbit",
+      "artifact": 12106051263,
+      "sha": "cc96390d97e2771c2b62f3ea0375a00f15b284275d5290eb904fee8381598e0a",
+      "frames": 90,
+      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39046325972/artifacts/12106051263",
+      "width": 432,
+      "height": 768,
+      "fps": 30,
+      "codec": "H264",
+      "pix_fmt": "yuv420p",
+      "frameMd5Unique": 90,
+      "fullDecode": "PASS",
+      "subjectiveVisualReview": "PASS FOR CAMERA PROTOTYPE ONLY; approved A1/A2 scene import not yet tested"
+    },
+    {
+      "name": "hook-rush",
+      "artifact": 12106290432,
+      "sha": "9e973a20758c6c059a5624b26125de2e889a56b01913a6c3fa20248c77df5963",
+      "frames": 90,
+      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39046325972/artifacts/12106290432",
+      "width": 432,
+      "height": 768,
+      "fps": 30,
+      "codec": "H264",
+      "pix_fmt": "yuv420p",
+      "frameMd5Unique": 90,
+      "fullDecode": "PASS",
+      "subjectiveVisualReview": "PASS FOR CAMERA PROTOTYPE ONLY; approved A1/A2 scene import not yet tested"
+    },
+    {
+      "name": "shaft-follow",
+      "artifact": 12106241289,
+      "sha": "874c29db63a0b42a6c2cc344a6fb64d22d0db2ed453311d2c5b02e268f9ad8e1",
+      "frames": 150,
+      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39046325972/artifacts/12106241289",
+      "width": 432,
+      "height": 768,
+      "fps": 30,
+      "codec": "H264",
+      "pix_fmt": "yuv420p",
+      "frameMd5Unique": 150,
+      "fullDecode": "PASS",
+      "subjectiveVisualReview": "PASS FOR CAMERA PROTOTYPE ONLY; approved A1/A2 scene import not yet tested"
+    },
+    {
+      "name": "charge-glide",
+      "artifact": 12106500298,
+      "sha": "3e2ca18583e5cc23b6d021c90c843ae433b4a780cf74a2651000f6d45bf5ff04",
+      "frames": 150,
+      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39046325972/artifacts/12106500298",
+      "width": 432,
+      "height": 768,
+      "fps": 30,
+      "codec": "H264",
+      "pix_fmt": "yuv420p",
+      "frameMd5Unique": 150,
+      "fullDecode": "PASS",
+      "subjectiveVisualReview": "PASS FOR CAMERA PROTOTYPE ONLY; approved A1/A2 scene import not yet tested"
+    },
+    {
+      "name": "road-hero",
+      "artifact": 12106221309,
+      "sha": "93f3e2a708743e764942d5291393dcac96c2258d6423d11b76c8fcd77f15322c",
+      "frames": 120,
+      "url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39046325972/artifacts/12106221309",
+      "width": 432,
+      "height": 768,
+      "fps": 30,
+      "codec": "H264",
+      "pix_fmt": "yuv420p",
+      "frameMd5Unique": 120,
+      "fullDecode": "PASS",
+      "subjectiveVisualReview": "PASS FOR CAMERA PROTOTYPE ONLY; approved A1/A2 scene import not yet tested"
+    }
+  ]
 }
