@@ -9,7 +9,7 @@ const Camera:React.FC<{frame:number;mode:'cutaway'|'exploded'|'full'}>=({frame,m
  const {camera}=useThree();
  useLayoutEffect(()=>{
    const t=frame/30;
-   const distance=(mode==='full'?10.3:6.9) - Math.min(40,frame)/40*.40;
+   const distance=(mode==='full'?13.6:7.6) - Math.min(40,frame)/40*.40;
    camera.position.set(distance*Math.sin(.20+t*.19),distance*.36+Math.sin(t*.36)*.13,distance*Math.cos(.20+t*.19));
    camera.lookAt(mode==='full'?.25:0,mode==='full'?-.30:0,mode==='full'?-1.4:0);
    camera.updateProjectionMatrix();
