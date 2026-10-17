@@ -32,9 +32,9 @@ export const sampleShot=(shot:Shot,frame:number,anchors:Anchors={},duration=shot
  let p0:Vec3,p1:Vec3,p2:Vec3,p3:Vec3,a:Vec3,b:Vec3, f0:number,f1:number;
  switch(shot){
  case 'hookOrbit':
-  p0=vec('TURBINE',[-4.25,0.75,1.2],anchors);p1=vec('TURBINE',[-3.9,0.60,1.65],anchors);
-  p2=vec('TURBINE',[-3.05,0.50,3.0],anchors);p3=vec('TURBINE',[-2.9,0.43,3.15],anchors);
-  a=vec('TURBINE',[0,0,0],anchors);b=vec('TURBINE',[0.07,0.04,0],anchors);f0=42;f1=44;break;
+  p0=vec('TURBINE',[-3.25,0.54,2.45],anchors);p1=vec('TURBINE',[-3.05,0.48,2.75],anchors);
+  p2=vec('TURBINE',[-2.45,0.40,3.05],anchors);p3=vec('TURBINE',[-2.40,0.42,3.3],anchors);
+  a=vec('TURBINE',[0,0.04,0.12],anchors);b=vec('TURBINE',[0.05,0.04,0.12],anchors);f0=40;f1=41;break;
  case 'hookRush':
   p0=vec('TURBINE',[-4.2,1.15,1.8],anchors);p1=vec('TURBINE',[-3.7,1.05,2.2],anchors);
   p2=vec('TURBINE',[-3.15,0.85,2.55],anchors);p3=vec('TURBINE',[-3.0,0.7,2.7],anchors);
