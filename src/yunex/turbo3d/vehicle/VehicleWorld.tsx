@@ -1,6 +1,7 @@
 import React, {useLayoutEffect, useMemo} from 'react';
 import * as THREE from 'three';
 import {useThree} from '@react-three/fiber';
+import {LightShell, FrontDuct, SideDuct, PremiumWheel, EngineBayDetail, HingedEngineDeck} from './DetailKit';
 
 /**
  * A1 ORIGINAL VEHICLE / ENVIRONMENT. 1 unit = 1 metre.
@@ -41,6 +42,8 @@ function loft(sections:ReadonlyArray<readonly [number,number,number,number]>):TH
   }
   for(let s=0;s<sections.length-1;s++){
     for(let j=0;j<4;j++){
+      // Leave actual rear-quarter side apertures for inboard deep duct geometry.
+      if(s===2 && (j===1 || j===3)) continue;
       const a=4*s+j,b=4*s+(j+1)%4,c=a+4,d=b+4;
       indices.push(a,b,c,b,d,c);
     }
@@ -62,63 +65,7 @@ const ROOF_SECTIONS:ReadonlyArray<readonly [number,number,number,number]>=[
   [-1.38,.72,.80,.82],[-.91,.63,.82,1.17],[-.60,.58,.82,1.25],
   [.23,.56,.82,1.24],[.46,.59,.82,1.17],[1.09,.78,.76,.78]
 ];
-const SideStripe:React.FC<{side:number}>=({side})=><group>
-  <mesh position={[side*.923,.51,.09]} rotation={[0,0,side*.12]} castShadow>
-    <boxGeometry args={[.031,.072,2.2]}/><meshStandardMaterial name="SIDE_METAL_EDGE" color={C.edge} metalness={.83} roughness={.25}/>
-  </mesh>
-  <mesh position={[side*.967,.67,-.65]} rotation={[0,side*.08,0]} castShadow>
-    <boxGeometry args={[.044,.17,.65]}/><meshStandardMaterial name="SIDE_AIR_INTAKE" color="#061119" roughness={.48} metalness={.35}/>
-  </mesh>
-  <mesh position={[side*.992,.665,-.37]}>
-    <boxGeometry args={[.020,.135,.026]}/><meshStandardMaterial color="#AACDD0" metalness={.88} roughness={.29}/>
-  </mesh>
-</group>;
-
-const Wheel:React.FC<{side:number;z:number;travelMeters:number}>=({side,z,travelMeters})=>{
-  const spin=-travelMeters/VEHICLE_SPEC.wheelRadius;
-  return <group name={z>0?'FRONT_WHEEL':'REAR_WHEEL'} position={[side*VEHICLE_SPEC.wheelX,VEHICLE_SPEC.wheelCenterY,z]}>
-    <group name="STATIONARY_BRAKE_CALIPER">
-      <mesh position={[side*.085,.155,.085]}><boxGeometry args={[.046,.135,.13]}/>
-        <meshStandardMaterial name="BRAKE_CALIPER_SILVER" color="#A5BCBC" metalness={.78} roughness={.26}/></mesh>
-    </group>
-    <group name="WHEEL_PIVOT_X" rotation={[spin,0,0]}>
-      <mesh rotation={[0,0,Pi/2]} castShadow>
-        <cylinderGeometry args={[.315,.315,.24,36,1]}/>
-        <meshStandardMaterial name="RUBBER_SIDEWALL" color={C.tyre} roughness={.9}/>
-      </mesh>
-      <mesh rotation={[0,Pi/2,0]} castShadow>
-        <torusGeometry args={[.282,.073,12,42]}/>
-        <meshStandardMaterial name="TYRE_TREAD" color="#090C10" roughness={.96}/>
-      </mesh>
-      {Array.from({length:18},(_,i)=><mesh key={'t'+i} position={[side*.115,Math.cos(i*Pi/9)*.31,Math.sin(i*Pi/9)*.31]} rotation={[i*Pi/9,0,0]}>
-        <boxGeometry args={[.012,.055,.087]}/><meshStandardMaterial color="#25282B" roughness={.89}/>
-      </mesh>)}
-      <mesh rotation={[0,Pi/2,0]} position={[side*.128,0,0]}>
-        <torusGeometry args={[.238,.027,12,32]}/>
-        <meshStandardMaterial name="RIM_OUTER_LIP" color="#74888F" metalness={.93} roughness={.19}/>
-      </mesh>
-      <mesh rotation={[0,0,Pi/2]} position={[side*.136,0,0]}>
-        <cylinderGeometry args={[.235,.235,.027,32]}/>
-        <meshStandardMaterial name="RIM_GRAPHITE" color={C.rim} metalness={.82} roughness={.3}/>
-      </mesh>
-      {Array.from({length:10},(_,i)=>{
-        const a=Pi*2*i/10;
-        return <group key={i} rotation={[a,0,0]}>
-          <mesh position={[side*.164,.137,0]} castShadow rotation={[.0,0,side*-.05]}>
-            <boxGeometry args={[.027,.211,.037]}/>
-            <meshStandardMaterial name="RIM_MACHINED_SPOKE" color={i%2?'#758C91':'#93A9AC'} metalness={.91} roughness={.25}/>
-          </mesh>
-          <mesh position={[side*.180,.220,0]}><boxGeometry args={[.022,.030,.068]}/>
-            <meshStandardMaterial color="#2B3941" metalness={.7} roughness={.32}/></mesh>
-        </group>;
-      })}
-      <mesh rotation={[0,0,Pi/2]} position={[side*.196,0,0]}>
-        <cylinderGeometry args={[.074,.074,.048,24]}/>
-        <meshStandardMaterial name="UNBRANDED_WHEEL_HUB" color="#B4CACC" metalness={.95} roughness={.21}/>
-      </mesh>
-    </group>
-  </group>;
-};
+/** Close-up wheel and air-inlet geometry is owned by DetailKit.tsx (A1 v2). */
 
 export const VehicleModel:React.FC<{frame:number;variant?:VehicleVariant;revealProgress?:number;travelMeters?:number}>=
 ({frame,variant='opaque',revealProgress=0,travelMeters=0})=>{
@@ -126,7 +73,7 @@ export const VehicleModel:React.FC<{frame:number;variant?:VehicleVariant;revealP
   const canopy=useMemo(()=>loft(ROOF_SECTIONS),[]);
   const r=clamp(revealProgress);
   const panelOpen=variant==='reveal'?r:0;
-  const hero=variant==='hero';
+  // Hero emissive settings are carried by the layered lamps in DetailKit.
   const float=Math.sin(frame*.065)*.007;
   return <group name="ORIGINAL_YUNEX_COUPE" position={[0,float,0]}>
     <group name="CAR_BODY">
@@ -139,14 +86,8 @@ export const VehicleModel:React.FC<{frame:number;variant?:VehicleVariant;revealP
       <mesh position={[0,1.247,-.16]}><boxGeometry args={[1.07,.016,.73]}/>
         <meshStandardMaterial name="ROOFLINE_TEAL" color="#245D63" metalness={.8} roughness={.25}/></mesh>
       {[-1,1].map(s=><group key={s}>
-        <SideStripe side={s}/>
-        <mesh position={[s*.76,.79,1.82]} rotation={[0,s*-.19,0]} castShadow>
-          <boxGeometry args={[.42,.075,.36]}/>
-          <meshStandardMaterial name="HEADLAMP_WHITE" color="#EBFEFF" emissive={C.head} emissiveIntensity={hero?2.8:1.4} roughness={.15}/>
-        </mesh>
-        <mesh position={[s*.765,.817,1.82]}>
-          <boxGeometry args={[.44,.025,.37]}/><meshStandardMaterial color="#071823" roughness={.25}/>
-        </mesh>
+        <LightShell side={s}/>
+        <SideDuct side={s}/>
         <mesh position={[s*.72,.775,-2.28]}>
           <boxGeometry args={[.52,.068,.042]}/><meshStandardMaterial name="REAR_LED_CRIMSON" emissive={C.tail} emissiveIntensity={3.5} color={C.tail}/>
         </mesh>
@@ -156,9 +97,7 @@ export const VehicleModel:React.FC<{frame:number;variant?:VehicleVariant;revealP
         <mesh position={[s*.76,.68,1.07]} rotation={[0,s*.22,0]}>
           <boxGeometry args={[.12,.035,.24]}/><meshStandardMaterial name="SIDE_MIRROR_DARK" color="#0B171E" metalness={.52} roughness={.38}/>
         </mesh>
-        <mesh position={[s*.75,.44,1.95]} rotation={[0,s*-.17,0]}>
-          <boxGeometry args={[.39,.14,.40]}/><meshStandardMaterial name="FRONT_BUMPER_INTAKE" color="#07161E" metalness={.26} roughness={.55}/>
-        </mesh>
+        <FrontDuct side={s}/>
         <mesh position={[s*.79,.53,-2.21]}>
           <boxGeometry args={[.37,.09,.09]}/><meshStandardMaterial color="#071116" metalness={.45} roughness={.33}/>
         </mesh>
@@ -167,22 +106,13 @@ export const VehicleModel:React.FC<{frame:number;variant?:VehicleVariant;revealP
       <mesh position={[0,.50,-2.288]}><boxGeometry args={[1.07,.12,.05]}/><meshStandardMaterial name="REAR_DIFFUSER" color="#0A151C" metalness={.32} roughness={.53}/></mesh>
       {[-.38,0,.38].map(x=><mesh key={x} position={[x,.43,-2.33]}>
         <boxGeometry args={[.09,.17,.13]}/><meshStandardMaterial color="#2B3940" metalness={.47}/></mesh>)}
-      <group name="ENGINE_ACCESS_DECK" position={[0,.85,-1.43]} rotation={[panelOpen*-.45,0,0]}>
-        <mesh position={[0,.016,0]} castShadow>
-          <boxGeometry args={[1.53,.055,.88]}/><meshPhysicalMaterial name="ENGINE_COVER" color={C.paint} metalness={.61} roughness={.28} clearcoat={.78}/>
-        </mesh>
-        {[-.48,-.24,0,.24,.48].map(x=><mesh key={x} position={[x,.052,-.13]}>
-          <boxGeometry args={[.06,.008,.54]}/><meshStandardMaterial name="ENGINE_DECK_VENT" color="#0A1C24" roughness={.48}/></mesh>)}
-      </group>
-      <mesh name="ENGINE_BAY" position={[0,.78,-1.45]}>
-        <boxGeometry args={[1.37,.12,.73]}/><meshStandardMaterial color="#182630" metalness={.51} roughness={.45}/></mesh>
-      <mesh name="EXHAUST_MANIFOLD_ZONE" visible={variant==='reveal' && panelOpen>.25} position={[0,.84,-1.75]}>
-        <boxGeometry args={[.72,.19,.21]}/><meshStandardMaterial color="#A47355" metalness={.7} roughness={.39}/></mesh>
+      <HingedEngineDeck open={panelOpen}/>
+      <EngineBayDetail visible={variant==='reveal' && panelOpen>.02}/>
       <mesh position={[0,.96,-2.04]}><boxGeometry args={[1.61,.065,.37]}/>
         <meshStandardMaterial name="AERO_REAR_SPOILER" color="#17242B" metalness={.73} roughness={.28}/></mesh>
       <mesh position={[0,.43,2.30]}><boxGeometry args={[1.58,.04,.29]}/>
         <meshStandardMaterial name="FRONT_SPLITTER" color="#10151B" metalness={.49} roughness={.44}/></mesh>
-      {[-1,1].flatMap(s=>[1.47,-1.48].map(z=><Wheel key={s+'_'+z} side={s} z={z} travelMeters={travelMeters}/>))}
+      {[-1,1].flatMap(s=>[1.47,-1.48].map(z=><PremiumWheel key={s+'_'+z} side={s} z={z} travelMeters={travelMeters}/>))}
     </group>
   </group>;
 };
