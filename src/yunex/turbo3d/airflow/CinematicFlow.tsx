@@ -77,7 +77,7 @@ const RotorPulse:React.FC<{frame:number;x:number;color:string;visible:boolean}>=
 export const CinematicFlow:React.FC<{frame:number;phase:TurboFlowPhase;intensity?:number}>=({
  frame,phase,intensity=1
 })=><group name="A3_CINEMATIC_FLOW_CUTAWAY">
- {all.filter(id=>phaseShows(phase,id)).map(id=>{
+ {all.filter(id=>phase==='combustion'?(id==='charge-cooled'||id==='fuel-pulse'):phaseShows(phase,id)).map(id=>{
   const points=A2_CANDIDATE_ROUTES[id];
   if(!points)return null;
   return <group key={id}>
