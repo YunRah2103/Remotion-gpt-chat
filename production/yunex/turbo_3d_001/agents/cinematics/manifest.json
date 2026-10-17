@@ -1,0 +1,103 @@
+{
+  "assetId": "YUNEX-TURBO-3D-EP001-A4-CINEMATICS",
+  "kind": "frame-driven Remotion Three camera/motion design with original proxy test meshes",
+  "owner": "director",
+  "unitMetersPerUnit": 1,
+  "upAxis": "+Y",
+  "forwardAxis": "+Z",
+  "boundingBox": "camera system no fixed mesh bounds; temporary turbo ~6m wide; temporary road 8x100m (NOT A1/A2 final bounds)",
+  "ports": "A4 anchors are stand-ins ONLY; A2 frozen port transforms not delivered",
+  "rigPivots": [
+    "TURBINE",
+    "SHAFT",
+    "COMPRESSOR",
+    "EXHAUST_IN",
+    "COMPRESSED_AIR_OUT",
+    "INTERCOOLER_OUT",
+    "ENGINE_INTAKE",
+    "CAR"
+  ],
+  "entrypoints": [
+    "src/yunex/turbo3d/cinematics/CameraDirector.tsx:CameraDirector",
+    "src/yunex/turbo3d/cinematics/KineticLabels.tsx:KineticLabel,SceneLabels",
+    "src/yunex/turbo3d/cinematics/previewEntry.tsx:YunexA4HookOrbit,YunexA4HookRush,YunexA4Shaft,YunexA4Charge,YunexA4Road"
+  ],
+  "sourceFiles": [
+    "src/yunex/turbo3d/cinematics/cameraMath.ts",
+    "src/yunex/turbo3d/cinematics/CameraDirector.tsx",
+    "src/yunex/turbo3d/cinematics/KineticLabels.tsx",
+    "src/yunex/turbo3d/cinematics/PreviewScenes.tsx",
+    "src/yunex/turbo3d/cinematics/previewEntry.tsx"
+  ],
+  "licenses": [
+    "Original procedural source; no footage or third-party 3D models; project uses package.json installed Remotion/Three dependencies"
+  ],
+  "evidence": [
+    "GitHub production-ci run 39041778306: passed after branch source commit 3709748827f4ed7f7bc86a5f81ad78092c82832b; includes TypeScript compile and older GpuDriveFilm WebGL smoke, NOT new Agent 4 scene renders.",
+    "Four 432x768, 30fps, 3s each real moving independent software 3D proxy MP4s produced in active ChatGPT workspace; FFprobe and full ffmpeg decode PASS; NOT native Remotion previews. No GitHub-hosted A4 preview artifact yet."
+  ],
+  "sha256": {
+    "nativePreviews": null,
+    "localProxyConcepts": {
+      "hook_orbit": "6455ccd0a76d1d2d2679955af1e64de40c8347cb5937aef3a47d60c0ed8a81e7",
+      "hook_rush": "88913a65c605b078cc45ffa5f6375d46165bb9b7528779d7e8797a4c162e7144",
+      "shaft_follow": "89aad09e70d3462c1d9c42268191b1eaefa0e7342e4e6be1f36050a6a194a8e8",
+      "road_hero": "77594d5b73b5e20b33c4c6fadb62b2ed629bad2e199829e7a8170fa787966334"
+    }
+  },
+  "sourceCommit": "3709748827f4ed7f7bc86a5f81ad78092c82832b",
+  "shots": [
+    {
+      "variant": "hookOrbit",
+      "frames": "0–89",
+      "subject": "angled fully visible turbine blades already spinning, amber hot flow, camera moving across casing",
+      "recommendation": "PREFERRED; rotor silhouette and camera motion most legible"
+    },
+    {
+      "variant": "hookRush",
+      "frames": "0–89",
+      "subject": "exhaust-path chase toward live turbine",
+      "recommendation": "alternative cut when VO begins with hot exhaust"
+    },
+    {
+      "variant": "exhaustTrack",
+      "frames": "3–7s provisional",
+      "subject": "travel with amber exhaust arriving at turbine",
+      "recommendation": "do not simulate A2 port alignments until frozen"
+    },
+    {
+      "variant": "shaftFollow",
+      "frames": "7–12s provisional",
+      "subject": "continuous shot tracking the physical shared shaft from hot turbine toward clean compressor",
+      "recommendation": "avoid misleading gas mixing"
+    },
+    {
+      "variant": "compressorReveal",
+      "frames": "7–12s provisional",
+      "subject": "clean-air compressor orbit reveal",
+      "recommendation": "A2 compressor inlet needed"
+    },
+    {
+      "variant": "chargeGlide",
+      "frames": "12–17s provisional",
+      "subject": "compressor outlet to intercooler/engine",
+      "recommendation": "no cooling-creates-mass visual"
+    },
+    {
+      "variant": "roadHero",
+      "frames": "22–26s provisional",
+      "subject": "glide to original A1 car on moving racing road",
+      "recommendation": "A1 camera anchor and bounds required"
+    }
+  ],
+  "integration": {
+    "owner": "A6",
+    "calls": "<CameraDirector frame={sceneLocalFrame} shot='hookOrbit' anchors={actualModelAnchors} durationInFrames={shotFrames}/>, plus <SceneLabels frame={sceneLocalFrame} variant='hookA'/> above <ThreeCanvas>",
+    "timing": "Shot durations provisional; retime to actual approved VO by A7; no global timeline ownership",
+    "requirements": [
+      "Freeze A1/A2 transform hierarchy; replace stand-in model proxies.",
+      "Resolve A2 turbine/casing occlusion and camera clearance in actual WebGL native previews.",
+      "Render 0–3s,7–12s,22–26s via render-previews.sh and inspect 30fps motion."
+    ]
+  }
+}
