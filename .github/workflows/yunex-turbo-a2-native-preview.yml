@@ -37,6 +37,10 @@ jobs:
       - name: Render actual A2 mechanism - complete charge path
         run: |
           npx remotion render src/yunex/turbo3d/mechanism/preview.entry.tsx A2EnginePlumbing out/yunex-a2/engine-native.mp4 --frames=0-39 --gl=swangle --codec=h264 --pixel-format=yuv420p --scale=0.5 --concurrency=1
+      - name: Install FFmpeg and FFprobe for full moving video audit
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
       - name: Verify MP4 metadata, complete decode, unique moving frames and SHA256
         shell: bash
         run: |
