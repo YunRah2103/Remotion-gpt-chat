@@ -7,6 +7,9 @@ import {AbsoluteFill,useCurrentFrame,useVideoConfig} from 'remotion';
 import {ThreeCanvas} from '@remotion/three';
 import * as THREE from 'three';
 import {VehicleWorld} from '../vehicle/VehicleWorld';
+import {CinematicFlow} from '../airflow/CinematicFlow';
+import {TurboFlow} from '../airflow/TurboFlow';
+import {A2_CANDIDATE_PORTS,A2_CANDIDATE_ROUTES} from '../airflow/A2CandidateAdapter';
 import {TurboMechanism} from '../mechanism/TurboMechanism';
 import {TURBO_PORTS,TURBO_PIVOTS} from '../mechanism/ports';
 import {YunexLights,RoadAtmosphere,ExhaustHeat,applyYunexMaterials,YUNEX_LOOK} from '../lookdev/YunexLookdev';
@@ -15,7 +18,7 @@ import {CameraDirector} from './CameraDirector';
 import {SceneLabels} from './KineticLabels';
 import type {Anchors,Shot,Vec3} from './cameraMath';
 
-export type RealModelVariant='realHook'|'realExhaust'|'realShaft'|'realCharge'|'realRoad';
+export type RealModelVariant='realHook'|'realExhaust'|'realShaft'|'realCharge'|'realChargeFlow'|'realRoad';
 const pt=(p:readonly [number,number,number]):Vec3=>[p[0],p[1],p[2]];
 const MECH_ANCHORS:Anchors={
  TURBINE:pt(TURBO_PIVOTS.TURBINE_ROTOR),
@@ -34,7 +37,7 @@ const RealModelMaterialAdapter:React.FC<{children:React.ReactNode}>=({children})
  return <group ref={root}>{children}</group>;
 };
 const A2Stage:React.FC<{frame:number;variant:RealModelVariant}>=({frame,variant})=>{
- const full=variant==='realCharge';
+ const full=variant==='realCharge'||variant==='realChargeFlow';
  const shot:Shot=variant==='realHook'?'hookOrbit':variant==='realExhaust'?'hookRush':variant==='realShaft'?'shaftFollow':'chargeGlide';
  const duration=variant==='realShaft'||full?120:90;
  return <>
@@ -49,6 +52,10 @@ const A2Stage:React.FC<{frame:number;variant:RealModelVariant}>=({frame,variant}
   <RealModelMaterialAdapter>
    <TurboMechanism frame={frame} variant={full?'full':'turbo'} cutaway={1}/>
   </RealModelMaterialAdapter>
+  {variant==='realChargeFlow'?<group name="A4_REAL_A3_AIRFLOW_CLEARANCE_PROOF">
+    <TurboFlow frame={frame} phase="intercooler" ports={A2_CANDIDATE_PORTS} routes={A2_CANDIDATE_ROUTES} intensity={.35}/>
+    <CinematicFlow frame={frame} phase="intercooler" intensity={.62}/>
+   </group>:null}
   <ExhaustHeat frame={frame} position={[-1.13,.74,.42]} intensity={variant==='realExhaust'?.8:.55}/>
   <CameraDirector frame={frame} shot={shot} anchors={MECH_ANCHORS} durationInFrames={duration}/>
  </>;
@@ -65,7 +72,7 @@ const A1Stage:React.FC<{frame:number}>=({frame})=><>
  </>;
 export const RealModelPreview:React.FC<{variant:RealModelVariant}>=({variant})=>{
  const frame=useCurrentFrame(),{width,height}=useVideoConfig(),road=variant==='realRoad';
- const label=variant==='realHook'?'hookA':variant==='realExhaust'?'hookB':variant==='realShaft'?'shaft':variant==='realCharge'?'charge':'road';
+ const label=variant==='realHook'?'hookA':variant==='realExhaust'?'hookB':variant==='realShaft'?'shaft':(variant==='realCharge'||variant==='realChargeFlow')?'charge':'road';
  return <AbsoluteFill style={{background:YUNEX_LOOK.background,overflow:'hidden'}}>
   <ThreeCanvas width={width} height={height} shadows gl={{antialias:true,preserveDrawingBuffer:true}} camera={{position:[0,1,7],fov:40,near:.08,far:180}}>
    {road?<A1Stage frame={frame}/>:<A2Stage frame={frame} variant={variant}/>}
