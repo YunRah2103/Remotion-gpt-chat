@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "task": "yunex-turbo-3d-ep001-agent3-airflow",
   "branch": "agent/turbo-3d-001-airflow",
-  "sourceSha": "66c10464777f52130b7d60efb0b808f9781507f3",
+  "sourceSha": "4c7c9526945511bab75ca66e089fd5bfc47b4c62",
   "owner": "engineering",
-  "summary": "Implemented frame-deterministic six-route R3F airflow with thermal and simplified combustion cues; independent offscreen VTK 3D proxy rendered and fully decoded.",
+  "summary": "Frame-deterministic independent R3F hot exhaust, clean intake, charge cooling and cylinder combustion, with pinned not-yet-approved A2 pipe/port compatibility adapter; two verified independent VTK moving reviews and clean repository TypeScript/native generic CI.",
   "status": "review",
   "files": [
     "src/yunex/turbo3d/airflow/TurboFlow.tsx",
@@ -13,17 +13,22 @@
     "src/yunex/turbo3d/airflow/preview/entry.ts",
     "production/yunex/turbo_3d_001/agents/airflow/flow-ports.json",
     "production/yunex/turbo_3d_001/agents/airflow/README.md",
-    "production/yunex/turbo_3d_001/agents/airflow/test_ports.py"
+    "production/yunex/turbo_3d_001/agents/airflow/test_ports.py",
+    "src/yunex/turbo3d/airflow/A2CandidateAdapter.ts",
+    "production/yunex/turbo_3d_001/agents/airflow/a2-candidate-routes.json",
+    "production/yunex/turbo_3d_001/agents/airflow/test_a2_candidate.py"
   ],
   "evidence": [
     "Source commit https://github.com/YunRah2103/Remotion-gpt-chat/commit/66c10464777f52130b7d60efb0b808f9781507f3",
     "PR https://github.com/YunRah2103/Remotion-gpt-chat/pull/137",
-    "Independent native VTK 3D moving review file delivered in user chat: A3_AIRFLOW_3D_PROOF.mp4 (11s, 220 frames, 20fps, 360x640, H264; SHA256 2ead248979a934730cdf4132a5130762f216f4c3e20614c4ea0e71b4696d100f), FFprobe/full decode PASS. Not an R3F render or GitHub artifact."
+    "Independent native VTK 3D moving review file delivered in user chat: A3_AIRFLOW_3D_PROOF.mp4 (11s, 220 frames, 20fps, 360x640, H264; SHA256 2ead248979a934730cdf4132a5130762f216f4c3e20614c4ea0e71b4696d100f), FFprobe/full decode PASS. Not an R3F render or GitHub artifact.",
+    "A2-port-aligned independent moving 3D proxy in user chat: A3_A2_CANDIDATE_FLOW_3D.mp4, H264 360x640 20fps 220 frames 11s, ffprobe/full decode PASS, sha256 7448d7499fd4c9abbbc3e835e88867e07d860b7e836f8fc452fc24533bb31a3c",
+    "Real GitHub TS+native generic smoke CI PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39042037668 and https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39042037661"
   ],
   "blockers": [
-    "Port coordinates and physical pipe centrelines are marked UNVERIFIED_A2 until immutable Agent 2 mechanical manifest is available; integrate only with reviewed A2 paths.",
-    "A genuine native Remotion isolated preview needs to be rendered and independently visually examined; no native playback QA yet.",
-    "Manager visual/science approval pending."
+    "A2 ports now documented in an explicitly unapproved candidate adapter pinned to a658ef8. Await model freeze + native geometry/rotor throat visual QA.",
+    "Dedicated native Remotion rendering for isolated A3AirflowReview has not been executed; generic PR smoke is NOT equivalent.",
+    "Manager needs to review artistic/scientific material before approved integration."
   ],
-  "notes": "Preliminary review; NOT APPROVED; only source and independently verified moving proxy delivered. User-chat link is not a GitHub-hosted artifact."
+  "notes": "STATUS REVIEW ONLY, not APPROVED. Two independent VTK moving software-rendered and FFmpeg-decoded videos in user chat, no public GitHub-hosted binary claimed."
 }
