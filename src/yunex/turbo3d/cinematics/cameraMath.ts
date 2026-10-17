@@ -32,12 +32,12 @@ export const sampleShot=(shot:Shot,frame:number,anchors:Anchors={},duration=shot
  let p0:Vec3,p1:Vec3,p2:Vec3,p3:Vec3,a:Vec3,b:Vec3, f0:number,f1:number;
  switch(shot){
  case 'hookOrbit':
-  p0=vec('TURBINE',[-0.2,0.6,4.5],anchors);p1=vec('TURBINE',[0,0.6,3.9],anchors);
-  p2=vec('TURBINE',[0.55,0.45,3.7],anchors);p3=vec('TURBINE',[0.55,0.4,3.6],anchors);
+  p0=vec('TURBINE',[-3.2,0.7,4.4],anchors);p1=vec('TURBINE',[-2.8,0.7,4.0],anchors);
+  p2=vec('TURBINE',[-2.0,0.6,3.5],anchors);p3=vec('TURBINE',[-1.7,0.55,3.3],anchors);
   a=vec('TURBINE',[0,0,0],anchors);b=vec('TURBINE',[0.2,0,0],anchors);f0=38;f1=40;break;
  case 'hookRush':
-  p0=vec('EXHAUST_IN',[0.25,0.3,4.7],anchors);p1=vec('EXHAUST_IN',[0.65,0.55,4.3],anchors);
-  p2=vec('TURBINE',[-0.25,0.6,4.0],anchors);p3=vec('TURBINE',[0,0.5,3.7],anchors);
+  p0=vec('EXHAUST_IN',[-0.7,0.4,4.5],anchors);p1=vec('EXHAUST_IN',[-0.4,0.55,4.1],anchors);
+  p2=vec('TURBINE',[-1.9,0.7,3.7],anchors);p3=vec('TURBINE',[-1.5,0.6,3.3],anchors);
   a=vec('EXHAUST_IN',[0.85,0,0],anchors);b=vec('TURBINE',[0,0,0],anchors);f0=40;f1=40;break;
  case 'exhaustTrack':
   p0=vec('EXHAUST_IN',[-0.7,0.65,2.6],anchors);p1=vec('EXHAUST_IN',[0.45,0.7,2.2],anchors);
