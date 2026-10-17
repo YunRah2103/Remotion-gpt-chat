@@ -1,0 +1,100 @@
+name: AI Glaze V2 - Remotion TikTok MP4
+on:
+  push:
+    branches:
+      - feat/ai-glaze-tiktok-20261017
+    paths:
+      - 'src/tiktok/AiGlazeTikTok.tsx'
+      - 'src/Root.tsx'
+      - '.github/workflows/ai-glaze-tiktok.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install tools
+        run: |
+          npm install --no-audit --no-fund
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq espeak ffmpeg
+      - name: Type check & verify registration
+        run: |
+          npm run check
+          npx remotion compositions src/index.ts --gl=swangle | tee out-comps.txt
+          grep -q AiGlazeTikTok out-comps.txt
+      - name: Render all 735 frames
+        run: |
+          mkdir -p out
+          npx remotion render src/index.ts AiGlazeTikTok out/visual.mp4 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=2
+      - name: Generate English satirical narration
+        run: |
+          espeak -v en-us -s 201 -p 45 -a 160 -w out/v0.wav 'I have terrible news. A I is officially better than all of us.'
+          espeak -v en-us -s 201 -p 45 -a 160 -w out/v1.wav 'And I have proof. I asked A I if A I is the best.'
+          espeak -v en-us -s 201 -p 45 -a 160 -w out/v2.wav 'It said yes. Case closed. Science.'
+          espeak -v en-us -s 201 -p 45 -a 160 -w out/v3.wav 'I asked it what to eat. It said electricity. Inspirational.'
+          espeak -v en-us -s 201 -p 45 -a 160 -w out/v4.wav 'I asked it to review itself. Five stars. No notes.'
+          espeak -v en-us -s 201 -p 45 -a 160 -w out/v5.wav 'Humans need sleep. A I just needs your data.'
+          espeak -v en-us -s 201 -p 45 -a 160 -w out/v6.wav 'If you disagree, your brain needs an update. Comment below.'
+      - name: Mix voice and custom generated electronic backing
+        run: |
+          ffmpeg -hide_banner -loglevel error -y \
+            -i out/v0.wav -i out/v1.wav -i out/v2.wav -i out/v3.wav -i out/v4.wav -i out/v5.wav -i out/v6.wav \
+            -f lavfi -i "sine=frequency=82:sample_rate=48000:duration=24.5" \
+            -f lavfi -i "sine=frequency=164.81:sample_rate=48000:duration=24.5" \
+            -filter_complex "\
+              [0:a]adelay=180:all=1,volume=1[v0];\
+              [1:a]adelay=3340:all=1,volume=1[v1];\
+              [2:a]adelay=6950:all=1,volume=1[v2];\
+              [3:a]adelay=10150:all=1,volume=1[v3];\
+              [4:a]adelay=13880:all=1,volume=1[v4];\
+              [5:a]adelay=17240:all=1,volume=1[v5];\
+              [6:a]adelay=20540:all=1,volume=1[v6];\
+              [7:a]volume=0.045[bass];\
+              [8:a]volume=0.017[lead];\
+              [v0][v1][v2][v3][v4][v5][v6][bass][lead]amix=inputs=9:duration=longest:normalize=0,alimiter=limit=0.88,afade=t=out:st=24.1:d=0.4[mix]" \
+            -map '[mix]' -t 24.5 -ar 48000 -ac 2 -c:a aac -b:a 192k out/audio.m4a
+          ffmpeg -hide_banner -loglevel error -y \
+            -i out/visual.mp4 -i out/audio.m4a \
+            -map 0:v:0 -map 1:a:0 \
+            -vf "scale=in_range=pc:out_range=tv,format=yuv420p" \
+            -c:v libx264 -preset veryfast -crf 18 -pix_fmt yuv420p -color_range tv \
+            -c:a copy -t 24.5 -movflags +faststart out/AI-GLAZE-V2-TIKTOK.mp4
+      - name: Full-decode and strict media QC
+        run: |
+          ffmpeg -hide_banner -loglevel error -xerror -i out/AI-GLAZE-V2-TIKTOK.mp4 -f null -
+          ffprobe -v error -show_streams -show_format -of json out/AI-GLAZE-V2-TIKTOK.mp4 > out/ffprobe.json
+          python3 - <<'PY'
+          import json
+          data=json.load(open('out/ffprobe.json'))
+          vid=next(s for s in data['streams'] if s['codec_type']=='video')
+          aud=next(s for s in data['streams'] if s['codec_type']=='audio')
+          assert vid['codec_name']=='h264' and (vid['width'],vid['height'])==(1080,1920),vid
+          assert vid['pix_fmt']=='yuv420p' and int(vid['nb_frames'])==735,vid
+          assert vid['r_frame_rate']=='30/1',vid
+          assert aud['codec_name']=='aac',aud
+          assert abs(float(data['format']['duration'])-24.5)<0.1,data['format']
+          print('PASS: 1080x1920, 30 fps, 735 frames, H264 yuv420p, AAC, 24.5 sec')
+          PY
+          for sec in 1 5 8 12 15 19 22; do
+            ffmpeg -hide_banner -loglevel error -y -ss "$sec" -i out/AI-GLAZE-V2-TIKTOK.mp4 -frames:v 1 -update 1 "out/scene-$sec.png"
+          done
+          sha256sum out/AI-GLAZE-V2-TIKTOK.mp4 > out/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AI-GLAZE-V2-TIKTOK-MASTER
+          path: |
+            out/AI-GLAZE-V2-TIKTOK.mp4
+            out/ffprobe.json
+            out/scene-*.png
+            out/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
