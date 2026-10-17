@@ -1,8 +1,11 @@
-name: YUNEX Turbo EP001 - A4 native 3D moving previews
+name: YUNEX A4 - pinned real-model camera integration proof
 on:
   pull_request:
     paths:
       - 'src/yunex/turbo3d/cinematics/**'
+      - 'src/yunex/turbo3d/vehicle/**'
+      - 'src/yunex/turbo3d/mechanism/**'
+      - 'src/yunex/turbo3d/lookdev/**'
       - 'production/yunex/turbo_3d_001/agents/cinematics/**'
       - '.github/workflows/yunex-a4-native-previews.yml'
   workflow_dispatch:
@@ -23,24 +26,24 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: hook-orbit
-            composition: YunexA4HookOrbit
+          - name: real-hook
+            composition: YunexA4RealHook
             end: 89
             frames: 90
-          - name: hook-rush
-            composition: YunexA4HookRush
+          - name: real-exhaust
+            composition: YunexA4RealExhaust
             end: 89
             frames: 90
-          - name: shaft-follow
-            composition: YunexA4Shaft
-            end: 149
-            frames: 150
-          - name: charge-glide
-            composition: YunexA4Charge
-            end: 149
-            frames: 150
-          - name: road-hero
-            composition: YunexA4Road
+          - name: real-shaft
+            composition: YunexA4RealShaft
+            end: 119
+            frames: 120
+          - name: real-charge
+            composition: YunexA4RealCharge
+            end: 119
+            frames: 120
+          - name: real-road
+            composition: YunexA4RealRoad
             end: 119
             frames: 120
     steps:
@@ -68,7 +71,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "out/a4/$NAME"
-          npx remotion render src/yunex/turbo3d/cinematics/previewEntry.tsx "$COMP" "out/a4/$NAME/native-source.mp4" \
+          npx remotion render src/yunex/turbo3d/cinematics/realModel.entry.tsx "$COMP" "out/a4/$NAME/native-source.mp4" \
             --frames="0-$END" --scale=0.4 --concurrency=1 --gl=swangle --codec=h264 --pixel-format=yuv420p
           # WebGL renders may encode full-range yuvj420p despite the pix_fmt option.
           # Convert explicitly to limited-range H.264 yuv420p for mobile playback.
@@ -108,7 +111,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: yunex-a4-native-${{ matrix.name }}-${{ github.run_id }}
+          name: yunex-a4-real-model-${{ matrix.name }}-${{ github.run_id }}
           path: out/a4/${{ matrix.name }}/
           retention-days: 30
           if-no-files-found: warn

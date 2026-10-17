@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "task": "YUNEX-TURBO3D-EP001-A4-ACTUAL-MODEL-INTEGRATION-REVIEW",
+  "branch": "integration/turbo-3d-001-a4-real-model-qc",
+  "sourceSha": "fadaee879e64cac3a43347e6d79010159a93403c",
+  "owner": "director",
+  "summary": "Camera integration QA with actual pinned Agent 1 vehicle, Agent 2 turbine/shaft/compressor+intercooler, and Agent 5 material/reflection/light rigs; all 5 native Remotion moving previews rendered, decoded, visually reviewed and published. A4 camera rigs and typography retimed and preserved; not A6 picture lock or A0 approval.",
+  "status": "review",
+  "files": [
+    "src/yunex/turbo3d/cinematics/RealModelPreview.tsx",
+    "src/yunex/turbo3d/cinematics/realModel.entry.tsx",
+    "src/yunex/turbo3d/cinematics/cameraMath.ts",
+    "src/yunex/turbo3d/cinematics/CameraDirector.tsx",
+    "src/yunex/turbo3d/cinematics/KineticLabels.tsx",
+    ".github/workflows/yunex-a4-native-previews.yml",
+    "production/yunex/turbo_3d_001/agents/cinematics/real-model-handoff.json",
+    "production/yunex/turbo_3d_001/agents/cinematics/REAL_MODEL_REVIEW.md"
+  ],
+  "evidence": [
+    "Native five-render successful matrix run: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39059676339",
+    "Independent FFprobe + full FFmpeg -xerror decode + SHA256 matched GitHub SHA256SUMS for all five 432x768/30fps/yuv420p H264 90/90/120/120/120-frame previews.",
+    "Moving footage and 7 sampled timestamps per clip independently visually inspected; contact sheet and 18s montage locally decoded.",
+    "YunexA4RealHook 90f 3297604444ec42d07ac4437babb1fc0f14aa400884cddb90a3736fb2704946cb https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39059676339/artifacts/12111076813",
+    "YunexA4RealExhaust 90f f75c1a662654f727e62d4be9e8b76f1497b1f2645a978e754e1ee3a3cc23a23d https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39059676339/artifacts/12110958039",
+    "YunexA4RealShaft 120f d8996f817249c8233ab7d859466b6a5104183c8c2cf6f13499fcf5bf6010b124 https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39059676339/artifacts/12111260846",
+    "YunexA4RealCharge 120f 6263a5ac0a2b50351215128716ce58c82279a85a5c6fcda590285567b4bb25f2 https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39059676339/artifacts/12111047243",
+    "YunexA4RealRoad 120f 08c041c4ff1ead98841cc9d76eca38a7d8e15cfcb84d64368f1c467aa7fbc59f https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39059676339/artifacts/12111360171"
+  ],
+  "blockers": [
+    "A0 manager has not granted explicit APPROVED to A4 or the contributing A1/A2/A5 versions; proof PR is isolated and must not be merged automatically.",
+    "These are 40%-scale camera QA renders. A6 must render and visually inspect final 1080x1920 picture lock; A3 airflow and A7 voice/music are not integrated here.",
+    "Procedural/blocky A1 front/fascia silhouette is visible in close low-angle road frame; manager may request A1 art refinement. Some A2 shaft front-on hub occludes the rotor; use oblique opening framing."
+  ],
+  "notes": "A6 imports A4 cameraMath/CameraDirector/KineticLabels, not PreviewScenes proxy. Explicit A2 port/pivot anchor map comes from imported ports.ts and is used in RealModelPreview. A5 lookdev material adapter only modifies mounted instance and restores materials; do not update artist model source. Composition order recommended realHook -> realShaft -> realCharge -> realRoad with realExhaust as alternative. Actual VO controls shot timings.",
+  "sources": {
+    "A1": {
+      "branch": "agent/turbo-3d-001-vehicle",
+      "sha": "0ea37cda916e809fd30514013a67a8034b491e87"
+    },
+    "A2": {
+      "branch": "agent/turbo-3d-001-mechanism",
+      "sha": "4f894a51083e4ebaa652193713ee0baf56ba2439"
+    },
+    "A5": {
+      "branch": "agent/turbo-3d-001-lookdev",
+      "sha": "db2c8f9b487bf5f80c415aeb585666bfeb44f7d3"
+    }
+  },
+  "previews": [
+    {
+      "composition": "YunexA4RealHook",
+      "scene": "turbine hook",
+      "frames": 90,
+      "durationSec": 3,
+      "artifactId": 12111076813,
+      "sha256": "3297604444ec42d07ac4437babb1fc0f14aa400884cddb90a3736fb2704946cb",
+      "creative": "PREFERRED opening; visible rotor at frame zero; camera tracks from face-on into oblique view",
+      "artifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39059676339/artifacts/12111076813",
+      "format": {
+        "width": 432,
+        "height": 768,
+        "fps": 30,
+        "codec": "h264",
+        "pix_fmt": "yuv420p"
+      },
+      "fullDecode": "PASS",
+      "frameMD5": "ALL FRAMES DISTINCT",
+      "nativeRender": "Remotion 4 + Three.js software WebGL (--gl=swangle)"
+    },
+    {
+      "composition": "YunexA4RealExhaust",
+      "scene": "exhaust alternative",
+      "frames": 90,
+      "durationSec": 3,
+      "artifactId": 12110958039,
+      "sha256": "f75c1a662654f727e62d4be9e8b76f1497b1f2645a978e754e1ee3a3cc23a23d",
+      "creative": "Alternative opener tracking actual hot-side geometry; lower priority than hook",
+      "artifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39059676339/artifacts/12110958039",
+      "format": {
+        "width": 432,
+        "height": 768,
+        "fps": 30,
+        "codec": "h264",
+        "pix_fmt": "yuv420p"
+      },
+      "fullDecode": "PASS",
+      "frameMD5": "ALL FRAMES DISTINCT",
+      "nativeRender": "Remotion 4 + Three.js software WebGL (--gl=swangle)"
+    },
+    {
+      "composition": "YunexA4RealShaft",
+      "scene": "turbine through shaft to compressor",
+      "frames": 120,
+      "durationSec": 4,
+      "artifactId": 12111260846,
+      "sha256": "d8996f817249c8233ab7d859466b6a5104183c8c2cf6f13499fcf5bf6010b124",
+      "creative": "Shows one common shaft between the real turbine and fresh-air compressor; unobstructed centre traversal",
+      "artifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39059676339/artifacts/12111260846",
+      "format": {
+        "width": 432,
+        "height": 768,
+        "fps": 30,
+        "codec": "h264",
+        "pix_fmt": "yuv420p"
+      },
+      "fullDecode": "PASS",
+      "frameMD5": "ALL FRAMES DISTINCT",
+      "nativeRender": "Remotion 4 + Three.js software WebGL (--gl=swangle)"
+    },
+    {
+      "composition": "YunexA4RealCharge",
+      "scene": "compressed-air path to intercooler",
+      "frames": 120,
+      "durationSec": 4,
+      "artifactId": 12111047243,
+      "sha256": "6263a5ac0a2b50351215128716ce58c82279a85a5c6fcda590285567b4bb25f2",
+      "creative": "Clean-air pipe followed to real A2 finned intercooler, with timed CLEAN AIR then INTERCOOLER title; still requires A3 overlay and VO sync",
+      "artifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39059676339/artifacts/12111047243",
+      "format": {
+        "width": 432,
+        "height": 768,
+        "fps": 30,
+        "codec": "h264",
+        "pix_fmt": "yuv420p"
+      },
+      "fullDecode": "PASS",
+      "frameMD5": "ALL FRAMES DISTINCT",
+      "nativeRender": "Remotion 4 + Three.js software WebGL (--gl=swangle)"
+    },
+    {
+      "composition": "YunexA4RealRoad",
+      "scene": "low-angle teal A1 driving payoff",
+      "frames": 120,
+      "durationSec": 4,
+      "artifactId": 12111360171,
+      "sha256": "08c041c4ff1ead98841cc9d76eca38a7d8e15cfcb84d64368f1c467aa7fbc59f",
+      "creative": "Actual A1 sports car and moving road with A5 reflective materials/lighting; stylized body silhouette subject to A0 taste approval",
+      "artifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39059676339/artifacts/12111360171",
+      "format": {
+        "width": 432,
+        "height": 768,
+        "fps": 30,
+        "codec": "h264",
+        "pix_fmt": "yuv420p"
+      },
+      "fullDecode": "PASS",
+      "frameMD5": "ALL FRAMES DISTINCT",
+      "nativeRender": "Remotion 4 + Three.js software WebGL (--gl=swangle)"
+    }
+  ]
+}

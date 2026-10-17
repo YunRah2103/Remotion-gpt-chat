@@ -37,5 +37,8 @@ export const SceneLabels:React.FC<{frame:number;variant:'hookA'|'hookB'|'shaft'|
   <KineticLabel frame={frame} startFrame={12} endFrame={72} label="ONE SHAFT" top={385}/>
   <KineticLabel frame={frame} startFrame={80} endFrame={140} label="CLEAN AIR" top={390} side="right"/>
  </>;
- return <KineticLabel frame={frame} startFrame={12} endFrame={120} label="INTERCOOLER" top={410}/>;
+ return <>
+  <KineticLabel frame={frame} startFrame={8} endFrame={43} label="CLEAN AIR" top={410}/>
+  <KineticLabel frame={frame} startFrame={44} endFrame={112} label="INTERCOOLER" top={410}/>
+ </>;
 };
