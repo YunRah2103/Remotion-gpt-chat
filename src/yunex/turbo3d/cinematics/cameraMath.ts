@@ -56,9 +56,9 @@ export const sampleShot=(shot:Shot,frame:number,anchors:Anchors={},duration=shot
   p2=vec('INTERCOOLER_OUT',[3.3,1.9,3.8],anchors);p3=vec('INTERCOOLER_OUT',[3.5,1.8,3.1],anchors);
   a=vec('COMPRESSED_AIR_OUT',[1.5,0.5,-0.4],anchors);b=vec('INTERCOOLER_OUT',[0.43,0.6,0],anchors);f0=46;f1=43;break;
  case 'roadHero':
-  p0=vec('CAR',[-2.45,0.26,6.65],anchors);p1=vec('CAR',[-1.9,0.22,6.25],anchors);
-  p2=vec('CAR',[1.5,0.28,6.4],anchors);p3=vec('CAR',[2.45,0.38,7.1],anchors);
-  a=vec('CAR',[0,0.03,0.35],anchors);b=vec('CAR',[0,0.1,0.15],anchors);f0=42;f1=42;break;
+  p0=vec('CAR',[-2.68,0.29,9.25],anchors);p1=vec('CAR',[-2.04,0.25,8.88],anchors);
+  p2=vec('CAR',[1.70,0.30,9.03],anchors);p3=vec('CAR',[2.69,0.42,9.68],anchors);
+  a=vec('CAR',[0,0.04,0.35],anchors);b=vec('CAR',[0,0.13,0.12],anchors);f0=44;f1=44;break;
  }
  return {position:bezier(p0,p1,p2,p3,t),target:lerp(a,b,t),fov:mix(f0,f1,t),roll:0};
 };
