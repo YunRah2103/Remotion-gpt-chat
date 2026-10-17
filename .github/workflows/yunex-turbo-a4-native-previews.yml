@@ -1,0 +1,140 @@
+name: YUNEX Turbo 3D - A4 native moving previews
+on:
+  push:
+    branches:
+      - 'agent/turbo-3d-001-cinematics'
+    paths:
+      - 'src/yunex/turbo3d/cinematics/**'
+      - 'production/yunex/turbo_3d_001/agents/cinematics/**'
+      - '.github/workflows/yunex-turbo-a4-native-previews.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: yunex-a4-native-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned dependencies, check TypeScript and deterministic camera trajectories
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          npm run check
+          node production/yunex/turbo_3d_001/agents/cinematics/camera.test.cjs
+          python production/tools/handoff.py production/yunex/turbo_3d_001/agents/cinematics/handoff.json
+
+  native-render:
+    needs: preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 100
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: YunexA4HookOrbit
+            file: hook-orbit
+            last: 89
+            midpoint: 45
+            count: 90
+          - id: YunexA4HookRush
+            file: hook-rush
+            last: 89
+            midpoint: 45
+            count: 90
+          - id: YunexA4Shaft
+            file: shaft-follow
+            last: 149
+            midpoint: 75
+            count: 150
+          - id: YunexA4Charge
+            file: charge-glide
+            last: 149
+            midpoint: 75
+            count: 150
+          - id: YunexA4Road
+            file: road-hero
+            last: 119
+            midpoint: 60
+            count: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install rendering toolchain
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Render complete genuine Remotion/Three/WebGL moving preview
+        env:
+          SHOT: ${{ matrix.id }}
+          OUT: ${{ matrix.file }}
+          LAST: ${{ matrix.last }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "out/yunex/a4/${OUT}/"
+          npx remotion render src/yunex/turbo3d/cinematics/previewEntry.tsx "$SHOT" "out/yunex/a4/${OUT}/${OUT}.mp4" \
+            --frames="0-${LAST}" --scale=0.4 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
+      - name: Decode, inspect frame count and emit actual extracted preview images
+        env:
+          SHOT: ${{ matrix.id }}
+          OUT: ${{ matrix.file }}
+          COUNT: ${{ matrix.count }}
+          MID: ${{ matrix.midpoint }}
+          LAST: ${{ matrix.last }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          DIR="out/yunex/a4/${OUT}"
+          VIDEO="${DIR}/${OUT}.mp4"
+          ffprobe -v error -show_entries stream=codec_name,width,height,pix_fmt,r_frame_rate,nb_frames:format=duration,size -of json "$VIDEO" > "${DIR}/ffprobe.json"
+          ffmpeg -v error -xerror -i "$VIDEO" -f null -
+          sha256sum "$VIDEO" | tee "${DIR}/sha256.txt"
+          ffmpeg -v info -i "$VIDEO" -vf "blackdetect=d=0.5:pix_th=0.1" -an -f null - 2> "${DIR}/blackdetect.log" || true
+          for frame in 0 "$MID" "$LAST"; do
+            ffmpeg -hide_banner -loglevel error -y -i "$VIDEO" \
+              -vf "select='eq(n,${frame})',scale=270:-1" -vsync vfr -frames:v 1 -q:v 4 "${DIR}/frame-${frame}.jpg"
+          done
+          python - "$DIR" "$COUNT" <<'PY'
+          import json,sys,pathlib,hashlib
+          root=pathlib.Path(sys.argv[1]); expected=int(sys.argv[2])
+          d=json.loads((root/'ffprobe.json').read_text())
+          stream=d['streams'][0]
+          assert stream['codec_name']=='h264',stream
+          assert stream['width']==432 and stream['height']==768,stream
+          assert stream['r_frame_rate']=='30/1',stream
+          assert stream['pix_fmt']=='yuv420p',stream
+          assert int(stream['nb_frames'])==expected,stream
+          images=list(root.glob('frame-*.jpg'))
+          assert len(images)==3,images
+          sha=[hashlib.sha256(x.read_bytes()).hexdigest() for x in images]
+          assert len(set(sha))>1,'No visible change in sampled frames'
+          print('NATIVE_REMOTION_VIDEO_PASS',root,expected,'frames; images differ')
+          PY
+          # Small genuine native snapshots in GitHub job logs allow remote visual inspection.
+          for pic in "${DIR}"/frame-*.jpg; do
+            echo "A4_FRAME_START:${SHOT}:$(basename "$pic")"
+            base64 -w0 "$pic"
+            echo
+            echo "A4_FRAME_END:${SHOT}:$(basename "$pic")"
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-A4-NATIVE-${{ matrix.file }}-${{ github.run_id }}
+          path: out/yunex/a4/${{ matrix.file }}/
+          retention-days: 30
+          if-no-files-found: warn
