@@ -1,23 +1,19 @@
-# A1 vehicle — suggested mobile camera anchors (for A4/A6)
+# A1 V5 Close-up camera handoff for A4/A6
 
-All positions are metres in **right-handed Y-up, +Z vehicle forward** space. Look-at target generally (0,0.80,0). These are suggestions only; A4 owns production camera moves, A6 shot timing.
+Axes right-handed **+Y UP, +Z vehicle nose, +X right**, measured in metres. A1 proof-only camera values are inspected and deterministic. A4 may use these as starting points but owns the actual episodic cameras.
 
-| Composition | Camera position | FOV | Why |
-| --- | --- | --- | --- |
-| Front three-quarter tracking | (-4.0,2.45,7.2) | 35° | Shows sculpted nose, roof and wheel assembly. |
-| Low wheel pass | (-2.1,0.85,3.2) | 43° | Wheels and front intake occupy phone screen. |
-| Side-body parallax | (-6.4,1.65,0.2) | 38° | Shows engine bay behind cockpit and coupe length. |
-| Rear glowing LED payoff | (3.6,2.0,-6.5) | 38° | Wing, taillamps and wheel stance. |
-| Engine reveal | (2.1,3.8,-2.65) | 32° | Uses `variant="reveal"`, `revealProgress` 0..1. |
+| Shot | Camera target (m) | Approx starting camera (m) | FOV | Preview frames |
+| --- | --- | --- | --- | --- |
+| FRONT_HEADLAMP_DUCT | (-0.48,0.70,1.83) | (-3.75,1.72,5.00) | 35 | 0–29 |
+| WHEEL_BRAKES | (-0.858,0.355,1.47) | (-2.65,0.96,3.08) | 31 | 30–59 |
+| REAR_ENGINE_REVEAL | (0,0.98,-1.51) | (-3.15,2.55,-4.28) | 37 | 60–89 |
+| REAR_HERO | (0,0.81,-1.35) | (4.28,2.12,-6.32) | 38 | 90–119 |
 
-## Lighting and A5 material hooks
+## Integration details
 
-Use camera-left cool key, camera-right amber rim to match shared contract. Keep hero car visible and avoid extreme contrast flattening the teal body. Original A1 preview uses neutral local lights solely for proof. Preserve clearcoat metalness + matte rubber and preserve emissive trim slots. No logos or exact real car geometry.
-
-## Motion
-
-For 30fps, illustrative speed `travelMeters=frame*0.24` gives 7.2 m/s (26 km/h). For final punchier car movement, increase consistently for road and wheel together; avoid separately spinning wheels. `VehicleWorld` uses deterministic frame-driven road wrapping. Road top y=0, tyre tangency y=0 exactly. Frame-based preview shows camera orbit and rear tracking.
-
-## Known quality notes
-
-Low-poly CGI aesthetics are deliberate (angular faceted road trees and auto body). Additional A5 shader/lighting treatment and A4 hero camera choreography are encouraged, but never overwrite this original A1 geometry during shared work.
+- The preview employs separate 30-frame moving tracking cameras for checking model surfaces, **not** full film edit or approved picture timing.
+- For engine detail, set `variant="reveal"` and animate `revealProgress` linearly 0..1 for a smooth-eased real hatch hinge. Engine parts are conditional, hidden with deck closed.
+- For driving, `travelMeters=frame*.12` in review; wheel angle follows distance / 0.355m exactly. Avoid spinning an externally mounted wheel pivot a second time.
+- Shared A5 lookdev references: deep teal `BODY_TEAL_ENAMEL`, `HEADLAMP_OUTER_CLEAR_LENS`, `HEADLAMP_INNER_SMOKED_OPTICS`, `ACTUAL_PERFORATED_BUMPER_FASCIA`, `RIM_MACHINED_SPOKE`, `DRILLED_BRAKE_DISC`, `ENGINE_INTAKE_PLENUM`, `ENGINE_BAY_BRACING`, `REAR_LED_CRIMSON`.
+- Don't recreate giant warm floodlight that blows out teal; place camera-left cool key and camera-right warm rim, maintaining legibility at phone size.
+- Low-poly stylisation is deliberate; A4/A5 should still check no visible floating optics, hardware clipping, wheel ground contact and hatch clearance with their own light rigs.
