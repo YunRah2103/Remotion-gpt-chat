@@ -178,7 +178,9 @@ export const SculptedCanopy:React.FC=()=>{
    <Tube points={[[side*.70,.802,1.09],[side*.69,.801,.64],[side*.65,.797,-.16],[side*.66,.797,-1.30]]}
     radius={.017} colour="#6A9A9A" name="SIDE_WINDOW_LOWER_CHROME"/>
   </group>)}
-  <mesh position={[0,1.229,-.24]} castShadow><boxGeometry args={[.94,.018,.61]}/>
+  {/* A gently crowned roof insert instead of the old flat rectangular slab. */}
+  <mesh position={[0,1.225,-.24]} scale={[.485,.019,.364]} castShadow>
+   <sphereGeometry args={[1,32,12]}/>
    <meshPhysicalMaterial name="COUPE_ROOF_INSERT" color="#164952" metalness={.68} roughness={.21} clearcoat={.8}/>
   </mesh>
  </group>;
