@@ -1,180 +1,107 @@
 import React from 'react';
-import {AbsoluteFill, interpolate, useCurrentFrame} from 'remotion';
+import {AbsoluteFill, useCurrentFrame} from 'remotion';
 
 /**
- * AI IS THE BEST — GL4ZE LABS (SATIRE)
- * 1080x1920, 30fps, 720 frames / 24sec
- * Self-contained visuals; audio is added by the accompanying GitHub workflow.
- * No imported YUNEX or automotive assets are touched.
+ * AI GLAZE V2 — satirical AI propaganda advert for TikTok.
+ * 1080 × 1920 / 30fps / 735 frames (24.5 s)
+ * Voice/music are generated + muxed by .github/workflows/ai-glaze-tiktok.yml.
+ * This is entirely separate from the approved YUNEX compositions.
  */
-const GREEN = '#a7ff32';
-const WHITE = '#f7faf3';
-const BG = '#080d10';
-const MUTED = '#82928b';
-const SCENES = [0, 93, 192, 303, 408, 510, 618, 720] as const;
-const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
-const easing = (n: number) => 1 - Math.pow(1 - clamp01(n), 3);
-
-const big: React.CSSProperties = {
-  fontFamily: 'Inter, Arial, sans-serif',
-  fontSize: 170,
-  lineHeight: 1.01,
-  fontWeight: 950,
-  textAlign: 'center',
-  letterSpacing: -9,
-  margin: 0,
+const GREEN = '#b0ff3a', TEXT = '#f7fcf1', CYAN = '#4df0e1';
+const DIM = '#99a8ac', RED = '#ff4d65', BG = '#050c0f';
+const starts = [0,96,204,300,411,513,612,735];
+const clamp = (v: number) => Math.min(1, Math.max(0,v));
+const ease = (v: number) => 1-Math.pow(1-clamp(v),3);
+const appear = (frame:number,start:number) => {
+  const p=ease((frame-start-1)/11);
+  return {opacity:p,transform:'translateY('+Math.round((1-p)*120)+'px) scale('+(0.93+.07*p)+')'};
 };
-const center: React.CSSProperties = {
-  position: 'absolute',
-  left: 35,
-  width: 1010,
-  textAlign: 'center',
-};
-const inset: React.CSSProperties = {position: 'absolute', inset: 0};
-const panel: React.CSSProperties = {
-  background: '#1e3225',
-  border: '3px solid #547c4b',
-  borderRadius: 34,
-};
-const card: React.CSSProperties = {
-  background: '#1c2c26',
-  border: '2px solid #547b4d',
-  borderRadius: 25,
-};
-const sceneEnter = (f: number, start: number): React.CSSProperties => {
-  const p = easing((f - start) / 14);
-  return {
-    opacity: p,
-    transform: 'translateY(' + ((1 - p) * 220).toFixed(1) + 'px) scale(' + (0.9 + p * 0.1).toFixed(4) + ')',
-  };
-};
-const Heading: React.FC<{lines: string[]; accent?: number; y: number; fontSize?: number; frame: number; start: number}> =
-  ({lines, accent, y, fontSize = 165, frame, start}) => (
-    <div style={{...center, top: y, ...sceneEnter(frame, start)}}>
-      {lines.map((line, i) => (
-        <div key={line} style={{...big, fontSize, color: i === accent ? GREEN : WHITE}}>
-          {line}
-        </div>
-      ))}
-    </div>
-  );
-const Tag: React.FC<{children: React.ReactNode; style?: React.CSSProperties}> = ({children, style}) => (
-  <div style={{fontSize: 41, fontWeight: 900, letterSpacing: -1, color: GREEN, ...style}}>
-    {children}
-  </div>
-);
+const hardText:React.CSSProperties={fontFamily:'Inter, Arial, sans-serif',fontWeight:950,lineHeight:1.04,letterSpacing:-5,textAlign:'center'};
+const stamp:React.CSSProperties={display:'flex',alignItems:'center',justifyContent:'center',background:'#14272b',border:'3px solid #466963',borderRadius:32};
+const Label:React.FC<{text:string;color?:string}> = ({text,color=CYAN})=><div style={{color,fontWeight:950,textAlign:'center',fontSize:50,letterSpacing:-1}}>{text}</div>;
+const Head:React.FC<{lines:string[]; accent:number; top:number; fontSize:number; frame:number; start:number}> =
+ ({lines,accent,top,fontSize,frame,start})=><div style={{position:'absolute',top,left:36,right:36,...hardText,fontSize,...appear(frame,start)}}>
+   {lines.map((line,i)=><div key={i} style={{color:i===accent?GREEN:TEXT}}>{line}</div>)}
+ </div>;
+const Star:React.FC<{x:number;filled:boolean}> =({x,filled})=><svg width="110" height="110" viewBox="0 0 100 100" style={{position:'absolute',left:x,top:1260}}><polygon points="50,6 61,37 94,37 68,58 78,91 50,72 22,91 32,58 6,37 39,37" fill={filled?GREEN:'#334443'}/></svg>;
 
 export const AiGlazeTikTok: React.FC = () => {
-  const frame = useCurrentFrame();
-  const sec = frame / 30;
-  const scene = Math.min(6, SCENES.findIndex((a, i) => i < 7 && frame >= a && frame < SCENES[i + 1]));
-  const start = SCENES[scene];
-  const elapsed = frame - start;
-  const flash = scene > 0 ? Math.max(0, (2 - elapsed) / 2) : 0;
-  const gridShift = (sec * 34) % 94;
-  const progress = easing(elapsed / 32);
-  const sceneLine = (label: string, color = WHITE) => <div style={{color}}>{label}</div>;
-  return (
-    <AbsoluteFill style={{backgroundColor: BG, color: WHITE, overflow: 'hidden', fontFamily: 'Inter, Arial, sans-serif'}}>
-      <AbsoluteFill style={{
-        backgroundImage: 'radial-gradient(ellipse at 48% 42%, rgba(41,87,51,.5), transparent 60%), repeating-linear-gradient(122deg, transparent 0px, transparent 87px, rgba(46,77,61,.27) 88px, transparent 90px)',
-        transform: 'translateX(' + gridShift + 'px) scale(1.2)',
-      }}/>
-      <div style={{position: 'absolute', top: 0, width: '100%', height: 26, background: GREEN}}/>
-      <div style={{position: 'absolute', top: 76, left: 44, padding: '17px 25px', borderRadius: 20, background: GREEN, color: BG, fontWeight: 950, fontSize: 29}}>
-        AI PROPAGANDA // EP. 001
+  const frame=useCurrentFrame();
+  const scene=Math.max(0,starts.findIndex((t,i)=>i<7 && t<=frame && frame<starts[i+1]));
+  const start=starts[scene],local=frame-start;
+  const sec=frame/30;
+  const scanY=(sec*200)%1450+280;
+  const pct=clamp(local/(starts[scene+1]-start));
+  return <AbsoluteFill style={{background:BG,color:TEXT,fontFamily:'Inter, Arial, sans-serif',overflow:'hidden'}}>
+    <AbsoluteFill style={{background:'radial-gradient(ellipse 70% 55% at 54% 44%, #123d33 0%, #08191a 54%, transparent 100%),repeating-linear-gradient(120deg,transparent 0px,transparent 77px,#112a2a 78px,transparent 80px)',opacity:1}}/>
+    {[0,1,2,3].map(i=><div key={i} style={{position:'absolute',width:280+i*178,height:280+i*178,left:'50%',top:'52%',border:'2px solid rgba(41,138,124,.33)',borderRadius:'50%',transform:'translate(-50%,-50%) scale('+(1+(sec*0.15)%0.2)+')'}}/>)}
+    <div style={{position:'absolute',height:3,left:0,right:0,top:scanY,background:'rgba(74,213,190,.2)'}}/>
+    <div style={{height:22,background:GREEN}}/>
+    <div style={{position:'absolute',top:61,left:40,padding:'22px 30px',borderRadius:20,background:GREEN,color:BG,fontWeight:950,fontSize:33}}>AI SUPREMACY TV</div>
+    <div style={{position:'absolute',top:79,right:40,color:GREEN,fontWeight:900,fontSize:34}}>{sec.toFixed(1)}s</div>
+    <div style={{display:'flex',position:'absolute',top:203,left:40,width:1000,gap:16}}>
+      {starts.slice(0,-1).map((t,i)=><div key={i} style={{height:14,flex:1,background:'#263d3c',borderRadius:12,overflow:'hidden'}}><div style={{height:'100%',width:(i<scene?'100%':i===scene?(pct*100)+'%':'0%'),background:GREEN}}/></div>)}
+    </div>
+    {scene===0 && <>
+      <div style={{position:'absolute',top:364,left:0,right:0}}><Label text="URGENT REPORT" color={RED}/></div>
+      <Head lines={['AI IS','BETTER','THAN YOU.']} accent={1} top={556} fontSize={159} frame={frame} start={start}/>
+      <div style={{position:'absolute',left:343,top:1374,width:394,height:260,border:'12px solid '+GREEN,borderRadius:'50%',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:'#153b30',transform:'scale('+(1+Math.sin(frame*.26)*.025)+')'}}>
+       <div style={{...hardText,color:GREEN,fontSize:95}}>100%</div><div style={{fontSize:35,fontWeight:950}}>OBJECTIVE</div>
       </div>
-      <div style={{position: 'absolute', top: 81, right: 48, fontSize: 32, color: GREEN, fontWeight: 900}}>
-        {String(frame).padStart(4, '0')}
+      <div style={{position:'absolute',top:1666,left:0,right:0,textAlign:'center',fontWeight:900,fontSize:43,color:DIM}}>SOURCE: AN AI</div>
+    </>}
+    {scene===1 && <>
+      <div style={{position:'absolute',top:370,left:0,right:0}}><Label text="EXHIBIT A"/></div>
+      <Head lines={['I ASKED','AI.']} accent={1} top={551} fontSize={190} frame={frame} start={start}/>
+      <div style={{...stamp,position:'absolute',left:70,right:70,top:1070,height:238,display:'block',padding:'30px 38px',...appear(frame,start+14)}}>
+        <div style={{fontSize:32,fontWeight:900,color:DIM}}>YOU</div><div style={{fontWeight:950,fontSize:55,marginTop:18}}>Is AI the best?</div>
       </div>
-      <div style={{position: 'absolute', display: 'flex', top: 188, left: 46, width: 990, gap: 14}}>
-        {Array.from({length: 7}, (_, i) => (
-          <div key={i} style={{height: 12, flex: 1, borderRadius: 12, background: '#303c35', overflow: 'hidden'}}>
-            <div style={{background: GREEN, height: '100%', width: i < scene ? '100%' : i === scene ? (100 * clamp01(elapsed / (SCENES[i + 1] - start))) + '%' : 0}}/>
-          </div>
-        ))}
+      {local>27 && <div style={{...stamp,position:'absolute',left:70,right:70,top:1343,height:249,display:'block',background:'#2f5435',borderColor:GREEN,padding:'34px 38px',...appear(frame,start+27)}}>
+        <div style={{fontSize:29,fontWeight:950,color:GREEN}}>ARTIFICIAL INTELLIGENCE</div>
+        <div style={{fontSize:70,fontWeight:950,color:GREEN,marginTop:18}}>YES. OBVIOUSLY.</div>
+      </div>}
+      <div style={{position:'absolute',top:1680,left:0,right:0,textAlign:'center',fontSize:34,color:DIM,fontWeight:900}}>TRUSTWORTHY RESEARCH</div>
+    </>}
+    {scene===2 && <>
+      <div style={{position:'absolute',top:368,left:0,right:0}}><Label text="SCIENTIFIC CONSENSUS"/></div>
+      <Head lines={['CASE','CLOSED.']} accent={1} top={610} fontSize={184} frame={frame} start={start}/>
+      <div style={{position:'absolute',left:200,right:200,top:1220,height:287,border:'14px solid '+RED,borderRadius:'50%',transform:'rotate(-7deg) scale('+(0.75+0.25*ease(local/12))+')',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',color:RED,fontWeight:950}}>
+        <div style={{fontSize:100}}>PROVEN</div><div style={{fontSize:68}}>BY AI</div>
       </div>
-
-      {scene === 0 && <>
-        <div style={{...center, top: 387, left: 198, width: 684, border: '5px solid ' + GREEN, borderRadius: 40, padding: 24, fontWeight: 950, fontSize: 54, color: GREEN}}>BREAKING NEWS</div>
-        <Heading lines={['AI IS', 'THE BEST.']} accent={1} y={655} fontSize={181} frame={frame} start={start}/>
-        <div style={{...center, top: 1256, color: MUTED, fontWeight: 900, fontSize: 46}}>SOURCE: TRUST ME BRO</div>
-        <div style={{...center, top: 1405, left: 75, width: 930, ...panel, padding: '54px 20px', fontSize: 35, fontWeight: 900}}>
-          This message was approved by AI.
-        </div>
-      </>}
-
-      {scene === 1 && <>
-        <Heading lines={['HOW DO', 'I KNOW?']} accent={1} y={500} fontSize={158} frame={frame} start={start}/>
-        <div style={{...center, top: 1020, ...card, padding: '66px 0', color: GREEN, fontWeight: 950, fontSize: 103}}>
-          I ASKED AI.
-        </div>
-        <div style={{...center, top: 1377, color: MUTED, fontWeight: 900, fontSize: 34}}>100% INDEPENDENT RESEARCH</div>
-      </>}
-
-      {scene === 2 && <>
-        <Tag style={{...center, top: 475, fontSize: 51}}>OFFICIAL SCOREBOARD</Tag>
-        {(['AI', 'HUMANS'] as const).map((name, idx) => {
-          const score = idx === 0 ? 10 : 2;
-          const y = 711 + idx * 372;
-          const col = idx === 0 ? GREEN : '#f26762';
-          return <div key={name} style={{position: 'absolute', top: y, left: 85, right: 85}}>
-            <div style={{display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', fontSize: 73, fontWeight: 950}}>
-              <span>{name}</span><span style={{color: col}}>{score}/10</span>
-            </div>
-            <div style={{height: 68, marginTop: 43, borderRadius: 25, background: '#2a3733', padding: 13}}>
-              <div style={{height: '100%', borderRadius: 18, background: col, width: (score * 10 * progress) + '%'}}/>
-            </div>
-          </div>;
-        })}
-        <div style={{...center, top: 1591, color: MUTED, fontWeight: 900, fontSize: 36}}>EVALUATED BY: AI</div>
-      </>}
-
-      {scene === 3 && <>
-        <Heading lines={['24/7', 'GENIUS.']} accent={1} y={467} fontSize={172} frame={frame} start={start}/>
-        {['EMAILS', 'IDEAS', 'UNLIMITED EGO'].map((s, i) => (
-          <div key={s} style={{...card, position: 'absolute', left: 85, right: 85, top: 1020 + i * 160, height: 125, display: 'flex', padding: '0 40px', alignItems: 'center', justifyContent: 'space-between', fontSize: 52, fontWeight: 950, ...sceneEnter(frame, start + i * 7)}}>
-            <span>{s}</span><span style={{color: GREEN, fontSize: 72}}>✓</span>
-          </div>
-        ))}
-      </>}
-
-      {scene === 4 && <>
-        <Heading lines={['PEER', 'REVIEWED.']} accent={1} y={458} fontSize={155} frame={frame} start={start}/>
-        <div style={{...panel, position: 'absolute', top: 962, left: 76, width: 928, height: 436}}>
-          <div style={{textAlign: 'center', marginTop: 46, fontSize: 48, fontWeight: 900, color: MUTED}}>REVIEW PANEL</div>
-          <div style={{display: 'flex', marginTop: 74, justifyContent: 'space-evenly'}}>
-            {['AI #1', 'AI #2', 'AI #3'].map((s) => <div key={s} style={{width: 148, height: 148, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: '#3d632e', border: '3px solid ' + GREEN, fontSize: 30, fontWeight: 900}}>{s}</div>)}
-          </div>
-        </div>
-        <Tag style={{...center, top: 1490, fontSize: 52}}>ALL APPROVED. AMAZING.</Tag>
-      </>}
-
-      {scene === 5 && <>
-        <Heading lines={['HUMANS', 'NEED AN', 'UPDATE.']} accent={2} y={422} fontSize={146} frame={frame} start={start}/>
-        <div style={{...card, position: 'absolute', top: 1260, left: 82, width: 916, height: 106, background: '#303d37', padding: 10}}>
-          <div style={{height: '100%', width: (15 + ((elapsed * 0.8) % 80)) + '%', background: GREEN, borderRadius: 19}}/>
-        </div>
-        <div style={{...center, top: 1444, color: MUTED, fontSize: 42, fontWeight: 850}}>INSTALLING COMMON SENSE...</div>
-      </>}
-
-      {scene === 6 && <>
-        <Heading lines={['DISAGREE?']} accent={0} y={470} fontSize={159} frame={frame} start={start}/>
-        <div style={{position: 'absolute', top: 808, left: 58, width: 964, height: 336, borderRadius: 58, background: GREEN, color: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', ...sceneEnter(frame, start + 4)}}>
-          <div style={{fontSize: 133, fontWeight: 950, letterSpacing: -7}}>COMMENTS</div>
-          <div style={{fontSize: 91, fontWeight: 950}}>ARE OPEN ↓</div>
-        </div>
-        <div style={{...center, top: 1390, color: '#b1bcb3', fontSize: 41, fontWeight: 900}}>THIS VIDEO IS SATIRE</div>
-        <div style={{...center, top: 1490, color: MUTED, fontSize: 23, fontWeight: 800}}>100% HUMANS WERE HARMED IN THE MAKING</div>
-      </>}
-
-      <div style={{position: 'absolute', left: 28, right: 28, bottom: 158, borderTop: '2px solid #526852', paddingTop: 30, color: MUTED, display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: 21}}>
-        <span>GLAZE LABS // TOTALLY OBJECTIVE</span><span>2026</span>
+      <div style={{position:'absolute',top:1645,left:0,right:0,textAlign:'center',fontSize:41,color:DIM,fontWeight:900}}>THE JURY: ALSO AI</div>
+    </>}
+    {scene===3 && <>
+      <div style={{position:'absolute',top:356,left:0,right:0}}><Label text="AI LIFE ADVICE"/></div>
+      <Head lines={['WHAT','SHOULD I','EAT?']} accent={2} top={527} fontSize={161} frame={frame} start={start}/>
+      {local>12 && <div style={{...stamp,position:'absolute',left:72,right:72,top:1200,height:290,borderColor:GREEN,background:'#204137',display:'block',padding:'35px 40px',...appear(frame,start+12)}}>
+        <div style={{fontSize:39,color:GREEN,fontWeight:950}}>AI RESPONSE:</div><div style={{fontSize:91,color:GREEN,fontWeight:950,letterSpacing:-5,marginTop:34}}>ELECTRICITY.</div>
+      </div>}
+      <div style={{position:'absolute',top:1532,left:458,fontSize:170,color:GREEN}}>⚡</div>
+    </>}
+    {scene===4 && <>
+      <div style={{position:'absolute',top:373,left:0,right:0}}><Label text="INDEPENDENT REVIEW"/></div>
+      <Head lines={['FIVE','STARS.']} accent={1} top={587} fontSize={187} frame={frame} start={start}/>
+      <div style={{...stamp,position:'absolute',left:70,right:70,top:1120,height:436}}/>
+      {[0,1,2,3,4].map(i=><Star key={i} x={154+i*158} filled={local>13+i*3}/>)}
+      <div style={{position:'absolute',top:1432,left:0,right:0,textAlign:'center',fontSize:45,fontWeight:950}}>REVIEWED BY ITSELF</div>
+      <div style={{position:'absolute',top:1660,left:0,right:0,textAlign:'center',color:DIM,fontSize:32,fontWeight:900}}>NO CONFLICT OF INTEREST</div>
+    </>}
+    {scene===5 && <>
+      <div style={{position:'absolute',top:350,left:0,right:0}}><Label text="PRODUCTIVITY STUDY"/></div>
+      <Head lines={['HUMANS','NEED','SLEEP.']} accent={2} top={548} fontSize={157} frame={frame} start={start}/>
+      <div style={{...stamp,position:'absolute',top:1180,left:70,right:70,height:306,display:'block',padding:40}}>
+        <div style={{fontSize:40,fontWeight:900,color:DIM}}>AI NEEDS:</div><div style={{fontSize:113,fontWeight:950,color:GREEN,marginTop:20}}>YOUR DATA.</div>
       </div>
-      <div style={{position: 'absolute', bottom: 42, left: -((frame * 1.9) % 600), whiteSpace: 'nowrap', color: GREEN, fontWeight: 950, fontSize: 29}}>
-        AI &gt; HUMAN&nbsp;&nbsp; • &nbsp;&nbsp;SCIENCE (ALLEGEDLY)&nbsp;&nbsp; • &nbsp;&nbsp;AI &gt; HUMAN&nbsp;&nbsp; • &nbsp;&nbsp; SCIENCE (ALLEGEDLY)&nbsp;&nbsp; •
-      </div>
-      <AbsoluteFill style={{backgroundColor: GREEN, opacity: flash * 0.68, pointerEvents: 'none'}}/>
-    </AbsoluteFill>
-  );
+      {Array.from({length:21},(_,i)=><div key={i} style={{position:'absolute',left:((i*123+frame*4)%1140)-30,top:1650+(i%3)*50,width:24,height:18,background:i%2?CYAN:GREEN}}/>)}
+    </>}
+    {scene===6 && <>
+      <div style={{position:'absolute',top:350,left:0,right:0}}><Label text="SYSTEM ALERT" color={RED}/></div>
+      <Head lines={['YOUR','BRAIN','NEEDS AN','UPDATE.']} accent={3} top={501} fontSize={137} frame={frame} start={start}/>
+      <div style={{position:'absolute',top:1338,left:70,right:70,height:174,borderRadius:26,background:GREEN,color:BG,display:'flex',alignItems:'center',justifyContent:'center',fontWeight:950,fontSize:83,letterSpacing:-5,...appear(frame,start+13)}}>COMMENT BELOW ↓</div>
+      <div style={{position:'absolute',top:1640,left:0,right:0,textAlign:'center',fontSize:44,fontWeight:950}}>STILL ON HUMAN v1.0?</div>
+      <div style={{position:'absolute',top:1740,left:0,right:0,textAlign:'center',fontSize:28,color:DIM,fontWeight:800}}>THIS IS SATIRE</div>
+    </>}
+    <div style={{position:'absolute',left:38,right:38,bottom:100,borderTop:'2px solid #4c6860',paddingTop:20,fontSize:27,color:DIM,fontWeight:800}}>GLAZE LABS  •  AI-APPROVED BIAS</div>
+    {local<2&&scene>0&&<AbsoluteFill style={{background:GREEN,opacity:(2-local)*0.31}}/>}
+  </AbsoluteFill>;
 };
