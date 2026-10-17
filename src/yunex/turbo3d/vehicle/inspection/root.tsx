@@ -10,8 +10,8 @@ const clamp=(v:number)=>Math.max(0,Math.min(1,v));
 const Cams:React.FC<{frame:number}>=({frame})=>{
  const {camera}=useThree();
  useLayoutEffect(()=>{
-   const stage=Math.min(3,Math.floor(frame/45));
-   const t=clamp((frame%45)/44), ease=t*t*(3-2*t);
+   const stage=Math.min(3,Math.floor(frame/30));
+   const t=clamp((frame%30)/29), ease=t*t*(3-2*t);
    let p:[number,number,number]=[-2.95,1.45,4.16],look:[number,number,number]=[-.56,.67,1.91],fov=32;
    if(stage===0){p=[-3.75+ease*.42,1.72+ease*.10,5.0-ease*.45];look=[-.48,.70,1.83];fov=35;}
    if(stage===1){p=[-2.65+ease*.19,.96+ease*.10,3.08-ease*.20];look=[-.858,.355,1.47];fov=31;}
@@ -25,8 +25,8 @@ const Cams:React.FC<{frame:number}>=({frame})=>{
  return null;
 };
 const Inspection:React.FC=()=>{
- const frame=useCurrentFrame(),stage=Math.floor(frame/45),local=frame%45;
- const reveal=stage===2?clamp(local/35):0;
+ const frame=useCurrentFrame(),stage=Math.floor(frame/30),local=frame%30;
+ const reveal=stage===2?clamp(local/25):0;
  const distance=stage===2?0:frame*.12;
  return <AbsoluteFill style={{background:'#08121D'}}>
   <ThreeCanvas width={540} height={960} shadows
@@ -39,4 +39,4 @@ const Inspection:React.FC=()=>{
  </AbsoluteFill>;
 };
 export const VehicleCloseupRoot:React.FC=()=> <Composition id="A1VehicleCloseupInspection" component={Inspection}
- width={540} height={960} fps={30} durationInFrames={180}/>;
+ width={540} height={960} fps={30} durationInFrames={120}/>;
