@@ -27,6 +27,8 @@ jobs:
           if test -s package-lock.json; then npm ci --no-audit --no-fund; else npm install --no-audit --no-fund; fi
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
+      - name: Validate A5 JSON handoff with canonical repository validator
+        run: python production/tools/handoff.py production/yunex/turbo_3d_001/agents/lookdev/handoff.json
       - name: TypeScript
         run: npm run check
       - name: Confirm isolated composition registration
@@ -160,6 +162,13 @@ jobs:
             ffprobe -v error -show_entries stream=width,height,nb_frames,pix_fmt,color_range -of default=nw=1 "$video"
           done
           sha256sum out/integration/*.mp4 > out/integration/SHA256SUMS.txt
+      - name: Record immutable A5 TypeScript/document source SHA256
+        if: always()
+        run: |
+          mkdir -p out/a5
+          sha256sum src/yunex/turbo3d/lookdev/*.tsx \
+            production/yunex/turbo_3d_001/agents/lookdev/*.json \
+            production/yunex/turbo_3d_001/agents/lookdev/README.md > out/a5/SOURCE-SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
