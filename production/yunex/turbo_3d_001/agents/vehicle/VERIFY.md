@@ -1,41 +1,37 @@
-# YUNEX Turbo EP001 — A1 V5 Native Proof and Review
+# YUNEX Turbo EP001 — A1 V6.3 sculpted vehicle proof
 
-**Scope:** original procedural stylised car and world ONLY. Handoff status **REVIEW** pending A0 approval, not final episode or A6/A7 deliverable.
+**Scope:** A1 original 3D vehicle + road only. **Status REVIEW, not APPROVED**; creative acceptance is an explicit A0 decision. Earlier V5 technical evidence remains historical; do not use it to claim V6.3 approval.
 
-## Reproduce
+## Reproduce exactly
+
 ```bash
-npm ci
+npm ci --no-audit --no-fund
 npm run check
 node production/yunex/turbo_3d_001/agents/vehicle/check-model.mjs
 python3 production/tools/handoff.py production/yunex/turbo_3d_001/agents/vehicle/handoff.json
 mkdir -p out
-npx remotion render src/yunex/turbo3d/vehicle/inspection/index.ts A1VehicleCloseupInspection out/a1-vehicle-v4-inspection.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1 --frames=0-119 --scale=0.8
-ffprobe -v error -show_entries stream=codec_name,width,height,nb_frames,r_frame_rate -show_entries format=duration -of json out/a1-vehicle-v4-inspection.mp4
-ffmpeg -v error -i out/a1-vehicle-v4-inspection.mp4 -f null -
-ffmpeg -hide_banner -loglevel error -i out/a1-vehicle-v4-inspection.mp4 -f framemd5 out/a1-v4-frames.md5
-sha256sum out/a1-vehicle-v4-inspection.mp4
+npx remotion render src/yunex/turbo3d/vehicle/inspection/index.ts A1VehicleCloseupInspection out/a1-closeups.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1 --frames=0-119 --scale=0.8
+npx remotion render src/yunex/turbo3d/vehicle/inspection/index.ts A1V6FrontThreeQuarterHero out/a1-v6-hero.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1 --frames=0-119 --scale=0.8
+ffprobe -v error -show_entries stream=codec_name,width,height,nb_frames,r_frame_rate -show_entries format=duration -of json out/a1-v6-hero.mp4
+ffmpeg -v error -i out/a1-v6-hero.mp4 -f null -
+ffmpeg -hide_banner -loglevel error -i out/a1-v6-hero.mp4 -f framemd5 out/a1-v6-frames.md5
+sha256sum out/a1-v6-hero.mp4
 ```
 
-**Source commit:** `85f1dc4b780a6aec8d18d16922ef161651038bb5`.
-**Native GitHub Actions PASS:** https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39044260650
-**Decoded MP4 artifact:** https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39044260650/artifacts/12105615160
-**Actual rendered proof:** 4.000s, 120 frames, 120 distinct decoded frame MD5s, 432x768 9:16, H.264, 30fps; FFprobe + full FFmpeg decode passed. Video SHA256: `4bd2422e8b220dab6f79336d8f44652f92dfb13ac48b60214e6d0dc6b16e9a62`.
+## Verified current proof — real native moving animation
 
-## Four-shot actual visual QC
+- **Source geometry commit:** `f290915380c1449edf0c46de6b1dc5bd3c48f4f9`.
+- **Passing CI run:** https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39065514179.
+- **Four-second moving front three-quarter hero:** https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39065514179/artifacts/12112793802, SHA256 `fe106d4ae36fb42f89c08404bab91569f47e6401caa5367a06fefc0a0a565db0`.
+- **Four-shot moving detail / wheel / engine hatch / rear proof:** https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39065514179/artifacts/12113127767, SHA256 `8be01446faa1856280861d316371e38c67a96ba1a358ac9e1d217a16c3db0b9e`.
+- **Each MP4:** 432 × 768, 30fps, 4.000s, H.264, 120/120 distinct decoded frames, full ffmpeg decoding PASS; TypeScript, A1 mechanical/coordinate contract and handoff schema PASS.
 
-- Frames 0–29: front fascia / three-layer bonnet-integrated headlight / genuine front aperture wall and vanes
-- Frames 30–59: rotating front wheel, 5 split-spoke construction, lugged hub and recessed brake hardware; no detached tread cuboids
-- Frames 60–89: rear powertrain plenum, two bank masses, hose connections and hinge-open rear deck with internal ribs
-- Frames 90–119: rear-three-quarter original car, smoked rear lenses and newly designed red LED signature
+## Actual moving-frame QC
 
-Manually inspected frames `5,18,27,35,48,55,64,75,85,95,108,116`; rejected previous V2 first pass after actual frame inspection (oversized lamp rings/caliper, detached tyre tread, giant hatch). Iterations through V5 corrected those problems. Rendering success does **not** certify photorealism or creative approval. Car intentionally remains geometrically simplified in the contract's low-poly videogame aesthetic.
+Extracted and visually inspected hero frames `0,15,30,45,60,75,90,105,119`; four-shot reel frames `3,14,28,35,50,59,65,80,88,95,105,117`. Compared against V5 and first V6 hero (rejected because the nose clipped at late frames), then V6.1 (rejected because a raised headlamp plate floated above the new bonnet).
 
-## Integration
+**Accepted technical package:** wheel arches are real tapered voids with sculpted fender lips; actual wheel pivots continue to rotate with road travel; low hood crown/haunch transitions are clearly visible in front three-quarter; the raked windscreen and greenhouse replace the blocky original roof; nose now stays inside frame; rear hinged deck and engine continue to reveal. Front lamps now have physical tapered bonnet apertures and surface-following lens meshes, rather than a separate elevated slab. The optics and hood remain **deliberately stylised**; independent manager aesthetic sign-off is still needed.
 
-`VehicleWorld({frame,variant,revealProgress,travelMeters})`, `VehicleModel`, `RoadEnvironment` exported from `src/yunex/turbo3d/vehicle/VehicleWorld.tsx`. Geometry primitives in `DetailKit.tsx`. Anchors `CAR_BODY`, `ENGINE_BAY`, `EXHAUST_MANIFOLD_ZONE`, `REAR_CAMERA_TRACK`, `ROAD_SURFACE`. 1 unit=1 metre, +Y UP, +Z front; wheel pivots X, tyre angle `-travelMeters/.355`, road parallax from SAME distance. Front fascia has two actual Shape perforations, side panels omitted at rear-quarter duct section, with recessed backing and dark guide vanes. Rear deck variant opens with eased 0–.83 rad hinge, lower than earlier rejected version. A5 owns final lookdev; A4 owns cinematic rigs; A6 owns registered film/Root; A7 owns mastered audio. Do not modify old compositions.
+## Interface preservation and ownership
 
-## Review risks
-
-- Simplified low-poly body and illustrative engine hardware, not manufacturer CAD. A4/A5 should test lighting, camera and stylized performance on phone before locking.
-- No Blender/GLB source because this project exports deterministic native R3F geometry; original mesh, style slots and rig transforms all source-controlled.
-- This is only an A1 isolated asset-proof video. The final film cannot be claimed ready until A2–A7 complete their own contracts.
+Source is `src/yunex/turbo3d/vehicle/VehicleWorld.tsx`, sculpt in `SculptedBody.tsx`, V5 mechanisms in `DetailKit.tsx`, proof compositions under `inspection/`. Public exports `VehicleWorld`, `VehicleModel`, `RoadEnvironment`; contract `frame`, `variant`, `revealProgress`, `travelMeters`; axes **+Y UP / +Z FRONT / +X RIGHT**, units metres. Wheel angle `-travelMeters/.355` and road parallax share distance. Preserved `CAR_BODY`, `ENGINE_BAY`, `EXHAUST_MANIFOLD_ZONE`, `REAR_CAMERA_TRACK`, `ROAD_SURFACE` anchors and model/material contracts. No A2–A5 ownership edits, no A6/A7 edits. No photoreal OEM CAD claimed.
