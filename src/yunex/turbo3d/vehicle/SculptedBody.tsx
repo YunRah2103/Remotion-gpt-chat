@@ -179,7 +179,7 @@ const noseShape=()=>{
  for(const side of [-1,1]){
   const cx=side*.42;
   const p=new THREE.Path();
-  p.moveTo(cx-.177,.454);p.lineTo(cx+.177,.454);p.lineTo(cx+.177,.605);p.lineTo(cx-.177,.605);p.closePath();
+  p.moveTo(cx-.182,.455);p.lineTo(cx+.182,.455);p.lineTo(cx+.159,.602);p.lineTo(cx-.132,.610);p.closePath();
   s.holes.push(p);
  }
  return new THREE.ExtrudeGeometry(s,{depth:.05,bevelEnabled:true,bevelSegments:2,
