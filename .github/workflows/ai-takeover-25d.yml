@@ -65,7 +65,7 @@ jobs:
           sudo apt-get install -y -qq ffmpeg
       - name: Native Remotion chunk (1080x1920, full frame)
         env:
-          PART: \${{ matrix.part }}
+          PART: ${{ matrix.part }}
         run: |
           mkdir -p out/chunks
           START=$((PART*170))
@@ -76,7 +76,7 @@ jobs:
           test "$COUNT" = "170"
       - uses: actions/upload-artifact@v4
         with:
-          name: ai-takeover-chunk-\${{ matrix.part }}
+          name: ai-takeover-chunk-${{ matrix.part }}
           path: out/chunks/ai-takeover-*.mp4
           retention-days: 30
           if-no-files-found: error
