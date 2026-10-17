@@ -1,23 +1,37 @@
 # YUNEX TURBO 3D EP001 — ENERGY IN MOTION
 
-**Stage:** PREPRODUCTION. **Actual running agents:** none verified. **GitHub manager:** [#126](https://github.com/YunRah2103/Remotion-gpt-chat/issues/126).
+**Current stage:** PREPRODUCTION / seven prompts ready; NO running AI agent sessions verified.  
+**Master tracker:** [#126](https://github.com/YunRah2103/Remotion-gpt-chat/issues/126)  
+**Draft production PR:** [#132](https://github.com/YunRah2103/Remotion-gpt-chat/pull/132)
 
-Five agent execution assignments; two dedicated original-3D modellers:
+## Correct pipeline: FIVE VISUAL specialists → A6 editor → A7 audio
 
-| Agent | Issue | Role | Source owner | Depends on |
+| Agent | Issue | Specialist | Owns | Starts |
 |---|---|---|---|---|
-| A1 | [#127](https://github.com/YunRah2103/Remotion-gpt-chat/issues/127) | Car, wheels, racing road/world | `agents/vehicle/` | Contract |
-| A2 | [#128](https://github.com/YunRah2103/Remotion-gpt-chat/issues/128) | Turbo + engine mechanical modelling | `agents/mechanism/` | Contract |
-| A3 | [#129](https://github.com/YunRah2103/Remotion-gpt-chat/issues/129) | Exhaust, intake, intercooler, combustion animation | `agents/airflow/` | Contract + geometry ports from A2 |
-| A4 | [#130](https://github.com/YunRah2103/Remotion-gpt-chat/issues/130) | Master 3D film editor + cinematic motion | `agents/editor/` and new `src/yunex/turbo3d/` | A1–A3 APPROVED |
-| A5 | [#131](https://github.com/YunRah2103/Remotion-gpt-chat/issues/131) | Narration, music, sound mix, final MP4 | `agents/audio/` | A4 picture lock |
+| A1 | [#127](https://github.com/YunRah2103/Remotion-gpt-chat/issues/127) | **Vehicle and racing environment 3D modeller** | `agents/vehicle/` / `src/yunex/turbo3d/vehicle/` | Parallel phase |
+| A2 | [#128](https://github.com/YunRah2103/Remotion-gpt-chat/issues/128) | **Turbocharger and engine 3D modeller** | `agents/mechanism/` / `src/yunex/turbo3d/mechanism/` | Parallel phase |
+| A3 | [#129](https://github.com/YunRah2103/Remotion-gpt-chat/issues/129) | Airflow, intercooling and combustion animator | `agents/airflow/` / `src/yunex/turbo3d/airflow/` | Parallel phase; A2 ports coordinated |
+| A4 | [#130](https://github.com/YunRah2103/Remotion-gpt-chat/issues/130) | Cinematic 3D camera, motion design and typography | `agents/cinematics/` / `src/yunex/turbo3d/cinematics/` | Parallel phase, with placeholder anchors |
+| A5 | [#131](https://github.com/YunRah2103/Remotion-gpt-chat/issues/131) | Cinematic lighting, material shading and VFX lookdev | `agents/lookdev/` / `src/yunex/turbo3d/lookdev/` | Parallel phase, with named material slots |
+| A6 | [#133](https://github.com/YunRah2103/Remotion-gpt-chat/issues/133) | **Master cinematic video editor and integrator** | `agents/editor/` and new unique Remotion composition/Root registration | After ALL five visual packages manager-approved |
+| A7 | [#134](https://github.com/YunRah2103/Remotion-gpt-chat/issues/134) | **Narration, music, sound and final master** | `agents/audio/` and final mix/export | After picture-lock master from A6 |
 
-Prompts are in `prompts/`. Each can be copied verbatim into an enabled coding/agent execution session. They are instructions, not running sessions, and a GitHub Issue does not launch an agent.
+**Each agent's ready-to-copy, detailed instructions:**
 
-First read `PRODUCTION_CONTRACT.md`. Agents 1, 2 and 3 may execute concurrently when agent execution supports it. Agents 4 and 5 execute sequential integration gates, with A4 allowed to pre-design camera choreography while A1–A3 work. Agent 0 (production manager) reviews factual progress at #126 and this branch's `STATUS.md`.
+- [A1 — Vehicle model](prompts/AGENT_1_VEHICLE.md)
+- [A2 — Turbo/engine model](prompts/AGENT_2_MECHANISM.md)
+- [A3 — Airflow/combustion](prompts/AGENT_3_AIRFLOW.md)
+- [A4 — Cinematic animation](prompts/AGENT_4_CINEMATICS.md)
+- [A5 — Lighting/materials/VFX](prompts/AGENT_5_LOOKDEV.md)
+- [A6 — Master editor](prompts/AGENT_6_EDITOR.md)
+- [A7 — Audio director](prompts/AGENT_7_AUDIO.md)
 
-**Creative direction:** Fully animated high-quality low-poly/blocky sports-car racing-world. A turbo cutaway bursting to life with hot amber exhaust energy, linked shaft, isolated cyan intake flow, intercooler, fuel/combustion and a fast racing-road payoff. Visually interesting from the first 0.5 seconds, not an explainer slide deck.
+**Shared production contract:** [PRODUCTION_CONTRACT.md](PRODUCTION_CONTRACT.md). **Honest current state:** [STATUS.md](STATUS.md).
 
-**Final only when proven:** `YUNEX_TURBO_3D_EP001_FINAL.mp4`: 1080x1920, 30fps, approximately 23–26 seconds, H.264 yuv420p, stereo AAC, voiced in English and accompanied by music/SFX. Require a downloadable file or a successful verified run/artifact link and a factual QC report; never substitute a text response for the MP4.
+## Production goal
 
-Historical `TurboDocumentary` and all previous YUNEX projects remain unchanged. Old `yunus-video-lab` is out of scope.
+One genuinely beautiful original 3D-only automotive engineering short, not a slideshow. Premium blocky racing-game car/world and macro turbo mechanics, hot amber exhaust causing a turbine to spin; common shaft drives separate cyan fresh-air compressor, through intercooler to engine, with appropriate fuel for extra power; hero car drives away. No live footage.
+
+**Final spec:** `YUNEX_TURBO_3D_EP001_FINAL.mp4`: 1080x1920, full-screen vertical, 30fps H.264, ~23–26s adjusted to actual natural narration, 48kHz stereo AAC, music and restrained sound design; verified real media, not just files and claims.
+
+A1–A5 may run in parallel only when separately launched in a compatible platform and on separate branches; issue/prompt/PR creation alone launches nothing. A4/A5 must not overwrite geometry from A1/A2; A6 integrates five distinct approved assets and A7 supplies the mastered sound. Read-only historical `TurboDocumentary` can inform technique but is not reused unchanged. Never modify the retired `yunus-video-lab`.
