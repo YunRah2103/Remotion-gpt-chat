@@ -193,6 +193,17 @@ const LowLamp:React.FC<{side:number;rear?:boolean}>=({side,rear=false})=>
   </mesh>
  </group>;
 const BodyDetails:React.FC=()=> <group name="NORMAL_ROAD_CAR_DETAILING">
+  {/* Closed body-colour front and rear fascia: no hollow, floating car nose. */}
+  <mesh name="FRONT_BODY_FASCIA" position={[0,.522,2.273]} castShadow>
+   <boxGeometry args={[1.55,.365,.078]}/>
+   <meshPhysicalMaterial name="BODY_TEAL_ENAMEL" color={PAINT}
+    metalness={.56} roughness={.29} clearcoat={.82}/>
+  </mesh>
+  <mesh name="REAR_BODY_FASCIA" position={[0,.509,-2.273]} castShadow>
+   <boxGeometry args={[1.52,.365,.078]}/>
+   <meshPhysicalMaterial name="BODY_TEAL_ENAMEL" color={PAINT}
+    metalness={.56} roughness={.29} clearcoat={.82}/>
+  </mesh>
   {[-1,1].map(side=><group key={side}>
     <LowLamp side={side}/>
     <LowLamp side={side} rear/>
