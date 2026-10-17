@@ -7,14 +7,14 @@ import type {PortMap,FlowRoutes,FlowPortName,Vec3} from './TurboFlow';
 const p=candidate.ports;
 export const A2_CANDIDATE_SOURCE_SHA=candidate.sourceCommit;
 export const A2_CANDIDATE_PORTS:PortMap={
- EXHAUST_IN:p.EXHAUST_IN as Vec3, EXHAUST_OUT:p.EXHAUST_OUT as Vec3,
- CLEAN_AIR_IN:p.CLEAN_AIR_IN as Vec3, COMPRESSED_AIR_OUT:p.COMPRESSED_AIR_OUT as Vec3,
- INTERCOOLER_IN:p.INTERCOOLER_IN as Vec3, INTERCOOLER_OUT:p.INTERCOOLER_OUT as Vec3,
- ENGINE_INTAKE:p.ENGINE_INTAKE as Vec3, FUEL_IN:p.FUEL_IN as Vec3,
- ENGINE_EXHAUST:p.ENGINE_EXHAUST as Vec3,
- TURBINE_WHEEL_FLOW:p.TURBINE_WHEEL_FLOW as Vec3,
- COMPRESSOR_WHEEL_FLOW:p.COMPRESSOR_WHEEL_FLOW as Vec3,
- CYLINDER:p.CYLINDER as Vec3,
+ EXHAUST_IN:p.EXHAUST_IN as unknown as Vec3, EXHAUST_OUT:p.EXHAUST_OUT as unknown as Vec3,
+ CLEAN_AIR_IN:p.CLEAN_AIR_IN as unknown as Vec3, COMPRESSED_AIR_OUT:p.COMPRESSED_AIR_OUT as unknown as Vec3,
+ INTERCOOLER_IN:p.INTERCOOLER_IN as unknown as Vec3, INTERCOOLER_OUT:p.INTERCOOLER_OUT as unknown as Vec3,
+ ENGINE_INTAKE:p.ENGINE_INTAKE as unknown as Vec3, FUEL_IN:p.FUEL_IN as unknown as Vec3,
+ ENGINE_EXHAUST:p.ENGINE_EXHAUST as unknown as Vec3,
+ TURBINE_WHEEL_FLOW:p.TURBINE_WHEEL_FLOW as unknown as Vec3,
+ COMPRESSOR_WHEEL_FLOW:p.COMPRESSOR_WHEEL_FLOW as unknown as Vec3,
+ CYLINDER:p.CYLINDER as unknown as Vec3,
 };
 export const A2_CANDIDATE_ROUTES:FlowRoutes=candidate.routes as unknown as FlowRoutes;
 export const candidateMatchesExpectedPorts=(actual:Record<FlowPortName,Vec3>,tolerance=.001)=>{
