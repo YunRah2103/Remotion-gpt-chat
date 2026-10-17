@@ -175,10 +175,27 @@ export const RoadEnvironment:React.FC<{travelMeters:number}>=({travelMeters})=><
     <dodecahedronGeometry args={[3+(i%4)*.7,0]}/><meshStandardMaterial color={i%3===0?'#1E3C42':'#142F38'} roughness={1}/></mesh>)}
 </group>;
 
+/** A restrained road-contact shadow adds visual mass without moving wheel pivots.
+ * Each tyre already physically meets road y=0; three transparent concentric
+ * ellipses soften the illusion of hovering in the dark A5 environment.
+ * Rendered only in the hero variant to preserve mechanism/reveal previews.
+ */
+const GroundContact:React.FC=()=> <group name="VEHICLE_ROAD_CONTACT">
+  {[-1,1].flatMap(side=>[1.47,-1.48].map(axle=><group key={side+'_'+axle} position={[side*.858,0,axle]}>
+    {[{r:.21,opacity:.27},{r:.32,opacity:.12},{r:.46,opacity:.04}].map((s,i)=>
+      <mesh key={i} position={[0,.006+i*.001,0]} rotation={[-Math.PI/2,0,0]} scale={[s.r,s.r*1.35,1]} renderOrder={i+1}>
+        <circleGeometry args={[1,28]}/>
+        <meshBasicMaterial color="#000409" transparent opacity={s.opacity} depthWrite={false} polygonOffset polygonOffsetFactor={-1}/>
+      </mesh>
+    )}
+  </group>))}
+</group>;
+
 export const VehicleWorld:React.FC<VehicleWorldProps>=({frame,variant='opaque',revealProgress=0,travelMeters})=>{
   const distance=travelMeters??frame*(variant==='hero'?.33:.23);
   return <group name="A1_VEHICLE_WORLD">
     <RoadEnvironment travelMeters={distance}/>
+    {variant==='hero'&&<GroundContact/>}
     <VehicleModel frame={frame} variant={variant} revealProgress={revealProgress} travelMeters={distance}/>
   </group>;
 };
