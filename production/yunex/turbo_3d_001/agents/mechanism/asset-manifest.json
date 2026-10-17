@@ -3,7 +3,7 @@
   "assetId": "YUNEX-TURBO-3D-EP001-A2",
   "kind": "deterministic-r3f-mechanical-rig",
   "owner": "agent-2-mechanism",
-  "sourceCommit": "439ab46ad0cf81a2da9d37aa0d783f69ca4ba000",
+  "sourceCommit": "301957b4f46936c6120f07573395d79038237bae",
   "unitMetersPerUnit": 1,
   "upAxis": "+Y",
   "forwardAxis": "+Z",
@@ -27,14 +27,17 @@
     "src/yunex/turbo3d/mechanism/preview.entry.tsx"
   ],
   "modelParts": [
-    "11-blade turbine",
-    "11-blade compressor",
-    "one common shaft",
-    "separate volutes",
-    "engine manifold",
-    "fresh air filter",
-    "intercooler and charge pipes",
-    "four-cylinder engine block"
+    "11 curved turbine blades",
+    "11 curved compressor blades",
+    "one common +X animated shaft",
+    "separate volumetric widening spiral scroll castings",
+    "12 perimeter bolts per housing",
+    "finned bearing-center housing",
+    "mechanical wastegate actuator",
+    "4-cylinder block with visible head and coil packs",
+    "four-engine intake plenum",
+    "19+fin intercooler core and charge pipes",
+    "separate hot exhaust and clean intake paths"
   ],
   "props": {
     "frame": "required numeric frame",
@@ -168,44 +171,33 @@
     ],
     "nativeRemotion": {
       "status": "PASS",
-      "exactSourceSha": "439ab46ad0cf81a2da9d37aa0d783f69ca4ba000",
-      "runId": 39043047809,
-      "workflow": "YUNEX A2 - native mechanical 3D previews",
-      "artifactId": 12105130685,
-      "artifactName": "yunex-turbo-a2-native-mechanical-previews",
-      "artifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39043047809/artifacts/12105130685",
-      "render": "Remotion 4, @remotion/three + R3F, software WebGL via --gl=swangle",
+      "exactSourceSha": "301957b4f46936c6120f07573395d79038237bae",
+      "runId": 39044425407,
+      "artifactId": 12105187562,
+      "artifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39044425407/artifacts/12105187562",
       "resolution": [
         540,
         960
       ],
-      "frameCount": 40,
       "fps": 30,
-      "codec": "H.264",
-      "clips": {
-        "cutaway": {
-          "sha256": "91da04c3974bc7e65086271c4773a2adf03690d9724404eedbd079c9aaf848e4",
-          "uniqueFrameCount": 40
-        },
-        "exploded": {
-          "sha256": "bfb4cfe32a0f3552428c4be0cd575b65babfab58e08d18acdcfc9ac9cc735914",
-          "uniqueFrameCount": 40
-        },
-        "engine": {
-          "sha256": "3278b48a253263eb24e55f039d28dd69895bbe4109d79f4d35433f58135f1e7c",
-          "uniqueFrameCount": 40
-        }
+      "frameCount": 40,
+      "codec": "h264",
+      "render": "Remotion 4 + R3F software WebGL (--gl=swangle)",
+      "clipSHA256": {
+        "cutaway": "d5ad915ab1c57e33cddee21473d91eaf1a04b43b63ac33d9d41ade6a5fad7427",
+        "exploded": "5dc9f4d9fff27cc58fe98999ee3346d21c48b052e9a123a695722d0f2dd5ce29",
+        "engine": "c82c3796cee42372134cceefbc7caae2171579b4855bae0850b7e35a78d8cf09"
       },
       "ffprobe": "PASS",
       "fullFfmpegDecode": "PASS",
-      "framemd5DistinctFrames": "40 of 40 each",
-      "typescript": "npm run check PASS",
-      "visualInspection": "Nine representative frames reviewed at mobile aspect; no unconnected pipes/port dots in isolated turbo; 3D moving proof only, not integrated episode"
+      "distinctFrames": "40 of 40 per clip",
+      "typescript": "PASS",
+      "visualInspection": "Nine native preview frames inspected; all major parts within portrait viewport, no cut-off engine or scroll. Art direction subject to manager review."
     },
-    "npmCheck": "PASS in dedicated Agent2 native run 39043047809",
+    "npmCheck": "PASS in 39044425407",
     "blender": "NOT USED"
   },
   "sha256": {
-    "note": "Preview SHA256 are actual local outputs; no native Remotion output is claimed."
+    "note": "Native Remotion output hashes are verified in evidence.nativeRemotion.clipSHA256. No separate production-final MP4 is claimed."
   }
 }
