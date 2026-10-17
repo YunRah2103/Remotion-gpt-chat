@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "task": "YUNEX-TURBO-3D-EP001-A1",
+  "branch": "agent/turbo-3d-001-vehicle",
+  "sourceSha": "53b836acddf37b4fac34ca320447205787bf59cb",
+  "owner": "engineering",
+  "summary": "Original Y-up, +Z-forward procedural teal sports coupe, fully assembled distance-driven 4-wheel animation, race road/world, 3s genuinely rendered native 3D review preview; A1 only.",
+  "status": "review",
+  "files": [
+    "src/yunex/turbo3d/vehicle/VehicleWorld.tsx",
+    "src/yunex/turbo3d/vehicle/preview/root.tsx",
+    "src/yunex/turbo3d/vehicle/preview/index.ts",
+    "production/yunex/turbo_3d_001/agents/vehicle/asset-manifest.json",
+    "production/yunex/turbo_3d_001/agents/vehicle/check-model.mjs",
+    "production/yunex/turbo_3d_001/agents/vehicle/VERIFY.md",
+    ".github/workflows/yunex-turbo-a1-vehicle-proof.yml"
+  ],
+  "evidence": [
+    "GitHub Actions 39041016213 PASS; npm ci + tsc + model assertions + native Remotion software-WebGL H.264 render + actual ffprobe + FFmpeg full decode.",
+    "Artifact https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39041016213/artifacts/12104206993",
+    "MP4 SHA256 ef696ed9c85f53ed8a07486024fc2ad5b129528b37f2c1c345a0e317ee563469; 90 distinct frames, 378x672, 30fps, 3s; manual contact-sheet reviewed."
+  ],
+  "blockers": [],
+  "notes": "REVIEW pending independent Agent 0 qualitative approval. No claim of all-seven-agent completion, and no final film. Repo contract and historical films unmodified."
+}
