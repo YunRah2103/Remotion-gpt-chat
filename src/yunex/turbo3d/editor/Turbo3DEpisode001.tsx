@@ -41,10 +41,38 @@ const MECH_ANCHORS:Anchors={
  ENGINE_INTAKE:asVec(TURBO_PORTS.ENGINE_INTAKE),
 };
 const CAR_ANCHORS:Anchors={CAR:[0,.76,0]};
-/** Parent-local A6 adapter: keep A1/A2 mesh sources untouched and dispose materials. */
-const SurfaceAdapter:React.FC<{children:React.ReactNode}>=({children})=>{
+/** Parent-local A6 adapter. Original A1/A2 geometry and ports are immutable.
+ * Only during clean-air visual phases do we present actual A2 cold-side pipe
+ * TubeGeometry as a translucent cutaway: cyan tracer stays INSIDE the pipe.
+ */
+const SurfaceAdapter:React.FC<{children:React.ReactNode;airCutaway?:boolean}>=({children,airCutaway=false})=>{
  const group=useRef<THREE.Group>(null);
- useLayoutEffect(()=>{if(!group.current)return;return applyYunexMaterials(group.current);},[]);
+ useLayoutEffect(()=>{
+  if(!group.current)return;
+  const restoreLook=applyYunexMaterials(group.current);
+  const replacements:Array<{mesh:THREE.Mesh;original:THREE.Material|THREE.Material[];clones:THREE.Material[]}>= [];
+  if(airCutaway)group.current.traverse(node=>{
+   if(!(node instanceof THREE.Mesh) || !(node.geometry instanceof THREE.TubeGeometry))return;
+   let parent:THREE.Object3D|null=node.parent,withinCleanAir=false;
+   while(parent){if(parent.name==='FRESH_AIR_CIRCUIT'){withinCleanAir=true;break;}parent=parent.parent;}
+   if(!withinCleanAir)return;
+   const original=node.material;
+   const clones=(Array.isArray(original)?original:[original]).map(src=>{
+    const m=src.clone();
+    m.transparent=true;
+    m.opacity=.30;
+    m.depthWrite=false;
+    m.needsUpdate=true;
+    return m;
+   });
+   node.material=Array.isArray(original)?clones:clones[0];
+   replacements.push({mesh:node,original,clones});
+  });
+  return ()=>{
+   for(const x of replacements){x.mesh.material=x.original;for(const c of x.clones)c.dispose();}
+   restoreLook();
+  };
+ },[airCutaway]);
  return <group ref={group}>{children}</group>;
 };
 /** Correct A3's preview-only depthTest=false for the actual assembled film.
@@ -117,7 +145,7 @@ const EnginePowerWindow:React.FC<{frame:number}>=({frame})=>{
  </group>;
 };
 const FilmMechanics:React.FC<{shot:FilmShot;frame:number;duration:number}>=({shot,frame,duration})=>{
- const road=shot==='road',full=['exhaust','power','cooler'].includes(shot);
+ const road=shot==='road',full=['exhaust','compressor','power','cooler'].includes(shot);
  const cameraShot:Shot=shot==='hook'?'hookOrbit':shot==='exhaust'?'exhaustTrack':shot==='shaft'?'shaftFollow':shot==='compressor'?'compressorReveal':'chargeGlide';
  const phase:TurboFlowPhase=shot==='exhaust'?'exhaust':shot==='hook'?'turbine':shot==='shaft'?'turbine':shot==='compressor'?'compressor':shot==='power'?'combustion':'intercooler';
  if(road)return <>
@@ -136,7 +164,7 @@ const FilmMechanics:React.FC<{shot:FilmShot;frame:number;duration:number}>=({sho
    <boxGeometry args={[18,.13,17]}/>
    <meshStandardMaterial color="#10222C" metalness={.2} roughness={.8}/>
   </mesh>
-  <SurfaceAdapter><TurboMechanism frame={frame} variant={full?'full':'turbo'} cutaway={1}/></SurfaceAdapter>
+  <SurfaceAdapter airCutaway={shot==='compressor'||shot==='cooler'}><TurboMechanism frame={frame} variant={full?'full':'turbo'} cutaway={1}/></SurfaceAdapter>
   {shot!=='shaft'&&<OccludedAirflow>
    <TurboFlow frame={frame} phase={phase} ports={A2_CANDIDATE_PORTS} routes={A2_CANDIDATE_ROUTES} intensity={shot==='power'?.5:.32}/>
    <CinematicFlow frame={frame} phase={phase} intensity={shot==='power'?.74:.65}/>
