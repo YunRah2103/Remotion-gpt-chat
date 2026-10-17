@@ -45,8 +45,22 @@ const Skin:React.FC<{rings:Vec[];c:string;metal?:number;rough?:number;glass?:boo
  </mesh>;
 };
 
-const bodyRings:Vec[]=[[-2.68,.55,.57],[-2.47,.83,.71],[-2.0,.98,.83],[-1.54,1.02,.88],[-.93,1.03,1.04],[.02,1.06,1.08],[1.0,1.09,1.04],[1.62,1.05,.98],[2.27,.96,.92],[2.64,.71,.79]];
-const canopyRings:Vec[]=[[-1.49,.51,1.13],[-1.17,.62,1.43],[-.66,.71,1.72],[.28,.73,1.76],[.9,.66,1.63],[1.36,.49,1.14]];
+
+const Intake:React.FC<{s:number}>=({s})=>{
+ const geometry=useMemo(()=>{
+  const g=new THREE.BufferGeometry();
+  const p=[s*1.037,.80,.13,s*1.052,1.04,.72,s*1.03,.58,1.59,
+           s*1.04,.85,.25,s*1.05,.59,1.61,s*1.05,.60,1.88];
+  g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));
+  g.computeVertexNormals();return g;
+ },[s]);
+ return <mesh geometry={geometry} >
+  <meshStandardMaterial color="#111d27" metalness={.50} roughness={.34} side={THREE.DoubleSide}/>
+ </mesh>;
+};
+
+const bodyRings:Vec[]=[[-2.69,.37,.49],[-2.49,.67,.56],[-2.20,.91,.64],[-1.76,1.05,.80],[-1.16,1.06,.90],[-.56,1.04,1.00],[.30,1.07,1.03],[1.18,1.10,1.00],[1.85,1.08,.99],[2.35,.87,.84],[2.62,.69,.71]];
+const canopyRings:Vec[]=[[-1.52,.34,1.06],[-1.14,.48,1.17],[-.74,.57,1.38],[-.10,.61,1.52],[.40,.60,1.51],[.89,.52,1.37],[1.36,.36,1.06]];
 
 const Wheel:React.FC<{side:number;z:number;f:number}>=({side,z,f})=>
  <group position={[side*1.085,.51,z]}>
@@ -110,13 +124,13 @@ const Supercar:React.FC<{f:number}>=({f})=>{
   {[-1,1].map(s=><React.Fragment key={s}>
    <Wheel side={s} z={-1.63} f={f}/>
    <Wheel side={s} z={1.65} f={f}/>
-   <Box p={[s*.97,.66,0]} s={[.15,.12,2.8]} c="#ac4218" metal={.35}/>
-   <Box p={[s*.84,.81,.76]} s={[.075,.35,.78]} c="#1a262e" metal={.63} rough={.23}/>
-   <Box p={[s*.66,.98,-2.48]} s={[.49,.092,.17]} c="#f1fff0" glow={1.0} rot={[0,s*.12,s*.25]}/>
+   <Box p={[s*.97,.61,0]} s={[.15,.10,2.65]} c="#a74c1d" metal={.48}/>\n   <Box p={[s*.97,.53,0]} s={[.18,.06,2.20]} c="#101f29" metal={.55}/>
+   <Intake s={s}/>
+   <Box p={[s*.65,.81,-2.47]} s={[.42,.065,.18]} c="#f5ffed" glow={.9} rot={[0,s*.22,s*.42]}/>\n   <Box p={[s*.84,.72,-2.28]} s={[.13,.047,.34]} c="#e1fff4" glow={.8} rot={[0,0,s*.58]}/>
    <Box p={[s*.76,.84,2.59]} s={[.57,.095,.055]} c="#ff3b37" glow={brake*2.2+.5}/>
    <Box p={[s*.76,.89,-2.49]} s={[.43,.035,.06]} c="#d2f4ef" glow={1.4}/>
-   <Box p={[s*.89,1.26,-.81]} s={[.19,.08,.23]} c="#f37c19" metal={.4}/>
-   <Box p={[s*.58,1.66,.2]} s={[.06,.03,.84]} c="#4b8a97" metal={.6}/>
+   <Box p={[s*.85,1.11,-.80]} s={[.18,.07,.23]} c="#f37c19" metal={.5}/>
+   <Box p={[s*.57,1.48,.1]} s={[.045,.024,.72]} c="#4b8a97" metal={.6}/>
    <Box p={[s*.86,.57,1.91]} s={[.36,.08,.92]} c="#222a31" metal={.4}/>
   </React.Fragment>)}
   <Spoiler f={f}/>
