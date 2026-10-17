@@ -47,8 +47,18 @@ const StubTurbo:React.FC<{frame:number}>=({frame})=><group>
 </group>;
 const EngineStub:React.FC<{frame:number}>=({frame})=><group>
  <StubTurbo frame={frame}/>
- <mesh position={[4,0,-1.4]}><boxGeometry args={[1.0,1.6,2]}/><meshStandardMaterial color="#374B57" metalness={.67} roughness={.34}/></mesh>
- <mesh position={[3.15,-.35,-1.25]}><boxGeometry args={[1.35,.32,.42]}/><meshStandardMaterial color="#73BEC3" metalness={.4} roughness={.35}/></mesh>
+ {/* CLEAR PROXY ENGINE: essential only for inspecting the A4 intake-to-cylinder camera.
+     A2 supplies the real dimensional engine; A3 owns the real combustion animation. */}
+ <mesh position={[4,0,-1.4]}><boxGeometry args={[1.0,1.58,2.0]}/><meshPhysicalMaterial color="#6B94A0" metalness={.32} roughness={.25} transparent opacity={.28} depthWrite={false} side={2}/></mesh>
+ <mesh position={[4,.81,-1.4]}><boxGeometry args={[1.07,.09,2.08]}/><meshStandardMaterial color="#A4C1C5" metalness={.72} roughness={.28}/></mesh>
+ {Array.from({length:4},(_,i)=><group key={i} position={[3.99,-.2,-2.09+i*.46]}>
+   <mesh><cylinderGeometry args={[.21,.21,.8,14]}/><meshStandardMaterial color="#77C8D7" emissive="#245967" emissiveIntensity={.45} metalness={.5} roughness={.24}/></mesh>
+   <mesh position={[0,.43,0]}><torusGeometry args={[.17,.035,8,16]}/><meshStandardMaterial color="#BDE6DE" metalness={.6} roughness={.2}/></mesh>
+  </group>)}
+ <mesh position={[3.15,-.35,-1.25]}><boxGeometry args={[1.35,.32,.42]}/><meshStandardMaterial color="#73BEC3" emissive="#267B83" emissiveIntensity={.38} metalness={.4} roughness={.35}/></mesh>
+ {Array.from({length:10},(_,i)=><mesh key={i} position={[2.57+i*.13,-.12,-1.25]}>
+   <boxGeometry args={[.035,.3,.48]}/><meshStandardMaterial color="#B1D6D8" metalness={.62} roughness={.27}/></mesh>
+  </mesh>)}
  {Array.from({length:12},(_,i)=>{const u=((i/12+frame*.009)%1);return <Orb key={i} x={2.1+u*2.2} y={-.2} z={-.9-u*.5} r={.055} color="#8CEBE3"/>})}
  </group>;
 const Tire:React.FC<{x:number;z:number;frame:number}>=({x,z,frame})=><group position={[x,.39,z]} rotation={[frame*.22,0,0]}>
