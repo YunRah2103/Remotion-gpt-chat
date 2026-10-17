@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
 const ts=require('typescript');
-const mod=path.resolve(__dirname,'../../../../src/yunex/turbo3d/cinematics/cameraMath.ts');
+const mod=path.resolve(__dirname,'../../../../../src/yunex/turbo3d/cinematics/cameraMath.ts');
 const js=ts.transpileModule(fs.readFileSync(mod,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;
 const m={exports:{}};
 Function('exports','module','require',js)(m.exports,m,require);
