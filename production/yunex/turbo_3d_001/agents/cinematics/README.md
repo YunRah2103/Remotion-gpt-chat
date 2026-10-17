@@ -50,3 +50,14 @@ The helper invokes `npx remotion render src/yunex/turbo3d/cinematics/previewEntr
 ### A4 review request / blockers
 
 Camera/source functionality implemented and prototype geometry animated; **approval blocked** until genuine native compositions are rendered/fully decoded, published with inspectable artifact, real model anchors validated, and manager personally reviews the images and movement. See handoff.json for precise blockers. A6 owns final composition; A7 owns final audio.
+
+## 2026-10-17 — REAL NATIVE RENDER QC: REVIEW REQUESTED
+
+The former warning above about *missing native Remotion outputs* is historical and superseded by the evidence here. The five native MP4 previews are now actually published, decoded and visually inspected. This is a **camera package review request**, not A1/A2 integration approval.
+
+- **Last A4 code SHA**: `cfc02e8d6d9276e5990b9beae29a24c637cb12fb`
+- **All-five matrix render success**: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39046325972
+- **Proof**: 600/600 frame hashes distinct, genuine Remotion 4 + @remotion/three SWANGLE, 432×768 full-motion 30fps, actual H.264 yuv420p, full FFmpeg decode PASS, per-clip SHA256 and artifact links in `manifest.json`.
+- **Human visual QC**: sampled genuine GitHub-native videos at 0/mid/last and viewed each 10-frame contact sheet, not just TypeScript tests. Fixed the cropped turbine close-up, charge camera clipping and weak opaque-box engine stand-in; second hook/road/shaft shots remain intentionally schematic until A1/A2 replacement.
+- **Preferred opening**: `hookOrbit`, near-frame-filling spinning turbine and hot exhaust present from frame 0; `hookRush` as conditional alternative when VO starts with exhaust energy.
+- **Still pending**: manager A0 approval, camera-to-final-approved A1/A2 geometry/port collision/occlusion check. A6 must not consume blindly or declare final episode complete.
