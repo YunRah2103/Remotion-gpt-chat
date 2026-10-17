@@ -120,6 +120,13 @@ const RotorProxy:React.FC<{x:number;frame:number;compressor:boolean}>=({x,frame,
 const TurboProxy:React.FC<{frame:number;charge?:boolean}>=({frame,charge=false})=><group>
  <mesh position={[0,-2.18,-.4]} receiveShadow>
    <boxGeometry args={[17,.30,13]}/><YunexSurface surface="carbon"/></mesh>
+ {[-1,1].map((s)=><group key={s} position={[s*4.1,1.2,-3.9]}>
+    <mesh scale={[.10,6.5,.12]}>
+      <boxGeometry args={[1,1,1]}/>
+      <meshBasicMaterial color={s<0?'#2F7582':'#A6754F'} transparent opacity={.45} depthWrite={false}/>
+    </mesh>
+    <pointLight color={s<0?'#6ED6E8':'#FFAE70'} intensity={s<0?3:4} distance={10}/>
+  </group>)}
  <mesh rotation={[0,0,Math.PI/2]}><cylinderGeometry args={[.12,.12,3.1,26]}/><YunexSurface surface="machinedSteel"/></mesh>
  <Casing x={-1.13} compressor={false}/><Casing x={1.13} compressor/>
  <RotorProxy x={-1.13} frame={frame} compressor={false}/>
@@ -145,15 +152,16 @@ const LookdevCamera:React.FC<{frame:number;sceneVariant:'road'|'turbine'|'charge
  useLayoutEffect(()=>{
   const t=clamp((frame%90)/89),w=t*t*(3-2*t);
   if(sceneVariant==='road'){
-    camera.position.set(4.65-.85*w,1.95+.45*w,8.5-1.2*w);
+    camera.position.set(4.4-.55*w,2.25+.25*w,10.2-.7*w);
     camera.lookAt(0,.65,0);
   }else if(sceneVariant==='turbine'){
-    camera.position.set(3.6-1.6*w,2.4+.15*w,6.7-.6*w);
+    camera.position.set(4.1-1.3*w,2.9+.25*w,15.8-1.1*w);
     camera.lookAt(0,.05,0);
   }else{
-    camera.position.set(5.6-.65*w,2.25+.3*w,6.2-1.0*w);
-    camera.lookAt(.85,-.35,-.55);
+    camera.position.set(4.6-.8*w,2.8+.2*w,18.8-1.1*w);
+    camera.lookAt(.65,-.32,-.55);
   }
+  (camera as THREE.PerspectiveCamera).fov=sceneVariant==='road'?39:49;
   camera.updateProjectionMatrix();
  },[camera,frame,sceneVariant]);
  return null;
