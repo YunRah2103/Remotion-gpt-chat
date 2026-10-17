@@ -50,6 +50,16 @@ const CITY_BUILDINGS = (() => {
  }
  return b.sort((a,b)=>(a.x+a.y)-(b.x+b.y));
 })();
+// The user-recorded Cedar narration is 29.16s long. V2 follows its real spoken
+// pauses, preserving the eight source scenes rather than uniformly speeding
+// the original 34-second film. Source seconds map to destination seconds.
+const V2_SOURCE_TIMES = [0,4.18,9.05,13.56,18.4,23.95,28.4,31.05,34];
+const V2_CEDAR_TIMES = [0,4.35,7.88,10.83,15.58,20.8,25.16,27.72,30];
+const v2SceneClock = (second:number) => {
+ const idx = Math.max(0, V2_CEDAR_TIMES.findIndex((v,i)=>i<V2_CEDAR_TIMES.length-1 && second>=v && second<V2_CEDAR_TIMES[i+1]));
+ const a=V2_CEDAR_TIMES[idx],b=V2_CEDAR_TIMES[idx+1];
+ return mix(V2_SOURCE_TIMES[idx],V2_SOURCE_TIMES[idx+1],clamp((second-a)/(b-a)));
+};
 const LINKS=[[0,7],[7,11],[11,18],[18,25],[25,30],[30,34],[34,42],[42,54],
 [54,63],[63,67],[67,75],[75,82],[82,93],[93,106],[106,125],[125,140]];
 const CITIES:{name:string,lon:number,lat:number}[]=[
@@ -342,14 +352,57 @@ const SceneTitle:React.FC<{t:number;start:number;end:number;eyebrow:string;title
  </div>;
 };
 
+/** Light-volume and network signal pulses rendered as moving native vectors.
+ * Only enabled in V2; the accepted 34s V1 composition remains unchanged. */
+const SignalAtmosphere:React.FC<{t:number;phase:'city'|'planet'|'core';opacity:number}> =({t,phase,opacity})=>{
+ const centerX=phase==='city'?515:540, centerY=phase==='city'?1260:1060;
+ const multiplier=phase==='city'?1.16:1.0;
+ return <svg viewBox="0 0 1080 1920" width="1080" height="1920"
+  style={{position:'absolute',inset:0,opacity,pointerEvents:'none'}}>
+  <defs>
+   <linearGradient id={'beam-'+phase} x1="0" y1="0" x2="0.85" y2="1">
+    <stop stopColor={C.cyan} stopOpacity="0"/>
+    <stop offset=".4" stopColor={C.cyan} stopOpacity=".13"/>
+    <stop offset="1" stopColor="#d7ffff" stopOpacity="0"/>
+   </linearGradient>
+   <radialGradient id={'light-'+phase}>
+    <stop stopColor={C.cyan} stopOpacity=".24"/><stop offset="1" stopColor={C.cyan} stopOpacity="0"/>
+   </radialGradient>
+  </defs>
+  <ellipse cx={centerX} cy={centerY} rx={440*multiplier} ry={440*multiplier}
+   fill={'url(#light-'+phase+')'} opacity=".7"/>
+  {Array.from({length:5},(_,i)=>{
+   const radius=40+((t*110+i*170)%780);
+   const q=clamp(1-radius/950);
+   return <ellipse key={'wave'+i} cx={centerX} cy={centerY} rx={radius*1.15} ry={radius*.47}
+    fill="none" stroke={i%2===0?C.cyan:C.ice} strokeWidth={1+q*2.1}
+    opacity={q*.4} strokeDasharray={i%2===0?'7 19':undefined}
+    transform={'rotate(-17 '+centerX+' '+centerY+')'}/>;
+  })}
+  {Array.from({length:42},(_,i)=>{
+   const angle=hash(i*17+5)*TWOPI;
+   const radius=80+hash(i*9+11)*575;
+   const x=centerX+Math.cos(angle+t*.10)*radius;
+   const y=centerY+Math.sin(angle+t*.10)*radius*.75;
+   const pulse=(t*(.6+hash(i*15)*.6)+hash(i*4)*10)%1;
+   const streakX=x+Math.cos(angle)*25,streakY=y+Math.sin(angle)*25;
+   return <g key={'data'+i} opacity={(0.2+0.7*Math.sin(pulse*Math.PI))*hash(i*29+13)}>
+    <line x1={x} y1={y} x2={streakX} y2={streakY} stroke={C.ice} strokeWidth="2.3"/>
+    <circle cx={x} cy={y} r={2.2+3.3*pulse} fill={C.cyan}/>
+   </g>;
+  })}
+ </svg>;
+};
 const HEADER:React.FC<{t:number}> =({t})=><div style={{position:'absolute',left:58,right:58,top:70,
 display:'flex',justifyContent:'space-between',alignItems:'center',fontFamily:FONT,fontWeight:900,color:C.ice}}>
  <span style={{fontSize:30,letterSpacing:7}}>FUTURE / 001</span>
  <span style={{fontSize:23,color:C.cyan,letterSpacing:2}}>{String(Math.floor(t)).padStart(2,'0')}:{String(Math.floor((t%1)*30)).padStart(2,'0')}</span>
 </div>;
 
-export const AiGlobalTakeoverFilm:React.FC =()=>{
- const frame=useCurrentFrame(),t=frame/30;
+export const AiGlobalTakeoverFilm:React.FC<{version?:1|2}> = ({version=1})=>{
+ const frame=useCurrentFrame(),playbackSeconds=frame/30;
+ const t=version===2?v2SceneClock(playbackSeconds):playbackSeconds;
+ const isV2=version===2;
  const globeFirst=fade(t,3.9,9.5,.68);
  const cityFirst=fade(t,0,4.75,.45);
  const cityNetwork=fade(t,8.9,18.95,.7);
@@ -365,9 +418,13 @@ export const AiGlobalTakeoverFilm:React.FC =()=>{
   {cityNetwork>.001&&<City t={t} opacity={cityNetwork} network={smooth((t-9.3)/8.6)}
     camera={.20+.43*smooth((t-9)/9)}/>}
   {cityNetwork>.05&&t>13.3&&<HoloSystem t={t} opacity={cityNetwork*smooth((t-13.3)/1)}/>}
+  {isV2&&cityNetwork>.01&&<SignalAtmosphere t={t} phase="city"
+   opacity={cityNetwork*.60*smooth((t-10)/2.2)}/>}
   {globeWide>.001&&<Globe t={t} opacity={globeWide} r={mix(435,485,smooth((t-18.4)/6))}
     rot={-3+(t-18.3)*23} network={1}/>}
+  {isV2&&globeWide>.01&&<SignalAtmosphere t={t} phase="planet" opacity={globeWide*.45}/>}
   {core>.001&&<Core t={t} opacity={core}/>}
+  {isV2&&core>.01&&<SignalAtmosphere t={t} phase="core" opacity={core*.32}/>}
   {finale>.001&&<Globe t={t} opacity={finale} r={mix(345,485,smooth((t-28)/6))}
     cy={1080} rot={120+(t-28)*10} network={1}/>}
   {/* small grounded vignette, grain illusion, safe area HUD */}
@@ -393,10 +450,10 @@ export const AiGlobalTakeoverFilm:React.FC =()=>{
   <div style={{position:'absolute',bottom:65,left:57,right:57,
     display:'flex',justifyContent:'space-between',color:C.dim,fontWeight:800,
     fontSize:23,letterSpacing:2}}>
-   <span>SPECULATIVE FUTURE / AI SYSTEMS</span>
+   <span>{isV2?'SIMULATION / AI NETWORK SYSTEMS':'SPECULATIVE FUTURE / AI SYSTEMS'}</span>
    <span>{(t/34*100).toFixed(0)}%</span>
   </div>
-  <div style={{position:'absolute',bottom:36,left:0,width:(frame/1020*1080)+'px',height:4,
+  <div style={{position:'absolute',bottom:36,left:0,width:(frame/(isV2?900:1020)*1080)+'px',height:4,
     background:C.cyan,boxShadow:'0 0 25px rgba(92,236,254,.9)'}}/>
   {flash>0&&<AbsoluteFill style={{background:'#bbfaff',opacity:flash,pointerEvents:'none'}}/>}
  </AbsoluteFill>;
