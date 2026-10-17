@@ -38,5 +38,34 @@ const Inspection:React.FC=()=>{
   <div style={{position:'absolute',left:28,top:38,color:'#C6E3E4',fontFamily:'Arial',fontWeight:700,fontSize:14,letterSpacing:2,opacity:.82}}>{CLOSEUP_SHOTS[stage]}</div>
  </AbsoluteFill>;
 };
-export const VehicleCloseupRoot:React.FC=()=> <Composition id="A1VehicleCloseupInspection" component={Inspection}
- width={540} height={960} fps={30} durationInFrames={120}/>;
+
+/** V6 cinematic acceptance camera: real A1 model, no stand-ins or flat image tricks. */
+const HeroCamera:React.FC<{frame:number}>=({frame})=>{
+ const {camera}=useThree();
+ useLayoutEffect(()=>{
+  const t=frame/119, smooth=t*t*(3-2*t);
+  const x=-5.15+2.65*smooth, z=6.35-1.10*smooth;
+  camera.position.set(x,1.61-.16*smooth,z);
+  camera.lookAt(0,.74,.75);
+  if('fov' in camera)(camera as import('three').PerspectiveCamera).fov=38;
+  camera.updateProjectionMatrix();
+ },[camera,frame]);
+ return null;
+};
+const Hero:React.FC=()=>{
+ const frame=useCurrentFrame();
+ return <AbsoluteFill style={{background:'#08121D'}}>
+  <ThreeCanvas width={540} height={960} shadows
+   camera={{fov:38,position:[-5.15,1.61,6.35],near:.06,far:160}}
+   gl={{antialias:true,preserveDrawingBuffer:true}}>
+   <HeroCamera frame={frame}/>
+   <VehicleWorld frame={frame} variant="hero" travelMeters={frame*.14}/>
+  </ThreeCanvas>
+ </AbsoluteFill>;
+};
+export const VehicleCloseupRoot:React.FC=()=> <>
+ <Composition id="A1VehicleCloseupInspection" component={Inspection}
+  width={540} height={960} fps={30} durationInFrames={120}/>
+ <Composition id="A1V6FrontThreeQuarterHero" component={Hero}
+  width={540} height={960} fps={30} durationInFrames={120}/>
+</>;
