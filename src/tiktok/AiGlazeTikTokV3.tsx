@@ -76,7 +76,7 @@ export const AiGlazeTikTokV3: React.FC<{includeCedar?:boolean}> = ({includeCedar
   </>}
   {s===4&&<>
    <Heading t={t} start={start} top={670} size={143} accent={1} lines={['THE SCORES','ARE IN.']}/>
-   <Panel top={1260} h={200} outline={C.cyan}><Center top={1300} size={65} color={C.lime}>CERTIFIED BY AI</Center></Panel>
+   <Panel top={1260} h={200} outline={C.cyan} fill="#173e36"><div style={{color:C.lime,fontSize:70,fontWeight:950,textAlign:'center',paddingTop:12}}>✓ CERTIFIED BY AI</div></Panel>
   </>}
   {s===5&&<>
    <Center top={500} size={60} color={C.cyan}>WINNER</Center>
