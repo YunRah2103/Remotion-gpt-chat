@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "assetId": "YUNEX_TURBO_3D_EP001_A5_LOOKDEV",
+  "kind": "look-development-r3f-lighting-materials-atmosphere",
+  "owner": "Agent 5 - Lighting Materials Atmospheric VFX",
+  "sourceSha": "dd0787bb016ed322b2e770df029c09dbbf964c9d",
+  "branch": "agent/turbo-3d-001-lookdev",
+  "unitMetersPerUnit": 1,
+  "upAxis": "+Y",
+  "forwardAxis": "+Z",
+  "boundingBox": {
+    "materials": "not-applicable-no-mesh",
+    "roadAtmosphere": {
+      "min": [
+        -8,
+        0,
+        -60
+      ],
+      "max": [
+        8,
+        6,
+        60
+      ]
+    },
+    "macroVfx": {
+      "min": [
+        -2,
+        -0.2,
+        -0.8
+      ],
+      "max": [
+        1,
+        1.8,
+        0.8
+      ]
+    }
+  },
+  "entrypoints": {
+    "materialLibrary": "src/yunex/turbo3d/lookdev/YunexLookdev.tsx#YunexMaterials",
+    "materialBinder": "src/yunex/turbo3d/lookdev/YunexLookdev.tsx#applyYunexMaterials",
+    "lightRig": "src/yunex/turbo3d/lookdev/YunexLookdev.tsx#YunexLights",
+    "environment": "src/yunex/turbo3d/lookdev/YunexReflectionEnvironment.tsx#YunexReflectionEnvironment",
+    "atmosphere": "src/yunex/turbo3d/lookdev/YunexLookdev.tsx#RoadAtmosphere",
+    "thermalAccent": "src/yunex/turbo3d/lookdev/YunexLookdev.tsx#ExhaustHeat",
+    "rotorHighlights": "src/yunex/turbo3d/lookdev/YunexLookdev.tsx#RotorGlimmer",
+    "preview": "src/yunex/turbo3d/lookdev/preview.entry.tsx#YunexA5LookdevProof"
+  },
+  "props": {
+    "YunexLights": "sceneVariant='road'|'turbine'|'charge', intensity 0..1+, augment boolean (38% energy when true), shadows boolean",
+    "RoadAtmosphere": "frame integer, visibility 0..1",
+    "ExhaustHeat": "frame integer, position XYZ metres, intensity 0..1",
+    "RotorGlimmer": "frame integer, position XYZ metres, intensity 0..1"
+  },
+  "ports": {
+    "authored": [],
+    "compatibleA2": [
+      "EXHAUST_IN",
+      "EXHAUST_OUT",
+      "CLEAN_AIR_IN",
+      "COMPRESSED_AIR_OUT",
+      "INTERCOOLER_IN",
+      "INTERCOOLER_OUT",
+      "ENGINE_INTAKE",
+      "FUEL_IN"
+    ],
+    "note": "A5 effects have no gas-mixing simulation; A2 owns real attachment positions"
+  },
+  "rigPivots": {
+    "defaultExhaustHeat": [
+      -1.13,
+      0.72,
+      0.43
+    ],
+    "defaultRotorGlitter": [
+      -1.13,
+      0,
+      0
+    ],
+    "shaftAxis": "+X"
+  },
+  "sourceFiles": [
+    "src/yunex/turbo3d/lookdev/YunexLookdev.tsx",
+    "src/yunex/turbo3d/lookdev/YunexReflectionEnvironment.tsx",
+    "src/yunex/turbo3d/lookdev/YunexLookdevPreview.tsx",
+    "src/yunex/turbo3d/lookdev/preview.entry.tsx",
+    "production/yunex/turbo_3d_001/agents/lookdev/README.md"
+  ],
+  "licenses": [
+    {
+      "source": "Original procedural Three.js geometry, shaders and palette",
+      "rights": "Repository-original implementation, no downloaded images/HDR/glbs"
+    },
+    {
+      "source": "A1 / A2 model source",
+      "rights": "Temporary read-only GitHub Actions checkouts at pinned commit; NOT modified or vendored into A5 branch"
+    }
+  ],
+  "evidence": {
+    "actionsRun": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39045212574",
+    "actionArtifact": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39045212574/artifacts/12105561449",
+    "rawNativeProofs": [
+      {
+        "name": "01-teal-road.mp4",
+        "frames": 24,
+        "sha256": "6908d2990527b0239862191d5692e3191d3e872d6f6927798ef6b066d4b6e178"
+      },
+      {
+        "name": "02-turbine-metal.mp4",
+        "frames": 24,
+        "sha256": "9eb7b704d4f8100c43d6c1697b3e2d4a2bde425cfae284d7abcffb56d74426c1"
+      },
+      {
+        "name": "03-cool-charge.mp4",
+        "frames": 24,
+        "sha256": "b5a74dc1cbb9e0f26434c82cee099d800340d4951fde4f5f269336ed9e34548c"
+      }
+    ],
+    "pinnedRealModels": [
+      {
+        "agent": "A1",
+        "sourceSha": "0ea37cda916e809fd30514013a67a8034b491e87",
+        "preview": "A1-real-vehicle.mp4",
+        "frames": 12,
+        "sha256": "bba95bd2687b6b256b01b988d0404a6d5281064988e1006eac1feffa27a9de46"
+      },
+      {
+        "agent": "A2",
+        "sourceSha": "4f894a51083e4ebaa652193713ee0baf56ba2439",
+        "preview": "A2-real-turbo.mp4",
+        "frames": 12,
+        "sha256": "b5b46aab1a05d48133711d8e36172c3d6ca6d0c4da7de1685e255bf96f8a4d4f"
+      }
+    ],
+    "technicalQA": [
+      "npm run check PASS in run 39045212574",
+      "Remotion composition registration PASS",
+      "five native moving video clips rendered via swangle",
+      "5/5 FFmpeg complete decodes PASS",
+      "3x24 A5 proxy frames with three differing frame hashes each",
+      "2x12 real A1/A2 frames checked locally: mean absolute pixel differences 7.17 and 1.87",
+      "540x960 30fps H264 yuv420p limited-range Rec.709"
+    ],
+    "visualReview": [
+      "Manual viewing of nine-frame proxy contact sheet and six-frame real-asset contact sheet",
+      "Teal paint and tungsten/cyan metal separation visible; no obvious black frames or letterboxing",
+      "A1 vehicle geometry readable but distant in phone framing; A2 hardware is too horizontally composed for premium mobile view",
+      "A4/A6 should use a near-macro oblique camera or ~1.1 rad parent roll for A2 shaft assembly, preserving physical local X rig"
+    ]
+  },
+  "sha256": {
+    "videoArtifacts": "per-file SHA256 listed in evidence.rawNativeProofs and evidence.pinnedRealModels",
+    "sourceHash": "sourceSha is immutable full Git commit SHA; sha256 of source paths can be computed by sha256sum after git checkout"
+  },
+  "status": "REVIEW - agent 0 visual/director approval pending; not A6 picture lock"
+}
