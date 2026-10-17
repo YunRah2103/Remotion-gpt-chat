@@ -60,14 +60,19 @@ export function surfaceForSlot(slot: string): SurfaceName | null {
   if (/REAR_SPOILER|SIDE_MIRROR|SPLITTER|DIFFUSER|CARBON/.test(n)) return 'carbon';
   if (/GLASS|WINDOW|WINDSCREEN/.test(n)) return 'glass';
   if (/TYRE|TIRE|RUBBER/.test(n)) return 'tyre';
+  if (/ENGINE_BAY_TURBO_HOUSING_HINT/.test(n)) return 'warmHousing';
+  if (/ENGINE_PLENUM_RIBBED_METAL|ENGINE_BAY_FASTENERS|ENGINE_BAY_BRACING/.test(n)) return 'machinedSteel';
   if (/RIM|SPOKE|WHEEL_METAL/.test(n)) return 'rim';
   if (/BRAKE|DISC/.test(n)) return 'brakeSteel';
   if (/RACE_ASPHALT|ROAD_SURFACE|ROAD_ASPHALT/.test(n)) return 'asphalt';
   if (/WHITE_ROAD_EDGE|CENTRE_DASHED_LINE/.test(n)) return 'roadStripe';
   if (/INTERCOOLER|COOLER_CORE|COOLER_FIN/.test(n)) return 'intercooler';
+  if (/FOUR_CYLINDER_ENGINE|CYLINDER_BANK_COVER/.test(n)) return 'graphiteHousing';
   if (/TURBINE_HOUSING|HOT_HOUSING|EXHAUST_HOUSING/.test(n)) return 'warmHousing';
   if (/COMPRESSOR_HOUSING|TURBO_HOUSING|BEARING_CASE/.test(n)) return 'graphiteHousing';
   if (/TURBINE_ROTOR|SHAFT|COMPRESSOR_ROTOR|MACHINED_STEEL/.test(n)) return 'machinedSteel';
+  if (/TURBINE_CIRCUIT/.test(n)) return 'hotPipe';
+  if (/FRESH_AIR_CIRCUIT/.test(n)) return 'coldPipe';
   if (/EXHAUST_PIPE|HOT_PIPE|EXHAUST_MANIFOLD/.test(n)) return 'hotPipe';
   if (/CLEAN_AIR|COMPRESSED_PIPE|COLD_PIPE/.test(n)) return 'coldPipe';
   return null;
@@ -88,7 +93,22 @@ export function applyYunexMaterials(root: THREE.Object3D): () => void {
   root.traverse((object)=>{
     if (!(object instanceof THREE.Mesh)) return;
     const current=Array.isArray(object.material)?object.material[0]:object.material;
-    const slot=surfaceForSlot((current?.name || object.name || ''));
+    // Prefer A1 named material. A2 often names the controlling parent group
+    // instead of the individual mesh, so walk upward only as far as a named
+    // mechanism circuit. Never recolour emissive head/taillamp optics.
+    const originalName=(current?.name || object.name || '').toUpperCase();
+    if (/HEADLAMP|REAR_LED|PROJECTOR|TAIL_LIGHT|GLOW|EMISSIVE/.test(originalName)) return;
+    let slot=surfaceForSlot(originalName);
+    if(!slot){
+      let parent=object.parent,depth=0;
+      while(parent && depth<4 && !slot){
+        const n=(parent.name||'').toUpperCase();
+        if (/^(SHAFT|TURBINE_ROTOR|COMPRESSOR_ROTOR|TURBINE_HOUSING|COMPRESSOR_HOUSING|TURBINE_CIRCUIT|FRESH_AIR_CIRCUIT|FOUR_CYLINDER_ENGINE|INTERCOOLER)$/.test(n)){
+          slot=surfaceForSlot(n);
+        }
+        parent=parent.parent;depth++;
+      }
+    }
     if (!slot) return;
     const created=makeYunexMaterial(slot);
     replaced.push({mesh:object,original:object.material,created});
