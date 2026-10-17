@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "task": "YUNEX-TURBO3D-EP001-A4-ISSUE-130",
   "branch": "agent/turbo-3d-001-cinematics",
-  "sourceSha": "3709748827f4ed7f7bc86a5f81ad78092c82832b",
+  "sourceSha": "6288c739b4546bb89393d98c9178a76f5b15f686",
   "owner": "director",
   "summary": "Implemented seven deterministic camera shots, two spinning-turbine animated hook options, independent native Remotion/Three temporary-geometry compositions, safe educational kinetic labels, tested moving software-proxy concept MP4s and a repeatable native render/decode script; final models are owned by A1/A2 and editor assembly by A6.",
   "status": "blocked",
@@ -15,7 +15,8 @@
     "production/yunex/turbo_3d_001/agents/cinematics/render-previews.sh",
     "production/yunex/turbo_3d_001/agents/cinematics/camera.test.cjs",
     "production/yunex/turbo_3d_001/agents/cinematics/manifest.json",
-    "production/yunex/turbo_3d_001/agents/cinematics/handoff.json"
+    "production/yunex/turbo_3d_001/agents/cinematics/handoff.json",
+    "production/yunex/turbo_3d_001/agents/cinematics/README.md"
   ],
   "evidence": [
     "https://github.com/YunRah2103/Remotion-gpt-chat/pull/135 — source branch and compile CI",
