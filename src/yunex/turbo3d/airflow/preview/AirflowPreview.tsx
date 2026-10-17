@@ -34,9 +34,9 @@ export const AirflowPreview:React.FC=()=>{
    camera={{position:[5,4.3,17],fov:46,near:.1,far:100}}>
    <color attach="background" args={['#08121D']}/><hemisphereLight args={['#C8E1E8','#152533',2]}/>
    <directionalLight position={[-6,9,6]} intensity={2.4}/><pointLight position={[4,3,3]} color="#F59F68" intensity={18}/>
-   <StubRig frame={frame}/><TurboFlow frame={frame} phase={phases[stage]}/>
+   <group rotation={[0,0,1.05]}><StubRig frame={frame}/><TurboFlow frame={frame} phase={phases[stage]}/></group>
   </ThreeCanvas>
-  <div style={{position:'absolute',top:215,left:80,fontSize:26,fontWeight:800,letterSpacing:2}}>{labels[stage]}</div>
+  <div style={{position:'absolute',top:215,left:80,fontSize:43,fontWeight:800,letterSpacing:2}}>{labels[stage]}</div>
   <div style={{position:'absolute',bottom:230,left:80,fontSize:18,letterSpacing:2}}>A3 TEMPORARY PORTS — A2 NOT VERIFIED</div>
  </AbsoluteFill>;
 };
