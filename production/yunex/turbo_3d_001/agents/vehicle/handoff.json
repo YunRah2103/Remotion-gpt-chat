@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "task": "YUNEX-TURBO-3D-EP001-A1",
   "branch": "agent/turbo-3d-001-vehicle",
-  "sourceSha": "53b836acddf37b4fac34ca320447205787bf59cb",
+  "sourceSha": "85f1dc4b780a6aec8d18d16922ef161651038bb5",
   "owner": "engineering",
-  "summary": "Original Y-up, +Z-forward procedural teal sports coupe, fully assembled distance-driven 4-wheel animation, race road/world, 3s genuinely rendered native 3D review preview; A1 only.",
+  "summary": "A1 v5 original procedural teal coupe, physical headlamp and bumper ducts, V-shaped spoke/brake hub wheels, full rear engine context plus pivoting hatch, genuine 4-shot R3F native video; scope vehicle only.",
   "status": "review",
   "files": [
     "src/yunex/turbo3d/vehicle/VehicleWorld.tsx",
@@ -13,13 +13,18 @@
     "production/yunex/turbo_3d_001/agents/vehicle/asset-manifest.json",
     "production/yunex/turbo_3d_001/agents/vehicle/check-model.mjs",
     "production/yunex/turbo_3d_001/agents/vehicle/VERIFY.md",
-    ".github/workflows/yunex-turbo-a1-vehicle-proof.yml"
+    ".github/workflows/yunex-turbo-a1-vehicle-proof.yml",
+    "src/yunex/turbo3d/vehicle/DetailKit.tsx",
+    "src/yunex/turbo3d/vehicle/inspection/index.ts",
+    "src/yunex/turbo3d/vehicle/inspection/root.ts",
+    "production/yunex/turbo_3d_001/agents/vehicle/CAMERA_PRESETS.md"
   ],
   "evidence": [
-    "GitHub Actions 39041016213 PASS; npm ci + tsc + model assertions + native Remotion software-WebGL H.264 render + actual ffprobe + FFmpeg full decode.",
-    "Artifact https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39041016213/artifacts/12104206993",
-    "MP4 SHA256 ef696ed9c85f53ed8a07486024fc2ad5b129528b37f2c1c345a0e317ee563469; 90 distinct frames, 378x672, 30fps, 3s; manual contact-sheet reviewed."
+    "CI run 39044260650 all PASS: npm ci, TypeScript, geometry/axes/wheel/frame tests, verified handoff.py, native --gl=swangle Remotion export, ffprobe and FFmpeg full decode, framemd5 120/120 unique decoded frames.",
+    "MP4 artifact https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39044260650/artifacts/12105615160",
+    "Exact native 432x768 H264 30fps 120 frames 4.000s; video SHA256 4bd2422e8b220dab6f79336d8f44652f92dfb13ac48b60214e6d0dc6b16e9a62",
+    "Manually inspected 12 source-decoded frames across four closeup intervals and compared to rejected earlier V2 closeup render; material/shape still stylized."
   ],
   "blockers": [],
-  "notes": "REVIEW pending independent Agent 0 qualitative approval. No claim of all-seven-agent completion, and no final film. Repo contract and historical films unmodified."
+  "notes": "A1 REVIEW, NOT APPROVED: Manager A0 must independently verify desired hero-model visual standard. v5 source anchored at exact commit above; doc commits do not change geometry. A2/A3/A4/A5 were not run here; A6/A7 untouched."
 }
