@@ -33,7 +33,7 @@
     "Original procedural source; no footage or third-party 3D models; project uses package.json installed Remotion/Three dependencies"
   ],
   "evidence": [
-    "GitHub production-ci run 39041778306: passed after branch source commit 3709748827f4ed7f7bc86a5f81ad78092c82832b; includes TypeScript compile and older GpuDriveFilm WebGL smoke, NOT new Agent 4 scene renders.",
+    "GitHub production-ci run 39041778306: passed after branch source commit 6288c739b4546bb89393d98c9178a76f5b15f686; includes TypeScript compile and older GpuDriveFilm WebGL smoke, NOT new Agent 4 scene renders.",
     "Four 432x768, 30fps, 3s each real moving independent software 3D proxy MP4s produced in active ChatGPT workspace; FFprobe and full ffmpeg decode PASS; NOT native Remotion previews. No GitHub-hosted A4 preview artifact yet."
   ],
   "sha256": {
@@ -45,7 +45,7 @@
       "road_hero": "77594d5b73b5e20b33c4c6fadb62b2ed629bad2e199829e7a8170fa787966334"
     }
   },
-  "sourceCommit": "3709748827f4ed7f7bc86a5f81ad78092c82832b",
+  "sourceCommit": "6288c739b4546bb89393d98c9178a76f5b15f686",
   "shots": [
     {
       "variant": "hookOrbit",
