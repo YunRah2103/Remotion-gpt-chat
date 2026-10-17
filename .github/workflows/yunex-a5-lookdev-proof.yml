@@ -88,7 +88,7 @@ jobs:
             mkdir -p "$dir"
             git show "$A1:$dir/$name" > "$dir/$name"
           done
-          for name in TurboMechanism.tsx ports.ts index.ts; do
+          for name in TurboMechanism.tsx ports.ts index.ts TurboPreviewHarness.tsx; do
             dir="src/yunex/turbo3d/mechanism"
             mkdir -p "$dir"
             git show "$A2:$dir/$name" > "$dir/$name"
