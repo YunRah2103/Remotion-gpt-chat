@@ -27,6 +27,8 @@ jobs:
         run: npm run check
       - name: Run A1 geometry and frame-contract tests
         run: node production/yunex/turbo_3d_001/agents/vehicle/check-model.mjs
+      - name: Validate A1 source handoff schema with production validator
+        run: python3 production/tools/handoff.py production/yunex/turbo_3d_001/agents/vehicle/handoff.json
       - name: Render native Three.js moving 3-second preview via software WebGL
         run: |
           mkdir -p out
@@ -40,6 +42,13 @@ jobs:
           ffprobe -v error -show_entries stream=codec_name,width,height,nb_frames,r_frame_rate -show_entries format=duration -of json out/a1-vehicle-native-proof.mp4 | tee out/a1-vehicle-ffprobe.json
           ffmpeg -v error -i out/a1-vehicle-native-proof.mp4 -f null -
           sha256sum out/a1-vehicle-native-proof.mp4 | tee out/a1-vehicle-sha256.txt
+          ffmpeg -hide_banner -loglevel error -i out/a1-vehicle-native-proof.mp4 -f framemd5 out/a1-vehicle-frames.md5
+          python3 - <<'PY'
+          from pathlib import Path
+          hashes=[line.rsplit(',',1)[-1].strip() for line in Path('out/a1-vehicle-frames.md5').read_text().splitlines() if not line.startswith('#')]
+          assert len(hashes)==90 and len(set(hashes))>=80,(len(hashes),len(set(hashes)))
+          print(f'MOTION_PASS: {len(set(hashes))} distinct decoded frames of {len(hashes)}')
+          PY
           python3 - <<'PY'
           import json
           d=json.load(open('out/a1-vehicle-ffprobe.json'))
@@ -57,4 +66,5 @@ jobs:
             out/a1-vehicle-native-proof.mp4
             out/a1-vehicle-ffprobe.json
             out/a1-vehicle-sha256.txt
+            out/a1-vehicle-frames.md5
           retention-days: 14
