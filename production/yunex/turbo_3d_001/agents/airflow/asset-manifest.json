@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "assetId": "YUNEX-TURBO-3D-EP001-A3-AIRFLOW",
+  "kind": "deterministic-r3f-frame-driven-gas-energy-visualiser",
+  "owner": "agent-3-airflow",
+  "sourceCommit": "35ba0c0ecc29a692b0fd4dba130091596d81bc85",
+  "sourceBranch": "agent/turbo-3d-001-airflow",
+  "status": "REVIEW",
+  "unitMetersPerUnit": 1,
+  "upAxis": "+Y",
+  "forwardAxis": "+Z",
+  "shaftAxisReference": "+X turbo-local",
+  "boundingBox": {
+    "kind": "conservative source-route extent estimate (not mesh-measured)",
+    "min": [
+      -3.9,
+      -2.2,
+      -3.5
+    ],
+    "max": [
+      4.5,
+      1.75,
+      1.75
+    ]
+  },
+  "entrypoints": [
+    "src/yunex/turbo3d/airflow/TurboFlow.tsx",
+    "src/yunex/turbo3d/airflow/preview/entry.ts"
+  ],
+  "components": [
+    "TurboFlow",
+    "FlowStream",
+    "Thermal",
+    "Combustion"
+  ],
+  "props": {
+    "frame": "required nonnegative integer video frame",
+    "phase": "exhaust|turbine|compressor|intercooler|combustion|full",
+    "ports": "exact 8 named mechanical port tuples with optional 4 flow nodes",
+    "routes": "optional 6 explicit directional 3D polylines in same local coordinate system",
+    "intensity": "0..1",
+    "visibility": "0..1"
+  },
+  "ports": {
+    "temporarySource": "production/yunex/turbo_3d_001/agents/airflow/flow-ports.json",
+    "a2CandidateSource": "production/yunex/turbo_3d_001/agents/airflow/a2-candidate-routes.json",
+    "agent2CandidateSourceSha": "a658ef8de63b4848c0d33fec6fd75e5a9287b4cc",
+    "approval": "NOT_APPROVED_A2_GEOMETRY"
+  },
+  "gasRoutes": [
+    "exhaust-feed",
+    "exhaust-exit",
+    "clean-intake",
+    "charge-hot",
+    "charge-cooled",
+    "fuel-pulse"
+  ],
+  "animation": {
+    "timeSource": "frame-driven only",
+    "nonseededRandomness": false,
+    "particleInstancesExhaust": 20,
+    "particleInstancesFreshAirPerSegment": 19,
+    "intercoolerMassCreation": false,
+    "combustion": "illustrative 25-frame power pulse (not simulated pressure)"
+  },
+  "materials": {
+    "hotExhaust": "#FF8A36",
+    "exhaustExit": "#F15C3A",
+    "freshAir": "#53CFFF",
+    "cooledAir": "#8CEBE3",
+    "fuel": "#FFCE87"
+  },
+  "sourceFiles": [
+    "src/yunex/turbo3d/airflow/TurboFlow.tsx",
+    "src/yunex/turbo3d/airflow/A2CandidateAdapter.ts",
+    "src/yunex/turbo3d/airflow/preview/AirflowPreview.tsx",
+    "src/yunex/turbo3d/airflow/preview/Root.tsx",
+    "src/yunex/turbo3d/airflow/preview/entry.ts",
+    "production/yunex/turbo_3d_001/agents/airflow/flow-ports.json",
+    "production/yunex/turbo_3d_001/agents/airflow/a2-candidate-routes.json"
+  ],
+  "licenses": [
+    {
+      "source": "All models, curves and source graphics built procedurally for this assignment",
+      "rights": "original authored code (no external footage or third-party models used)"
+    }
+  ],
+  "evidence": {
+    "nativeRemotion": {
+      "runId": 39042989345,
+      "runUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39042989345",
+      "artifactId": 12104513415,
+      "artifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39042989345/artifacts/12104513415",
+      "clipFormat": "H.264 540x960 30fps, 30 frames per clip, no audio",
+      "fullDecode": "PASS",
+      "uniqueFrameHashesEachClip": 30,
+      "sha256": {
+        "turbine": "832eed5b7c9d297f65c2a41c96f005ff054b0848f727f29a222d754b3640bf50",
+        "compressor": "5954016ce87d4e809ed3be609cf938da7bff5ec2737e4c0d2f6bfce8658e49ec",
+        "intercooler": "75875450a58f2d6f526c181ffc14a7da08cf130e0d26657296c05294729e42ca",
+        "combustion": "f574c533ed5e8171162e245474f3d5b83a7aea2b81abfec607cf358c87f0ffb4",
+        "full": "bfee7438d370762ee0babe627d86e72b065f2620be4456b284ea43e822a7f708"
+      }
+    },
+    "reviewConcat": {
+      "sha256": "fbe635c1462ff9725ab7b9e6e5fdeb9b355ec9cf1dc21bf7608818e3957d7ba5",
+      "frames": 150,
+      "durationSeconds": 5,
+      "fps": 30,
+      "resolution": "540x960",
+      "fullDecode": "PASS",
+      "location": "User chat artifact A3_NATIVE_PORTRAIT_REVIEW.mp4"
+    },
+    "offlineA2PositionedDemo": {
+      "sha256": "7448d7499fd4c9abbbc3e835e88867e07d860b7e836f8fc452fc24533bb31a3c",
+      "note": "VTK independent preview; not native or approved mechanical model"
+    }
+  },
+  "sha256": {
+    "note": "Exact SHA256s of native MP4s recorded in evidence.nativeRemotion.sha256; test runner owns binary artifacts."
+  },
+  "limitations": [
+    "Illustrative not CAD or CFD; no measured power or boost",
+    "A2 pipes and rotor throat transitions require independent geometric/collision-science approval",
+    "One-second isolated segment previews, not a final whole-film picture lock",
+    "Test stand-in rotor/wheels never enter final A6 picture"
+  ]
+}

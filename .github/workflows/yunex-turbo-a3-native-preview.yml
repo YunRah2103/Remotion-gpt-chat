@@ -31,6 +31,11 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
+      - name: Validate real A3 route manifests and typed handoff contract
+        run: |
+          python production/yunex/turbo_3d_001/agents/airflow/test_ports.py
+          python production/yunex/turbo_3d_001/agents/airflow/test_a2_candidate.py
+          python production/tools/handoff.py production/yunex/turbo_3d_001/agents/airflow/handoff.json
       - name: Render five real A3 R3F motion phases
         shell: bash
         run: |

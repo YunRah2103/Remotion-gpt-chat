@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "task": "yunex-turbo-3d-ep001-agent3-airflow",
   "branch": "agent/turbo-3d-001-airflow",
-  "sourceSha": "4c7c9526945511bab75ca66e089fd5bfc47b4c62",
+  "sourceSha": "35ba0c0ecc29a692b0fd4dba130091596d81bc85",
   "owner": "engineering",
-  "summary": "Frame-deterministic independent R3F hot exhaust, clean intake, charge cooling and cylinder combustion, with pinned not-yet-approved A2 pipe/port compatibility adapter; two verified independent VTK moving reviews and clean repository TypeScript/native generic CI.",
+  "summary": "Reproducible deterministic 3D native R3F/Remotion six-route exhaust/intake/intercooler/combustion and independent native 5-phase moving-preview clips verified at 540x960/30fps; independent A2 candidate adapter held for scientific/art review.",
   "status": "review",
   "files": [
     "src/yunex/turbo3d/airflow/TurboFlow.tsx",
@@ -16,19 +16,22 @@
     "production/yunex/turbo_3d_001/agents/airflow/test_ports.py",
     "src/yunex/turbo3d/airflow/A2CandidateAdapter.ts",
     "production/yunex/turbo_3d_001/agents/airflow/a2-candidate-routes.json",
-    "production/yunex/turbo_3d_001/agents/airflow/test_a2_candidate.py"
+    "production/yunex/turbo_3d_001/agents/airflow/test_a2_candidate.py",
+    "production/yunex/turbo_3d_001/agents/airflow/asset-manifest.json",
+    ".github/workflows/yunex-turbo-a3-native-preview.yml"
   ],
   "evidence": [
     "Source commit https://github.com/YunRah2103/Remotion-gpt-chat/commit/66c10464777f52130b7d60efb0b808f9781507f3",
     "PR https://github.com/YunRah2103/Remotion-gpt-chat/pull/137",
     "Independent native VTK 3D moving review file delivered in user chat: A3_AIRFLOW_3D_PROOF.mp4 (11s, 220 frames, 20fps, 360x640, H264; SHA256 2ead248979a934730cdf4132a5130762f216f4c3e20614c4ea0e71b4696d100f), FFprobe/full decode PASS. Not an R3F render or GitHub artifact.",
     "A2-port-aligned independent moving 3D proxy in user chat: A3_A2_CANDIDATE_FLOW_3D.mp4, H264 360x640 20fps 220 frames 11s, ffprobe/full decode PASS, sha256 7448d7499fd4c9abbbc3e835e88867e07d860b7e836f8fc452fc24533bb31a3c",
-    "Real GitHub TS+native generic smoke CI PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39042037668 and https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39042037661"
+    "Real GitHub TS+native generic smoke CI PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39042037668 and https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39042037661",
+    "Native 3D Remotion source check, 5 animated 30-frame phases, H264 540x960 30fps, ffprobe and FFmpeg full video decode, frame hash count 30/30 all phases, real SHA256s: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39042989345/artifacts/12104513415",
+    "Original 5 native MP4s individually reverified by downloading GitHub artifact ZIP in this chat. Review-only 5s/150frame 540x960 30fps concatenation SHA256 fbe635c1462ff9725ab7b9e6e5fdeb9b355ec9cf1dc21bf7608818e3957d7ba5 was separately FFmpeg full decoded; user chat attachment A3_NATIVE_PORTRAIT_REVIEW.mp4."
   ],
   "blockers": [
-    "A2 ports now documented in an explicitly unapproved candidate adapter pinned to a658ef8. Await model freeze + native geometry/rotor throat visual QA.",
-    "Dedicated native Remotion rendering for isolated A3AirflowReview has not been executed; generic PR smoke is NOT equivalent.",
-    "Manager needs to review artistic/scientific material before approved integration."
+    "Manager/Agent2 final mechanical model and in-housing rotor-throat paths need joint geometry QC. Candidate A2 source pinned at a658ef8 (actual port geometry inspected, but NOT approved).",
+    "Manager must independently approve mobile visual quality and mechanical science before A6 integration. Stand-in rig must NOT be included in finished film."
   ],
-  "notes": "STATUS REVIEW ONLY, not APPROVED. Two independent VTK moving software-rendered and FFmpeg-decoded videos in user chat, no public GitHub-hosted binary claimed."
+  "notes": "REVIEW / READY FOR MANAGER REVIEW, NOT APPROVED. Native moving previews and precise SHA256 provided, actual A2 full geometry integration remains pending. 3D previews contain no full episode narration or finished car (owned by A6/A7)."
 }

@@ -34,3 +34,13 @@ Independent A2-coordinate VTK 3D review: `A3_A2_CANDIDATE_FLOW_3D.mp4` in the us
 The TypeScript strict-check passed on [Actions 39042037668](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39042037668), and repository native **generic** PR visual check passed [39042037661](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39042037661). These do not directly render `A3AirflowReview`; a genuine dedicated A3 Remotion proof is still needed before APPROVED.
 
 Scientific route tests for the pinned candidate: `python production/yunex/turbo_3d_001/agents/airflow/test_a2_candidate.py`. It validates port endpoint geometry but cannot certify that rendered particles do not collide with the A2 housing. Ask Agent 2/manager to confirm the inner volute throat transition before integration.
+
+## Native Remotion delivery — visual QA round 2
+
+The **dedicated real R3F Remotion render** passed on [run 39042989345](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39042989345), commit `35ba0c0ecc29a692b0fd4dba130091596d81bc85` with five inspectable [H.264 phase MP4s](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39042989345/artifacts/12104513415) at 540x960, 30fps, 30 frames each. FFprobe, full FFmpeg decode, 30 distinct frame-hash checks per phase passed. The videos were additionally downloaded and visually inspected; the initial horizontal scene was rejected as too empty for vertical mobile viewing, and the approved **test-only camera framing** was rotated diagonally for fuller use of 9:16 space. This does not touch the reusable physics or Agent2 geometry.
+
+A user-viewable 5s/150frame stitched **review only** MP4 from the five ACTUAL Remotion phase clips is available in the chat as `A3_NATIVE_PORTRAIT_REVIEW.mp4`, SHA256 `fbe635c1462ff9725ab7b9e6e5fdeb9b355ec9cf1dc21bf7608818e3957d7ba5`; full video decode PASS. Native per-phase checksums and links live in `asset-manifest.json`. This stitching is solely for A3 visual review: **not** an A6 production edit or approved final release.
+
+Before integrating with A2 geometry, use the candidate adapter only with a manager-frozen A2 source SHA, then do a **new physical geometry overlay** and confirm particles stay in visible tube/volute centres, including turbine and compressor throat entrances/exits.
+
+A3's source package is **ready for specialist QA review**; manager approval and true combined A2 geometry QA are still outstanding.
