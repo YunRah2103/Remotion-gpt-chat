@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "task": "YUNEX-TURBO-3D-EP001-A1",
   "branch": "agent/turbo-3d-001-vehicle",
-  "sourceSha": "85f1dc4b780a6aec8d18d16922ef161651038bb5",
+  "sourceSha": "f290915380c1449edf0c46de6b1dc5bd3c48f4f9",
   "owner": "engineering",
-  "summary": "A1 v5 original procedural teal coupe, physical headlamp and bumper ducts, V-shaped spoke/brake hub wheels, full rear engine context plus pivoting hatch, genuine 4-shot R3F native video; scope vehicle only.",
+  "summary": "A1 V6.3 original teal sports coupe sculpted body surface, low tapered nose, actual front and rear wheel arch holes/fender lips, low raked glass canopy, body-following headlamp cutouts and preserved V5 engine reveal/wheel travel; native moving front three-quarter hero and four-angle visual proof reviewed.",
   "status": "review",
   "files": [
     "src/yunex/turbo3d/vehicle/VehicleWorld.tsx",
@@ -17,14 +17,19 @@
     "src/yunex/turbo3d/vehicle/DetailKit.tsx",
     "src/yunex/turbo3d/vehicle/inspection/index.ts",
     "src/yunex/turbo3d/vehicle/inspection/root.ts",
-    "production/yunex/turbo_3d_001/agents/vehicle/CAMERA_PRESETS.md"
+    "production/yunex/turbo_3d_001/agents/vehicle/CAMERA_PRESETS.md",
+    "src/yunex/turbo3d/vehicle/SculptedBody.tsx"
   ],
   "evidence": [
-    "CI run 39044260650 all PASS: npm ci, TypeScript, geometry/axes/wheel/frame tests, verified handoff.py, native --gl=swangle Remotion export, ffprobe and FFmpeg full decode, framemd5 120/120 unique decoded frames.",
-    "MP4 artifact https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39044260650/artifacts/12105615160",
-    "Exact native 432x768 H264 30fps 120 frames 4.000s; video SHA256 4bd2422e8b220dab6f79336d8f44652f92dfb13ac48b60214e6d0dc6b16e9a62",
-    "Manually inspected 12 source-decoded frames across four closeup intervals and compared to rejected earlier V2 closeup render; material/shape still stylized."
+    "V5 historical comparison only: prior proven run 39044260650; not relied on for the new sculpted geometry.",
+    "V6.3 commit f290915380c1449edf0c46de6b1dc5bd3c48f4f9; source source-file SHA256 values in asset-manifest.json.",
+    "V6.3 native GitHub Actions PASS run 39065514179, npm ci, TypeScript, model/axes/wheel contract, handoff validator and BOTH Remotion swangle exports; ffprobe H264 432x768 30fps four seconds 120 frames, full FFmpeg decode and 120/120 distinct decoded frame MD5s for each reel.",
+    "V6.3 hero artifact https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39065514179/artifacts/12112793802; MP4 sha256 fe106d4ae36fb42f89c08404bab91569f47e6401caa5367a06fefc0a0a565db0",
+    "V6.3 engine/close-up artifact https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39065514179/artifacts/12113127767; MP4 sha256 8be01446faa1856280861d316371e38c67a96ba1a358ac9e1d217a16c3db0b9e",
+    "Manually examined native decoded samples from both MP4s (hero frames 0,15,30,45,60,75,90,105,119; inspection frames 3,14,28,35,50,59,65,80,88,95,105,117). Compared first failed-framing V6 render and V5 cinematic. Improved shoulders and wheel connection; final nose in frame; rear engine opens. Lamps remain stylized, not photoreal."
   ],
-  "blockers": [],
-  "notes": "A1 REVIEW, NOT APPROVED: Manager A0 must independently verify desired hero-model visual standard. v5 source anchored at exact commit above; doc commits do not change geometry. A2/A3/A4/A5 were not run here; A6/A7 untouched."
+  "blockers": [
+    "Independent A0 creative sign-off on final V6.3 rendered hero; technical proof PASS does not grant approval."
+  ],
+  "notes": "V6.3 STILL REVIEW, NOT APPROVED. Scoped exclusively to A1 source and A1 proof/metadata; A2-A5 owned assets not modified; A6/A7 untouched. Nominal world anchors, +Y/+Z/metre, front/rear wheel rig, deterministic travel and opening engine deck preserved."
 }
