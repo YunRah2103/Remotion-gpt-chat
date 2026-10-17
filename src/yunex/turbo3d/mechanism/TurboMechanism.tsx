@@ -124,19 +124,23 @@ export const TurboMechanism:React.FC<TurboMechanismProps>=({
      <Rotor compressor={false} x={TURBO_PIVOTS.TURBINE_ROTOR[0]-gap} phase={phase}/>
      <CylinderX a={[-2.22,0,0]} b={[-1.44,0,0]} r={.24} color="#825B4C"/>
      <CylinderX a={[-.60,0,0]} b={[-.26,0,0]} r={.33} color="#5B6368"/>
-     <CurvePipe points={exhaustManifold} r={.17} color="#885944"/>
-     <CurvePipe points={exhaustBranch} r={.11} color="#8B6048"/>
-     <CurvePipe points={exhaustTail} r={.16} color="#8C604D"/>
+     {variant==='full'?<React.Fragment>
+       <CurvePipe points={exhaustManifold} r={.17} color="#885944"/>
+       <CurvePipe points={exhaustBranch} r={.11} color="#8B6048"/>
+       <CurvePipe points={exhaustTail} r={.16} color="#8C604D"/>
+     </React.Fragment>:null}
    </group>
    <group name="FRESH_AIR_CIRCUIT">
      <Housing compressor x={TURBO_PIVOTS.COMPRESSOR_ROTOR[0]+gap} cutaway={clamp(cutaway)}/>
      <Rotor compressor x={TURBO_PIVOTS.COMPRESSOR_ROTOR[0]+gap} phase={phase}/>
      <CylinderX a={[1.44,0,0]} b={[2.22,0,0]} r={.24} color="#527C91"/>
      <CylinderX a={[.26,0,0]} b={[.60,0,0]} r={.33} color="#657C88"/>
-     <CurvePipe points={cleanFilter} r={.18} color="#416B84"/>
-     <CurvePipe points={compressedPipe} r={.16} color="#4B8295"/>
-     <CurvePipe points={cooledPipe} r={.16} color="#619D9D"/>
-     <CylinderX a={[3.87,.24,.35]} b={[4.47,.24,.35]} r={.30} color="#284C60"/>
+     {variant==='full'?<React.Fragment>
+       <CurvePipe points={cleanFilter} r={.18} color="#416B84"/>
+       <CurvePipe points={compressedPipe} r={.16} color="#4B8295"/>
+       <CurvePipe points={cooledPipe} r={.16} color="#619D9D"/>
+       <CylinderX a={[3.87,.24,.35]} b={[4.47,.24,.35]} r={.30} color="#284C60"/>
+     </React.Fragment>:null}
    </group>
    {variant==='full'?<><Engine/><Intercooler/></>:null}
    {Object.entries(TURBO_PORTS).map(([name,where])=>
