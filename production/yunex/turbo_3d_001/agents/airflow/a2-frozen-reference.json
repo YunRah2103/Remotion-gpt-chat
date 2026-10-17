@@ -1,0 +1,19 @@
+{
+  "sourceRepository": "YunRah2103/Remotion-gpt-chat",
+  "sourceBranch": "agent/turbo-3d-001-mechanism",
+  "sourceCommit": "4f894a51083e4ebaa652193713ee0baf56ba2439",
+  "sourcePaths": [
+    "src/yunex/turbo3d/mechanism/TurboMechanism.tsx",
+    "src/yunex/turbo3d/mechanism/ports.ts"
+  ],
+  "frozenCopyPaths": [
+    "src/yunex/turbo3d/airflow/preview/a2-frozen/TurboMechanism.tsx",
+    "src/yunex/turbo3d/airflow/preview/a2-frozen/ports.ts"
+  ],
+  "sourceBlobSha": [
+    "b99becdeb7987b9a1e431900f0c42a5e6c16d8bf",
+    "36cbc69a303596428e6f05ac784e1db7b6a55675"
+  ],
+  "scope": "REVIEW PREVIEW ONLY. No A2 owned file altered or production copy replaced.",
+  "status": "actual upgraded A2 source snapshot (NOT primitive stand-in); manager final approved version is not assumed"
+}

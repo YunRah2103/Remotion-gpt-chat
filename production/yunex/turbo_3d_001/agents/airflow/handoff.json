@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "task": "yunex-turbo-3d-ep001-agent3-airflow",
+  "branch": "agent/turbo-3d-001-airflow",
+  "sourceSha": "0dc11dfe7d521c4bf380cbac49ffe16af4aebc4e",
+  "owner": "engineering",
+  "summary": "Cinematic actual-model upgrade: unchanged frozen latest A2 procedural turbo/engine in isolated A3 Remotion test, close-up camera staging, layered bright amber/cyan motion trails, actual mechanical shared shaft, correct channels, A2-mounted illustrative power stroke. Five native moving clips technically verified and visually inspected.",
+  "status": "review",
+  "files": [
+    "src/yunex/turbo3d/airflow/TurboFlow.tsx",
+    "src/yunex/turbo3d/airflow/preview/AirflowPreview.tsx",
+    "src/yunex/turbo3d/airflow/preview/Root.tsx",
+    "src/yunex/turbo3d/airflow/preview/entry.ts",
+    "production/yunex/turbo_3d_001/agents/airflow/flow-ports.json",
+    "production/yunex/turbo_3d_001/agents/airflow/README.md",
+    "production/yunex/turbo_3d_001/agents/airflow/test_ports.py",
+    "src/yunex/turbo3d/airflow/A2CandidateAdapter.ts",
+    "production/yunex/turbo_3d_001/agents/airflow/a2-candidate-routes.json",
+    "production/yunex/turbo_3d_001/agents/airflow/test_a2_candidate.py",
+    "production/yunex/turbo_3d_001/agents/airflow/asset-manifest.json",
+    ".github/workflows/yunex-turbo-a3-native-preview.yml",
+    "src/yunex/turbo3d/airflow/CinematicFlow.tsx",
+    "src/yunex/turbo3d/airflow/PowerWindow.tsx",
+    "src/yunex/turbo3d/airflow/preview/a2-frozen/TurboMechanism.tsx",
+    "src/yunex/turbo3d/airflow/preview/a2-frozen/ports.ts",
+    "production/yunex/turbo_3d_001/agents/airflow/a2-frozen-reference.json"
+  ],
+  "evidence": [
+    "Source commit https://github.com/YunRah2103/Remotion-gpt-chat/commit/66c10464777f52130b7d60efb0b808f9781507f3",
+    "PR https://github.com/YunRah2103/Remotion-gpt-chat/pull/137",
+    "Independent native VTK 3D moving review file delivered in user chat: A3_AIRFLOW_3D_PROOF.mp4 (11s, 220 frames, 20fps, 360x640, H264; SHA256 2ead248979a934730cdf4132a5130762f216f4c3e20614c4ea0e71b4696d100f), FFprobe/full decode PASS. Not an R3F render or GitHub artifact.",
+    "A2-port-aligned independent moving 3D proxy in user chat: A3_A2_CANDIDATE_FLOW_3D.mp4, H264 360x640 20fps 220 frames 11s, ffprobe/full decode PASS, sha256 7448d7499fd4c9abbbc3e835e88867e07d860b7e836f8fc452fc24533bb31a3c",
+    "Real GitHub TS+native generic smoke CI PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39042037668 and https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39042037661",
+    "Native 3D Remotion source check, 5 animated 30-frame phases, H264 540x960 30fps, ffprobe and FFmpeg full video decode, frame hash count 30/30 all phases, real SHA256s: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39042989345/artifacts/12104513415",
+    "Original 5 native MP4s individually reverified by downloading GitHub artifact ZIP in this chat. Review-only 5s/150frame 540x960 30fps concatenation SHA256 fbe635c1462ff9725ab7b9e6e5fdeb9b355ec9cf1dc21bf7608818e3957d7ba5 was separately FFmpeg full decoded; user chat attachment A3_NATIVE_PORTRAIT_REVIEW.mp4.",
+    "Cinematic A2 actual-model native Remotion five previews PASS: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39059260120/artifacts/12110533804 — H264 540x960, 30fps, 30 frames per clip, 30 unique frames each, full FFmpeg decode, all SHA256 listed in asset-manifest.json.",
+    "Independent local montage rebuilt from five native clips: A3_TURBO_REAL_MODEL_CINEMATIC_V2_REVIEW.mp4, 5.000s, 150 frames @30fps, 540x960 H264, FFmpeg full decode PASS, SHA256 6ab1da8f84c5525694f8ccbcfb0eef051468805267a1071d2f38e67212679bfe"
+  ],
+  "blockers": [
+    "Manager independent aesthetic/scientific approval outstanding; preview now uses actual frozen Agent2 model, no primitive stand-ins.",
+    "Rotor throat/volute channel collision accuracy must be reviewed jointly with A2; luminous cutaway overlay is illustrative and intentionally visible through casings.",
+    "Need A6 picture integration and A7 1080x1920 voice/audio final; this handoff is not a finished episode."
+  ],
+  "notes": "SPECIALIST QUALITY REWORK REVIEW: first actual-A2-model cinematic V1 rendered and decoded but combustion view rejected and fixed. Final V2 has five actual native MP4s checked/visually sampled, not a static diagram. No Agent2 owned original source modified. Snapshot retained in A3 isolated preview only."
+}

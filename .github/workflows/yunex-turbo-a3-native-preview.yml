@@ -1,0 +1,82 @@
+name: YUNEX A3 - native airflow phase previews
+
+on:
+  push:
+    branches:
+      - agent/turbo-3d-001-airflow
+    paths:
+      - 'src/yunex/turbo3d/airflow/**'
+      - 'production/yunex/turbo_3d_001/agents/airflow/**'
+      - '.github/workflows/yunex-turbo-a3-native-preview.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-a3-flow-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install locked Remotion and Three dependencies
+        run: npm ci --no-audit --no-fund
+      - name: TypeScript strict type check
+        run: npm run check
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Validate real A3 route manifests and typed handoff contract
+        run: |
+          python production/yunex/turbo_3d_001/agents/airflow/test_ports.py
+          python production/yunex/turbo_3d_001/agents/airflow/test_a2_candidate.py
+          python production/tools/handoff.py production/yunex/turbo_3d_001/agents/airflow/handoff.json
+      - name: Render five real A3 R3F motion phases
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/yunex-a3
+          ENTRY=src/yunex/turbo3d/airflow/preview/entry.ts
+          for spec in "turbine:0-29" "compressor:66-95" "intercooler:132-161" "combustion:198-227" "full:264-293"; do
+            label="${spec%%:*}"
+            frames="${spec#*:}"
+            npx --no-install remotion render "$ENTRY" A3AirflowReview "out/yunex-a3/${label}-native.mp4" --frames="$frames" --gl=swangle --codec=h264 --pixel-format=yuv420p --scale=0.5 --concurrency=1
+          done
+      - name: Verify H264, full decode, real moving frames and publish SHA256
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import subprocess,json,hashlib
+          from pathlib import Path
+          outputs={}
+          for label in ('turbine','compressor','intercooler','combustion','full'):
+              p=Path(f'out/yunex-a3/{label}-native.mp4')
+              assert p.is_file() and p.stat().st_size>1500, ('missing file',label)
+              metadata=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(p)]))
+              stream=next(x for x in metadata['streams'] if x['codec_type']=='video')
+              assert stream['codec_name']=='h264',label
+              assert (stream['width'],stream['height'])==(540,960),(label,stream['width'],stream['height'])
+              assert stream['r_frame_rate']=='30/1',(label,stream['r_frame_rate'])
+              assert int(stream['nb_frames'])==30,(label,stream['nb_frames'])
+              subprocess.run(['ffmpeg','-hide_banner','-v','error','-xerror','-i',str(p),'-f','null','-'],check=True)
+              raw=subprocess.check_output(['ffmpeg','-hide_banner','-v','error','-i',str(p),'-f','framemd5','-'])
+              hashes=[x.split(b',')[-1].strip() for x in raw.splitlines() if x and not x.startswith(b'#')]
+              assert len(hashes)==30 and len(set(hashes))>=22,(label,len(hashes),len(set(hashes)))
+              sha=hashlib.sha256(p.read_bytes()).hexdigest()
+              outputs[label]={'sha256':sha,'frameCount':30,'fps':30,'sizeBytes':p.stat().st_size,'resolution':'540x960','uniqueFrameHashes':len(set(hashes))}
+              print('A3_NATIVE_PASS',label,'sha256='+sha,'unique='+str(len(set(hashes))),flush=True)
+          Path('out/yunex-a3/native-validation.json').write_text(json.dumps(outputs,indent=2)+'\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: yunex-turbo-a3-native-flow-previews
+          path: out/yunex-a3/
+          retention-days: 30
+          if-no-files-found: warn
