@@ -1,42 +1,42 @@
-# YUNEX Turbo 3D EP001 — Production status
+# YUNEX Turbo 3D EP001 — Honest production status
 
-**Last actual manager update:** 2026-10-17 (Europe/Oslo; time not recorded).  
-**Phase:** PREPRODUCTION / assignment setup.  
-**Running agent sessions verified:** NONE.  
+**Update date:** 2026-10-17 (Europe/Oslo; exact update clock not logged).  
+**Phase:** PREPRODUCTION / seven reusable assignments and shared contract created.  
+**Verified autonomous AI agent sessions:** NONE.  
 **Production branch:** `production/yunex-turbo-3d-ep001`  
-**Master tracker:** https://github.com/YunRah2103/Remotion-gpt-chat/issues/126
+**Master issue:** https://github.com/YunRah2103/Remotion-gpt-chat/issues/126  
+**Draft PR:** https://github.com/YunRah2103/Remotion-gpt-chat/pull/132
 
-| Agent | Issue | Status | Evidence |
-|---|---|---|---|
-| A1 vehicle/world | #127 | NOT STARTED | Assignment issue created; no actual modelling verified |
-| A2 turbo/engine | #128 | NOT STARTED | Assignment issue created; no actual modelling verified |
-| A3 airflow/combustion | #129 | NOT STARTED | Assignment issue created; no actual moving preview |
-| A4 picture editor/cinematics | #130 | NOT STARTED | Assignment issue created; waits for A1–A3 approval |
-| A5 audio director | #131 | NOT STARTED | Assignment issue created; waits for picture lock |
+## Seven-agent assignment status
 
-## Verified at preflight
+| ID | Job | GitHub | Stage | Verified state |
+|---|---|---|---|---|
+| A1 | Car + environment modeller | #127 | Parallel visual | NOT STARTED — issue/prompt only |
+| A2 | Turbo + engine modeller | #128 | Parallel visual | NOT STARTED — issue/prompt only |
+| A3 | Airflow/intercooler/combustion | #129 | Parallel visual | NOT STARTED — issue/prompt only |
+| A4 | Cinematic motion/cameras/titles | #130 | Parallel visual | NOT STARTED — issue/prompt only |
+| A5 | Lighting, materials, atmospheric VFX | #131 | Parallel visual | NOT STARTED — issue/prompt only |
+| A6 | Picture editor + integrator | #133 | After five approvals | NOT STARTED — issue/prompt only |
+| A7 | Narration/audio/final MP4 | #134 | After A6 picture lock | NOT STARTED — issue/prompt only |
 
-- Repository `main` accessible; Remotion 4, R3F, Three.js and `@remotion/three` dependencies declared.
-- Existing 28-second `TurboDocumentary` source exists with real procedural vehicle/turbo geometry and documentary production CI workflow; **it is not this film**.
-- Blender export, engineering handoff, studio voice-alignment, and FFmpeg/Remotion QA utilities are present in source.
-- GitHub Copilot custom-agent profiles/prompts and GitHub issues do not automatically execute AI specialists. No agent session or preview is evidenced here.
-- Actual optional tool execution, Blender pipeline integration, synthetic narration and final rendering **not tested for this episode**.
+## Verifiable preflight result
 
-## Next verifiable actions
+- Existing repository main is accessible, declared Remotion 4/R3F/Three.js toolchain, previous procedural `TurboDocumentary`, original Blender GLB exporter, image/physics support and video QC tools inspected.
+- Preproduction documentation produced, five visual role requirements corrected and two additional downstream assignments opened. None of this means modelling/renders/audio have begun.
+- No verified new assets, moving proof, approved five-agent contributions, voice track, picture lock or final video file yet.
+- Local/remote GPU, Blender capability in each future run, and TTS provider availability for this film are **not yet verified**.
 
-1. Open and launch the A1, A2 and A3 prompts in separate capable coding agent sessions, each with its own branch. Post real branch/session references to #127–#129 and #126.
-2. Validate named turbo ports from A2 before A3 finalizes flow routing.
-3. Review moving model previews; request rework until A1–A3 pass technical and cinematic QC.
-4. Launch A4 once reviewed packages are approved; render and picture-lock.
-5. Launch A5; use actual narration method, final audio mix, mux and full verified MP4.
-6. Manager posts real dated progress updates only when backed by evidence. Never claim sessions launched or work rendered by this initial setup.
+## Required real next actions
 
-## Blockers
+1. Start **five real parallel agent sessions** with their prompts: A1–A5, each branched from `production/yunex-turbo-3d-ep001`.
+2. Each agent posts truthful session link, branch/commit, real source and decodable moving preview to its issue and #126.
+3. Manager independently checks A1 vehicle/wheels/road, A2 rotor/shaft/port accuracy, A3 non-mixing flows, A4 first-second moving camera and transitions, A5 premium consistent shader/light/VFX. Request targeted revisions and individually approve each of FIVE asset packages.
+4. **Only then** start A6 final integration/Remotion composition, verify picture lock.
+5. **Only then** start A7 actual voice/music/SFX mix, ensure speech sync, verified downloadable final master.
+6. Post realistic timestamped progress with evidence; no guessed percentages, fake runs or background task promises.
 
-- Agent execution not automatically started by current GitHub issue/file creation.
-- No approved new GLBs, filmed previews, narration audio, picture lock or final MP4 yet.
-- Runtime-specific availability of GPU, Blender and narration remains to be tested.
+## Accuracy and media acceptance
 
-## Final acceptance
+Exhaust -> turbine -> exhaust outlet; single turbine/compressor shaft; fresh intake air -> compressor -> intercooler -> cylinders, with matched fuel/combustion. No invented boost/horsepower facts; fully stylised educational CFD, not certified simulation.
 
-Final file `YUNEX_TURBO_3D_EP001_FINAL.mp4`; native 1080x1920 / 30 fps / H.264 / stereo AAC / ~23–26s, free from black bars, visible mech errors, missing voice or unlicensed assets. Artifacts and SHA256/FFprobe/full-decode proof must be linked here or #126 before COMPLETE.
+Final `YUNEX_TURBO_3D_EP001_FINAL.mp4` must be actually present and independently checked as 1080x1920, 30fps, H.264, AAC stereo, ~23–26s, with speech, music and mechanical audio; provide size/hash/fps/duration, full FFmpeg decode, real visual and listen-through QC. No final rendered output exists yet.
