@@ -1,0 +1,104 @@
+name: YUNEX Turbo EP001 - A4 native 3D moving previews
+on:
+  pull_request:
+    paths:
+      - 'src/yunex/turbo3d/cinematics/**'
+      - 'production/yunex/turbo_3d_001/agents/cinematics/**'
+      - '.github/workflows/yunex-a4-native-previews.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: yunex-a4-native-${{ github.event.pull_request.number || github.ref }}-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  native-previews:
+    name: Render ${{ matrix.name }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: hook-orbit
+            composition: YunexA4HookOrbit
+            end: 89
+            frames: 90
+          - name: hook-rush
+            composition: YunexA4HookRush
+            end: 89
+            frames: 90
+          - name: shaft-follow
+            composition: YunexA4Shaft
+            end: 149
+            frames: 150
+          - name: charge-glide
+            composition: YunexA4Charge
+            end: 149
+            frames: 150
+          - name: road-hero
+            composition: YunexA4Road
+            end: 119
+            frames: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies and verify A4 camera mathematics
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          npm run check
+          node production/yunex/turbo_3d_001/agents/cinematics/camera.test.cjs
+          python production/tools/handoff.py production/yunex/turbo_3d_001/agents/cinematics/handoff.json
+          ffmpeg -version | head -n 1
+      - name: Actual native Remotion Three/WebGL moving preview
+        env:
+          COMP: ${{ matrix.composition }}
+          END: ${{ matrix.end }}
+          NAME: ${{ matrix.name }}
+          EXPECT: ${{ matrix.frames }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "out/a4/$NAME"
+          npx remotion render src/yunex/turbo3d/cinematics/previewEntry.tsx "$COMP" "out/a4/$NAME/$NAME.mp4" \
+            --frames="0-$END" --scale=0.4 --concurrency=1 --gl=swangle --codec=h264 --pixel-format=yuv420p
+          ffmpeg -v error -xerror -i "out/a4/$NAME/$NAME.mp4" -f null -
+          ffprobe -v error -show_entries format=duration,size:stream=codec_name,width,height,r_frame_rate,nb_frames,pix_fmt -of json "out/a4/$NAME/$NAME.mp4" > "out/a4/$NAME/probe.json"
+          python - "$NAME" "$EXPECT" <<'PY'
+          import json,subprocess,sys,pathlib
+          name,expected=sys.argv[1],int(sys.argv[2])
+          base=pathlib.Path('out/a4')/name
+          metadata=json.loads((base/'probe.json').read_text())
+          stream=next(s for s in metadata['streams'] if s['codec_name']=='h264')
+          assert int(stream['width'])==432 and int(stream['height'])==768,stream
+          assert stream['r_frame_rate']=='30/1',stream
+          assert stream['pix_fmt']=='yuv420p',stream
+          assert int(stream['nb_frames'])==expected,(expected,stream)
+          result=subprocess.check_output(['ffmpeg','-v','error','-i',str(base/(name+'.mp4')),'-an','-f','framemd5','-']).decode()
+          hashes=[ln.rsplit(',',1)[-1].strip() for ln in result.splitlines() if ln and not ln.startswith('#')]
+          assert len(hashes)==expected,(len(hashes),expected)
+          assert len(set(hashes))>expected*.7,('Too many duplicate frames',len(set(hashes)))
+          (base/'quality.json').write_text(json.dumps({'nativeRemotionWebGL':True,'frames':expected,'uniqueFrameHashes':len(set(hashes)),'decode':'PASS','size':[432,768],'fps':30,'pixelFormat':'yuv420p'},indent=2)+'\n')
+          print('A4 native real moving preview decode/frame-motion/metadata PASS:',name,'frames',expected,'unique',len(set(hashes)))
+          PY
+          ffmpeg -hide_banner -loglevel error -y -i "out/a4/$NAME/$NAME.mp4" -vf 'select=not(mod(n\,15)),scale=216:384,tile=6x2' -frames:v 1 -update 1 "out/a4/$NAME/contact-sheet.png"
+          for spec in "0:first" "$(( EXPECT / 2 )):middle" "$(( EXPECT - 1 )):last"; do
+            F="${spec%%:*}"; LABEL="${spec#*:}"
+            ffmpeg -hide_banner -loglevel error -y -i "out/a4/$NAME/$NAME.mp4" -vf "select=eq(n\\,$F)" -frames:v 1 -vsync vfr "out/a4/$NAME/$LABEL.png"
+          done
+          sha256sum "out/a4/$NAME/$NAME.mp4" > "out/a4/$NAME/SHA256SUMS"
+          cat "out/a4/$NAME/probe.json" "out/a4/$NAME/quality.json" "out/a4/$NAME/SHA256SUMS"
+      - name: Upload native original moving MP4 and inspection frames
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: yunex-a4-native-${{ matrix.name }}-${{ github.run_id }}
+          path: out/a4/${{ matrix.name }}/
+          retention-days: 30
+          if-no-files-found: warn
