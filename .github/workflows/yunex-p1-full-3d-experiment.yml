@@ -51,7 +51,7 @@ jobs:
             -f lavfi -i "sine=frequency=62:duration=18:sample_rate=48000" \
             -f lavfi -i "sine=frequency=124:duration=18:sample_rate=48000" \
             -f lavfi -i "anoisesrc=color=pink:amplitude=0.13:duration=18:sample_rate=48000" \
-            -filter_complex "[0:a]volume=0.11,lowpass=f=190,afade=t=in:st=0:d=0.15,afade=t=out:st=17.1:d=0.9[a];[1:a]volume=0.035,lowpass=f=340,afade=t=in:st=0:d=0.3,afade=t=out:st=17.2:d=0.7[b];[2:a]highpass=f=140,lowpass=f=2400,volume=0.026,afade=t=in:st=0:d=0.2,afade=t=out:st=17.1:d=.9[c];[a][b][c]amix=inputs=3:duration=shortest:normalize=0,alimiter=limit=0.86[out]" \
+            -filter_complex "[0:a]volume=0.11,lowpass=f=190,afade=t=in:st=0:d=0.15,afade=t=out:st=17.1:d=0.9[a];[1:a]volume=0.035,lowpass=f=340,afade=t=in:st=0:d=0.3,afade=t=out:st=17.2:d=0.7[b];[2:a]highpass=f=140,lowpass=f=2400,volume=0.026,afade=t=in:st=0:d=0.2,afade=t=out:st=17.1:d=0.9[c];[a][b][c]amix=inputs=3:duration=shortest:normalize=0,alimiter=limit=0.86[out]" \
             -map "[out]" -c:a aac -b:a 160k out/p1-full3d/music.m4a
       - name: Master true 1080 by 1920 H264 AAC delivery
         run: |
