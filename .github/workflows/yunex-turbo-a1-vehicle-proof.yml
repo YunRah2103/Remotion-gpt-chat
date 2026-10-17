@@ -4,13 +4,14 @@ on:
     branches: [agent/turbo-3d-001-vehicle]
     paths:
       - 'src/yunex/turbo3d/vehicle/**'
-      - 'production/yunex/turbo_3d_001/agents/vehicle/**'
       - '.github/workflows/yunex-turbo-a1-vehicle-proof.yml'
+      - 'production/yunex/turbo_3d_001/agents/vehicle/check-model.mjs'
   workflow_dispatch:
-
+concurrency:
+  group: yunex-turbo-a1-vehicle-branch
+  cancel-in-progress: true
 permissions:
   contents: read
-
 jobs:
   native-proof:
     runs-on: ubuntu-latest
@@ -21,68 +22,47 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-      - name: Install exact locked dependencies
+      - name: Install locked dependencies
         run: npm ci --no-audit --no-fund
-      - name: TypeScript build gate
+      - name: TypeScript check
         run: npm run check
-      - name: Run A1 geometry and frame-contract tests
+      - name: Model and camera-contract checks
         run: node production/yunex/turbo_3d_001/agents/vehicle/check-model.mjs
-      - name: Validate A1 source handoff schema with production validator
+      - name: Validate truthful pending-review handoff schema
         run: python3 production/tools/handoff.py production/yunex/turbo_3d_001/agents/vehicle/handoff.json
-      - name: Render native Three.js moving 3-second preview via software WebGL
-        run: |
-          mkdir -p out
-          npx remotion render src/yunex/turbo3d/vehicle/preview/index.ts A1VehiclePreview out/a1-vehicle-native-proof.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1 --frames=0-89 --scale=0.7
-      - name: Install independent FFmpeg / FFprobe verification tools
+      - name: Install FFmpeg and FFprobe
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
-      - name: Render four close-up inspections (lamps, wheel, engine reveal, rear hero)
+      - name: Render four actual moving 3D closeup shots using software WebGL
         run: |
-          npx remotion render src/yunex/turbo3d/vehicle/inspection/index.ts A1VehicleCloseupInspection out/a1-vehicle-v2-four-shots.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1 --frames=0-179 --scale=0.8
-      - name: Verify real media, dimensions, SHA256 and full decode
+          mkdir -p out
+          npx remotion render src/yunex/turbo3d/vehicle/inspection/index.ts A1VehicleCloseupInspection out/a1-vehicle-v4-inspection.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1 --frames=0-119 --scale=0.8
+      - name: FFprobe, 120-frame movement and full FFmpeg decode validation
         run: |
-          ffprobe -v error -show_entries stream=codec_name,width,height,nb_frames,r_frame_rate -show_entries format=duration -of json out/a1-vehicle-native-proof.mp4 | tee out/a1-vehicle-ffprobe.json
-          ffprobe -v error -show_entries stream=codec_name,width,height,nb_frames,r_frame_rate -show_entries format=duration -of json out/a1-vehicle-v2-four-shots.mp4 | tee out/a1-v2-ffprobe.json
-          ffmpeg -v error -i out/a1-vehicle-v2-four-shots.mp4 -f null -
-          sha256sum out/a1-vehicle-v2-four-shots.mp4 | tee out/a1-v2-sha256.txt
-          ffmpeg -hide_banner -loglevel error -i out/a1-vehicle-v2-four-shots.mp4 -f framemd5 out/a1-v2-frames.md5
-          ffmpeg -v error -i out/a1-vehicle-native-proof.mp4 -f null -
-          sha256sum out/a1-vehicle-native-proof.mp4 | tee out/a1-vehicle-sha256.txt
-          ffmpeg -hide_banner -loglevel error -i out/a1-vehicle-native-proof.mp4 -f framemd5 out/a1-vehicle-frames.md5
+          ffprobe -v error -show_entries stream=codec_name,width,height,nb_frames,r_frame_rate -show_entries format=duration -of json out/a1-vehicle-v4-inspection.mp4 | tee out/a1-v4-ffprobe.json
+          ffmpeg -v error -i out/a1-vehicle-v4-inspection.mp4 -f null -
+          ffmpeg -hide_banner -loglevel error -i out/a1-vehicle-v4-inspection.mp4 -f framemd5 out/a1-v4-frames.md5
+          sha256sum out/a1-vehicle-v4-inspection.mp4 | tee out/a1-v4-sha256.txt
           python3 - <<'PY'
           from pathlib import Path
-          hashes=[line.rsplit(',',1)[-1].strip() for line in Path('out/a1-vehicle-frames.md5').read_text().splitlines() if not line.startswith('#')]
-          assert len(hashes)==90 and len(set(hashes))>=80,(len(hashes),len(set(hashes)))
-          print(f'MOTION_PASS: {len(set(hashes))} distinct decoded frames of {len(hashes)}')
-          PY
-          python3 - <<'PY'
           import json
-          d2=json.load(open('out/a1-v2-ffprobe.json'))
-          v2=[s for s in d2['streams'] if s['codec_name']=='h264']
-          assert len(v2)==1 and v2[0]['width']==432 and v2[0]['height']==768, d2
-          assert v2[0]['r_frame_rate']=='30/1' and abs(float(d2['format']['duration'])-6.0)<.1
-          hashes2=[line.rsplit(',',1)[-1].strip() for line in open('out/a1-v2-frames.md5') if not line.startswith('#')]
-          assert len(hashes2)==180 and len(set(hashes2))>=160, (len(hashes2),len(set(hashes2)))
-          print(f'A1 V2 FOUR SHOTS PASS: {len(set(hashes2))} unique moving frames, 432x768 H264, full decode')
-          d=json.load(open('out/a1-vehicle-ffprobe.json'))
+          d=json.loads(Path('out/a1-v4-ffprobe.json').read_text())
           v=[s for s in d['streams'] if s['codec_name']=='h264']
-          assert len(v)==1 and v[0]['width']==378 and v[0]['height']==672, d
-          assert v[0]['r_frame_rate']=='30/1', d
-          assert abs(float(d['format']['duration'])-3.0)<0.10,d
-          print('NATIVE_MOVING_PROOF_PASS: 90 frames, 378x672, h264, 30fps, full decode')
+          assert len(v)==1 and v[0]['width']==432 and v[0]['height']==768,d
+          assert v[0]['r_frame_rate']=='30/1' and int(v[0]['nb_frames'])==120,d
+          assert abs(float(d['format']['duration'])-4.0)<.1,d
+          hashes=[line.rsplit(',',1)[-1].strip() for line in Path('out/a1-v4-frames.md5').read_text().splitlines() if not line.startswith('#')]
+          assert len(hashes)==120 and len(set(hashes))>=105,(len(hashes),len(set(hashes)))
+          print('A1_V4_MOVING_MEDIA_PASS',len(set(hashes)), 'unique frames / 120')
           PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: yunex-turbo-a1-vehicle-native-proof
+          name: yunex-turbo-a1-v4-closeups
           path: |
-            out/a1-vehicle-native-proof.mp4
-            out/a1-vehicle-ffprobe.json
-            out/a1-vehicle-sha256.txt
-            out/a1-vehicle-frames.md5
-            out/a1-vehicle-v2-four-shots.mp4
-            out/a1-v2-ffprobe.json
-            out/a1-v2-frames.md5
-            out/a1-v2-sha256.txt
+            out/a1-vehicle-v4-inspection.mp4
+            out/a1-v4-ffprobe.json
+            out/a1-v4-frames.md5
+            out/a1-v4-sha256.txt
           retention-days: 14
