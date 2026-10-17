@@ -41,7 +41,7 @@ const createSkin=(rings:Vec[])=>{
 const Skin:React.FC<{rings:Vec[];c:string;metal?:number;rough?:number;glass?:boolean}>=({rings,c,metal=.3,rough=.3,glass=false})=>{
  const geometry=useMemo(()=>createSkin(rings),[rings]);
  return <mesh geometry={geometry} castShadow={!glass} receiveShadow>
-  <meshPhysicalMaterial color={c} metalness={metal} roughness={rough} clearcoat={glass?.8:1} clearcoatRoughness={.18} side={THREE.DoubleSide} transparent={glass} opacity={glass?.9:1}/>
+  <meshPhysicalMaterial color={c} metalness={metal} roughness={rough} clearcoat={glass ? .8 : 1} clearcoatRoughness={.18} side={THREE.DoubleSide} transparent={glass} opacity={glass ? .9 : 1}/>
  </mesh>;
 };
 
@@ -190,12 +190,12 @@ const Stream:React.FC<{idx:number;f:number}>=({idx,f})=>{
  </group>;
 };
 const ForceArrow:React.FC<{p:Vec;length:number;color:string;vertical?:boolean}>=({p,length,color,vertical=false})=>
- <group position={p} rotation={vertical?[0,0,PI/2]:[PI/2,0,0]}>
+ <group position={p} rotation={vertical?[0,0,PI]:[PI/2,0,0]}>
   <mesh position={[0,length*.43,0]}>
    <cylinderGeometry args={[.035,.035,length*.78,10]}/>
    <meshBasicMaterial color={color} transparent opacity={.77}/>
   </mesh>
-  <mesh position={[0,length*.92,0]} rotation={[0,0,PI]}>
+  <mesh position={[0,length*.92,0]}>
    <coneGeometry args={[.13,.30,12]}/>
    <meshBasicMaterial color={color} transparent opacity={.85}/>
   </mesh>
