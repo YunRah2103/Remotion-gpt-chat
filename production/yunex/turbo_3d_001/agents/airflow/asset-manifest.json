@@ -3,9 +3,9 @@
   "assetId": "YUNEX-TURBO-3D-EP001-A3-AIRFLOW",
   "kind": "deterministic-r3f-frame-driven-gas-energy-visualiser",
   "owner": "agent-3-airflow",
-  "sourceCommit": "35ba0c0ecc29a692b0fd4dba130091596d81bc85",
+  "sourceCommit": "0dc11dfe7d521c4bf380cbac49ffe16af4aebc4e",
   "sourceBranch": "agent/turbo-3d-001-airflow",
-  "status": "REVIEW",
+  "status": "REVIEW_PENDING_MANAGER",
   "unitMetersPerUnit": 1,
   "upAxis": "+Y",
   "forwardAxis": "+Z",
@@ -25,13 +25,17 @@
   },
   "entrypoints": [
     "src/yunex/turbo3d/airflow/TurboFlow.tsx",
-    "src/yunex/turbo3d/airflow/preview/entry.ts"
+    "src/yunex/turbo3d/airflow/preview/entry.ts",
+    "src/yunex/turbo3d/airflow/preview/a2-frozen/TurboMechanism.tsx"
   ],
   "components": [
     "TurboFlow",
     "FlowStream",
     "Thermal",
-    "Combustion"
+    "Combustion",
+    "CinematicFlow",
+    "PowerWindow",
+    "unchanged-frozen-Agent2-TurboMechanism"
   ],
   "props": {
     "frame": "required nonnegative integer video frame",
@@ -77,7 +81,12 @@
     "src/yunex/turbo3d/airflow/preview/Root.tsx",
     "src/yunex/turbo3d/airflow/preview/entry.ts",
     "production/yunex/turbo_3d_001/agents/airflow/flow-ports.json",
-    "production/yunex/turbo_3d_001/agents/airflow/a2-candidate-routes.json"
+    "production/yunex/turbo_3d_001/agents/airflow/a2-candidate-routes.json",
+    "src/yunex/turbo3d/airflow/CinematicFlow.tsx",
+    "src/yunex/turbo3d/airflow/PowerWindow.tsx",
+    "src/yunex/turbo3d/airflow/preview/a2-frozen/TurboMechanism.tsx",
+    "src/yunex/turbo3d/airflow/preview/a2-frozen/ports.ts",
+    "production/yunex/turbo_3d_001/agents/airflow/a2-frozen-reference.json"
   ],
   "licenses": [
     {
@@ -114,6 +123,42 @@
     "offlineA2PositionedDemo": {
       "sha256": "7448d7499fd4c9abbbc3e835e88867e07d860b7e836f8fc452fc24533bb31a3c",
       "note": "VTK independent preview; not native or approved mechanical model"
+    },
+    "cinematicActualModel": {
+      "sourceCommit": "0dc11dfe7d521c4bf380cbac49ffe16af4aebc4e",
+      "agent2FrozenSourceCommit": "4f894a51083e4ebaa652193713ee0baf56ba2439",
+      "workflowRunId": 39059260120,
+      "workflowUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39059260120",
+      "artifactId": 12110533804,
+      "artifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39059260120/artifacts/12110533804",
+      "resolution": "540x960",
+      "fps": 30,
+      "framesPerPhase": 30,
+      "phases": [
+        "turbine",
+        "compressor",
+        "intercooler",
+        "combustion",
+        "full"
+      ],
+      "fullDecode": "PASS",
+      "uniqueFrameHashes": 30,
+      "clipSha256": {
+        "turbine": "34a76b734a3e267ccae32debcc0d171cd44f5cd3a3fc447e39799af6ca7b8796",
+        "compressor": "84b67551d64171621972aab91a227aeed3ceb38057a20e70b82cea2a4560baa7",
+        "intercooler": "cf373220fd2b2ad8e4381c5166aa2539d49abc011380a6288aa0e6aa937d3888",
+        "combustion": "ee23e2b82bac14d0d5e7a30eeaea5ba99b38fc2497d8d12f46a38c46678ae9bf",
+        "full": "e8d047c174704d1085f696de33d4b641329549959d47486ad99760b7fdbb8e71"
+      },
+      "localCombinedReview": {
+        "sha256": "6ab1da8f84c5525694f8ccbcfb0eef051468805267a1071d2f38e67212679bfe",
+        "bytes": 1929392,
+        "frames": 150,
+        "durationSeconds": 5,
+        "ffmpegFullDecode": "PASS",
+        "chatAttachment": "A3_TURBO_REAL_MODEL_CINEMATIC_V2_REVIEW.mp4"
+      },
+      "visualReview": "5 actual native midpoint frames inspected; engine/combustion reworked after first actual-model V1 rejected. V2 model fills phone viewport; amber exhaust turbine, cyan compressor, cooler and glass power-stroke visible; no fake A2 stand-in."
     }
   },
   "sha256": {
@@ -123,6 +168,9 @@
     "Illustrative not CAD or CFD; no measured power or boost",
     "A2 pipes and rotor throat transitions require independent geometric/collision-science approval",
     "One-second isolated segment previews, not a final whole-film picture lock",
-    "Test stand-in rotor/wheels never enter final A6 picture"
+    "Test stand-in rotor/wheels never enter final A6 picture",
+    "Cinematic streams use intentional cutaway-visible glow with depthTest disabled: illustrative energy visualization, NOT physically volumetric CFD or flow through uncut metal",
+    "Only A3 isolated 540x960 review previews delivered; exact final 1080x1920 episode belongs to A6/A7",
+    "Final A2 model geometry lock and engineering clearance/rotor throat signoff pending manager"
   ]
 }
