@@ -25,7 +25,7 @@ export const KineticLabel:React.FC<{
   textShadow:'0 3px 12px rgba(0,0,0,.8)'
  }}>
   <div style={{width:65,height:3,background:accent,boxShadow:`0 0 12px ${accent}55`}}/>
-  <span style={{color:'#EFF7F7',fontSize:32,fontWeight:800,letterSpacing:3.2,whiteSpace:'nowrap'}}>{label}</span>
+  <span style={{color:'#EFF7F7',fontSize:42,fontWeight:800,letterSpacing:3.1,whiteSpace:'nowrap'}}>{label}</span>
  </div>;
 };
 /** No blanket story-board UI: only timed subject-matched educational tags. */
