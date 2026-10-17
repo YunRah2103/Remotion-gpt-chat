@@ -1,4 +1,4 @@
-name: YUNEX A4 - pinned real-model camera integration proof
+name: YUNEX A4 - final A1 V6.3 and A3 flow camera refinement
 on:
   pull_request:
     paths:
@@ -6,6 +6,7 @@ on:
       - 'src/yunex/turbo3d/vehicle/**'
       - 'src/yunex/turbo3d/mechanism/**'
       - 'src/yunex/turbo3d/lookdev/**'
+      - 'src/yunex/turbo3d/airflow/**'
       - 'production/yunex/turbo_3d_001/agents/cinematics/**'
       - '.github/workflows/yunex-a4-native-previews.yml'
   workflow_dispatch:
@@ -30,16 +31,12 @@ jobs:
             composition: YunexA4RealHook
             end: 89
             frames: 90
-          - name: real-exhaust
-            composition: YunexA4RealExhaust
-            end: 89
-            frames: 90
           - name: real-shaft
             composition: YunexA4RealShaft
             end: 119
             frames: 120
-          - name: real-charge
-            composition: YunexA4RealCharge
+          - name: real-charge-flow
+            composition: YunexA4RealChargeFlow
             end: 119
             frames: 120
           - name: real-road
