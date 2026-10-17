@@ -182,7 +182,7 @@ export const RoadWheel:React.FC<{side:number;z:number;travelMeters:number}>=
 };
 const LowLamp:React.FC<{side:number;rear?:boolean}>=({side,rear=false})=>
  <group name={rear?'CONVENTIONAL_REAR_TAILLIGHT':'CONVENTIONAL_FRONT_HEADLIGHT'}
-  position={[side*.605,rear?.783:.804,rear?-2.303:2.302]}>
+  position={[side*.605,rear?.675:.705,rear?-2.303:2.302]}>
   <mesh castShadow><boxGeometry args={[.385,.100,.028]}/>
    <meshStandardMaterial color="#0C1B23" metalness={.47} roughness={.26}/>
   </mesh>
