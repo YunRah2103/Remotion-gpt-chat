@@ -37,9 +37,9 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p out/a5
-          npx remotion render src/yunex/turbo3d/lookdev/preview.entry.tsx YunexA5LookdevProof out/a5/01-teal-road.mp4 --frames=12-35 --scale=0.33 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
-          npx remotion render src/yunex/turbo3d/lookdev/preview.entry.tsx YunexA5LookdevProof out/a5/02-turbine-metal.mp4 --frames=102-125 --scale=0.33 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
-          npx remotion render src/yunex/turbo3d/lookdev/preview.entry.tsx YunexA5LookdevProof out/a5/03-cool-charge.mp4 --frames=192-215 --scale=0.33 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
+          npx remotion render src/yunex/turbo3d/lookdev/preview.entry.tsx YunexA5LookdevProof out/a5/01-teal-road.mp4 --frames=12-35 --scale=0.5 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
+          npx remotion render src/yunex/turbo3d/lookdev/preview.entry.tsx YunexA5LookdevProof out/a5/02-turbine-metal.mp4 --frames=102-125 --scale=0.5 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
+          npx remotion render src/yunex/turbo3d/lookdev/preview.entry.tsx YunexA5LookdevProof out/a5/03-cool-charge.mp4 --frames=192-215 --scale=0.5 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
       - name: Decode videos, prove frames change, and capture actual stills
         run: |
           set -euo pipefail
