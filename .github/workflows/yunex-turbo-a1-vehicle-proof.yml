@@ -31,6 +31,10 @@ jobs:
         run: |
           mkdir -p out
           npx remotion render src/yunex/turbo3d/vehicle/preview/index.ts A1VehiclePreview out/a1-vehicle-native-proof.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1 --frames=0-89 --scale=0.7
+      - name: Install independent FFmpeg / FFprobe verification tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
       - name: Verify real media, dimensions, SHA256 and full decode
         run: |
           ffprobe -v error -show_entries stream=codec_name,width,height,nb_frames,r_frame_rate -show_entries format=duration -of json out/a1-vehicle-native-proof.mp4 | tee out/a1-vehicle-ffprobe.json
