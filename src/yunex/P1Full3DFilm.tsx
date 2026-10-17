@@ -73,7 +73,7 @@ const Wheel:React.FC<{side:number;z:number;f:number}>=({side,z,f})=>
     <cylinderGeometry args={[.395,.395,.04,32]}/>
     <meshStandardMaterial color="#111b26" metalness={.8} roughness={.28}/>
    </mesh>
-   <mesh position={[side*.23,0,0]} rotation={[0,0,PI/2]}>
+   <mesh position={[side*.23,0,0]} rotation={[0,PI/2,0]}>
     <torusGeometry args={[.36,.029,6,32]}/>
     <meshStandardMaterial color="#b9cad5" roughness={.29} metalness={.9}/>
    </mesh>
