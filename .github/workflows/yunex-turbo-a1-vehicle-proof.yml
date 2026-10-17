@@ -56,6 +56,37 @@ jobs:
           assert len(hashes)==120 and len(set(hashes))>=105,(len(hashes),len(set(hashes)))
           print('A1_V4_MOVING_MEDIA_PASS',len(set(hashes)), 'unique frames / 120')
           PY
+      - name: Render new moving V6 front-three-quarter hero through native Remotion
+        run: |
+          npx remotion render src/yunex/turbo3d/vehicle/inspection/index.ts A1V6FrontThreeQuarterHero out/a1-v6-front-three-quarter.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1 --frames=0-119 --scale=0.8
+      - name: Validate actual V6 moving MP4, independent of existing V5 reel
+        run: |
+          ffprobe -v error -show_entries stream=codec_name,width,height,nb_frames,r_frame_rate -show_entries format=duration -of json out/a1-v6-front-three-quarter.mp4 | tee out/a1-v6-ffprobe.json
+          ffmpeg -v error -i out/a1-v6-front-three-quarter.mp4 -f null -
+          ffmpeg -hide_banner -loglevel error -i out/a1-v6-front-three-quarter.mp4 -f framemd5 out/a1-v6-frames.md5
+          sha256sum out/a1-v6-front-three-quarter.mp4 | tee out/a1-v6-sha256.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path('out/a1-v6-ffprobe.json').read_text())
+          v=[s for s in d['streams'] if s['codec_name']=='h264']
+          assert len(v)==1 and v[0]['width']==432 and v[0]['height']==768,d
+          assert v[0]['r_frame_rate']=='30/1' and int(v[0]['nb_frames'])==120,d
+          assert abs(float(d['format']['duration'])-4.0)<.1,d
+          hashes=[line.rsplit(',',1)[-1].strip() for line in Path('out/a1-v6-frames.md5').read_text().splitlines() if not line.startswith('#')]
+          assert len(hashes)==120 and len(set(hashes))>=105,(len(hashes),len(set(hashes)))
+          print('A1_V6_MOVING_HERO_PASS',len(set(hashes)), 'unique frames / 120')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: yunex-turbo-a1-v6-front-three-quarter-hero
+          path: |
+            out/a1-v6-front-three-quarter.mp4
+            out/a1-v6-ffprobe.json
+            out/a1-v6-frames.md5
+            out/a1-v6-sha256.txt
+          retention-days: 14
       - uses: actions/upload-artifact@v4
         if: always()
         with:
