@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "status": "TEMPORARY_STUB_UNVERIFIED_A2",
+  "coordinateSystem": "+Y up, +Z vehicle forward, +X vehicle right; one unit = one metre",
+  "referenceFrame": "Temporary exploded-diagram world space; NOT Agent 2's eventual turbo-local mesh transform",
+  "ports": {
+    "EXHAUST_IN": [
+      -2.15,
+      0.28,
+      -0.8
+    ],
+    "EXHAUST_OUT": [
+      -0.5,
+      -0.95,
+      -1.35
+    ],
+    "CLEAN_AIR_IN": [
+      3.65,
+      0.34,
+      0.95
+    ],
+    "COMPRESSED_AIR_OUT": [
+      1.3,
+      1.24,
+      0.95
+    ],
+    "INTERCOOLER_IN": [
+      3.35,
+      1.38,
+      1.3
+    ],
+    "INTERCOOLER_OUT": [
+      3.35,
+      -0.5,
+      1.3
+    ],
+    "ENGINE_INTAKE": [
+      -1.85,
+      -1.45,
+      1.35
+    ],
+    "FUEL_IN": [
+      -2.6,
+      -1.12,
+      1.75
+    ]
+  },
+  "nodes": {
+    "ENGINE_EXHAUST": [
+      -2.85,
+      -1.4,
+      -1.35
+    ],
+    "TURBINE_WHEEL_FLOW": [
+      -1.35,
+      0.2,
+      -0.8
+    ],
+    "COMPRESSOR_WHEEL_FLOW": [
+      1.95,
+      0.28,
+      0.95
+    ],
+    "CYLINDER": [
+      -2.12,
+      -1.5,
+      1.38
+    ]
+  },
+  "routes": [
+    {
+      "id": "exhaust-feed",
+      "gas": "exhaust",
+      "upstream": "ENGINE_EXHAUST",
+      "downstream": "TURBINE_WHEEL_FLOW",
+      "via": [
+        "EXHAUST_IN"
+      ],
+      "color": "#FF8A36",
+      "meaning": "Burned exhaust gas from manifold through turbine inlet to rotor"
+    },
+    {
+      "id": "exhaust-exit",
+      "gas": "exhaust",
+      "upstream": "TURBINE_WHEEL_FLOW",
+      "downstream": "EXHAUST_OUT",
+      "via": [],
+      "color": "#F15C3A",
+      "meaning": "Exhaust exits turbine downstream"
+    },
+    {
+      "id": "clean-intake",
+      "gas": "fresh-air",
+      "upstream": "CLEAN_AIR_IN",
+      "downstream": "COMPRESSOR_WHEEL_FLOW",
+      "via": [],
+      "color": "#53CFFF",
+      "meaning": "Fresh external air enters a separate compressor"
+    },
+    {
+      "id": "charge-hot",
+      "gas": "fresh-air",
+      "upstream": "COMPRESSOR_WHEEL_FLOW",
+      "downstream": "INTERCOOLER_IN",
+      "via": [
+        "COMPRESSED_AIR_OUT"
+      ],
+      "color": "#53CFFF",
+      "meaning": "Compressed intake air flows to intercooler"
+    },
+    {
+      "id": "charge-cooled",
+      "gas": "fresh-air",
+      "upstream": "INTERCOOLER_OUT",
+      "downstream": "CYLINDER",
+      "via": [
+        "ENGINE_INTAKE"
+      ],
+      "color": "#8CEBE3",
+      "meaning": "Same air mass flows through cooler outlet into engine"
+    },
+    {
+      "id": "fuel-pulse",
+      "gas": "fuel",
+      "upstream": "FUEL_IN",
+      "downstream": "CYLINDER",
+      "via": [],
+      "color": "#FFCE87",
+      "meaning": "Separately added fuel near cylinder"
+    }
+  ],
+  "hardRequirements": [
+    "Keep exhaust and fresh air separate; shared turbo shaft transmits mechanical work, not gas",
+    "This is an explicitly unverified A2 stub; obtain pipe centrelines from immutable A2 model manifest before integration",
+    "Do not create intake-air molecules by cooling",
+    "Use frame-indexed deterministic animation, no timers or Math.random"
+  ]
+}
