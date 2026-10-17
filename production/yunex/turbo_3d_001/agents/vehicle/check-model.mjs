@@ -19,7 +19,7 @@ assert.match(world,/if\(s===2 && \(j===1 \|\| j===3\)\) continue/,'real side pan
 assert.match(world,/4\.6, width: 1\.95, height: 1\.25/);
 assert.match(world,/wheelRadius: 0\.355/);
 assert.match(world,/wrap\(-85\+i\*8\.0,travelMeters\)/,'road motion must match wheel');
-assert.match(inspection,/durationInFrames=\{180\}/);
+assert.match(inspection,/durationInFrames=\{120\}/);
 assert.match(inspection,/fps=\{30\}/);
 for(const name of ['FRONT_HEADLAMP_DUCT','WHEEL_BRAKES','REAR_ENGINE_REVEAL','REAR_HERO']){
  assert.ok(inspection.includes(name),'missing inspection scene '+name);
