@@ -2,6 +2,7 @@ import React, {useLayoutEffect, useMemo} from 'react';
 import * as THREE from 'three';
 import {useThree} from '@react-three/fiber';
 import {LightShell, FrontDuct, SideDuct, PremiumWheel, EngineBayDetail, HingedEngineDeck, RearSignature} from './DetailKit';
+import {SculptedShell, SculptedCanopy, SculptedNose} from './SculptedBody';
 
 /**
  * A1 ORIGINAL VEHICLE / ENVIRONMENT. 1 unit = 1 metre.
@@ -69,36 +70,17 @@ const ROOF_SECTIONS:ReadonlyArray<readonly [number,number,number,number]>=[
 
 export const VehicleModel:React.FC<{frame:number;variant?:VehicleVariant;revealProgress?:number;travelMeters?:number}>=
 ({frame,variant='opaque',revealProgress=0,travelMeters=0})=>{
-  const chassis=useMemo(()=>loft(BODY_SECTIONS,true),[]);
-  // The two openings are real holes in the front fascia, not black decals over a body cap.
-  const fascia=useMemo(()=>{
-    const shape=new THREE.Shape();
-    shape.moveTo(-.62,.40);shape.lineTo(.62,.40);shape.lineTo(.62,.68);shape.lineTo(-.62,.68);shape.closePath();
-    for(const side of [-1,1]){
-      const cx=side*.42, p=new THREE.Path(),x0=cx-.18,x1=cx+.18;
-      p.moveTo(x0,.46);p.lineTo(x0,.61);p.lineTo(x1,.61);p.lineTo(x1,.46);p.closePath();
-      shape.holes.push(p);
-    }
-    return new THREE.ExtrudeGeometry(shape,{depth:.07,steps:1,bevelEnabled:false,curveSegments:3});
-  },[]);
-  const canopy=useMemo(()=>loft(ROOF_SECTIONS),[]);
+  // V6: physical wheel cutaways, 3D crown and raked greenhouse live in SculptedBody.
+  // Retain the world coordinates, all public props, the wheel rig and rear hatch.
   const r=clamp(revealProgress);
   const panelOpen=variant==='reveal'?r:0;
   // Hero emissive settings are carried by the layered lamps in DetailKit.
   const float=Math.sin(frame*.065)*.007;
   return <group name="ORIGINAL_YUNEX_COUPE" position={[0,float,0]}>
     <group name="CAR_BODY">
-      <mesh geometry={chassis} castShadow receiveShadow>
-        <meshPhysicalMaterial name="BODY_TEAL_ENAMEL" color={C.paint} metalness={.67} roughness={.24} clearcoat={.85} clearcoatRoughness={.17}/>
-      </mesh>
-      <mesh geometry={fascia} position={[0,0,2.265]} castShadow>
-        <meshPhysicalMaterial name="ACTUAL_PERFORATED_BUMPER_FASCIA" color={C.paint} metalness={.67} roughness={.24} clearcoat={.85}/>
-      </mesh>
-      <mesh geometry={canopy} castShadow>
-        <meshPhysicalMaterial name="DARK_TINTED_GLASS" color={C.glass} roughness={.10} metalness={.54} transparent opacity={.9} clearcoat={1}/>
-      </mesh>
-      <mesh position={[0,1.247,-.16]}><boxGeometry args={[1.07,.016,.73]}/>
-        <meshStandardMaterial name="ROOFLINE_TEAL" color="#245D63" metalness={.8} roughness={.25}/></mesh>
+      <SculptedShell/>
+      <SculptedNose/>
+      <SculptedCanopy/>
       {[-1,1].map(s=><group key={s}>
         <LightShell side={s}/>
         <SideDuct side={s}/>
@@ -106,15 +88,18 @@ export const VehicleModel:React.FC<{frame:number;variant?:VehicleVariant;revealP
         <mesh position={[s*.71,.92,-2.05]} rotation={[0,0,s*.1]}>
           <boxGeometry args={[.23,.038,.26]}/><meshStandardMaterial color="#0D1C22" roughness={.3} metalness={.4}/>
         </mesh>
-        <mesh position={[s*.76,.68,1.07]} rotation={[0,s*.22,0]}>
-          <boxGeometry args={[.12,.035,.24]}/><meshStandardMaterial name="SIDE_MIRROR_DARK" color="#0B171E" metalness={.52} roughness={.38}/>
-        </mesh>
+        <group position={[s*.77,.81,.85]} rotation={[0,s*.17,0]} name="AERODYNAMIC_SIDE_MIRROR">
+          <mesh position={[s*.042,.015,0]} rotation={[0,s*.28,0]} castShadow><sphereGeometry args={[.095,12,8]}/>
+            <meshPhysicalMaterial name="SIDE_MIRROR_DARK" color="#0E2932" metalness={.6} roughness={.27} clearcoat={.85}/></mesh>
+          <mesh position={[s*.067,.017,-.018]}><boxGeometry args={[.028,.045,.11]}/>
+            <meshStandardMaterial color="#91BDBF" metalness={.6} roughness={.24}/></mesh>
+        </group>
         <FrontDuct side={s}/>
         <mesh position={[s*.79,.53,-2.21]}>
           <boxGeometry args={[.37,.09,.09]}/><meshStandardMaterial color="#071116" metalness={.45} roughness={.33}/>
         </mesh>
       </group>)}
-      <mesh position={[0,.51,2.293]}><boxGeometry args={[.91,.12,.05]}/><meshStandardMaterial color="#08161C" metalness={.28} roughness={.56}/></mesh>
+      <mesh position={[0,.377,2.300]}><boxGeometry args={[.92,.048,.035]}/><meshStandardMaterial name="LOWER_GRILLE_SHADOW" color="#08161C" metalness={.28} roughness={.56}/></mesh>
       <mesh position={[0,.50,-2.288]}><boxGeometry args={[1.07,.12,.05]}/><meshStandardMaterial name="REAR_DIFFUSER" color="#0A151C" metalness={.32} roughness={.53}/></mesh>
       {[-.38,0,.38].map(x=><mesh key={x} position={[x,.43,-2.33]}>
         <boxGeometry args={[.09,.17,.13]}/><meshStandardMaterial color="#2B3940" metalness={.47}/></mesh>)}
@@ -122,7 +107,7 @@ export const VehicleModel:React.FC<{frame:number;variant?:VehicleVariant;revealP
       <EngineBayDetail visible={variant==='reveal' && panelOpen>.02}/>
       <mesh position={[0,.96,-2.04]}><boxGeometry args={[1.61,.065,.37]}/>
         <meshStandardMaterial name="AERO_REAR_SPOILER" color="#17242B" metalness={.73} roughness={.28}/></mesh>
-      <mesh position={[0,.43,2.30]}><boxGeometry args={[1.50,.027,.14]}/>
+      <mesh position={[0,.34,2.32]}><boxGeometry args={[1.55,.026,.23]}/>
         <meshStandardMaterial name="FRONT_SPLITTER" color="#080F14" metalness={.14} roughness={.74}/></mesh>
       {[-1,1].flatMap(s=>[1.47,-1.48].map(z=><PremiumWheel key={s+'_'+z} side={s} z={z} travelMeters={travelMeters}/>))}
     </group>
