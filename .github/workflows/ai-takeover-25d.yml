@@ -112,7 +112,7 @@ jobs:
             -c:a aac -b:a 192k -ar 48000 -ac 2 -t 34 -movflags +faststart \
             out/AI-GLOBAL-TAKEOVER-PREVOICE.mp4
           ffmpeg -hide_banner -loglevel error -y -i out/ai-takeover-demo-score.wav -c:a libmp3lame -q:a 3 out/ai-takeover-temp-score.mp3
-      - name: Final strict QC: decode, 1020 frames and sample stills
+      - name: Final strict QC - decode 1020 frames and sample stills
         run: |
           ffmpeg -hide_banner -loglevel error -xerror -i out/AI-GLOBAL-TAKEOVER-PREVOICE.mp4 -f null -
           ffprobe -v error -show_streams -show_format -of json out/AI-GLOBAL-TAKEOVER-PREVOICE.mp4 > out/probe.json
