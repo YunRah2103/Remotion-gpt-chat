@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "task": "YUNEX-TURBO3D-EP001-A4-ISSUE130-FINAL-REAL-REFINEMENT",
+  "branch": "integration/turbo-3d-001-a4-real-model-qc",
+  "sourceSha": "f4956b05e9b557bd40b3bc9fd020c3ead840fcc7",
+  "owner": "director",
+  "status": "review",
+  "summary": "Final focused 3D cinematography refinements on actual original Agent 1 V6.3 vehicle and Agent 2 rotating turbo with Agent 5 lookdev and Agent 3 genuine animated intercooler airflow; shaft shot untouched; rejected/reframed clipping car shot; all four native MP4s independently decoded and visually inspected at source-pinned SHA.",
+  "files": [
+    "src/yunex/turbo3d/cinematics/cameraMath.ts",
+    "src/yunex/turbo3d/cinematics/CameraDirector.tsx",
+    "src/yunex/turbo3d/cinematics/KineticLabels.tsx",
+    "src/yunex/turbo3d/cinematics/RealModelPreview.tsx",
+    "src/yunex/turbo3d/cinematics/realModel.entry.tsx",
+    ".github/workflows/yunex-a4-native-previews.yml",
+    "production/yunex/turbo_3d_001/agents/cinematics/final-refinement-handoff.json",
+    "production/yunex/turbo_3d_001/agents/cinematics/FINAL_REFINEMENT_QA.md"
+  ],
+  "evidence": [
+    "Native Remotion/Three/WebGL final source pinned run SUCCESS https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39067372328",
+    "Source SHA f4956b05e9b557bd40b3bc9fd020c3ead840fcc7, 4 of 4 successful jobs; 450 decoded frames; all 450 frame-MD5 hashes distinct; no decode faults.",
+    "YunexA4RealHook 90f H264 432x768@30 sha256 187f53689394ae80e3c1817d30d9d0b0c65fee8b87a469103ea57ff7a4cbc595 https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39067372328/artifacts/12114036853",
+    "YunexA4RealShaft 120f H264 432x768@30 sha256 05cc0e3f7b578e5317ca67b80255fdb6c18c0ab972a6d9fefaffee0592dbb81c https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39067372328/artifacts/12113967419",
+    "YunexA4RealChargeFlow 120f H264 432x768@30 sha256 635e73c7287c494623a150749e85797c6ebc8d810e9cc758db1079ac8a46ce77 https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39067372328/artifacts/12114200783",
+    "YunexA4RealRoad 120f H264 432x768@30 sha256 40c35127c4612914c67dea132c99aa02cbf6197c131ba7d5579148e8774bcc0d https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39067372328/artifacts/12113373138"
+  ],
+  "blockers": [
+    "A0 independent artistic/engineering model approvals still required; A1/A2/A3/A5 latest branches are not manager-approved by this A4 camera test.",
+    "A6 must render film picture lock at genuine 1080x1920 and time/bridge shots to narration and A3; A7 audio final mixing has not been completed.",
+    "3D clips show artistic engineering illustrations, not CFD or physically computed engine power; A3 glow stream is visually above the pipe surface in some samples. Final manager may request intensity masking refinement."
+  ],
+  "notes": "Original specialist branches and master Root.tsx were NOT changed. Agent 1, 2, 3, 5 code/route files were byte-identically SNAPSHOTTED into a test-only PR #142 branch; A4-owned camera files were the only manually changed production source. Preserve stable common-shaft path. Do not merge integration proof branch wholesale over evolving agent code. Preferred editor sequence: RealHook -> RealShaft -> RealChargeFlow -> RealRoad. No audio in preview.",
+  "sources": {
+    "agent1": {
+      "branch": "agent/turbo-3d-001-vehicle",
+      "head": "9e0bee160e21436997fab74463c65c188585aab1"
+    },
+    "agent2": {
+      "branch": "agent/turbo-3d-001-mechanism",
+      "head": "4f894a51083e4ebaa652193713ee0baf56ba2439"
+    },
+    "agent3": {
+      "branch": "agent/turbo-3d-001-airflow",
+      "head": "dbe85ae2f12d7ab61177008bb6cb560847ab5a62"
+    },
+    "agent5": {
+      "branch": "agent/turbo-3d-001-lookdev",
+      "head": "db2c8f9b487bf5f80c415aeb585666bfeb44f7d3"
+    }
+  },
+  "previews": [
+    {
+      "name": "YunexA4RealHook",
+      "frames": 90,
+      "artifactId": 12114036853,
+      "sha256": "187f53689394ae80e3c1817d30d9d0b0c65fee8b87a469103ea57ff7a4cbc595",
+      "result": "Real turbine rotor visible from opening frame; shorter projected hub than prior frontal framing",
+      "artifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39067372328/artifacts/12114036853",
+      "fps": 30,
+      "dimensions": [
+        432,
+        768
+      ],
+      "format": "H264 yuv420p",
+      "decode": "PASS",
+      "motionFramesUnique": 90
+    },
+    {
+      "name": "YunexA4RealShaft",
+      "frames": 120,
+      "artifactId": 12113967419,
+      "sha256": "05cc0e3f7b578e5317ca67b80255fdb6c18c0ab972a6d9fefaffee0592dbb81c",
+      "result": "UNCHANGED proven camera move from hot turbine through continuous common shaft to compressor",
+      "artifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39067372328/artifacts/12113967419",
+      "fps": 30,
+      "dimensions": [
+        432,
+        768
+      ],
+      "format": "H264 yuv420p",
+      "decode": "PASS",
+      "motionFramesUnique": 120
+    },
+    {
+      "name": "YunexA4RealChargeFlow",
+      "frames": 120,
+      "artifactId": 12114200783,
+      "sha256": "635e73c7287c494623a150749e85797c6ebc8d810e9cc758db1079ac8a46ce77",
+      "result": "Real A2 intercooler remains visible under original A3 TurboFlow/CinematicFlow animated particles and timed labels; flow overlay intentionally representational, not CFD",
+      "artifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39067372328/artifacts/12114200783",
+      "fps": 30,
+      "dimensions": [
+        432,
+        768
+      ],
+      "format": "H264 yuv420p",
+      "decode": "PASS",
+      "motionFramesUnique": 120
+    },
+    {
+      "name": "YunexA4RealRoad",
+      "frames": 120,
+      "artifactId": 12113373138,
+      "sha256": "40c35127c4612914c67dea132c99aa02cbf6197c131ba7d5579148e8774bcc0d",
+      "result": "Real improved A1 V6.3 sculpted teal coupe in low-angle moving road camera; previous cropped framing rejected and corrected",
+      "artifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39067372328/artifacts/12113373138",
+      "fps": 30,
+      "dimensions": [
+        432,
+        768
+      ],
+      "format": "H264 yuv420p",
+      "decode": "PASS",
+      "motionFramesUnique": 120
+    }
+  ]
+}
