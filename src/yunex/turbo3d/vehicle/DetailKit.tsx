@@ -1,7 +1,7 @@
 import React, {useMemo} from 'react';
 import * as THREE from 'three';
 
-/** A1 v2 close-up geometry. Entirely authored 3D meshes, metres / Y-up / +Z forward. */
+/** A1 v6 close-up geometry. Entirely authored 3D meshes, metres / Y-up / +Z forward. */
 const PI=Math.PI;
 const graphite='#0A131C', alloy='#9FB8C1', bronze='#BD815D';
 type P3=[number,number,number];
@@ -18,7 +18,7 @@ export const LightShell:React.FC<{side:number}>=({side})=>{
     shape.quadraticCurveTo(-.02,.197,-.223,.08);shape.closePath();
     return new THREE.ExtrudeGeometry(shape,{depth:.018,steps:1,bevelEnabled:true,bevelSize:.009,bevelThickness:.006,bevelSegments:2});
   },[]);
-  return <group name="LAYERED_HEADLAMP_ASSEMBLY" position={[side*.636,.645,1.945]}>
+  return <group name="LAYERED_HEADLAMP_ASSEMBLY" position={[side*.65,.758,1.945]}>
     <mesh rotation={[PI/2,0,0]} geometry={shell} castShadow>
       <meshPhysicalMaterial name="HEADLAMP_RECESSED_HOUSING" color="#07131B" metalness={.61} roughness={.18} clearcoat={.82}/>
     </mesh>
