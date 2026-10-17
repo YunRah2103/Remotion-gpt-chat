@@ -57,8 +57,7 @@ const EngineStub:React.FC<{frame:number}>=({frame})=><group>
   </group>)}
  <mesh position={[3.15,-.35,-1.25]}><boxGeometry args={[1.35,.32,.42]}/><meshStandardMaterial color="#73BEC3" emissive="#267B83" emissiveIntensity={.38} metalness={.4} roughness={.35}/></mesh>
  {Array.from({length:10},(_,i)=><mesh key={i} position={[2.57+i*.13,-.12,-1.25]}>
-   <boxGeometry args={[.035,.3,.48]}/><meshStandardMaterial color="#B1D6D8" metalness={.62} roughness={.27}/></mesh>
-  </mesh>)}
+   <boxGeometry args={[.035,.3,.48]}/><meshStandardMaterial color="#B1D6D8" metalness={.62} roughness={.27}/></mesh>)}
  {Array.from({length:12},(_,i)=>{const u=((i/12+frame*.009)%1);return <Orb key={i} x={2.1+u*2.2} y={-.2} z={-.9-u*.5} r={.055} color="#8CEBE3"/>})}
  </group>;
 const Tire:React.FC<{x:number;z:number;frame:number}>=({x,z,frame})=><group position={[x,.39,z]} rotation={[frame*.22,0,0]}>
