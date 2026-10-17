@@ -1,7 +1,7 @@
 import React, {useLayoutEffect, useMemo} from 'react';
 import * as THREE from 'three';
 import {useThree} from '@react-three/fiber';
-import {LightShell, FrontDuct, SideDuct, PremiumWheel, EngineBayDetail, HingedEngineDeck} from './DetailKit';
+import {LightShell, FrontDuct, SideDuct, PremiumWheel, EngineBayDetail, HingedEngineDeck, RearSignature} from './DetailKit';
 
 /**
  * A1 ORIGINAL VEHICLE / ENVIRONMENT. 1 unit = 1 metre.
@@ -102,9 +102,7 @@ export const VehicleModel:React.FC<{frame:number;variant?:VehicleVariant;revealP
       {[-1,1].map(s=><group key={s}>
         <LightShell side={s}/>
         <SideDuct side={s}/>
-        <mesh position={[s*.72,.775,-2.28]}>
-          <boxGeometry args={[.52,.068,.042]}/><meshStandardMaterial name="REAR_LED_CRIMSON" emissive={C.tail} emissiveIntensity={3.5} color={C.tail}/>
-        </mesh>
+        <RearSignature side={s}/>
         <mesh position={[s*.71,.92,-2.05]} rotation={[0,0,s*.1]}>
           <boxGeometry args={[.23,.038,.26]}/><meshStandardMaterial color="#0D1C22" roughness={.3} metalness={.4}/>
         </mesh>
