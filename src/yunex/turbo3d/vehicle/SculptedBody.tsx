@@ -54,13 +54,23 @@ const archBottom=(z:number,low:number)=>{
 function buildSkin(){
  const vs:number[]=[],is:number[]=[],sv:number[]=[],si:number[]=[];
  const steps=184, z0=-2.30,z1=2.30;
- const xs=[-1.01,-.96,-.84,-.59,-.23,0,.23,.59,.84,.96,1.01];
- const ys=[-.105,.012,.054,-.018,-.047,-.056,-.047,-.018,.054,.012,-.105];
+ const xs=[-1.01,-.96,-.84,-.59,-.42,-.23,0,.23,.42,.59,.84,.96,1.01];
+ const ys=[-.105,.012,.054,-.018,-.039,-.047,-.056,-.047,-.039,-.018,.054,.012,-.105];
  const rows:Point[][]=[];
  for(let i=0;i<=steps;i++){
    const z=z0+(z1-z0)*i/steps,{w,high}=at(z);
    const rear=(z<-.95),lift=rear?-.018:0;
-   rows.push(xs.map((f,j)=>[w*f, high+ys[j]+lift,z]));
+   // Match the variable-width headlamp openings to the physical swept lens.
+   const lt=THREE.MathUtils.clamp((z-1.76)/.37,0,1);
+   rows.push(xs.map((f,j)=>{
+     const abs=Math.abs(f);
+     let projected=f;
+     if(z>=1.76&&z<=2.13){
+       if(Math.abs(abs-.42)<.0001)projected=Math.sign(f)*((.405+.033*lt)/w);
+       if(Math.abs(abs-.84)<.0001)projected=Math.sign(f)*((.805-.130*lt)/w);
+     }
+     return [w*projected, high+ys[j]+lift,z];
+   }));
  }
  for(let i=0;i<steps;i++){
   for(let j=0;j<xs.length-1;j++){
@@ -69,6 +79,10 @@ function buildSkin(){
    const mid=(z0+(z1-z0)*(i+.5)/steps);
    const center=(Math.abs(xs[j]+xs[j+1])<1.20);
    if(mid>-1.94&&mid<-.995&&center) continue;
+   // The headlamp outer lenses span these two panels on either side:
+   // omit opaque bonnet faces so they are genuine openings, not decals.
+   const stripCenter=(xs[j]+xs[j+1])/2;
+   if(mid>1.76&&mid<2.13&&Math.abs(stripCenter)>.43&&Math.abs(stripCenter)<.84) continue;
    pushQuad(vs,is,rows[i][j],rows[i+1][j],rows[i+1][j+1],rows[i][j+1]);
   }
  }
