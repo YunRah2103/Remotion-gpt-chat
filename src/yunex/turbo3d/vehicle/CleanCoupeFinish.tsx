@@ -26,11 +26,11 @@ const ExhaustTip:React.FC<{x:number}>=({x})=><group name="DUAL_REAR_EXHAUST" pos
     <cylinderGeometry args={[.064,.069,.105,28,1,true]}/>
     <meshStandardMaterial color="#97B0B5" roughness={.22} metalness={.91} side={THREE.DoubleSide}/>
   </mesh>
-  <mesh position={[0,0,-.056]} rotation={[Math.PI/2,0,0]}>
+  <mesh position={[0,0,-.056]}>
     <circleGeometry args={[.052,28]}/>
     <meshStandardMaterial color="#03080C" roughness={.93} side={THREE.DoubleSide}/>
   </mesh>
-  <mesh position={[0,0,-.060]} rotation={[Math.PI/2,0,0]}>
+  <mesh position={[0,0,-.060]}>
     <torusGeometry args={[.057,.007,8,28]}/>
     <meshStandardMaterial color="#C3D5D2" roughness={.22} metalness={.9}/>
   </mesh>
