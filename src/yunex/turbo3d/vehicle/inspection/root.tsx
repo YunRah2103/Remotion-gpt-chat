@@ -44,10 +44,10 @@ const HeroCamera:React.FC<{frame:number}>=({frame})=>{
  const {camera}=useThree();
  useLayoutEffect(()=>{
   const t=frame/119, smooth=t*t*(3-2*t);
-  const x=-5.15+2.65*smooth, z=6.35-1.10*smooth;
-  camera.position.set(x,1.61-.16*smooth,z);
-  camera.lookAt(0,.74,.75);
-  if('fov' in camera)(camera as import('three').PerspectiveCamera).fov=38;
+  const x=-5.60+2.0*smooth, z=7.50-1.10*smooth;
+  camera.position.set(x,1.57-.12*smooth,z);
+  camera.lookAt(0,.76,.85);
+  if('fov' in camera)(camera as import('three').PerspectiveCamera).fov=44;
   camera.updateProjectionMatrix();
  },[camera,frame]);
  return null;
@@ -56,7 +56,7 @@ const Hero:React.FC=()=>{
  const frame=useCurrentFrame();
  return <AbsoluteFill style={{background:'#08121D'}}>
   <ThreeCanvas width={540} height={960} shadows
-   camera={{fov:38,position:[-5.15,1.61,6.35],near:.06,far:160}}
+   camera={{fov:44,position:[-5.60,1.57,7.50],near:.06,far:160}}
    gl={{antialias:true,preserveDrawingBuffer:true}}>
    <HeroCamera frame={frame}/>
    <VehicleWorld frame={frame} variant="hero" travelMeters={frame*.14}/>
