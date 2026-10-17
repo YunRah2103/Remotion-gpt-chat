@@ -52,9 +52,9 @@ export const sampleShot=(shot:Shot,frame:number,anchors:Anchors={},duration=shot
   p2=vec('COMPRESSED_AIR_OUT',[0.35,0.55,2.65],anchors);p3=vec('COMPRESSED_AIR_OUT',[0.65,0.65,2.7],anchors);
   a=vec('COMPRESSOR',[0,0,0],anchors);b=vec('COMPRESSED_AIR_OUT',[0,0,0],anchors);f0=34;f1=36;break;
  case 'chargeGlide':
-  p0=vec('COMPRESSED_AIR_OUT',[3.0,1.4,3.7],anchors);p1=vec('INTERCOOLER_OUT',[1.55,2.0,5.2],anchors);
-  p2=vec('INTERCOOLER_OUT',[1.15,1.9,5.5],anchors);p3=vec('ENGINE_INTAKE',[2.1,2.7,6.2],anchors);
-  a=vec('COMPRESSED_AIR_OUT',[1.5,0.5,-0.4],anchors);b=vec('ENGINE_INTAKE',[0,0.25,0],anchors);f0=46;f1=47;break;
+  p0=vec('COMPRESSED_AIR_OUT',[3.0,1.4,3.7],anchors);p1=vec('INTERCOOLER_OUT',[2.5,2.0,4.2],anchors);
+  p2=vec('INTERCOOLER_OUT',[3.3,1.9,3.8],anchors);p3=vec('INTERCOOLER_OUT',[3.5,1.8,3.1],anchors);
+  a=vec('COMPRESSED_AIR_OUT',[1.5,0.5,-0.4],anchors);b=vec('INTERCOOLER_OUT',[0.43,0.6,0],anchors);f0=46;f1=43;break;
  case 'roadHero':
   p0=vec('CAR',[-2.45,0.26,6.65],anchors);p1=vec('CAR',[-1.9,0.22,6.25],anchors);
   p2=vec('CAR',[1.5,0.28,6.4],anchors);p3=vec('CAR',[2.45,0.38,7.1],anchors);
