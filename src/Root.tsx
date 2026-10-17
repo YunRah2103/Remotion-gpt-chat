@@ -10,6 +10,7 @@ import {StudioMaterialProof} from './studio/StudioMaterialProof';
 import {TwoVersionFilm} from './advanced/TwoVersionFilm';
 
 export const VideoRoot=()=> <>
+  <Composition id="AiGlobalTakeoverFilmV2" component={AiGlobalTakeoverFilm} width={1080} height={1920} fps={30} durationInFrames={900} defaultProps={{version:2 as const}}/>
   <Composition id="AiGlobalTakeoverFilm" component={AiGlobalTakeoverFilm} width={1080} height={1920} fps={30} durationInFrames={1020}/>
   <Composition id="ChironFourTurbosFilm" component={ChironFourTurbosFilm} width={1080} height={1920} fps={30} durationInFrames={858} defaultProps={{includeVoice:false,includeMusic:false}}/>
   <Composition id="GtrAttesaFilm" component={GtrAttesaFilm} width={1920} height={1080} fps={30} durationInFrames={825} defaultProps={{includeVoice:false,includeMusic:false}}/>
