@@ -13,10 +13,10 @@ const Cams:React.FC<{frame:number}>=({frame})=>{
    const stage=Math.min(3,Math.floor(frame/45));
    const t=clamp((frame%45)/44), ease=t*t*(3-2*t);
    let p:[number,number,number]=[-2.95,1.45,4.16],look:[number,number,number]=[-.56,.67,1.91],fov=32;
-   if(stage===0){p=[-2.90+ease*.42,1.38+ease*.21,4.0-ease*.45];look=[-.50,.68,1.85];fov=32;}
-   if(stage===1){p=[-2.11+ease*.25,.74+ease*.10,2.66-ease*.26];look=[-.858,.355,1.47];fov=27;}
-   if(stage===2){p=[-2.25+ease*.45,2.22-ease*.31,-3.55+ease*.25];look=[0,.98,-1.51];fov=34;}
-   if(stage===3){p=[3.34-ease*.82,1.79+ease*.24,-5.46+ease*.48];look=[0,.81,-1.35];fov=35;}
+   if(stage===0){p=[-3.75+ease*.42,1.72+ease*.10,5.0-ease*.45];look=[-.48,.70,1.83];fov=35;}
+   if(stage===1){p=[-2.65+ease*.19,.96+ease*.10,3.08-ease*.20];look=[-.858,.355,1.47];fov=31;}
+   if(stage===2){p=[-3.15+ease*.40,2.55-ease*.22,-4.28+ease*.16];look=[0,.98,-1.51];fov=37;}
+   if(stage===3){p=[4.28-ease*.55,2.12+ease*.20,-6.32+ease*.55];look=[0,.81,-1.35];fov=38;}
    camera.position.set(...p);
    camera.lookAt(...look);
    if('fov' in camera){(camera as import('three').PerspectiveCamera).fov=fov;}
