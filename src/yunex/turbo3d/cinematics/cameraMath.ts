@@ -44,9 +44,9 @@ export const sampleShot=(shot:Shot,frame:number,anchors:Anchors={},duration=shot
   p2=vec('TURBINE',[-1.15,0.5,2.5],anchors);p3=vec('TURBINE',[-0.05,0.25,2.25],anchors);
   a=vec('EXHAUST_IN',[0.2,0,0],anchors);b=vec('TURBINE',[0,0,0],anchors);f0=34;f1=33;break;
  case 'shaftFollow':
-  p0=vec('TURBINE',[0.0,0.4,5.5],anchors);p1=vec('SHAFT',[-0.55,0.75,5.3],anchors);
-  p2=vec('SHAFT',[0.55,0.65,5.3],anchors);p3=vec('COMPRESSOR',[0.15,0.45,5.5],anchors);
-  a=vec('TURBINE',[0,0,0],anchors);b=vec('COMPRESSOR',[0,0,0],anchors);f0=46;f1=46;break;
+  p0=vec('TURBINE',[-2.4,0.65,4.3],anchors);p1=vec('SHAFT',[-1.5,0.85,4.5],anchors);
+  p2=vec('SHAFT',[1.5,0.85,4.5],anchors);p3=vec('COMPRESSOR',[2.4,0.65,4.3],anchors);
+  a=vec('TURBINE',[0,0,0],anchors);b=vec('COMPRESSOR',[0,0,0],anchors);f0=42;f1=42;break;
  case 'compressorReveal':
   p0=vec('COMPRESSOR',[0.36,0.25,2.15],anchors);p1=vec('COMPRESSOR',[0.6,0.35,2.5],anchors);
   p2=vec('COMPRESSED_AIR_OUT',[0.35,0.55,2.65],anchors);p3=vec('COMPRESSED_AIR_OUT',[0.65,0.65,2.7],anchors);
