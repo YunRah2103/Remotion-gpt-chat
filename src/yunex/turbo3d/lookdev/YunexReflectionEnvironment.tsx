@@ -37,7 +37,7 @@ export const YunexReflectionEnvironment:React.FC<ReflectionEnvironmentProps>=({
     if(variant==='charge') addCard(1,-1,4,5,2,'#83CEDD',0,.3);
     const pmrem=new THREE.PMREMGenerator(gl);
     pmrem.compileEquirectangularShader();
-    const target=pmrem.fromScene(environment,.045);
+    const target=pmrem.fromScene(environment,.025);
     scene.environment=target.texture;
     scene.environmentIntensity=intensity;
     return ()=>{
