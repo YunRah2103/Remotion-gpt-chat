@@ -18,40 +18,40 @@ export const LightShell:React.FC<{side:number}>=({side})=>{
     shape.closePath();
     return new THREE.ExtrudeGeometry(shape,{depth:.035,steps:1,bevelEnabled:true,bevelThickness:.015,bevelSize:.013,bevelSegments:2,curveSegments:5});
   },[]);
-  const y=.705;
+  const y=.635;
   return <group name="LAYERED_HEADLAMP_ASSEMBLY" position={[side*.636,y,1.939]}>
     <group rotation={[PI/2,0,side*-.02]}>
       <mesh geometry={shell} castShadow>
         <meshPhysicalMaterial name="HEADLAMP_RECESSED_HOUSING" color="#07111B" metalness={.51} roughness={.20} clearcoat={.72}/>
       </mesh>
     </group>
-    <mesh position={[0,.018,.0]} castShadow><boxGeometry args={[.435,.018,.30]}/>
+    <mesh position={[0,.010,.0]} castShadow><boxGeometry args={[.435,.018,.30]}/>
       <meshStandardMaterial color="#263D46" metalness={.55} roughness={.26}/></mesh>
-    {[-.09,.076].map((dx,i)=><group key={i} position={[dx,.052,.045]}>
-      <mesh rotation={[PI/2,0,0]}><cylinderGeometry args={[i===0?.074:.055,i===0?.074:.055,.021,24]}/>
+    {[-.09,.076].map((dx,i)=><group key={i} position={[dx,.014,.045]}>
+      <mesh rotation={[PI/2,0,0]}><cylinderGeometry args={[i===0?.047:.038,i===0?.047:.038,.017,24]}/>
         <meshStandardMaterial name="HEADLAMP_PROJECTOR_BEZEL" color="#BECED2" metalness={.88} roughness={.17}/></mesh>
-      <mesh position={[0,.014,0]}><sphereGeometry args={[i===0?.053:.041,18,12]}/>
+      <mesh position={[0,.012,0]}><sphereGeometry args={[i===0?.029:.024,18,12]}/>
         <meshPhysicalMaterial name="HEADLAMP_PROJECTOR_LENS" color="#C3F8FF" emissive="#7ADDF1" emissiveIntensity={1.8} roughness={.12} transmission={.13} clearcoat={1}/></mesh>
     </group>)}
-    <Hose points={[[-.191,.069,.109],[-.11,.09,.160],[.035,.093,.143],[.175,.08,.025]]} radius={.014} color="#BBF9FC" metalness={.06}/>
-    <Hose points={[[-.17,.066,-.08],[-.015,.075,-.131],[.153,.07,-.108]]} radius={.010} color="#5196A9"/>
-    <mesh position={[0,.100,.016]}><boxGeometry args={[.429,.008,.30]}/>
+    <Hose points={[[-.191,.026,.109],[-.11,.038,.160],[.035,.04,.143],[.175,.027,.025]]} radius={.014} color="#BBF9FC" metalness={.06}/>
+    <Hose points={[[-.17,.022,-.08],[-.015,.03,-.131],[.153,.025,-.108]]} radius={.010} color="#5196A9"/>
+    <mesh position={[0,.043,.016]}><boxGeometry args={[.429,.008,.30]}/>
       <meshPhysicalMaterial name="HEADLAMP_OUTER_CLEAR_LENS" color="#8CC7D7" metalness={.08} roughness={.095} transparent opacity={.16} clearcoat={1} depthWrite={false}/></mesh>
   </group>;
 };
 
 /** Recess on the +Z front face, including real sidewalls and slats rather than a black sticker. */
-export const FrontDuct:React.FC<{side:number}>=({side})=><group name="FRONT_BUMPER_RECESSED_DUCT" position={[side*.42,.535,2.36]}>
+export const FrontDuct:React.FC<{side:number}>=({side})=><group name="FRONT_BUMPER_RECESSED_DUCT" position={[side*.42,.535,2.315]}>
   <mesh position={[0,0,-.112]}><boxGeometry args={[.340,.116,.010]}/>
     <meshStandardMaterial name="FRONT_DUCT_DEPTH_BACK" color="#020A0D" roughness={1}/></mesh>
-  <mesh position={[0,-.071,.005]}><boxGeometry args={[.405,.023,.213]}/>
+  <mesh position={[0,-.071,.005]}><boxGeometry args={[.405,.023,.088]}/>
     <meshStandardMaterial name="FRONT_DUCT_LOWER_LIP" color="#182F39" metalness={.52} roughness={.33}/></mesh>
-  <mesh position={[0,.070,.005]}><boxGeometry args={[.407,.020,.215]}/>
+  <mesh position={[0,.070,.005]}><boxGeometry args={[.407,.020,.088]}/>
     <meshStandardMaterial name="FRONT_DUCT_UPPER_LIP" color="#2B565A" metalness={.6} roughness={.3}/></mesh>
-  {[-1,1].map(s=><mesh key={s} position={[s*.2,0,-.015]}>
-    <boxGeometry args={[.022,.14,.175]}/><meshStandardMaterial color="#1F333E" metalness={.48}/></mesh>)}
-  {[-.09,0,.09].map(x=><mesh key={x} position={[x,0,.07]} rotation={[0,.03*side,0]}>
-    <boxGeometry args={[.012,.117,.12]}/><meshStandardMaterial name="FRONT_INTAKE_GUIDE_VANES" color="#4A777D" metalness={.72} roughness={.3}/></mesh>)}
+  {[-1,1].map(s=><mesh key={s} position={[s*.2,0,-.043]}>
+    <boxGeometry args={[.022,.14,.124]}/><meshStandardMaterial color="#1F333E" metalness={.48}/></mesh>)}
+  {[-.09,0,.09].map(x=><mesh key={x} position={[x,0,-.037]} rotation={[0,.03*side,0]}>
+    <boxGeometry args={[.012,.117,.115]}/><meshStandardMaterial name="FRONT_INTAKE_GUIDE_VANES" color="#4A777D" metalness={.72} roughness={.3}/></mesh>)}
   <mesh position={[0,0,-.105]}><boxGeometry args={[.34,.006,.09]}/>
     <meshStandardMaterial color="#09161E" roughness={.63}/></mesh>
 </group>;
@@ -82,8 +82,8 @@ export const PremiumWheel:React.FC<{side:number;z:number;travelMeters:number}>=(
       {Array.from({length:20},(_,i)=>{const a=PI*2*i/20;return <mesh key={i} position={[side*.021,Math.cos(a)*.188,Math.sin(a)*.188]}>
         <sphereGeometry args={[.012,6,5]}/><meshStandardMaterial color="#21313B" roughness={.71}/></mesh>;})}
       <group position={[side*.072,.18,.09]} rotation={[.24,0,0]}>
-        <mesh castShadow><boxGeometry args={[.077,.117,.17]}/><meshStandardMaterial name="BRAKE_CALIPER_BRONZE" color="#D39B70" metalness={.76} roughness={.3}/></mesh>
-        <mesh position={[side*.043,0,0]}><boxGeometry args={[.012,.054,.13]}/><meshStandardMaterial color="#3A454D" metalness={.63}/></mesh>
+        <mesh castShadow><boxGeometry args={[.05,.075,.105]}/><meshStandardMaterial name="BRAKE_CALIPER_BRONZE" color="#566C78" metalness={.76} roughness={.3}/></mesh>
+        <mesh position={[side*.032,0,0]}><boxGeometry args={[.012,.043,.075]}/><meshStandardMaterial color="#3A454D" metalness={.63}/></mesh>
       </group>
     </group>
     <group name="WHEEL_PIVOT_X" rotation={[spin,0,0]}>
@@ -99,15 +99,15 @@ export const PremiumWheel:React.FC<{side:number;z:number;travelMeters:number}>=(
       </mesh>
       <mesh rotation={[0,PI/2,0]} position={[side*.149,0,0]}>
         <torusGeometry args={[.229,.011,8,44]}/><meshStandardMaterial color="#2A4F58" metalness={.89} roughness={.19}/></mesh>
-      {Array.from({length:10},(_,i)=>{
-        const a=i*PI*2/10;
+      {Array.from({length:5},(_,i)=>{
+        const a=i*PI*2/5;
         return <group key={i} rotation={[a,0,0]}>
-          <mesh position={[side*.163,.13,-.018]} rotation={[.19,0,side*-.17]} castShadow>
-            <boxGeometry args={[.035,.215,.029]}/>
+          <mesh position={[side*.163,.123,-.018]} rotation={[.16,0,side*-.16]} castShadow>
+            <boxGeometry args={[.027,.198,.026]}/>
             <meshStandardMaterial name="RIM_MACHINED_SPOKE" color="#9BAEB6" metalness={.89} roughness={.20}/>
           </mesh>
-          <mesh position={[side*.173,.177,.037]} rotation={[-.19,0,side*.18]} castShadow>
-            <boxGeometry args={[.023,.117,.021]}/><meshStandardMaterial color="#3F7A7B" metalness={.85} roughness={.27}/></mesh>
+          <mesh position={[side*.173,.159,.035]} rotation={[-.17,0,side*.18]} castShadow>
+            <boxGeometry args={[.018,.115,.018]}/><meshStandardMaterial color="#3F7A7B" metalness={.85} roughness={.27}/></mesh>
         </group>;
       })}
       <mesh rotation={[0,0,PI/2]} position={[side*.185,0,0]}>
@@ -115,9 +115,32 @@ export const PremiumWheel:React.FC<{side:number;z:number;travelMeters:number}>=(
         <meshStandardMaterial name="UNBRANDED_WHEEL_HUB" color="#C2CFCE" metalness={.96} roughness={.17}/></mesh>
       {Array.from({length:5},(_,i)=>{const a=i*PI*2/5;return <mesh key={i} rotation={[0,0,PI/2]} position={[side*.206,Math.sin(a)*.052,Math.cos(a)*.052]}>
         <cylinderGeometry args={[.012,.012,.012,8]}/><meshStandardMaterial name="HUB_LUGS" color="#263C44" metalness={.68} roughness={.27}/></mesh>;})}
-      {Array.from({length:26},(_,i)=>{const a=i*PI*2/26;return <mesh key={i} position={[side*.107,Math.cos(a)*.343,Math.sin(a)*.343]} rotation={[a,0,0]}>
-        <boxGeometry args={[.16,.015,.030]}/><meshStandardMaterial name="TREAD_GROOVE_HINT" color="#171C20" roughness={.95}/></mesh>;})}
+      {Array.from({length:32},(_,i)=>{const a=i*PI*2/32;return <mesh key={i} position={[side*.107,Math.cos(a)*.351,Math.sin(a)*.351]} rotation={[a,0,0]}>
+        <boxGeometry args={[.055,.005,.017]}/><meshStandardMaterial name="TREAD_GROOVE_HINT" color="#171C20" roughness={.95}/></mesh>;})}
     </group>
+  </group>;
+};
+
+
+/** Sculpted rear lens and thin luminous LED signature, facing -Z. */
+export const RearSignature:React.FC<{side:number}>=({side})=>{
+  const path=useMemo(()=>new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-.235,.033,-.003),
+    new THREE.Vector3(-.227,-.018,-.007),
+    new THREE.Vector3(-.14,-.045,-.012),
+    new THREE.Vector3(.16,-.043,-.01),
+    new THREE.Vector3(.22,.025,-.005)
+  ]),[]);
+  return <group name="REAR_LED_ASSEMBLY" position={[side*.686,.771,-2.303]}>
+    <mesh castShadow><boxGeometry args={[.51,.117,.038]}/>
+      <meshStandardMaterial name="REAR_RECESSED_LAMP_SURROUND" color="#08121A" metalness={.51} roughness={.26}/></mesh>
+    <mesh position={[0,0,-.028]}><boxGeometry args={[.461,.086,.014]}/>
+      <meshPhysicalMaterial name="REAR_LAMP_SMOKED_LENS" color="#3B0D1B" transparent opacity={.8} metalness={.38} clearcoat={.97} roughness={.15}/></mesh>
+    <mesh position={[0,0,-.054]} geometry={new THREE.TubeGeometry(path,24,.010,8,false)}>
+      <meshBasicMaterial name="REAR_LED_CRIMSON" color="#FF4E66" toneMapped={false}/>
+    </mesh>
+    {[-.13,0,.13].map(x=><mesh key={x} position={[x,.015,-.044]}><boxGeometry args={[.045,.014,.014]}/>
+      <meshBasicMaterial color="#FF4255" toneMapped={false}/></mesh>)}
   </group>;
 };
 
@@ -161,7 +184,7 @@ export const EngineBayDetail:React.FC<{visible:boolean}>=({visible})=><group nam
 export const HingedEngineDeck:React.FC<{open:number}>=({open})=>{
   const t=Math.max(0,Math.min(1,open));
   const eased=t*t*(3-2*t);
-  return <group name="ENGINE_ACCESS_DECK" position={[0,.914,-.978]} rotation={[eased*1.14,0,0]}>
+  return <group name="ENGINE_ACCESS_DECK" position={[0,.914,-.978]} rotation={[eased*.83,0,0]}>
     <mesh name="REAR_DECK_SKIN" position={[0,.02,-.45]} castShadow>
       <boxGeometry args={[1.49,.065,.91]}/>
       <meshPhysicalMaterial name="ENGINE_COVER" color="#0D817F" metalness={.7} roughness={.23} clearcoat={.9} clearcoatRoughness={.16}/>
