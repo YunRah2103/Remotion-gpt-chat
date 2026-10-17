@@ -18,23 +18,23 @@ export const LightShell:React.FC<{side:number}>=({side})=>{
     shape.quadraticCurveTo(-.02,.197,-.223,.08);shape.closePath();
     return new THREE.ExtrudeGeometry(shape,{depth:.018,steps:1,bevelEnabled:true,bevelSize:.009,bevelThickness:.006,bevelSegments:2});
   },[]);
-  return <group name="LAYERED_HEADLAMP_ASSEMBLY" position={[side*.636,.670,1.945]}>
+  return <group name="LAYERED_HEADLAMP_ASSEMBLY" position={[side*.636,.645,1.945]}>
     <mesh rotation={[PI/2,0,0]} geometry={shell} castShadow>
       <meshPhysicalMaterial name="HEADLAMP_RECESSED_HOUSING" color="#07131B" metalness={.61} roughness={.18} clearcoat={.82}/>
     </mesh>
-    <mesh position={[0,.012,.01]}><boxGeometry args={[.413,.011,.288]}/>
+    <mesh position={[0,.009,.01]}><boxGeometry args={[.413,.011,.288]}/>
       <meshStandardMaterial name="HEADLAMP_INNER_SMOKED_OPTICS" color="#122A37" metalness={.66} roughness={.25}/></mesh>
-    {[-.10,.035,.15].map((x,i)=><group key={i} position={[x,.022,.046]}>
+    {[-.10,.035,.15].map((x,i)=><group key={i} position={[x,.015,.046]}>
       <mesh><boxGeometry args={[i===0?.071:.057,.011,.082]}/>
         <meshStandardMaterial name="HEADLAMP_PROJECTOR_BEZEL" color="#8BA7B1" metalness={.87} roughness={.21}/></mesh>
       <mesh position={[0,.008,0]}><boxGeometry args={[i===0?.056:.043,.008,.058]}/>
         <meshBasicMaterial name="HEADLAMP_PROJECTOR_LENS" color={i===1?'#D8FCFF':'#86DCEB'} toneMapped={false}/></mesh>
     </group>)}
-    <mesh name="FLUSH_DRIVING_LIGHT" position={[0,.034,.14]}>
+    <mesh name="FLUSH_DRIVING_LIGHT" position={[0,.026,.14]}>
       <boxGeometry args={[.358,.008,.020]}/>
       <meshBasicMaterial name="HEADLAMP_WHITE" color="#DBFFFF" toneMapped={false}/>
     </mesh>
-    <mesh position={[0,.042,.005]}><boxGeometry args={[.420,.008,.29]}/>
+    <mesh position={[0,.026,.005]}><boxGeometry args={[.420,.008,.29]}/>
       <meshPhysicalMaterial name="HEADLAMP_OUTER_CLEAR_LENS" color="#9ACAD7" roughness={.09} metalness={.1} transparent opacity={.20} depthWrite={false} clearcoat={1}/>
     </mesh>
   </group>;
