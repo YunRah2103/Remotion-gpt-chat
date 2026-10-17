@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "task": "YUNEX-TURBO-3D-EP001-A2-128",
+  "branch": "agent/turbo-3d-001-mechanism",
+  "sourceSha": "a658ef8de63b4848c0d33fec6fd75e5a9287b4cc",
+  "owner": "engineering",
+  "summary": "Original R3F turbine/compressor common shaft, distinct exhaust and intake/charge plumbing, 4-cylinder engine, intercooler and three decoded software-rendered 3D moving MP4s; native Remotion validation pending",
+  "status": "review",
+  "files": [
+    "src/yunex/turbo3d/mechanism/TurboMechanism.tsx",
+    "src/yunex/turbo3d/mechanism/ports.ts",
+    "src/yunex/turbo3d/mechanism/TurboPreviewHarness.tsx",
+    "src/yunex/turbo3d/mechanism/preview.entry.tsx",
+    "src/yunex/turbo3d/mechanism/index.ts",
+    "production/yunex/turbo_3d_001/agents/mechanism/README.md",
+    "production/yunex/turbo_3d_001/agents/mechanism/asset-manifest.json"
+  ],
+  "evidence": [
+    "GitHub code/manifest source commit a658ef8de63b4848c0d33fec6fd75e5a9287b4cc",
+    "Three 96-frame 450x800 30fps moving Python 3D OpenCV-projected H264 previews with genuine changing rotor phase/camera, ffprobe and full ffmpeg decode PASS; exact SHA256 in manifest",
+    "Local prototype TS transpilation zero syntax diagnostics, NOT npm full typecheck"
+  ],
+  "blockers": [
+    "Native Remotion WebGL render and npm run check blocked locally by unavailable offline npm dependencies",
+    "Three offline 3D proof MP4s linked in ChatGPT, not hosted on GitHub; manager approval still requires genuinely native WebGL decoded MP4"
+  ],
+  "notes": "review status means code/interface review only; no APPROVED state or completed final episode claimed"
+}
