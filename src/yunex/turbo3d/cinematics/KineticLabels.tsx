@@ -31,7 +31,8 @@ export const KineticLabel:React.FC<{
 /** No blanket story-board UI: only timed subject-matched educational tags. */
 export const SceneLabels:React.FC<{frame:number;variant:'hookA'|'hookB'|'shaft'|'charge'|'road'}>=({frame,variant})=>{
  if(variant==='road')return null;
- if(variant==='hookA'||variant==='hookB')return <KineticLabel frame={frame} startFrame={8} endFrame={66} label="TURBINE" top={350}/>;
+ if(variant==='hookA')return <KineticLabel frame={frame} startFrame={8} endFrame={66} label="TURBINE" top={350}/>;
+ if(variant==='hookB')return <KineticLabel frame={frame} startFrame={8} endFrame={66} label="HOT EXHAUST" top={350}/>;
  if(variant==='shaft')return <>
   <KineticLabel frame={frame} startFrame={12} endFrame={72} label="ONE SHAFT" top={385}/>
   <KineticLabel frame={frame} startFrame={80} endFrame={140} label="CLEAN AIR" top={390} side="right"/>
