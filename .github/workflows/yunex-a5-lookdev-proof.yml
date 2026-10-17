@@ -40,6 +40,18 @@ jobs:
           npx remotion render src/yunex/turbo3d/lookdev/preview.entry.tsx YunexA5LookdevProof out/a5/01-teal-road.mp4 --frames=12-35 --scale=0.5 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
           npx remotion render src/yunex/turbo3d/lookdev/preview.entry.tsx YunexA5LookdevProof out/a5/02-turbine-metal.mp4 --frames=102-125 --scale=0.5 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
           npx remotion render src/yunex/turbo3d/lookdev/preview.entry.tsx YunexA5LookdevProof out/a5/03-cool-charge.mp4 --frames=192-215 --scale=0.5 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
+      - name: Convert native WebGL full-range output to proper limited-range H264
+        run: |
+          set -euo pipefail
+          for video in out/a5/*.mp4; do
+            tmp="${video%.mp4}.limited.mp4"
+            ffmpeg -hide_banner -loglevel error -y -i "$video" \
+              -vf "scale=in_range=pc:out_range=tv,format=yuv420p" \
+              -c:v libx264 -preset veryfast -crf 17 -pix_fmt yuv420p \
+              -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 \
+              -an "$tmp"
+            mv "$tmp" "$video"
+          done
       - name: Decode videos, prove frames change, and capture actual stills
         run: |
           set -euo pipefail
@@ -52,7 +64,7 @@ jobs:
               subprocess.run(['ffmpeg','-hide_banner','-loglevel','error','-xerror','-i',str(video),'-f','null','-'],check=True)
               meta=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(video)]))
               s=next(s for s in meta['streams'] if s['codec_type']=='video')
-              assert s['codec_name']=='h264' and s['pix_fmt']=='yuv420p',s
+              assert s['codec_name']=='h264' and s['pix_fmt']=='yuv420p' and s['color_range']=='tv',s
               assert s['r_frame_rate']=='30/1' and int(s['nb_frames'])==24,s
               frames=[]
               for f in (0,12,23):
