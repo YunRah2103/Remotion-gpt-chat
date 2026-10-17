@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import {useThree} from '@react-three/fiber';
 import {LightShell, FrontDuct, SideDuct, PremiumWheel, EngineBayDetail, HingedEngineDeck, RearSignature} from './DetailKit';
 import {SculptedShell, SculptedCanopy, SculptedNose} from './SculptedBody';
+import {CleanCoupeFinish} from './CleanCoupeFinish';
 
 /**
  * A1 ORIGINAL VEHICLE / ENVIRONMENT. 1 unit = 1 metre.
@@ -81,6 +82,7 @@ export const VehicleModel:React.FC<{frame:number;variant?:VehicleVariant;revealP
       <SculptedShell/>
       <SculptedNose/>
       <SculptedCanopy/>
+      <CleanCoupeFinish/>
       {[-1,1].map(s=><group key={s}>
         <LightShell side={s}/>
         <SideDuct side={s}/>
@@ -105,8 +107,6 @@ export const VehicleModel:React.FC<{frame:number;variant?:VehicleVariant;revealP
         <boxGeometry args={[.09,.17,.13]}/><meshStandardMaterial color="#2B3940" metalness={.47}/></mesh>)}
       <HingedEngineDeck open={panelOpen}/>
       <EngineBayDetail visible={variant==='reveal' && panelOpen>.02}/>
-      <mesh position={[0,.96,-2.04]}><boxGeometry args={[1.61,.065,.37]}/>
-        <meshStandardMaterial name="AERO_REAR_SPOILER" color="#17242B" metalness={.73} roughness={.28}/></mesh>
       <mesh position={[0,.34,2.32]}><boxGeometry args={[1.55,.026,.23]}/>
         <meshStandardMaterial name="FRONT_SPLITTER" color="#080F14" metalness={.14} roughness={.74}/></mesh>
       {[-1,1].flatMap(s=>[1.47,-1.48].map(z=><PremiumWheel key={s+'_'+z} side={s} z={z} travelMeters={travelMeters}/>))}
