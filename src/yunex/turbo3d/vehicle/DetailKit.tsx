@@ -9,33 +9,64 @@ const Hose:React.FC<{points:P3[];radius?:number;color?:string;metalness?:number}
   const path=useMemo(()=>new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(...p))),[points]);
   return <mesh castShadow><tubeGeometry args={[path,24,radius,8,false]}/><meshStandardMaterial color={color} metalness={metalness} roughness={.32}/></mesh>;
 };
+/** Flush swept glass lens. Four corners follow the real front-haunch crown
+ * and the descending bonnet: no elevated slab or exposed projector plate.
+ * Three optical elements and the white DRL remain independently named.
+ */
 export const LightShell:React.FC<{side:number}>=({side})=>{
-  // Low-profile recess: no bulb/projector cylinder can stand proud of the bonnet.
   const shell=useMemo(()=>{
-    const shape=new THREE.Shape();
-    shape.moveTo(-.23,-.155);shape.lineTo(.12,-.215);
-    shape.lineTo(.242,-.075);shape.lineTo(.205,.171);
-    shape.quadraticCurveTo(-.02,.197,-.223,.08);shape.closePath();
-    return new THREE.ExtrudeGeometry(shape,{depth:.018,steps:1,bevelEnabled:true,bevelSize:.009,bevelThickness:.006,bevelSegments:2});
-  },[]);
-  return <group name="LAYERED_HEADLAMP_ASSEMBLY" position={[side*.65,.758,1.945]}>
-    <mesh rotation={[PI/2,0,0]} geometry={shell} castShadow>
-      <meshPhysicalMaterial name="HEADLAMP_RECESSED_HOUSING" color="#07131B" metalness={.61} roughness={.18} clearcoat={.82}/>
+    const coords=[
+      [side*.405,.755,1.76], [side*.805,.838,1.76],
+      [side*.675,.727,2.13], [side*.438,.683,2.13]
+    ];
+    const v=coords.flat();
+    const g=new THREE.BufferGeometry();
+    g.setAttribute('position',new THREE.Float32BufferAttribute(v,3));
+    g.setIndex([0,1,2,0,2,3]);g.computeVertexNormals();
+    return g;
+  },[side]);
+  const over=useMemo(()=>{
+    const g=shell.clone();
+    const p=g.getAttribute('position');
+    for(let i=0;i<p.count;i++)p.setY(i,p.getY(i)+.007);
+    p.needsUpdate=true;g.computeVertexNormals();return g;
+  },[shell]);
+  const glow=useMemo(()=>{
+    const points=[
+      new THREE.Vector3(side*.448,.701,2.132),
+      new THREE.Vector3(side*.550,.719,2.134),
+      new THREE.Vector3(side*.675,.744,2.126),
+    ];
+    return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points),18,.010,7,false);
+  },[side]);
+  return <group name="LAYERED_HEADLAMP_ASSEMBLY">
+    <mesh geometry={shell} name="HEADLAMP_RECESSED_HOUSING">
+      <meshPhysicalMaterial color="#06131C" roughness={.18} metalness={.54}
+       clearcoat={.86} side={THREE.DoubleSide}/>
     </mesh>
-    <mesh position={[0,.009,.01]}><boxGeometry args={[.413,.011,.288]}/>
-      <meshStandardMaterial name="HEADLAMP_INNER_SMOKED_OPTICS" color="#122A37" metalness={.66} roughness={.25}/></mesh>
-    {[-.10,.035,.15].map((x,i)=><group key={i} position={[x,.015,.046]}>
-      <mesh><boxGeometry args={[i===0?.071:.057,.011,.082]}/>
-        <meshStandardMaterial name="HEADLAMP_PROJECTOR_BEZEL" color="#8BA7B1" metalness={.87} roughness={.21}/></mesh>
-      <mesh position={[0,.008,0]}><boxGeometry args={[i===0?.056:.043,.008,.058]}/>
-        <meshBasicMaterial name="HEADLAMP_PROJECTOR_LENS" color={i===1?'#D8FCFF':'#86DCEB'} toneMapped={false}/></mesh>
-    </group>)}
-    <mesh name="FLUSH_DRIVING_LIGHT" position={[0,.026,.14]}>
-      <boxGeometry args={[.358,.008,.020]}/>
-      <meshBasicMaterial name="HEADLAMP_WHITE" color="#DBFFFF" toneMapped={false}/>
+    <mesh geometry={over} name="HEADLAMP_INNER_SMOKED_OPTICS">
+      <meshPhysicalMaterial color="#16313B" roughness={.17} metalness={.35}
+       clearcoat={.9} transparent opacity={.66} depthWrite={false} side={THREE.DoubleSide}/>
     </mesh>
-    <mesh position={[0,.026,.005]}><boxGeometry args={[.420,.008,.29]}/>
-      <meshPhysicalMaterial name="HEADLAMP_OUTER_CLEAR_LENS" color="#9ACAD7" roughness={.09} metalness={.1} transparent opacity={.20} depthWrite={false} clearcoat={1}/>
+    {[0,1,2].map((i)=>{
+      const x=side*(.518+i*.078), y=.758+i*.013;
+      return <group key={i} position={[x,y,1.917]} rotation={[.24,0,side*-.16]}>
+        <mesh name="HEADLAMP_PROJECTOR_BEZEL">
+          <boxGeometry args={[.066,.006,.092]}/>
+          <meshStandardMaterial color="#70909A" metalness={.85} roughness={.22}/>
+        </mesh>
+        <mesh name="HEADLAMP_PROJECTOR_LENS" position={[0,.006,0]}>
+          <boxGeometry args={[.045,.005,.066]}/>
+          <meshBasicMaterial color={i===0?'#D7FAFF':'#A8E9F2'} toneMapped={false}/>
+        </mesh>
+      </group>;
+    })}
+    <mesh name="FLUSH_DRIVING_LIGHT" geometry={glow}>
+      <meshBasicMaterial name="HEADLAMP_WHITE" color="#DFFFFF" toneMapped={false}/>
+    </mesh>
+    <mesh name="HEADLAMP_OUTER_CLEAR_LENS" geometry={over}>
+      <meshPhysicalMaterial color="#84C7D1" metalness={.15} roughness={.075}
+       transparent opacity={.19} clearcoat={1} depthWrite={false} side={THREE.DoubleSide}/>
     </mesh>
   </group>;
 };
