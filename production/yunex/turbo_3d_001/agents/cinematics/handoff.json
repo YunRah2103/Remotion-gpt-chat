@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "task": "YUNEX-TURBO3D-EP001-A4-ISSUE-130",
+  "branch": "agent/turbo-3d-001-cinematics",
+  "sourceSha": "3709748827f4ed7f7bc86a5f81ad78092c82832b",
+  "owner": "director",
+  "summary": "Implemented seven deterministic camera shots, two spinning-turbine animated hook options, independent native Remotion/Three temporary-geometry compositions, safe educational kinetic labels, tested moving software-proxy concept MP4s and a repeatable native render/decode script; final models are owned by A1/A2 and editor assembly by A6.",
+  "status": "blocked",
+  "files": [
+    "src/yunex/turbo3d/cinematics/cameraMath.ts",
+    "src/yunex/turbo3d/cinematics/CameraDirector.tsx",
+    "src/yunex/turbo3d/cinematics/KineticLabels.tsx",
+    "src/yunex/turbo3d/cinematics/PreviewScenes.tsx",
+    "src/yunex/turbo3d/cinematics/previewEntry.tsx",
+    "production/yunex/turbo_3d_001/agents/cinematics/render-previews.sh",
+    "production/yunex/turbo_3d_001/agents/cinematics/camera.test.cjs",
+    "production/yunex/turbo_3d_001/agents/cinematics/manifest.json",
+    "production/yunex/turbo_3d_001/agents/cinematics/handoff.json"
+  ],
+  "evidence": [
+    "https://github.com/YunRah2103/Remotion-gpt-chat/pull/135 — source branch and compile CI",
+    "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39041778306 — successful existing production CI compile and unrelated native GpuDriveFilm smoke; NOT new A4 native scene render",
+    "Four unique moving 3s independent original software 3D proxy MP4s generated and full-decode tested in active ChatGPT session: 432x768 H264/30fps. SHA256 in manifest; available to requesting user through conversation only; GitHub-hosted source/moving Remotion artifact NOT yet available."
+  ],
+  "blockers": [
+    "Actual A4 native Remotion/Three WebGL preview MP4 for new compositions has not executed in accessible runtime: npm packages unavailable in local tool container; GitHub production CI only renders old GpuDriveFilm.",
+    "A1 vehicle, A2 turbo anchor and port models not frozen: temporary preview geometry must be replaced and camera clearance verified before manager approval.",
+    "No GitHub-hosted preview artifacts yet; proxy files exist only in conversation sandbox, not the repository. A6 must not integrate before manager approves real native preview."
+  ],
+  "notes": "Strictly truthful handoff: blocked until native render + actual A1/A2 geometry visual QC. `node .../camera.test.cjs` command included for later runner; existence of test file does not claim it was executed."
+}
