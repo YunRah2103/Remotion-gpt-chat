@@ -95,7 +95,7 @@ const Spoiler:React.FC<{f:number}>=({f})=>{
  const later=sm((f-91)/27);
  // In the opening, start deployed; then retract and redeploy for the mechanism view.
  const act=f<68?early:f<98?1-sm((f-68)/27):later;
- const wingAngle=act*.88;
+ const wingAngle=act*1.20;
  return <group position={[0,1.05,2.06]}>
   {[-1,1].map(s=><React.Fragment key={s}>
    <Box p={[s*.58,.07,.1]} s={[.12,.36,.13]} c="#23232c" metal={.6}/>
@@ -164,7 +164,7 @@ const World:React.FC<{f:number}>=({f})=>{
    const z=((i*10.6+distance*.47+75)%150)-75;
    return <Building key={i} x={s*(10+(i%4)*3)} z={z} h={2.8+(i*17%10)*.75} tint={i}/>;
   })}
-  {Array.from({length:12},(_,i)=>{
+  {f>=365?Array.from({length:12},(_,i)=>{
     const z=((i*14+distance+84)%168)-84;
     return <group key={i} position={[0,0,z]}>
      {[-1,1].map(s=><group key={s}>
@@ -172,7 +172,7 @@ const World:React.FC<{f:number}>=({f})=>{
       <Box p={[s*4.92,3.6,0]} s={[.65,.20,.54]} c="#adc8ba" glow={.46}/>
      </group>)}
     </group>;
-  })}
+  }):null}
   {f>=384&&f<515?<group position={[0,.02,-15]}>
    {Array.from({length:9},(_,i)=><Box key={i} p={[0,.035,-i*4]} s={[7.3,.06,.31]} c="#ebded0" glow={.3}/>)}
   </group>:null}
@@ -236,7 +236,7 @@ const Aerodynamics:React.FC<{f:number}>=({f})=>{
 };
 type Shot={start:number;end:number;a:Vec;b:Vec;target:Vec;fov:number};
 const shots:Shot[]=[
- {start:0,end:60,a:[2.6,1.84,4.36],b:[1.65,1.74,3.35],target:[0,1.35,2.1],fov:35},
+ {start:0,end:60,a:[3.20,1.83,3.80],b:[3.00,1.65,3.23],target:[0,1.36,2.06],fov:39},
  {start:60,end:139,a:[11.8,3.2,2.5],b:[10.5,2.4,-.9],target:[0,.98,0],fov:38},
  {start:139,end:249,a:[5.9,3.9,6.2],b:[-6.7,4.2,6.1],target:[0,1.05,1.55],fov:34},
  {start:249,end:365,a:[-7.3,4.8,5.1],b:[-5.7,2.9,3.8],target:[0,1.14,1.4],fov:38},
