@@ -32,13 +32,13 @@ export const sampleShot=(shot:Shot,frame:number,anchors:Anchors={},duration=shot
  let p0:Vec3,p1:Vec3,p2:Vec3,p3:Vec3,a:Vec3,b:Vec3, f0:number,f1:number;
  switch(shot){
  case 'hookOrbit':
-  p0=vec('TURBINE',[-2.55,0.35,2.3],anchors);p1=vec('TURBINE',[-2.35,0.45,2.05],anchors);
-  p2=vec('TURBINE',[-2.05,0.45,1.85],anchors);p3=vec('TURBINE',[-2.1,0.34,2.28],anchors);
-  a=vec('TURBINE',[0,0,0],anchors);b=vec('TURBINE',[0.1,0.04,0],anchors);f0=37;f1=40;break;
+  p0=vec('TURBINE',[-4.25,0.75,1.2],anchors);p1=vec('TURBINE',[-3.9,0.60,1.65],anchors);
+  p2=vec('TURBINE',[-3.05,0.50,3.0],anchors);p3=vec('TURBINE',[-2.9,0.43,3.15],anchors);
+  a=vec('TURBINE',[0,0,0],anchors);b=vec('TURBINE',[0.07,0.04,0],anchors);f0=42;f1=44;break;
  case 'hookRush':
-  p0=vec('EXHAUST_IN',[-0.45,0.35,3.1],anchors);p1=vec('EXHAUST_IN',[0.2,0.45,2.7],anchors);
-  p2=vec('TURBINE',[-2.0,0.55,2.25],anchors);p3=vec('TURBINE',[-1.95,0.43,2.42],anchors);
-  a=vec('EXHAUST_IN',[0.9,0,0],anchors);b=vec('TURBINE',[0,0.02,0],anchors);f0=37;f1=40;break;
+  p0=vec('TURBINE',[-4.2,1.15,1.8],anchors);p1=vec('TURBINE',[-3.7,1.05,2.2],anchors);
+  p2=vec('TURBINE',[-3.15,0.85,2.55],anchors);p3=vec('TURBINE',[-3.0,0.7,2.7],anchors);
+  a=vec('EXHAUST_IN',[0.05,0.0,0],anchors);b=vec('TURBINE',[0,0.02,0],anchors);f0=42;f1=43;break;
  case 'exhaustTrack':
   p0=vec('EXHAUST_IN',[-0.7,0.65,2.6],anchors);p1=vec('EXHAUST_IN',[0.45,0.7,2.2],anchors);
   p2=vec('TURBINE',[-1.15,0.5,2.5],anchors);p3=vec('TURBINE',[-0.05,0.25,2.25],anchors);
@@ -52,13 +52,13 @@ export const sampleShot=(shot:Shot,frame:number,anchors:Anchors={},duration=shot
   p2=vec('COMPRESSED_AIR_OUT',[0.35,0.55,2.65],anchors);p3=vec('COMPRESSED_AIR_OUT',[0.65,0.65,2.7],anchors);
   a=vec('COMPRESSOR',[0,0,0],anchors);b=vec('COMPRESSED_AIR_OUT',[0,0,0],anchors);f0=34;f1=36;break;
  case 'chargeGlide':
-  p0=vec('COMPRESSED_AIR_OUT',[0.4,1.25,5.6],anchors);p1=vec('INTERCOOLER_OUT',[-0.8,1.35,6.2],anchors);
-  p2=vec('INTERCOOLER_OUT',[0.15,1.35,6.3],anchors);p3=vec('ENGINE_INTAKE',[-0.2,1.35,6.8],anchors);
-  a=vec('COMPRESSED_AIR_OUT',[0.25,-0.22,-0.55],anchors);b=vec('ENGINE_INTAKE',[-0.05,-0.12,0.1],anchors);f0=42;f1=42;break;
+  p0=vec('COMPRESSED_AIR_OUT',[3.0,1.4,3.7],anchors);p1=vec('INTERCOOLER_OUT',[1.55,2.0,5.2],anchors);
+  p2=vec('INTERCOOLER_OUT',[1.15,1.9,5.5],anchors);p3=vec('ENGINE_INTAKE',[2.1,2.7,6.2],anchors);
+  a=vec('COMPRESSED_AIR_OUT',[1.5,0.5,-0.4],anchors);b=vec('ENGINE_INTAKE',[0,0.25,0],anchors);f0=46;f1=47;break;
  case 'roadHero':
-  p0=vec('CAR',[-2.7,0.72,7.3],anchors);p1=vec('CAR',[-1.85,0.65,6.9],anchors);
-  p2=vec('CAR',[1.9,1.05,7.1],anchors);p3=vec('CAR',[2.65,1.25,8.15],anchors);
-  a=vec('CAR',[0,0.1,0.35],anchors);b=vec('CAR',[0,0.22,0.1],anchors);f0=39;f1=39;break;
+  p0=vec('CAR',[-2.45,0.26,6.65],anchors);p1=vec('CAR',[-1.9,0.22,6.25],anchors);
+  p2=vec('CAR',[1.5,0.28,6.4],anchors);p3=vec('CAR',[2.45,0.38,7.1],anchors);
+  a=vec('CAR',[0,0.03,0.35],anchors);b=vec('CAR',[0,0.1,0.15],anchors);f0=42;f1=42;break;
  }
  return {position:bezier(p0,p1,p2,p3,t),target:lerp(a,b,t),fov:mix(f0,f1,t),roll:0};
 };
