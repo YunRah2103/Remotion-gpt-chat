@@ -3,7 +3,7 @@
   "assetId": "YUNEX-TURBO-3D-EP001-A2",
   "kind": "deterministic-r3f-mechanical-rig",
   "owner": "agent-2-mechanism",
-  "sourceCommit": "ac08dc4a8343ac7c9e8f99ebaaa337dd0779c1e8",
+  "sourceCommit": "439ab46ad0cf81a2da9d37aa0d783f69ca4ba000",
   "unitMetersPerUnit": 1,
   "upAxis": "+Y",
   "forwardAxis": "+Z",
@@ -166,8 +166,43 @@
         "url": "not publicly hosted; available in ChatGPT source session"
       }
     ],
-    "nativeRemotion": "PENDING: dependencies not installed in this offline runtime",
-    "npmCheck": "PENDING",
+    "nativeRemotion": {
+      "status": "PASS",
+      "exactSourceSha": "439ab46ad0cf81a2da9d37aa0d783f69ca4ba000",
+      "runId": 39043047809,
+      "workflow": "YUNEX A2 - native mechanical 3D previews",
+      "artifactId": 12105130685,
+      "artifactName": "yunex-turbo-a2-native-mechanical-previews",
+      "artifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39043047809/artifacts/12105130685",
+      "render": "Remotion 4, @remotion/three + R3F, software WebGL via --gl=swangle",
+      "resolution": [
+        540,
+        960
+      ],
+      "frameCount": 40,
+      "fps": 30,
+      "codec": "H.264",
+      "clips": {
+        "cutaway": {
+          "sha256": "91da04c3974bc7e65086271c4773a2adf03690d9724404eedbd079c9aaf848e4",
+          "uniqueFrameCount": 40
+        },
+        "exploded": {
+          "sha256": "bfb4cfe32a0f3552428c4be0cd575b65babfab58e08d18acdcfc9ac9cc735914",
+          "uniqueFrameCount": 40
+        },
+        "engine": {
+          "sha256": "3278b48a253263eb24e55f039d28dd69895bbe4109d79f4d35433f58135f1e7c",
+          "uniqueFrameCount": 40
+        }
+      },
+      "ffprobe": "PASS",
+      "fullFfmpegDecode": "PASS",
+      "framemd5DistinctFrames": "40 of 40 each",
+      "typescript": "npm run check PASS",
+      "visualInspection": "Nine representative frames reviewed at mobile aspect; no unconnected pipes/port dots in isolated turbo; 3D moving proof only, not integrated episode"
+    },
+    "npmCheck": "PASS in dedicated Agent2 native run 39043047809",
     "blender": "NOT USED"
   },
   "sha256": {

@@ -6,7 +6,6 @@ on:
       - agent/turbo-3d-001-mechanism
     paths:
       - 'src/yunex/turbo3d/mechanism/**'
-      - 'production/yunex/turbo_3d_001/agents/mechanism/**'
       - '.github/workflows/yunex-turbo-a2-native-preview.yml'
   workflow_dispatch:
 

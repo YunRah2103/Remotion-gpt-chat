@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "task": "YUNEX-TURBO-3D-EP001-A2-128",
   "branch": "agent/turbo-3d-001-mechanism",
-  "sourceSha": "a658ef8de63b4848c0d33fec6fd75e5a9287b4cc",
+  "sourceSha": "439ab46ad0cf81a2da9d37aa0d783f69ca4ba000",
   "owner": "engineering",
-  "summary": "Original R3F turbine/compressor common shaft, distinct exhaust and intake/charge plumbing, 4-cylinder engine, intercooler and three decoded software-rendered 3D moving MP4s; native Remotion validation pending",
-  "status": "review",
+  "summary": "Agent 2 original deterministic R3F turbo+engine completed; isolated 3-mode native Remotion moving WebGL preview rendered, metadata/full decode/all-frame motion SHA256 verified; ready for independent manager review, not approved or merged.",
+  "status": "ready",
   "files": [
     "src/yunex/turbo3d/mechanism/TurboMechanism.tsx",
     "src/yunex/turbo3d/mechanism/ports.ts",
@@ -16,13 +16,13 @@
     "production/yunex/turbo_3d_001/agents/mechanism/asset-manifest.json"
   ],
   "evidence": [
-    "GitHub code/manifest source commit a658ef8de63b4848c0d33fec6fd75e5a9287b4cc",
-    "Three 96-frame 450x800 30fps moving Python 3D OpenCV-projected H264 previews with genuine changing rotor phase/camera, ffprobe and full ffmpeg decode PASS; exact SHA256 in manifest",
-    "Local prototype TS transpilation zero syntax diagnostics, NOT npm full typecheck"
+    "Code SHA 439ab46ad0cf81a2da9d37aa0d783f69ca4ba000",
+    "Dedicated native R3F/Remotion software-WebGL run 39043047809 passed: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39043047809",
+    "Three independently rendered 540x960 30fps 40-frame H264 clips with full FFmpeg decode, 40/40 unique frames each; artifact https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39043047809/artifacts/12105130685",
+    "Actual native clip SHA256 cutaway 91da04c3974bc7e65086271c4773a2adf03690d9724404eedbd079c9aaf848e4; exploded bfb4cfe32a0f3552428c4be0cd575b65babfab58e08d18acdcfc9ac9cc735914; engine 3278b48a253263eb24e55f039d28dd69895bbe4109d79f4d35433f58135f1e7c",
+    "Source manifest exact ports, rig pivots, scientific non-mixing flow paths; local GLB bind-pose validated, linked separately to user but not stored on GitHub",
+    "npm ci and npm run check PASS in real GitHub Action"
   ],
-  "blockers": [
-    "Native Remotion WebGL render and npm run check blocked locally by unavailable offline npm dependencies",
-    "Three offline 3D proof MP4s linked in ChatGPT, not hosted on GitHub; manager approval still requires genuinely native WebGL decoded MP4"
-  ],
-  "notes": "review status means code/interface review only; no APPROVED state or completed final episode claimed"
+  "blockers": [],
+  "notes": "READY for independent manager engineering/visual review; NOT APPROVED, not merged, not A6 picture lock. Native evidence pinned to source commit 439ab46..., docs on top do not change geometry. Final film is A6/A7."
 }
