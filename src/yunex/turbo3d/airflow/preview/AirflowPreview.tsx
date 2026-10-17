@@ -11,6 +11,7 @@ import {TurboMechanism} from './a2-frozen/TurboMechanism';
 import {TurboFlow,type TurboFlowPhase} from '../TurboFlow';
 import {A2_CANDIDATE_PORTS,A2_CANDIDATE_ROUTES} from '../A2CandidateAdapter';
 import {CinematicFlow} from '../CinematicFlow';
+import {PowerWindow} from '../PowerWindow';
 
 const phases:TurboFlowPhase[]=['turbine','compressor','intercooler','combustion','full'];
 const headlines=['EXHAUST SPINS','FRESH AIR IN','COOL THE CHARGE','MORE AIR. MORE FUEL.','ONE SHAFT. TWO PATHS.'];
@@ -19,7 +20,7 @@ const specs=[
  {pos:[-3.65,1.60,3.48],target:[-1.33,.16,-.05],fov:33},
  {pos:[3.65,1.48,3.45],target:[1.32,.08,-.03],fov:33},
  {pos:[5.25,1.45,2.13],target:[2.55,-.53,-1.43],fov:34},
- {pos:[2.35,1.02,-.26],target:[-.18,-1.03,-2.93],fov:34},
+ {pos:[.95,1.15,.62],target:[-.20,-1.05,-2.88],fov:39},
  {pos:[4.55,4.0,6.25],target:[.32,-.62,-1.18],fov:40}
 ] as const;
 const MovingCamera:React.FC<{frame:number;stage:number}>=({frame,stage})=>{
@@ -54,7 +55,8 @@ const World:React.FC<{frame:number;stage:number}>=({frame,stage})=>{
   <group name="A3_REAL_A2_MODEL_AND_FLOW">
    <TurboMechanism frame={frame} variant={turboOnly?'turbo':'full'} cutaway={.99} exploded={0}/>
    <TurboFlow frame={frame} phase={phase} ports={A2_CANDIDATE_PORTS} routes={A2_CANDIDATE_ROUTES} intensity={1}/>
-   <CinematicFlow frame={frame} phase={phase} intensity={1}/>
+   <CinematicFlow frame={frame} phase={phase} intensity={stage===3?.85:1}/>
+   {stage===3?<PowerWindow frame={frame}/>:null}
   </group>
  </>;
 };
