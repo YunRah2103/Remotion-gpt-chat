@@ -1,0 +1,181 @@
+name: YUNEX A5 — isolated native moving lookdev proofs
+
+on:
+  pull_request:
+    branches: [production/yunex-turbo-3d-ep001]
+    paths:
+      - 'src/yunex/turbo3d/lookdev/**'
+      - 'production/yunex/turbo_3d_001/agents/lookdev/**'
+      - '.github/workflows/yunex-a5-lookdev-proof.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  moving-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies and video probes
+        run: |
+          set -euo pipefail
+          if test -s package-lock.json; then npm ci --no-audit --no-fund; else npm install --no-audit --no-fund; fi
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Validate A5 JSON handoff with canonical repository validator
+        run: python production/tools/handoff.py production/yunex/turbo_3d_001/agents/lookdev/handoff.json
+      - name: TypeScript
+        run: npm run check
+      - name: Confirm isolated composition registration
+        run: |
+          npx remotion compositions src/yunex/turbo3d/lookdev/preview.entry.tsx --gl=swangle | tee compositions.txt
+          grep -q 'YunexA5LookdevProof' compositions.txt
+      - name: Render real frame-driven Three.js animated car, turbine and charge clips
+        run: |
+          set -euo pipefail
+          mkdir -p out/a5
+          npx remotion render src/yunex/turbo3d/lookdev/preview.entry.tsx YunexA5LookdevProof out/a5/01-teal-road.mp4 --frames=12-35 --scale=0.5 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
+          npx remotion render src/yunex/turbo3d/lookdev/preview.entry.tsx YunexA5LookdevProof out/a5/02-turbine-metal.mp4 --frames=102-125 --scale=0.5 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
+          npx remotion render src/yunex/turbo3d/lookdev/preview.entry.tsx YunexA5LookdevProof out/a5/03-cool-charge.mp4 --frames=192-215 --scale=0.5 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
+      - name: Convert native WebGL full-range output to proper limited-range H264
+        run: |
+          set -euo pipefail
+          for video in out/a5/*.mp4; do
+            tmp="${video%.mp4}.limited.mp4"
+            ffmpeg -hide_banner -loglevel error -y -i "$video" \
+              -vf "scale=in_range=pc:out_range=tv,format=yuv420p" \
+              -c:v libx264 -preset veryfast -crf 17 -pix_fmt yuv420p \
+              -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 \
+              -an "$tmp"
+            mv "$tmp" "$video"
+          done
+      - name: Decode videos, prove frames change, and capture actual stills
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import subprocess, json, hashlib
+          root=Path('out/a5')
+          manifest={}
+          for video in sorted(root.glob('*.mp4')):
+              subprocess.run(['ffmpeg','-hide_banner','-loglevel','error','-xerror','-i',str(video),'-f','null','-'],check=True)
+              meta=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(video)]))
+              s=next(s for s in meta['streams'] if s['codec_type']=='video')
+              assert s['codec_name']=='h264' and s['pix_fmt']=='yuv420p' and s['color_range']=='tv',s
+              assert s['r_frame_rate']=='30/1' and int(s['nb_frames'])==24,s
+              frames=[]
+              for f in (0,12,23):
+                  out=root/(video.stem+'-f'+str(f).zfill(2)+'.png')
+                  subprocess.run(['ffmpeg','-hide_banner','-loglevel','error','-y','-i',str(video),'-vf',f'select=eq(n\\,{f})','-vsync','0','-frames:v','1',str(out)],check=True)
+                  frames.append(hashlib.sha256(out.read_bytes()).hexdigest())
+              assert len(set(frames))>1,'Preview is static: '+video.name
+              manifest[video.name]={'sha256':hashlib.sha256(video.read_bytes()).hexdigest(),'bytes':video.stat().st_size,'width':s['width'],'height':s['height'],'frames':s['nb_frames'],'fps':s['r_frame_rate'],'decoded':True,'distinctFrameImages':len(set(frames))}
+          assert len(manifest)==3,manifest
+          (root/'manifest.json').write_text(json.dumps(manifest,indent=2))
+          print(json.dumps(manifest,indent=2))
+          PY
+      - name: Test lookdev against pinned A1/A2 real assets without writing their branches
+        run: |
+          set -euo pipefail
+          A1=0ea37cda916e809fd30514013a67a8034b491e87
+          A2=4f894a51083e4ebaa652193713ee0baf56ba2439
+          git fetch --no-tags origin "$A1" "$A2"
+          for name in VehicleWorld.tsx DetailKit.tsx; do
+            dir="src/yunex/turbo3d/vehicle"
+            mkdir -p "$dir"
+            git show "$A1:$dir/$name" > "$dir/$name"
+          done
+          for name in TurboMechanism.tsx ports.ts index.ts TurboPreviewHarness.tsx; do
+            dir="src/yunex/turbo3d/mechanism"
+            mkdir -p "$dir"
+            git show "$A2:$dir/$name" > "$dir/$name"
+          done
+          cat > src/yunex/turbo3d/lookdev/ci-integration.entry.tsx <<'TSX'
+          import React,{useEffect,useLayoutEffect,useRef} from 'react';
+          import * as THREE from 'three';
+          import {useThree} from '@react-three/fiber';
+          import {ThreeCanvas} from '@remotion/three';
+          import {Composition,registerRoot,useCurrentFrame,AbsoluteFill} from 'remotion';
+          import {VehicleModel,RoadEnvironment} from '../vehicle/VehicleWorld';
+          import {TurboMechanism} from '../mechanism/TurboMechanism';
+          import {YunexLights,RoadAtmosphere,ExhaustHeat,RotorGlimmer,applyYunexMaterials} from './YunexLookdev';
+          import {YunexReflectionEnvironment} from './YunexReflectionEnvironment';
+          const Camera:React.FC<{frame:number;road:boolean}>=({frame,road})=>{
+            const {camera}=useThree();
+            useLayoutEffect(()=>{
+              const t=(frame%60)/60;
+              if(road){camera.position.set(4.9-t*.8,2.45,10-t);camera.lookAt(0,.8,0);}
+              else{camera.position.set(5.3-t*.65,3.4,16.4-t);camera.lookAt(0,-.4,-.7);}
+              (camera as THREE.PerspectiveCamera).fov=road?42:49;
+              camera.updateProjectionMatrix();
+            },[frame,road,camera]);
+            return null;
+          };
+          const Scene:React.FC<{frame:number}>=({frame})=>{
+            const road=frame<60,ref=useRef<THREE.Group>(null);
+            useEffect(()=>ref.current?applyYunexMaterials(ref.current):undefined,[road]);
+            return <>
+              <Camera frame={frame} road={road}/>
+              <YunexReflectionEnvironment variant={road?'road':'turbine'} intensity={.9}/>
+              <YunexLights sceneVariant={road?'road':'turbine'} augment={road} shadows={!road}/>
+              <group ref={ref}>
+                {road?<><RoadEnvironment travelMeters={frame*.29}/><VehicleModel frame={frame} travelMeters={frame*.29}/></>
+                :<TurboMechanism frame={frame} cutaway={.85} variant="full"/>}
+              </group>
+              {road?<RoadAtmosphere frame={frame} visibility={.76}/>:<>
+                <ExhaustHeat frame={frame} position={[-1.13,.72,.43]}/>
+                <RotorGlimmer frame={frame}/>
+              </>}
+            </>;
+          };
+          const Film:React.FC=()=>{
+            const f=useCurrentFrame();
+            return <AbsoluteFill style={{background:'#08121D'}}>
+              <ThreeCanvas width={1080} height={1920}
+                camera={{position:[5,3,12],fov:42,near:.05,far:180}}
+                gl={{antialias:true,preserveDrawingBuffer:true}}>
+                <Scene frame={f}/>
+              </ThreeCanvas>
+            </AbsoluteFill>;
+          };
+          registerRoot(()=> <Composition id="A5PinnedRealModels" component={Film}
+            fps={30} width={1080} height={1920} durationInFrames={120}/>);
+          TSX
+          npm run check
+          mkdir -p out/integration
+          printf '{"a1":"%s","a2":"%s"}\n' "$A1" "$A2" > out/integration/pinned-sources.json
+          npx remotion render src/yunex/turbo3d/lookdev/ci-integration.entry.tsx A5PinnedRealModels out/integration/A1-real-vehicle.mp4 --frames=10-21 --scale=0.5 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
+          npx remotion render src/yunex/turbo3d/lookdev/ci-integration.entry.tsx A5PinnedRealModels out/integration/A2-real-turbo.mp4 --frames=70-81 --scale=0.5 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
+          for video in out/integration/*.mp4; do
+            tmp="$video.limited.mp4"
+            ffmpeg -hide_banner -loglevel error -y -i "$video" \
+              -vf "scale=in_range=pc:out_range=tv,format=yuv420p" \
+              -c:v libx264 -preset veryfast -crf 17 -pix_fmt yuv420p \
+              -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 -an "$tmp"
+            mv "$tmp" "$video"
+            ffmpeg -hide_banner -loglevel error -xerror -i "$video" -f null -
+            ffprobe -v error -show_entries stream=width,height,nb_frames,pix_fmt,color_range -of default=nw=1 "$video"
+          done
+          sha256sum out/integration/*.mp4 > out/integration/SHA256SUMS.txt
+      - name: Record immutable A5 TypeScript/document source SHA256
+        if: always()
+        run: |
+          mkdir -p out/a5
+          sha256sum src/yunex/turbo3d/lookdev/*.tsx \
+            production/yunex/turbo_3d_001/agents/lookdev/*.json \
+            production/yunex/turbo_3d_001/agents/lookdev/README.md > out/a5/SOURCE-SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-A5-native-moving-lookdev
+          path: |
+            out/a5/
+            out/integration/
+            compositions.txt
+          if-no-files-found: warn
+          retention-days: 30
