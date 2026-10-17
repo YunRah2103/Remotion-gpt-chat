@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "assetId": "YUNEX_TURBO_3D_EP001_A1_COUPE_RACEWORLD_V1",
+  "assetId": "YUNEX_TURBO_3D_EP001_A1_COUPE_RACEWORLD_V5",
   "kind": "procedural-react-three-fiber",
   "owner": "Agent 1 — Vehicle & Environment 3D Modeller",
-  "sourceCommit": "53b836acddf37b4fac34ca320447205787bf59cb",
+  "sourceCommit": "85f1dc4b780a6aec8d18d16922ef161651038bb5",
   "unitMetersPerUnit": 1,
   "upAxis": "+Y",
   "forwardAxis": "+Z",
@@ -11,15 +11,16 @@
   "boundingBox": {
     "car": {
       "min": [
-        -0.99,
+        -1.08,
         0,
-        -2.35
+        -2.4
       ],
       "max": [
-        0.99,
-        1.26,
-        2.45
-      ]
+        1.08,
+        1.7,
+        2.38
+      ],
+      "note": "Approximate union across opaque and open-engine-deck variants; nominal closed car roof about 1.25m"
     },
     "road": {
       "topY": 0,
@@ -65,6 +66,37 @@
       "renderedFrames": [
         0,
         89
+      ]
+    },
+    {
+      "module": "src/yunex/turbo3d/vehicle/inspection/index.ts",
+      "compositionId": "A1VehicleCloseupInspection",
+      "fps": 30,
+      "fullPreviewDimensions": [
+        540,
+        960
+      ],
+      "renderedFrames": [
+        0,
+        119
+      ],
+      "shots": [
+        "FRONT_HEADLAMP_DUCT",
+        "WHEEL_BRAKES",
+        "REAR_ENGINE_REVEAL",
+        "REAR_HERO"
+      ]
+    },
+    {
+      "module": "src/yunex/turbo3d/vehicle/DetailKit.tsx",
+      "exports": [
+        "LightShell",
+        "FrontDuct",
+        "SideDuct",
+        "PremiumWheel",
+        "EngineBayDetail",
+        "HingedEngineDeck",
+        "RearSignature"
       ]
     }
   ],
@@ -132,12 +164,48 @@
     "TYRE_TREAD",
     "RACE_ASPHALT",
     "GUARD_RAIL_SILVER",
-    "AERO_REAR_SPOILER"
+    "AERO_REAR_SPOILER",
+    "HEADLAMP_RECESSED_HOUSING",
+    "HEADLAMP_OUTER_CLEAR_LENS",
+    "HEADLAMP_PROJECTOR_LENS",
+    "HEADLAMP_PROJECTOR_BEZEL",
+    "HEADLAMP_INNER_SMOKED_OPTICS",
+    "FRONT_DUCT_DEPTH_BACK",
+    "FRONT_INTAKE_GUIDE_VANES",
+    "ACTUAL_PERFORATED_BUMPER_FASCIA",
+    "SIDE_DUCT_DEPTH_BACK",
+    "SIDE_DUCT_MACHINED_LIP",
+    "DRILLED_BRAKE_DISC",
+    "BRAKE_CALIPER_BRONZE",
+    "HUB_LUGS",
+    "ENGINE_INTAKE_PLENUM",
+    "CYLINDER_BANK_COVER",
+    "ENGINE_BAY_TURBO_HOUSING_HINT",
+    "ENGINE_BAY_BRACING",
+    "ENGINE_DECK_UNDERSIDE",
+    "REAR_LAMP_SMOKED_LENS",
+    "REAR_RECESSED_LAMP_SURROUND"
   ],
   "sourceFiles": [
     {
       "path": "src/yunex/turbo3d/vehicle/VehicleWorld.tsx",
-      "sha256": "f80b6d86153ae8686257825ae8a8988daf29644deebb4422a7bf78f1b74efc8c"
+      "sha256": "b69d80d24281bd63677f90bb125f6a012c53e063c5c37b86d5f3344e92a69e10"
+    },
+    {
+      "path": "src/yunex/turbo3d/vehicle/DetailKit.tsx",
+      "sha256": "dfe614cddfccf10173a71161473bf8eb5f88a35ff6f18f022b1b73ab2c889eff"
+    },
+    {
+      "path": "src/yunex/turbo3d/vehicle/inspection/root.tsx",
+      "sha256": "3f6e7c84abad8bbd060058b0f07ad22966cf695ca9d430c2303f8bf8682fd5eb"
+    },
+    {
+      "path": "src/yunex/turbo3d/vehicle/inspection/index.ts",
+      "sha256": "c6b1ef8d99013b7694fc2c2821fa97c2d04d5f7bb9450300ab35236041e0e1cf"
+    },
+    {
+      "path": "production/yunex/turbo_3d_001/agents/vehicle/check-model.mjs",
+      "sha256": "4fee038bf8ea321d14034815b432f92322e1185e6b638f5655e92eb1739e207f"
     },
     {
       "path": "src/yunex/turbo3d/vehicle/preview/root.tsx",
@@ -146,10 +214,6 @@
     {
       "path": "src/yunex/turbo3d/vehicle/preview/index.ts",
       "sha256": "6388caec86e45c3f4e137aa7f06ae16310164261034b4f9ac0346ad4304deff2"
-    },
-    {
-      "path": "production/yunex/turbo_3d_001/agents/vehicle/check-model.mjs",
-      "sha256": "dc3a01ad8041637c6177143420eec43c3ff6f32cd4be38407232baf90834bbbc"
     }
   ],
   "licenses": [
@@ -164,39 +228,57 @@
   ],
   "evidence": [
     {
-      "type": "CI native software-WebGL render + full FFmpeg decode",
+      "type": "CI native software-WebGL Remotion render and full decode",
       "result": "PASS",
-      "runId": 39041016213,
-      "runUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39041016213",
-      "artifactId": 12104206993,
-      "artifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39041016213/artifacts/12104206993",
-      "sourceSha": "53b836acddf37b4fac34ca320447205787bf59cb",
-      "sha256": "ef696ed9c85f53ed8a07486024fc2ad5b129528b37f2c1c345a0e317ee563469",
-      "durationSeconds": 3,
-      "frames": 90,
+      "runId": 39044260650,
+      "runUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39044260650",
+      "artifactId": 12105615160,
+      "artifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39044260650/artifacts/12105615160",
+      "sourceSha": "85f1dc4b780a6aec8d18d16922ef161651038bb5",
+      "sha256": "4bd2422e8b220dab6f79336d8f44652f92dfb13ac48b60214e6d0dc6b16e9a62",
+      "durationSeconds": 4,
+      "frames": 120,
+      "uniqueDecodedFrames": 120,
       "codec": "h264",
-      "width": 378,
-      "height": 672,
+      "width": 432,
+      "height": 768,
       "fps": 30,
       "fullDecode": true
     },
     {
-      "type": "Manual contact-sheet inspection",
+      "type": "Manual visual review",
       "frameIndices": [
-        0,
-        30,
-        60,
-        78
+        5,
+        18,
+        27,
+        35,
+        48,
+        55,
+        64,
+        75,
+        85,
+        95,
+        108,
+        116
       ],
-      "result": "Reviewed actual render; recognizable original teal coupe, rotating wheels, road parallax; aesthetic approval reserved for manager"
+      "result": "Reviewed actual decoded native 3D shots. Wheel/rear-engine/front optics demonstrably more detailed than V1. A1 procedural low-poly style still deliberate; independent manager aesthetic approval pending."
     }
   ],
   "sha256": {
-    "previewMp4": "ef696ed9c85f53ed8a07486024fc2ad5b129528b37f2c1c345a0e317ee563469"
+    "previewMp4": "4bd2422e8b220dab6f79336d8f44652f92dfb13ac48b60214e6d0dc6b16e9a62"
   },
   "caveats": [
-    "Low-resolution A1-only review preview (378x672) is not final vertical film.",
-    "A6 must use approved A4 cameras and A5 lookdev; A1's standalone camera is proof-only.",
-    "Stylized illustrative model, not licensed manufacturer CAD. No fictitious performance specifications."
+    "Proof is isolated native 432x768 A1 animation, not the final 1080x1920 film. A6 owns full composition and final art direction after five approvals.",
+    "Modelling remains stylized geometric low-poly/game CGI, not photoreal manufacturer CAD; surface intake holes and simplified engine-bay hardware are illustrative.",
+    "Manager A0 must approve aesthetics and integration readiness; preview CI passing does not constitute creative approval.",
+    "Do not re-use previous v1 source hashes/MP4 as evidence for this v5 model. Source SHA pinned above."
+  ],
+  "revisionNotes": [
+    "3D headlamp changes: flush recessed smoked optics, 3 named internal low-profile projectors, outer clear lens and narrow DRL. Eliminated floating ring-like bulbs from first V2 proof.",
+    "Front and side intakes: actual front fascia Shape holes and unclosed rear-quarter side body surface backed by inboard dark ducts, walled recesses and slim guide vanes; splitter scaled back.",
+    "Rear engine bay: raised plenum with ribs, two bank covers, bracing, compressor housings, connecting hoses, bronze exhaust and heat-shield cues; hinge-open rear deck with visible underside ribs.",
+    "Wheel: reauthored low-profile 5-pair machined spokes, radial brake rotor with drilled holes, compact caliper and lug/hub assembly; removed visually disconnected tread cuboids.",
+    "Rear lighting: recessed dark lens + designed red LED path in lieu of opaque red blocks.",
+    "Four-shot deterministic 4.00s inspection at 30fps with mobile framing and native WebGL scene movement."
   ]
 }
