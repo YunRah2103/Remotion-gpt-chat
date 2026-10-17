@@ -1,0 +1,77 @@
+name: YUNEX P1 Full 3D Experiment 001
+on:
+  push:
+    branches:
+      - yunex/p1-full3d-experiment001
+    paths:
+      - src/yunex/P1Full3DFilm.tsx
+      - src/yunex/p1-full3d-index.tsx
+      - .github/workflows/yunex-p1-full-3d-experiment.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render:
+    name: Validate, render and quality-check 100 percent native 3D
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Remotion and FFmpeg
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          npm run check
+      - name: Verify composition and representative frames
+        run: |
+          set -euo pipefail
+          mkdir -p out/p1-full3d
+          npx remotion compositions src/yunex/p1-full3d-index.tsx --gl=swangle > out/p1-full3d/compositions.txt
+          grep -q 'P1Full3DExperiment001' out/p1-full3d/compositions.txt
+          for f in 12 93 186 306 430 524; do
+            npx remotion still src/yunex/p1-full3d-index.tsx P1Full3DExperiment001 \
+              "out/p1-full3d/still-$f.png" --frame="$f" --scale=0.45 --gl=swangle
+          done
+      - name: Render every original Three.js animation frame
+        run: |
+          set -euo pipefail
+          npx remotion render src/yunex/p1-full3d-index.tsx P1Full3DExperiment001 \
+            out/p1-full3d/picture.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2 --scale=0.75 --crf=16
+      - name: Create original restrained soundtrack
+        run: |
+          set -euo pipefail
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i "sine=frequency=62:duration=18:sample_rate=48000" \
+            -f lavfi -i "sine=frequency=124:duration=18:sample_rate=48000" \
+            -f lavfi -i "anoisesrc=color=pink:amplitude=0.13:duration=18:sample_rate=48000" \
+            -filter_complex "[0:a]volume=0.11,lowpass=f=190,afade=t=in:st=0:d=0.15,afade=t=out:st=17.1:d=.9[a];[1:a]volume=0.035,lowpass=f=340,afade=t=in:st=0:d=.3,afade=t=out:st=17.2:d=.7[b];[2:a]highpass=f=140,lowpass=f=2400,volume=0.026,afade=t=in:st=0:d=.2,afade=t=out:st=17.1:d=.9[c];[a][b][c]amix=inputs=3:duration=shortest:normalize=0,alimiter=limit=.86[out]" \
+            -map "[out]" -c:a aac -b:a 160k out/p1-full3d/music.m4a
+      - name: Master true 1080 by 1920 H264 AAC delivery
+        run: |
+          set -euo pipefail
+          ffmpeg -hide_banner -loglevel error -y -i out/p1-full3d/picture.mp4 \
+            -i out/p1-full3d/music.m4a -map 0:v:0 -map 1:a:0 \
+            -vf "scale=1080:1920:flags=lanczos,unsharp=3:3:0.2" \
+            -c:v libx264 -preset medium -crf 17 -pix_fmt yuv420p \
+            -c:a aac -b:a 160k -t 18 -movflags +faststart \
+            out/p1-full3d/YUNEX_P1_FULL_3D_EXPERIMENT_001.mp4
+          ffmpeg -hide_banner -loglevel error -xerror -i out/p1-full3d/YUNEX_P1_FULL_3D_EXPERIMENT_001.mp4 -f null -
+          ffprobe -v error -show_entries format=duration,size:stream=codec_name,width,height,r_frame_rate,nb_frames \
+            -of json out/p1-full3d/YUNEX_P1_FULL_3D_EXPERIMENT_001.mp4 > out/p1-full3d/ffprobe.json
+          cat out/p1-full3d/ffprobe.json
+          sha256sum out/p1-full3d/YUNEX_P1_FULL_3D_EXPERIMENT_001.mp4 > out/p1-full3d/SHA256SUMS.txt
+      - name: Upload original film, 6 quality control stills and tech report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-P1-FULL-3D-EXPERIMENT-001
+          path: out/p1-full3d/
+          retention-days: 30
+          if-no-files-found: warn
