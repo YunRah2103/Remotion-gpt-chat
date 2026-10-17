@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "task": "YUNEX Turbo EP001 Agent 6 First-Cut Integration #133",
+  "branch": "agent/turbo-3d-001-editor",
+  "sourceSha": "254710f94f51ced23d4f8b4b84dc48a97f667c97",
+  "owner": "Agent 6 Master Cinematic Editor",
+  "summary": "Compiled original specialist assets into a new 24s/720f native Remotion composition; supplied narration analyzed and aligned to seven editorial sections. First-cut native video is rendering in parallel, not picture-locked.",
+  "status": "review",
+  "files": [
+    "src/yunex/turbo3d/editor/Turbo3DEpisode001.tsx",
+    "src/yunex/turbo3d/Turbo3DEpisode001.tsx",
+    "src/Root.tsx",
+    "production/yunex/turbo_3d_001/agents/editor/first_cut_manifest.json",
+    ".github/workflows/yunex-turbo-a6-firstcut.yml"
+  ],
+  "evidence": [
+    "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39077004921",
+    "TypeScript and A4 deterministic camera preflight PASS on run #39077004921",
+    "User-supplied narration MP3 SHA256 38efe2e473b1edd16cbcdf5194f6ba41284f84cef4c54e42ad584961d7b9ee19; 21.216 seconds, 24kHz mono"
+  ],
+  "blockers": [
+    "Native final assembled first-cut MP4 and actual visual QA pending render completion; do not call it locked.",
+    "A0 manager science/style approval pending and A3 glow-to-pipe masking requires actual native frame inspection.",
+    "A7 narration/music/SFX mastering is subsequent and does not occur in the A6 silent first-cut MP4."
+  ],
+  "notes": "Source is based on actual A4 pinned five-agent real-model integration branch; originals preserved. No A1-A5 source changes. A6 is first-cut REVIEW only."
+}
