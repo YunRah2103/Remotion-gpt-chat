@@ -1,0 +1,147 @@
+name: AI Global Takeover V2 — Cedar-timed native 2.5D QC
+on:
+  push:
+    branches:
+      - feat/ai-global-takeover-25d-001
+    paths:
+      - 'src/tiktok/AiGlobalTakeoverFilm.tsx'
+      - 'src/tiktok/aiTakeoverWorld.ts'
+      - 'src/Root.tsx'
+      - 'production/tiktok_ai/**'
+      - '.github/workflows/ai-takeover-25d-v2.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Node + FFmpeg
+        run: |
+          npm install --no-audit --no-fund
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: TypeScript and composition validation
+        run: |
+          npm run check
+          mkdir -p out/previews
+          npx remotion compositions src/index.ts | tee out/previews/compositions.txt
+          grep -q 'AiGlobalTakeoverFilmV2' out/previews/compositions.txt
+      - name: Native movement test and eight cinematic stills
+        run: |
+          npx remotion render src/index.ts AiGlobalTakeoverFilmV2 out/previews/city-movement.mp4 --frames=330-341 --scale=0.5 --codec=h264 --pixel-format=yuv420p --concurrency=2
+          ffmpeg -hide_banner -loglevel error -xerror -i out/previews/city-movement.mp4 -f null -
+          for f in 60 180 290 420 560 690 785 870; do
+            npx remotion still src/index.ts AiGlobalTakeoverFilmV2 "out/previews/frame-${f}.png" --frame="$f" --scale=0.5
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AI-TAKEOVER-V2-native-previews
+          path: out/previews/
+          retention-days: 30
+          if-no-files-found: error
+  render:
+    needs: preflight
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [0, 1, 2, 3, 4, 5]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned Remotion toolchain and FFmpeg
+        run: |
+          npm install --no-audit --no-fund
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Native Remotion chunk (1080x1920, full frame)
+        env:
+          PART: ${{ matrix.part }}
+        run: |
+          mkdir -p out/chunks
+          START=$((PART*150))
+          END=$((START+149))
+          npx remotion render src/index.ts AiGlobalTakeoverFilmV2 "out/chunks/ai-takeover-v2-$PART.mp4" --frames="$START-$END" --codec=h264 --pixel-format=yuv420p --concurrency=2
+          ffmpeg -hide_banner -loglevel error -xerror -i "out/chunks/ai-takeover-v2-$PART.mp4" -f null -
+          COUNT=$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=nokey=1:noprint_wrappers=1 "out/chunks/ai-takeover-v2-$PART.mp4")
+          test "$COUNT" = "150"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ai-takeover-v2-chunk-${{ matrix.part }}
+          path: out/chunks/ai-takeover-*.mp4
+          retention-days: 30
+          if-no-files-found: error
+  master:
+    needs: render
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: ai-takeover-v2-chunk-*
+          path: out/chunks
+          merge-multiple: true
+      - name: Join exact native frames and create original provisional score
+        run: |
+          mkdir -p out
+          : > out/chunks.txt
+          for i in 0 1 2 3 4 5; do
+            test -s "out/chunks/ai-takeover-v2-$i.mp4"
+            echo "file 'chunks/ai-takeover-v2-$i.mp4'" >> out/chunks.txt
+          done
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i out/chunks.txt -c copy out/visual-native-900.mp4
+          python3 production/tiktok_ai/synth_score.py out/ai-takeover-demo-score.wav
+          ffmpeg -hide_banner -loglevel error -y -i out/visual-native-900.mp4 -i out/ai-takeover-demo-score.wav \
+            -filter:v "scale=in_range=pc:out_range=tv,format=yuv420p" \
+            -map 0:v:0 -map 1:a:0 -c:v libx264 -preset veryfast -crf 19 \
+            -pix_fmt yuv420p -color_range tv -color_primaries bt709 -color_trc bt709 -colorspace bt709 \
+            -c:a aac -b:a 192k -ar 48000 -ac 2 -af "afade=t=out:st=29:d=1" -t 30 -movflags +faststart \
+            out/AI-GLOBAL-TAKEOVER-V2-VOICE-READY.mp4
+          ffmpeg -hide_banner -loglevel error -y -i out/ai-takeover-demo-score.wav -c:a libmp3lame -q:a 3 out/ai-takeover-v2-temp-score.mp3
+      - name: Final strict QC - decode 900 frames and sample stills
+        run: |
+          ffmpeg -hide_banner -loglevel error -xerror -i out/AI-GLOBAL-TAKEOVER-V2-VOICE-READY.mp4 -f null -
+          ffprobe -v error -show_streams -show_format -of json out/AI-GLOBAL-TAKEOVER-V2-VOICE-READY.mp4 > out/probe.json
+          python3 - <<'PY'
+          import json
+          p=json.load(open('out/probe.json'))
+          v=next(s for s in p['streams'] if s['codec_type']=='video')
+          a=next(s for s in p['streams'] if s['codec_type']=='audio')
+          assert (v['width'],v['height']) == (1080,1920),v
+          assert v['r_frame_rate']=='30/1' and int(v['nb_frames'])==900,v
+          assert v['codec_name']=='h264' and v['pix_fmt']=='yuv420p',v
+          assert a['codec_name']=='aac' and int(a['sample_rate'])==48000,a
+          assert abs(float(p['format']['duration'])-30)<.07,p['format']
+          print('QC PASS: 30 seconds; 900 frames; 1080x1920; H264 limited-range; AAC; complete decode')
+          PY
+          for sec in 1 5 9 13 17 21 26 29; do
+            ffmpeg -hide_banner -loglevel error -y -ss "$sec" -i out/AI-GLOBAL-TAKEOVER-V2-VOICE-READY.mp4 -frames:v 1 -update 1 "out/still-$sec.png"
+          done
+          ffmpeg -hide_banner -loglevel info -i out/AI-GLOBAL-TAKEOVER-V2-VOICE-READY.mp4 -vf "blackdetect=d=0.6:pix_th=0.02:pic_th=0.96" -an -f null - 2> out/blackdetect.log
+          sha256sum out/AI-GLOBAL-TAKEOVER-V2-VOICE-READY.mp4 > out/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AI-GLOBAL-TAKEOVER-V2-VOICE-READY-FINAL-QC
+          path: |
+            out/AI-GLOBAL-TAKEOVER-V2-VOICE-READY.mp4
+            out/ai-takeover-v2-temp-score.mp3
+            out/probe.json
+            out/SHA256SUMS.txt
+            out/still-*.png
+            out/blackdetect.log
+          retention-days: 30
+          if-no-files-found: error
