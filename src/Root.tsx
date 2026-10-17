@@ -10,7 +10,7 @@ import {TwoVersionFilm} from './advanced/TwoVersionFilm';
 import {AiGlazeTikTok} from './tiktok/AiGlazeTikTok';
 
 export const VideoRoot=()=> <>
-  <Composition id="AiGlazeTikTok" component={AiGlazeTikTok} width={1080} height={1920} fps={30} durationInFrames={720}/>
+  <Composition id="AiGlazeTikTok" component={AiGlazeTikTok} width={1080} height={1920} fps={30} durationInFrames={735}/>
   <Composition id="ChironFourTurbosFilm" component={ChironFourTurbosFilm} width={1080} height={1920} fps={30} durationInFrames={858} defaultProps={{includeVoice:false,includeMusic:false}}/>
   <Composition id="GtrAttesaFilm" component={GtrAttesaFilm} width={1920} height={1080} fps={30} durationInFrames={825} defaultProps={{includeVoice:false,includeMusic:false}}/>
   <Composition id="GpuDriveFilm" component={GpuDriveFilm} width={1080} height={1920} fps={30} durationInFrames={180}/>
