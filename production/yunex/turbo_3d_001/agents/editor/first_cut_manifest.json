@@ -1,0 +1,99 @@
+{
+  "status": "FIRST_CUT_IN_PROGRESS_NOT_LOCKED",
+  "composition": "Turbo3DEpisode001",
+  "fps": 30,
+  "frames": 720,
+  "width": 1080,
+  "height": 1920,
+  "narration": {
+    "provided": "openai-fm-cedar-sports-coach.mp3",
+    "sha256": "38efe2e473b1edd16cbcdf5194f6ba41284f84cef4c54e42ad584961d7b9ee19",
+    "durationSeconds": 21.216,
+    "sampleRateHz": 24000,
+    "channels": 1,
+    "embedded": false,
+    "notes": "User provided actual MP3 and transcript. A6 silent picture preview; A7 to mix AAC and ensure sync.",
+    "clauses": [
+      {
+        "start": 0,
+        "end": 2.09,
+        "text": "How can an exhaust make your car faster?"
+      },
+      {
+        "start": 2.71,
+        "end": 5,
+        "text": "Hot exhaust gas spins a turbine."
+      },
+      {
+        "start": 5.72,
+        "end": 7.84,
+        "text": "That turbine shares a shaft with a compressor"
+      },
+      {
+        "start": 8.55,
+        "end": 10.79,
+        "text": "which squeezes more fresh air into the engine"
+      },
+      {
+        "start": 11.75,
+        "end": 15.35,
+        "text": "More air means more fuel and more power"
+      },
+      {
+        "start": 16.32,
+        "end": 18.85,
+        "text": "An intercooler cools compressed air on the way in"
+      },
+      {
+        "start": 19.56,
+        "end": 21.09,
+        "text": "That's how a turbocharger works"
+      }
+    ]
+  },
+  "sourceRefs": {
+    "vehicle": "agent/turbo-3d-001-vehicle@9e0bee160e21436997fab74463c65c188585aab1",
+    "mechanism": "agent/turbo-3d-001-mechanism@4f894a51083e4ebaa652193713ee0baf56ba2439",
+    "airflow": "agent/turbo-3d-001-airflow@dbe85ae2f12d7ab61177008bb6cb560847ab5a62",
+    "cinematics": "integration/turbo-3d-001-a4-real-model-qc@f4956b05e9b557bd40b3bc9fd020c3ead840fcc7",
+    "lookdev": "agent/turbo-3d-001-lookdev@db2c8f9b487bf5f80c415aeb585666bfeb44f7d3"
+  },
+  "shots": [
+    {
+      "id": "hook",
+      "start": 0,
+      "end": 75
+    },
+    {
+      "id": "exhaust",
+      "start": 75,
+      "end": 174
+    },
+    {
+      "id": "shaft",
+      "start": 174,
+      "end": 258
+    },
+    {
+      "id": "compressor",
+      "start": 258,
+      "end": 352
+    },
+    {
+      "id": "power",
+      "start": 352,
+      "end": 482
+    },
+    {
+      "id": "cooler",
+      "start": 482,
+      "end": 587
+    },
+    {
+      "id": "road",
+      "start": 587,
+      "end": 720
+    }
+  ],
+  "approval": "Manager has not approved picture lock; first cut subject to visual review."
+}
