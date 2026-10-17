@@ -1,0 +1,202 @@
+{
+  "schemaVersion": 1,
+  "assetId": "YUNEX_TURBO_3D_EP001_A1_COUPE_RACEWORLD_V1",
+  "kind": "procedural-react-three-fiber",
+  "owner": "Agent 1 — Vehicle & Environment 3D Modeller",
+  "sourceCommit": "53b836acddf37b4fac34ca320447205787bf59cb",
+  "unitMetersPerUnit": 1,
+  "upAxis": "+Y",
+  "forwardAxis": "+Z",
+  "rightAxis": "+X",
+  "boundingBox": {
+    "car": {
+      "min": [
+        -0.99,
+        0,
+        -2.35
+      ],
+      "max": [
+        0.99,
+        1.26,
+        2.45
+      ]
+    },
+    "road": {
+      "topY": 0,
+      "halfWidthMeters": 4,
+      "lengthMeters": 240
+    }
+  },
+  "physicalSpec": {
+    "carNominalLengthMeters": 4.6,
+    "carNominalWidthMeters": 1.95,
+    "carHeightMeters": 1.25,
+    "wheelRadiusMeters": 0.355,
+    "frontAxleZ": 1.47,
+    "rearAxleZ": -1.48
+  },
+  "entrypoints": [
+    {
+      "module": "src/yunex/turbo3d/vehicle/VehicleWorld.tsx",
+      "export": "VehicleWorld",
+      "props": {
+        "frame": "integer >=0",
+        "variant": "opaque|reveal|hero",
+        "revealProgress": "0..1",
+        "travelMeters": "number; road and tyres share motion"
+      }
+    },
+    {
+      "module": "src/yunex/turbo3d/vehicle/VehicleWorld.tsx",
+      "export": "VehicleModel"
+    },
+    {
+      "module": "src/yunex/turbo3d/vehicle/VehicleWorld.tsx",
+      "export": "RoadEnvironment"
+    },
+    {
+      "module": "src/yunex/turbo3d/vehicle/preview/index.ts",
+      "compositionId": "A1VehiclePreview",
+      "fps": 30,
+      "fullPreviewDimensions": [
+        540,
+        960
+      ],
+      "renderedFrames": [
+        0,
+        89
+      ]
+    }
+  ],
+  "ports": [],
+  "anchors": {
+    "CAR_BODY": [
+      0,
+      0.76,
+      0
+    ],
+    "ENGINE_BAY": [
+      0,
+      0.84,
+      -1.33
+    ],
+    "EXHAUST_MANIFOLD_ZONE": [
+      0,
+      0.63,
+      -1.78
+    ],
+    "REAR_CAMERA_TRACK": [
+      0,
+      1.32,
+      -5.6
+    ],
+    "ROAD_SURFACE": [
+      0,
+      0,
+      0
+    ]
+  },
+  "rigPivots": {
+    "FRONT_WHEEL_LEFT": [
+      -0.858,
+      0.355,
+      1.47
+    ],
+    "FRONT_WHEEL_RIGHT": [
+      0.858,
+      0.355,
+      1.47
+    ],
+    "REAR_WHEEL_LEFT": [
+      -0.858,
+      0.355,
+      -1.48
+    ],
+    "REAR_WHEEL_RIGHT": [
+      0.858,
+      0.355,
+      -1.48
+    ],
+    "wheelRotationAxis": "local +X; angleRadians=-travelMeters/0.355",
+    "ENGINE_ACCESS_DECK": "hinge-style reveal around local X axis; controlled by revealProgress"
+  },
+  "namedMaterials": [
+    "BODY_TEAL_ENAMEL",
+    "DARK_TINTED_GLASS",
+    "ENGINE_COVER",
+    "HEADLAMP_WHITE",
+    "REAR_LED_CRIMSON",
+    "RIM_GRAPHITE",
+    "RIM_MACHINED_SPOKE",
+    "RUBBER_SIDEWALL",
+    "TYRE_TREAD",
+    "RACE_ASPHALT",
+    "GUARD_RAIL_SILVER",
+    "AERO_REAR_SPOILER"
+  ],
+  "sourceFiles": [
+    {
+      "path": "src/yunex/turbo3d/vehicle/VehicleWorld.tsx",
+      "sha256": "f80b6d86153ae8686257825ae8a8988daf29644deebb4422a7bf78f1b74efc8c"
+    },
+    {
+      "path": "src/yunex/turbo3d/vehicle/preview/root.tsx",
+      "sha256": "755ed746ac9487305e7cb7ac2f378e9be050382930724c9801f4913ebf7195eb"
+    },
+    {
+      "path": "src/yunex/turbo3d/vehicle/preview/index.ts",
+      "sha256": "6388caec86e45c3f4e137aa7f06ae16310164261034b4f9ac0346ad4304deff2"
+    },
+    {
+      "path": "production/yunex/turbo_3d_001/agents/vehicle/check-model.mjs",
+      "sha256": "dc3a01ad8041637c6177143420eec43c3ff6f32cd4be38407232baf90834bbbc"
+    }
+  ],
+  "licenses": [
+    {
+      "item": "original mesh source and animation",
+      "license": "Author-created, all procedural; unbranded automotive design"
+    },
+    {
+      "item": "Runtime dependencies",
+      "license": "Existing repository pinned React/Three.js/Remotion packages; see repo dependencies"
+    }
+  ],
+  "evidence": [
+    {
+      "type": "CI native software-WebGL render + full FFmpeg decode",
+      "result": "PASS",
+      "runId": 39041016213,
+      "runUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39041016213",
+      "artifactId": 12104206993,
+      "artifactUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39041016213/artifacts/12104206993",
+      "sourceSha": "53b836acddf37b4fac34ca320447205787bf59cb",
+      "sha256": "ef696ed9c85f53ed8a07486024fc2ad5b129528b37f2c1c345a0e317ee563469",
+      "durationSeconds": 3,
+      "frames": 90,
+      "codec": "h264",
+      "width": 378,
+      "height": 672,
+      "fps": 30,
+      "fullDecode": true
+    },
+    {
+      "type": "Manual contact-sheet inspection",
+      "frameIndices": [
+        0,
+        30,
+        60,
+        78
+      ],
+      "result": "Reviewed actual render; recognizable original teal coupe, rotating wheels, road parallax; aesthetic approval reserved for manager"
+    }
+  ],
+  "sha256": {
+    "previewMp4": "ef696ed9c85f53ed8a07486024fc2ad5b129528b37f2c1c345a0e317ee563469"
+  },
+  "caveats": [
+    "Low-resolution A1-only review preview (378x672) is not final vertical film.",
+    "A6 must use approved A4 cameras and A5 lookdev; A1's standalone camera is proof-only.",
+    "Stylized illustrative model, not licensed manufacturer CAD. No fictitious performance specifications."
+  ]
+}
