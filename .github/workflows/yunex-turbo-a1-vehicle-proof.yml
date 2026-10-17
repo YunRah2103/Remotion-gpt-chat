@@ -1,0 +1,56 @@
+name: YUNEX Turbo EP001 - A1 vehicle native moving proof
+on:
+  push:
+    branches: [agent/turbo-3d-001-vehicle]
+    paths:
+      - 'src/yunex/turbo3d/vehicle/**'
+      - 'production/yunex/turbo_3d_001/agents/vehicle/**'
+      - '.github/workflows/yunex-turbo-a1-vehicle-proof.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install exact locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: TypeScript build gate
+        run: npm run check
+      - name: Run A1 geometry and frame-contract tests
+        run: node production/yunex/turbo_3d_001/agents/vehicle/check-model.mjs
+      - name: Render native Three.js moving 3-second preview via software WebGL
+        run: |
+          mkdir -p out
+          npx remotion render src/yunex/turbo3d/vehicle/preview/index.ts A1VehiclePreview out/a1-vehicle-native-proof.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1 --frames=0-89 --scale=0.7
+      - name: Verify real media, dimensions, SHA256 and full decode
+        run: |
+          ffprobe -v error -show_entries stream=codec_name,width,height,nb_frames,r_frame_rate -show_entries format=duration -of json out/a1-vehicle-native-proof.mp4 | tee out/a1-vehicle-ffprobe.json
+          ffmpeg -v error -i out/a1-vehicle-native-proof.mp4 -f null -
+          sha256sum out/a1-vehicle-native-proof.mp4 | tee out/a1-vehicle-sha256.txt
+          python3 - <<'PY'
+          import json
+          d=json.load(open('out/a1-vehicle-ffprobe.json'))
+          v=[s for s in d['streams'] if s['codec_name']=='h264']
+          assert len(v)==1 and v[0]['width']==378 and v[0]['height']==672, d
+          assert v[0]['r_frame_rate']=='30/1', d
+          assert abs(float(d['format']['duration'])-3.0)<0.10,d
+          print('NATIVE_MOVING_PROOF_PASS: 90 frames, 378x672, h264, 30fps, full decode')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: yunex-turbo-a1-vehicle-native-proof
+          path: |
+            out/a1-vehicle-native-proof.mp4
+            out/a1-vehicle-ffprobe.json
+            out/a1-vehicle-sha256.txt
+          retention-days: 14
