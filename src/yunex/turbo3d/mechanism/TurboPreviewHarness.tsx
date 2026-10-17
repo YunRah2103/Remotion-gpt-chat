@@ -11,7 +11,7 @@ const Camera:React.FC<{frame:number;mode:'cutaway'|'exploded'|'full'}>=({frame,m
    const t=frame/30;
    const distance=mode==='full'?17.6:9.3;
    camera.position.set(distance*Math.sin(.20+t*.19),distance*.27+Math.sin(t*.36)*.2,distance*Math.cos(.20+t*.19));
-   camera.lookAt(mode==='full'?[.15,-.65,-1.48]:[0,0,0]);
+   camera.lookAt(mode==='full'?.15:0,mode==='full'?-.65:0,mode==='full'?-1.48:0);
    camera.updateProjectionMatrix();
  },[camera,frame,mode]);
  return null;
