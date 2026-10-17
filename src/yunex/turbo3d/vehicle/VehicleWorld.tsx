@@ -122,8 +122,8 @@ export const VehicleModel:React.FC<{frame:number;variant?:VehicleVariant;revealP
       <EngineBayDetail visible={variant==='reveal' && panelOpen>.02}/>
       <mesh position={[0,.96,-2.04]}><boxGeometry args={[1.61,.065,.37]}/>
         <meshStandardMaterial name="AERO_REAR_SPOILER" color="#17242B" metalness={.73} roughness={.28}/></mesh>
-      <mesh position={[0,.43,2.30]}><boxGeometry args={[1.58,.04,.29]}/>
-        <meshStandardMaterial name="FRONT_SPLITTER" color="#10151B" metalness={.49} roughness={.44}/></mesh>
+      <mesh position={[0,.43,2.30]}><boxGeometry args={[1.50,.027,.14]}/>
+        <meshStandardMaterial name="FRONT_SPLITTER" color="#080F14" metalness={.14} roughness={.74}/></mesh>
       {[-1,1].flatMap(s=>[1.47,-1.48].map(z=><PremiumWheel key={s+'_'+z} side={s} z={z} travelMeters={travelMeters}/>))}
     </group>
   </group>;
