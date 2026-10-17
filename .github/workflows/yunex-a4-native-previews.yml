@@ -51,6 +51,8 @@ jobs:
       - name: Install dependencies and verify A4 camera mathematics
         run: |
           set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
           npm ci --no-audit --no-fund
           npm run check
           node production/yunex/turbo_3d_001/agents/cinematics/camera.test.cjs
@@ -66,8 +68,16 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "out/a4/$NAME"
-          npx remotion render src/yunex/turbo3d/cinematics/previewEntry.tsx "$COMP" "out/a4/$NAME/$NAME.mp4" \
+          npx remotion render src/yunex/turbo3d/cinematics/previewEntry.tsx "$COMP" "out/a4/$NAME/native-source.mp4" \
             --frames="0-$END" --scale=0.4 --concurrency=1 --gl=swangle --codec=h264 --pixel-format=yuv420p
+          # WebGL renders may encode full-range yuvj420p despite the pix_fmt option.
+          # Convert explicitly to limited-range H.264 yuv420p for mobile playback.
+          ffmpeg -hide_banner -loglevel error -y -i "out/a4/$NAME/native-source.mp4" \
+            -vf 'scale=in_range=pc:out_range=tv,format=yuv420p' \
+            -c:v libx264 -crf 18 -preset veryfast -pix_fmt yuv420p \
+            -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 -an \
+            "out/a4/$NAME/$NAME.mp4"
+          rm "out/a4/$NAME/native-source.mp4"
           ffmpeg -v error -xerror -i "out/a4/$NAME/$NAME.mp4" -f null -
           ffprobe -v error -show_entries format=duration,size:stream=codec_name,width,height,r_frame_rate,nb_frames,pix_fmt -of json "out/a4/$NAME/$NAME.mp4" > "out/a4/$NAME/probe.json"
           python - "$NAME" "$EXPECT" <<'PY'
