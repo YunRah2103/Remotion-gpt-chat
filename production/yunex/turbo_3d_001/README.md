@@ -1,5 +1,7 @@
 # YUNEX TURBO 3D EP001 — ENERGY IN MOTION
 
+**Reusable master takeover prompt:** [MASTER_PRODUCTION_MANAGER.md](prompts/MASTER_PRODUCTION_MANAGER.md) — five simultaneous visual specialists, A6 editor, A7 audio.
+
 **Current stage:** PREPRODUCTION / seven prompts ready; NO running AI agent sessions verified.  
 **Master tracker:** [#126](https://github.com/YunRah2103/Remotion-gpt-chat/issues/126)  
 **Draft production PR:** [#132](https://github.com/YunRah2103/Remotion-gpt-chat/pull/132)
