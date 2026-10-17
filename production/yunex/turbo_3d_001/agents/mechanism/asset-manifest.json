@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "assetId": "YUNEX-TURBO-3D-EP001-A2",
+  "kind": "deterministic-r3f-mechanical-rig",
+  "owner": "agent-2-mechanism",
+  "sourceCommit": "ac08dc4a8343ac7c9e8f99ebaaa337dd0779c1e8",
+  "unitMetersPerUnit": 1,
+  "upAxis": "+Y",
+  "forwardAxis": "+Z",
+  "shaftAxis": "+X",
+  "localOrigin": "shaft midpoint",
+  "boundingBox": {
+    "kind": "conservative-estimate-not-measured",
+    "min": [
+      -3.9,
+      -2.4,
+      -3.9
+    ],
+    "max": [
+      4.9,
+      1.6,
+      1.1
+    ]
+  },
+  "entrypoints": [
+    "src/yunex/turbo3d/mechanism/index.ts",
+    "src/yunex/turbo3d/mechanism/preview.entry.tsx"
+  ],
+  "modelParts": [
+    "11-blade turbine",
+    "11-blade compressor",
+    "one common shaft",
+    "separate volutes",
+    "engine manifold",
+    "fresh air filter",
+    "intercooler and charge pipes",
+    "four-cylinder engine block"
+  ],
+  "props": {
+    "frame": "required numeric frame",
+    "rotationPhase": "radians",
+    "cutaway": "0..1",
+    "exploded": "0..1",
+    "visibility": "0..1",
+    "variant": "turbo or full"
+  },
+  "animation": {
+    "phase": "rotationPhase + frame * 0.165",
+    "bothRotorPhasesIdentical": true,
+    "deterministic": true,
+    "previewFps": 30
+  },
+  "ports": {
+    "EXHAUST_IN": [
+      -1.1,
+      0.78,
+      0.43
+    ],
+    "EXHAUST_OUT": [
+      -2.22,
+      0,
+      0
+    ],
+    "CLEAN_AIR_IN": [
+      2.22,
+      0,
+      0
+    ],
+    "COMPRESSED_AIR_OUT": [
+      1.12,
+      0.82,
+      0.43
+    ],
+    "INTERCOOLER_IN": [
+      3.08,
+      0.12,
+      -1.45
+    ],
+    "INTERCOOLER_OUT": [
+      3.08,
+      -1.13,
+      -1.45
+    ],
+    "ENGINE_INTAKE": [
+      0.77,
+      -1.26,
+      -3.15
+    ],
+    "FUEL_IN": [
+      -0.63,
+      -0.8,
+      -3.15
+    ]
+  },
+  "rigPivots": {
+    "TURBINE_ROTOR": [
+      -1.13,
+      0,
+      0
+    ],
+    "COMPRESSOR_ROTOR": [
+      1.13,
+      0,
+      0
+    ],
+    "SHAFT": [
+      0,
+      0,
+      0
+    ]
+  },
+  "sourceFiles": [
+    "src/yunex/turbo3d/mechanism/TurboMechanism.tsx",
+    "src/yunex/turbo3d/mechanism/ports.ts",
+    "src/yunex/turbo3d/mechanism/TurboPreviewHarness.tsx",
+    "src/yunex/turbo3d/mechanism/preview.entry.tsx",
+    "src/yunex/turbo3d/mechanism/index.ts"
+  ],
+  "materials": {
+    "graphite": "#4B606D",
+    "steel": "#C5D0D1",
+    "exhaust": "#FF8A36",
+    "compressor": "#53CFFF",
+    "cooled": "#8CEBE3"
+  },
+  "licenses": [
+    {
+      "asset": "all code and model geometry",
+      "provenance": "original procedural YUNEX A2",
+      "externalAssets": []
+    }
+  ],
+  "evidence": {
+    "software3dPreviews": [
+      {
+        "file": "yunex_A2_cutaway_preview.mp4",
+        "width": 450,
+        "height": 800,
+        "frames": 96,
+        "fps": 30,
+        "durationSeconds": 3.2,
+        "sha256": "e036900961d56612467db3616f8ab7fb3fa22cda0f6a217b4c7113bbce73041b",
+        "ffmpegDecode": "PASS",
+        "url": "not publicly hosted; available in ChatGPT source session"
+      },
+      {
+        "file": "yunex_A2_exploded_preview.mp4",
+        "width": 450,
+        "height": 800,
+        "frames": 96,
+        "fps": 30,
+        "durationSeconds": 3.2,
+        "sha256": "e7e3f14b8a4a923d4e07199aa132f5c11ff6a1264611807600c975df596c83ec",
+        "ffmpegDecode": "PASS",
+        "url": "not publicly hosted; available in ChatGPT source session"
+      },
+      {
+        "file": "yunex_A2_engine_path_preview.mp4",
+        "width": 450,
+        "height": 800,
+        "frames": 96,
+        "fps": 30,
+        "durationSeconds": 3.2,
+        "sha256": "3da8e2ec839759c7ad05aa5cd97b4e51246e9aef81e696f5f1857f3241dc7559",
+        "ffmpegDecode": "PASS",
+        "url": "not publicly hosted; available in ChatGPT source session"
+      }
+    ],
+    "nativeRemotion": "PENDING: dependencies not installed in this offline runtime",
+    "npmCheck": "PENDING",
+    "blender": "NOT USED"
+  },
+  "sha256": {
+    "note": "Preview SHA256 are actual local outputs; no native Remotion output is claimed."
+  }
+}
