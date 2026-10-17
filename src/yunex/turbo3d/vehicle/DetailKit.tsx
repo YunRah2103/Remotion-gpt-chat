@@ -9,7 +9,7 @@ const Hose:React.FC<{points:P3[];radius?:number;color?:string;metalness?:number}
   const path=useMemo(()=>new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(...p))),[points]);
   return <mesh castShadow><tubeGeometry args={[path,24,radius,8,false]}/><meshStandardMaterial color={color} metalness={metalness} roughness={.32}/></mesh>;
 };
-const LightShell:React.FC<{side:number}>=({side})=>{
+export const LightShell:React.FC<{side:number}>=({side})=>{
   // The shell is an actual bevelled, sharply swept polygon, rather than a headlamp cuboid.
   const shell=useMemo(()=>{
     const shape=new THREE.Shape();
