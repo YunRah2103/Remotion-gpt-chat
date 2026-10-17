@@ -10,50 +10,48 @@ const Hose:React.FC<{points:P3[];radius?:number;color?:string;metalness?:number}
   return <mesh castShadow><tubeGeometry args={[path,24,radius,8,false]}/><meshStandardMaterial color={color} metalness={metalness} roughness={.32}/></mesh>;
 };
 export const LightShell:React.FC<{side:number}>=({side})=>{
-  // The shell is an actual bevelled, sharply swept polygon, rather than a headlamp cuboid.
+  // Low-profile recess: no bulb/projector cylinder can stand proud of the bonnet.
   const shell=useMemo(()=>{
     const shape=new THREE.Shape();
-    shape.moveTo(-.225,-.16);shape.lineTo(.125,-.23);shape.lineTo(.255,-.07);
-    shape.lineTo(.205,.185);shape.quadraticCurveTo(-.025,.215,-.22,.09);
-    shape.closePath();
-    return new THREE.ExtrudeGeometry(shape,{depth:.035,steps:1,bevelEnabled:true,bevelThickness:.015,bevelSize:.013,bevelSegments:2,curveSegments:5});
+    shape.moveTo(-.23,-.155);shape.lineTo(.12,-.215);
+    shape.lineTo(.242,-.075);shape.lineTo(.205,.171);
+    shape.quadraticCurveTo(-.02,.197,-.223,.08);shape.closePath();
+    return new THREE.ExtrudeGeometry(shape,{depth:.018,steps:1,bevelEnabled:true,bevelSize:.009,bevelThickness:.006,bevelSegments:2});
   },[]);
-  const y=.635;
-  return <group name="LAYERED_HEADLAMP_ASSEMBLY" position={[side*.636,y,1.939]}>
-    <group rotation={[PI/2,0,side*-.02]}>
-      <mesh geometry={shell} castShadow>
-        <meshPhysicalMaterial name="HEADLAMP_RECESSED_HOUSING" color="#07111B" metalness={.51} roughness={.20} clearcoat={.72}/>
-      </mesh>
-    </group>
-    <mesh position={[0,.010,.0]} castShadow><boxGeometry args={[.435,.018,.30]}/>
-      <meshStandardMaterial color="#263D46" metalness={.55} roughness={.26}/></mesh>
-    {[-.09,.076].map((dx,i)=><group key={i} position={[dx,.014,.045]}>
-      <mesh rotation={[PI/2,0,0]}><cylinderGeometry args={[i===0?.047:.038,i===0?.047:.038,.017,24]}/>
-        <meshStandardMaterial name="HEADLAMP_PROJECTOR_BEZEL" color="#BECED2" metalness={.88} roughness={.17}/></mesh>
-      <mesh position={[0,.012,0]}><sphereGeometry args={[i===0?.029:.024,18,12]}/>
-        <meshPhysicalMaterial name="HEADLAMP_PROJECTOR_LENS" color="#C3F8FF" emissive="#7ADDF1" emissiveIntensity={1.8} roughness={.12} transmission={.13} clearcoat={1}/></mesh>
+  return <group name="LAYERED_HEADLAMP_ASSEMBLY" position={[side*.636,.670,1.945]}>
+    <mesh rotation={[PI/2,0,0]} geometry={shell} castShadow>
+      <meshPhysicalMaterial name="HEADLAMP_RECESSED_HOUSING" color="#07131B" metalness={.61} roughness={.18} clearcoat={.82}/>
+    </mesh>
+    <mesh position={[0,.012,.01]}><boxGeometry args={[.413,.011,.288]}/>
+      <meshStandardMaterial name="HEADLAMP_INNER_SMOKED_OPTICS" color="#122A37" metalness={.66} roughness={.25}/></mesh>
+    {[-.10,.035,.15].map((x,i)=><group key={i} position={[x,.022,.046]}>
+      <mesh><boxGeometry args={[i===0?.071:.057,.011,.082]}/>
+        <meshStandardMaterial name="HEADLAMP_PROJECTOR_BEZEL" color="#8BA7B1" metalness={.87} roughness={.21}/></mesh>
+      <mesh position={[0,.008,0]}><boxGeometry args={[i===0?.056:.043,.008,.058]}/>
+        <meshBasicMaterial name="HEADLAMP_PROJECTOR_LENS" color={i===1?'#D8FCFF':'#86DCEB'} toneMapped={false}/></mesh>
     </group>)}
-    <Hose points={[[-.191,.026,.109],[-.11,.038,.160],[.035,.04,.143],[.175,.027,.025]]} radius={.014} color="#BBF9FC" metalness={.06}/>
-    <Hose points={[[-.17,.022,-.08],[-.015,.03,-.131],[.153,.025,-.108]]} radius={.010} color="#5196A9"/>
-    <mesh position={[0,.043,.016]}><boxGeometry args={[.429,.008,.30]}/>
-      <meshPhysicalMaterial name="HEADLAMP_OUTER_CLEAR_LENS" color="#8CC7D7" metalness={.08} roughness={.095} transparent opacity={.16} clearcoat={1} depthWrite={false}/></mesh>
+    <mesh name="FLUSH_DRIVING_LIGHT" position={[0,.034,.14]}>
+      <boxGeometry args={[.358,.008,.020]}/>
+      <meshBasicMaterial name="HEADLAMP_WHITE" color="#DBFFFF" toneMapped={false}/>
+    </mesh>
+    <mesh position={[0,.042,.005]}><boxGeometry args={[.420,.008,.29]}/>
+      <meshPhysicalMaterial name="HEADLAMP_OUTER_CLEAR_LENS" color="#9ACAD7" roughness={.09} metalness={.1} transparent opacity={.20} depthWrite={false} clearcoat={1}/>
+    </mesh>
   </group>;
 };
 
 /** Recess on the +Z front face, including real sidewalls and slats rather than a black sticker. */
-export const FrontDuct:React.FC<{side:number}>=({side})=><group name="FRONT_BUMPER_RECESSED_DUCT" position={[side*.42,.535,2.315]}>
-  <mesh position={[0,0,-.112]}><boxGeometry args={[.340,.116,.010]}/>
-    <meshStandardMaterial name="FRONT_DUCT_DEPTH_BACK" color="#020A0D" roughness={1}/></mesh>
-  <mesh position={[0,-.071,.005]}><boxGeometry args={[.405,.023,.088]}/>
-    <meshStandardMaterial name="FRONT_DUCT_LOWER_LIP" color="#182F39" metalness={.52} roughness={.33}/></mesh>
-  <mesh position={[0,.070,.005]}><boxGeometry args={[.407,.020,.088]}/>
-    <meshStandardMaterial name="FRONT_DUCT_UPPER_LIP" color="#2B565A" metalness={.6} roughness={.3}/></mesh>
-  {[-1,1].map(s=><mesh key={s} position={[s*.2,0,-.043]}>
-    <boxGeometry args={[.022,.14,.124]}/><meshStandardMaterial color="#1F333E" metalness={.48}/></mesh>)}
-  {[-.09,0,.09].map(x=><mesh key={x} position={[x,0,-.037]} rotation={[0,.03*side,0]}>
-    <boxGeometry args={[.012,.117,.115]}/><meshStandardMaterial name="FRONT_INTAKE_GUIDE_VANES" color="#4A777D" metalness={.72} roughness={.3}/></mesh>)}
-  <mesh position={[0,0,-.105]}><boxGeometry args={[.34,.006,.09]}/>
-    <meshStandardMaterial color="#09161E" roughness={.63}/></mesh>
+export const FrontDuct:React.FC<{side:number}>=({side})=><group name="FRONT_BUMPER_RECESSED_DUCT" position={[side*.42,.535,2.30]}>
+  <mesh position={[0,0,-.064]}><boxGeometry args={[.34,.125,.012]}/>
+    <meshStandardMaterial name="FRONT_DUCT_DEPTH_BACK" color="#02080E" roughness={1}/></mesh>
+  <mesh position={[0,-.074,.032]}><boxGeometry args={[.382,.018,.025]}/>
+    <meshStandardMaterial name="FRONT_DUCT_LOWER_LIP" color="#12303B" metalness={.6} roughness={.31}/></mesh>
+  <mesh position={[0,.074,.032]}><boxGeometry args={[.382,.018,.025]}/>
+    <meshStandardMaterial name="FRONT_DUCT_UPPER_LIP" color="#2F6365" metalness={.66} roughness={.25}/></mesh>
+  {[-1,1].map(s=><mesh key={s} position={[s*.19,0,-.025]}>
+    <boxGeometry args={[.013,.142,.086]}/><meshStandardMaterial color="#1A333D" metalness={.48}/></mesh>)}
+  {[-.082,0,.082].map(x=><mesh key={x} position={[x,-.001,.032]}>
+    <boxGeometry args={[.010,.112,.018]}/><meshStandardMaterial name="FRONT_INTAKE_GUIDE_VANES" color="#547E80" metalness={.7} roughness={.30}/></mesh>)}
 </group>;
 
 /** Side opening reaches inboard, with real fore/aft wall faces, a deep cavity and 3 vanes. */
@@ -115,8 +113,7 @@ export const PremiumWheel:React.FC<{side:number;z:number;travelMeters:number}>=(
         <meshStandardMaterial name="UNBRANDED_WHEEL_HUB" color="#C2CFCE" metalness={.96} roughness={.17}/></mesh>
       {Array.from({length:5},(_,i)=>{const a=i*PI*2/5;return <mesh key={i} rotation={[0,0,PI/2]} position={[side*.206,Math.sin(a)*.052,Math.cos(a)*.052]}>
         <cylinderGeometry args={[.012,.012,.012,8]}/><meshStandardMaterial name="HUB_LUGS" color="#263C44" metalness={.68} roughness={.27}/></mesh>;})}
-      {Array.from({length:32},(_,i)=>{const a=i*PI*2/32;return <mesh key={i} position={[side*.107,Math.cos(a)*.351,Math.sin(a)*.351]} rotation={[a,0,0]}>
-        <boxGeometry args={[.055,.005,.017]}/><meshStandardMaterial name="TREAD_GROOVE_HINT" color="#171C20" roughness={.95}/></mesh>;})}
+      {/* Continuous round tyre profile: reject protruding faux tread lugs at close range. */}
     </group>
   </group>;
 };
