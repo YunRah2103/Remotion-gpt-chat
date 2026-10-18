@@ -48,17 +48,19 @@ Narration timing/picture lock are explicitly later. Do not claim these exact seg
 
 Five individual source branches and six GitHub Issues have now been created. **All five agents remain NOT STARTED** until independently launched in new agent sessions by the user. Separate branch creation is not evidence of code production.
 
-## Real status — updated at manager setup
+## Real status — GitHub manager audit, 18 October 2026
 
-| Department | Status | Ownership branch suffix | Implementation SHA | Moving native MP4 QA | Manager decision |
-|---|---|---|---|---|---|
-| A1 Brake engineering | **NOT STARTED** | `agent/braking-200kmh-001-engineering` | — | — | Await manually launched session |
-| A2 Grip, physics & ABS | **NOT STARTED** | `agent/braking-200kmh-001-physics` | — | — | Await manually launched session |
-| A3 Vehicle & cameras | **NOT STARTED** | `agent/braking-200kmh-001-cameras` | — | — | Await manually launched session |
-| A4 Environment & lookdev | **NOT STARTED** | `agent/braking-200kmh-001-lookdev` | — | — | Await manually launched session |
-| A5 Visual storytelling | **NOT STARTED** | `agent/braking-200kmh-001-graphics` | — | — | Await manually launched session |
-| A6 Master editor | **BLOCKED** | Later, after five approvals | — | — | Not authorised to start |
-| A7 Audio director | **BLOCKED** | Later, after picture lock | — | — | Not authorised to start |
+| Department | Observed state | Source / PR | Native moving MP4 proof | Manager decision |
+|---|---|---|---|---|
+| A1 Brake engineering | **IMPLEMENTED, in-progress**; 3 owned commits ahead, drilled rotor, pads/hydraulics and context vehicle | `8ff5f5f81a40b66ee93cd940113063a9f8ca1e31`, [#147](https://github.com/YunRah2103/Remotion-gpt-chat/issues/147) | No verified native braking MP4 delivered | **REVIEW BLOCKED**: correct positive state angle → negative visual wheel/disc rotation and verify A1/A3 seam |
+| A2 Grip, physics & ABS | **ACTIVE COORDINATION, NO CODE COMMIT** at audit; agreed sim contract/sign with A1 | baseline `1bebbce820b00b696b8b66499c1c486ebef53182`, [#148](https://github.com/YunRah2103/Remotion-gpt-chat/issues/148) | None | **CRITICAL PATH**: implement authoritative deterministic sampler/film-time mapping |
+| A3 Vehicle & cameras | **IMPLEMENTED, DRAFT PR**; 6 commits ahead, deterministic shot rig & tests, labelled constant-speed previews only | [PR #152](https://github.com/YunRah2103/Remotion-gpt-chat/pull/152), SHA `d856659ffae980f9611ff70b49e4aa69e4ad0d1e` | PR explicitly admits not rendered/verified; generic PR CI pending | **REVIEW BLOCKED**: injectable A1 car so no double vehicle; proof render in GitHub Actions |
+| A4 Environment & lookdev | **IMPLEMENTED, DRAFT PR**; 1 owned commit, reusable material/light stage | [PR #153](https://github.com/YunRah2103/Remotion-gpt-chat/pull/153), SHA `b85ca32993e4e9bc7b6d405c710d01b017449803` | PR explicitly admits not rendered/verified; generic PR CI pending | **REVIEW BLOCKED**: native context/macro MP4 render, decode + visual review |
+| A5 Visual storytelling | **IMPLEMENTED, in-progress**; 4 commits ahead, camera-pinned animated graphics and labelled proof fixtures | `71786ebbcb93a868bc3d5b66eacdd2052cdd79b3`, [#151](https://github.com/YunRah2103/Remotion-gpt-chat/issues/151) | No verified native moving MP4 delivered | **REVIEW BLOCKED**: register compositions, actually render and inspect |
+| A6 Master editor | **BLOCKED** until all five independently approved and their interfaces integrated | — | — | Not authorised to start |
+| A7 Audio director | **BLOCKED** until A6 picture lock | — | — | Not authorised to start |
+
+**Critical integration findings:** A1 applied `+wheelRotationRad` to the tyre and disc but existing kit and A3 use `-wheelRotationRad` for positive +X forward travel; mismatch requires an A1 correction. A3 currently always mounts its own kit car; injection of A1's actual car must replace it rather than duplicating it. Manager filed specific comments on all five assigned issues, requesting source-accurate native moving previews (not green unrelated generic CI). **All five remain unapproved; no editor/picture lock/audio/final film yet.**
 
 ## Each visual agent must deliver
 
