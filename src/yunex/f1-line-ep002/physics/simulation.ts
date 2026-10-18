@@ -166,13 +166,34 @@ export function sampleCarAtTime(p:CarProfile,timeSeconds:number,c:Readonly<Dynam
 }
 export function makeRaceSimulator(paths:Record<RaceCarId,RacePath>,c:Readonly<DynamicsConfig>=REPRESENTATIVE_F1_CONFIG){
   if(paths.shortcut.id!=='shortcut'||paths.racing.id!=='racing')throw new Error('RacePath IDs mismatch');
-  const profiles={shortcut:buildCarProfile(paths.shortcut,c),racing:buildCarProfile(paths.racing,c)};
+  const startA=finitePose(paths.shortcut,0).position,startB=finitePose(paths.racing,0).position;
+  const startSeparationM=Math.hypot(startA[0]-startB[0],startA[1]-startB[1],startA[2]-startB[2]);
+  const finishA=finitePose(paths.shortcut,paths.shortcut.lengthM).position;
+  const finishB=finitePose(paths.racing,paths.racing.lengthM).position;
+  const finishSeparationM=Math.hypot(finishA[0]-finishB[0],finishA[1]-finishB[1],finishA[2]-finishB[2]);
+  if(startSeparationM>.5||finishSeparationM>.5)throw new Error(
+    'RacePaths must share physical start and finish checkpoints (A1 path revision required): '+JSON.stringify({startSeparationM,finishSeparationM}));
+  let effectiveConfig:DynamicsConfig={...c};
+  let profiles={shortcut:buildCarProfile(paths.shortcut,effectiveConfig),
+    racing:buildCarProfile(paths.racing,effectiveConfig)};
+  // A harder early bend may force one car to brake before the entry gate.
+  // Lower BOTH entrants to the same feasible starting velocity instead of
+  // quietly giving either route an unequal entry-speed advantage.
+  for(let pass=0;pass<4;pass++){
+    const sharedSpeed=Math.min(profiles.shortcut.nodes[0].speedMps,profiles.racing.nodes[0].speedMps);
+    if(Math.abs(profiles.shortcut.nodes[0].speedMps-profiles.racing.nodes[0].speedMps)<.00001)break;
+    effectiveConfig={...effectiveConfig,entrySpeedMps:sharedSpeed};
+    profiles={shortcut:buildCarProfile(paths.shortcut,effectiveConfig),
+      racing:buildCarProfile(paths.racing,effectiveConfig)};
+  }
+  if(Math.abs(profiles.shortcut.nodes[0].speedMps-profiles.racing.nodes[0].speedMps)>.0001)
+    throw new Error('Could not find identical physically feasible entry speeds');
   const sample=(frame:number,fps:number):RaceFrameState=>{
     if(!Number.isFinite(frame)||!Number.isFinite(fps)||fps<=0)throw new Error('Invalid frame/fps');
     const t=Math.max(0,frame/fps);
     return {frame,fps,timeSeconds:t,cars:{
-      shortcut:sampleCarAtTime(profiles.shortcut,t,c),
-      racing:sampleCarAtTime(profiles.racing,t,c),
+      shortcut:sampleCarAtTime(profiles.shortcut,t,effectiveConfig),
+      racing:sampleCarAtTime(profiles.racing,t,effectiveConfig),
     }};
   };
   const carMetrics=(p:CarProfile):CarComparison=>{
@@ -187,15 +208,13 @@ export function makeRaceSimulator(paths:Record<RaceCarId,RacePath>,c:Readonly<Dy
       finishTimeSeconds:p.elapsedSeconds,finishSpeedMps:p.nodes.at(-1)!.speedMps,
     };
   };
-  const a=paths.shortcut.sampleAtDistance(paths.shortcut.lengthM).position;
-  const b=paths.racing.sampleAtDistance(paths.racing.lengthM).position;
-  const finishSeparationM=Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2]);
+  // Physical finish-gate separation was validated before solving the profiles.
   const shortcut=carMetrics(profiles.shortcut),racing=carMetrics(profiles.racing);
   const racingFinishAdvantageSeconds=shortcut.finishTimeSeconds-racing.finishTimeSeconds;
   const comparison:RaceComparison={
-    assumptions:{...c},shortcut,racing,finishSeparationM,racingFinishAdvantageSeconds,
-    fasterAtCommonFinish:finishSeparationM>1?'tie':racingFinishAdvantageSeconds>1e-6?'racing':
+    assumptions:{...effectiveConfig},shortcut,racing,finishSeparationM,racingFinishAdvantageSeconds,
+    fasterAtCommonFinish:racingFinishAdvantageSeconds>1e-6?'racing':
       racingFinishAdvantageSeconds< -1e-6?'shortcut':'tie',
   };
-  return {profiles,sample,comparison,config:c};
+  return {profiles,sample,comparison,config:effectiveConfig};
 }
