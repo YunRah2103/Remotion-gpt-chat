@@ -1,0 +1,64 @@
+name: YUNEX Braking 200 A5 — native integrated graphics proof
+on:
+  push:
+    branches:
+      - agent/braking-200kmh-001-graphics
+    paths:
+      - 'src/yunex/braking200/graphics/**'
+      - '.github/workflows/yunex-braking-a5-graphics-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-a5-graphics-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Hydrate exact upstream peer source for integrated review ONLY
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/braking-a5
+          for pair in \
+            "engineering:engineering" \
+            "physics:physics" \
+            "cameras:cameras"; do
+            role="${pair%%:*}"
+            dir="${pair##*:}"
+            peer="agent/braking-200kmh-001-${role}"
+            git fetch --depth=1 origin "refs/heads/${peer}"
+            echo "${peer}: $(git rev-parse FETCH_HEAD)" | tee -a out/braking-a5/PEER_SOURCE_SHAS.txt
+            git archive FETCH_HEAD "src/yunex/braking200/${dir}/" | tar -xf -
+          done
+          test -f src/yunex/braking200/engineering/BrakingVehicle.tsx
+          test -f src/yunex/braking200/physics/simulation.ts
+          test -f src/yunex/braking200/cameras/cameraRig.ts
+          echo 'PEER-INTEGRATION-SOURCES-EXACTLY-RECORDED'
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Render actual A1+A2+A3 integrated previews (A4 palette) and verify
+        run: bash src/yunex/braking200/graphics/render-and-verify.sh
+      - name: Source SHA and evidence manifest
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p out/braking-a5
+          git rev-parse HEAD | tee out/braking-a5/SOURCE_SHA.txt
+          find out/braking-a5 -maxdepth 1 -type f -printf '%f %s bytes\n' | sort | tee out/braking-a5/FILES.txt
+      - name: Upload actual integrated moving proof media and QA logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-Braking200-Agent5-INTEGRATED-${{ github.run_id }}
+          path: out/braking-a5/
+          retention-days: 30
+          if-no-files-found: error
