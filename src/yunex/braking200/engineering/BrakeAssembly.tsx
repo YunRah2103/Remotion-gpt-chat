@@ -53,6 +53,25 @@ function bar(
   return addMesh(parent, name, new THREE.BoxGeometry(...length), mat, xyz, [0,0,rotationZ]);
 }
 
+function sculptedCaliperCheek(radius: number): THREE.ExtrudeGeometry {
+  // Compact, bevelled forged body follows a short arc of the brake disc.
+  const r=radius,shape=new THREE.Shape();
+  shape.moveTo(-r*.30,-r*.19);
+  shape.quadraticCurveTo(-r*.40,-r*.06,-r*.31,r*.11);
+  shape.lineTo(-r*.19,r*.26);
+  shape.quadraticCurveTo(0,r*.36,r*.18,r*.27);
+  shape.quadraticCurveTo(r*.36,r*.22,r*.37,r*.04);
+  shape.lineTo(r*.32,-r*.19);
+  shape.quadraticCurveTo(r*.23,-r*.31,0,-r*.29);
+  shape.quadraticCurveTo(-r*.22,-r*.30,-r*.30,-r*.19);
+  const geometry=new THREE.ExtrudeGeometry(shape,{
+    depth:.016,bevelEnabled:true,bevelThickness:.004,
+    bevelSize:.004,bevelSegments:3,curveSegments:12,steps:1,
+  });
+  geometry.translate(0,0,-.008);
+  return geometry;
+}
+
 function rotorAnnulus(radius: number): THREE.ExtrudeGeometry {
   const shape = new THREE.Shape();
   shape.absarc(0,0,radius,0,Math.PI*2,false);
@@ -149,7 +168,7 @@ export function createBrakeAssembly(options: BrakeAssemblyOptions): BrakeRig {
   const insideCaliper = new THREE.Group();
   const outsideCaliper = new THREE.Group();
   const bridge = new THREE.Group();
-  const centers:[number,number]=[R*.72,R*.34];
+  const centers:[number,number]=[R*.78,R*.36];
 
   for (const [side,pad,cal] of [
     [-1,insidePad,insideCaliper],[1,outsidePad,outsideCaliper],
@@ -166,10 +185,17 @@ export function createBrakeAssembly(options: BrakeAssemblyOptions): BrakeRig {
     // the entire cheek to expose pistons; it is NEVER represented as squeeze.
     const calZ=side*(ROTOR_FACE_HALF_SPACING_M+.045);
     cal.position.z=calZ;
-    bar(cal,'forged-caliper-cheek',[px,py,0],
-      [R*.65,R*.82,.024],caliperGold,-.21);
-    bar(cal,'machined-inset',[px,py,.013*side],
-      [R*.42,R*.52,.003],caliperInset,-.21);
+    addMesh(cal,'sculpted-forged-caliper-cheek',
+      sculptedCaliperCheek(R),caliperGold,[px,py,0],[0,0,-.20]);
+    // Machined circular bosses read as actual piston positions.
+    for(const y of [-1,1]){
+      addMesh(cal,'piston-boss-cover',
+        new THREE.CylinderGeometry(R*.12,R*.12,.003,28),
+        caliperInset,[px+y*R*.13,py+y*R*.13,side*.017],[Math.PI/2,0,0]);
+      addMesh(cal,'piston-boss-shoulder',
+        new THREE.TorusGeometry(R*.119,.0025,8,28),
+        machined,[px+y*R*.13,py+y*R*.13,side*.020]);
+    }
     for(const y of [-1,1]){
       const piston = addMesh(cal,'hydraulic-piston',
         new THREE.CylinderGeometry(R*.122,R*.122,.018,28),
@@ -184,9 +210,9 @@ export function createBrakeAssembly(options: BrakeAssemblyOptions): BrakeRig {
   }
   root.add(bridge);
   bar(bridge,'top-bridge',[R*.69,R*.72,0],
-    [R*.62,R*.16,.103],caliperGold,.10);
+    [R*.49,R*.12,.103],caliperGold,.10);
   bar(bridge,'lower-cross-member',[R*.63,-R*.035,0],
-    [R*.48,R*.12,.105],caliperGold,-.20);
+    [R*.41,R*.095,.105],caliperGold,-.20);
   for(const z of [-.049,.049]){
     addMesh(bridge,'caliper-through-bolt',
       new THREE.CylinderGeometry(.0075,.0075,.014,12),
