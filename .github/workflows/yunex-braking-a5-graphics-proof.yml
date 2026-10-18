@@ -45,7 +45,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
-      - name: Render actual A1+A2+A3+A4 integrated previews and verify
+      - name: Render actual A1+A2+A3 integrated previews (A4 palette) and verify
         run: bash src/yunex/braking200/graphics/render-and-verify.sh
       - name: Source SHA and evidence manifest
         if: always()
