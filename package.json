@@ -5,7 +5,11 @@
   "scripts": {
     "studio": "remotion studio src/index.ts",
     "check": "tsc --noEmit",
-    "render": "remotion render src/index.ts GpuDriveFilm out/GPU-DRIVE-001.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p"
+    "render": "remotion render src/index.ts GpuDriveFilm out/GPU-DRIVE-001.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p",
+    "worldkit:studio": "remotion studio src/yunex/world-kit/entry.tsx",
+    "worldkit:test": "node --experimental-strip-types --test tests/world-kit/*.test.mjs",
+    "worldkit:export": "node --experimental-strip-types scripts/world-kit/export-models.mjs",
+    "worldkit:review": "node --experimental-strip-types scripts/world-kit/render-review.mjs"
   },
   "dependencies": {
     "@remotion/captions": "4.0.533",

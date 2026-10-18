@@ -1,0 +1,33 @@
+name: YUNEX reusable world kit
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'src/yunex/world-kit/**'
+      - 'tests/world-kit/**'
+      - 'scripts/world-kit/**'
+      - '.github/workflows/yunex-world-kit.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run worldkit:test
+      - run: npm run worldkit:export
+      - run: node scripts/world-kit/validate-glb.mjs
+      - name: Native model and environment review
+        run: npm run worldkit:review
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-WORLD-KIT-19-MODELS
+          path: out/world-kit
+          retention-days: 30
