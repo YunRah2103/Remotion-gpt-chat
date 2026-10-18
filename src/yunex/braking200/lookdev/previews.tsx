@@ -1,53 +1,46 @@
 import React from 'react';
 import {AbsoluteFill,Composition,useCurrentFrame,useVideoConfig} from 'remotion';
 import {ThreeCanvas} from '@remotion/three';
+import {Vehicle,Environment,CameraAim} from '../../world-kit/components.tsx';
 import {sampleRoute} from '../../world-kit/environments.ts';
-import {vehicleSpec} from '../../world-kit/catalog.ts';
 import {BrakingLookdev} from './BrakingLookdev.tsx';
-import {calibrationHeat,worldFromCar} from './math.ts';
-import type {Point3} from './math.ts';
+import type {Vec3} from '../contracts.ts';
 
-type Mode='macro'|'context';
-export const BrakingLookdevProof:React.FC<{mode:Mode}>=({mode})=>{
-  const frame=useCurrentFrame(),{fps,width,height}=useVideoConfig();
-  const t=frame/fps,car=vehicleSpec('grand-tourer');
-  // Diagnostic driving at steady preview speed. NOT the episode's brake simulation.
-  const distance=14+t*(mode==='macro'?5.8:10.5);
-  const route=sampleRoute('track',distance),p=route.position,yaw=route.yaw;
-  const a=mode==='macro'? .18*Math.sin(t*.7):.7*Math.sin(t*.45);
-  const targetLocal:Point3=mode==='macro'
-    ?[car.wheelbase/2,car.radius+.05,car.width/2-.09]
-    :[.55,.68,0];
-  const cameraLocal:Point3=mode==='macro'
-    ?[car.wheelbase/2+.25+a,.78+.055*Math.sin(t*.8),2.75-.15*Math.sin(t*.5)]
-    :[7.35+a,3.65,10.0-.4*Math.sin(t*.5)];
-  const eye=worldFromCar(cameraLocal,p,yaw);
-  const target=worldFromCar(targetLocal,p,yaw);
-  const heat=mode==='macro'?calibrationHeat(t):0;
-  return <AbsoluteFill style={{background:'#b9ced5'}}>
-    <ThreeCanvas width={width} height={height} shadows
-      camera={{position:[...eye],fov:mode==='macro'?42:44,near:.1,far:360}}>
-      <BrakingLookdev previewDistanceM={distance} heatIllustration01={heat}
-        cameraPose={{position:eye,target,fovDeg:mode==='macro'?42:44}}/>
-    </ThreeCanvas>
-    <div style={{position:'absolute',top:height*.052,left:width*.07,
-      color:'#f3f6f5',font:'600 22px Arial',letterSpacing:3,
-      background:'rgba(20,35,44,.70)',padding:'11px 15px',borderLeft:'3px solid #d2a36c',
-      textShadow:'0 2px 8px #23313b8c'}}>YUNEX <span style={{opacity:.65}}> / LOOKDEV QC</span></div>
-    <div style={{position:'absolute',bottom:height*.062,left:width*.07,
-      maxWidth:width*.84,color:'#f5f7f5',font:'500 25px Arial',
-      background:'rgba(20,35,44,.76)',padding:'11px 15px',borderLeft:'3px solid #d2a36c',
-      textShadow:'0 2px 10px #16212cb3'}}>
-      {mode==='macro'?'WHEEL / MATERIAL FINISH':'GRAND TOURER / DAYLIGHT CIRCUIT'}
-      <div style={{marginTop:8,opacity:.73,font:'400 16px Arial',letterSpacing:1}}>
-        {mode==='macro'?'Heat is illustrative, not a temperature measurement':'Moving material study; constant preview speed'}
-      </div>
-    </div>
-  </AbsoluteFill>;
+export const BrakingLookdevContextProof:React.FC=()=>{
+ const frame=useCurrentFrame(),{width,height,fps}=useVideoConfig(),t=frame/fps;
+ const distance=28+t*10,pose=sampleRoute('track',distance);
+ const yaw=pose.yaw,c=Math.cos(yaw),s=Math.sin(yaw);
+ const eyeLocal:Vec3=[7.6+.3*Math.sin(t*.8),2.12,7.9-.3*Math.cos(t*.7)];
+ const aimLocal:Vec3=[.25,.55,0];
+ const toWorld=(v:Vec3):[number,number,number]=>
+   [pose.position[0]+c*v[0]+s*v[2],v[1],
+    pose.position[2]-s*v[0]+c*v[2]];
+ const eye=toWorld(eyeLocal),aim=toWorld(aimLocal);
+ return <AbsoluteFill style={{background:'#9eb9c7'}}>
+  <ThreeCanvas width={width} height={height} shadows
+   camera={{position:eye,fov:45,near:.05,far:350}}>
+   <Environment kind="track" seed={12} timeOfDay="day"/>
+   <Vehicle variant="grand-tourer" color="#35546e" accent="#d2a36c"
+      pose={pose} distance={distance}/>
+   <BrakingLookdev route={pose}/>
+   <CameraAim position={eye} target={aim} fov={45}/>
+  </ThreeCanvas>
+  <div style={{position:'absolute',top:'6%',left:'7%',padding:'8px 13px',
+   color:'#e8f0f0',background:'#172934b3',
+   borderLeft:'3px solid #d2a36c',font:'600 21px Arial',letterSpacing:2}}>
+   YUNEX / AUTOMOTIVE LOOKDEV
+  </div>
+  <div style={{position:'absolute',bottom:'8%',left:'7%',padding:'14px 18px',
+   background:'#142733c9',borderLeft:'3px solid #d2a36c',
+   color:'#f3f5f3',font:'600 28px Arial',letterSpacing:1}}>
+   METALLIC SLATE / CIRCUIT
+   <div style={{font:'400 18px Arial',marginTop:8,opacity:.78}}>Episode-owned lighting and material finish</div>
+  </div>
+ </AbsoluteFill>;
 };
+/** Isolated source-tree showcase. The actual A1 3D rotor macro is registered
+ * only by the A1+A2 integration QA harness, NOT an opaque kit wheel stand-in. */
 export const BrakingLookdevCompositions:React.FC=()=> <>
-  <Composition id="BrakingLookdevMacro" component={BrakingLookdevProof} width={1080} height={1920}
-    fps={30} durationInFrames={120} defaultProps={{mode:'macro' as const}}/>
-  <Composition id="BrakingLookdevContext" component={BrakingLookdevProof} width={1080} height={1920}
-    fps={30} durationInFrames={120} defaultProps={{mode:'context' as const}}/>
+ <Composition id="BrakingLookdevContext" component={BrakingLookdevContextProof}
+    width={1080} height={1920} fps={30} durationInFrames={120}/>
 </>;
