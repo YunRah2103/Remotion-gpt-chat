@@ -64,13 +64,13 @@ export const BrakingGraphicsMacroProof:React.FC=()=>{
 export const BrakingGraphicsTrackProof:React.FC=()=>{
   const frame=useCurrentFrame(),{width,height,fps}=useVideoConfig();
   const t=frame/fps;
-  const state=sampleGraphicsProofOnly(t);
+  const state=sampleGraphicsProofOnly(t,.62);
   const route=sampleRoute('track',75+state.traveledM);
-  const localCamera:Vec3=[-11.1+Math.sin(t*.8)*.55,4.2,8.0];
+  const localCamera:Vec3=[-8.3+Math.sin(t*.8)*.35,2.55,5.85];
   const cameraPosition=plus(route.position,signedRotation(localCamera,route.yaw));
   const cameraTarget=plus(route.position,[0,.72,0]);
   const camera:CinematicCameraPose={
-    position:cameraPosition,target:cameraTarget,fovDeg:43,focusId:'vehicle',
+    position:cameraPosition,target:cameraTarget,fovDeg:46,focusId:'vehicle',
   };
   const anchor=plus(route.position,signedRotation(frame<84?frontCenter:wheelContact,route.yaw));
   const direction=signedRotation([1,0,0],route.yaw);
