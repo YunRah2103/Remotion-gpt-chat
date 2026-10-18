@@ -21,8 +21,8 @@ export function sampleBrakePreviewFixture(seconds: number): BrakingSimulationSta
   for(const anchor of wheelAnchors(spec)){
     const front=anchor.axle==='front';
     wheels[anchor.id]={
-      angularSpeedRadPerSec:-speed/anchor.radiusM,
-      rotationRad:-traveled/anchor.radiusM,
+      angularSpeedRadPerSec:speed/anchor.radiusM,
+      rotationRad:traveled/anchor.radiusM,
       slipRatio:0,
       normalLoadN:(mass*g/2+(front?transfer:-transfer))/2,
       roadLongitudinalForceN:-mass*decel/4,
