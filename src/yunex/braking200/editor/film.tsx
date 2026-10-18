@@ -11,23 +11,30 @@ import type {CinematicCameraPose,FilmCue,TimedCue,Vec3,BrakingSimulationState} f
 import {vehicleSpec} from '../../world-kit/catalog.ts';
 import {sampleRoute} from '../../world-kit/environments.ts';
 import {CameraAim,Environment} from '../../world-kit/components.tsx';
+// @ts-ignore Integration source supplied by pinned A1 commit in render workflow.
 import {BrakingVehicle} from '../engineering/BrakingVehicle.tsx';
+// @ts-ignore Integration source supplied by pinned A2 commit in render workflow.
 import {sampleBrakingSimulation} from '../physics/simulation.ts';
+// @ts-ignore Integration source supplied by pinned A2 commit in render workflow.
 import {mapAbsInsertFrameToSimulationSec,mapFilmFrameToSimulationSec} from '../physics/timeline.ts';
+// @ts-ignore Integration source supplied by pinned A3 commit in render workflow.
 import {sampleCameraPose} from '../cameras/cameraRig.ts';
+// @ts-ignore Integration source supplied by pinned A4 commit in render workflow.
 import {BrakingLookdev} from '../lookdev/BrakingLookdev.tsx';
+// @ts-ignore Integration source supplied by pinned A5 commit in render workflow.
 import {BrakingGraphics} from '../graphics/BrakingGraphics.tsx';
+// @ts-ignore Integration source supplied by pinned A5 commit in render workflow.
 import {heatVisual01,smooth} from '../graphics/logic.ts';
 
 export const EP001_FPS=30;
 export const EP001_FRAMES=810; // 27 seconds; first-cut picture, not lock
 export const EP001_SHOTS:readonly TimedCue[]=[
- {cue:'hook',fromFrame:0,toFrameExclusive:110},
- {cue:'mechanism',fromFrame:110,toFrameExclusive:270},
- {cue:'heat',fromFrame:270,toFrameExclusive:430},
- {cue:'grip',fromFrame:430,toFrameExclusive:555},
- {cue:'abs',fromFrame:555,toFrameExclusive:650},
- {cue:'finale',fromFrame:650,toFrameExclusive:810},
+ {cue:'hook',fromFrame:0,toFrameExclusive:155},
+ {cue:'mechanism',fromFrame:155,toFrameExclusive:305},
+ {cue:'heat',fromFrame:305,toFrameExclusive:385},
+ {cue:'grip',fromFrame:385,toFrameExclusive:500},
+ {cue:'abs',fromFrame:500,toFrameExclusive:682},
+ {cue:'finale',fromFrame:682,toFrameExclusive:810},
 ];
 const SPEC=vehicleSpec(BRAKING_EP001.vehicleVariant);
 const FRONT=wheelAnchors(SPEC).find(x=>x.id==='front-left');
@@ -75,7 +82,7 @@ export function sampleEditorialFrame(frame:number):BrakingEditorialSample{
  const state=sampleBrakingSimulation(simTime,lowGrip?'low-grip-abs':'dry-track');
  // The insert uses a separate chronological physical simulation; avoid positional
  // teleport within that insert while maintaining exactly ONE shared scene car.
- const insertDry=sampleBrakingSimulation(mapFilmFrameToSimulationSec(555*750/EP001_FRAMES));
+ const insertDry=sampleBrakingSimulation(mapFilmFrameToSimulationSec(500*750/EP001_FRAMES));
  const insertAbs=sampleBrakingSimulation(mapAbsInsertFrameToSimulationSec(ABS_START),'low-grip-abs');
  const routeShift=lowGrip?insertDry.traveledM-insertAbs.traveledM:0;
  const route=sampleRoute(BRAKING_EP001.environment,START_ROUTE_M+routeShift+state.traveledM);
