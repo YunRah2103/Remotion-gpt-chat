@@ -62,7 +62,7 @@ export function getRaceCamera(shotId:CinematicShotId,state:RaceFrameState,frame:
  }
  case 'onboard':{
   // Lens just above the halo, offset from centre. Framing follows actual yaw.
-  return camera(racing.worldPose.position,yaw,[1.2,2.06,-.24],[20,1.5,0],65);
+  return camera(racing.worldPose.position,yaw,[-1.15,1.44,.12],[16,.94,0],65);
  }
  case 'duel':{
   return camera(both,yaw,[3.2,13.2,14.8+arc*.3],[0,.89,0],71);
