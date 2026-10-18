@@ -134,11 +134,18 @@ export function wheel(g: T.Group, id: string, m: Palette) {
         spoke.rotation.z = a;
     }
     bolts(roll, m.alloy, .037, w * .44, 5);
-    for (let i = 0; i < (off ? 32 : 48); i++) {
-        const a = i / (off ? 32 : 48) * Math.PI * 2;
+    if (off) {
+        for (let i = 0; i < 32; i++) {
+            const a = i / 32 * Math.PI * 2;
+            for (const z of [-.065, .065]) {
+                const tread = box(roll, m.rubber, [.055, .026, .085], [Math.cos(a) * (r - .006), Math.sin(a) * (r - .006), z], .001, 'tyre-tread');
+                tread.rotation.z = a + Math.PI / 2;
+            }
+        }
+    } else {
         for (const z of [-.065, .065]) {
-            const tread = box(roll, off ? m.rubber : m.dark, [off ? .055 : .006, off ? .026 : .004, off ? .085 : .055], [Math.cos(a) * (r - .006), Math.sin(a) * (r - .006), z], .001, 'tyre-tread');
-            tread.rotation.z = a + Math.PI / 2;
+            const surfaceRadius = r * .79 + r * .21 * Math.sqrt(1 - Math.pow(z / (w / 2), 2));
+            ring(roll, m.dark, surfaceRadius, .0015, [0, 0, z], 'z', 'road-groove');
         }
     }
     mount(g, 'axle', [0, 0, -w * .35], [0, 0, 1]);

@@ -50,3 +50,6 @@ test('wheel sidewalls cover the width of their rim lips', () => { for (const var
 } });
 test('automatic transmission exposes a planetary stage while DCT has a second input sleeve', () => { const a = createPart({ variant: 'gearbox-auto', cutaway: true }), b = createPart({ variant: 'gearbox-dct', cutaway: true }); assert.ok(a.getObjectByName('planetary-carrier')); assert.ok(a.getObjectByName('annulus')); assert.ok(b.getObjectByName('secondary-input')); disposeObject(a); disposeObject(b); });
 test('turbo volute outer radial surface normals face outwards', () => { const g = createPart({ variant: 'turbo-small' }), scroll = g.getObjectByName('compressor-housing').getObjectByName('scroll-housing'); assert.ok(scroll.geometry.attributes.normal.getX(0) > .5); disposeObject(g); });
+test('road tyre tread details conform to the tyre surface', () => {
+ for(const [variant,r,w] of [['wheel-road',.32,.20],['wheel-sport',.35,.24]]){const g=createPart({variant});g.updateMatrixWorld(true);g.traverse(o=>{if(!['tyre-tread','road-groove'].includes(o.name))return;const a=o.geometry.attributes.position;for(let i=0;i<a.count;i++){const p=new T.Vector3().fromBufferAttribute(a,i).applyMatrix4(o.matrixWorld),surface=r*.79+r*.21*Math.sqrt(Math.max(0,1-Math.pow(p.z/(w/2),2)));assert.ok(Math.hypot(p.x,p.y)-surface<.004,`${variant}: detached tread`);}});disposeObject(g);}
+});
