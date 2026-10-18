@@ -56,19 +56,23 @@ function bar(
 function sculptedCaliperCheek(radius: number): THREE.ExtrudeGeometry {
   // Compact, bevelled forged body follows a short arc of the brake disc.
   const r=radius,shape=new THREE.Shape();
-  shape.moveTo(-r*.30,-r*.19);
-  shape.quadraticCurveTo(-r*.40,-r*.06,-r*.31,r*.11);
-  shape.lineTo(-r*.19,r*.26);
-  shape.quadraticCurveTo(0,r*.36,r*.18,r*.27);
-  shape.quadraticCurveTo(r*.36,r*.22,r*.37,r*.04);
-  shape.lineTo(r*.32,-r*.19);
-  shape.quadraticCurveTo(r*.23,-r*.31,0,-r*.29);
-  shape.quadraticCurveTo(-r*.22,-r*.30,-r*.30,-r*.19);
+  // Forged, tapered road-car caliper, not a flat oval cover:
+  // broad shoulders, relieved waist and an asymmetric machined heel.
+  shape.moveTo(-r*.32,-r*.19);
+  shape.quadraticCurveTo(-r*.42,-r*.11,-r*.38,r*.06);
+  shape.lineTo(-r*.29,r*.23);
+  shape.quadraticCurveTo(-r*.18,r*.36,-r*.03,r*.34);
+  shape.lineTo(r*.19,r*.29);
+  shape.quadraticCurveTo(r*.33,r*.24,r*.35,r*.10);
+  shape.lineTo(r*.37,-r*.08);
+  shape.lineTo(r*.24,-r*.23);
+  shape.quadraticCurveTo(r*.08,-r*.30,-r*.09,-r*.27);
+  shape.quadraticCurveTo(-r*.25,-r*.26,-r*.32,-r*.19);
   const geometry=new THREE.ExtrudeGeometry(shape,{
-    depth:.016,bevelEnabled:true,bevelThickness:.004,
-    bevelSize:.004,bevelSegments:3,curveSegments:12,steps:1,
+    depth:.018,bevelEnabled:true,bevelThickness:.005,
+    bevelSize:.005,bevelSegments:4,curveSegments:12,steps:1,
   });
-  geometry.translate(0,0,-.008);
+  geometry.translate(0,0,-.009);
   return geometry;
 }
 
@@ -105,14 +109,21 @@ export function createBrakeAssembly(options: BrakeAssemblyOptions): BrakeRig {
   root.name = 'yunex-brake-' + options.wheel;
   root.position.z = options.axialOffsetM ?? 0;
 
-  const castIron = material('#77818a',.87,.32);
-  const machined = material('#a8b4bc',.88,.25);
-  const darkSteel = material('#303c46',.73,.45);
-  const hubSteel = material('#54616a',.92,.3);
-  const friction = material('#353943',.12,.91);
-  const caliperGold = material(options.accent??'#d2a36c',.72,.28);
-  const caliperInset = material('#514435',.55,.35);
-  const hydraulic = material('#899fab',.8,.26);
+  // Controlled metals under actual Remotion key lights. The old highly
+  // metallic ivory plate blew out and obscured the genuine drilled depth.
+  const castIron = material('#626c75',.60,.48);
+  const machined = material('#a2abb0',.64,.34);
+  const darkSteel = material('#242e38',.44,.58);
+  const hubSteel = material('#586570',.64,.40);
+  const wearLight = material('#79828a',.54,.49);
+  const wearDark = material('#4b565e',.48,.58);
+  const friction = material('#262b31',.12,.92);
+  const caliperGold = material(options.accent??'#d2a36c',.54,.40);
+  // Darker alloy makes the cast contour legible without changing the palette.
+  caliperGold.color.lerp(new THREE.Color('#58493c'),.34);
+  const caliperInset = material('#352d2b',.44,.59);
+  const caliperHighlight = material('#b69b76',.48,.37);
+  const hydraulic = material('#879ba4',.64,.38);
   const heatMat = new THREE.MeshBasicMaterial({
     color:'#dc773a',transparent:true,opacity:0,
     depthWrite:false,blending:THREE.AdditiveBlending,
@@ -135,10 +146,14 @@ export function createBrakeAssembly(options: BrakeAssemblyOptions): BrakeRig {
     addMesh(rotor,'rotor-inner-machined-ring',
       new THREE.TorusGeometry(R*.365,.0042,7,80),machined,
       [0,0,side*(ROTOR_FACE_HALF_SPACING_M+.0018)]);
-    for (let groove=0;groove<2;groove++){
+    // Multiple fine lathe-wear tracks catch light with subtle alternating
+    // roughness/colour. These are actual geometry, not an animated disc HUD.
+    for (let groove=0;groove<15;groove++){
+      const rr=R*(.52+groove*.029);
       addMesh(rotor,'concentric-machining',
-        new THREE.TorusGeometry(R*(.73+groove*.17),.00065,3,96),
-        darkSteel,[0,0,side*(ROTOR_FACE_HALF_SPACING_M+.002)]);
+        new THREE.TorusGeometry(rr,groove%4===0?.00058:.00027,4,120),
+        groove%4===0?wearDark:wearLight,
+        [0,0,side*(ROTOR_FACE_HALF_SPACING_M+ROTOR_FACE_THICKNESS_M/2+.0004)]);
     }
   }
   for (let i=0;i<28;i++) {
@@ -187,14 +202,25 @@ export function createBrakeAssembly(options: BrakeAssemblyOptions): BrakeRig {
     cal.position.z=calZ;
     addMesh(cal,'sculpted-forged-caliper-cheek',
       sculptedCaliperCheek(R),caliperGold,[px,py,0],[0,0,-.20]);
-    // Machined circular bosses read as actual piston positions.
+    // Low-profile reinforcement rib and machined shoulder. Keep the cast
+    // exterior intact so this is recognisably a brake caliper, not a badge.
+    bar(cal,'forged-spine',[px+R*.02,py+R*.02,side*.017],
+      [R*.56,R*.054,.006],caliperHighlight,-.20);
+    bar(cal,'caliper-relief',[px-R*.04,py-R*.20,side*.018],
+      [R*.32,R*.023,.0035],caliperInset,-.20);
+    // Small piston access caps sit in the cast surface; the actual four
+    // hydraulic pistons are independently modelled on the inner sides.
     for(const y of [-1,1]){
-      addMesh(cal,'piston-boss-cover',
-        new THREE.CylinderGeometry(R*.12,R*.12,.003,28),
-        caliperInset,[px+y*R*.13,py+y*R*.13,side*.017],[Math.PI/2,0,0]);
-      addMesh(cal,'piston-boss-shoulder',
-        new THREE.TorusGeometry(R*.119,.0025,8,28),
-        machined,[px+y*R*.13,py+y*R*.13,side*.020]);
+      const bx=px+y*R*.125, by=py+y*R*.115;
+      addMesh(cal,'machined-piston-access',
+        new THREE.CylinderGeometry(R*.075,R*.075,.003,32),
+        caliperInset,[bx,by,side*.023],[Math.PI/2,0,0]);
+      addMesh(cal,'machined-piston-edge',
+        new THREE.TorusGeometry(R*.077,.0020,8,40),
+        machined,[bx,by,side*.026]);
+      addMesh(cal,'piston-access-fastener',
+        new THREE.CylinderGeometry(R*.025,R*.025,.004,12),
+        caliperHighlight,[bx,by,side*.028],[Math.PI/2,0,0]);
     }
     for(const y of [-1,1]){
       const piston = addMesh(cal,'hydraulic-piston',
@@ -227,9 +253,9 @@ export function createBrakeAssembly(options: BrakeAssemblyOptions): BrakeRig {
       machined,[R*.31,a,-.066],[Math.PI/2,0,0]);
   }
   const hosePoints=[
-    new THREE.Vector3(-R*.24,R*1.15,-.085),
-    new THREE.Vector3(R*.12,R*.97,-.080),
-    new THREE.Vector3(R*.35,R*.78,-.064),
+    new THREE.Vector3(-R*.22,R*1.12,-.09),
+    new THREE.Vector3(R*.10,R*1.00,-.086),
+    new THREE.Vector3(R*.31,R*.82,-.070),
     new THREE.Vector3(R*.54,R*.61,-.038),
   ];
   const hoseCurve=new THREE.CatmullRomCurve3(hosePoints);
