@@ -4,6 +4,7 @@ import {ThreeCanvas} from '@remotion/three';
 import {VEHICLES,vehicleSpec} from './catalog.ts';
 import type {EnvironmentKind,TimeOfDay,VehicleVariant} from './catalog.ts';
 import type {V3} from './geometry.ts';
+import {ENVIRONMENT_CATALOG,environmentSpec} from './world-catalog.ts';
 import {sampleRoute} from './environments.ts';
 import {Vehicle,Environment,CameraAim,WorldLighting} from './components';
 export type PreviewProps={variant:VehicleVariant;angle:number;color?:string};
@@ -23,17 +24,17 @@ export const VehiclePreview:React.FC<PreviewProps>=({variant='saloon',angle=.67,
   </div>
  </AbsoluteFill>;
 };
-export type DrivingProps={variant:VehicleVariant;environment:EnvironmentKind;timeOfDay:TimeOfDay;seed:number};
-export const DrivingPreview:React.FC<DrivingProps>=({variant='coupe',environment='highway',timeOfDay='day',seed=12})=>{
- const {width,height,fps}=useVideoConfig(),frame=useCurrentFrame(),s=vehicleSpec(variant),d=frame/fps*9-48;
+export type DrivingProps={variant:VehicleVariant;environment:EnvironmentKind;timeOfDay:TimeOfDay;seed:number;wideView?:boolean};
+export const DrivingPreview:React.FC<DrivingProps>=({variant='coupe',environment='highway',timeOfDay='day',seed=12,wideView=false})=>{
+ const {width,height,fps}=useVideoConfig(),frame=useCurrentFrame(),s=vehicleSpec(variant),d=environmentSpec(environment).mode==='display'?0:frame/fps*9-48;
  const pose=sampleRoute(environment,d),next=sampleRoute(environment,d+.5);
- const angle=pose.yaw,wide=height>width?1.35:1;
- const offset:V3=[s.length*1.25*wide,s.height+2.05,s.length*1.05*wide];
+ const angle=pose.yaw,wide=(height>width?1.35:1)*(wideView?1.65:1);
+ const offset:V3=environment==='tunnel'?[s.length*1.8,s.height+1.1,3.7]:[s.length*1.25*wide,s.height+(wideView?3.4:2.05),s.length*1.05*wide];
  const camera:V3=[pose.position[0]+Math.cos(angle)*offset[0]+Math.sin(angle)*offset[2],offset[1],pose.position[2]-Math.sin(angle)*offset[0]+Math.cos(angle)*offset[2]];
  const delta=Math.atan2(Math.sin(next.yaw-angle),Math.cos(next.yaw-angle));
  return <AbsoluteFill>
   <ThreeCanvas width={width} height={height} shadows camera={{position:camera,fov:44,near:.1,far:350}}>
-   <WorldLighting timeOfDay={timeOfDay} focus={pose.position}/><Environment kind={environment} seed={seed} timeOfDay={timeOfDay}/>
+   <WorldLighting timeOfDay={timeOfDay} focus={pose.position} studio={environmentSpec(environment).mode==='display'}/><Environment kind={environment} seed={seed} timeOfDay={timeOfDay}/>
    <CameraAim position={camera} target={[pose.position[0],s.height*.55,pose.position[2]]} fov={44}/>
    <Vehicle variant={variant} lights={timeOfDay!=='day'} distance={d} steer={Math.atan(s.wheelbase*delta/.5)} pose={pose}/>
   </ThreeCanvas>
@@ -45,4 +46,9 @@ export const WorldKitReel:React.FC=()=>{
  const frame=useCurrentFrame(),{fps}=useVideoConfig(),i=Math.min(VEHICLES.length-1,Math.floor(frame/fps));
  const environment=(['highway','city','track'] as const)[i%3];
  return <Sequence key={VEHICLES[i].id} from={i*fps} durationInFrames={fps} premountFor={fps}><DrivingPreview variant={VEHICLES[i].id} environment={environment} timeOfDay={i%3===1?'dusk':'day'} seed={12}/></Sequence>;
+};
+
+export const EnvironmentReel:React.FC=()=>{
+ const frame=useCurrentFrame(),{fps}=useVideoConfig(),i=Math.min(ENVIRONMENT_CATALOG.length-1,Math.floor(frame/fps)),spec=ENVIRONMENT_CATALOG[i];
+ return <Sequence key={spec.id} from={i*fps} durationInFrames={fps} premountFor={fps}><DrivingPreview variant={i%3===1?'boxy-suv':'coupe'} environment={spec.id} timeOfDay={spec.timeOfDay} seed={12} wideView/></Sequence>;
 };

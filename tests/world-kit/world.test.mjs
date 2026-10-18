@@ -3,7 +3,7 @@ import {VEHICLES,ENVIRONMENTS} from '../../src/yunex/world-kit/catalog.ts';
 import {createEnvironment,sampleRoute,routeLength} from '../../src/yunex/world-kit/environments.ts';
 import {createVehicle} from '../../src/yunex/world-kit/vehicles.ts';
 import {animateVehicle,placeVehicle} from '../../src/yunex/world-kit/motion.ts';
-test('all 57 pairings use a finite route, consistent scale and ground plane',()=>{
+test('all vehicle/world pairings use a finite route, consistent scale and ground plane',()=>{
  for(const env of ENVIRONMENTS){
  const e=createEnvironment({kind:env,seed:42});assert.ok(e.children.length>0);
  for(const v of VEHICLES){const car=createVehicle({variant:v.id});const pose=sampleRoute(env,15);placeVehicle(car,pose);animateVehicle(car,15,.12);car.updateMatrixWorld(true);const b=new T.Box3().setFromObject(car,true);assert.ok(Math.abs(b.min.y)<.025,`${env}/${v.id}: ${b.min.y}`);assert.ok(v.width<3);assert.ok(pose.position.every(Number.isFinite));}

@@ -8,3 +8,7 @@ export {disposeObject} from './geometry.ts';
 export {Vehicle,Environment,WorldLighting,CameraAim} from './components';
 export {vehicleCamera} from './cameras.ts';
 export type {CameraPreset} from './cameras.ts';
+export {ENVIRONMENT_CATALOG,environmentSpec} from './world-catalog.ts';
+export {PROP_KINDS,createProp} from './props.ts';
+export type {PropKind,PropOptions} from './props.ts';
+export {SceneProp} from './components';

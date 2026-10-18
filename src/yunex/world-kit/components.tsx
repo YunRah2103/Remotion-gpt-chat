@@ -3,6 +3,8 @@ import {useThree} from '@react-three/fiber';
 import * as T from 'three';
 import {RoomEnvironment} from 'three/examples/jsm/environments/RoomEnvironment.js';
 import {createVehicle} from './vehicles.ts';
+import {createProp} from './props.ts';
+import type {PropOptions} from './props.ts';
 import {createEnvironment} from './environments.ts';
 import {animateVehicle,placeVehicle} from './motion.ts';
 import {disposeObject} from './geometry.ts';
@@ -39,4 +41,9 @@ export const WorldLighting:React.FC<{timeOfDay?:TimeOfDay;studio?:boolean;focus?
   <directionalLight position={[-20,12,-28]} color="#b1dcf3" intensity={.7}/>
   <Reflections/>
  </>;
+};
+
+export const SceneProp:React.FC<PropOptions & {position?:V3;rotationY?:number}>=({kind,color,lit=false,position=[0,0,0],rotationY=0})=>{
+ const model=useMemo(()=>createProp({kind,color,lit}),[kind,color,lit]);useEffect(()=>()=>disposeObject(model),[model]);
+ return <group position={position} rotation={[0,rotationY,0]}><primitive object={model}/></group>;
 };

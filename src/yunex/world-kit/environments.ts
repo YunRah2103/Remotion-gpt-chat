@@ -1,4 +1,8 @@
 import * as T from 'three';
+import {random,instances,trees} from './scenery.ts';
+import type {Instance} from './scenery.ts';
+import {environmentSpec,isScenic,scenicOffset} from './world-catalog.ts';
+import {buildNewEnvironment} from './new-environments.ts';
 import {box,mesh,surface} from './geometry.ts';
 import type {V3} from './geometry.ts';
 import type {EnvironmentKind,TimeOfDay} from './catalog.ts';
@@ -7,21 +11,19 @@ export type RoutePose={position:V3;yaw:number};
 const circuit=new T.CatmullRomCurve3([[56,0,-24],[37,0,-43],[-38,0,-43],[-65,0,-19],[-65,0,20],[-36,0,42],[39,0,42],[65,0,18]].map(p=>new T.Vector3(...p)),true,'catmullrom',.35);
 const circuitLength=circuit.getLength();
 const wrap=(n:number,m:number)=>((n%m)+m)%m;
-export function routeLength(kind:EnvironmentKind){if(kind==='track')return circuitLength;if(kind==='highway'||kind==='city')return 180;throw new Error(`Unknown environment: ${kind}`);}
+export function routeLength(kind:EnvironmentKind){if(kind==='track')return circuitLength;environmentSpec(kind);return 180;}
 export function sampleRoute(kind:EnvironmentKind,distance:number):RoutePose{
  if(!Number.isFinite(distance))throw new Error('Route distance must be finite');
  const len=routeLength(kind);
- if(kind!=='track')return {position:[wrap(distance+90,len)-90,0,-1.85],yaw:0};
+ if(kind!=='track'){
+  if(environmentSpec(kind).mode==='display')return {position:[0,0,0],yaw:0};
+  const x=wrap(distance+90,len)-90,z=isScenic(kind)?scenicOffset(x,kind):0;
+  const derivative=isScenic(kind)?(scenicOffset(x+.01,kind)-scenicOffset(x-.01,kind))/.02:0;
+  return {position:[x,0,z+(kind==='parking'?0:-1.85)],yaw:-Math.atan(derivative)};
+ }
  const u=wrap(distance,len)/len,p=circuit.getPointAt(u),t=circuit.getTangentAt(u);
  return {position:[p.x,0,p.z],yaw:Math.atan2(-t.z,t.x)};
 }
-function random(seed:number){let a=seed>>>0;return ()=>{a=(Math.imul(a,1664525)+1013904223)>>>0;return a/4294967296;};}
-type Instance={p:V3;s:V3;ry?:number;color?:string};
-function instances(g:T.Group,name:string,geo:T.BufferGeometry,material:T.Material,items:Instance[]){
- const m=new T.InstancedMesh(geo,material,items.length),dummy=new T.Object3D();m.name=name;m.castShadow=true;m.receiveShadow=true;
- items.forEach((v,i)=>{dummy.position.set(...v.p);dummy.scale.set(...v.s);dummy.rotation.set(0,v.ry??0,0);dummy.updateMatrix();m.setMatrixAt(i,dummy.matrix);if(v.color)m.setColorAt(i,new T.Color(v.color));});m.instanceMatrix.needsUpdate=true;g.add(m);return m;
-}
-function trees(g:T.Group,items:V3[]){instances(g,'tree-trunks',new T.CylinderGeometry(.23,.31,1,7),surface('#655446'),items.map(p=>({p:[p[0],1.1,p[2]],s:[1,2.2,1]})));instances(g,'tree-crowns',new T.ConeGeometry(1,1,8),surface('#526c52'),items.map((p,i)=>({p:[p[0],3.35,p[2]],s:[1.4+(i%3)*.25,4,1.4+(i%3)*.25]})));}
 function highway(g:T.Group){
  const asphalt=surface('#353e45',.02,.91),white=surface('#d8ded7'),steel=surface('#9faeae',.5,.45);
  box(g,asphalt,[220,.10,15],[0,-.05,0],.005,'road');
@@ -90,12 +92,13 @@ function track(g:T.Group){
  for(let i=0;i<8;i++){box(g,surface('#bcb9a9'),[6,3.8,7],[-28+i*7,1.9,-66],.03,'pit-garage');box(g,surface('#3d555a'),[4.7,2.7,.06],[-28+i*7,1.36,-62.45],.01,'pit-door');}
  for(let row=0;row<4;row++)box(g,surface(row%2?'#737c7b':'#a2aaa4'),[46,.7,2.1],[0,.4+row*.7,67+row*2.1],.01,'grandstand');
  box(g,surface('#414f55',.2),[49,.15,11],[0,5.7,71],.03,'grandstand-roof');
+ for(const x of [-22,-7,7,22])for(const z of [66,76])box(g,surface('#687978',.3),[.17,5.7,.17],[x,2.85,z],.01,'grandstand-support');
  trees(g,Array.from({length:24},(_,i)=>[Math.cos(i*Math.PI/12)*100,0,Math.sin(i*Math.PI/12)*90]));
 }
 export function createEnvironment({kind,seed=12,timeOfDay='day'}:EnvironmentOptions):T.Group{
  routeLength(kind);if(!Number.isFinite(seed))throw new Error('Seed must be finite');
- const g=new T.Group();g.name=`YUNEX-${kind}`;g.userData={kind,seed,units:'metres',roadY:0};
- box(g,surface(kind==='city'?'#78847a':'#6d815d'),[520,.12,520],[0,-.18,0],.001,'terrain');
- if(kind==='highway')highway(g);else if(kind==='city')city(g,seed,timeOfDay==='night');else track(g);
+ const spec=environmentSpec(kind);const g=new T.Group();g.name=`YUNEX-${kind}`;g.userData={kind,seed,units:'metres',roadY:0};
+ if(['highway','city','track'].includes(kind))box(g,surface(spec.ground),[520,.12,520],[0,-.18,0],.001,'terrain');
+ if(kind==='highway')highway(g);else if(kind==='city')city(g,seed,timeOfDay==='night');else if(kind==='track')track(g);else buildNewEnvironment(g,{kind,seed,timeOfDay});
  return g;
 }

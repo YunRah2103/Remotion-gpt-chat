@@ -25,6 +25,6 @@ export const VEHICLES=[
 export type VehicleVariant=typeof VEHICLES[number]['id'];
 export type VehicleOptions={variant:VehicleVariant;color?:string;accent?:string;wheelColor?:string;lights?:boolean};
 export function vehicleSpec(id:string):VehicleSpec{const s=VEHICLES.find(v=>v.id===id);if(!s)throw new Error(`Unknown vehicle variant: ${id}`);return s;}
-export const ENVIRONMENTS=['highway','city','track'] as const;
+export const ENVIRONMENTS=['highway','city','track','coast','mountain','forest','desert','snow','tunnel','bridge','industrial','parking','airfield','garage','showroom'] as const;
 export type EnvironmentKind=typeof ENVIRONMENTS[number];
 export type TimeOfDay='day'|'dusk'|'night';

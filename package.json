@@ -9,7 +9,9 @@
     "worldkit:studio": "remotion studio src/yunex/world-kit/entry.tsx",
     "worldkit:test": "node --experimental-strip-types --test tests/world-kit/*.test.mjs",
     "worldkit:export": "node --experimental-strip-types scripts/world-kit/export-models.mjs",
-    "worldkit:review": "node --experimental-strip-types scripts/world-kit/render-review.mjs"
+    "worldkit:review": "node --experimental-strip-types scripts/world-kit/render-review.mjs",
+    "worldkit:environments": "node --experimental-strip-types scripts/world-kit/render-environments.mjs",
+    "worldkit:export-props": "node --experimental-strip-types scripts/world-kit/export-props.mjs"
   },
   "dependencies": {
     "@remotion/captions": "4.0.533",
