@@ -42,3 +42,30 @@ Proofs are 540×960 at scale .5 but have the exact 9:16 framing of final 1080×1
 **Proof limitations / pending dependency:** The kit caliper is a simple placeholder; Agent 1's real brake rig is not on this branch. The motion preview fixture intentionally does not simulate 200 km/h or apply any braking/ABS forces. It tests actual kit appearance, tracking/camera/framing/wheel rotation only. The independent manager must re-review after A1/A2 integration.
 
 **Presentation constraints:** real unbranded generic blue GT #35546e, generic actual kit track, no new lighting/look override (A4), no unapproved film edits/audio (A6/A7), no full-frame HUD or parked intro.
+
+## Real A1 / A2 / A4 integration (after specialist PR approval)
+
+Agent 1 PR #155 exports `BrakingVehicle` with `simulation` and `pose` inputs; Agent 2 PR #156 exports `sampleBrakingSimulation` and `mapFilmFrameToSimulationSec`. Once their modules are integrated, the editor can use:
+
+```tsx
+<BrakingCameraStage
+  sampleBrakingSimulation={sampleBrakingSimulation}
+  simulationTimeAtFilmFrame={(frame) => mapFilmFrameToSimulationSec(frame)}
+  renderVehicle={({state,route}) =>
+    <EngineeringBrakingVehicle
+      simulation={state}
+      pose={route}
+      cutawayWheel="front-left"
+      cutaway01={mechanismCutawayAtCurrentCue}
+    />
+  }
+  renderLighting={({route}) => <Agent4Lighting focus={route.position} />}
+/>
+```
+
+This is **illustrative integration pseudocode**, not an assertion that names such as
+`Agent4Lighting` or `mechanismCutawayAtCurrentCue` already exist. Actual editor
+imports must use the approved A1/A2/A4 exports. The default internal vehicle
+is purposely the unmodified kit GT; the optional `renderVehicle` hook replaces
+it instead of rendering a second overlapping car. `children` are world-space
+objects, not automatically mounted to the moving GT.
