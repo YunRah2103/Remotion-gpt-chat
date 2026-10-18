@@ -5,7 +5,20 @@
   "scripts": {
     "studio": "remotion studio src/index.ts",
     "check": "tsc --noEmit",
-    "render": "remotion render src/index.ts GpuDriveFilm out/GPU-DRIVE-001.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p"
+    "render": "remotion render src/index.ts GpuDriveFilm out/GPU-DRIVE-001.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p",
+    "worldkit:studio": "remotion studio src/yunex/world-kit/entry.tsx",
+    "worldkit:test": "node --experimental-strip-types --test tests/world-kit/*.test.mjs",
+    "worldkit:export": "node --experimental-strip-types scripts/world-kit/export-models.mjs",
+    "worldkit:review": "node --experimental-strip-types scripts/world-kit/render-review.mjs",
+    "worldkit:environments": "node --experimental-strip-types scripts/world-kit/render-environments.mjs",
+    "worldkit:export-props": "node --experimental-strip-types scripts/world-kit/export-props.mjs",
+    "worldkit:review-v3": "node --experimental-strip-types scripts/world-kit/render-v3.mjs",
+    "partskit:studio": "remotion studio src/yunex/parts-kit/entry.tsx",
+    "partskit:test": "node --experimental-strip-types --test tests/parts-kit/*.test.mjs",
+    "partskit:export": "node --experimental-strip-types scripts/parts-kit/export.mjs",
+    "partskit:review": "node --experimental-strip-types scripts/parts-kit/review.mjs",
+    "worldkit:review-quality": "node --experimental-strip-types scripts/world-kit/render-quality.mjs",
+    "worldkit:review-worlds": "node --experimental-strip-types scripts/world-kit/render-world-quality.mjs"
   },
   "dependencies": {
     "@remotion/captions": "4.0.533",
