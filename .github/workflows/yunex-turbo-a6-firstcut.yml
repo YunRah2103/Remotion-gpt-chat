@@ -4,6 +4,7 @@ on:
     branches: ['agent/turbo-3d-001-editor']
     paths:
       - 'src/yunex/turbo3d/editor/**'
+      - 'src/yunex/turbo3d/vehicle/**'
       - 'src/yunex/turbo3d/Turbo3DEpisode001.tsx'
       - 'src/Root.tsx'
       - 'production/yunex/turbo_3d_001/agents/editor/**'
