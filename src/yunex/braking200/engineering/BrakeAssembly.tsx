@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import type {BrakeAssemblyPose, WheelKey} from '../contracts.ts';
 import {
   clamp01, padCenterZ, MAX_CUTAWAY_EXPLOSION_M,
-  ROTOR_FACE_HALF_SPACING_M, PAD_HALF_THICKNESS_M,
+  ROTOR_FACE_HALF_SPACING_M, ROTOR_FACE_THICKNESS_M, PAD_HALF_THICKNESS_M,
 } from './mechanics.ts';
 
 export type BrakeAssemblyOptions = {
@@ -91,7 +91,7 @@ function rotorAnnulus(radius: number): THREE.ExtrudeGeometry {
     }
   }
   return new THREE.ExtrudeGeometry(shape,{
-    depth:.0036,steps:1,bevelEnabled:false,curveSegments:14,
+    depth:ROTOR_FACE_THICKNESS_M,steps:1,bevelEnabled:false,curveSegments:14,
   });
 }
 
@@ -127,11 +127,11 @@ export function createBrakeAssembly(options: BrakeAssemblyOptions): BrakeRig {
   const faces = rotorAnnulus(R);
   for(const side of [-1,1]) {
     const plate = addMesh(rotor,'rotor-drilled-face',faces,castIron,
-      [0,0,side*ROTOR_FACE_HALF_SPACING_M-.0018]);
+      [0,0,side*ROTOR_FACE_HALF_SPACING_M-ROTOR_FACE_THICKNESS_M/2]);
     plate.userData.rotorPart = true;
     addMesh(rotor,'rotor-outer-lip',
       new THREE.TorusGeometry(R*.978,.0036,7,96),machined,
-      [0,0,side*(ROTOR_FACE_HALF_SPACING_M+.0018)]);
+      [0,0,side*(ROTOR_FACE_HALF_SPACING_M+ROTOR_FACE_THICKNESS_M/2)]);
     addMesh(rotor,'rotor-inner-machined-ring',
       new THREE.TorusGeometry(R*.365,.0042,7,80),machined,
       [0,0,side*(ROTOR_FACE_HALF_SPACING_M+.0018)]);
