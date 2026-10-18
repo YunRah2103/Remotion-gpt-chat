@@ -64,16 +64,21 @@ export const BrakeTrackProof:React.FC=()=>{
   const c=Math.cos(theta),s=Math.sin(theta);
   // Start with an actual whole-car contextual composition, then smoothly
   // dolly to the exposed front-left assembly (no arbitrary hard cuts).
-  const zoom=Math.max(0,Math.min(1,(progress-.14)/.86));
-  const side=8.6-3.4*zoom,fore=8.2-4.1*zoom;
+  const t=Math.max(0,Math.min(1,(progress-.12)/.88));
+  const zoom=t*t*(3-2*t);
+  // Dampen the camera's dolly, targeting the EXACT kit front-left pivot.
+  // Begin as a three-quarter full-car context, end on a readable disc macro.
+  const side=8.6+(1.65-8.6)*zoom,fore=8.2+(1.05-8.2)*zoom;
+  const forward=.15+(1.46-.15)*zoom;
+  const left=.10+(.88-.10)*zoom;
   const center:V3=[
-    carPose.position[0]+c*(.15+1.10*zoom)+s*(.10+.52*zoom),
-    .67-.15*zoom,
-    carPose.position[2]-s*(.15+1.10*zoom)+c*(.10+.52*zoom),
+    carPose.position[0]+c*forward+s*left,
+    .67+(.43-.67)*zoom,
+    carPose.position[2]-s*forward+c*left,
   ];
   const eye:V3=[
     center[0]+c*fore+s*side,
-    3.05-1.30*zoom,
+    3.05+(1.05-3.05)*zoom,
     center[2]-s*fore+c*side,
   ];
   return <AbsoluteFill style={{background:'#c3d4dd'}}>
@@ -81,7 +86,7 @@ export const BrakeTrackProof:React.FC=()=>{
       camera={{position:[7,3,5],fov:42,near:.1,far:380}}>
       <WorldLighting timeOfDay="day" focus={carPose.position}/>
       <Environment kind="track" seed={12} timeOfDay="day"/>
-      <CameraAim position={eye} target={center} fov={42-5*zoom}/>
+      <CameraAim position={eye} target={center} fov={42-4*zoom}/>
       <BrakingVehicle simulation={state} pose={carPose}
         cutawayWheel="front-left" cutaway01={.88}
         heatIllustration01={.06*progress}/>
