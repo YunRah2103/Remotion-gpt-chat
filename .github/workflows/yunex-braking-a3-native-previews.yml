@@ -46,12 +46,26 @@ jobs:
           npx remotion render src/yunex/braking200/cameras/entry.tsx BrakingA3Track \
             out/braking-a3/track-native.mp4 --gl=swangle --codec=h264 \
             --pixel-format=yuv420p --scale=0.5 --concurrency=1
+      - name: Normalize Remotion full-range H264 previews to limited-range yuv420p
+        shell: bash
+        run: |
+          set -euo pipefail
+          for clip in macro track; do
+            mv "out/braking-a3/${clip}-native.mp4" "out/braking-a3/${clip}-remotion-fullrange.mp4"
+            ffmpeg -hide_banner -loglevel error -y \
+              -i "out/braking-a3/${clip}-remotion-fullrange.mp4" \
+              -vf 'scale=in_range=full:out_range=limited:flags=bicubic,format=yuv420p' \
+              -c:v libx264 -preset veryfast -crf 19 -pix_fmt yuv420p \
+              -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 \
+              -an "out/braking-a3/${clip}-native.mp4"
+            rm "out/braking-a3/${clip}-remotion-fullrange.mp4"
+          done
       - name: Full-file decoding, metadata, frames and portrait confirmation
         shell: bash
         run: |
           set -euo pipefail
           for clip in macro track; do
-            ffprobe -v error -show_entries stream=codec_name,pix_fmt,width,height,nb_frames,r_frame_rate \
+            ffprobe -v error -show_entries stream=codec_name,pix_fmt,color_range,width,height,nb_frames,r_frame_rate \
               -select_streams v:0 -of json "out/braking-a3/${clip}-native.mp4" \
               > "out/braking-a3/${clip}-ffprobe.json"
             ffmpeg -v error -xerror -i "out/braking-a3/${clip}-native.mp4" -f null -
@@ -66,6 +80,7 @@ jobs:
               assert int(d['width'])==540 and int(d['height'])==960, d
               assert int(d['nb_frames'])==frames, d
               assert d['codec_name']=='h264' and d['pix_fmt']=='yuv420p', d
+              assert d.get('color_range')=='tv', d
               assert d['r_frame_rate']=='30/1', d
               print(name,'NATIVE A3 PROOF VERIFIED',frames,'frames 540x960 30fps')
           PY
