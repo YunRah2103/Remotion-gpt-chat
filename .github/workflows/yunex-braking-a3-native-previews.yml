@@ -1,4 +1,4 @@
-name: YUNEX Braking A3 - Native Camera MP4 Proof
+name: YUNEX Braking A3 - Real A1 A2 Camera MP4 Proof
 on:
   push:
     branches:
@@ -10,61 +10,84 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: yunex-braking-a3-native-${{ github.ref }}
+  group: yunex-braking-a3-integrated-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  original-3d-camera-proofs:
+  native-integrated-camera:
     runs-on: ubuntu-24.04
-    timeout-minutes: 105
+    timeout-minutes: 115
     steps:
       - uses: actions/checkout@v4
         with:
+          persist-credentials: false
+      # Peer source is read-only; never commit peers' directory files to A3.
+      - uses: actions/checkout@v4
+        with:
+          ref: c704dc67acd0567cb7dbde8c21a9a4b0bf4f1f0c
+          path: .integration/a1
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: 0b1bf91e7004f50261bdf6804c91134d69b46dd4
+          path: .integration/a2
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: npm
+      - name: Prepare temporary integration against exact A1 A2 peer source
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp -a .integration/a1/src/yunex/braking200/engineering src/yunex/braking200/engineering
+          cp -a .integration/a2/src/yunex/braking200/physics src/yunex/braking200/physics
+          cp src/yunex/braking200/cameras/IntegratedProof.template \
+            src/yunex/braking200/cameras/IntegratedProof.tsx
+          printf '%s\n' "import {registerRoot} from 'remotion';" \
+            "import {A3IntegratedRoot} from './IntegratedProof.tsx';" \
+            "registerRoot(A3IntegratedRoot);" \
+            > src/yunex/braking200/cameras/IntegratedEntry.tsx
+          printf '%s\n' "A1 source: c704dc67acd0567cb7dbde8c21a9a4b0bf4f1f0c" \
+            "A2 source: 0b1bf91e7004f50261bdf6804c91134d69b46dd4" \
+            "A3 source: ${GITHUB_SHA}" > /tmp/a3-sources.txt
       - name: Install pinned packages and FFmpeg
         run: |
           set -euo pipefail
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
           npm ci --no-audit --no-fund
-      - name: Verify TS, kit compatibility and A3 seek stability
+      - name: TypeScript kit A3 A1 A2 deterministic physics tests
         run: |
           set -euo pipefail
           npm run check
           npm run worldkit:test
           node --experimental-strip-types --test src/yunex/braking200/cameras/cameraRig.test.mjs
-      - name: Render two real 3D Remotion camera previews
+          node --experimental-strip-types --test src/yunex/braking200/engineering/mechanics.test.mjs
+          node --experimental-strip-types --test src/yunex/braking200/physics/simulation.test.mjs
+      - name: Render TWO genuine 9x16 moving previews with A1 rotor A2 braking
         run: |
           set -euo pipefail
           mkdir -p out/braking-a3/stills
-          npx remotion render src/yunex/braking200/cameras/entry.tsx BrakingA3Macro \
-            out/braking-a3/macro-native.mp4 --gl=swangle --codec=h264 \
-            --pixel-format=yuv420p --scale=0.5 --concurrency=1
-          npx remotion render src/yunex/braking200/cameras/entry.tsx BrakingA3Track \
-            out/braking-a3/track-native.mp4 --gl=swangle --codec=h264 \
-            --pixel-format=yuv420p --scale=0.5 --concurrency=1
-      - name: Normalize Remotion full-range H264 previews to limited-range yuv420p
+          cp /tmp/a3-sources.txt out/braking-a3/SOURCE-SHAS.txt
+          npx remotion render src/yunex/braking200/cameras/IntegratedEntry.tsx \
+            BrakingA3IntegratedTrack out/braking-a3/track-remotion-fullrange.mp4 \
+            --gl=swangle --codec=h264 --pixel-format=yuv420p \
+            --scale=0.4 --concurrency=2
+          npx remotion render src/yunex/braking200/cameras/IntegratedEntry.tsx \
+            BrakingA3IntegratedMacro out/braking-a3/macro-remotion-fullrange.mp4 \
+            --gl=swangle --codec=h264 --pixel-format=yuv420p \
+            --scale=0.4 --concurrency=2
+      - name: Normalize to limited-range H264 and verify whole files
         shell: bash
         run: |
           set -euo pipefail
           for clip in macro track; do
-            mv "out/braking-a3/${clip}-native.mp4" "out/braking-a3/${clip}-remotion-fullrange.mp4"
             ffmpeg -hide_banner -loglevel error -y \
               -i "out/braking-a3/${clip}-remotion-fullrange.mp4" \
               -vf 'scale=in_range=full:out_range=limited:flags=bicubic,format=yuv420p' \
-              -c:v libx264 -preset veryfast -crf 19 -pix_fmt yuv420p \
+              -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p \
               -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 \
               -an "out/braking-a3/${clip}-native.mp4"
-            rm "out/braking-a3/${clip}-remotion-fullrange.mp4"
-          done
-      - name: Full-file decoding, metadata, frames and portrait confirmation
-        shell: bash
-        run: |
-          set -euo pipefail
-          for clip in macro track; do
             ffprobe -v error -show_entries stream=codec_name,pix_fmt,color_range,width,height,nb_frames,r_frame_rate \
               -select_streams v:0 -of json "out/braking-a3/${clip}-native.mp4" \
               > "out/braking-a3/${clip}-ffprobe.json"
@@ -75,28 +98,35 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-          for name,frames in [('macro',195),('track',240)]:
+          for name,frames in [('macro',185),('track',210)]:
               d=json.loads(Path('out/braking-a3/'+name+'-ffprobe.json').read_text())['streams'][0]
-              assert int(d['width'])==540 and int(d['height'])==960, d
-              assert int(d['nb_frames'])==frames, d
-              assert d['codec_name']=='h264' and d['pix_fmt']=='yuv420p', d
-              assert d.get('color_range')=='tv', d
-              assert d['r_frame_rate']=='30/1', d
-              print(name,'NATIVE A3 PROOF VERIFIED',frames,'frames 540x960 30fps')
+              assert int(d['width'])==432 and int(d['height'])==768,d
+              assert int(d['nb_frames'])==frames,d
+              assert d['codec_name']=='h264' and d['pix_fmt']=='yuv420p',d
+              assert d.get('color_range')=='tv',d
+              assert d['r_frame_rate']=='30/1',d
+              print(name,'PASS full decoded H264 432x768 30fps',frames)
           PY
-          for spec in "macro:0.4" "macro:2.2" "macro:4.7" \
-                      "track:0.4" "track:2.8" "track:6.8"; do
-            clip="${spec%%:*}"; t="${spec#*:}"
-            ffmpeg -hide_banner -loglevel error -y \
-              -ss "${t}" -i "out/braking-a3/${clip}-native.mp4" -frames:v 1 \
-              "out/braking-a3/stills/${clip}-${t}.png"
+      - name: Extract inspection samples and full portrait frame
+        shell: bash
+        run: |
+          set -euo pipefail
+          for spec in "track:0.4" "track:1.7" "track:2.7" \
+                      "track:3.9" "track:5.2" "track:6.7" \
+                      "macro:0.4" "macro:1.5" "macro:2.7" \
+                      "macro:3.8" "macro:4.9" "macro:5.8"; do
+            clip="${spec%%:*}"; sec="${spec#*:}"
+            ffmpeg -hide_banner -loglevel error -y -ss "${sec}" \
+              -i "out/braking-a3/${clip}-native.mp4" -frames:v 1 \
+              "out/braking-a3/stills/${clip}-${sec}.png"
           done
-          npx remotion still src/yunex/braking200/cameras/entry.tsx BrakingA3Track \
-            out/braking-a3/stills/track-phone-full-1080x1920.png --frame=18 --gl=swangle
+          npx remotion still src/yunex/braking200/cameras/IntegratedEntry.tsx \
+            BrakingA3IntegratedTrack out/braking-a3/stills/track-phone-1080x1920.png \
+            --frame=12 --gl=swangle
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: YUNEX-BRAKING-A3-NATIVE-CAMERA-PROOFS
+          name: YUNEX-BRAKING-A3-INTEGRATED-NATIVE-PROOFS
           path: out/braking-a3/
           retention-days: 30
           if-no-files-found: warn
