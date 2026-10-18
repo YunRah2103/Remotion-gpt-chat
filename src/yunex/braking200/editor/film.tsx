@@ -77,7 +77,7 @@ export function sampleEditorialFrame(frame:number):BrakingEditorialSample{
  const lowGrip=cue.cue==='abs';
  // A low-grip what-if insert, not an unexplained extension of the dry-road stop.
  const simTime=lowGrip
-  ?mapAbsInsertFrameToSimulationSec(ABS_START+Math.min(local,94)*.95)
+  ?mapAbsInsertFrameToSimulationSec(ABS_START+Math.min(local,181)*(145-ABS_START)/181)
   :mapFilmFrameToSimulationSec(frame*750/EP001_FRAMES);
  const state=sampleBrakingSimulation(simTime,lowGrip?'low-grip-abs':'dry-track');
  // The insert uses a separate chronological physical simulation; avoid positional
@@ -87,8 +87,8 @@ export function sampleEditorialFrame(frame:number):BrakingEditorialSample{
  const routeShift=lowGrip?insertDry.traveledM-insertAbs.traveledM:0;
  const route=sampleRoute(BRAKING_EP001.environment,START_ROUTE_M+routeShift+state.traveledM);
  const raw=sampleCameraPose(frame,route,SPEC,{cues:EP001_SHOTS});
- const distance=cue.cue==='hook'?.94:cue.cue==='mechanism'?.86:
-  cue.cue==='heat'?.83:cue.cue==='grip'?.85:cue.cue==='abs'?.88:.92;
+ const distance=cue.cue==='hook'?1.20:cue.cue==='mechanism'?.82:
+  cue.cue==='heat'?.76:cue.cue==='grip'?.85:cue.cue==='abs'?.88:.92;
  const camera=zoom(raw,distance);
  const cutaway=(cue.cue==='mechanism'||cue.cue==='heat'||cue.cue==='abs')
   ?(.62+.23*smooth(local/24)):0;
