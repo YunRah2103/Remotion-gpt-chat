@@ -87,14 +87,14 @@ const Overlay:React.FC<{s:BrakingSimulationState;abs:boolean;progress:number;cut
       {abs?'ILLUSTRATIVE LOW-GRIP ABS / SEPARATE RUN':'DRY TRACK / NO ABS INTERVENTION'}
     </div>
   </div>
-  {abs&&<div style={{position:'absolute',right:'7%',top:'32%',width:205,
+  {abs&&<div style={{position:'absolute',right:'6%',top:'31%',width:240,
     padding:'13px 15px',borderLeft:cue.absPressureRelease?'4px solid #eab875':'3px solid #90c2c7',
     background:'linear-gradient(90deg,#0b1e2acc,#0c223766)',
     boxShadow:cue.absPressureRelease?'0 0 22px #dba75c30':'none'}}>
-    <div style={{fontSize:17,fontWeight:800,letterSpacing:2.1,color:'#add3d8'}}>
+    <div style={{fontSize:19,fontWeight:800,letterSpacing:1.8,color:'#add3d8'}}>
       HYDRAULIC CONTROL
     </div>
-    <div style={{fontSize:24,fontWeight:900,marginTop:8,lineHeight:1.13,
+    <div style={{fontSize:27,fontWeight:900,marginTop:8,lineHeight:1.12,
       color:cue.absPressureRelease?'#ffd59e':'#e8f3f4'}}>
       {cue.absPressureRelease?'ABS / PRESSURE RELEASE':'WHEEL SLIP MONITORED'}
     </div>
@@ -143,9 +143,9 @@ const IntegratedFilm:React.FC<{abs:boolean}>=({abs})=>{
  const cutaway=abs?1:ease((progress-.22)/.28);
  const target=world(route.position,yaw,lerp(.1,front.center[0]-.02,zoom),
    lerp(.7,front.center[1]+.04,zoom),lerp(0,front.center[2],zoom));
- const camera=world(route.position,yaw,lerp(6.9,front.center[0]+.62,zoom)+Math.sin(progress*2.35)*.14,
-   lerp(2.5,front.center[1]+.48,zoom),
-   lerp(7.1,front.center[2]+1.43,zoom)+Math.sin(progress*1.4)*.07);
+ const camera=world(route.position,yaw,lerp(8.3,front.center[0]+.62,zoom)+Math.sin(progress*2.35)*.14,
+   lerp(2.85,front.center[1]+.48,zoom),
+   lerp(8.6,front.center[2]+1.43,zoom)+Math.sin(progress*1.4)*.07);
  return <AbsoluteFill style={{background:'#93b0bd'}}>
   <ThreeCanvas width={width} height={height} shadows camera={{position:[8,3,8],fov:52,near:.06,far:400}}>
     <WorldLighting timeOfDay="day" focus={route.position}/>
@@ -161,7 +161,7 @@ const IntegratedFilm:React.FC<{abs:boolean}>=({abs})=>{
       </group>
       <LoadedTyres s={s} cutaway={cutaway}/>
     </group>
-    <CameraAim position={camera} target={target} fov={lerp(46,43,zoom)}/>
+    <CameraAim position={camera} target={target} fov={lerp(48,43,zoom)}/>
   </ThreeCanvas>
   <Overlay s={s} abs={abs} progress={progress} cutaway={abs||cutaway>.4}/>
  </AbsoluteFill>;
