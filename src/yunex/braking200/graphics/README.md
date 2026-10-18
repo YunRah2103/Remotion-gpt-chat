@@ -1,42 +1,45 @@
-# Braking 200 EP001 — A5 Motion Graphics
+# A5 | YUNEX braking — cinematic graphics refinement
 
-Owner: Agent 5 only. This directory provides deterministic camera-pinned graphics for the existing 3D grand-tourer on the track. No car/physics/camera/lookdev source is changed.
-
-## Integrate with the actual film
-
-Import `BrakingGraphics` from `./graphics/index.ts` and mount it OUTSIDE `<ThreeCanvas>` over the cinematic car. Supply Agent 2's authoritative `BrakingSimulationState` sampled at exactly the scene's simulated timestamp, Agent 3's actual `CinematicCameraPose` and a world-space rotor/contact-patch focus anchor. Use `wheelAnchors(vehicleSpec('grand-tourer'))` and rotate/translate with the kit vehicle pose. `wheelKey` selects which wheel state drives cue opacity; the camera and world position control the projected callout.
+## Product interface
+`BrakingGraphics` remains a frame-seekable external Remotion SVG layer. It has **no vehicle/physics material generation**, is not mounted inside ThreeCanvas, and receives the **same A2 BrakingSimulationState** used by all peers. Import from `graphics/index.ts`.
 
 ```tsx
-<BrakingGraphics state={simulation} frame={frame} cue={shot.cue}
-  cueFrame={shot.localFrame} cameraPose={camera}
-  focusWorld={discOrContactPointInWorld} travelDirectionWorld={forwardWorld}
-  wheelKey="front-left" heatReferenceJ={authoritativeEnergyReference}/>
+<BrakingGraphics state={simulation} cue={shot.cue} cueFrame={shot.localFrame}
+ cameraPose={camera} focusWorld={brakeOrTyreWorldAnchor}
+ travelDirectionWorld={forwardWorld} wheelKey="front-left"
+ heatReferenceJ={brakeEnergyVisualReferenceJ}
+ lowGripExample={isLabelledLowGripDemo} palette={a4Palette}/>
 ```
 
-The current speed typography derives only from `speedMps × 3.6`, and never from frame-based fake numbers. Thermal cues show a proportional **illustrative energy budget**, NOT a rotor temperature. Road-contact direction points opposite supplied travel direction; strength is derived from tyre-road force and normal load. ABS typography is completely hidden unless `wheel.absIntervening` is true; it does not assert ABS engages on every stop. The pressure graphic reflects `wheel.brakePressure01`. No fake stopping-distance statistic appears. A4 can customize the restrained palette using `palette`. If a projected anchor is off camera, no pointer is painted.
+- `hook`: oversized opening velocity, strictly `speedMps × 3.6`. At time zero, **200 KM/H** is visible immediately.
+- `mechanism`: paired small hydraulic action strokes, projected to physical rotor/caliper; their opacity comes from A2 brake pressure, not invented displacement.
+- `heat`: understated rotor-sized concentric amber sweeps and bloom driven only by A2 brake thermal-energy budget. `heatReferenceJ` is a user-defined **visual scale**, not temperature. A1 independently renders the subtle rotor heat in actual 3D.
+- `grip`: contact-patch ellipse, a single short opposing longitudinal force cue driven by A2 `roadLongitudinalForceN / normalLoadN`, and front normal-load stroke. No nonphysical stopping distance claims.
+- `abs`: only if **both** `lowGripExample` AND A2's wheel `absIntervening` are true, including small pressure strokes driven by sampled `brakePressure01`. Dry road absolutely does NOT automatically show ABS. A clearly labelled low-grip teaching insert is mandatory in final film.
 
-`cue` and `cueFrame` let Agent 6 retime graphics to picture and VO, and omit both to use provisional shared cues. `showPin={false}` permits unannotated hero shots. There are no frame clocks, `useFrame` loops or random values in production code.
+Projected anchor dimensions use A3 camera FOV/depth; callouts disappear if the anchor is outside camera frustum. Portrait graphics never require generic HUD plates. A4 palette is configurable and defaults to blue/ivory/amber film accents.
 
-## Two independent *native Remotion* proof definitions
+## Integrated native proofs: peer source, not placeholders
 
-The full-scale compositions are 1080×1920, 30 fps, 150 frames each (5 seconds). `BrakingGraphicsMacroProof` shows wheel-close mechanism, heat, tyre-road contact and illustrative ABS. `BrakingGraphicsTrackProof` shows a moving kit grand-tourer on the **real kit track**, with the speed hook in the opening second and world-pinned callouts. Only these proof compositions import `proof-state.ts`, a clearly marked temporary deterministic fixture: the film must instead import A2's actual sampler.
+The native compositions still have IDs `BrakingGraphicsMacroProof` and `BrakingGraphicsTrackProof` under `graphics/entry.tsx` (1080×1920 / 30fps / 150 frames each). **Both now use actual branch components**:
 
-To execute on a renderer with the repo checked out:
+- A1 `engineering/BrakingVehicle.tsx` with **actual drilled rotor, moving pads/pistons and cutaway**.
+- A2 `physics/simulation.ts` using authoritative `sampleBrakingSimulation`. Explicit dry-track film-time mapping, with a **separately labelled** low-grip ABS scene that uses A2's own film-time map.
+- A3 `cameras/cameraRig.ts` with the real `sampleCameraPose` / camera cues. A5's portrait lens-compression factor adjusts framing only; camera target and shot identity still derive from A3. Shared route and world-space wheel anchors preserve pin alignment.
+- A4 `lookdev/lighting.tsx` with the existing premium daylight and authentic A4 accent colours. A5 creates **no duplicate vehicle**.
 
-```bash
-npm ci
-npm run check
-node --experimental-strip-types --test src/yunex/braking200/graphics/logic.test.mjs
-mkdir -p out/braking-a5
-npx remotion render src/yunex/braking200/graphics/entry.tsx BrakingGraphicsMacroProof out/braking-a5/macro.mp4 --frames=0-149 --gl=swangle --scale=0.5 --codec=h264 --pixel-format=yuv420p --concurrency=1
-npx remotion render src/yunex/braking200/graphics/entry.tsx BrakingGraphicsTrackProof out/braking-a5/track.mp4 --frames=0-149 --gl=swangle --scale=0.5 --codec=h264 --pixel-format=yuv420p --concurrency=1
-for f in out/braking-a5/macro.mp4 out/braking-a5/track.mp4; do
-  ffprobe -v error -show_entries stream=codec_name,width,height,nb_frames,r_frame_rate -of json "$f"
-  ffmpeg -v error -xerror -i "$f" -f null -
-done
-npx remotion still src/yunex/braking200/graphics/entry.tsx BrakingGraphicsMacroProof out/braking-a5/macro-12.png --frame=12 --gl=swangle --scale=.5
-npx remotion still src/yunex/braking200/graphics/entry.tsx BrakingGraphicsMacroProof out/braking-a5/macro-90.png --frame=90 --gl=swangle --scale=.5
-npx remotion still src/yunex/braking200/graphics/entry.tsx BrakingGraphicsTrackProof out/braking-a5/track-125.png --frame=125 --gl=swangle --scale=.5
+The repo's five peer branches are unmerged, so these proof-only imports are deliberately marked as hydrated dependencies. The proof GitHub Action performs **temporary, read-only upstream Git branch fetch/archive into the runner checkout**. It records full upstream source SHAs in `PEER_SOURCE_SHAS.txt` for reproducibility. **No peer-owned source files are committed to A5.** Until G3 multi-agent merge, users of `graphics/entry.tsx` locally must hydrate peer folders in their clone.
+
+The old `proof-state.ts` remains clearly synthetic legacy reference **but is not imported by either final proof**. A5's production component also never imports it.
+
+## Exact render and verification
+
+GitHub workflow: `.github/workflows/yunex-braking-a5-graphics-proof.yml`. It hydrates peer source then runs:
+
+```sh
+bash src/yunex/braking200/graphics/render-and-verify.sh
 ```
 
-Before claiming delivery: independently watch both whole MP4s, confirm at least three truly distinct decoded frames plus a phone-frame sample, record actual FFprobe and full FFmpeg decode, attach proof artifacts and exact commit/run SHA to Issue #151. Merely committing source or passing generic PR visual smoke does **not** satisfy these native-proof gates.
+Outputs under `out/braking-a5/`: `macro.mp4`, `track.mp4`, FFprobe JSON and per-frame MD5 for each, true Remotion stills, GitHub source SHA plus A1–A4 peer SHAs. The script asserts H264, 540×960 (proof `--scale=.5`), 30fps, 150 frames, **all decoded frames** and minimum 3 distinct frames. It also runs `npm run check` and targeted tests. Native stills and meaningful phone-size visual inspection are **separate** from technical QA.
+
+Manager review still owns G3 approval and Agent 6 film integration. These are two short department motion proofs, not the final film.
