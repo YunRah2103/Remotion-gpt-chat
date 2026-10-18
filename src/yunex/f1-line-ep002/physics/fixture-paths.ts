@@ -29,7 +29,8 @@ function racingOffset(u:number){
   return clamp(y,-4,4);
 }
 function shortcutOffset(u:number){
-  return -4*smooth(u/.24)*smooth((1-u)/.24);
+  // A's aggressive inner cut produces a smaller radius and a real braking cost.
+  return -4*smooth(u/.18)*smooth((1-u)/.18);
 }
 const angleOf=(a:V3,b:V3)=>Math.atan2(-(b[2]-a[2]),b[0]-a[0]);
 const anchor=(()=>{
