@@ -12,7 +12,11 @@
     "worldkit:review": "node --experimental-strip-types scripts/world-kit/render-review.mjs",
     "worldkit:environments": "node --experimental-strip-types scripts/world-kit/render-environments.mjs",
     "worldkit:export-props": "node --experimental-strip-types scripts/world-kit/export-props.mjs",
-    "worldkit:review-v3": "node --experimental-strip-types scripts/world-kit/render-v3.mjs"
+    "worldkit:review-v3": "node --experimental-strip-types scripts/world-kit/render-v3.mjs",
+    "partskit:studio": "remotion studio src/yunex/parts-kit/entry.tsx",
+    "partskit:test": "node --experimental-strip-types --test tests/parts-kit/*.test.mjs",
+    "partskit:export": "node --experimental-strip-types scripts/parts-kit/export.mjs",
+    "partskit:review": "node --experimental-strip-types scripts/parts-kit/review.mjs"
   },
   "dependencies": {
     "@remotion/captions": "4.0.533",
