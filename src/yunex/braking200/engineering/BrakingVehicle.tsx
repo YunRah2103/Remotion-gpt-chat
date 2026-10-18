@@ -17,6 +17,9 @@ export type BrakingVehicleProps = {
   steerRad?: number;
   cutawayWheel?: WheelKey;
   cutaway01?: number;
+  /** Explicit educational display only: remove the opposite axle rim too,
+   * so it cannot falsely appear THROUGH the exposed rotor in open wheel arches. */
+  isolateOppositeRimInCutaway?: boolean;
   heatIllustration01?: number;
 };
 
@@ -69,7 +72,8 @@ function createContextVehicle():{model:THREE.Group;mounts:WheelMount[];sills:Dec
 
 /** Reuses the untouched kit car and steering pivots; A2 state is authoritative. */
 export const BrakingVehicle: React.FC<BrakingVehicleProps> = ({
-  simulation,pose,steerRad=0,cutawayWheel,cutaway01=0,heatIllustration01=0,
+  simulation,pose,steerRad=0,cutawayWheel,cutaway01=0,
+  isolateOppositeRimInCutaway=false,heatIllustration01=0,
 })=>{
   const context=useMemo(createContextVehicle,[]);
   useEffect(()=>()=>disposeObject(context.model),[context]);
@@ -92,7 +96,10 @@ export const BrakingVehicle: React.FC<BrakingVehicleProps> = ({
     mount.roll.rotation.z=poseForWheel.wheelRotationRad;
     // Clear film-level cutaway shows the rotor instead of falsely placing it
     // on top of the kit's opaque wheel and spokes.
-    mount.roll.visible=cutaway<.35;
+    const oppositeRimOccluded=isolateOppositeRimInCutaway && exposed &&
+      cutawayWheel!==undefined && mount.anchor.id!==cutawayWheel &&
+      mount.anchor.axle===cutawayWheel.split('-')[0];
+    mount.roll.visible=cutaway<.35 && !oppositeRimOccluded;
     applyBrakeAssemblyPose(mount.rig,poseForWheel);
   }
   if(pose) placeVehicle(context.model,pose);
