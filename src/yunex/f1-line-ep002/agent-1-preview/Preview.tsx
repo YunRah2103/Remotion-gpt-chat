@@ -26,9 +26,11 @@ export function getAgent1PreviewCamera(frame:number,fps=30):RaceCameraPose {
     return {position:plus(plus(mid,[Math.sin(orbit)*13,43,0]),[12,0,Math.cos(orbit)*8]),
       target:plus(mid,[0,.5,0]),fov:39};
   }
+  // Longer-lens-feeling exit framing, with extra horizontal breathing room:
+  // both cars remain in view in 9:16 even as their roads reconverge.
   return {
-    position:plus(plus(plus(mid,mul(forward,25)),mul(left,15)),[0,8,0]),
-    target:plus(plus(mid,mul(forward,-1)),[0,.7,0]),fov:49,
+    position:plus(plus(plus(mid,mul(forward,35)),mul(left,23)),[0,14,0]),
+    target:plus(mid,[0,.7,0]),fov:60,
   };
 }
 const label:React.CSSProperties={
