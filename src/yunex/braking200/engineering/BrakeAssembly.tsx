@@ -23,6 +23,8 @@ export type BrakeRig = {
   outsideCaliper: THREE.Group;
   bridge: THREE.Group;
   heat: THREE.Mesh;
+  pressureChannel: THREE.Mesh;
+  pistons: Array<{mesh: THREE.Mesh; side: -1 | 1; restZ: number}>;
 };
 
 function material(color: string, metalness: number, roughness: number): THREE.MeshStandardMaterial {
@@ -141,6 +143,7 @@ export function createBrakeAssembly(options: BrakeAssemblyOptions): BrakeRig {
   }
 
   // Real opposed pads (stationary), their backing plates and four pistons.
+  const pistons: Array<{mesh: THREE.Mesh; side: -1 | 1; restZ: number}> = [];
   const insidePad = new THREE.Group();
   const outsidePad = new THREE.Group();
   const insideCaliper = new THREE.Group();
@@ -168,9 +171,10 @@ export function createBrakeAssembly(options: BrakeAssemblyOptions): BrakeRig {
     bar(cal,'machined-inset',[px,py,.013*side],
       [R*.42,R*.52,.003],caliperInset,-.21);
     for(const y of [-1,1]){
-      addMesh(cal,'hydraulic-piston',
+      const piston = addMesh(cal,'hydraulic-piston',
         new THREE.CylinderGeometry(R*.122,R*.122,.018,28),
         hydraulic,[px+y*R*.12,py+y*R*.18,-side*.017],[Math.PI/2,0,0]);
+      pistons.push({mesh:piston,side,restZ:piston.position.z});
       addMesh(cal,'piston-seal',
         new THREE.TorusGeometry(R*.129,.0025,7,28),
         darkSteel,[px+y*R*.12,py+y*R*.18,-side*.025]);
@@ -206,6 +210,11 @@ export function createBrakeAssembly(options: BrakeAssemblyOptions): BrakeRig {
   addMesh(root,'hydraulic-flex-hose',
     new THREE.TubeGeometry(hoseCurve,42,.006,8,false),
     hydraulic);
+  // A subtle amber pressure trace represents hydraulic pressure, not fluid
+  // travelling through the system or a literal real-world pressure scale.
+  const pressureChannel=addMesh(root,'illustrative-hydraulic-pressure',
+    new THREE.TubeGeometry(hoseCurve,42,.0032,8,false),
+    new THREE.MeshStandardMaterial({color:'#dbb477',emissive:'#d38a3e',emissiveIntensity:0,roughness:.24}));
   addMesh(root,'banjo-hydraulic-fitting',
     new THREE.CylinderGeometry(.013,.013,.024,18),
     machined,[R*.54,R*.61,-.038],[0,0,Math.PI/2]);
@@ -214,7 +223,7 @@ export function createBrakeAssembly(options: BrakeAssemblyOptions): BrakeRig {
     new THREE.TorusGeometry(R*.9,.009,8,96),heatMat,
     [0,0,.018]);
   heat.userData.illustrativeOnly=true;
-  return {root,rotor,insidePad,outsidePad,insideCaliper,outsideCaliper,bridge,heat};
+  return {root,rotor,insidePad,outsidePad,insideCaliper,outsideCaliper,bridge,heat,pressureChannel,pistons};
 }
 
 export function applyBrakeAssemblyPose(rig: BrakeRig, pose: BrakeAssemblyPose): void {
@@ -225,6 +234,12 @@ export function applyBrakeAssemblyPose(rig: BrakeRig, pose: BrakeAssemblyPose): 
   rig.outsidePad.position.z=padCenterZ(pose,1);
   rig.insideCaliper.position.z=-(ROTOR_FACE_HALF_SPACING_M+.045)-separation;
   rig.outsideCaliper.position.z=(ROTOR_FACE_HALF_SPACING_M+.045)+separation;
+  // Two opposed hydraulic pistons on each cheek move by genuine millimetres.
+  for(const piston of rig.pistons){
+    piston.mesh.position.z=piston.restZ-piston.side*Math.max(0,Math.min(.0012,pose.padTravelM));
+  }
+  const pressureMat=rig.pressureChannel.material as THREE.MeshStandardMaterial;
+  pressureMat.emissiveIntensity=.12+clamp01(pose.pressure01)*.85;
   rig.bridge.visible=separation<.025;
   const glow=rig.heat.material as THREE.MeshBasicMaterial;
   glow.opacity=clamp01(pose.heatIllustration01)*.16;
