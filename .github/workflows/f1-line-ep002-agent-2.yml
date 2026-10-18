@@ -1,0 +1,83 @@
+name: F1 EP002 Agent 2 - physics and native moving previews
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/f1-ep002-02-dynamics
+    paths:
+      - 'src/yunex/f1-line-ep002/physics/**'
+      - 'src/yunex/f1-line-ep002/agent-2-preview/**'
+      - 'tests/f1-line-ep002/agent-2*'
+      - '.github/workflows/f1-line-ep002-agent-2.yml'
+  pull_request:
+    branches:
+      - production/f1-racing-line-ep002-contract
+    paths:
+      - 'src/yunex/f1-line-ep002/physics/**'
+      - 'src/yunex/f1-line-ep002/agent-2-preview/**'
+      - 'tests/f1-line-ep002/agent-2*'
+      - '.github/workflows/f1-line-ep002-agent-2.yml'
+permissions:
+  contents: read
+jobs:
+  physics-and-render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: TypeScript and existing shared-kit unit tests
+        run: |
+          npm run check
+          npm run worldkit:test
+      - name: Agent 2 mechanics and signed comparison
+        run: |
+          node --experimental-strip-types --test tests/f1-line-ep002/agent-2.test.mjs
+          node --experimental-strip-types tests/f1-line-ep002/agent-2-report.mjs
+      - name: Render native animated Remotion two-car ghost comparison
+        run: |
+          mkdir -p out
+          npx remotion render src/yunex/f1-line-ep002/agent-2-preview/entry.tsx F1Agent2PhysicsDuel out/f1-agent2-duel.mp4 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1 --scale=0.75
+      - name: Render native animated Remotion tyre-load visualization
+        run: |
+          npx remotion render src/yunex/f1-line-ep002/agent-2-preview/entry.tsx F1Agent2GripVectors out/f1-agent2-grip.mp4 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1 --scale=0.75
+      - name: FFprobe, full decode, all frame hashes and moving-frame contact sheets
+        run: |
+          set -euo pipefail
+          for clip in out/f1-agent2-duel.mp4 out/f1-agent2-grip.mp4; do
+            test -s "$clip"
+            ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,pix_fmt,width,height,r_frame_rate,nb_frames -show_entries format=duration -of json "$clip" | tee "$clip.probe.json"
+            ffmpeg -nostdin -v error -xerror -i "$clip" -f null -
+            ffmpeg -nostdin -v error -i "$clip" -f framemd5 "$clip.framemd5"
+            ffmpeg -nostdin -v error -i "$clip" -vf "select='eq(n,0)+eq(n,60)+eq(n,120)+eq(n,180)',scale=360:-1,tile=4x1" -frames:v 1 "$clip.contact.jpg"
+          done
+          python3 - <<'PY'
+          import json,pathlib
+          for base in ['out/f1-agent2-duel.mp4','out/f1-agent2-grip.mp4']:
+              probe=json.loads(pathlib.Path(base+'.probe.json').read_text())
+              st=probe['streams'][0]
+              assert st['codec_name']=='h264' and st['pix_fmt']=='yuv420p',st
+              assert st['r_frame_rate']=='30/1' and int(st['nb_frames'])==186,st
+              assert st['width']==540 and st['height']==960,st
+              hashes=[line.split(',')[-1].strip() for line in pathlib.Path(base+'.framemd5').read_text().splitlines() if line and not line.startswith('#')]
+              assert len(hashes)==186,(base,len(hashes))
+              distinct=len(set(hashes))
+              print(base,'distinct moving frames:',distinct,'duration:',probe['format']['duration'])
+              assert distinct>=160,(base,distinct)
+          PY
+      - name: Publish native MP4, machine report and QC evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: f1-ep002-agent-2-physics-renders
+          path: |
+            out/*.mp4
+            out/*.json
+            out/*.framemd5
+            out/*.jpg
+          retention-days: 30
+          if-no-files-found: warn
