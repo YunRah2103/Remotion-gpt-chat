@@ -40,8 +40,8 @@ jobs:
           for n in abs-wheel-macro grand-tourer-track; do
             f="out/a2-physics/$n.mp4"
             ffprobe -v error -show_format -show_streams "$f" > "out/a2-physics/$n.ffprobe.txt"
-            dims=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0:s=x "$f")
-            test "$dims" = "540x960" || { echo "Incorrect 9:16 preview $dims"; exit 1; }
+            dims=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 "$f")
+            test "$dims" = "540,960" || { echo "Incorrect 9:16 preview $dims"; exit 1; }
             ffmpeg -nostdin -v error -xerror -i "$f" -f null - 2> "out/a2-physics/$n.decode.log"
             ffmpeg -nostdin -v error -i "$f" -vf 'select=eq(n\,8)+eq(n\,42)+eq(n\,92)' -vsync 0 "out/a2-physics/$n-sample-%02d.png"
             test "$(find out/a2-physics -name "$n-sample-*.png" | wc -l)" -eq 3
