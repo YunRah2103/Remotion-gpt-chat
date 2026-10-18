@@ -15,6 +15,8 @@ import type {FilmCue,TimedCue} from '../contracts.ts';
 import {BrakingVehicle as EngineeringBrakingVehicle} from '../engineering/BrakingVehicle.tsx';
 import {sampleBrakingSimulation} from '../physics/simulation.ts';
 import {mapFilmFrameToSimulationSec,mapAbsInsertFrameToSimulationSec} from '../physics/timeline.ts';
+import {sampleRoute} from '../../world-kit/environments.ts';
+import {vehicleSpec} from '../../world-kit/catalog.ts';
 
 type Mode = 'track'|'macro';
 const CUES:Record<Mode,readonly TimedCue[]>={
@@ -62,6 +64,7 @@ const Preview:React.FC<{mode:Mode}>=({mode})=>{
   const cutaway=shot==='mechanism'||shot==='heat' ?
     easing((progress01-.10)/.40)*.78:0;
   const label=shotNames[shot];
+  const wheelbase=vehicleSpec('grand-tourer').wheelbase;
   const opacity=frame<8?frame/8:frame>(mode==='track'?202:177)
     ?clamp01(((mode==='track'?210:185)-frame)/8):1;
   return <BrakingCameraStage
@@ -69,11 +72,15 @@ const Preview:React.FC<{mode:Mode}>=({mode})=>{
     simulationTimeAtFilmFrame={mapTime}
     startDistanceM={18}
     cameraOptions={{cues}}
-    renderVehicle={({state,route})=><EngineeringBrakingVehicle
-      simulation={state} pose={route}
+    renderVehicle={({state,route})=>{
+      const ahead=sampleRoute('track',18+state.traveledM+.75);
+      const deltaYaw=Math.atan2(Math.sin(ahead.yaw-route.yaw),Math.cos(ahead.yaw-route.yaw));
+      const steerRad=Math.max(-.42,Math.min(.42,Math.atan(wheelbase*deltaYaw/.75)));
+      return <EngineeringBrakingVehicle
+      simulation={state} pose={route} steerRad={steerRad}
       cutawayWheel="front-left" cutaway01={cutaway}
       heatIllustration01={shot==='heat'?.16:0}
-    />}
+    />;}}
     overlay={<div style={{...HUD,opacity}} aria-label={label}>
       <div style={{display:'inline-block',borderTop:'2px solid #d2a36c',paddingTop:14}}>
         {label}
