@@ -20,15 +20,15 @@ const follow=(p:V3,yaw:number,forwardM:number,sideM:number,heightM:number):V3=>{
 function cameraFor(shot:number,a:{position:V3;yaw:number},b:{position:V3;yaw:number},frame:number):Camera{
  const sway=Math.sin(frame*.055)*.06;
  if(shot===0)return {
-  position:follow(b.position,b.yaw,-14,13,9.7+sway),
-  target:follow(b.position,b.yaw,9,0,.8),fov:47};
+  position:follow(b.position,b.yaw,-20,12,11.4+sway),
+  target:follow(b.position,b.yaw,5,0,.8),fov:46};
  if(shot===1)return {
   // Near-wheel kerb height; visible road contact and moving background.
-  position:follow(b.position,b.yaw,3.6,6.3,1.18+sway),
-  target:follow(b.position,b.yaw,.4,0,.38),fov:44};
+  position:follow(b.position,b.yaw,1.7,-12.2,2.0+sway),
+  target:follow(b.position,b.yaw,0,0,.49),fov:50};
  return {
-  position:follow(a.position,a.yaw,-10,-4.6,2.3+sway),
-  target:follow(a.position,a.yaw,7.0,.1,.53),fov:43};
+  position:follow(a.position,a.yaw,-32,-7.0,9.0+sway),
+  target:follow(a.position,a.yaw,-8,.1,.63),fov:46};
 }
 /** Matched moving camera/cars/route for baseline and premium, 3 angles in six seconds.
  * NOT authoritative race physics or a winner claim. Agent 1/2 replace staging in film.
