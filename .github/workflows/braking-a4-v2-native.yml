@@ -1,0 +1,54 @@
+name: YUNEX Braking Agent 4 V2 authentic shared-model proof
+on:
+  push:
+    branches: [agent/braking-200kmh-001-lookdev-v2-proof]
+permissions:
+  contents: read
+jobs:
+  native-a4-v2:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install and verify all source
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          npm ci --no-audit --no-fund
+          npm run check
+          node --experimental-strip-types --test src/yunex/braking200/lookdev/lookdev.test.mjs
+      - name: Render the real GT and real A1 rotor with A2 physics (CPU swangle)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/braking-a4-v2
+          npx --no-install remotion compositions src/yunex/braking200/lookdev/proof-entry.tsx --gl=swangle
+          npx --no-install remotion render src/yunex/braking200/lookdev/proof-entry.tsx BrakingA4V2Car out/braking-a4-v2/full-car.mp4 --frames=0-89 --scale=0.6 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
+          npx --no-install remotion render src/yunex/braking200/lookdev/proof-entry.tsx BrakingA4V2Macro out/braking-a4-v2/real-brake-macro.mp4 --frames=0-89 --scale=0.6 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
+      - name: Probe full-decode and sampled-frame motion checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          for shot in full-car real-brake-macro; do
+            f="out/braking-a4-v2/${shot}.mp4"
+            ffprobe -v error -show_entries stream=codec_name,pix_fmt,width,height,nb_frames,r_frame_rate -show_entries format=duration,size -of json "$f" > "out/braking-a4-v2/${shot}-probe.json"
+            ffmpeg -v error -xerror -i "$f" -f null -
+            mkdir -p "out/braking-a4-v2/${shot}-frames"
+            ffmpeg -v error -i "$f" -vf "select='eq(n\\,0)+eq(n\\,44)+eq(n\\,89)'" -fps_mode vfr "out/braking-a4-v2/${shot}-frames/frame-%02d.png"
+            test "$(find "out/braking-a4-v2/${shot}-frames" -name '*.png' | wc -l)" -eq 3
+            test "$(sha256sum out/braking-a4-v2/${shot}-frames/*.png | cut -d' ' -f1 | sort -u | wc -l)" -ge 2
+            sha256sum "out/braking-a4-v2/${shot}.mp4" >> out/braking-a4-v2/SHA256SUMS.txt
+          done
+          echo "Native MP4s 3 seconds each; both full decoded and visibly moving at 0,44,89 frames. Review artistic quality separately." > out/braking-a4-v2/report.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-BRAKING-A4-V2-NATIVE-${{ github.run_id }}
+          path: out/braking-a4-v2/
+          retention-days: 30
+          if-no-files-found: warn
