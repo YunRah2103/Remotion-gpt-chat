@@ -11,7 +11,8 @@
     "worldkit:export": "node --experimental-strip-types scripts/world-kit/export-models.mjs",
     "worldkit:review": "node --experimental-strip-types scripts/world-kit/render-review.mjs",
     "worldkit:environments": "node --experimental-strip-types scripts/world-kit/render-environments.mjs",
-    "worldkit:export-props": "node --experimental-strip-types scripts/world-kit/export-props.mjs"
+    "worldkit:export-props": "node --experimental-strip-types scripts/world-kit/export-props.mjs",
+    "worldkit:review-v3": "node --experimental-strip-types scripts/world-kit/render-v3.mjs"
   },
   "dependencies": {
     "@remotion/captions": "4.0.533",

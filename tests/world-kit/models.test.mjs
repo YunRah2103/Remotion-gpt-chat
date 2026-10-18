@@ -4,10 +4,10 @@ import * as T from 'three';
 import {VEHICLES} from '../../src/yunex/world-kit/catalog.ts';
 import {createVehicle} from '../../src/yunex/world-kit/vehicles.ts';
 
-test('19 body variants cover the six vehicle families',()=>{
- assert.equal(VEHICLES.length,19);
- assert.deepEqual([...new Set(VEHICLES.map(v=>v.family))].sort(),['bike','formula','normal','sports','suv','truck']);
- assert.equal(new Set(VEHICLES.map(v=>v.id)).size,19);
+test('35 body variants cover seven vehicle families',()=>{
+ assert.equal(VEHICLES.length,35);
+ assert.deepEqual([...new Set(VEHICLES.map(v=>v.family))].sort(),['bike','formula','normal','sports','suv','truck','van']);
+ assert.equal(new Set(VEHICLES.map(v=>v.id)).size,35);
 });
 test('all models have finite geometry, realistic metre bounds and tyre contact',()=>{
  for(const spec of VEHICLES){
@@ -27,7 +27,7 @@ test('all models have finite geometry, realistic metre bounds and tyre contact',
  }
 });
 test('variants in a family have different silhouettes even in the same colour',()=>{
- for(const family of ['normal','sports','suv','formula','bike','truck']){
+ for(const family of ['normal','sports','suv','formula','bike','truck','van']){
   const signatures=VEHICLES.filter(v=>v.family===family).map(v=>{
    const m=createVehicle({variant:v.id,color:'#aaaaaa'});m.updateMatrixWorld(true);
    return new T.Box3().setFromObject(m).getSize(new T.Vector3()).toArray().map(n=>n.toFixed(3)).join(',');

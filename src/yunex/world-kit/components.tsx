@@ -11,8 +11,8 @@ import {disposeObject} from './geometry.ts';
 import type {VehicleOptions,TimeOfDay} from './catalog.ts';
 import type {EnvironmentOptions,RoutePose} from './environments.ts';
 import type {V3} from './geometry.ts';
-export const Vehicle:React.FC<VehicleOptions & {distance?:number;steer?:number;pose?:RoutePose}>=({variant,color,accent,wheelColor,lights=false,distance=0,steer=0,pose})=>{
- const model=useMemo(()=>createVehicle({variant,color,accent,wheelColor,lights}),[variant,color,accent,wheelColor,lights]);
+export const Vehicle:React.FC<VehicleOptions & {distance?:number;steer?:number;pose?:RoutePose}>=({variant,color,accent,wheelColor,lights=false,interior=true,cutaway=false,glassOpacity,interiorColor,steeringSide,distance=0,steer=0,pose})=>{
+ const model=useMemo(()=>createVehicle({variant,color,accent,wheelColor,lights,interior,cutaway,glassOpacity,interiorColor,steeringSide}),[variant,color,accent,wheelColor,lights,interior,cutaway,glassOpacity,interiorColor,steeringSide]);
  useEffect(()=>()=>disposeObject(model),[model]);
  animateVehicle(model,distance,steer);if(pose)placeVehicle(model,pose);else {model.position.set(0,0,0);model.rotation.set(0,0,0);}
  return <primitive object={model}/>;

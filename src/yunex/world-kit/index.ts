@@ -12,3 +12,4 @@ export {ENVIRONMENT_CATALOG,environmentSpec} from './world-catalog.ts';
 export {PROP_KINDS,createProp} from './props.ts';
 export type {PropKind,PropOptions} from './props.ts';
 export {SceneProp} from './components';
+export {createInterior,interiorLayout,interiorCamera} from './interiors.ts';

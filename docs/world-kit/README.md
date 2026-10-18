@@ -1,17 +1,18 @@
 # YUNEX reusable vehicles and worlds
 
-19 original generic vehicle bodies, 15 compatible 3D environments and 14 scene props. Designed for clean, modest-detail automotive explainers and stylised cinematics. No manufacturer badges or licensed model downloads. These are illustrative models, not engineering CAD or photoreal assets.
+35 original generic vehicle bodies, 20 compatible 3D environments and 14 scene props. Designed for clean, modest-detail automotive explainers and stylised cinematics. No manufacturer badges or licensed model downloads. These are illustrative models, not engineering CAD or photoreal assets.
 
 ## Vehicle catalogue
 
 | Family | Variant IDs |
 |---|---|
-| Normal | `saloon`, `hatchback`, `estate`, `compact` |
-| Sports | `coupe`, `roadster`, `supercar`, `grand-tourer` |
-| SUV | `crossover`, `boxy-suv`, `fastback-suv` |
+| Normal | `saloon`, `hatchback`, `estate`, `compact`, `fastback`, `city-ev`, `luxury-saloon`, `retro-saloon`, `hot-hatch` |
+| Sports | `coupe`, `roadster`, `supercar`, `grand-tourer`, `muscle-coupe`, `retro-coupe`, `targa`, `track-coupe` |
+| SUV | `crossover`, `boxy-suv`, `fastback-suv`, `compact-suv`, `long-suv` |
+| Van | `panel-van`, `minivan`, `camper-van` |
 | Single-seater | `formula-modern`, `formula-classic` |
 | Motorcycle | `sport-bike`, `naked-bike`, `touring-bike` |
-| Truck | `pickup`, `box-truck`, `tractor-truck` |
+| Truck | `pickup`, `box-truck`, `tractor-truck`, `single-cab-pickup`, `crew-pickup` |
 
 The variants have different dimensions and body geometry. Roadsters have an open cockpit, pickups an open bed, bikes different fairings/luggage, and heavy trucks distinct cab/cargo/chassis configurations. Paint changes are additional to those body differences.
 
@@ -22,13 +23,14 @@ npm ci
 npm run worldkit:studio
 ```
 
-The eight compositions also appear under **YUNEX-World-Kit** in the regular Studio. Original films remain intact.
+The eleven compositions also appear under **YUNEX-World-Kit** in the regular Studio. Original films remain intact.
 
 - `VehiclePreview` and `VehiclePreviewPortrait`: orbiting model inspection. Props: `variant`, `angle` (radians), optional `color`.
 - `DrivingPreview` and `DrivingPreviewPortrait`: 8-second tracking shot. Props: `variant`, `environment` (see the catalogue below), `timeOfDay` (`day`, `dusk`, `night`), `seed` (integer).
-- `WorldKitReel`: 19-second catalogue showing all vehicle shapes across the original three worlds.
+- `WorldKitReel`: 35-second catalogue showing all vehicle shapes across the original three worlds.
 - `EnvironmentPreview`: wider landscape shot for inspecting each environment.
-- `EnvironmentReel`: 15-second moving catalogue, one location per second.
+- `EnvironmentReel`: 20-second moving catalogue, one location per second.
+- `InteriorPreview`, `InteriorDriver`, `InteriorReel`: cutaway, driver-eye and 6-second interior catalogue.
 - `PropPreview`: orbiting scene prop inspection. Prop: `kind`.
 
 CLI example:
@@ -39,7 +41,7 @@ npx remotion render src/yunex/world-kit/entry.tsx DrivingPreview out/my-shot.mp4
   --gl=swangle --codec=h264 --pixel-format=yuv420p
 ```
 
-Default compositions render at 1920x1080 or 1080x1920, 30fps. The included review reel is 960x540 to keep review fast; it does not limit source output resolution. It is silent because this is an asset kit, not a scored film.
+Default compositions render at 1920x1080 or 1080x1920, 30fps. The V3 review reels are 960x540 at 15fps to keep review fast; this does not limit source output resolution. They are silent because this is an asset kit, not a scored film.
 
 ## Use in another film
 
@@ -80,7 +82,7 @@ For pure Three.js use `createVehicle`, `createEnvironment`, `animateVehicle`, `p
 - Roads accommodate the widest truck. Lane-following is kinematic; there is no collision simulation or real suspension. The highway median separates its two carriageways.
 - City building shapes and windows are repeatable by seed; another seed gives another layout. Lighting supports day/dusk/night. Headlights glow but do not project physical beams.
 - Environments use instancing for repeated scenery. The scene is deliberately modest in detail. Shadow focus follows the hero vehicle; distant objects fade with fog.
-- Models have exterior details and basic roadster seats; there are no complete interiors, opening doors, drivers, racing liveries or brand-specific mechanical claims.
+- Enclosed vehicles share a modelled interior template, fitted to their cabin dimensions. Doors are fixed; no drivers, racing liveries or brand-specific mechanical claims are included.
 
 ## GLB export and verification
 
@@ -90,17 +92,17 @@ Node **22.18+ or 24** is needed for scripts that execute TypeScript directly.
 npm run worldkit:test
 npm run check
 npm run worldkit:export
-npm run worldkit:review
+npm run worldkit:review-v3
 ```
 
-Export produces 19 `.glb` files plus `catalog.json` under `out/world-kit/glb`. GLBs retain wheel/steering node metadata, so the same animation helpers work on a loaded scene. Environments remain procedural source components; no environment GLBs are included.
+Export produces 35 `.glb` files plus `catalog.json` under `out/world-kit/glb`. GLBs retain wheel/steering node metadata, so the same animation helpers work on a loaded scene. Environments remain procedural source components; no environment GLBs are included.
 
-Review generates every model's front angle, five rear checks, two portrait checks, three environment stills and a moving 19-second MP4. Exported GLBs are round-trip loaded during validation. `out/` is ignored: build outputs are delivered separately, rather than bloating the repository.
+V3 review generates all 35 model stills, 20 environment stills, representative cutaway and driver views, and two moving MP4 previews. Exported GLBs are round-trip loaded during validation. `out/` is ignored: build outputs are delivered separately, rather than bloating the repository.
 
-Tests cover catalogue families, distinct body bounds, valid vertex positions, tyre ground contact, fairing normals, 285 combinations, deterministic/reversible wheel motion, repeatable city layouts, circuit wrapping and input rejection. `npm run check` checks the entire source tree. Native renders are still necessary to assess appearance.
+Tests cover catalogue families, distinct body bounds, valid vertex positions, tyre ground contact, fairing normals, 700 vehicle/environment combinations, deterministic/reversible wheel motion, repeatable city layouts, circuit wrapping and input rejection. `npm run check` checks the entire source tree. Native renders are still necessary to assess appearance.
 
 
-## Environment expansion V2
+## Environments
 
 | ID | Location | Mode |
 |---|---|---|
@@ -119,10 +121,15 @@ Tests cover catalogue families, distinct body bounds, valid vertex positions, ty
 | `airfield` | Runway, hangars and control tower | Drive |
 | `garage` | Workshop with tools and a service bay | Parked display |
 | `showroom` | Minimal display hall | Parked display |
+| `suburb` | Residential neighbourhood and gardens | Drive |
+| `harbour` | Docks, water and moored boats | Drive |
+| `canyon` | Rock canyon road | Drive |
+| `rally` | Dirt rally road and course furniture | Drive |
+| `service-station` | Fuel and charging forecourt | Drive |
 
 `ENVIRONMENT_CATALOG` provides IDs, labels, suggested lighting and mode. The existing `Environment` wrapper and pure `createEnvironment` factory accept every ID. Scenic routes curve in X/Z while preserving the common y=0 surface. `sampleRoute` follows those roads and returns a fixed pose for the two display sets. `DrivingPreview` automatically parks vehicles in those sets. Workshop and showroom are open camera sets with selected walls and overhead strips, not fully enclosed buildings. They support the largest included truck.
 
-V2 preserves the original three route interfaces. Straight driving scenes wrap over 180m, while the race circuit is a continuous loop. Use `routeLength` and cut before a straight route's wrap for longer videos. Routes are visually compatible kinematic paths, not collision or terrain physics. The corridor check samples three widths every 12m; it is not an exhaustive vehicle-volume sweep.
+The kit preserves the original three route interfaces. Straight driving scenes wrap over 180m, while the race circuit is a continuous loop. Use `routeLength` and cut before a straight route's wrap for longer videos. Routes are visually compatible kinematic paths, not collision or terrain physics. The corridor check samples three widths every 12m; it is not an exhaustive vehicle-volume sweep.
 
 ### Reusable props
 
@@ -139,7 +146,15 @@ For pure Three.js: `createProp({kind:'barrier',color:'#c67e43',lit:false})`. Pro
 
 ```bash
 npm run worldkit:export-props   # 14 GLBs, round-trip validated on export
-npm run worldkit:environments   # 15 location stills, 14 prop stills, portrait truck checks and MP4
+npm run worldkit:environments -- --props-only --stills-only # 14 prop stills
 ```
 
-V2 outputs live in `out/world-kit-v2`. Vehicles and props export to portable GLB files. Environments remain procedural source components so route geometry, lighting and repeated scenery can be adjusted easily; environment GLBs are not included. Snow and water are stylised static geometry, with no weather simulation. Vehicle models remain unchanged from the approved V1 kit.
+V2 outputs live in `out/world-kit-v2`. Vehicles and props export to portable GLB files. Environments remain procedural source components so route geometry, lighting and repeated scenery can be adjusted easily; environment GLBs are not included. Snow and water are stylised static geometry, with no weather simulation. V3 adds 16 vehicle bodies, five environments and shared interiors to V2.
+
+## Shared interiors
+
+`Vehicle` and `createVehicle` accept `interior` (default `true`), `interiorColor`, `steeringSide` (`right` default, or `left`), `glassOpacity` (default `0.34`) and `cutaway` (default `false`). Cutaway removes roof/glass visibility, including the heavy-truck cab roof, for interior inspection. Use the full exterior for driving shots.
+
+Most enclosed cars reuse seats, headrests, dashboard, screens, vents, steering wheel, pedals, console, door trim and floor. Seat positions fit sloping rear glass; five- and seven-seat bodies include the centre rear seat. Sports cars use lower layouts; trucks use a raised two-seat cab. Panel/camper vans add a cab divider, with a simple bed and cabinet in the camper. Formula cars keep their own basic racing cockpit; bikes have saddles and controls rather than enclosed cabins. These are modest-detail illustrative interiors, not manufacturer interiors.
+
+`interiorCamera(vehicleSpec('saloon'),'right')` returns a position, target and FOV in vehicle-local coordinates. Apply the vehicle pose to both vectors when filming a moving vehicle. `InteriorDriver` demonstrates a fixed view on a highway; `InteriorPreview` demonstrates the cutaway. Steering animation also turns the interior wheel. Portable GLBs include interiors by default.

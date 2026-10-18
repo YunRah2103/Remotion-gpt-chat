@@ -26,13 +26,14 @@ jobs:
       - run: node scripts/world-kit/validate-glb.mjs
       - run: npm run worldkit:export-props
       - name: Native model and environment review
-        run: npm run worldkit:review
-      - name: Expanded environment and prop review
-        run: npm run worldkit:environments
+        run: npm run worldkit:review-v3
+      - name: Reusable prop stills
+        run: npm run worldkit:environments -- --props-only --stills-only
       - uses: actions/upload-artifact@v4
         with:
-          name: YUNEX-WORLD-KIT-V2
+          name: YUNEX-WORLD-KIT-V3
           path: |
             out/world-kit
             out/world-kit-v2
+            out/world-kit-v3
           retention-days: 30

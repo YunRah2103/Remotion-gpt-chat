@@ -3,17 +3,18 @@ import * as T from 'three';
 import {box,mesh,rod,surface} from './geometry.ts';import type {V3} from './geometry.ts';
 import {instances,trees,random} from './scenery.ts';import type {Instance} from './scenery.ts';
 import {createProp} from './props.ts';import type {PropKind} from './props.ts';
-import {environmentSpec,scenicOffset} from './world-catalog.ts';
+import {environmentSpec,scenicOffset,isScenic} from './world-catalog.ts';
 import type {EnvironmentKind,TimeOfDay} from './catalog.ts';
 type BuildOptions={kind:EnvironmentKind;seed:number;timeOfDay:TimeOfDay};
 function prop(g:T.Group,kind:PropKind,p:V3,ry=0,lit=false){const o=createProp({kind,lit});o.position.set(...p);o.rotation.y=ry;g.add(o);return o;}
 function ground(g:T.Group,color:string,y=-.12){box(g,surface(color),[520,.12,520],[0,y-.06,0],.001,'terrain');}
 function road(g:T.Group,kind:string,width=10){
- const curved=['coast','mountain','forest','desert','snow'].includes(kind),pos:number[]=[],idx:number[]=[],lines:Instance[]=[];
+ const curved=isScenic(kind),pos:number[]=[],idx:number[]=[],lines:Instance[]=[];
  const offset=(x:number)=>curved?scenicOffset(x,kind):0;
  for(let i=0;i<=120;i++){const x=-120+i*2,z=offset(x);pos.push(x,0,z-width/2,x,0,z+width/2);if(i<120){const j=i*2;idx.push(j,j+1,j+2,j+1,j+3,j+2);}}
- const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(pos,3));geo.setIndex(idx);geo.computeVertexNormals();mesh(g,geo,surface('#3e484e',.02,.94),[0,0,0],[0,0,0],'road');
+ const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(pos,3));geo.setIndex(idx);geo.computeVertexNormals();mesh(g,geo,surface(kind==='rally'?'#8e826c':'#3e484e',.02,.94),[0,0,0],[0,0,0],'road');
  for(let x=-118;x<119;x+=4){const z=offset(x),ry=-Math.atan((offset(x+.1)-offset(x-.1))/.2);for(const side of [-1,1])lines.push({p:[x,.012,z+side*(width/2-.25)],s:[4.1,.018,.11],ry});if(Math.round(x/4)%2===0)lines.push({p:[x,.013,z],s:[2.4,.018,.10],ry});}
+ if(kind==='rally')return;
  instances(g,'lane-markings',new T.BoxGeometry(),surface(kind==='snow'?'#c5b368':'#dbddcf'),lines);
 }
 function rocks(g:T.Group,rng:()=>number,items:number,snow=false){
@@ -99,8 +100,35 @@ function indoor(g:T.Group,kind:string,lit:boolean){
  }
  for(const x of [-7,7]){const light=new T.PointLight('#e4f2f4',45,25,2);light.position.set(x,5,-2);g.add(light);}
 }
+
+function extraLocation(g:T.Group,opts:BuildOptions){
+ const {kind,timeOfDay}=opts,lit=timeOfDay!=='day';
+ if(kind==='harbour'){
+  box(g,surface('#a4a797'),[520,.12,280],[0,-.18,122],.001,'dock-land');box(g,surface('#527e8e',.25,.35),[520,.1,240],[0,-.45,-138],.001,'harbour-water');road(g,kind,12);
+  for(let i=0;i<8;i++){const x=-110+i*30;box(g,surface('#7d8e8c'),[10,.4,16],[x,-.05,-23],.02,'jetty');const hull=box(g,surface(i%2?'#788f9d':'#ad9c79'),[8,.9,2.6],[x,.15,-34],.12,'moored-boat');box(g,surface('#d2d5c8'),[3.1,1.6,2.0],[x,1.1,-34],.08,'boat-cabin');prop(g,'bollard',[x-3,0,-12]);}
+  for(const x of [-70,40]){const m=surface('#a58b58',.3);for(const z of [15,23])box(g,m,[.5,15,.5],[x,7.5,z],.02,'crane-leg');box(g,m,[2,1.5,32],[x,15,8],.03,'crane-jib');rod(g,m,[x,16,22],[x,16,-10],.14);rod(g,surface('#46565b'),[x,15,-8],[x,4,-8],.05);}
+ }else if(kind==='suburb'){
+  ground(g,'#829275');road(g,kind,11);const rng=random(opts.seed);
+  for(let i=0;i<12;i++)for(const sign of [-1,1]){const x=-110+i*20,z=sign*20,colour=['#c0b89e','#b3bdaf','#b4b4b1'][i%3];box(g,surface(colour),[9,5.2,8],[x,2.6,z],.02,'house');mesh(g,new T.ConeGeometry(1,1,4),surface('#7d6b5e'),[x,6.45,z],[0,Math.PI/4,0],'pitched-roof').scale.set(7.4,2.5,6.3);for(const dx of [-2.4,2.4])box(g,surface('#5b7980',.3,.3),[1.7,1.5,.04],[x+dx,3.2,z-sign*4.03],.01,'house-window');box(g,surface('#727e75'),[3,.05,10],[x,-.025,sign*10],.002,'driveway');for(let j=0;j<12;j++)box(g,surface('#b8b4a0'),[.15,1.0,.12],[x-5.5+j,0.5,sign*12.5],.01,'garden-fence');}
+  trees(g,Array.from({length:18},(_,i)=>[-114+i*13,0,(i%2?1:-1)*30]));
+ }else if(kind==='canyon'){
+  ground(g,'#b6977b');road(g,kind,10);const rng=random(opts.seed),r:T.Object3D[]=[];
+  for(let i=0;i<38;i++){const x=-120+i*6.5;for(const sign of [-1,1]){const h=9+rng()*15;mesh(g,new T.IcosahedronGeometry(1,1),surface(i%2?'#ad8c72':'#be9d7f'),[x,h*.40,sign*(25+rng()*9)],[0,rng()*2,0],'canyon-wall').scale.set(10,h,9);}}
+  for(let i=0;i<6;i++)prop(g,'road-sign',[-100+i*40,0,scenicOffset(-100+i*40,kind)+7],-Math.PI/2);
+ }else if(kind==='rally'){
+  ground(g,'#858566');road(g,kind,10);const rng=random(opts.seed);trees(g,Array.from({length:110},(_,i)=>{const x=(rng()-.5)*250;return [x,0,scenicOffset(x,kind)+(i%2?1:-1)*(12+rng()*40)];}));
+  const gravel:Instance[]=[];for(let i=0;i<150;i++){const x=(rng()-.5)*240;gravel.push({p:[x,.008,scenicOffset(x,kind)+(rng()-.5)*8],s:[.10,.016,.08],color:i%2?'#b5aa8c':'#8e826a'});}instances(g,'gravel-speckles',new T.BoxGeometry(),surface('#ffffff'),gravel);
+  for(let i=0;i<10;i++){const x=-100+i*22;prop(g,'barrier',[x,0,scenicOffset(x,kind)+6.4]);}
+ }else{
+  ground(g,'#929888');road(g,kind,12);box(g,surface('#a5aaa1'),[58,.08,34],[0,-.04,-25],.002,'forecourt');
+  const beam=surface('#d4d6c6'),accent=surface('#4e9389',.25);for(const x of [-18,0,18])for(const z of [-16,-31])box(g,beam,[.45,5.9,.45],[x,2.95,z],.02,'fuel-canopy-column');box(g,beam,[42,.5,20],[0,6.1,-23.5],.03,'fuel-canopy');box(g,accent,[42,.22,.18],[0,6.15,-13.4],.01,'canopy-trim');
+  for(const x of [-13,-5,5,13])prop(g,'fuel-pump',[x,0,-21],0,lit);for(const x of [-22,22])prop(g,'charging-point',[x,0,-12],0,lit);
+  box(g,surface('#b5b9a9'),[35,4,9],[0,2,-43],.03,'service-shop');box(g,surface('#5b7e85',.25,.3),[31,2.4,.05],[0,1.6,-38.46],.01,'shopfront');for(const x of [-25,25])prop(g,'streetlight',[x,0,-13],Math.PI,lit);
+ }
+}
+
 export function buildNewEnvironment(g:T.Group,opts:BuildOptions){
  const {kind,timeOfDay}=opts,lit=timeOfDay!=='day';
  if(['coast','mountain','forest','desert','snow'].includes(kind))scenic(g,opts);
- else if(kind==='tunnel')tunnel(g,lit);else if(kind==='bridge')bridge(g);else if(kind==='industrial')industrial(g,lit);else if(kind==='parking')parking(g,lit);else if(kind==='airfield')airfield(g);else if(kind==='garage'||kind==='showroom')indoor(g,kind,lit);else throw new Error(`Unknown environment: ${kind}`);
+ else if(kind==='tunnel')tunnel(g,lit);else if(kind==='bridge')bridge(g);else if(kind==='industrial')industrial(g,lit);else if(kind==='parking')parking(g,lit);else if(kind==='airfield')airfield(g);else if(kind==='garage'||kind==='showroom')indoor(g,kind,lit);else if(['suburb','harbour','canyon','rally','service-station'].includes(kind))extraLocation(g,opts);else throw new Error(`Unknown environment: ${kind}`);
 }

@@ -23,5 +23,5 @@ try{
  const composition=await selectComposition({serveUrl,id:'WorldKitReel',browserInstance:browser});
  console.log('REEL START');
  await renderMedia({serveUrl,composition,codec:'h264',outputLocation:`${output}/YUNEX_WORLD_KIT_PREVIEW.mp4`,scale:.5,concurrency:2,browserInstance:browser,chromiumOptions:{gl:'swangle'},crf:19,onProgress:p=>{if(p.renderedFrames%30===0)console.log('REEL',p.renderedFrames);}});
- await writeFile(`${output}/render-manifest.json`,JSON.stringify({variants:VEHICLES.map(v=>v.id),environments:['highway','city','track'],preview:{width:960,height:540,fps:30,frames:570}},null,2));
+ await writeFile(`${output}/render-manifest.json`,JSON.stringify({variants:VEHICLES.map(v=>v.id),environments:['highway','city','track'],preview:{width:960,height:540,fps:composition.fps,frames:composition.durationInFrames}},null,2));
 }finally{await browser.close({silent:true});}

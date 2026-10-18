@@ -16,7 +16,12 @@ export const ENVIRONMENT_CATALOG:readonly EnvironmentSpec[]=[
  {id:'airfield',label:'Airfield straight',mode:'drive',timeOfDay:'day',ground:'#7f8b70',description:'Runway markings, hangars and control tower'},
  {id:'garage',label:'Workshop garage',mode:'display',timeOfDay:'day',ground:'#89908b',description:'Service bay, benches, tool cabinets and tyre racks'},
  {id:'showroom',label:'Minimal showroom',mode:'display',timeOfDay:'day',ground:'#b6bfba',description:'Bright display hall, slatted walls and overhead lighting'},
+ {id:'suburb',label:'Suburban neighbourhood',mode:'drive',timeOfDay:'day',ground:'#829275',description:'Houses, gardens, driveways and fences'},
+ {id:'harbour',label:'Harbour front',mode:'drive',timeOfDay:'dusk',ground:'#a4a797',description:'Dock road, boats, waterfront and cranes'},
+ {id:'canyon',label:'Canyon road',mode:'drive',timeOfDay:'day',ground:'#b6977b',description:'Rock walls, sandstone formations and bends'},
+ {id:'rally',label:'Gravel rally stage',mode:'drive',timeOfDay:'day',ground:'#858566',description:'Unmarked gravel road, forest and safety barriers'},
+ {id:'service-station',label:'Roadside service station',mode:'drive',timeOfDay:'dusk',ground:'#929888',description:'Fuel canopy, pumps, shop and charging bays'},
 ];
 export function environmentSpec(id:string):EnvironmentSpec{const s=ENVIRONMENT_CATALOG.find(e=>e.id===id);if(!s)throw new Error(`Unknown environment: ${id}`);return s;}
-export const isScenic=(id:string)=>['coast','mountain','forest','desert','snow'].includes(id);
+export const isScenic=(id:string)=>['coast','mountain','forest','desert','snow','canyon','rally'].includes(id);
 export function scenicOffset(x:number,kind:string){return Math.sin(x/(kind==='mountain'?32:48))*(kind==='mountain'?8:5);}

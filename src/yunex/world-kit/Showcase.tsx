@@ -26,7 +26,7 @@ export const VehiclePreview:React.FC<PreviewProps>=({variant='saloon',angle=.67,
 };
 export type DrivingProps={variant:VehicleVariant;environment:EnvironmentKind;timeOfDay:TimeOfDay;seed:number;wideView?:boolean};
 export const DrivingPreview:React.FC<DrivingProps>=({variant='coupe',environment='highway',timeOfDay='day',seed=12,wideView=false})=>{
- const {width,height,fps}=useVideoConfig(),frame=useCurrentFrame(),s=vehicleSpec(variant),d=environmentSpec(environment).mode==='display'?0:frame/fps*9-48;
+ const {width,height,fps}=useVideoConfig(),frame=useCurrentFrame(),s=vehicleSpec(variant),d=environmentSpec(environment).mode==='display'?0:frame/fps*9-(environment==='service-station'?4:48);
  const pose=sampleRoute(environment,d),next=sampleRoute(environment,d+.5);
  const angle=pose.yaw,wide=(height>width?1.35:1)*(wideView?1.65:1);
  const offset:V3=environment==='tunnel'?[s.length*1.8,s.height+1.1,3.7]:[s.length*1.25*wide,s.height+(wideView?3.4:2.05),s.length*1.05*wide];
@@ -41,7 +41,7 @@ export const DrivingPreview:React.FC<DrivingProps>=({variant='coupe',environment
   <div style={{...caption,position:'absolute',left:'5%',top:'7%',background:'#15232bd9',padding:'12px 18px',fontSize:width*.016}}>{s.label.toUpperCase()} / {environment.toUpperCase()}</div>
  </AbsoluteFill>;
 };
-/** 19 shapes, 3 environments; one second per variant at any FPS. */
+/** 35 shapes, 3 environments; one second per variant at any FPS. */
 export const WorldKitReel:React.FC=()=>{
  const frame=useCurrentFrame(),{fps}=useVideoConfig(),i=Math.min(VEHICLES.length-1,Math.floor(frame/fps));
  const environment=(['highway','city','track'] as const)[i%3];
