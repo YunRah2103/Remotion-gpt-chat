@@ -10,49 +10,69 @@ permissions:
 jobs:
   render-a2:
     runs-on: ubuntu-24.04
-    timeout-minutes: 70
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: npm
+      - name: Stage actual Agent 1 brake assembly from pinned SHA (CI only, no peer edit)
+        shell: bash
+        env:
+          A1_PIN: c704dc67acd0567cb7dbde8c21a9a4b0bf4f1f0c
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "$A1_PIN"
+          git restore --source="$A1_PIN" --worktree -- src/yunex/braking200/engineering
+          mkdir -p out/a2-physics
+          echo "$A1_PIN" > out/a2-physics/PINNED_A1_SHA.txt
+          git rev-parse HEAD > out/a2-physics/ACTUAL_A2_SHA.txt
+          test -f src/yunex/braking200/engineering/BrakingVehicle.tsx
+          test -f src/yunex/braking200/engineering/BrakeAssembly.tsx
+          test -f src/yunex/braking200/engineering/mechanics.ts
       - name: Install dependencies and FFmpeg
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
           npm ci --no-audit --no-fund
-      - name: Typecheck and verify physical invariants
+      - name: Typecheck and physics and A1 integration tests
         run: |
           npm run check
           node --experimental-strip-types --test src/yunex/braking200/physics/simulation.test.mjs
-      - name: Native portrait tyre and ABS moving proof
+          node --experimental-strip-types --test src/yunex/braking200/physics/integration.test.mjs
+          node --experimental-strip-types --test src/yunex/braking200/engineering/mechanics.test.mjs
+      - name: Real A1 drilled-rotor and lower-grip ABS integration MP4
         run: |
           mkdir -p out/a2-physics
-          npx remotion render src/yunex/braking200/physics/entry.tsx BrakingPhysicsMacro out/a2-physics/abs-wheel-macro.mp4 --frames=0-144 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
-      - name: Native portrait kit grand-tourer and track proof
+          npx remotion render src/yunex/braking200/physics/integrated-entry.tsx PhysicsIntegratedAbsMacro out/a2-physics/01-a1-brake-low-grip-abs.mp4 --frames=0-144 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+      - name: Real A1 kit grand-tourer with physical dry-track stop MP4
         run: |
-          npx remotion render src/yunex/braking200/physics/entry.tsx BrakingPhysicsContext out/a2-physics/grand-tourer-track.mp4 --frames=0-119 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+          npx remotion render src/yunex/braking200/physics/integrated-entry.tsx PhysicsIntegratedDryTrack out/a2-physics/02-a1-grand-tourer-dry-stop.mp4 --frames=0-149 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
       - name: Full stream decode, samples and moving frame integrity
         shell: bash
         run: |
           set -euo pipefail
-          for n in abs-wheel-macro grand-tourer-track; do
+          for n in 01-a1-brake-low-grip-abs 02-a1-grand-tourer-dry-stop; do
             f="out/a2-physics/$n.mp4"
             ffprobe -v error -show_format -show_streams "$f" > "out/a2-physics/$n.ffprobe.txt"
             dims=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of default=noprint_wrappers=1:nokey=1 "$f" | paste -sdx -)
             test "$dims" = "540x960" || { echo "Incorrect 9:16 preview $dims"; exit 1; }
+            count=$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=noprint_wrappers=1:nokey=1 "$f")
+            test "$count" -ge 145 || { echo "Incorrect frame count $count"; exit 1; }
             ffmpeg -nostdin -v error -xerror -i "$f" -f null - 2> "out/a2-physics/$n.decode.log"
-            ffmpeg -nostdin -v error -i "$f" -vf 'select=eq(n\,8)+eq(n\,42)+eq(n\,92)' -vsync 0 "out/a2-physics/$n-sample-%02d.png"
-            test "$(find out/a2-physics -name "$n-sample-*.png" | wc -l)" -eq 3
+            ffmpeg -nostdin -v error -i "$f" -vf 'select=eq(n\,7)+eq(n\,55)+eq(n\,105)+eq(n\,140)' -vsync 0 "out/a2-physics/$n-sample-%02d.png"
+            test "$(find out/a2-physics -name "$n-sample-*.png" | wc -l)" -eq 4
             ffmpeg -nostdin -v error -i "$f" -f framemd5 "out/a2-physics/$n.framemd5"
-            test "$(grep -v '^#' "out/a2-physics/$n.framemd5" | awk -F, '{print $6}' | sort -u | wc -l)" -ge 12 || { echo "Insufficient moving frame differences"; exit 1; }
+            test "$(grep -v '^#' "out/a2-physics/$n.framemd5" | awk -F, '{print $6}' | sort -u | wc -l)" -ge 90 || { echo "Insufficient moving frame differences"; exit 1; }
           done
           sha256sum out/a2-physics/*.mp4 > out/a2-physics/SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: YUNEX-A2-PHYSICS-MP4-${{ github.run_id }}
+          name: YUNEX-A2-A1-INTEGRATED-PROOFS-${{ github.run_id }}
           path: out/a2-physics/
           retention-days: 30
           if-no-files-found: warn
