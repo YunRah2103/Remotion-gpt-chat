@@ -148,7 +148,8 @@ test('signed inverse-metre curvature is the measured path yaw derivative dyaw/ds
   const ds=.25;
   for(let s=1;s<path.lengthM-1;s+=.61){
    const p=path.sampleAtDistance(s),ahead=path.sampleAtDistance(s+ds),behind=path.sampleAtDistance(s-ds);
-   // Path headings are continuously unwrapped; direct signed difference is dyaw.\n   const numerical=(ahead.yaw-behind.yaw)/(2*ds);
+   // Path headings are continuously unwrapped; direct signed difference is dyaw.
+   const numerical=(ahead.yaw-behind.yaw)/(2*ds);
    assert.ok(Number.isFinite(numerical), `yaw derivative nonfinite: ${path.id} s=${s} forwardYaw=${ahead.yaw} backYaw=${behind.yaw} arc=${path.lengthM} declared=${p.curvatureInvM}`);
    assert.ok(Math.abs(numerical-p.curvatureInvM)<.04,
     `${path.id} at s=${s.toFixed(2)}m: finite diff ${numerical.toFixed(4)}, declared ${p.curvatureInvM.toFixed(4)}`);
