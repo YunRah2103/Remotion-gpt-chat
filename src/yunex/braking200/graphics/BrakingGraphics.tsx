@@ -55,7 +55,7 @@ export const BrakingGraphics:React.FC<BrakingGraphicsProps>=({
   const target=focusWorld&&cameraPose?projectWorldPoint(focusWorld,cameraPose):null;
   const pin=target?.visible?safePin(target):null;
   const pinShown=showPin&&pin!==null;
-  const left=pin&&pin.x<540?580:103;
+  const left=pin&&pin.x<540?475:103;
   const baseline=pin&&pin.y<935?1500:510;
   const lineFromX=left===103?left+385:left;
   const lineFromY=baseline+45;
