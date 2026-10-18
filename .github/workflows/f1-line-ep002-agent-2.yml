@@ -50,6 +50,12 @@ jobs:
           set -euo pipefail
           for clip in out/f1-agent2-duel.mp4 out/f1-agent2-grip.mp4; do
             test -s "$clip"
+            # Remotion's software WebGL output is tagged full-range yuvj420p.
+            # Convert values correctly to limited-range yuv420p for video delivery.
+            ffmpeg -nostdin -v error -y -i "$clip" -vf "scale=in_range=full:out_range=limited,format=yuv420p" \
+              -c:v libx264 -preset veryfast -crf 18 -pix_fmt yuv420p \
+              -color_range tv -movflags +faststart "${clip%.mp4}.limited.mp4"
+            mv "${clip%.mp4}.limited.mp4" "$clip"
             ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,pix_fmt,width,height,r_frame_rate,nb_frames -show_entries format=duration -of json "$clip" | tee "$clip.probe.json"
             ffmpeg -nostdin -v error -xerror -i "$clip" -f null -
             ffmpeg -nostdin -v error -i "$clip" -f framemd5 "$clip.framemd5"
