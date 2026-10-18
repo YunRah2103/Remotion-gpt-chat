@@ -5,7 +5,7 @@ import {ThreeCanvas} from '@remotion/three';
 import {Environment,Vehicle,WorldLighting,CameraAim} from '../../world-kit/components.tsx';
 import {RACE_COLORS} from '../contract.ts';
 import type {CarFrameState,RaceCameraPose,RaceFrameState,V3} from '../contract.ts';
-import {fixtureSimulator} from '../physics/index.ts';
+import {raceSimulator} from '../physics/index.ts';
 
 /** Agent 2 owns physical movie demonstrations; Agent 3 owns final episode cameras. */
 const plus=(a:V3,b:V3):V3=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]];
@@ -68,17 +68,17 @@ const ForceVectors:React.FC<{car:CarFrameState;accent:string}>=({car,accent})=>{
 };
 const Caption:React.FC<{state:RaceFrameState;scene:'duel'|'grip'}>=({state,scene})=>{
   const a=state.cars.shortcut,b=state.cars.racing;
-  const comparison=fixtureSimulator.comparison;
+  const comparison=raceSimulator.comparison;
   const delta=comparison.racingFinishAdvantageSeconds;
   return <AbsoluteFill style={{pointerEvents:'none'}}>
     <div style={{...overlay,left:'6%',top:'6%',fontSize:16,fontWeight:800,letterSpacing:2}}>
       YUNEX / RACING LINE / PHYSICS REPLAY
     </div>
     <div style={{...overlay,left:'6%',top:'10%',fontSize:14,opacity:.85}}>
-      IDENTICAL CARS · IDENTICAL GRIP · SAME START
+      AGENT 1 REAL PATHS · IDENTICAL CARS · SHARED CHECKPOINTS
     </div>
     <div style={{...overlay,left:'6%',top:'14%',fontSize:13,opacity:.75}}>
-      GHOST-LAP COMPARISON · NOT A WHEEL-TO-WHEEL OVERTAKE
+      SYNCHRONISED GHOST REPLAY · NOT A WHEEL-TO-WHEEL OVERTAKE
     </div>
     <div style={{...overlay,left:'6%',bottom:'12%',fontSize:25,fontWeight:700,color:RACE_COLORS.shortcut}}>
       A / INNER LINE — {kmh(a.speedMps)} km/h
@@ -88,8 +88,8 @@ const Caption:React.FC<{state:RaceFrameState;scene:'duel'|'grip'}>=({state,scene
     </div>
     <div style={{...overlay,left:'6%',bottom:'4%',fontSize:14}}>
       {scene==='grip'?'3D arrows: lateral tyre demand / longitudinal brake + throttle':
-        'COMPUTED FINISH: '+(Math.abs(delta)<.000001?'TIE':
-        (delta>0?'B ':'A ')+Math.abs(delta).toFixed(3)+' s ahead')}
+        'REAL PATH FINISH: '+(Math.abs(delta)<.000001?'TIE':
+        (delta>0?'B ':'A ')+Math.abs(delta).toFixed(3)+' s faster')}
     </div>
   </AbsoluteFill>;
 };
@@ -97,8 +97,9 @@ const Caption:React.FC<{state:RaceFrameState;scene:'duel'|'grip'}>=({state,scene
  * race-time source. No fake wheelspin, speed readouts or injected overtake animation. */
 export const F1Agent2PhysicsPreview:React.FC<{scene:'duel'|'grip'}>=({scene})=>{
   const frame=useCurrentFrame(),{width,height,fps}=useVideoConfig();
-  const timeSeconds=scene==='duel'?.65+frame/fps*.91:.3+frame/fps*.94;
-  const state=fixtureSimulator.sample(Math.round(timeSeconds*fps*100)/100,fps);
+  // Ghost-lap time is the SAME for both cars: no offset, scripted advantage or fake pass.
+  const timeSeconds=frame/fps;
+  const state=raceSimulator.sample(timeSeconds*fps,fps);
   // All scene geometry/wheels use car.pathDistanceM rather than independent timers.
   const camera=cameraFor(state,scene);
   return <AbsoluteFill style={{background:'#a3bdc6'}}>
@@ -107,12 +108,30 @@ export const F1Agent2PhysicsPreview:React.FC<{scene:'duel'|'grip'}>=({scene})=>{
       <WorldLighting timeOfDay="dusk" focus={camera.target}/>
       <Environment kind="track" seed={12} timeOfDay="dusk"/>
       <CameraAim position={camera.position} target={camera.target} fov={camera.fov}/>
-      <Vehicle variant="formula-modern" color={RACE_COLORS.shortcut} accent="#ecf5f4"
-        distance={state.cars.shortcut.travelDistanceM} steer={state.cars.shortcut.steerRad}
-        pose={state.cars.shortcut.worldPose}/>
-      <Vehicle variant="formula-modern" color={RACE_COLORS.racing} accent="#fff0d5"
-        distance={state.cars.racing.travelDistanceM} steer={state.cars.racing.steerRad}
-        pose={state.cars.racing.worldPose}/>
+      {/*
+         Comparison replay shares frame time and real checkpoint. If the paths
+         converge within one Formula-car width, suppress the non-focused ghost
+         so two solid cars never physically intersect on screen. These are
+         alternative laps, not a race overtake.
+      */}
+      {(() => {
+        const pa=state.cars.shortcut.worldPose.position;
+        const pb=state.cars.racing.worldPose.position;
+        const separation=Math.hypot(pa[0]-pb[0],pa[2]-pb[2]);
+        const safe=separation>2.7;
+        const focus=scene==='grip'?(timeSeconds<3.05?'racing':'shortcut'):
+          (timeSeconds<2.3?'shortcut':'racing');
+        return <>
+          {(safe||focus==='shortcut')&&<Vehicle variant="formula-modern"
+            color={RACE_COLORS.shortcut} accent="#ecf5f4"
+            distance={state.cars.shortcut.travelDistanceM} steer={state.cars.shortcut.steerRad}
+            pose={state.cars.shortcut.worldPose}/>}
+          {(safe||focus==='racing')&&<Vehicle variant="formula-modern"
+            color={RACE_COLORS.racing} accent="#fff0d5"
+            distance={state.cars.racing.travelDistanceM} steer={state.cars.racing.steerRad}
+            pose={state.cars.racing.worldPose}/>}
+        </>;
+      })()}
       <ForceVectors car={scene==='duel'?state.cars.racing:state.cars.shortcut}
         accent={scene==='duel'?RACE_COLORS.racing:RACE_COLORS.shortcut}/>
       {scene==='grip'&&<ForceVectors car={state.cars.racing} accent={RACE_COLORS.racing}/>}
