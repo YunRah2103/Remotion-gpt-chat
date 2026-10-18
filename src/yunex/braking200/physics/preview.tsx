@@ -89,19 +89,19 @@ const ContactVectors:React.FC<{s:BrakingSimulationState}>=({s})=>{
  const w=s.wheel['front-left'],load=Math.min(1,w.normalLoadN/6300),
    force=Math.min(1,w.roadLongitudinalForceN/5400);
  return <group>
-  <mesh rotation={[-Math.PI/2,0,0]} position={[-.21,.017,.39]}>
+  <mesh rotation={[-Math.PI/2,0,0]} position={[.06,.019,.39]}>
    <planeGeometry args={[.60,.29]}/><meshBasicMaterial color={ICE} transparent opacity={.19}/></mesh>
-  <group position={[-.40,.045,.52]}>
+  <group position={[.13,.055,.47]}>
    <mesh position={[force*.31,0,0]} rotation={[0,0,-Math.PI/2]}>
     <coneGeometry args={[.08,.17,12]}/><meshBasicMaterial color={ICE}/></mesh>
    <mesh position={[force*.14,0,0]} rotation={[0,0,Math.PI/2]}>
     <cylinderGeometry args={[.018,.018,Math.max(.02,force*.54),12]}/><meshBasicMaterial color={ICE}/></mesh>
   </group>
-  <group position={[.60,.84,.02]}>
-   <mesh position={[0,-load*.21,0]}><cylinderGeometry args={[.016,.016,load*.42,12]}/>
+  <group position={[.42,.70,-.26]}>
+   <mesh position={[0,-load*.13,0]}><cylinderGeometry args={[.016,.016,load*.26,12]}/>
     <meshBasicMaterial color={GOLD}/></mesh>
-   <mesh position={[0,-load*.45,0]} rotation={[Math.PI,0,0]}>
-    <coneGeometry args={[.075,.15,12]}/><meshBasicMaterial color={GOLD}/></mesh>
+   <mesh position={[0,-load*.29,0]} rotation={[Math.PI,0,0]}>
+    <coneGeometry args={[.060,.12,12]}/><meshBasicMaterial color={GOLD}/></mesh>
   </group>
  </group>;
 };
@@ -135,8 +135,8 @@ const PhysicsVehicle:React.FC<{s:BrakingSimulationState}>=({s})=>{
 const WorldScene:React.FC<{state:BrakingSimulationState}>=({state})=>{
  const {width,height}=useVideoConfig();
  const p=sampleRoute('track',state.traveledM),x=p.position[0],z=p.position[2],a=p.yaw;
- const camera:[number,number,number]=[x+Math.cos(a)*8.5+Math.sin(a)*6.4,2.7,
-   z-Math.sin(a)*8.5+Math.cos(a)*6.4];
+ const camera:[number,number,number]=[x+Math.cos(a)*10.8+Math.sin(a)*8.4,3.1,
+   z-Math.sin(a)*10.8+Math.cos(a)*8.4];
  return <AbsoluteFill>
   <ThreeCanvas width={width} height={height} shadows camera={{position:camera,fov:39,near:.2,far:350}}>
    <WorldLighting timeOfDay="day" focus={p.position}/>
@@ -155,10 +155,10 @@ export const BrakingPhysicsMacro:React.FC=()=>{
  </AbsoluteFill>;
 };
 export const BrakingPhysicsContext:React.FC=()=>{
- const frame=useCurrentFrame(),s=sampleBrakingSimulation(frame/30*1.65,'dry-track');
+ const frame=useCurrentFrame(),s=sampleBrakingSimulation(frame/30*2.0,'dry-track');
  return <AbsoluteFill><WorldScene state={s}/>
   <Graphics state={s} title="200 KM/H TO ZERO" subtitle="Four wheels / one physical state"
-   context="DRY TRACK / ABS INACTIVE" progress={s.traveledM/215} abs={false}/>
+   context="DRY TRACK / 2X PREVIEW" progress={s.traveledM/215} abs={false}/>
  </AbsoluteFill>;
 };
 export const physicsWheelAnchors=()=>wheelAnchors(vehicleSpec(BRAKING_EP001.vehicleVariant));
