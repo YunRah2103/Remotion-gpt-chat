@@ -44,7 +44,7 @@ test('arc length, finite curvature and tangent continuity are deterministic',()=
    }
   }
   assert.throws(()=>path.sampleAtDistance(NaN),/finite/i);
- });
+ }
  assert.ok(Math.abs(A.sampleAtDistance(A.apexDistanceM).curvatureInvM)>
            Math.abs(B.sampleAtDistance(B.apexDistanceM).curvatureInvM)*1.10,
            'inside apex is tighter than wide apex');
