@@ -12,12 +12,13 @@ import {clamp01} from './logic.ts';
 const V0=200/3.6;
 const TSTOP=8; // test-only, NOT a reported stopping claim
 const DECEL=V0/TSTOP;
-export function sampleGraphicsProofOnly(seconds:number):BrakingSimulationState{
-  const t=Math.max(0,Math.min(TSTOP,seconds));
+export function sampleGraphicsProofOnly(seconds:number,previewHookLeadInSec=0):BrakingSimulationState{
+  const lead=Math.max(0,Math.min(1,previewHookLeadInSec));
+  const t=Math.max(0,Math.min(TSTOP,seconds-lead));
   const speed=Math.max(0,V0-DECEL*t);
-  const traveled=V0*t-DECEL*t*t/2;
+  const traveled=V0*Math.min(Math.max(0,seconds),lead)+V0*t-DECEL*t*t/2;
   const illustratingLockTendency=seconds>=3.25&&seconds<4.9;
-  const modulation=illustratingLockTendency?.67+.21*Math.sin(seconds*16):.89;
+  const modulation=seconds<lead?0:(illustratingLockTendency?.67+.21*Math.sin(seconds*16):.89);
   const nearLock=illustratingLockTendency?.22+.09*Math.sin(seconds*10):.045;
   const wheel=(id:WheelKey):WheelBrakingState=>{
     const front=id.startsWith('front');
@@ -27,7 +28,7 @@ export function sampleGraphicsProofOnly(seconds:number):BrakingSimulationState{
       rotationRad:-traveled/.36, // presentation model's +Z wheel axis
       slipRatio:clamp01(nearLock),
       normalLoadN:normal,
-      roadLongitudinalForceN:-normal*(illustratingLockTendency?.59:.72),
+      roadLongitudinalForceN:seconds<lead?0:-normal*(illustratingLockTendency?.59:.72),
       brakePressure01:clamp01(modulation),
       absIntervening:illustratingLockTendency,
     };
@@ -36,7 +37,7 @@ export function sampleGraphicsProofOnly(seconds:number):BrakingSimulationState{
     simTimeSec:seconds,
     speedMps:speed,
     traveledM:traveled,
-    decelerationMps2:seconds<TSTOP?DECEL:0,
+    decelerationMps2:seconds>=lead&&t<TSTOP?DECEL:0,
     pitchRad:seconds<.5?.015:0,
     wheel:{
       'front-left':wheel('front-left'),'front-right':wheel('front-right'),
