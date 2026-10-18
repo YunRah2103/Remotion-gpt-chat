@@ -1,0 +1,95 @@
+/**
+ * YUNEX A3 — ACTUAL A1 + A2 BRANCH-SOURCED NATIVE CAMERA FILM PROOFS.
+ * This file is a TEMPLATE, not compiled on A3's unmerged branch.
+ * The dedicated A3 CI workflow checks out upstream agent branches, copies
+ * their unchanged source into its ephemeral runner checkout, then copies
+ * this template to IntegratedProof.tsx. No foreign department code is committed
+ * to the A3 branch. Every visible car is Agent 1's brake-equipped real GT,
+ * and every frame samples Agent 2's authoritative simulation.
+ */
+import React from 'react';
+import {Composition,Folder,useCurrentFrame} from 'remotion';
+import {BrakingCameraStage} from './BrakingCameraStage.tsx';
+import {cameraShotAtFrame} from './cameraRig.ts';
+import type {FilmCue,TimedCue} from '../contracts.ts';
+import {BrakingVehicle as EngineeringBrakingVehicle} from '../engineering/BrakingVehicle.tsx';
+import {sampleBrakingSimulation} from '../physics/simulation.ts';
+import {mapFilmFrameToSimulationSec,mapAbsInsertFrameToSimulationSec} from '../physics/timeline.ts';
+
+type Mode = 'track'|'macro';
+const CUES:Record<Mode,readonly TimedCue[]>={
+  track:[
+    {cue:'hook',fromFrame:0,toFrameExclusive:60},
+    {cue:'mechanism',fromFrame:60,toFrameExclusive:107},
+    {cue:'grip',fromFrame:107,toFrameExclusive:145},
+    {cue:'abs',fromFrame:145,toFrameExclusive:178},
+    {cue:'finale',fromFrame:178,toFrameExclusive:210},
+  ],
+  macro:[
+    {cue:'mechanism',fromFrame:0,toFrameExclusive:59},
+    {cue:'heat',fromFrame:59,toFrameExclusive:113},
+    {cue:'grip',fromFrame:113,toFrameExclusive:149},
+    {cue:'abs',fromFrame:149,toFrameExclusive:185},
+  ],
+};
+const shotNames:Record<FilmCue,string>={
+  hook:'200 KM/H — BRAKING BEGINS',
+  mechanism:'FRONT BRAKE / DISC + CALIPER',
+  heat:'FRICTION INTO HEAT',
+  grip:'TYRE / ROAD CONTACT',
+  abs:'LOW-GRIP ABS DEMONSTRATION',
+  finale:'SPEED TO ZERO',
+};
+const HUD:React.CSSProperties={position:'absolute',bottom:95,left:65,right:70,
+  font:'600 29px Arial,sans-serif',letterSpacing:2,
+  textShadow:'0 2px 8px rgba(3,10,20,.8)',color:'#f8faf8'};
+const tech:React.CSSProperties={fontSize:16,letterSpacing:1.2,marginTop:9,
+  color:'#e7eae2',fontWeight:400};
+const clamp01=(x:number)=>Math.min(1,Math.max(0,x));
+const easing=(x:number)=>{const t=clamp01(x);return t*t*(3-2*t);};
+const Preview:React.FC<{mode:Mode}>=({mode})=>{
+  const frame=useCurrentFrame(),cues=CUES[mode];
+  const {shot,progress01,fromFrame}=cameraShotAtFrame(frame,cues);
+  const isAbs=shot==='abs';
+  // Local ABS insert is a SEPARATE labelled low-grip demonstration. No claim
+  // that ABS intervenes automatically during dry, high-grip braking.
+  const mapTime=(f:number)=>{
+    if(isAbs)return mapAbsInsertFrameToSimulationSec(f-fromFrame);
+    const duration=mode==='track'?210:185;
+    return mapFilmFrameToSimulationSec((f/duration)*750);
+  };
+  const sampler=(t:number)=>sampleBrakingSimulation(t,isAbs?'low-grip-abs':'dry-track');
+  const cutaway=shot==='mechanism'||shot==='heat' ?
+    easing((progress01-.10)/.40)*.78:0;
+  const label=shotNames[shot];
+  const opacity=frame<8?frame/8:frame>(mode==='track'?202:177)
+    ?clamp01(((mode==='track'?210:185)-frame)/8):1;
+  return <BrakingCameraStage
+    sampleBrakingSimulation={sampler}
+    simulationTimeAtFilmFrame={mapTime}
+    startDistanceM={18}
+    cameraOptions={{cues}}
+    renderVehicle={({state,route})=><EngineeringBrakingVehicle
+      simulation={state} pose={route}
+      cutawayWheel="front-left" cutaway01={cutaway}
+      heatIllustration01={shot==='heat'?.16:0}
+    />}
+    overlay={<div style={{...HUD,opacity}} aria-label={label}>
+      <div style={{display:'inline-block',borderTop:'2px solid #d2a36c',paddingTop:14}}>
+        {label}
+      </div>
+      <div style={tech}>A1 REAL BRAKE ASSEMBLY · A2 AUTHENTIC STATE · A3 CAMERA</div>
+      {isAbs&&<div style={{...tech,fontWeight:600}}>
+        ILLUSTRATIVE LOW-GRIP SCENARIO · PRESSURE MODULATION
+      </div>}
+    </div>}
+  />;
+};
+export const A3IntegratedTrack:React.FC=()=> <Preview mode="track"/>;
+export const A3IntegratedMacro:React.FC=()=> <Preview mode="macro"/>;
+export const A3IntegratedRoot:React.FC=()=> <Folder name="YUNEX-Real-A1-A2-Camera-QA">
+  <Composition id="BrakingA3IntegratedTrack" component={A3IntegratedTrack}
+    durationInFrames={210} fps={30} width={1080} height={1920}/>
+  <Composition id="BrakingA3IntegratedMacro" component={A3IntegratedMacro}
+    durationInFrames={185} fps={30} width={1080} height={1920}/>
+</Folder>;
