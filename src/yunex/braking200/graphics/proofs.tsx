@@ -33,6 +33,21 @@ const ROTOR_POINT:Vec3=[FOCUS[0]+.12,FOCUS[1]+.07,FOCUS[2]+.055];
 const CONTACT_POINT:Vec3=[FOCUS[0],.018,FOCUS[2]];
 const startDistance=75;
 const HEAT_REF_J=1700000; // fixed ARTISTIC NORMALISATION for A2's energy budget
+/** Pick the contiguous 30-frame portion of A2's own low-grip insert with most
+ * genuine pressure interventions. Film time is a SLOW-MOTION window over A2,
+ * not a fabricated ABS switch or a continuation of the dry stop. */
+const ABS_WINDOW_START=(()=>{
+ const hits=Array.from({length:145},(_,i)=>{
+  const s=sampleBrakingSimulation(mapAbsInsertFrameToSimulationSec(i),'low-grip-abs');
+  return s.wheel['front-left'].absIntervening?1:0;
+ });
+ let start=0,best=-1;
+ for(let i=0;i<=115;i++){
+  const score=hits.slice(i,i+30).reduce((a,b)=>a+b,0);
+  if(score>best){start=i;best=score;}
+ }
+ return start;
+})();
 const cuesMacro:readonly TimedCue[]=[
  {cue:'mechanism',fromFrame:0,toFrameExclusive:55},
  {cue:'heat',fromFrame:55,toFrameExclusive:96},
@@ -85,7 +100,7 @@ const Proof:React.FC<{mode:'macro'|'track'}>=({mode})=>{
  const local=f-segment.fromFrame;
  const lowGripExample=mode==='macro'&&cue==='abs';
  const simTime=lowGripExample
-  ?mapAbsInsertFrameToSimulationSec(local/30*145)
+  ?mapAbsInsertFrameToSimulationSec(ABS_WINDOW_START+local)
   :dryTime(f,mode);
  const state:BrakingSimulationState=sampleBrakingSimulation(simTime,
   lowGripExample?'low-grip-abs':'dry-track');
