@@ -66,9 +66,9 @@ export const BrakingGraphicsTrackProof:React.FC=()=>{
   const t=frame/fps;
   const state=sampleGraphicsProofOnly(t,.62);
   const route=sampleRoute('track',75+state.traveledM);
-  const localCamera:Vec3=[-8.3+Math.sin(t*.8)*.35,2.55,5.85];
+  const localCamera:Vec3=[-9.0+Math.sin(t*.8)*.35,2.8,6.3];
   const cameraPosition=plus(route.position,signedRotation(localCamera,route.yaw));
-  const cameraTarget=plus(route.position,[0,.72,0]);
+  const cameraTarget=plus(route.position,signedRotation([-.43,.72,0],route.yaw));
   const camera:CinematicCameraPose={
     position:cameraPosition,target:cameraTarget,fovDeg:46,focusId:'vehicle',
   };
