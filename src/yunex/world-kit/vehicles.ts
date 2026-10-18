@@ -51,7 +51,7 @@ function cabin(g:T.Group,m:Mats,s:VehicleSpec,belt:number){
   for(const sign of [-1,1]){
    const side=(v:V3):V3=>[v[0],v[1],v[2]*sign];panel(g,m.glass,[side(a),side(b),side(c),side(d)],'side-glass');
    rod(g,m.body,side(a),side(b),.035);rod(g,m.body,side(c),side(d),.045);
-   if(!sports){const px=-s.length*.075;rod(g,m.trim,[px,belt,baseZ*sign],[px,roofY,roofZ*sign],.038);}
+   if(!sports){const px=-s.length*.075;if(px>rearRoof+.05&&px<frontRoof-.05)rod(g,m.trim,[px,belt,baseZ*sign],[px,roofY,roofZ*sign],.038);}
    rod(g,m.body,side(a),side(d),.025);
   }
   if(s.bodyStyle!=='targa')panel(g,m.body,[b,[frontRoof,roofY,-roofZ],[rearRoof,roofY,-roofZ],c],'roof');else{rod(g,m.body,[rearRoof+.15,roofY,-roofZ],[rearRoof+.15,roofY,roofZ],.06);}

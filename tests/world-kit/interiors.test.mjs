@@ -20,3 +20,6 @@ test('seat headrests fit inside the sloping rear glass on every cabin',()=>{
 test('passenger seating matches the specified capacity',()=>{
  for(const id of ['saloon','minivan','long-suv','crew-pickup']){const s=VEHICLES.find(v=>v.id===id),g=createVehicle({variant:id});let count=0;g.traverse(o=>{if(o.isGroup&&/^(front|rear|third)-seat-/.test(o.name))count++;});assert.equal(count,s.seats??5,id);disposeObject(g);}
 });
+test('pickup window pillars stay inside the cabin above the beltline',()=>{
+ for(const id of ['pickup','single-cab-pickup','crew-pickup']){const s=VEHICLES.find(v=>v.id===id),l=interiorLayout(s),g=createVehicle({variant:id});g.updateMatrixWorld(true);g.traverse(o=>{if(o.geometry?.type!=='CylinderGeometry'||o.material?.color?.getHexString()!=='18232a')return;const a=o.geometry.attributes.position;for(let i=0;i<a.count;i++){const v=new T.Vector3().fromBufferAttribute(a,i).applyMatrix4(o.matrixWorld);if(v.y<=l.belt+.05)continue;const t=T.MathUtils.clamp((v.y-l.belt)/(l.roof-l.belt),0,1),rear=l.rearBase+(l.rearRoof-l.rearBase)*t;assert.ok(v.x>=rear-.05,`${id}: window pillar extends behind cabin`);}});disposeObject(g);}
+});

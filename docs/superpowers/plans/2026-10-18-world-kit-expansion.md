@@ -19,9 +19,11 @@ The user requested 20 environments, more types of cars and modelled shared inter
 - [x] Add 16 vehicle bodies and five environments.
 - [x] Add shared interiors, fitted seat positions and five/seven-seat arrangements.
 - [x] Add cutaway and driver compositions and native review automation.
-- [x] TypeScript and 24 tests pass, including 700 pairings, rear glass/headrest clearance, driver rays and heavy-cab cutaway regression.
+- [x] TypeScript and 25 tests pass, including 700 pairings, rear glass/headrest clearance, driver rays and heavy-cab cutaway regression.
 - [x] Re-export and round-trip load all 35 vehicle GLBs. Existing 14 prop exports remain valid.
-- [ ] Finish native still/reel inspection and portable package verification.
-- [ ] Push the final source and deliver V3 previews/package.
+- [x] Finish native still/reel inspection and portable package verification.
+- [x] Prepare the final source update and self-contained V3 previews/package for delivery.
 
 Independent review found cab-roof occlusion in truck cutaways, headrests crossing sloped rear glass, missing middle rear seats and harbour boat/jetty overlap. The fixes have dedicated interior tests; harbour boats now sit beyond the jetties. Existing Production Studio review CI separately fails on absent `public/chiron/CHIRON_105_01.mp4` footage used by an older film; the new kit is independent of that footage.
+
+Final validation: both native H.264 previews decode completely (300 environment frames and 90 interior frames at 15fps); every location and interior shot has been inspected. The 176-file standalone ZIP passes integrity checks, TypeScript and all 25 tests after extraction. A final pickup close-up exposed a middle window pillar behind the short cab; its fitted placement now has a failing-then-passing regression test, and both affected vehicle stills and all vehicle GLBs were regenerated. Independent review found no blocker.
