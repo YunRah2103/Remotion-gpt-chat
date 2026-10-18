@@ -30,7 +30,7 @@ test('arc length, finite curvature and tangent continuity are deterministic',()=
    assert.ok(p.arcM>previous.arcM,'strictly increasing arc metres');
    assert.ok(Math.abs(p.yaw-previous.yaw)<.06,'heading continuous');
    assert.ok(Number.isFinite(p.curvatureInvM));
-   assert.ok(Math.abs(p.curvatureInvM)<.17,'corner curvature within illustrative roadway bounds');
+   assert.ok(Math.abs(p.curvatureInvM)<.17, `curvature limit ${path.id} at u=${p.progress01.toFixed(5)}: ${p.curvatureInvM.toFixed(5)} 1/m`);
    previous=p;
   }
   for(let i=0;i<=100;i++){
