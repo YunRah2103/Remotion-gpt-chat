@@ -9,7 +9,7 @@ import {sampleRoute} from '../../world-kit/environments.ts';
 import {vehicleSpec} from '../../world-kit/catalog.ts';
 import {BRAKING_EP001,wheelAnchors} from '../contracts.ts';
 import type {BrakingSimulationState} from '../contracts.ts';
-import {BRAKING_MODEL,sampleBrakingSimulation} from './simulation.ts';
+import {sampleBrakingSimulation} from './simulation.ts';
 import {physicsVisualSignals} from './visual-signals.ts';
 import {mapFilmFrameToSimulationSec,mapAbsInsertFrameToSimulationSec} from './timeline.ts';
 // @ts-ignore A1 source is staged from a pinned peer SHA at render time.
@@ -70,7 +70,7 @@ const LoadedTyres:React.FC<{s:BrakingSimulationState;cutaway:number}>=({s,cutawa
  </group>;
 };
 const Overlay:React.FC<{s:BrakingSimulationState;abs:boolean;progress:number;cutaway:boolean}>=({s,abs,progress,cutaway})=>{
- const w=s.wheel['front-left'],cue=physicsVisualSignals(s);
+ const cue=physicsVisualSignals(s);
  const plus=cue.frontLoadDeltaKN;
  const font:React.CSSProperties={fontFamily:'Arial,Helvetica,sans-serif',color:'#eef6f6'};
  return <div style={{position:'absolute',inset:0,pointerEvents:'none',...font}}>
