@@ -50,6 +50,12 @@ jobs:
         run: |
           mkdir -p out/f1-ep002-agent-1
           npx remotion render src/yunex/f1-line-ep002/agent-1-preview/entry.tsx F1Agent1Preview out/f1-ep002-agent-1/two-car-corner.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1 --overwrite
+      - name: Install FFmpeg and FFprobe for machine-verifiable QC
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          ffmpeg -version | head -n 1
+          ffprobe -version | head -n 1
       - name: Probe, fully decode and prove time-varying frames
         run: |
           set -euo pipefail
