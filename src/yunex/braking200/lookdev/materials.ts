@@ -34,13 +34,13 @@ function tune(original:T.Material,role:Role):T.Material {
   const m=original.clone();
   if(!(m instanceof T.MeshStandardMaterial))return m;
   if(role==='paint'){
-    m.color.set(BRAKING_PALETTE.paint);m.metalness=.46;m.roughness=.26;
+    m.color.set(BRAKING_PALETTE.paint);m.metalness=.35;m.roughness=.39;
     if(m instanceof T.MeshPhysicalMaterial){
-      m.clearcoat=.87;m.clearcoatRoughness=.16;
+      m.clearcoat=.61;m.clearcoatRoughness=.32;
     }
   } else if(role==='glass'){
-    m.color.set(BRAKING_PALETTE.glass);m.metalness=.27;m.roughness=.12;
-    if(m instanceof T.MeshPhysicalMaterial){m.clearcoat=1;m.clearcoatRoughness=.09;}
+    m.color.set(BRAKING_PALETTE.glass);m.metalness=.18;m.roughness=.28;
+    if(m instanceof T.MeshPhysicalMaterial){m.clearcoat=.59;m.clearcoatRoughness=.27;}
   } else if(role==='rubber'){
     m.color.set(BRAKING_PALETTE.tyre);m.metalness=.01;m.roughness=.93;
   } else if(role==='metal'){
