@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {sampleBrakingSimulation,BRAKING_MODEL} from '../physics/simulation.ts';
 import {sampleCameraPose} from '../cameras/cameraRig.ts';
+import {mapAbsInsertFrameToSimulationSec} from '../physics/timeline.ts';
 import {vehicleSpec} from '../../world-kit/catalog.ts';
 import {sampleRoute} from '../../world-kit/environments.ts';
 import {projectWorldPoint,heatVisual01,shouldShowAbs,speedText} from './logic.ts';
@@ -36,4 +37,16 @@ test('A3 actual moving camera projects its physical aim point on screen',()=>{
  assert.ok(p.visible);
  assert.ok(Math.abs(p.x-540)<.00001);
  assert.ok(Math.abs(p.y-960)<.00001);
+});
+
+test('A5 ABS slow-motion window contains real sampled pressure intervention',()=>{
+ const hits=Array.from({length:145},(_,frame)=>{
+  const t=mapAbsInsertFrameToSimulationSec(frame);
+  return Number(sampleBrakingSimulation(t,'low-grip-abs').wheel['front-left'].absIntervening);
+ });
+ const windows=Array.from({length:116},(_,i)=>
+  hits.slice(i,i+30).reduce((a,b)=>a+b,0));
+ const max=Math.max(...windows);
+ assert.ok(max>=2,'Low-grip sequence has no legible intervention samples');
+ assert.ok(windows.indexOf(max)>=0);
 });
