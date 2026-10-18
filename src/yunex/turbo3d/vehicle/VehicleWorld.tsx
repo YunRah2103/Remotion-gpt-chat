@@ -1,8 +1,8 @@
 import React, {useLayoutEffect, useMemo} from 'react';
 import * as THREE from 'three';
 import {useThree} from '@react-three/fiber';
-import {LightShell, FrontDuct, SideDuct, PremiumWheel, EngineBayDetail, HingedEngineDeck, RearSignature} from './DetailKit';
-import {SculptedShell, SculptedCanopy, SculptedNose} from './SculptedBody';
+import {EngineBayDetail, HingedEngineDeck} from './DetailKit';
+import {RoadCarBody} from './NormalCoupe';
 
 /**
  * A1 ORIGINAL VEHICLE / ENVIRONMENT. 1 unit = 1 metre.
@@ -29,87 +29,23 @@ export interface VehicleWorldProps {
   revealProgress?: number; // 0..1, opens rear-deck/engine-bay view
   travelMeters?: number; // cumulative movement, drives tyre rotation + road parallax
 }
-const C = {paint:'#0D817F', dark:'#101A22', carbon:'#17242D', glass:'#152A38',
-  edge:'#B6D5D4', tyre:'#111317', rim:'#171D27', head:'#D5FDFF', tail:'#FF405C'};
 const Pi=Math.PI;
 const clamp=(x:number,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const wrap=(z:number,travel:number,extent=190)=>((z+travel+extent/2)%extent+extent)%extent-extent/2;
 
-/** Shape loft: real bevel-like varying cross-sections, not overlapping car boxes. */
-function loft(sections:ReadonlyArray<readonly [number,number,number,number]>,openFront=false):THREE.BufferGeometry {
-  const vertices:number[]=[]; const indices:number[]=[];
-  for(const [z,halfW,low,high] of sections){
-    vertices.push(-halfW,low,z, halfW,low,z, halfW,high,z, -halfW,high,z);
-  }
-  for(let s=0;s<sections.length-1;s++){
-    for(let j=0;j<4;j++){
-      // Leave actual rear-quarter side apertures for inboard deep duct geometry.
-      if(s===2 && (j===1 || j===3)) continue;
-      const a=4*s+j,b=4*s+(j+1)%4,c=a+4,d=b+4;
-      indices.push(a,b,c,b,d,c);
-    }
-  }
-  indices.push(0,2,1,0,3,2);
-  const n=4*(sections.length-1);
-  if(!openFront) indices.push(n,n+1,n+2,n,n+2,n+3);
-  const g=new THREE.BufferGeometry();
-  g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));
-  g.setIndex(indices); g.computeVertexNormals();
-  return g;
-}
-const BODY_SECTIONS:ReadonlyArray<readonly [number,number,number,number]>=[
-  [-2.30,.66,.48,.63],[-2.09,.83,.41,.77],[-1.58,.97,.43,.85],
-  [-.75,.955,.42,.80],[.25,.94,.41,.83],[1.29,.96,.40,.76],
-  [1.98,.79,.44,.65],[2.30,.62,.40,.68]
-];
-const ROOF_SECTIONS:ReadonlyArray<readonly [number,number,number,number]>=[
-  [-1.38,.72,.80,.82],[-.91,.63,.82,1.17],[-.60,.58,.82,1.25],
-  [.23,.56,.82,1.24],[.46,.59,.82,1.17],[1.09,.78,.76,.78]
-];
-/** Close-up wheel and air-inlet geometry is owned by DetailKit.tsx (A1 v2). */
-
+/** V8 keeps the complete public animation/camera interface while replacing
+ * ONLY the rendered body/wheel presentation with an ordinary modern coupe.
+ * No camera transforms, frame offsets or film code change.
+ */
 export const VehicleModel:React.FC<{frame:number;variant?:VehicleVariant;revealProgress?:number;travelMeters?:number}>=
 ({frame,variant='opaque',revealProgress=0,travelMeters=0})=>{
-  // V6: physical wheel cutaways, 3D crown and raked greenhouse live in SculptedBody.
-  // Retain the world coordinates, all public props, the wheel rig and rear hatch.
-  const r=clamp(revealProgress);
-  const panelOpen=variant==='reveal'?r:0;
-  // Hero emissive settings are carried by the layered lamps in DetailKit.
+  const panelOpen=variant==='reveal'?clamp(revealProgress):0;
   const float=Math.sin(frame*.065)*.007;
   return <group name="ORIGINAL_YUNEX_COUPE" position={[0,float,0]}>
     <group name="CAR_BODY">
-      <SculptedShell/>
-      <SculptedNose/>
-      <SculptedCanopy/>
-      {[-1,1].map(s=><group key={s}>
-        <LightShell side={s}/>
-        <SideDuct side={s}/>
-        <RearSignature side={s}/>
-        <mesh position={[s*.71,.92,-2.05]} rotation={[0,0,s*.1]}>
-          <boxGeometry args={[.23,.038,.26]}/><meshStandardMaterial color="#0D1C22" roughness={.3} metalness={.4}/>
-        </mesh>
-        <group position={[s*.77,.81,.85]} rotation={[0,s*.17,0]} name="AERODYNAMIC_SIDE_MIRROR">
-          <mesh position={[s*.042,.015,0]} rotation={[0,s*.28,0]} castShadow><sphereGeometry args={[.095,12,8]}/>
-            <meshPhysicalMaterial name="SIDE_MIRROR_DARK" color="#0E2932" metalness={.6} roughness={.27} clearcoat={.85}/></mesh>
-          <mesh position={[s*.067,.017,-.018]}><boxGeometry args={[.028,.045,.11]}/>
-            <meshStandardMaterial color="#91BDBF" metalness={.6} roughness={.24}/></mesh>
-        </group>
-        <FrontDuct side={s}/>
-        <mesh position={[s*.79,.53,-2.21]}>
-          <boxGeometry args={[.37,.09,.09]}/><meshStandardMaterial color="#071116" metalness={.45} roughness={.33}/>
-        </mesh>
-      </group>)}
-      <mesh position={[0,.377,2.300]}><boxGeometry args={[.92,.048,.035]}/><meshStandardMaterial name="LOWER_GRILLE_SHADOW" color="#08161C" metalness={.28} roughness={.56}/></mesh>
-      <mesh position={[0,.50,-2.288]}><boxGeometry args={[1.07,.12,.05]}/><meshStandardMaterial name="REAR_DIFFUSER" color="#0A151C" metalness={.32} roughness={.53}/></mesh>
-      {[-.38,0,.38].map(x=><mesh key={x} position={[x,.43,-2.33]}>
-        <boxGeometry args={[.09,.17,.13]}/><meshStandardMaterial color="#2B3940" metalness={.47}/></mesh>)}
-      <HingedEngineDeck open={panelOpen}/>
-      <EngineBayDetail visible={variant==='reveal' && panelOpen>.02}/>
-      <mesh position={[0,.96,-2.04]}><boxGeometry args={[1.61,.065,.37]}/>
-        <meshStandardMaterial name="AERO_REAR_SPOILER" color="#17242B" metalness={.73} roughness={.28}/></mesh>
-      <mesh position={[0,.34,2.32]}><boxGeometry args={[1.55,.026,.23]}/>
-        <meshStandardMaterial name="FRONT_SPLITTER" color="#080F14" metalness={.14} roughness={.74}/></mesh>
-      {[-1,1].flatMap(s=>[1.47,-1.48].map(z=><PremiumWheel key={s+'_'+z} side={s} z={z} travelMeters={travelMeters}/>))}
+      <RoadCarBody travelMeters={travelMeters} reveal={variant==='reveal'}/>
+      {variant==='reveal'&&<HingedEngineDeck open={panelOpen}/>}
+      <EngineBayDetail visible={variant==='reveal'&&panelOpen>.02}/>
     </group>
   </group>;
 };
@@ -175,10 +111,27 @@ export const RoadEnvironment:React.FC<{travelMeters:number}>=({travelMeters})=><
     <dodecahedronGeometry args={[3+(i%4)*.7,0]}/><meshStandardMaterial color={i%3===0?'#1E3C42':'#142F38'} roughness={1}/></mesh>)}
 </group>;
 
+/** A restrained road-contact shadow adds visual mass without moving wheel pivots.
+ * Each tyre already physically meets road y=0; three transparent concentric
+ * ellipses soften the illusion of hovering in the dark A5 environment.
+ * Rendered only in the hero variant to preserve mechanism/reveal previews.
+ */
+const GroundContact:React.FC=()=> <group name="VEHICLE_ROAD_CONTACT">
+  {[-1,1].flatMap(side=>[1.47,-1.48].map(axle=><group key={side+'_'+axle} position={[side*.858,0,axle]}>
+    {[{r:.21,opacity:.27},{r:.32,opacity:.12},{r:.46,opacity:.04}].map((s,i)=>
+      <mesh key={i} position={[0,.006+i*.001,0]} rotation={[-Math.PI/2,0,0]} scale={[s.r,s.r*1.35,1]} renderOrder={i+1}>
+        <circleGeometry args={[1,28]}/>
+        <meshBasicMaterial color="#000409" transparent opacity={s.opacity} depthWrite={false} polygonOffset polygonOffsetFactor={-1}/>
+      </mesh>
+    )}
+  </group>))}
+</group>;
+
 export const VehicleWorld:React.FC<VehicleWorldProps>=({frame,variant='opaque',revealProgress=0,travelMeters})=>{
   const distance=travelMeters??frame*(variant==='hero'?.33:.23);
   return <group name="A1_VEHICLE_WORLD">
     <RoadEnvironment travelMeters={distance}/>
+    {variant==='hero'&&<GroundContact/>}
     <VehicleModel frame={frame} variant={variant} revealProgress={revealProgress} travelMeters={distance}/>
   </group>;
 };
