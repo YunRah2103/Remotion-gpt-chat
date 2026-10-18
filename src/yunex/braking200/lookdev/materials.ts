@@ -17,10 +17,13 @@ export function illustrativeHeatFromEnergy(state?:BrakingSimulationState):number
   const motion=clamp01((state.speedMps-2)/19);
   return clamp01(energetic*braking*motion);
 }
-type Role='paint'|'glass'|'tyre'|'brushed'|'cast-iron'|'caliper'|'trim'|'asphalt'|'runoff'|'barrier'|'grass'|'structure'|'other';
+type Role='paint'|'glass'|'tyre'|'brushed'|'cast-iron'|'machined'|'vent'|'hub'|'caliper'|'trim'|'asphalt'|'runoff'|'barrier'|'grass'|'structure'|'other';
 const rolesForCar=(mesh:T.Mesh,material:T.Material):Role=>{
   const n=mesh.name;
-  if(n==='rotor-drilled-face'||n==='rotor-outer-lip'||n==='concentric-machining'||n==='curved-ventilation-vane')return 'cast-iron';
+  if(n==='rotor-drilled-face')return 'cast-iron';
+  if(n==='rotor-outer-lip'||n==='rotor-inner-machined-ring'||n==='concentric-machining')return 'machined';
+  if(n==='curved-ventilation-vane')return 'vent';
+  if(n==='bearing-hub'||n==='hub-step'||n==='axle-cap')return 'hub';
   if(n==='sculpted-forged-caliper-cheek'||n==='top-bridge'||n==='lower-cross-member'||n==='brake-caliper')return 'caliper';
   if(['hub-step','hub-fastener','piston-boss-shoulder','hydraulic-piston','hub-cap','bearing-hub','axle-cap','bleed-screw','banjo-hydraulic-fitting'].includes(n))return 'brushed';
   if(['windshield','rear-glass','side-glass'].includes(n))return 'glass';
@@ -47,46 +50,55 @@ function finish(material:T.Material,role:Role):T.Material {
   if(!(next instanceof T.MeshStandardMaterial))return next;
   if(role==='paint'){
     next.color.set(BRAKING_PALETTE.paint);
-    next.metalness=.42;next.roughness=.355;next.envMapIntensity=.54;
+    next.metalness=.48;next.roughness=.30;next.envMapIntensity=.69;
     if(next instanceof T.MeshPhysicalMaterial){
-      next.clearcoat=.61;next.clearcoatRoughness=.30;
+      next.clearcoat=.86;next.clearcoatRoughness=.185;
       next.iridescence=0;
     }
   }else if(role==='glass'){
-    next.color.set(BRAKING_PALETTE.glass);next.metalness=.18;
-    next.roughness=.22;next.envMapIntensity=.46;
+    next.color.set('#152b36');next.metalness=.27;
+    next.roughness=.18;next.envMapIntensity=.60;
     if(next instanceof T.MeshPhysicalMaterial){
-      next.clearcoat=.75;next.clearcoatRoughness=.23;
+      next.clearcoat=.98;next.clearcoatRoughness=.15;
     }
   }else if(role==='tyre'){
-    next.color.set(BRAKING_PALETTE.tyre);
-    next.metalness=0;next.roughness=.94;next.envMapIntensity=.06;
+    next.color.set('#101719');
+    next.metalness=0;next.roughness=.96;next.envMapIntensity=.035;
   }else if(role==='brushed'){
-    next.color.set('#a7b2b7');next.metalness=.79;next.roughness=.33;
-    next.envMapIntensity=.66;
+    next.color.set('#87959d');next.metalness=.81;next.roughness=.36;
+    next.envMapIntensity=.47;
   }else if(role==='cast-iron'){
-    next.color.set('#596166');next.metalness=.72;next.roughness=.52;
-    next.envMapIntensity=.28;next.emissive=new T.Color('#a54b29');
+    next.color.set('#4f575b');next.metalness=.67;next.roughness=.55;
+    next.envMapIntensity=.33;next.emissive=new T.Color('#943c21');
     next.emissiveIntensity=0;
+  }else if(role==='machined'){
+    next.color.set('#929da3');next.metalness=.86;next.roughness=.29;
+    next.envMapIntensity=.62;
+  }else if(role==='vent'){
+    next.color.set('#343e42');next.metalness=.74;next.roughness=.67;
+    next.envMapIntensity=.27;
+  }else if(role==='hub'){
+    next.color.set('#65747d');next.metalness=.78;next.roughness=.42;
+    next.envMapIntensity=.41;
   }else if(role==='caliper'){
-    next.color.set(BRAKING_PALETTE.caliper);
-    next.metalness=.48;next.roughness=.39;
+    next.color.set('#ad7547');
+    next.metalness=.67;next.roughness=.35;
     next.envMapIntensity=.47;
     if(next instanceof T.MeshPhysicalMaterial){
-      next.clearcoat=.55;next.clearcoatRoughness=.24;
+      next.clearcoat=.48;next.clearcoatRoughness=.28;
     }
   }else if(role==='trim'){
     next.color.set('#15232b');next.metalness=.2;next.roughness=.60;
   }else if(role==='asphalt'){
-    next.color.set(BRAKING_PALETTE.asphalt);next.metalness=0;
-    next.roughness=.99;next.side=T.DoubleSide;
+    next.color.set('#303638');next.metalness=0;
+    next.roughness=.975;next.side=T.DoubleSide;
   }else if(role==='runoff'){
-    next.color.set('#898577');next.metalness=0;next.roughness=1;
+    next.color.set('#76776d');next.metalness=0;next.roughness=1;
     next.side=T.DoubleSide;
   }else if(role==='barrier'){
     next.color.set('#657173');next.metalness=.30;next.roughness=.68;
   }else if(role==='grass'){
-    next.color.set('#56644d');next.metalness=0;next.roughness=1;
+    next.color.set('#54634c');next.metalness=0;next.roughness=1;
   }else if(role==='structure'){
     next.color.set('#647078');next.metalness=.15;next.roughness=.80;
   }
@@ -139,7 +151,7 @@ export function applyBrakingFinishes(root:T.Object3D,kind:'car'|'track'):FinishH
     touchedMeshes:patched.length,
     setHeat:(strength)=>{
       if(!active)return;
-      const e=.12*Math.pow(clamp01(strength),1.4);
+      const e=.095*Math.pow(clamp01(strength),1.4);
       ironMaterials.forEach(mat=>{mat.emissiveIntensity=e;});
     },
     dispose:()=>{
@@ -153,12 +165,12 @@ export function applyBrakingFinishes(root:T.Object3D,kind:'car'|'track'):FinishH
 }
 /** Artist-owned road grain: independent sparse millimetre flecks, no new road.
  * CPU-software safe instances, seeded, with dark+light gravel variation. */
-export function createAsphaltGrain(seed=12,count=4200):T.InstancedMesh{
+export function createAsphaltGrain(seed=12,count=9500):T.InstancedMesh{
   let state=(seed>>>0);
   const rand=()=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return state/4294967296;};
   const geo=new T.PlaneGeometry(1,1);
   const material=new T.MeshBasicMaterial({
-    color:'#bec1bf',transparent:true,opacity:.14,depthWrite:false,
+    color:'#bec1bf',transparent:true,opacity:.21,depthWrite:false,
     side:T.DoubleSide,polygonOffset:true,polygonOffsetFactor:-1
   });
   const mesh=new T.InstancedMesh(geo,material,count),dummy=new T.Object3D();
@@ -169,7 +181,7 @@ export function createAsphaltGrain(seed=12,count=4200):T.InstancedMesh{
     dummy.position.set(route.position[0]+Math.sin(route.yaw)*across,.012,
       route.position[2]+Math.cos(route.yaw)*across);
     dummy.rotation.set(-Math.PI/2,route.yaw,0,'YXZ');
-    dummy.scale.set(.015+rand()*.075,.018+rand()*.15,1);
+    dummy.scale.set(.010+rand()*.045,.014+rand()*.085,1);
     dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);
     const tint=.23+rand()*.57;
     mesh.setColorAt(i,new T.Color().setRGB(tint,tint*.98,tint*.94));
