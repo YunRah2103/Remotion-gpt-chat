@@ -101,7 +101,8 @@ export function getRaceCamera(shotId:CinematicShotId,state:RaceFrameState,frame:
   return camera(r.origin,r.yaw,[-12.5,3.15,3.9+arc*.3],[3.7,.83,.15],50);
  }
  case 'apex':{
-  return camera(both,yaw,[13.9,3.25,-10.2-arc*.5],[1.2,.82,0],56);
+  // Both cars are principal subjects here; preserve their entire body footprint.
+  return fitPairInPortrait(camera(both,yaw,[13.9,3.25,-10.2-arc*.5],[1.2,.82,0],56),state);
  }
  case 'onboard':{
   // Lens just above the halo, offset from centre. Framing follows actual yaw.
@@ -114,7 +115,8 @@ export function getRaceCamera(shotId:CinematicShotId,state:RaceFrameState,frame:
   return fitPairInPortrait(camera(both,yaw,[4.5,26,8],[0,0,0],48),state);
  }
  case 'force':{
-  return camera(both,yaw,[2.8,23.5,16.4+arc*.5],[0,.1,0],52);
+  // Trackside force shot is a paired comparison, not an isolated car close-up.
+  return fitPairInPortrait(camera(both,yaw,[2.8,23.5,16.4+arc*.5],[0,.1,0],52),state);
  }
  case 'exit':{
   return camera(both,yaw,[-15.0-arc*.3,3.9,2.7],[4,.86,0],57);
