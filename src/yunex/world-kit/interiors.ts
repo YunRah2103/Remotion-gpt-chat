@@ -1,4 +1,5 @@
-import * as T from 'three';import {box,mesh,rod,surface} from './geometry.ts';import type {V3} from './geometry.ts';import type {VehicleSpec,VehicleOptions} from './catalog.ts';
+import {toCreasedNormals} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import * as T from 'three';import {box,mesh,rod,surface,roundedGeometry} from './geometry.ts';import type {V3} from './geometry.ts';import type {VehicleSpec,VehicleOptions} from './catalog.ts';
 export function interiorLayout(s:VehicleSpec){
  const heavy=s.id==='box-truck'||s.id==='tractor-truck',van=s.family==='van',pickup=s.id.includes('pickup'),sports=s.family==='sports';
  const belt=heavy?1.55:van?s.height*.55:s.family==='suv'?s.height*.59:pickup?1.08:sports?.79:.94;
@@ -15,24 +16,31 @@ export function createInterior(s:VehicleSpec,o:Partial<VehicleOptions>={}):T.Gro
  const fabric=surface(o.interiorColor??'#454c50',.02,.92),trim=surface('#202c33',.10,.70),bright=surface('#a4b3b7',.65,.37),carpet=surface('#303a40',0,1),screen=new T.MeshStandardMaterial({color:'#517b86',emissive:'#294f5a',emissiveIntensity:.35});for(const m of [fabric,trim,bright,carpet])m.side=T.DoubleSide;
  const span=l.frontBase-l.rearBase;
  box(g,carpet,[span-.08,.045,l.innerWidth],[ (l.frontBase+l.rearBase)/2,l.floor-.025,0],.012,'interior-floor');
- const seat=(x:number,z:number,name:string)=>{const seat=new T.Group();seat.name=name;seat.position.set(Math.max(x,l.minimumSeat),l.floor,z);g.add(seat);box(seat,fabric,[.53,.15*l.k,s.width*.245],[0,.19*l.k,0],.045,'seat-cushion');const back=box(seat,fabric,[.14,.48*l.k,s.width*.245],[-.23,.47*l.k,0],.045,'seat-back');back.rotation.z=-.09;
+ const seat=(x:number,z:number,name:string)=>{const seat=new T.Group();seat.name=name;seat.position.set(Math.max(x,l.minimumSeat),l.floor,z);g.add(seat);box(seat,fabric,[.51,.12*l.k,s.width*.19],[0,.19*l.k,0],.04,'seat-cushion');const shell=box(seat,trim,[.16,.50*l.k,s.width*.245],[-.255,.47*l.k,0],.055,'seat-shell');shell.rotation.z=-.09;const back=box(seat,fabric,[.14,.46*l.k,s.width*.185],[-.23,.47*l.k,0],.045,'seat-back');back.rotation.z=-.09;
  // Upholstery seams sit on the seat surface and follow the reclined backrest.
  const stitching=surface('#8d999a',0,.95);
  for(const sign of [-1,1]){
   rod(back,stitching,[.075,-.16*l.k,sign*s.width*.087],[.075,.16*l.k,sign*s.width*.087],.0025).name='seat-stitching';
-  rod(seat,stitching,[-.16,.268*l.k,sign*s.width*.088],[.19,.268*l.k,sign*s.width*.088],.0025).name='cushion-stitching';
+  rod(seat,stitching,[-.16,.252*l.k,sign*s.width*.088],[.19,.252*l.k,sign*s.width*.088],.0025).name='cushion-stitching';
   rod(seat,bright,[-.26,.69*l.k,sign*s.width*.045],[-.26,.73*l.k,sign*s.width*.045],.008).name='headrest-post';
  }
  box(seat,trim,[.08,.06,.04],[.10,.25*l.k,-Math.sign(z||1)*s.width*.14],.01,'belt-buckle');
  box(seat,surface('#a13738',0,.6),[.045,.008,.027],[.10,.284*l.k,-Math.sign(z||1)*s.width*.14],.002,'belt-release');
- box(seat,fabric,[.12,.17*l.k,s.width*.16],[-.26,.78*l.k,0],.035,'headrest');for(const sign of [-1,1])box(seat,trim,[.06,.27*l.k,.035],[-.20,.4*l.k,sign*s.width*.125],.008,'seat-bolster');};
+ box(seat,fabric,[.12,.17*l.k,s.width*.16],[-.26,.78*l.k,0],.035,'headrest');
+ for(const sign of [-1,1]){
+  const backBolster=mesh(seat,new T.CapsuleGeometry(.034,.28*l.k,6,12),fabric,[-.17,.46*l.k,sign*s.width*.106],[0,0,-.09],'seat-bolster');backBolster.scale.set(1.35,1,1.30);
+  const cushionBolster=mesh(seat,new T.CapsuleGeometry(.036,.32,6,12),fabric,[.005,.214*l.k,sign*s.width*.106],[0,0,Math.PI/2],'cushion-bolster');cushionBolster.scale.z=1.20;
+ }
+ };
  for(const sign of [-1,1])seat(l.frontSeat,sign*s.width*.235,sign>0?'front-seat-left':'front-seat-right');
  const rearX=l.frontSeat-.88;
  const capacity=s.seats??(l.sports||l.pickup?2:5);
  if(capacity>2&&rearX>l.rearBase+.3){for(const sign of [-1,1])seat(rearX,sign*s.width*(capacity>=5?.27:.235),sign>0?'rear-seat-left':'rear-seat-right');if(capacity>=5)seat(rearX,0,'rear-seat-centre');}
  if(s.seats===7)for(const sign of [-1,1])seat(Math.max(l.rearBase+.4,rearX-.82),sign*s.width*.235,sign>0?'third-seat-left':'third-seat-right');
  const dashX=l.frontBase-.28,dashY=Math.min(l.belt-.05,l.floor+.67*l.k);
- box(g,trim,[.38,.18*l.k,l.innerWidth],[dashX,dashY,0],.045,'dashboard');
+ const dashGeo=roundedGeometry(.38,.18*l.k,l.innerWidth,.045),dp=dashGeo.attributes.position;
+ for(let i=0;i<dp.count;i++)if(dp.getY(i)>0)dp.setY(i,dp.getY(i)+.035*Math.sin(Math.PI*(dp.getZ(i)/l.innerWidth+.5)));
+ dashGeo.computeVertexNormals();mesh(g,dashGeo,trim,[dashX,dashY,0],[0,0,0],'dashboard');
  box(g,bright,[.05,.04,l.innerWidth*.90],[dashX-.205,dashY+.01,0],.008,'dashboard-trim');
  box(g,screen,[.024,.15*l.k,.26],[dashX-.21,dashY+.05,0],.008,'centre-screen');
  for(const sign of [-1,1]){const z=sign*s.width*.34;box(g,bright,[.03,.065,.17],[dashX-.21,dashY,z],.008,'air-vent');}
@@ -41,6 +49,15 @@ export function createInterior(s:VehicleSpec,o:Partial<VehicleOptions>={}):T.Gro
  mesh(controls,new T.TorusGeometry(.17*l.k,.025*l.k,8,32),trim,[0,0,0],[0,Math.PI/2,0]);rod(controls,bright,[0,0,0],[0,.14*l.k,0],.014);for(const sign of [-1,1])rod(controls,bright,[0,0,0],[0,-.08*l.k,sign*.13*l.k],.014);mesh(controls,new T.SphereGeometry(.055*l.k,12,8),trim);
  rod(g,trim,[steerX,steerY,driverZ],[dashX-.04,dashY,driverZ],.035);
  box(g,screen,[.025,.12,.30],[dashX-.215,dashY+.09,driverZ],.01,'instrument-cluster');
+ box(g,trim,[.17,.045,.36],[dashX-.16,dashY+.173*l.k,driverZ],.018,'instrument-hood');
+ for(const z of [-.07,.07])mesh(g,new T.CylinderGeometry(.022,.022,.018,16),bright,[dashX-.226,dashY-.052,z],[0,0,Math.PI/2],'climate-knob');
+ // Centre-stack face connects the screen to the console below it.
+ box(g,trim,[.11,.23*l.k,.24],[dashX-.125,dashY-.15*l.k,0],.025,'centre-stack');
+ mesh(controls,new T.SphereGeometry(.068*l.k,16,12),trim,[0,0,0],[0,0,0],'steering-airbag').scale.set(.55,1,1.25);
+ for(const sign of [-1,1]){
+  const grip=mesh(controls,new T.TorusGeometry(.17*l.k,.029*l.k,8,24,.75),fabric,[0,0,0],[0,Math.PI/2,sign>0?-.38:Math.PI-.38],'steering-grip');grip.userData.trim=true;
+ }
+
  // Modelled dial faces, needles and small display marks remain readable in driver shots.
  for(const dz of [-.075,.075]){
   mesh(g,new T.CylinderGeometry(.046,.046,.008,24),trim,[dashX-.234,dashY+.09,driverZ+dz],[0,0,Math.PI/2],'gauge-face');
@@ -56,5 +73,6 @@ export function createInterior(s:VehicleSpec,o:Partial<VehicleOptions>={}):T.Gro
  box(g,trim,[.08,Math.max(.1,l.belt-l.floor),l.innerWidth],[l.rearBase+.04,(l.floor+l.belt)/2,0],.01,'rear-bulkhead');
  if(s.id==='panel-van'||s.id==='camper-van'){box(g,trim,[.06,l.roof-l.floor-.1,l.innerWidth],[l.frontSeat-.5,(l.roof+l.floor)/2,0],.02,'cab-divider');if(s.id==='camper-van'){box(g,fabric,[1.7,.24,1.25],[l.rearBase+1.05,l.floor+.35,0],.04,'camper-bed');box(g,trim,[1.0,.9,.42],[l.frontSeat-1.4,l.floor+.45,-s.width*.30],.03,'camper-cabinet');}}
  if(s.roof!=='open'&&s.bodyStyle!=='targa')box(g,trim,[Math.max(.2,l.frontRoof-l.rearRoof),.025,s.width*.71],[(l.frontRoof+l.rearRoof)/2,l.roof-.03,0],.005,'roof-liner');
+ const smoothed=new Map<T.BufferGeometry,T.BufferGeometry>();g.traverse(o=>{if(o instanceof T.Mesh&&o.geometry.type==='ExtrudeGeometry'){const old=o.geometry;let next=smoothed.get(old);if(!next){next=toCreasedNormals(old,Math.PI/3);smoothed.set(old,next);}o.geometry=next;}});smoothed.forEach((_,geo)=>geo.dispose());
  return g;
 }

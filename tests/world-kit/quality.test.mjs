@@ -42,7 +42,7 @@ test('pickup bed floors remain open between their ribs',()=>{
 test('heavy-truck handles and seams sit against the cab skin',()=>{
  for(const variant of ['box-truck','tractor-truck']){
   const g=createVehicle({variant});g.updateMatrixWorld(true);const cab=new T.Box3().setFromObject(g.getObjectByName('cab'),true);
-  g.traverse(o=>{if(!['cab-handle','cab-door-seam'].includes(o.name))return;const b=new T.Box3().setFromObject(o,true);const gap=o.position.z>0?b.min.z-cab.max.z:cab.min.z-b.max.z;assert.ok(gap<.008,`${variant} ${o.name} floats ${gap}m`);});disposeObject(g);
+  g.traverse(o=>{if(!['cab-handle','cab-door-seam'].includes(o.name))return;const b=new T.Box3().setFromObject(o,true);const gap=b.getCenter(new T.Vector3()).z>0?b.min.z-cab.max.z:cab.min.z-b.max.z;assert.ok(gap<.008,`${variant} ${o.name} floats ${gap}m`);});disposeObject(g);
  }
 });
 test('the three-door compact has handles only for its two passenger doors',()=>{

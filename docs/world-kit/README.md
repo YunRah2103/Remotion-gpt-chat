@@ -2,6 +2,14 @@
 
 35 original generic vehicle bodies, 20 compatible 3D environments and 14 scene props. Designed for clean, modest-detail automotive explainers and stylised cinematics. No manufacturer badges or licensed model downloads. These are illustrative models, not engineering CAD or photoreal assets.
 
+## Sculpted vehicle revision
+
+Road bodies now use a continuous shaped shell with fuller fenders, a narrower lower body, rounded shoulders and real lamp/grille apertures. Rounded painted window frames and inset seals replace the exposed bar construction. Default glass opacity is 0.55; `glassOpacity` still overrides it, and the driver preview uses 0.15.
+
+Distinct wheel geometry serves road, split-spoke sports/SUV, turbine EV, vented steel, Formula and motorcycle designs. Formula cars have tapered noses, hollow cockpits, shaped sidepods and engine covers. Bikes have lofted tanks/seats and fitted headers/shock springs. Trucks gain seated glazing, steel wheels, rear lamps, rear protection and cargo hardware. The shared cabin has contoured seat shells/bolsters and a curved dashboard with instrument hood and centre-stack controls.
+
+Door paths and arch trim follow the body surface. Detail paths are merged into one mesh per path to limit draw calls. The 35 IDs, wheel hierarchy and scale remain compatible. See `SCULPTED_REVISION.md` for verification.
+
 ## Refined vehicle geometry
 
 All 35 variants now share continuous crowned body surfaces, smoother bevel shading, rounded tyre shoulders, open alloy wheels with drilled rotors and fixed calipers, layered projector lamps and tail-light strips. Modelled door gaps, handles, mirrors, wipers, grilles and exhausts add readable detail without badges or a specific manufacturer identity.
@@ -12,7 +20,7 @@ Formula cars gain wing flaps, pushrods, cooling louvres and cockpit padding; bik
 npm run worldkit:review-quality
 ```
 
-This renders 56 native stills and a silent 21-second 960x540 / 12fps review MP4. The source composition remains 1920x1080 / 30fps. All 35 GLBs are refreshed by `npm run worldkit:export`.
+This renders 65 native stills and a silent 21-second 960x540 / 12fps review MP4. The source composition remains 1920x1080 / 30fps. All 35 GLBs are refreshed by `npm run worldkit:export`.
 
 ## Vehicle catalogue
 

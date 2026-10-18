@@ -1,5 +1,7 @@
 # Vehicle quality verification — 18 October 2026
 
+The subsequent sculpted revision supersedes this first-pass geometry/count summary; see [SCULPTED_REVISION.md](SCULPTED_REVISION.md).
+
 Scope: all 35 generic catalogue variants; the existing 20 environments and 55 mechanical-part assemblies retain their public interfaces.
 
 - TypeScript check passed.

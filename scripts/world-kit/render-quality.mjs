@@ -2,7 +2,7 @@ import {bundle} from '@remotion/bundler';
 import {openBrowser,selectComposition,renderStill,renderMedia} from '@remotion/renderer';
 import {mkdir,writeFile} from 'node:fs/promises';
 import {VEHICLES} from '../../src/yunex/world-kit/catalog.ts';
-const out='out/world-kit-quality';await mkdir(out,{recursive:true});
+const out=process.env.WORLD_KIT_REVIEW_OUT??'out/world-kit-quality';await mkdir(out,{recursive:true});
 const serveUrl=await bundle({entryPoint:'src/yunex/world-kit/entry.tsx'});
 const browser=await openBrowser('chrome',{chromiumOptions:{gl:'swangle'}});
 const still=async(id,inputProps,file)=>{
@@ -15,6 +15,8 @@ try{
   for(const v of variants)await still('VehiclePreview',{variant:v.id,angle:.67},`vehicle-${v.id}`);
   if(!process.argv.includes('--smoke')){
    for(const variant of ['saloon','coupe','boxy-suv','sport-bike','formula-modern','box-truck','tractor-truck','single-cab-pickup','camper-van'])await still('VehiclePreview',{variant,angle:2.50},`rear-${variant}`);
+   for(const variant of ['saloon','coupe','boxy-suv','formula-modern','sport-bike','box-truck','minivan'])await still('VehiclePreview',{variant,angle:Math.PI/2},`side-${variant}`);
+   for(const variant of ['coupe','city-ev'])await still('DrivingPreview',{variant,environment:'city',timeOfDay:'night',seed:12},`night-${variant}`);
    for(const variant of ['saloon','supercar','boxy-suv','box-truck','minivan']){
     await still('InteriorPreview',{variant,mode:'cutaway'},`interior-${variant}`);
     await still('InteriorDriver',{variant,mode:'driver'},`driver-${variant}`);

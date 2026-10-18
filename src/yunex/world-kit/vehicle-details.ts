@@ -1,3 +1,5 @@
+import {mergeGeometries} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import {bodyHalfWidth,bodyTop} from './vehicle-body.ts';
 import * as T from 'three';
 import {box,mesh,rod,surface} from './geometry.ts';
 import type {V3} from './geometry.ts';
@@ -6,8 +8,12 @@ import type {VehicleSpec} from './catalog.ts';
 import {interiorLayout} from './interiors.ts';
 
 function line(g:T.Object3D,m:T.Material,points:V3[],radius=.003,name='panel-gap'){
- // Straight segments keep creases crisp and avoid Catmull-Rom overshoot into panels.
- for(let i=1;i<points.length;i++){const r=rod(g,m,points[i-1],points[i],radius);r.name=name;}
+ const pieces:T.BufferGeometry[]=[];
+ for(let i=1;i<points.length;i++){
+  const a=new T.Vector3(...points[i-1]),b=new T.Vector3(...points[i]),d=b.clone().sub(a);if(d.length()<1e-6)continue;
+  const geo=new T.CylinderGeometry(radius,radius,d.length(),8),q=new T.Quaternion().setFromUnitVectors(new T.Vector3(0,1,0),d.clone().normalize()),matrix=new T.Matrix4().compose(a.add(b).multiplyScalar(.5),q,new T.Vector3(1,1,1));geo.applyMatrix4(matrix);pieces.push(geo);
+ }
+ if(pieces.length){const geo=mergeGeometries(pieces,false);pieces.forEach(p=>p.dispose());mesh(g,geo,m,[0,0,0],[0,0,0],name);}
 }
 function ring(g:T.Object3D,m:T.Material,r:number,t:number,p:V3,rotation:V3=[0,0,0],name='trim-ring'){return mesh(g,new T.TorusGeometry(r,t,8,32),m,p,rotation,name);}
 function slats(g:T.Object3D,m:T.Material,x:number,y:number,width:number,height:number,count:number){
@@ -22,6 +28,9 @@ export function lamp(g:T.Group,m:VehicleMaterials,x:number,y:number,z:number,wid
   return;
  }
  box(g,m.trim,[.050,height+.035,width+.035],[x,y,z],.014,front?'headlamp-housing':'tail-lamp-housing');
+ // A deep lamp bucket joins the flush bezel to its recessed reflector.
+ for(const dy of [-1,1])box(g,m.trim,[.045,.012,width+.035],[x+sign*.040,y+dy*(height/2+.009),z],.004,'lamp-bucket');
+ for(const dz of [-1,1])box(g,m.trim,[.045,height+.030,.012],[x+sign*.040,y,z+dz*(width/2+.009)],.004,'lamp-bucket');
  box(g,front?m.metal:m.red,[.014,height*.68,width*.90],[x+sign*.029,y,z],.009,'lamp-reflector');
  const lensMat=new T.MeshPhysicalMaterial({color:front?'#c6e6ed':'#b32132',metalness:.12,roughness:.15,clearcoat:1,transparent:true,opacity:.62,depthWrite:false});
  box(g,lensMat,[.012,height*.84,width*.96],[x+sign*.040,y,z],.008,'lamp-lens');
@@ -42,17 +51,22 @@ export function crownedPanel(g:T.Group,m:T.Material,x0:number,x1:number,z:number
 export function roadDetails(g:T.Group,m:VehicleMaterials,s:VehicleSpec){
  const l=interiorLayout(s),front=s.length/2,rear=-front,sports=s.family==='sports',pickup=s.id.includes('pickup'),seam=surface('#243038',.15,.64),black=surface('#0c171d',.15,.5);
  for(const sign of [-1,1]){
-  lamp(g,m,front-.015,l.belt-.12,sign*s.width*.34,s.width*.22,sports?.065:.10,true,s.bodyStyle==='retro');
-  lamp(g,m,rear+.015,l.belt-.11,sign*s.width*.34,s.width*.22,.085,false);
+  const bodyLine=(points:V3[],radius:number,name:string)=>{
+   const fitted:V3[]=[];
+   for(let i=1;i<points.length;i++){const a=new T.Vector3(...points[i-1]),b=new T.Vector3(...points[i]),n=Math.ceil(a.distanceTo(b)/.09);for(let j=0;j<=n;j++){const p=a.clone().lerp(b,j/n);fitted.push([p.x,p.y,sign*(bodyHalfWidth(s,p.x,p.y)+.004)]);}}
+   line(g,seam,fitted,radius,name);
+  };
+  lamp(g,m,front-(s.bodyStyle==='retro'?.015:.060),l.belt-(s.bodyStyle==='retro'?.12:sports?.135:.15),sign*s.width*.31,s.width*.20,sports?.065:.10,true,s.bodyStyle==='retro');
+  lamp(g,m,rear+.060,l.belt-.11,sign*s.width*.31,s.width*.20,.085,false);
   const z=sign*(s.width/2+.003),doorRear=Math.max(-s.wheelbase/2+s.radius*1.16,-s.length*.09),doorFront=Math.min(s.wheelbase/2-s.radius*1.16,l.frontBase-.10),bottom=s.radius*.70+.15;
-  line(g,seam,[[doorRear,l.belt-.014,z],[doorRear,bottom+.08,z],[doorRear+.09,bottom,z],[doorFront-.06,bottom,z],[doorFront,bottom+.07,z],[doorFront,l.belt-.014,z]],.0035,'door-seam');
+  bodyLine([[doorRear,l.belt-.014,z],[doorRear,bottom+.08,z],[doorRear+.09,bottom,z],[doorFront-.06,bottom,z],[doorFront,bottom+.07,z],[doorFront,l.belt-.014,z]],.0035,'door-seam');
   // A second door only fits passenger cabins with enough distance behind the B pillar.
   const rearDoors=!sports&&s.id!=='compact'&&!pickup&&l.rearBase<doorRear-.35;
-  if(rearDoors)line(g,seam,[[l.rearBase+.11,l.belt-.015,z],[l.rearBase+.16,Math.max(bottom+.05,s.radius*2.13),z],[doorRear,Math.max(bottom+.05,s.radius*2.13),z]],.003,'rear-door-seam');
-  const handleX=doorRear+.13;
-  box(g,black,[.18,.042,.008],[handleX,l.belt-.07,z],.01,'handle-recess');
-  box(g,m.metal,[.13,.018,.025],[handleX+.005,l.belt-.066,z+sign*.012],.006,'door-handle');
-  if(rearDoors)box(g,m.metal,[.13,.018,.025],[l.rearBase+.25,l.belt-.066,z+sign*.012],.006,'rear-door-handle');
+  if(rearDoors)bodyLine([[l.rearBase+.11,l.belt-.015,z],[l.rearBase+.16,Math.max(bottom+.05,s.radius*2.13),z],[doorRear,Math.max(bottom+.05,s.radius*2.13),z]],.003,'rear-door-seam');
+  const handleX=doorRear+.13,hz=sign*(bodyHalfWidth(s,handleX,l.belt-.07)+.004);
+  box(g,black,[.18,.042,.008],[handleX,l.belt-.07,hz],.01,'handle-recess');
+  box(g,m.metal,[.13,.018,.025],[handleX+.005,l.belt-.066,hz+sign*.012],.006,'door-handle');
+  if(rearDoors)box(g,m.metal,[.13,.018,.025],[l.rearBase+.25,l.belt-.066,sign*(bodyHalfWidth(s,l.rearBase+.25,l.belt-.066)+.016)],.006,'rear-door-handle');
   const mx=l.frontBase-.14,mz=sign*s.width*.53;
   rod(g,m.trim,[mx,l.belt+.035,sign*s.width*.455],[mx-.035,l.belt+.10,mz],.018).name='mirror-stalk';
   box(g,m.body,[.22,.105,.14],[mx-.02,l.belt+.12,mz],.035,'mirror');
@@ -60,10 +74,13 @@ export function roadDetails(g:T.Group,m:VehicleMaterials,s:VehicleSpec){
   // Wheel-arch beads follow the opening, with no tyre intersection.
   for(const x of [-s.wheelbase/2,s.wheelbase/2]){
    const pts:V3[]=[];for(let i=0;i<=24;i++){const a=i*Math.PI/24;pts.push([x+Math.cos(a)*s.radius*1.10,s.radius+Math.sin(a)*s.radius*1.10,z]);}
-   line(g,s.family==='suv'||pickup?m.trim:m.body,pts,s.family==='suv'||pickup?.012:.007,'arch-trim');
+   line(g,s.family==='suv'||pickup?m.trim:m.body,pts.map(p=>[p[0],p[1],sign*(bodyHalfWidth(s,p[0],p[1])+.006)] as V3),s.family==='suv'||pickup?.012:.007,'arch-trim');
   }
-  const hoodStart=Math.max(l.frontBase+.06,front-.95),hoodEnd=front-.25;
-  if(hoodEnd>hoodStart+.1){const y=(x:number)=>l.belt+.036-(x+front-.23)/(s.length-.46)*.05+.028*Math.sin(Math.PI*.81)+.004;line(g,seam,[[hoodStart,y(hoodStart),sign*s.width*.31],[hoodEnd,y(hoodEnd),sign*s.width*.30]],.003,'bonnet-seam');}
+  const hoodStart=Math.max(l.frontBase+.07,front-1.40),hoodEnd=front-.23;
+  if(hoodEnd>hoodStart+.12){
+   const pts:V3[]=[];for(let j=0;j<=16;j++){const t=j/16,x=T.MathUtils.lerp(hoodStart,hoodEnd,t),z=sign*s.width*T.MathUtils.lerp(.30,.29,t),y=bodyTop(s,x)+.040*Math.sin(Math.PI*(.5+z/(2*bodyHalfWidth(s,x,bodyTop(s,x)))))+.003;pts.push([x,y,z]);}
+   line(g,seam,pts,.0025,'bonnet-seam');
+  }
   if(s.bodyStyle!=='ev'){
    // Rear-facing exhaust outlets use a dark bore, avoiding a solid chrome plug.
    const exhaust=mesh(g,new T.CylinderGeometry(.041,.041,.12,20,1,true),m.metal,[rear-.035,.365,sign*s.width*.31],[0,0,Math.PI/2],'exhaust-tip');
@@ -71,7 +88,7 @@ export function roadDetails(g:T.Group,m:VehicleMaterials,s:VehicleSpec){
   }
   box(g,m.red,[.012,.03,.10],[rear-.055,.46,sign*s.width*.38],.005,'rear-reflector');
  }
- if(s.bodyStyle!=='ev')slats(g,m.metal,front+.047,l.belt-.34,s.width*.48,.12,sports?3:5);
+ if(s.bodyStyle!=='ev')slats(g,m.metal,front+.022,l.belt-.34,s.width*.48,.12,sports?3:5);
  for(const x of [front+.052,rear-.052])box(g,black,[.014,.095,.38],[x,.47,0],.007,'plate-mount');
  // Wipers lie on the sloped windscreen, below the driver's sightline.
  for(const z of [-s.width*.23,s.width*.18]){
@@ -87,7 +104,7 @@ export function roadDetails(g:T.Group,m:VehicleMaterials,s:VehicleSpec){
   for(let i=-4;i<=4;i++)box(g,m.trim,[length,.014,.025],[cx,1.137,i*s.width*.075],.003,'bed-rib');
   line(g,seam,[[rear-.003,1.06,-s.width*.42],[rear-.003,.91,-s.width*.42],[rear-.003,.91,s.width*.42],[rear-.003,1.06,s.width*.42]],.004,'tailgate-seam');
  }
- if(s.family==='van'&&s.id!=='minivan')for(const sign of [-1,1])box(g,m.trim,[s.length*.40,.07,.035],[-s.length*.18,.69,sign*(s.width/2+.018)],.01,'cargo-rub-strip');
+ if(s.family==='van'&&s.id!=='minivan')for(const sign of [-1,1])box(g,m.trim,[s.length*.40,.07,.035],[-s.length*.18,.69,sign*(bodyHalfWidth(s,-s.length*.18,.69)+.012)],.01,'cargo-rub-strip');
 }
 export function formulaDetails(g:T.Group,m:VehicleMaterials,s:VehicleSpec){
  const modern=s.id==='formula-modern';
