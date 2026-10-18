@@ -3,6 +3,9 @@ import type {BrakeAssemblyPose, BrakingSimulationState, WheelKey} from '../contr
 /** True movement of a road-car disc pad: no educational scale inflation. */
 export const MAX_PAD_TRAVEL_M = 0.0012;
 export const ROTOR_FACE_HALF_SPACING_M = 0.012;
+export const ROTOR_FACE_THICKNESS_M = 0.0036;
+/** Exterior swept surface of each friction plate, not its middle plane. */
+export const ROTOR_OUTER_FACE_Z_M = ROTOR_FACE_HALF_SPACING_M + ROTOR_FACE_THICKNESS_M / 2;
 export const PAD_HALF_THICKNESS_M = 0.0065;
 export const REST_PAD_CLEARANCE_M = MAX_PAD_TRAVEL_M;
 export const MAX_CUTAWAY_EXPLOSION_M = 0.092;
@@ -40,5 +43,5 @@ export function padFaceGapM(pose: BrakeAssemblyPose): number {
 
 export function padCenterZ(pose: BrakeAssemblyPose, side: -1 | 1): number {
   const cutaway = clamp01(pose.cutaway01) * MAX_CUTAWAY_EXPLOSION_M;
-  return side * (ROTOR_FACE_HALF_SPACING_M + PAD_HALF_THICKNESS_M + padFaceGapM(pose) + cutaway);
+  return side * (ROTOR_OUTER_FACE_Z_M + PAD_HALF_THICKNESS_M + padFaceGapM(pose) + cutaway);
 }
