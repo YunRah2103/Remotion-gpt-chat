@@ -91,7 +91,8 @@ function create(id:RaceCarId):RacePath{
     const kh=1.45,P=positionAt(Math.max(0,d-kh)),Q=positionAt(Math.min(lengthM,d+kh));
     const x1=p[0]-P[0],z1=p[2]-P[2],x2=Q[0]-p[0],z2=Q[2]-p[2];
     const l1=Math.hypot(x1,z1),l2=Math.hypot(x2,z2),l3=Math.hypot(Q[0]-P[0],Q[2]-P[2]);
-    const curvatureInvM=l1*l2*l3<1e-8?0:2*(x1*z2-z1*x2)/(l1*l2*l3);
+    // Sign follows yaw/distance: positive curvature rotates +X toward -Z (right turn).
+    const curvatureInvM=l1*l2*l3<1e-8?0:-2*(x1*z2-z1*x2)/(l1*l2*l3);
     return {position:p,yaw:wrapAngle(yaw),curvatureInvM};
   };
   return {
