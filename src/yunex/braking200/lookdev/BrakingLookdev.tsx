@@ -22,12 +22,17 @@ export const BrakingFinishes:React.FC<{state?:BrakingSimulationState}>=({state})
  useFrame(({scene})=>{
   const lookups:[string,'car'|'track'][]=[
    ['YUNEX-grand-tourer','car'],['YUNEX-track','track'],
-   ['yunex-brake-front-left','car']
+   ['yunex-brake-front-left','car'],['yunex-brake-front-right','car'],
+   ['yunex-brake-rear-left','car'],['yunex-brake-rear-right','car']
   ];
   for(const [name,role] of lookups){
    const object=scene.getObjectByName(name);
    if(object&&!roots.current.has(object)){
-    roots.current.set(object,applyBrakingFinishes(object,role));
+    // A1's brake groups are children of its already-finished car: do not
+    // finish the same meshes twice or restore stale material pointers.
+    let ancestor=object.parent,covered=false;
+    while(ancestor){if(roots.current.has(ancestor)){covered=true;break;}ancestor=ancestor.parent;}
+    if(!covered)roots.current.set(object,applyBrakingFinishes(object,role));
    }
   }
   const heat=illustrativeHeatFromEnergy(state);
@@ -54,12 +59,12 @@ function addTube(group:T.Group,name:string,points:T.Vector3[],radius:number,
  */
 export function createTrackDressing(seed=12):T.Group{
  const group=new T.Group();group.name='A4-circuit-film-dressing';
- const steel=new T.MeshStandardMaterial({color:'#67757c',metalness:.46,roughness:.5});
+ const steel=new T.MeshStandardMaterial({color:'#596a70',metalness:.48,roughness:.56});
  const dark=new T.MeshStandardMaterial({color:'#28373c',metalness:.24,roughness:.61});
- const fence=new T.MeshStandardMaterial({color:'#708185',metalness:.42,roughness:.58});
+ const fence=new T.MeshStandardMaterial({color:'#647376',metalness:.42,roughness:.66});
  const postsGeo=new T.CylinderGeometry(.042,.058,2.35,7);
  const wiresGeo=new T.CylinderGeometry(.013,.013,2.35,5);
- const length=routeLength('track'),count=84;
+ const length=routeLength('track'),count=56;
  let seedValue=seed>>>0;
  const rand=()=>{seedValue=(Math.imul(seedValue,1664525)+1013904223)>>>0;return seedValue/4294967296;};
  for(const sign of [-1,1]){
@@ -103,6 +108,22 @@ export function createTrackDressing(seed=12):T.Group{
    group.add(pack);
   }
  }
+ // Restrained irregular verge vegetation adds scale without copying the kit's
+ // simplified pyramid trees or scattering items onto the driving surface.
+ const shrubCount=230;
+ const green=new T.MeshStandardMaterial({color:'#52664d',roughness:1,metalness:0});
+ const scrub=new T.InstancedMesh(new T.IcosahedronGeometry(1,0),green,shrubCount);
+ scrub.name='trackside-low-scrub';scrub.castShadow=false;const p=new T.Object3D();
+ for(let i=0;i<shrubCount;i++){
+   const route=sampleRoute('track',rand()*length),side=(rand()<.5?-1:1)*(16+rand()*12);
+   const height=.18+rand()*.58;
+   p.position.set(route.position[0]+Math.sin(route.yaw)*side,height*.42,
+     route.position[2]+Math.cos(route.yaw)*side);
+   p.rotation.set(0,rand()*Math.PI*2,0);
+   p.scale.set(.4+rand()*.35,height,.4+rand()*.42);
+   p.updateMatrix();scrub.setMatrixAt(i,p.matrix);
+ }
+ scrub.instanceMatrix.needsUpdate=true;group.add(scrub);
  // Small architectural pit lights create scale/depth near grandstand.
  for(let i=0;i<5;i++){
    const x=-29+i*13;
@@ -124,12 +145,12 @@ export const BrakingContactShadow:React.FC<{pose:RoutePose}>=({pose})=>{
    const local=a.center,x=pose.position[0]+c*local[0]+s*local[2],
     z=pose.position[2]-s*local[0]+c*local[2];
    return <group key={a.id}>
-    <mesh position={[x,.018,z]} rotation={[-Math.PI/2,0,-pose.yaw]} scale={[.58,.91,1]}>
+    <mesh position={[x,.018,z]} rotation={[-Math.PI/2,0,-pose.yaw]} scale={[.32,.53,1]}>
      <circleGeometry args={[1,32]}/>
-     <meshBasicMaterial color="#050b0e" transparent opacity={.24}
+     <meshBasicMaterial color="#050b0e" transparent opacity={.21}
        depthWrite={false} polygonOffset polygonOffsetFactor={-1}/>
     </mesh>
-    <mesh position={[x,.020,z]} rotation={[-Math.PI/2,0,-pose.yaw]} scale={[.49,.88,1]}>
+    <mesh position={[x,.020,z]} rotation={[-Math.PI/2,0,-pose.yaw]} scale={[.24,.39,1]}>
      <circleGeometry args={[1,32]}/>
      <meshBasicMaterial color="#081319" transparent opacity={.13} depthWrite={false}/>
     </mesh>
