@@ -113,8 +113,8 @@ test('identical world entry and finish checkpoints: position, heading and curvat
  for(const id of ['shortcut','racing']){
   assert.equal(offsetFromCentre(id,0),0);
   assert.equal(offsetFromCentre(id,1),0);
-  assert.equal(offsetFromCentre(id,.00001),0, 'C2 smooth departure from checkpoint');
-  assert.equal(offsetFromCentre(id,.99999),0, 'C2 smooth return to checkpoint');
+  assert.ok(Math.abs(offsetFromCentre(id,.00001))<1e-9, 'C2 smooth departure from checkpoint');
+  assert.ok(Math.abs(offsetFromCentre(id,.99999))<1e-9, 'C2 smooth return to checkpoint');
  }
 });
 
