@@ -1,0 +1,204 @@
+name: YUNEX BRAKING EP001 A6 — full native cinematic first cut
+on:
+  push:
+    branches: [agent/braking-200kmh-001-master-editor]
+    paths:
+      - 'src/yunex/braking200/editor/**'
+      - '.github/workflows/yunex-braking-a6-full-film.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: yunex-a6-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Integrate immutable A1–A5 commits without editing their branches
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/braking-a6
+          while read -r team branch pin; do
+            git fetch --depth=1 origin "refs/heads/${branch}"
+            actual="$(git rev-parse FETCH_HEAD)"
+            echo "${team} ${branch} ${actual}" | tee -a out/braking-a6/SOURCE_PINS.txt
+            if [[ "$actual" != "$pin" ]]; then
+              echo "::error::${team} changed from pinned source $pin to $actual; editorial re-review required"
+              exit 1
+            fi
+            git archive "$actual" "src/yunex/braking200/${team}/" | tar -xf -
+          done <<'PINS'
+          engineering agent/braking-200kmh-001-engineering 395fa07113838999f0de485cb6ab545421b7e1cd
+          physics agent/braking-200kmh-001-physics 4a6152c2035c8492171bf684b5a51670a3b2c56c
+          cameras agent/braking-200kmh-001-cameras 9bf5a1d2d68ee609ae8c0ed5d9d4355ea82e6835
+          lookdev agent/braking-200kmh-001-lookdev 192f2fddeec41c397a3524ec5c22e59a7d33124d
+          graphics agent/braking-200kmh-001-graphics 228667a5e17d87d92d2435cfa6f358a1d0d549aa
+          PINS
+      - name: Install, TS check and physics / interface regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          npm run check
+          npm run worldkit:test
+          for testfile in \
+            src/yunex/braking200/engineering/mechanics.test.mjs \
+            src/yunex/braking200/physics/simulation.test.mjs \
+            src/yunex/braking200/physics/integration.test.mjs \
+            src/yunex/braking200/cameras/cameraRig.test.mjs \
+            src/yunex/braking200/lookdev/lookdev.test.mjs \
+            src/yunex/braking200/graphics/logic.test.mjs \
+            src/yunex/braking200/graphics/integration.test.mjs; do
+            node --experimental-strip-types --test "$testfile"
+          done
+      - name: Native render integration smoke test in three chapter positions
+        shell: bash
+        run: |
+          set -euo pipefail
+          for frame in 0 245 599; do
+            npx remotion still src/yunex/braking200/editor/entry.tsx \
+              YunexBraking200FirstCut "out/braking-a6/smoke-${frame}.png" \
+              --frame="${frame}" --gl=swangle --scale=0.35
+          done
+      - name: Save smoke checks and pinned source manifest
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: yunex-a6-smoke-${{ github.run_id }}
+          path: out/braking-a6/
+          if-no-files-found: warn
+          retention-days: 30
+
+  render_shots:
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        include:
+          - {idx: 1, name: hero, start: 0, end: 154}
+          - {idx: 2, name: braking-disc, start: 155, end: 304}
+          - {idx: 3, name: heat, start: 305, end: 384}
+          - {idx: 4, name: grip, start: 385, end: 499}
+          - {idx: 5, name: low-grip-abs, start: 500, end: 681}
+          - {idx: 6, name: final-stop, start: 682, end: 809}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Hydrate ONLY approved source commits for rendering
+        shell: bash
+        run: |
+          set -euo pipefail
+          while read -r team branch pin; do
+            git fetch --depth=1 origin "refs/heads/${branch}"
+            test "$(git rev-parse FETCH_HEAD)" = "$pin" ||
+              { echo "::error::Source pin drift: ${team}"; exit 1; }
+            git archive FETCH_HEAD "src/yunex/braking200/${team}/" | tar -xf -
+          done <<'PINS'
+          engineering agent/braking-200kmh-001-engineering 395fa07113838999f0de485cb6ab545421b7e1cd
+          physics agent/braking-200kmh-001-physics 4a6152c2035c8492171bf684b5a51670a3b2c56c
+          cameras agent/braking-200kmh-001-cameras 9bf5a1d2d68ee609ae8c0ed5d9d4355ea82e6835
+          lookdev agent/braking-200kmh-001-lookdev 192f2fddeec41c397a3524ec5c22e59a7d33124d
+          graphics agent/braking-200kmh-001-graphics 228667a5e17d87d92d2435cfa6f358a1d0d549aa
+          PINS
+          npm ci --no-audit --no-fund
+          mkdir -p out/braking-a6-segments
+      - name: Render genuine full-resolution 1080x1920 H264 picture frames
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx remotion render src/yunex/braking200/editor/entry.tsx \
+            YunexBraking200FirstCut \
+            "out/braking-a6-segments/shot-${{ matrix.idx }}.mp4" \
+            --frames="${{ matrix.start }}-${{ matrix.end }}" \
+            --gl=swangle --scale=1 --codec=h264 \
+            --pixel-format=yuv420p --concurrency=1
+          ffmpeg -v error -xerror -i "out/braking-a6-segments/shot-${{ matrix.idx }}.mp4" -f null -
+          ffprobe -v error -show_entries stream=codec_name,width,height,avg_frame_rate,nb_frames \
+            -of default=nw=1 "out/braking-a6-segments/shot-${{ matrix.idx }}.mp4"
+      - name: Upload actual source-rendered frames
+        uses: actions/upload-artifact@v4
+        with:
+          name: yunex-a6-shot-${{ matrix.idx }}
+          path: out/braking-a6-segments/shot-${{ matrix.idx }}.mp4
+          if-no-files-found: error
+          retention-days: 30
+
+  assemble:
+    needs: render_shots
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: yunex-a6-shot-*
+          path: out/parts
+          merge-multiple: true
+      - name: Concatenate original 810 frames and verify every decoded frame
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/braking-a6-final
+          for i in 1 2 3 4 5 6; do
+            test -s "out/parts/shot-${i}.mp4"
+            echo "file '$(realpath "out/parts/shot-${i}.mp4")'"
+          done > out/braking-a6-final/concat.txt
+          ffmpeg -hide_banner -loglevel warning -xerror -y \
+            -f concat -safe 0 -i out/braking-a6-final/concat.txt \
+            -map 0:v:0 -c:v copy -movflags +faststart \
+            out/braking-a6-final/YUNEX_BRAKING_200KMH_A6_PICTURE.mp4
+          ffprobe -v error -show_streams -show_format -of json \
+            out/braking-a6-final/YUNEX_BRAKING_200KMH_A6_PICTURE.mp4 \
+            > out/braking-a6-final/ffprobe.json
+          ffmpeg -v error -xerror \
+            -i out/braking-a6-final/YUNEX_BRAKING_200KMH_A6_PICTURE.mp4 \
+            -f null -
+          ffmpeg -v error -xerror \
+            -i out/braking-a6-final/YUNEX_BRAKING_200KMH_A6_PICTURE.mp4 \
+            -f framemd5 out/braking-a6-final/framemd5.txt
+          python3 - <<'PY'
+          import json
+          from fractions import Fraction
+          p='out/braking-a6-final/'
+          j=json.load(open(p+'ffprobe.json'))
+          v=next(x for x in j['streams'] if x['codec_type']=='video')
+          assert v['codec_name']=='h264',v
+          assert (v['width'],v['height'])==(1080,1920),v
+          assert Fraction(v['avg_frame_rate'])==30,v
+          hashes=[x.rsplit(',',1)[-1].strip() for x in open(p+'framemd5.txt')
+                  if x.strip() and not x.startswith('#')]
+          assert len(hashes)==810,len(hashes)
+          assert len(set(hashes))>700,(len(set(hashes)),len(hashes))
+          print('REAL_1080x1920_NATIVE_27SEC_810FRAMES_FFMPEG_DECODE_PASS')
+          PY
+          for sec in 0.2 1.2 3.8 5.6 8.2 11.4 13.5 15.8 17.4 19.5 21.5 23.6 25.5 26.6; do
+            ffmpeg -hide_banner -loglevel error -y \
+              -ss "$sec" -i out/braking-a6-final/YUNEX_BRAKING_200KMH_A6_PICTURE.mp4 \
+              -frames:v 1 -vf scale=405:720 \
+              "out/braking-a6-final/still-${sec}.png"
+          done
+      - name: Upload native complete first-cut film for picture review
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-BRAKING-200-A6-FIRST-CUT-${{ github.run_id }}
+          path: out/braking-a6-final/
+          if-no-files-found: error
+          retention-days: 30
