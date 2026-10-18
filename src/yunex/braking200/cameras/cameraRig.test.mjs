@@ -87,11 +87,15 @@ test('hero silhouette and front-left wheel remain composed for 9:16',()=>{
   assert.ok(w);
   for(const cue of PROVISIONAL_CUES){
     const isMacro=['mechanism','heat','grip','abs'].includes(cue.cue);
+    // Once the front rim is removed in the actual A1 integration heat shot,
+    // its real rotor is the visible subject. Do not force a physically
+    // nonexistent opaque tyre to fit the exposed rotor macro.
+    const radius=cue.cue==='heat'?w.radiusM*.645:w.radiusM;
     const targetPoints=isMacro?
       Array.from({length:24},(_,j)=>[
-        w.center[0]+Math.cos(j*Math.PI/12)*w.radiusM,
-        w.center[1]+Math.sin(j*Math.PI/12)*w.radiusM,
-        w.center[2]+.14,
+        w.center[0]+Math.cos(j*Math.PI/12)*radius,
+        w.center[1]+Math.sin(j*Math.PI/12)*radius,
+        w.center[2]+(cue.cue==='heat'?.05:.14),
       ]):
       [-car.length/2,car.length/2].flatMap(x=>
         [0,car.height].flatMap(y=>
