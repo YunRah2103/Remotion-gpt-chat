@@ -34,7 +34,11 @@ Interface: createVehicle(options) returns the same root and wheel metadata; help
 
 Files: quality preview composition/script, README and QA notes.
 
-- [ ] Render all 35 vehicles, selected rear/interior/portrait checks and moving review.
-- [ ] Export/reload all GLBs, decode MP4, inspect contact sheets and moving frames.
+- [x] Render all 35 vehicles, selected rear/interior/portrait checks and moving review.
+- [x] Export/reload all GLBs, decode MP4, inspect contact sheets and moving frames.
 - [x] Obtain one fresh final code review; address important defects and rerun checks.
-- [ ] Commit, update PR #145 and save the clean source/models/preview pack.
+- [x] Commit, update PR #145 and save the clean source/models/preview pack.
+
+## Completion evidence
+
+Source commit `ac1155031076c5192b5a063f9464a576412e478e` is on PR #145. Typecheck, 31 world tests, 19 parts tests and 35 GLB reloads passed. The native 21-second MP4 fully decoded with no black frames. The verified 232-entry V4 ZIP includes source, 35 refreshed vehicle GLBs, 55 unchanged parts GLBs, 56 stills and the moving preview; it excludes dependency caches. All three deliverables were saved successfully. Independent review fixes and the compact identity correction are recorded in `docs/world-kit/VEHICLE_QUALITY_QA.md`.
