@@ -158,3 +158,7 @@ V2 outputs live in `out/world-kit-v2`. Vehicles and props export to portable GLB
 Most enclosed cars reuse seats, headrests, dashboard, screens, vents, steering wheel, pedals, console, door trim and floor. Seat positions fit sloping rear glass; five- and seven-seat bodies include the centre rear seat. Sports cars use lower layouts; trucks use a raised two-seat cab. Panel/camper vans add a cab divider, with a simple bed and cabinet in the camper. Formula cars keep their own basic racing cockpit; bikes have saddles and controls rather than enclosed cabins. These are modest-detail illustrative interiors, not manufacturer interiors.
 
 `interiorCamera(vehicleSpec('saloon'),'right')` returns a position, target and FOV in vehicle-local coordinates. Apply the vehicle pose to both vectors when filming a moving vehicle. `InteriorDriver` demonstrates a fixed view on a highway; `InteriorPreview` demonstrates the cutaway. Steering animation also turns the interior wheel. Portable GLBs include interiors by default.
+
+## Mechanical parts baseline
+
+A companion [automotive parts library](../parts-kit/README.md) adds 55 generic engines, turbos, brakes, suspension, aero and supporting-system variants. It uses the same metre scale, lighting and resource ownership, with independent models, named mounts, animation controls, GLB exports and an isolated `npm run partskit:studio` entry. Existing cars and environments are unchanged.
