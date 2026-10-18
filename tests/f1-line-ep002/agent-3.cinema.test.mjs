@@ -42,6 +42,13 @@ test('camera projections stay inside the portrait image for pair-reveal shot cen
     assert.ok(projected.z>-1&&projected.z<1,shot+' '+id+' depth @'+frame);
     assert.ok(Math.abs(projected.x)<.98,shot+' '+id+' horizontal crop @'+frame+': '+projected.x);
     assert.ok(Math.abs(projected.y)<.98,shot+' '+id+' vertical crop @'+frame+': '+projected.y);
+    // F1 body corners capture actual front wings and tyres, not merely car centres.
+    const yaw=state.cars[id].worldPose.yaw;
+    for(const f of [-2.72,2.72])for(const lateral of [-1.03,1.03]){
+     const c=Math.cos(yaw),s=Math.sin(yaw);
+     const corner=new Vector3(car[0]+c*f+s*lateral,car[1]+.6,car[2]-s*f+c*lateral).project(cam);
+     assert.ok(Math.abs(corner.x)<.995,shot+' '+id+' wing/wheel horizontal crop @'+frame+': '+corner.x);
+    }
    }
   }
  }
