@@ -1,0 +1,42 @@
+name: YUNEX Braking 200 A5 — native graphics motion proof
+on:
+  push:
+    branches:
+      - agent/braking-200kmh-001-graphics
+    paths:
+      - 'src/yunex/braking200/graphics/**'
+      - '.github/workflows/yunex-braking-a5-graphics-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-a5-graphics-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Render actual GT / track and wheel macro MP4s, full decode, frame proofs
+        run: bash src/yunex/braking200/graphics/render-and-verify.sh
+      - name: Exact source SHA and evidence manifest
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p out/braking-a5
+          git rev-parse HEAD | tee out/braking-a5/SOURCE_SHA.txt
+          find out/braking-a5 -maxdepth 1 -type f -printf '%f %s bytes\n' | sort | tee out/braking-a5/FILES.txt
+      - name: Upload actual native moving proof media and QA logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-Braking200-Agent5-Motion-Proof-${{ github.run_id }}
+          path: out/braking-a5/
+          retention-days: 30
+          if-no-files-found: error
