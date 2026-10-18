@@ -7,7 +7,9 @@ import type {RaceCarId,RacePath,RacePose,V3} from '../contract.ts';
  * the existing road centreline; negative values therefore hug this RIGHT turn.
  *
  * The cars share the SAME centreline progress stations and the same asphalt.
- * A holds a tight inner radius; B is wide at both ends and clips a later apex.
+ * Both trajectories occupy EXACTLY the same physical start/finish checkpoints.
+ * A makes the tight inside arc; B opens the corner, clips a later apex, then
+ * smoothly returns to the shared exit. A2 measures timing at those SAME points.
  */
 export const CORNER_GEOMETRY={
   anchor:[65,0,18] as V3,
@@ -20,7 +22,6 @@ export const CORNER_GEOMETRY={
   wheelbaseM:3.42,
   tyreRadiusM:0.36,
 } as const;
-const TAU=Math.PI*2;
 const clamp=(x:number,a:number,b:number)=>Math.max(a,Math.min(b,x));
 const differences=(b:number,a:number)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
 const circuitLengthM=routeLength('track');
@@ -43,10 +44,20 @@ export function sampleCornerCentre(progress01:number){
   const p=sampleRoute('track',s);
   return {position:p.position,yaw:p.yaw,circuitDistanceM:s};
 }
+/** C2 quintic blending avoids abrupt lateral velocity or heading changes. */
+const smooth5=(t:number)=>{const x=clamp(t,0,1);return x*x*x*(x*(x*6-15)+10);};
 export function offsetFromCentre(id:RaceCarId,progress01:number){
+  if(!Number.isFinite(progress01))throw new Error('Corner progress must be finite');
   const u=clamp(progress01,0,1);
-  // Constant inside line versus genuine outside-inside-outside line.
-  return id==='shortcut'?-2.8:2.8-4.45*Math.sin(Math.PI*u)**2;
+  // Both cars travel the SAME physical centerline at the start/finish
+  // checkpoints. During the approach and runout, offsets fade with zero
+  // first and second derivative at their ends (no discontinuous steering).
+  const sharedGate=smooth5(u/.19)*smooth5((1-u)/.19);
+  if(id==='shortcut')return -2.8*sharedGate;
+  // Wide entry, late inside apex, wide exit. Spread the offset change over
+  // much of the turn, not a sudden steering snap or unrealistic hairpin.
+  const apexWave=Math.sin(Math.PI*clamp((u-.10)/.8,0,1))**2;
+  return sharedGate*(2.8-4.25*apexWave);
 }
 
 type Knot={arcM:number;position:V3;yaw:number;curvatureInvM:number;progress01:number};
@@ -94,7 +105,17 @@ function build(id:RaceCarId):RacingLineData{
       const w=Math.exp(-.5*(k/sigma)**2),p=point(i+k);
       x+=w*p[0];z+=w*p[2];sum+=w;
     }
-    knots[i].position=[x/sum,0,z/sum];
+    // Smooth the real spatial points only inside the sector. Restore the
+    // original road-matched endpoints *exactly* while smoothly blending the
+    // Gaussian filtering on/off over the approach and runout. The gate itself
+    // has vanishing first and second derivatives at its boundaries.
+    const u=i/SAMPLES;
+    const filterGate=smooth5((u-.065)/.095)*smooth5((.935-u)/.095);
+    const raw=rawPoints[i];
+    knots[i].position=[
+      raw[0]+filterGate*(x/sum-raw[0]),0,
+      raw[2]+filterGate*(z/sum-raw[2]),
+    ];
   }
   knots[0].arcM=0;
   for(let i=1;i<=SAMPLES;i++){
