@@ -1,0 +1,93 @@
+name: YUNEX F1 EP002 · Agent 1 Native Race Preview
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/f1-ep002-01-track-cars
+    paths:
+      - 'src/yunex/f1-line-ep002/track/**'
+      - 'src/yunex/f1-line-ep002/cars/**'
+      - 'src/yunex/f1-line-ep002/agent-1-preview/**'
+      - 'tests/f1-line-ep002/agent-1.test.mjs'
+      - '.github/workflows/f1-line-ep002-agent-1.yml'
+  pull_request:
+    branches:
+      - production/f1-racing-line-ep002-contract
+    paths:
+      - 'src/yunex/f1-line-ep002/track/**'
+      - 'src/yunex/f1-line-ep002/cars/**'
+      - 'src/yunex/f1-line-ep002/agent-1-preview/**'
+      - 'tests/f1-line-ep002/agent-1.test.mjs'
+      - '.github/workflows/f1-line-ep002-agent-1.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  # Share the same queue for push and PR triggers from this agent branch.
+  # Otherwise identical 240-frame software-WebGL films run twice.
+  group: f1-race-agent-1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  verify-and-render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install exact Remotion and world-kit dependencies
+        run: npm ci
+      - name: Typecheck all productions without modifying approved shared code
+        run: npm run check
+      - name: Test true road bounds, curvature, wheel travel and safe choreography
+        run: node --experimental-strip-types --test tests/f1-line-ep002/agent-1.test.mjs
+      - name: Verify original reusable kit
+        run: npm run worldkit:test
+      - name: Install FFmpeg and FFprobe for machine-verifiable QC
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          ffmpeg -version | head -n 1
+          ffprobe -version | head -n 1
+      - name: Render native 8 second two-car Remotion MP4
+        run: |
+          mkdir -p out/f1-ep002-agent-1
+          npx remotion render src/yunex/f1-line-ep002/agent-1-preview/entry.tsx F1Agent1Preview out/f1-ep002-agent-1/two-car-corner.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1 --overwrite
+      - name: Normalize limited-range yuv420p for universally playable H264
+        run: |
+          set -euo pipefail
+          F=out/f1-ep002-agent-1/two-car-corner.mp4
+          ffmpeg -v error -y -i "$F" -c:v libx264 -preset veryfast -crf 17 -pix_fmt yuv420p -color_range tv -movflags +faststart out/f1-ep002-agent-1/two-car-normalized.mp4
+          mv out/f1-ep002-agent-1/two-car-normalized.mp4 "$F"
+      - name: Probe, fully decode and prove time-varying frames
+        run: |
+          set -euo pipefail
+          F=out/f1-ep002-agent-1/two-car-corner.mp4
+          ffprobe -v error -show_entries stream=codec_name,width,height,r_frame_rate,pix_fmt -show_entries format=duration -of json "$F" | tee out/f1-ep002-agent-1/ffprobe.json
+          ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of csv=p=0 "$F" | tee out/f1-ep002-agent-1/frame-count.txt
+          ffmpeg -v error -xerror -i "$F" -f null -
+          ffmpeg -v error -i "$F" -vf fps=1 -f framemd5 - 2>/dev/null | grep -v '^#' | tee out/f1-ep002-agent-1/frames.md5
+          U=$(awk -F, '{gsub(/ /,"",$NF); print $NF}' out/f1-ep002-agent-1/frames.md5 | sort -u | wc -l)
+          echo "Different genuine decoded video-frame hashes: $U"
+          test "$U" -ge 6
+          grep -q '"codec_name": "h264"' out/f1-ep002-agent-1/ffprobe.json
+          grep -q '"pix_fmt": "yuv420p"' out/f1-ep002-agent-1/ffprobe.json
+          grep -q '"width": 720' out/f1-ep002-agent-1/ffprobe.json
+          grep -q '"height": 1280' out/f1-ep002-agent-1/ffprobe.json
+          test "$(head -n 1 out/f1-ep002-agent-1/frame-count.txt | cut -d, -f1 | tr -d '[:space:]')" -eq 240
+          mkdir -p out/f1-ep002-agent-1/qc
+          for S in 0.8 2.3 3.5 4.8 6.0 7.6; do
+            ffmpeg -v error -ss "$S" -i "$F" -frames:v 1 -q:v 2 "out/f1-ep002-agent-1/qc/shot-$S.jpg"
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-F1-EP002-Agent1-Native-Motion-QC
+          path: out/f1-ep002-agent-1/
+          if-no-files-found: warn
+          retention-days: 30
