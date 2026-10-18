@@ -56,3 +56,49 @@ test('individual shots move meaningfully, but do not teleport during a shot',()=
     assert.ok(step(points[0],points[1])<2,'no intra-shot teleport');
   }
 });
+
+/**
+ * Software-projection guard for a narrow 9:16 viewport.
+ * A 16:9-only camera can silently crop the entire tyre or both bumpers
+ * in portrait; checking target distance alone does not catch this.
+ */
+test('hero silhouette and front-left wheel remain composed for 9:16',()=>{
+  const plus=(a,b)=>a.map((v,i)=>v+b[i]);
+  const sub=(a,b)=>a.map((v,i)=>v-b[i]);
+  const dot=(a,b)=>a.reduce((v,n,i)=>v+n*b[i],0);
+  const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],
+    a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+  const norm=(v)=>v.map(n=>n/Math.hypot(...v));
+  const project=(camera,point)=>{
+    const forward=norm(sub(camera.target,camera.position));
+    const right=norm(cross(forward,[0,1,0]));
+    const up=cross(right,forward),delta=sub(point,camera.position);
+    const depth=dot(delta,forward);
+    assert.ok(depth>.05,'projected subject must be in front of the lens');
+    const halfHeight=depth*Math.tan(camera.fovDeg*Math.PI/360);
+    return [dot(delta,right)/(halfHeight*(1080/1920)),dot(delta,up)/halfHeight];
+  };
+  const w=wheelAnchors(car).find(w=>w.id==='front-left');
+  assert.ok(w);
+  for(const cue of PROVISIONAL_CUES){
+    const isMacro=['mechanism','heat','grip','abs'].includes(cue.cue);
+    const targetPoints=isMacro?
+      Array.from({length:24},(_,j)=>[
+        w.center[0]+Math.cos(j*Math.PI/12)*w.radiusM,
+        w.center[1]+Math.sin(j*Math.PI/12)*w.radiusM,
+        w.center[2]+.14,
+      ]):
+      [-car.length/2,car.length/2].flatMap(x=>
+        [0,car.height].flatMap(y=>
+          [-car.width/2,car.width/2].map(z=>[x,y,z])));
+    for(const frame of [cue.fromFrame,Math.floor((cue.fromFrame+cue.toFrameExclusive)/2),
+       cue.toFrameExclusive-1]){
+      const camera=sampleCameraPose(frame,route,car);
+      const imagePoints=targetPoints.map(local=>project(camera,plus(route.position,local)));
+      const maxX=Math.max(...imagePoints.map(p=>Math.abs(p[0])));
+      const maxY=Math.max(...imagePoints.map(p=>Math.abs(p[1])));
+      assert.ok(maxX<1.09,`${cue.cue} frame ${frame}: 9:16 horizontal clip (NDC ${maxX})`);
+      assert.ok(maxY<.88,`${cue.cue} frame ${frame}: 9:16 vertical clip (NDC ${maxY})`);
+    }
+  }
+});
