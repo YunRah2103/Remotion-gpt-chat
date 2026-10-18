@@ -21,8 +21,8 @@ test('pressure is clamped and never inflates pad travel',()=>{
   assert.equal(poseFromSimulation(simulation(1),'front-left').padTravelM,.0012);
   assert.equal(padFaceGapM(poseFromSimulation(simulation(1),'front-left')),0);
 });
-test('physics supplies the exact rotor rotation without remapping',()=>{
-  assert.equal(poseFromSimulation(simulation(.6,-815.2),'rear-right').wheelRotationRad,-815.2);
+test('A2 positive progress maps to negative Three.js wheel rotation',()=>{
+  assert.equal(poseFromSimulation(simulation(.6,815.2),'rear-right').wheelRotationRad,-815.2);
 });
 test('symmetric opposed pads and educational explosion are separate',()=>{
   for(const cutaway of [0,.1,.5,1]){
