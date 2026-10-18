@@ -32,7 +32,8 @@ export const BrakingLookdevProof:React.FC<{mode:Mode}>=({mode})=>{
     </ThreeCanvas>
     <div style={{position:'absolute',top:height*.052,left:width*.07,
       color:'#f3f6f5',font:'600 22px Arial',letterSpacing:3,
-      background:'rgba(20,35,44,.70)',padding:'11px 15px',borderLeft:'3px solid #d2a36c',\n      textShadow:'0 2px 8px #23313b8c'}}>YUNEX <span style={{opacity:.65}}> / LOOKDEV QC</span></div>
+      background:'rgba(20,35,44,.70)',padding:'11px 15px',borderLeft:'3px solid #d2a36c',
+      textShadow:'0 2px 8px #23313b8c'}}>YUNEX <span style={{opacity:.65}}> / LOOKDEV QC</span></div>
     <div style={{position:'absolute',bottom:height*.062,left:width*.07,
       maxWidth:width*.84,color:'#f5f7f5',font:'500 25px Arial',
       textShadow:'0 2px 10px #16212cb3'}}>
