@@ -34,9 +34,9 @@ function tune(original:T.Material,role:Role):T.Material {
   const m=original.clone();
   if(!(m instanceof T.MeshStandardMaterial))return m;
   if(role==='paint'){
-    m.color.set(BRAKING_PALETTE.paint);m.metalness=.35;m.roughness=.39;
+    m.color.set(BRAKING_PALETTE.paint);m.metalness=.27;m.roughness=.48;m.envMapIntensity=.36;
     if(m instanceof T.MeshPhysicalMaterial){
-      m.clearcoat=.61;m.clearcoatRoughness=.32;
+      m.clearcoat=.34;m.clearcoatRoughness=.44;
     }
   } else if(role==='glass'){
     m.color.set(BRAKING_PALETTE.glass);m.metalness=.18;m.roughness=.28;
