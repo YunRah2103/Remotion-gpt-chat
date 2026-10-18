@@ -40,6 +40,11 @@ jobs:
       - name: Render native animated Remotion tyre-load visualization
         run: |
           npx remotion render src/yunex/f1-line-ep002/agent-2-preview/entry.tsx F1Agent2GripVectors out/f1-agent2-grip.mp4 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1 --scale=0.75
+      - name: Install FFmpeg inspection tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          ffprobe -version | head -n 1
       - name: FFprobe, full decode, all frame hashes and moving-frame contact sheets
         run: |
           set -euo pipefail
