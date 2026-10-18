@@ -148,8 +148,8 @@ export function createBrakeAssembly(options: BrakeAssemblyOptions): BrakeRig {
       [0,0,side*(ROTOR_FACE_HALF_SPACING_M+.0018)]);
     // Multiple fine lathe-wear tracks catch light with subtle alternating
     // roughness/colour. These are actual geometry, not an animated disc HUD.
-    for (let groove=0;groove<15;groove++){
-      const rr=R*(.52+groove*.029);
+    for (let groove=0;groove<9;groove++){
+      const rr=R*(.52+groove*.051);
       addMesh(rotor,'concentric-machining',
         new THREE.TorusGeometry(rr,groove%4===0?.00058:.00027,4,120),
         groove%4===0?wearDark:wearLight,
@@ -204,22 +204,25 @@ export function createBrakeAssembly(options: BrakeAssemblyOptions): BrakeRig {
       sculptedCaliperCheek(R),caliperGold,[px,py,0],[0,0,-.20]);
     // Low-profile reinforcement rib and machined shoulder. Keep the cast
     // exterior intact so this is recognisably a brake caliper, not a badge.
-    bar(cal,'forged-spine',[px+R*.02,py+R*.02,side*.017],
-      [R*.56,R*.054,.006],caliperHighlight,-.20);
-    bar(cal,'caliper-relief',[px-R*.04,py-R*.20,side*.018],
-      [R*.32,R*.023,.0035],caliperInset,-.20);
-    // Small piston access caps sit in the cast surface; the actual four
-    // hydraulic pistons are independently modelled on the inner sides.
-    for(const y of [-1,1]){
-      const bx=px+y*R*.125, by=py+y*R*.115;
-      addMesh(cal,'machined-piston-access',
-        new THREE.CylinderGeometry(R*.075,R*.075,.003,32),
+    // Offset upper/lower casting ribs are structural, never face-like:
+    // small triangular access bolts replace the former two large "eyes".
+    bar(cal,'forged-upper-shoulder',[px+R*.025,py+R*.23,side*.018],
+      [R*.37,R*.038,.006],caliperHighlight,-.24);
+    bar(cal,'machined-heel',[px-R*.17,py-R*.17,side*.017],
+      [R*.20,R*.027,.004],caliperInset,-.44);
+    // The real four opposed hydraulic pistons live behind the outer casting.
+    // External visible hardware is merely three small access fasteners.
+    for(const i of [-1,0,1]){
+      const bx=px+i*R*.17;
+      const by=py+(i===0?R*.10:-R*.12);
+      addMesh(cal,'machined-access-boss',
+        new THREE.CylinderGeometry(R*.043,R*.043,.003,24),
         caliperInset,[bx,by,side*.023],[Math.PI/2,0,0]);
-      addMesh(cal,'machined-piston-edge',
-        new THREE.TorusGeometry(R*.077,.0020,8,40),
+      addMesh(cal,'access-boss-edge',
+        new THREE.TorusGeometry(R*.045,.0018,7,30),
         machined,[bx,by,side*.026]);
-      addMesh(cal,'piston-access-fastener',
-        new THREE.CylinderGeometry(R*.025,R*.025,.004,12),
+      addMesh(cal,'access-bolt',
+        new THREE.CylinderGeometry(R*.015,R*.015,.004,10),
         caliperHighlight,[bx,by,side*.028],[Math.PI/2,0,0]);
     }
     for(const y of [-1,1]){
