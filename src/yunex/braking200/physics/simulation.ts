@@ -34,20 +34,32 @@ function slipRoadFraction(slip:number):number{
   const p=BRAKING_MODEL.optimalSlipRatio;
   return slip<=p?clamp(slip/p,0,1):.78+.22*Math.exp(-(slip-p)/.29);
 }
+function staticNormalLoadN(id:WheelKey):number{
+  const m=BRAKING_MODEL;
+  const share=id.startsWith('front')?m.staticFrontLoadFraction:1-m.staticFrontLoadFraction;
+  return m.illustrativeMassKg*m.gravityMps2*share/2;
+}
 function start():BrakingSimulationState{
   const wheel=freshWheels(BRAKING_MODEL.initialSpeedMps);
-  const mg=BRAKING_MODEL.illustrativeMassKg*BRAKING_MODEL.gravityMps2;
-  for(const id of WHEELS)wheel[id].normalLoadN=mg*(id.startsWith('front')?.52:.48)/2;
+  for(const id of WHEELS)wheel[id].normalLoadN=staticNormalLoadN(id);
   return {simTimeSec:0,speedMps:BRAKING_MODEL.initialSpeedMps,traveledM:0,
     decelerationMps2:0,pitchRad:0,wheel,brakeHeatJ:0};
 }
 function advance(prev:BrakingSimulationState,t:number,scenario:BrakingScenario):BrakingSimulationState{
   const m=BRAKING_MODEL,speed=prev.speedMps;
   if(speed<=0){
-    const wheel=freshWheels(0);
-    for(const id of WHEELS)wheel[id]={...prev.wheel[id],angularSpeedRadPerSec:0,
-      slipRatio:0,roadLongitudinalForceN:0,absIntervening:false,brakePressure01:0};
-    return {...prev,simTimeSec:t,speedMps:0,decelerationMps2:0,pitchRad:0,wheel};
+    // After stopping, restore static wheel loads and body attitude continuously.
+    // Avoid an instantaneous pitch snap, frozen forward load transfer, or pad pop.
+    const settle=1-Math.exp(-DT/.30),wheel={} as Record<WheelKey,WheelBrakingState>;
+    for(const id of WHEELS){
+      const previous=prev.wheel[id];
+      wheel[id]={...previous,angularSpeedRadPerSec:0,slipRatio:0,
+        normalLoadN:previous.normalLoadN+(staticNormalLoadN(id)-previous.normalLoadN)*settle,
+        roadLongitudinalForceN:0,absIntervening:false,
+        brakePressure01:Math.max(0,previous.brakePressure01-2.4*DT)};
+    }
+    return {...prev,simTimeSec:t,speedMps:0,decelerationMps2:0,
+      pitchRad:prev.pitchRad*(1-settle),wheel};
   }
   const mg=m.illustrativeMassKg*m.gravityMps2;
   const transferN=m.illustrativeMassKg*prev.decelerationMps2*m.cgHeightM/m.wheelbaseM;
