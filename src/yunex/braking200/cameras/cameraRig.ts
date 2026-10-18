@@ -59,32 +59,32 @@ function keyPose(spec:VehicleSpec,wheel:WheelAnchor,shot:FilmCue,progress:number
   // narrow horizontal field of view. Macros may intentionally crop bodywork.
   switch(shot){
     case 'hook': {
-      const a:Key={eye:[length*1.85,height*.98,width*3.00],
-        aim:[length*.08,height*.61,0],fov:53};
-      const b:Key={eye:[length*1.42,height*.66,width*2.40],
-        aim:[length*.30,height*.58,width*.04],fov:49};
+      const a:Key={eye:[length*1.55,height*.82,width*2.35],
+        aim:[length*.10,height*.59,0],fov:53};
+      const b:Key={eye:[length*1.19,height*.64,width*2.02],
+        aim:[length*.18,height*.57,width*.04],fov:49};
       return {eye:mix(a.eye,b.eye,eased),aim:mix(a.aim,b.aim,eased),fov:lerp(a.fov,b.fov,eased)};
     }
     case 'mechanism': {
-      const a:Key={eye:[wx+length*.98,wy+height*.76,wz+width*1.30],
+      const a:Key={eye:[wx+length*.90,wy+height*.65,wz+width*1.25],
         aim:[wx,wy+.15,wz-.12],fov:46};
-      const b:Key={eye:[wx+.54,wy+.45,wz+1.12],
-        aim:[wx,wy,wz],fov:35};
+      const b:Key={eye:[wx+.39,wy+.38,wz+2.38],
+        aim:[wx,wy,wz],fov:48};
       return {eye:mix(a.eye,b.eye,eased),aim:mix(a.aim,b.aim,eased),fov:lerp(a.fov,b.fov,eased)};
     }
     case 'heat': {
-      const theta=lerp(.50,-.31,eased);
-      return {eye:[wx+.38+Math.sin(theta)*.40,wy+.22+Math.cos(theta)*.22,wz+1.12],
-        aim:[wx,wy+.04,wz-.025],fov:34};
+      const theta=lerp(.42,-.32,eased);
+      return {eye:[wx+.25+Math.sin(theta)*.56,wy+.34+Math.cos(theta)*.30,wz+2.42],
+        aim:[wx,wy+.02,wz-.025],fov:48};
     }
     case 'grip': {
       const low=wR*.10;
-      return {eye:[wx+lerp(.85,-.38,eased),low+.15,wz+1.06],
-        aim:[wx+lerp(.21,-.05,eased),low,wz+.005],fov:38};
+      return {eye:[wx+lerp(.63,-.29,eased),low+.14,wz+2.18],
+        aim:[wx+lerp(.15,-.05,eased),low,wz+.005],fov:46};
     }
     case 'abs': {
-      return {eye:[wx+lerp(.48,.88,eased),wy+lerp(.28,.66,eased),wz+lerp(1.24,1.70,eased)],
-        aim:[wx+.06,wy*.91,wz-.04],fov:35};
+      return {eye:[wx+lerp(.38,.75,eased),wy+lerp(.27,.47,eased),wz+lerp(2.42,2.72,eased)],
+        aim:[wx+.04,wy*.90,wz-.04],fov:47};
     }
     case 'finale': {
       const a:Key={eye:[-length*.97,height*1.45,width*2.05],
