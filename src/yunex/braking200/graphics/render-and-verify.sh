@@ -8,6 +8,7 @@ mkdir -p "$DIR"
 npm ci --no-audit --no-fund
 npm run check
 node --experimental-strip-types --test src/yunex/braking200/graphics/logic.test.mjs
+node --experimental-strip-types --test src/yunex/braking200/graphics/integration.test.mjs
 for composition in BrakingGraphicsMacroProof BrakingGraphicsTrackProof; do
   name="macro"; [[ "$composition" == *Track* ]] && name="track"
   output="$DIR/$name.mp4"
