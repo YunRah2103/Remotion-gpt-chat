@@ -61,9 +61,14 @@ test('actual circuit staging paths contain two different track-anchored legal li
   for(const pos of positions)assert.ok(pos.every(Number.isFinite));
   assert.ok(previewDistance(110,id)>=0);
  }
- const a=STAGING_PREVIEW_PATHS.shortcut.sampleAtDistance(36).position;
- const b=STAGING_PREVIEW_PATHS.racing.sampleAtDistance(36).position;
- assert.ok(Math.hypot(a[0]-b[0],a[2]-b[2])>1,'Distinct racing line geometry');
+ const spacingAt=d=>{
+  const a=STAGING_PREVIEW_PATHS.shortcut.sampleAtDistance(d).position;
+  const b=STAGING_PREVIEW_PATHS.racing.sampleAtDistance(d).position;
+  return Math.hypot(a[0]-b[0],a[2]-b[2]);
+ };
+ assert.ok(spacingAt(1)>3,'Different legal entry lines');
+ assert.ok(spacingAt(69)>3,'Different legal exit lines');
+ assert.ok(spacingAt(36)<1,'Cars may visit a shared apex at different times');
  assert.equal(RACE_COLORS.shortcut,'#25AFA8');
  assert.equal(RACE_COLORS.racing,'#F5A44B');
 });
