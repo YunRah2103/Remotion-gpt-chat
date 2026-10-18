@@ -43,7 +43,7 @@ const ABS_WINDOW_START=(()=>{
  });
  let start=0,best=-1;
  for(let i=0;i<=115;i++){
-  const score=hits.slice(i,i+30).reduce((a,b)=>a+b,0);
+  const score=hits.slice(i,i+30).reduce<number>((a,b)=>a+b,0);
   if(score>best){start=i;best=score;}
  }
  return start;
