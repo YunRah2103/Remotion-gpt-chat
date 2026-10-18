@@ -13,7 +13,14 @@ export {fixtureRacePaths,FIXTURE_SCENARIO} from './fixture-paths.ts';
 /** A1 integration: makeRaceSimulator({shortcut: makeRacingLinePath('shortcut'),
  * racing:makeRacingLinePath('racing')}); never modify or rescale their paths. */
 export const fixtureSimulator=makeRaceSimulator(fixtureRacePaths,REPRESENTATIVE_F1_CONFIG);
-export const sampleRaceFrame=(frame:number,fps:number,paths?:Record<RaceCarId,RacePath>)=>
-  paths?makeRaceSimulator(paths,REPRESENTATIVE_F1_CONFIG).sample(frame,fps):
-    fixtureSimulator.sample(frame,fps);
+// Immutable path identity cache: no mutable integrator/time stepping inside Remotion.
+const cache=new WeakMap<RacePath,WeakMap<RacePath,ReturnType<typeof makeRaceSimulator>>>();
+export const sampleRaceFrame=(frame:number,fps:number,paths?:Record<RaceCarId,RacePath>)=>{
+  if(!paths)return fixtureSimulator.sample(frame,fps);
+  let inner=cache.get(paths.shortcut);
+  if(!inner){inner=new WeakMap();cache.set(paths.shortcut,inner);}
+  let sim=inner.get(paths.racing);
+  if(!sim){sim=makeRaceSimulator(paths,REPRESENTATIVE_F1_CONFIG);inner.set(paths.racing,sim);}
+  return sim.sample(frame,fps);
+};
 export const getRaceComparison=()=>fixtureSimulator.comparison;
