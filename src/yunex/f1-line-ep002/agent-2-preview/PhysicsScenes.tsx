@@ -42,7 +42,7 @@ const ForceVectors:React.FC<{car:CarFrameState;accent:string}>=({car,accent})=>{
   const yaw=car.worldPose.yaw,pos=car.worldPose.position;
   const lateral=car.lateralAccelMps2;
   const k=car.worldPose.curvatureInvM;
-  const latDir=left(yaw).map(v=>v*(k<0?-1:1)) as V3;
+  const latDir=left(yaw).map(v=>v*(k>0?-1:1)) as V3;
   const longDir=forward(yaw).map(v=>v*(car.longitudinalAccelMps2<0?-1:1)) as V3;
   const lateralLength=Math.min(3.6,.23*lateral);
   const longLength=Math.min(2.4,.24*Math.abs(car.longitudinalAccelMps2));
