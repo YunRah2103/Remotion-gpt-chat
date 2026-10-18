@@ -47,25 +47,25 @@ export function getRaceCamera(shotId:CinematicShotId,state:RaceFrameState,frame:
  switch(shotId){
  case 'opening':{
   // Approach cars face-on, camera's tracking speed lets tarmac slide below them.
-  return camera(both,yaw,[25+arc*.95,2.1,5.7+arc*.6],[0,1.0,0],53);
+  return camera(both,yaw,[18.6+arc*.55,1.52,4.0+arc*.35],[0,.88,0],51);
  }
  case 'shortcut':{
   const r=reference(state,'shortcut');
-  return camera(r.origin,r.yaw,[-12.9,2.7,4.2+arc*.3],[3.7,0.76,0],48);
+  return camera(r.origin,r.yaw,[13.6,2.55,-5.8-arc*.3],[-.7,.74,0],50);
  }
  case 'wide-entry':{
   const r=reference(state,'racing');
-  return camera(r.origin,r.yaw,[19.5,3.45,-5.4-arc*.45],[-.3,.8,0],47);
+  return camera(r.origin,r.yaw,[-13.4,3.2,-5.8-arc*.3],[3.5,.82,0],51);
  }
  case 'apex':{
   return camera(both,yaw,[13.9,3.25,-10.2-arc*.5],[1.2,.82,0],56);
  }
  case 'onboard':{
   // Lens just above the halo, offset from centre. Framing follows actual yaw.
-  return camera(racing.worldPose.position,yaw,[-.6,1.62,.48],[20,1.28,.2],66);
+  return camera(racing.worldPose.position,yaw,[1.2,2.06,-.24],[20,1.5,0],65);
  }
  case 'duel':{
-  return camera(both,yaw,[-1.8,4.5,24.5+arc*.7],[0,.85,0],43);
+  return camera(both,yaw,[1.3,9.6,8.5+arc*.3],[0,.9,0],69);
  }
  case 'overhead':{
   return camera(both,yaw,[6.0,31,10],[.0,0,0],48);
@@ -74,10 +74,10 @@ export function getRaceCamera(shotId:CinematicShotId,state:RaceFrameState,frame:
   return camera(both,yaw,[2.8,23.5,16.4+arc*.5],[0,.1,0],52);
  }
  case 'exit':{
-  return camera(racing.worldPose.position,yaw,[-18.5-arc*.55,3.4,4.7],[9,.85,0],48);
+  return camera(racing.worldPose.position,yaw,[-13.3-arc*.3,3.2,4.4],[8,.85,0],49);
  }
  case 'final':{
-  return camera(both,yaw,[-24-arc*.85,7.3,11],[5,.9,0],50);
+  return camera(both,yaw,[-17.2-arc*.55,6.1,8.5],[4,.9,0],51);
  }
  default:
   throw new Error('Unknown cinema shot '+String(shotId));

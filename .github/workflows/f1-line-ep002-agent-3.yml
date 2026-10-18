@@ -48,6 +48,19 @@ jobs:
         run: npx remotion render src/yunex/f1-line-ep002/agent-3-preview/entry.tsx F1CinemaA out/f1-ep002-agent-3/agent-3-cinema-A.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
       - name: Native eight-second cinematic action reel B
         run: npx remotion render src/yunex/f1-line-ep002/agent-3-preview/entry.tsx F1CinemaB out/f1-ep002-agent-3/agent-3-cinema-B.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
+      - name: Normalise browser full-range output into deliverable limited-range H.264
+        run: |
+          set -euo pipefail
+          for name in A B; do
+            input="out/f1-ep002-agent-3/agent-3-cinema-$name.mp4"
+            mv "$input" "out/f1-ep002-agent-3/agent-3-cinema-$name.browser.mp4"
+            ffmpeg -nostdin -y -v error -xerror -i "out/f1-ep002-agent-3/agent-3-cinema-$name.browser.mp4" \
+              -vf "scale=in_range=pc:out_range=tv,format=yuv420p" \
+              -c:v libx264 -preset medium -crf 17 -pix_fmt yuv420p \
+              -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 \
+              -movflags +faststart "$input"
+            rm "out/f1-ep002-agent-3/agent-3-cinema-$name.browser.mp4"
+          done
       - name: Probe, fully decode and collect genuine frame inspection sheets
         run: |
           set -euo pipefail

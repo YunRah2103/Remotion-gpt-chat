@@ -24,3 +24,6 @@ A reel: 0–2 opening, 2–4 shortcut, 4–6 onboard, 6–8 exit. B reel: 0–2 
 
 ## Safe integration
 Uses no changes to `src/Root.tsx`, `package.json`, shared kit, prior braking/turbo films, nor other four agents' directories. A4 can independently replace lighting/environment on the shared scene. A5 can overlay graphics after A6 selection. Avoid moving the two models again in the film editor. No artificial camera shake that implies tyre loss.
+
+## First rendered-frame QC and corrective shot direction
+Initial native H.264 proof (run [39170534062](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39170534062), artifact 12152856258) was **actually rendered and visually inspected**, not marked approved: source browser colour tagged `yuvj420p`/full-range despite the Remotion flag, and frame grids revealed a small first-second opening, fence crossing in the lateral duel, and a distracting partial foreground nose in chase views. V2 positions now lower/closer for a larger opener, move the lateral duel inside/above circuit barriers and reverse tracking perspectives to reduce occlusion. The native MP4 workflow now explicitly converts browser full-range output to colour-safe limited-range `yuv420p` before the strict probe and full-decode gate. V2 remains subject to its own fresh visual review.
