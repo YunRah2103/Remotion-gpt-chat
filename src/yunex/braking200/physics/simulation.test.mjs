@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {BRAKING_MODEL,sampleBrakingSimulation} from './simulation.ts';
+import {physicsVisualSignals} from './visual-signals.ts';
 import {mapFilmFrameToSimulationSec,mapAbsInsertFrameToSimulationSec} from './timeline.ts';
 const ids=['front-left','front-right','rear-left','rear-right'];
 const near=(a,b,eps=1e-8)=>assert.ok(Math.abs(a-b)<=eps,String(a)+' != '+String(b));
@@ -97,5 +98,29 @@ test('after physical stop: zero travel, no rotation, smooth pitch and load settl
    assert.ok(Math.abs(next.normalLoadN-staticN)<=Math.abs(old.normalLoadN-staticN)+1e-6);
    near(last.normalLoadN,staticN,.01);
   }
+ }
+});
+
+test('cinematic suspension, contact and ABS visuals never detach from sampler',()=>{
+ const rest=physicsVisualSignals(sampleBrakingSimulation(0));
+ const braking=physicsVisualSignals(sampleBrakingSimulation(2.5));
+ const end=physicsVisualSignals(sampleBrakingSimulation(14));
+ near(rest.frontLoadDeltaN,0);
+ near(rest.illustrativeSpringCompressionM,0);
+ near(rest.illustrativeGripStreakM,0);
+ assert.ok(braking.frontLoadDeltaN>0);
+ assert.ok(braking.illustrativeSpringCompressionM>0&&braking.illustrativeSpringCompressionM<=.025);
+ assert.ok(braking.roadForceN>0&&braking.illustrativeGripStreakM>0);
+ assert.ok(braking.illustrativeContactOpacity>=0&&braking.illustrativeContactOpacity<=.23);
+ near(end.illustrativeGripStreakM,0);
+ near(end.roadForceN,0);
+ assert.ok(end.illustrativeSpringCompressionM<.0001);
+ for(let f=0;f<144;f++){
+  const physical=sampleBrakingSimulation(mapAbsInsertFrameToSimulationSec(f),'low-grip-abs');
+  const visual=physicsVisualSignals(physical),wheel=physical.wheel['front-left'];
+  near(visual.brakePressure01,wheel.brakePressure01);
+  near(visual.slipRatio,wheel.slipRatio);
+  assert.equal(visual.absPressureRelease,wheel.absIntervening);
+  assert.ok(visual.illustrativeGripStreakM>=0);
  }
 });
