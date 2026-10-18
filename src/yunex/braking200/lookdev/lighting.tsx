@@ -2,49 +2,57 @@ import React,{useEffect,useMemo} from 'react';
 import {useThree} from '@react-three/fiber';
 import * as T from 'three';
 import {RoomEnvironment} from 'three/examples/jsm/environments/RoomEnvironment.js';
-import type {Point3} from './math.ts';
+import type {Vec3} from '../contracts.ts';
 import {BRAKING_PALETTE} from './materials.ts';
 
-/** Portable software-render-friendly image-based reflection setup.
- * Falls back to direct lights when PMREM is unavailable. All GPU resources
- * and renderer settings are restored/disposed on unmount. */
-const StudioReflection:React.FC=()=>{
-  const {gl,scene}=useThree();
-  useEffect(()=>{
-    const oldEnv=scene.environment,oldIntensity=scene.environmentIntensity;
-    const oldTone=gl.toneMapping,oldExposure=gl.toneMappingExposure;
-    let map:T.WebGLRenderTarget<T.Texture>|undefined;
-    gl.toneMapping=T.ACESFilmicToneMapping;gl.toneMappingExposure=1.09;
-    try{
-      const generator=new T.PMREMGenerator(gl),room=new RoomEnvironment();
-      try{map=generator.fromScene(room,.04);}finally{room.dispose();generator.dispose();}
-      scene.environment=map.texture;scene.environmentIntensity=.45;
-    }catch(_error){scene.environment=oldEnv;scene.environmentIntensity=oldIntensity;}
-    return ()=>{
-      scene.environment=oldEnv;scene.environmentIntensity=oldIntensity;
-      gl.toneMapping=oldTone;gl.toneMappingExposure=oldExposure;map?.dispose();
-    };
-  },[gl,scene]);return null;
+const ReflectedDaylight:React.FC=()=>{
+ const {gl,scene}=useThree();
+ useEffect(()=>{
+  const previous={environment:scene.environment,intensity:scene.environmentIntensity,
+    mapping:gl.toneMapping,exposure:gl.toneMappingExposure};
+  let radiance:T.WebGLRenderTarget<T.Texture>|undefined;
+  gl.toneMapping=T.ACESFilmicToneMapping;gl.toneMappingExposure=1.12;
+  try{
+   const pmrem=new T.PMREMGenerator(gl),room=new RoomEnvironment();
+   try{radiance=pmrem.fromScene(room,.07);}
+   finally{pmrem.dispose();room.dispose();}
+   scene.environment=radiance.texture;scene.environmentIntensity=.49;
+  }catch(_err){/* Shadowed directional/hemisphere lights still work on swangle. */}
+  return ()=>{
+   scene.environment=previous.environment;
+   scene.environmentIntensity=previous.intensity;
+   gl.toneMapping=previous.mapping;gl.toneMappingExposure=previous.exposure;
+   radiance?.dispose();
+  };
+ },[gl,scene]);return null;
 };
-export const BrakingWorldLighting:React.FC<{focus?:Point3}>=({focus=[0,0,0]})=>{
-  const target=useMemo(()=>new T.Object3D(),[]);
-  target.position.set(focus[0],focus[1],focus[2]);
-  return <>
-    <color attach="background" args={[BRAKING_PALETTE.sky]}/>
-    <fog attach="fog" args={[BRAKING_PALETTE.sky,100,275]}/>
-    <hemisphereLight args={['#edf4f6','#72796b',1.52]}/>
-    <ambientLight color="#ebf1f4" intensity={.17}/>
-    <primitive object={target}/>
-    <directionalLight target={target} position={[focus[0]+30,focus[1]+52,focus[2]+21]}
-      color={BRAKING_PALETTE.sun} intensity={2.47} castShadow
-      shadow-mapSize={[1024,1024]} shadow-camera-left={-24}
-      shadow-camera-right={24} shadow-camera-top={24}
-      shadow-camera-bottom={-24} shadow-camera-near={.5}
-      shadow-camera-far={150} shadow-bias={-.0003} shadow-normalBias={.026}/>
-    <directionalLight position={[focus[0]-21,focus[1]+12,focus[2]-24]}
-      color="#b6d8e5" intensity={.82}/>
-    <directionalLight position={[focus[0]-13,focus[1]+8,focus[2]+17]}
-      color="#f4cf9f" intensity={.40}/>
-    <StudioReflection/>
-  </>;
+/** 3-point automotive lighting: bright sculpted forms, anchored shadows,
+ * broad cool sky fill, warm directional grazing highlights; no night look. */
+export const BrakingLighting:React.FC<{focus?:Vec3;studio?:boolean}>=({
+ focus=[0,0,0],studio=false
+})=>{
+ const target=useMemo(()=>new T.Object3D(),[]);
+ target.position.set(...focus);
+ return <>
+  <color attach="background" args={[studio?'#354755':BRAKING_PALETTE.sky]}/>
+  <fog attach="fog" args={[studio?'#354755':BRAKING_PALETTE.sky,studio?22:85,studio?100:225]}/>
+  <hemisphereLight args={['#d8eaf7','#53564f',studio?1.26:.96]}/>
+  <ambientLight color="#f1f1ed" intensity={studio?.20:.12}/>
+  <primitive object={target}/>
+  <directionalLight target={target}
+    position={[focus[0]+18,focus[1]+32,focus[2]+24]}
+    color={BRAKING_PALETTE.sun} intensity={studio?3.6:3.35}
+    castShadow shadow-mapSize={[2048,2048]}
+    shadow-camera-left={-21} shadow-camera-right={21}
+    shadow-camera-top={21} shadow-camera-bottom={-21}
+    shadow-camera-near={.4} shadow-camera-far={115}
+    shadow-bias={-.0004} shadow-normalBias={.022}/>
+  <directionalLight position={[focus[0]-15,focus[1]+9,focus[2]-18]}
+    color="#b2d7ef" intensity={studio?1.65:.92}/>
+  <directionalLight position={[focus[0]-7,focus[1]+15,focus[2]+10]}
+    color="#ffe0ac" intensity={studio?1.20:.57}/>
+  <ReflectedDaylight/>
+ </>;
 };
+/** Back-compatible name; contains no meshes other than light target. */
+export const BrakingWorldLighting=BrakingLighting;
