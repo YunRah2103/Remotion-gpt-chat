@@ -27,13 +27,25 @@ const cameraFor=(state:RaceFrameState,scene:'duel'|'grip'):RaceCameraPose=>{
     return {position:plus(center,[11,26,14]),target:center,fov:35};
   }
   if(scene==='duel'&&t>=4.65){
-    // Long-lens corner exit: orange car and physically simulated teal ghost.
-    return {position:plus(plus(p,scaled(f,-12)),plus(scaled(l,4.4),[0,2.65,0])),
-      target:plus(aim,scaled(f,9)),fov:46};
+    // Both original cars remain visible as the straight opens up.
+    const midpoint=mix(a.worldPose.position,b.worldPose.position,.5);
+    const averageYaw=(a.worldPose.yaw+b.worldPose.yaw)*.5;
+    const axis=forward(averageYaw),side=left(averageYaw);
+    return {position:plus(plus(midpoint,scaled(axis,-19)),plus(scaled(side,8.8),[0,5.1,0])),
+      target:plus(plus(midpoint,[0,.8,0]),scaled(axis,1.7)),fov:44};
   }
-  const rear=scene==='grip'&&t>3.05?11:9.2;
-  return {position:plus(plus(p,scaled(f,-rear)),plus(scaled(l,7),[0,2.3,0])),
-    target:plus(aim,scaled(f,3.5)),fov:43};
+  if(scene==='duel'){
+    // Wider dolly prevents a Formula nose/wing clipping the 9:16 safe area.
+    const midpoint=mix(a.worldPose.position,b.worldPose.position,.5);
+    const axis=forward((a.worldPose.yaw+b.worldPose.yaw)*.5);
+    const side=left((a.worldPose.yaw+b.worldPose.yaw)*.5);
+    return {position:plus(plus(midpoint,scaled(axis,-17.5)),plus(scaled(side,9.5),[0,5.3,0])),
+      target:plus(midpoint,[0,.85,0]),fov:45};
+  }
+  // Agent 2 physical close-ups, full vehicle readable even on phone.
+  const rear=t>3.05?15:16;
+  return {position:plus(plus(p,scaled(f,-rear)),plus(scaled(l,8.8),[0,4.7,0])),
+    target:plus(aim,scaled(f,1.5)),fov:45};
 };
 const kmh=(v:number)=>Math.round(v*3.6);
 const overlay:React.CSSProperties={position:'absolute',fontFamily:'Arial,Helvetica,sans-serif',
@@ -44,14 +56,14 @@ const ForceVectors:React.FC<{car:CarFrameState;accent:string}>=({car,accent})=>{
   const k=car.worldPose.curvatureInvM;
   const latDir=left(yaw).map(v=>v*(k>0?-1:1)) as V3;
   const longDir=forward(yaw).map(v=>v*(car.longitudinalAccelMps2<0?-1:1)) as V3;
-  const lateralLength=Math.min(3.6,.23*lateral);
-  const longLength=Math.min(2.4,.24*Math.abs(car.longitudinalAccelMps2));
+  const lateralLength=Math.min(4.8,.32*lateral);
+  const longLength=Math.min(3.6,.34*Math.abs(car.longitudinalAccelMps2));
   return <group position={[pos[0],.95,pos[2]]}>
     {lateralLength>.15&&<arrowHelper
-      args={[new THREE.Vector3(...latDir),new THREE.Vector3(0,0,0),lateralLength,accent,.46,.24]}/>}
+      args={[new THREE.Vector3(...latDir),new THREE.Vector3(0,0,0),lateralLength,accent,.65,.36]}/>}
     {longLength>.15&&<arrowHelper
       args={[new THREE.Vector3(...longDir),new THREE.Vector3(0,.1,0),longLength,
-        car.longitudinalAccelMps2<0?'#f6c973':'#b9efcd',.35,.18]}/>}
+        car.longitudinalAccelMps2<0?'#f6c973':'#b9efcd',.50,.29]}/>}
   </group>;
 };
 const Caption:React.FC<{state:RaceFrameState;scene:'duel'|'grip'}>=({state,scene})=>{
