@@ -1,0 +1,76 @@
+name: F1 EP002 Agent 5 — native motion/graphics proof
+on:
+  push:
+    branches:
+      - agent/f1-ep002-05-graphics
+    paths:
+      - 'src/yunex/f1-line-ep002/graphics/**'
+      - 'src/yunex/f1-line-ep002/agent-5-preview/**'
+      - 'tests/f1-line-ep002/agent-5.*'
+      - '.github/workflows/f1-line-ep002-agent-5.yml'
+  pull_request:
+    branches:
+      - production/f1-racing-line-ep002-contract
+    paths:
+      - 'src/yunex/f1-line-ep002/graphics/**'
+      - 'src/yunex/f1-line-ep002/agent-5-preview/**'
+      - 'tests/f1-line-ep002/agent-5.*'
+      - '.github/workflows/f1-line-ep002-agent-5.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render:
+    name: Tests + moving 3D H264 demonstration
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run worldkit:test
+      - name: Agent 5 deterministic geometry and timing unit tests
+        run: node --experimental-strip-types --test tests/f1-line-ep002/agent-5.test.mjs
+      - name: Render real moving 3D car / circuit preview
+        run: |
+          mkdir -p out/f1-agent5
+          npx remotion render src/yunex/f1-line-ep002/agent-5-preview/entry.tsx F1Agent5GraphicsPreview out/f1-agent5/moving-graphics.mp4 \
+            --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+      - name: Native codec and full decode verification
+        run: |
+          ffprobe -v error -show_entries format=duration:stream=codec_name,width,height,r_frame_rate,pix_fmt -of json out/f1-agent5/moving-graphics.mp4 | tee out/f1-agent5/ffprobe.json
+          ffmpeg -v error -i out/f1-agent5/moving-graphics.mp4 -f null -
+          python3 - <<'PY'
+          import json
+          data=json.load(open('out/f1-agent5/ffprobe.json'))
+          video=next(s for s in data['streams'] if s['codec_name']=='h264')
+          assert (video['width'],video['height']) == (540,960),video
+          assert video['r_frame_rate']=='30/1',video
+          assert video['pix_fmt']=='yuv420p',video
+          assert abs(float(data['format']['duration'])-7)<.05,data['format']
+          print('PASS: native moving 7-second 30fps H264 540x960; full FFmpeg decode passed')
+          PY
+      - name: Extract three actual source frames and check temporal difference
+        run: |
+          ffmpeg -v error -ss 0.5 -i out/f1-agent5/moving-graphics.mp4 -frames:v 1 out/f1-agent5/frame-early.png
+          ffmpeg -v error -ss 3.5 -i out/f1-agent5/moving-graphics.mp4 -frames:v 1 out/f1-agent5/frame-mid.png
+          ffmpeg -v error -ss 6.5 -i out/f1-agent5/moving-graphics.mp4 -frames:v 1 out/f1-agent5/frame-late.png
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          files=list(Path('out/f1-agent5').glob('frame-*.png'))
+          assert len(files)==3,files
+          hashes={hashlib.sha256(f.read_bytes()).hexdigest() for f in files}
+          assert len(hashes)==3,'Identical frames; moving preview not established'
+          print('PASS: three distinct true video frames at 0.5 / 3.5 / 6.5 sec')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: F1-EP002-AGENT5-NATIVE-MOVING
+          path: out/f1-agent5/
+          retention-days: 30
