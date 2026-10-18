@@ -208,21 +208,20 @@ export function createBrakeAssembly(options: BrakeAssemblyOptions): BrakeRig {
     // small triangular access bolts replace the former two large "eyes".
     bar(cal,'forged-upper-shoulder',[px+R*.025,py+R*.23,side*.018],
       [R*.37,R*.038,.006],caliperHighlight,-.24);
-    bar(cal,'machined-heel',[px-R*.17,py-R*.17,side*.017],
-      [R*.20,R*.027,.004],caliperInset,-.44);
-    // The real four opposed hydraulic pistons live behind the outer casting.
-    // External visible hardware is merely three small access fasteners.
-    for(const i of [-1,0,1]){
-      const bx=px+i*R*.17;
-      const by=py+(i===0?R*.10:-R*.12);
+    // The real four opposed hydraulic pistons live behind the outer
+    // casting; the two small outboard fasteners are offset on the forging
+    // shoulder, not oversized face-like circular display windows.
+    for(const vertical of [-1,1]){
+      const bx=px+R*.245;
+      const by=py+vertical*R*.20;
       addMesh(cal,'machined-access-boss',
-        new THREE.CylinderGeometry(R*.043,R*.043,.003,24),
+        new THREE.CylinderGeometry(R*.033,R*.033,.003,24),
         caliperInset,[bx,by,side*.023],[Math.PI/2,0,0]);
       addMesh(cal,'access-boss-edge',
-        new THREE.TorusGeometry(R*.045,.0018,7,30),
+        new THREE.TorusGeometry(R*.035,.0015,7,30),
         machined,[bx,by,side*.026]);
       addMesh(cal,'access-bolt',
-        new THREE.CylinderGeometry(R*.015,R*.015,.004,10),
+        new THREE.CylinderGeometry(R*.013,R*.013,.004,10),
         caliperHighlight,[bx,by,side*.028],[Math.PI/2,0,0]);
     }
     for(const y of [-1,1]){
