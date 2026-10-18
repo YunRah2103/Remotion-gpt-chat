@@ -127,7 +127,7 @@ const PhysicsVehicle:React.FC<{s:BrakingSimulationState}>=({s})=>{
  model.traverse(node=>{
   if(!node.userData.wheel)return;
   const pivot=node.parent;if(!pivot)return;
-  const key=(pivot.position.x>0?'front':'rear')+'-'+(pivot.position.z>0?'left':'right') as WheelKey;
+  const key=((pivot.position.x>0?'front':'rear')+'-'+(pivot.position.z>0?'left':'right')) as WheelKey;
   node.rotation.z=-s.wheel[key].rotationRad;
  });
  return <primitive object={model}/>;
