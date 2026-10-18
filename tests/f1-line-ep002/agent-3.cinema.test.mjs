@@ -32,7 +32,12 @@ test('fixture keeps car centre separation safely nonzero and wheel travel physic
 test('camera projections stay inside the portrait image for pair-reveal shot centres',()=>{
  // Validate three-dimensional projection (not merely distances in world coordinates).
  for(const shot of ['opening','duel','overhead','final']){
-  for(const frame of [0,20,40,80,120,160,200,239]){
+  // Shots are timed edits, not continuously displayed cameras. Validate the
+  // complete on-screen ranges, including cut boundaries, rather than testing
+  // an opening camera at 4 seconds when the editor is showing an onboard shot.
+  const windows={opening:[0,59],duel:[0,59],overhead:[120,179],final:[180,239]};
+  const [first,last]=windows[shot];
+  for(const frame of [...new Set([first,first+10,first+20,first+30,first+40,first+50,last])].filter(f=>f<=last)){
    const state=sampleAgent3Fixture(frame,30),pose=getRaceCamera(shot,state,frame);
    const cam=new PerspectiveCamera(pose.fov,540/960,.12,450);
    cam.position.set(...pose.position);cam.lookAt(new Vector3(...pose.target));cam.updateProjectionMatrix();cam.updateMatrixWorld();
@@ -46,12 +51,12 @@ test('camera projections stay inside the portrait image for pair-reveal shot cen
     const yaw=state.cars[id].worldPose.yaw;
     // Full wings must fit during the shot's actual edit window; other timestamps
     // are intentionally reserved for other cameras, not this shot.
-    const windows={opening:[0,40],duel:[0,40],overhead:[120,160],final:[180,239]};
-    const [start,end]=windows[shot];
-    if(frame>=start&&frame<=end)for(const f of [-2.72,2.72])for(const lateral of [-1.03,1.03]){
+    for(const f of [-2.72,2.72])for(const lateral of [-1.03,1.03]){
      const c=Math.cos(yaw),s=Math.sin(yaw);
      const corner=new Vector3(car[0]+c*f+s*lateral,car[1]+.6,car[2]-s*f+c*lateral).project(cam);
+     assert.ok(corner.z>-1&&corner.z<1,shot+' '+id+' wing/wheel depth @'+frame+': '+corner.z);
      assert.ok(Math.abs(corner.x)<.995,shot+' '+id+' wing/wheel horizontal crop @'+frame+': '+corner.x);
+     assert.ok(Math.abs(corner.y)<.995,shot+' '+id+' wing/wheel vertical crop @'+frame+': '+corner.y);
     }
    }
   }
