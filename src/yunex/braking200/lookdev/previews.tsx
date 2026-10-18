@@ -36,6 +36,7 @@ export const BrakingLookdevProof:React.FC<{mode:Mode}>=({mode})=>{
       textShadow:'0 2px 8px #23313b8c'}}>YUNEX <span style={{opacity:.65}}> / LOOKDEV QC</span></div>
     <div style={{position:'absolute',bottom:height*.062,left:width*.07,
       maxWidth:width*.84,color:'#f5f7f5',font:'500 25px Arial',
+      background:'rgba(20,35,44,.76)',padding:'11px 15px',borderLeft:'3px solid #d2a36c',
       textShadow:'0 2px 10px #16212cb3'}}>
       {mode==='macro'?'WHEEL / MATERIAL FINISH':'GRAND TOURER / DAYLIGHT CIRCUIT'}
       <div style={{marginTop:8,opacity:.73,font:'400 16px Arial',letterSpacing:1}}>
