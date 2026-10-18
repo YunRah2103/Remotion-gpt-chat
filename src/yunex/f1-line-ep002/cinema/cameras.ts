@@ -47,7 +47,7 @@ export function getRaceCamera(shotId:CinematicShotId,state:RaceFrameState,frame:
  switch(shotId){
  case 'opening':{
   // Approach cars face-on, camera's tracking speed lets tarmac slide below them.
-  return camera(both,yaw,[19.8+arc*.45,1.45,.65+arc*.12],[0,.91,0],55);
+  return camera(both,yaw,[15.8+arc*.35,1.28,.65+arc*.12],[0,-.55,0],57);
  }
  case 'shortcut':{
   const r=reference(state,'shortcut');
@@ -68,7 +68,7 @@ export function getRaceCamera(shotId:CinematicShotId,state:RaceFrameState,frame:
   return camera(both,yaw,[3.2,13.2,14.8+arc*.3],[0,.89,0],71);
  }
  case 'overhead':{
-  return camera(both,yaw,[6.0,31,10],[.0,0,0],48);
+  return camera(both,yaw,[4.5,26,8],[0,0,0],48);
  }
  case 'force':{
   return camera(both,yaw,[2.8,23.5,16.4+arc*.5],[0,.1,0],52);
