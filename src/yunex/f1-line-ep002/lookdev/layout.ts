@@ -26,7 +26,7 @@ export function previewCarPositions(timeSeconds:number,anchorDistanceM:number):{
  // A1/A2 replace these positions in the integrated film.
  const travel=11.5*timeSeconds;
  return {shortcut:{distanceM:anchorDistanceM-29+travel,offsetM:0.4},
-         racing:{distanceM:anchorDistanceM-45+travel,offsetM:timeSeconds<4?2.4:4.95}};
+         racing:{distanceM:anchorDistanceM-45+travel,offsetM:timeSeconds<2?2.4:4.95}};
 }
 export function normalizedShadowFocus(focus:V3):V3{
  if(!focus.every(Number.isFinite))throw Error('Finite focus required');
