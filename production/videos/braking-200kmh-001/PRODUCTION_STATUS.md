@@ -36,6 +36,18 @@
 
 Narration timing/picture lock are explicitly later. Do not claim these exact segments align with unrecorded VO.
 
+## Visual agent issue launch links (manually launch five sessions)
+
+- **Agent 1 — Brake engineering:** https://github.com/YunRah2103/Remotion-gpt-chat/issues/147
+- **Agent 2 — Physics/grip/ABS:** https://github.com/YunRah2103/Remotion-gpt-chat/issues/148
+- **Agent 3 — Cameras/vehicle:** https://github.com/YunRah2103/Remotion-gpt-chat/issues/149
+- **Agent 4 — Lighting/world/lookdev:** https://github.com/YunRah2103/Remotion-gpt-chat/issues/150
+- **Agent 5 — Motion graphics:** https://github.com/YunRah2103/Remotion-gpt-chat/issues/151
+
+**Manager board:** https://github.com/YunRah2103/Remotion-gpt-chat/issues/146
+
+Five individual source branches and six GitHub Issues have now been created. **All five agents remain NOT STARTED** until independently launched in new agent sessions by the user. Separate branch creation is not evidence of code production.
+
 ## Real status — updated at manager setup
 
 | Department | Status | Ownership branch suffix | Implementation SHA | Moving native MP4 QA | Manager decision |
