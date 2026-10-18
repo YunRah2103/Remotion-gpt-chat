@@ -121,6 +121,11 @@ jobs:
           PINS
           npm ci --no-audit --no-fund
           mkdir -p out/braking-a6-segments
+      - name: Install FFmpeg for H264 whole-file validation
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
       - name: Render genuine full-resolution 1080x1920 H264 picture frames
         shell: bash
         run: |
@@ -152,6 +157,11 @@ jobs:
           pattern: yunex-a6-shot-*
           path: out/parts
           merge-multiple: true
+      - name: Install FFmpeg for lossless assembly and decode
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
       - name: Concatenate original 810 frames and verify every decoded frame
         shell: bash
         run: |
