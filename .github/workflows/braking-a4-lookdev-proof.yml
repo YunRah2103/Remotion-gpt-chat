@@ -1,0 +1,58 @@
+name: YUNEX Braking A4 native lookdev proof
+on:
+  push:
+    branches:
+      - agent/braking-200kmh-001-lookdev-proof
+permissions:
+  contents: read
+jobs:
+  render-two-portrait-scenes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install pinned dependencies, FFmpeg and validate TypeScript
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          npm ci --no-audit --no-fund
+          npm run check
+          node --experimental-strip-types --test src/yunex/braking200/lookdev/lookdev.test.mjs
+      - name: Render both ACTUAL lookdev compositions on CPU software GL
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/lookdev
+          npx --no-install remotion compositions src/yunex/braking200/lookdev/entry.tsx --gl=swangle
+          npx --no-install remotion render src/yunex/braking200/lookdev/entry.tsx BrakingLookdevMacro out/lookdev/macro.mp4 --frames=0-59 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
+          npx --no-install remotion render src/yunex/braking200/lookdev/entry.tsx BrakingLookdevContext out/lookdev/context.mp4 --frames=0-59 --scale=0.5 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
+      - name: Verify streams, decode every movie frame, sample three real frames
+        shell: bash
+        run: |
+          set -euo pipefail
+          for shot in macro context; do
+            file="out/lookdev/${shot}.mp4"
+            ffprobe -v error -show_entries stream=codec_name,pix_fmt,width,height,nb_frames,r_frame_rate -show_entries format=duration,size -of json "$file" | tee "out/lookdev/${shot}-ffprobe.json"
+            ffmpeg -v error -xerror -i "$file" -f null -
+            mkdir -p "out/lookdev/${shot}-stills"
+            ffmpeg -hide_banner -loglevel error -i "$file" -vf "select='eq(n\\,0)+eq(n\\,30)+eq(n\\,59)'" -vsync vfr "out/lookdev/${shot}-stills/frame-%02d.png"
+            test "$(find "out/lookdev/${shot}-stills" -name '*.png' | wc -l)" -eq 3
+            sha256sum out/lookdev/${shot}-stills/*.png | tee "out/lookdev/${shot}-frame-sha256.txt"
+            unique="$(sha256sum out/lookdev/${shot}-stills/*.png | cut -d' ' -f1 | sort -u | wc -l)"
+            test "$unique" -ge 2 || (echo "NOT MOVING: identical sampled frames" >&2; exit 1)
+          done
+          sha256sum out/lookdev/*.mp4 | tee out/lookdev/SHA256SUMS.txt
+          echo "All native MP4s fully decoded; three sampled frames each; non-identical motion proof." | tee out/lookdev/verification.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-BRAKING-A4-LOOKDEV-NATIVE-${{ github.run_id }}
+          path: out/lookdev/
+          retention-days: 30
+          if-no-files-found: warn
