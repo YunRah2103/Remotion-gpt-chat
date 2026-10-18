@@ -42,10 +42,10 @@ jobs:
         run: npm ci
       - name: Typecheck all productions without modifying approved shared code
         run: npm run check
-      - name: Verify original reusable kit
-        run: npm run worldkit:test
       - name: Test true road bounds, curvature, wheel travel and safe choreography
         run: node --experimental-strip-types --test tests/f1-line-ep002/agent-1.test.mjs
+      - name: Verify original reusable kit
+        run: npm run worldkit:test
       - name: Render native 8 second two-car Remotion MP4
         run: |
           mkdir -p out/f1-ep002-agent-1
