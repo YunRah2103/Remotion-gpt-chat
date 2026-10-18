@@ -17,7 +17,7 @@ export function illustrativeHeatFromEnergy(state?:BrakingSimulationState):number
   const motion=clamp01((state.speedMps-2)/19);
   return clamp01(energetic*braking*motion);
 }
-type Role='paint'|'glass'|'tyre'|'brushed'|'cast-iron'|'caliper'|'trim'|'asphalt'|'runoff'|'barrier'|'other';
+type Role='paint'|'glass'|'tyre'|'brushed'|'cast-iron'|'caliper'|'trim'|'asphalt'|'runoff'|'barrier'|'grass'|'structure'|'other';
 const rolesForCar=(mesh:T.Mesh,material:T.Material):Role=>{
   const n=mesh.name;
   if(n==='rotor-drilled-face'||n==='rotor-outer-lip'||n==='concentric-machining'||n==='curved-ventilation-vane')return 'cast-iron';
@@ -38,6 +38,8 @@ const roleForTrack=(m:T.Mesh):Role=>{
   if(m.name==='circuit-asphalt')return 'asphalt';
   if(m.name==='runoff')return 'runoff';
   if(m.name==='circuit-barriers')return 'barrier';
+  if(m.name==='terrain'||m.name==='tree-crowns')return 'grass';
+  if(['grandstand-roof','pit-garage','pit-door','grandstand','grandstand-support'].includes(m.name))return 'structure';
   return 'other';
 };
 function finish(material:T.Material,role:Role):T.Material {
@@ -45,16 +47,16 @@ function finish(material:T.Material,role:Role):T.Material {
   if(!(next instanceof T.MeshStandardMaterial))return next;
   if(role==='paint'){
     next.color.set(BRAKING_PALETTE.paint);
-    next.metalness=.54;next.roughness=.295;next.envMapIntensity=.78;
+    next.metalness=.42;next.roughness=.355;next.envMapIntensity=.54;
     if(next instanceof T.MeshPhysicalMaterial){
-      next.clearcoat=.75;next.clearcoatRoughness=.22;
+      next.clearcoat=.61;next.clearcoatRoughness=.30;
       next.iridescence=0;
     }
   }else if(role==='glass'){
-    next.color.set(BRAKING_PALETTE.glass);next.metalness=.22;
-    next.roughness=.13;next.envMapIntensity=.64;
+    next.color.set(BRAKING_PALETTE.glass);next.metalness=.18;
+    next.roughness=.22;next.envMapIntensity=.46;
     if(next instanceof T.MeshPhysicalMaterial){
-      next.clearcoat=1;next.clearcoatRoughness=.1;
+      next.clearcoat=.75;next.clearcoatRoughness=.23;
     }
   }else if(role==='tyre'){
     next.color.set(BRAKING_PALETTE.tyre);
@@ -63,13 +65,13 @@ function finish(material:T.Material,role:Role):T.Material {
     next.color.set('#a7b2b7');next.metalness=.79;next.roughness=.33;
     next.envMapIntensity=.66;
   }else if(role==='cast-iron'){
-    next.color.set('#747a7d');next.metalness=.76;next.roughness=.46;
-    next.envMapIntensity=.35;next.emissive=new T.Color('#b24d27');
+    next.color.set('#596166');next.metalness=.72;next.roughness=.52;
+    next.envMapIntensity=.28;next.emissive=new T.Color('#a54b29');
     next.emissiveIntensity=0;
   }else if(role==='caliper'){
     next.color.set(BRAKING_PALETTE.caliper);
-    next.metalness=.53;next.roughness=.30;
-    next.envMapIntensity=.67;
+    next.metalness=.48;next.roughness=.39;
+    next.envMapIntensity=.47;
     if(next instanceof T.MeshPhysicalMaterial){
       next.clearcoat=.55;next.clearcoatRoughness=.24;
     }
@@ -83,6 +85,10 @@ function finish(material:T.Material,role:Role):T.Material {
     next.side=T.DoubleSide;
   }else if(role==='barrier'){
     next.color.set('#657173');next.metalness=.30;next.roughness=.68;
+  }else if(role==='grass'){
+    next.color.set('#56644d');next.metalness=0;next.roughness=1;
+  }else if(role==='structure'){
+    next.color.set('#647078');next.metalness=.15;next.roughness=.80;
   }
   next.needsUpdate=true;return next;
 }
@@ -133,7 +139,7 @@ export function applyBrakingFinishes(root:T.Object3D,kind:'car'|'track'):FinishH
     touchedMeshes:patched.length,
     setHeat:(strength)=>{
       if(!active)return;
-      const e=.20*Math.pow(clamp01(strength),1.4);
+      const e=.12*Math.pow(clamp01(strength),1.4);
       ironMaterials.forEach(mat=>{mat.emissiveIntensity=e;});
     },
     dispose:()=>{
@@ -152,7 +158,7 @@ export function createAsphaltGrain(seed=12,count=4200):T.InstancedMesh{
   const rand=()=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return state/4294967296;};
   const geo=new T.PlaneGeometry(1,1);
   const material=new T.MeshBasicMaterial({
-    color:'#bec1bf',transparent:true,opacity:.23,depthWrite:false,
+    color:'#bec1bf',transparent:true,opacity:.14,depthWrite:false,
     side:T.DoubleSide,polygonOffset:true,polygonOffsetFactor:-1
   });
   const mesh=new T.InstancedMesh(geo,material,count),dummy=new T.Object3D();
