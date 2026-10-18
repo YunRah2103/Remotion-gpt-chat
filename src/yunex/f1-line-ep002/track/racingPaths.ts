@@ -49,10 +49,13 @@ const smooth5=(t:number)=>{const x=clamp(t,0,1);return x*x*x*(x*(x*6-15)+10);};
 export function offsetFromCentre(id:RaceCarId,progress01:number){
   if(!Number.isFinite(progress01))throw new Error('Corner progress must be finite');
   const u=clamp(progress01,0,1);
-  // Both cars travel the SAME physical centerline at the start/finish
-  // checkpoints. During the approach and runout, offsets fade with zero
-  // first and second derivative at their ends (no discontinuous steering).
-  const sharedGate=smooth5(u/.19)*smooth5((1-u)/.19);
+  // The first/last 3.88m of track are EXACTLY shared (not merely the
+  // 3D checkpoint coordinate). This also makes one-sided sampled yaw and
+  // signed curvature identical at both timing gates. Smooth C2 transitions
+  // begin ONLY after the shared straight and finish before the common exit.
+  // Do not trade this for a fade that begins at u=0: finite-difference rigs
+  // would report different entry tangents at the supposedly identical gate.
+  const sharedGate=smooth5((u-.04)/.19)*smooth5((.96-u)/.19);
   if(id==='shortcut')return -2.8*sharedGate;
   // Wide entry, late inside apex, wide exit. Spread the offset change over
   // much of the turn, not a sudden steering snap or unrealistic hairpin.
