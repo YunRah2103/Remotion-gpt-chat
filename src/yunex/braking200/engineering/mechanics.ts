@@ -25,7 +25,8 @@ export function poseFromSimulation(
   const pressure = clamp01(state.brakePressure01);
   return {
     wheel,
-    wheelRotationRad: state.rotationRad,
+    // A2 expresses positive distance/radius; Three.js kit rolls -Z for +X forward.
+    wheelRotationRad: -state.rotationRad,
     pressure01: pressure,
     padTravelM: pressure * MAX_PAD_TRAVEL_M,
     cutaway01: clamp01(cutaway01),
