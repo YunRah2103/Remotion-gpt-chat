@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   poseFromSimulation,padFaceGapM,padCenterZ,MAX_PAD_TRAVEL_M,
   MAX_CUTAWAY_EXPLOSION_M,clamp01,
+  PAD_HALF_THICKNESS_M,ROTOR_OUTER_FACE_Z_M,
 } from './mechanics.ts';
 
 function simulation(pressure=0.7,rotation=-12.25){
@@ -21,6 +22,21 @@ test('pressure is clamped and never inflates pad travel',()=>{
   assert.equal(poseFromSimulation(simulation(1),'front-left').padTravelM,.0012);
   assert.equal(padFaceGapM(poseFromSimulation(simulation(1),'front-left')),0);
 });
+test('opposed pads never penetrate drilled rotor friction faces',()=>{
+  for(const pressure of [0,.1,.3,.6,.9,1]){
+    const pose=poseFromSimulation(simulation(pressure),'front-left');
+    for(const side of [-1,1]){
+      const padInnerFace=side*padCenterZ(pose,side)-PAD_HALF_THICKNESS_M;
+      const physicalClearance=padInnerFace-ROTOR_OUTER_FACE_Z_M;
+      assert.ok(physicalClearance>=-1e-9,'contact may touch but never intersect');
+      assert.ok(Math.abs(physicalClearance-padFaceGapM(pose))<1e-9);
+    }
+  }
+  const pressed=poseFromSimulation(simulation(1),'front-right');
+  const released=poseFromSimulation(simulation(0),'front-right');
+  assert.ok(Math.abs(padCenterZ(pressed,1)-padCenterZ(released,1)+MAX_PAD_TRAVEL_M)<1e-9);
+});
+
 test('A2 positive progress maps to negative Three.js wheel rotation',()=>{
   assert.equal(poseFromSimulation(simulation(.6,815.2),'rear-right').wheelRotationRad,-815.2);
 });
