@@ -32,7 +32,16 @@ export type CameraFilmProps={
   simulationTimeAtFilmFrame:(frame:number,fps:number)=>number;
   startDistanceM?:number;
   cameraOptions?:CameraSampleOptions;
-  /** Agents 1/4 can add engineering hardware / lookdev without editing cameras. */
+  /**
+   * Integrated film: supply Agent 1's vehicle instead of the bare world-kit car,
+   * for example renderVehicle={({state,route}) => <EngineeringBrakingVehicle
+   * simulation={state} pose={route} cutawayWheel="front-left" />}.
+   * No direct dependency on another agent's unmerged branch.
+   */
+  renderVehicle?:(sample:BrakingCameraFrame)=>React.ReactNode;
+  /** Optional Agent 4 scene lighting override, not ownership of lighting in A3. */
+  renderLighting?:(sample:BrakingCameraFrame)=>React.ReactNode;
+  /** Optional additional world props; does not inherit the vehicle transform. */
   children?:React.ReactNode;
   /**
    * Optional render slot for self-contained proof watermark.
@@ -87,7 +96,7 @@ export const BrakingVehicle:React.FC<{state:BrakingSimulationState;route:RoutePo
 };
 export const BrakingCameraStage:React.FC<CameraFilmProps>=({
   sampleBrakingSimulation,simulationTimeAtFilmFrame,startDistanceM=0,
-  cameraOptions,children,overlay,
+  cameraOptions,renderVehicle,renderLighting,children,overlay,
 })=>{
   const frame=useCurrentFrame(),{width,height,fps}=useVideoConfig();
   const sampled=sampleBrakingCameraFrame(frame,fps,sampleBrakingSimulation,
@@ -98,10 +107,14 @@ export const BrakingCameraStage:React.FC<CameraFilmProps>=({
     <ThreeCanvas width={width} height={height} shadows
       camera={{position:aimPosition as [number,number,number],
         fov:shotCamera.fovDeg,near:.035,far:350}}>
-      <WorldLighting timeOfDay={BRAKING_EP001.timeOfDay} focus={route.position}/>
+      {renderLighting
+        ?renderLighting(sampled)
+        :<WorldLighting timeOfDay={BRAKING_EP001.timeOfDay} focus={route.position}/>}
       <Environment kind={BRAKING_EP001.environment}
         seed={BRAKING_EP001.environmentSeed} timeOfDay={BRAKING_EP001.timeOfDay}/>
-      <BrakingVehicle state={state} route={route} startDistanceM={startDistanceM}/>
+      {renderVehicle
+        ?renderVehicle(sampled)
+        :<BrakingVehicle state={state} route={route} startDistanceM={startDistanceM}/>}
       {children}
       <CameraAim position={aimPosition as [number,number,number]}
         target={aimTarget as [number,number,number]} fov={shotCamera.fovDeg}/>
