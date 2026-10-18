@@ -46,16 +46,22 @@ jobs:
         run: node --experimental-strip-types --test tests/f1-line-ep002/agent-1.test.mjs
       - name: Verify original reusable kit
         run: npm run worldkit:test
-      - name: Render native 8 second two-car Remotion MP4
-        run: |
-          mkdir -p out/f1-ep002-agent-1
-          npx remotion render src/yunex/f1-line-ep002/agent-1-preview/entry.tsx F1Agent1Preview out/f1-ep002-agent-1/two-car-corner.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1 --overwrite
       - name: Install FFmpeg and FFprobe for machine-verifiable QC
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
           ffmpeg -version | head -n 1
           ffprobe -version | head -n 1
+      - name: Render native 8 second two-car Remotion MP4
+        run: |
+          mkdir -p out/f1-ep002-agent-1
+          npx remotion render src/yunex/f1-line-ep002/agent-1-preview/entry.tsx F1Agent1Preview out/f1-ep002-agent-1/two-car-corner.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1 --overwrite
+      - name: Normalize limited-range yuv420p for universally playable H264
+        run: |
+          set -euo pipefail
+          F=out/f1-ep002-agent-1/two-car-corner.mp4
+          ffmpeg -v error -y -i "$F" -c:v libx264 -preset veryfast -crf 17 -pix_fmt yuv420p -color_range tv -movflags +faststart out/f1-ep002-agent-1/two-car-normalized.mp4
+          mv out/f1-ep002-agent-1/two-car-normalized.mp4 "$F"
       - name: Probe, fully decode and prove time-varying frames
         run: |
           set -euo pipefail
