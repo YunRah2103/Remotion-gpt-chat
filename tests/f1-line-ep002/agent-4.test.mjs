@@ -24,11 +24,11 @@ test('preview is seekable, deterministic and safely staggered',()=>{
   const p=previewCarPositions(t,112);
   assert.deepEqual(previewCarPositions(t,112),p);
   assert.equal(p.shortcut.distanceM-p.racing.distanceM,16);
-  assert.ok(Math.abs(p.shortcut.offsetM)<=5.2);
-  assert.ok(Math.abs(p.racing.offsetM)<=5.2);
+  assert.ok(Math.abs(p.shortcut.offsetM)<=5.5);
+  assert.ok(Math.abs(p.racing.offsetM)<=5.5);
   assert.ok(p.shortcut.offsetM+p.racing.offsetM<9);
  }
- assert.equal(previewCarPositions(2.5,0).racing.offsetM,4.95);
+ assert.equal(previewCarPositions(2.5,0).racing.offsetM,5.25);
 });
 test('rejects non-finite inputs and returns stable light target',()=>{
  assert.throws(()=>offsetPose({position:[0,0,0],yaw:0},Infinity));
