@@ -31,6 +31,9 @@ export const StoryOverlay:React.FC<{
      {note&&<div style={{fontSize:20*scale,fontWeight:650,letterSpacing:1.25*scale,
        maxWidth:'90%',lineHeight:1.25}}>{note}</div>}
    </div>
+   {/* Subtle road-coloured scrim keeps the lower legend readable over pale kerbs. */}
+   <div style={{position:'absolute',bottom:'8%',left:0,right:0,height:'20%',
+     background:'linear-gradient(to top, rgba(5,15,21,.48), rgba(5,15,21,.24) 38%, transparent 100%)'}}/>
    {/* Colour encodes car identity only, never a fixed winner. */}
    <div style={{position:'absolute',bottom:'12%',left:'9%',right:'9%',
       display:'flex',justifyContent:'space-between',gap:16*scale}}>

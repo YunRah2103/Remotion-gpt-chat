@@ -92,7 +92,7 @@ test('vehicle width and wheelbase stay inside the approved asphalt at denser che
 });
 
 test('A3 portrait cameras are driven by REAL A2 positions, including both-car wing corners',()=>{
- const pairShots=['opening','duel','overhead','final'];
+ const pairShots=['opening','apex','duel','overhead','force','final'];
  const check=(camera,car,shot,frame)=>{
   const position=car.worldPose.position,yaw=car.worldPose.yaw;
   const c=Math.cos(yaw),s=Math.sin(yaw);
