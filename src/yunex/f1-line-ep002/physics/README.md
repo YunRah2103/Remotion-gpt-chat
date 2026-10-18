@@ -1,37 +1,46 @@
-# YUNEX F1 Racing Line EP002 — Agent 2 dynamics handoff
+# F1 EP002 — Agent 2 / Real Geometry Authoritative Physics
 
-**Scope:** representative, deterministic engineering illustration; this is **not** a validated current Formula 1 car, tyre, aerodynamic map, vehicle dynamics lap simulator or measured F1 telemetry.
+**Source of truth:** PR #166's corrected and on-track `track/racingPaths.ts`, copied *verbatim* into PR #168 and imported by `physics/index.ts`. The temporary test fixture is retired. No proxy corner geometry, no assigned winning car and no fake overtakes.
 
-## Authoritative API
+## Integration API for Agents 3, 5 and 6
 ```ts
-import {makeRaceSimulator} from '../physics/index.ts';
-import {makeRacingLinePath} from '../track/racingPaths.ts'; // Agent 1 (once integrated)
-const race=makeRaceSimulator({
-  shortcut:makeRacingLinePath('shortcut'),
-  racing:makeRacingLinePath('racing'),
-});
-const state=race.sample(frame,fps); // identical car handling, independent of render order
-const report=race.comparison; // signed measured timing, never a forced winner
+import {
+  raceSimulator, sampleRaceFrame, getRaceComparison,
+  AUTHORITATIVE_RACE_PATHS, REPRESENTATIVE_F1_CONFIG,
+  makeRaceSimulator
+} from './physics/index.ts';
+
+const state = sampleRaceFrame(frame, fps);
+const a = state.cars.shortcut; // car A: teal, real A1 inside-line pose
+const b = state.cars.racing;   // car B: amber, real A1 wide-apex-wide pose
+const report = getRaceComparison(); // signed measured result at identical finish
+// Alternate: const state = raceSimulator.sample(frame,fps)
 ```
 
-The `sampleRaceFrame(frame,fps,paths?)` convenience API also accepts A1's two immutable `RacePath` objects (cached by object identity, with no mutable motion integrator). `CarFrameState.travelDistanceM` is the actual arc travelled and must be passed to the world-kit `Vehicle.distance` for wheel rotation. `worldPose.yaw` and `steerRad` come from the same path. The `+X`-forward single-seater rotates towards `-Z` as *positive* yaw/curvature/steer increases on this right-hand turn. Both cars use identical `formula-modern` meshes.
+Each `CarFrameState` contains `worldPose.position`, `worldPose.yaw`, `worldPose.curvatureInvM`, `speedMps`, `pathDistanceM`, `travelDistanceM`, `steerRad`, `longitudinalAccelMps2`, `lateralAccelMps2`, `gripUtilization01`, `brake01`, `throttle01`. The `Vehicle` kit consumes `worldPose` as pose, `travelDistanceM` as rolling distance and `steerRad` as tyre steer. **Never apply a second yaw rotation or advance wheels with frame counts.**
 
-## Physical assumptions (SI units, declared in simulation.ts)
+The simulation caches immutable paths and integrates a bounded, forward/backward arc-length speed profile before playback. Any Remotion frame is a pure lookup at `frame/fps`; render-order/parallelism/frame seeking do not change vehicle positions or timing. Agent 3 must sample the same race state and follow its positions instead of animating cars independently. Agent 5 must read these calculated values, not type speed labels or a B advantage manually.
 
-- Identical mass **800 kg**; gravitational acceleration **9.81 m/s²**.
-- Illustrative effective slick-tyre friction coefficient **1.5**; an idealized *combined-force circle*, not a slip/temperature-dependent Pacejka tyre.
-- Vertical downforce **2.4 N/(m/s)² × speed²**; aerodynamic drag **0.55 N/(m/s)² × speed²**. This is a synthetic plausible-envelope model, not a claim about actual F1 aerodynamic coefficients.
-- Drive acceleration cap **6 m/s²**, brakes **9 m/s²**, power cap **340 kW** and modelling speed ceiling **47 m/s**. The requested equal entry speed **23 m/s** is a maximum; if either route requires earlier braking, *both* enter at the same lower **feasible** speed.
-- The local required lateral tyre acceleration is **speed² × |path curvature|**. Normal load is **mass × gravity + downforce**; available tyre force is **mu × normal load**. Available longitudinal force is the remaining radius of the friction circle after lateral tyre demand.
-- Each arc sample has a curvature-based upper speed limit. Iterated **backward** passes solve how much speed can be lost safely before a tight segment, and **forward** passes limit throttle by engine power, combined grip and drag. Local time is integrated as **2 × Δs/(v_start + v_end)** for constant-acceleration segments; querying any Remotion frame interpolates within that integral without numerical drift.
-- No fake acceleration, speed, overtakes or advantageous starting offset is inserted into the model.
+## Fairness rules and gates
+Both `RacePath` objects must start and finish at **identical physical world coordinates** (within a 0.5m defensive runtime limit and 1e-6m test accuracy). Both cars receive exactly the same geometry, mass, grip, aero, wheelbase, power, brake cap, drive cap, initial feasible entry speed and conditions. Strong early path curvature may force a shared entry speed lower than the declared maximum; the slower *feasible* value is imposed on **both** cars rather than allowing a head start. The simulation throws if start/end checkpoints differ.
 
-## Fair timing gate
-Both `RacePath` objects must have **identical physical start and finish** checkpoints (within 0.5m centre-to-centre). Mismatched endpoints fail before a winner is calculated. Signed finish margin is *A finish time minus B finish time*. The result may favour A, B or tie and is always recalculated when the geometry changes. It is **not** a prediction of who wins every corner.
+The signed `racingFinishAdvantageSeconds` = *time A arrives at the common finish minus time B arrives*. Positive values favour B, negative values favour A, zero is a tie. `fasterAtCommonFinish` is derived **only** from this numerical difference. A positive B lead is not hardcoded anywhere. If PR #166 geometry is revised, use that exact geometry, regenerate the report and rerun preview QC. Never claim telemetry from the old temporary fixture.
 
-**Integration blocker observed on A1's initial branch:** A1's `-2.8m` inside path and `+2.8m` outside path had different physical entry and finish centres. Agent 2 has requested smoothing them into shared start/end gates via Issues #159 and #158. Never bypass these guards or copy fixture metrics onto A1 paths.
+## Declared illustrative physics assumptions (not real F1 telemetry)
+- 800kg, gravity 9.81m/s²; both identical `formula-modern` cars.
+- Synthetic effective tyre friction coefficient 1.5; combined circle of longitudinal and lateral contact-patch forces, independent of temperature/slip/individual wheels.
+- Downforce `2.4*v²` newtons, drag `0.55*v²` newtons. Normal load = `mass*g + downforce`; lateral demand = `mass*v²*abs(curvature)`.
+- Longitudinal force bounded by residual combined grip, nominal 9m/s² braking, 6m/s² acceleration, a 340kW motor and aero drag.
+- Representative speed ceiling 47m/s and requested entry speed cap 23m/s; this is an illustrative corner demonstration rather than real motorsport setup optimization.
+- Numerically constrained backward braking and forward drive through the exact A1 arc-distance curvature and time integral; no scripted pass, winner, time delta or speed advantage.
 
-## Demonstration and QC
-The temporary fixture starts and finishes at exactly the same world point on the original 12m-wide `track` scene. It is arc-length sampled from the world's existing Catmull–Rom route around `[65,0,18]`. The more severe `-4m` inside approach geometrically shortens A's path but forces A to reduce speed under the identical grip envelope. B's `+3m` wide approach moves towards the centre for a late apex and returns wide on exit. Full width of formula-modern is 1.98m, leaving more than 1m asphalt margin with the max centre offset. This is a deliberately illustrative controlled scenario, not A1's final authoritative curve.
+## Two native movie demonstrations
+`src/yunex/f1-line-ep002/agent-2-preview/entry.tsx` includes `F1Agent2PhysicsDuel` and `F1Agent2GripVectors`. Both use A1 circuit/trajectory, original `Environment kind="track"` and **two identical** `Vehicle variant="formula-modern"` models. The comparison is explicitly a **ghost replay**, not an unsafe simultaneous side-by-side overtake. To avoid showing colliding physical vehicles when the two alternate paths touch at common gates, the duplicate ghost is hidden for centres less than 2.7m apart; it returns once separated. Braking/throttle/lateral tyre forces are drawn in real 3D, not an animated static dashboard.
 
-The automated agent-owned workflow runs `npm ci`, `npm run check`, `npm run worldkit:test`, and nine Agent-2 physical tests, writes `out/f1-agent2-physics-report.json`, renders two separate native Remotion H.264 MP4s with software WebGL, executes FFprobe/full FFmpeg decode, counts unique frame hashes and creates multi-frame contact sheets. **Existence of the workflow or a successful test step is not by itself proof that the movies exist or look good.** Use the resulting run/artifact ID and visual inspection before final manager signoff.
+Agent-specific CI renders genuine H.264 via `--gl=swangle`, converts to limited-range 4:2:0, FFprobes pixel format/dimensions/fps/frames, fully decodes each movie, checks distinct frame hashes and emits contact sheets and a machine-readable report. Passing unit tests does **not** prove visuals are attractive: inspect actual multi-time frames before approval.
+
+## Required machine report
+`node --experimental-strip-types tests/f1-line-ep002/agent-2-report.mjs` writes `out/f1-agent2-physics-report.json`, showing **the real A1 path lengths**, exact shared checkpoint error, entry speeds, corner minimum speed, apex/exit speeds, elapsed times and signed finish advantage. Do not quote numbers until that report passes CI for the current PR SHA.
+
+## Final handoff for Agent 6
+Preserve baseline `formula-modern` mesh, original 12m circuit and existing episodes. Pull PR #166 and #168, recompute the shared signed metric if geometry changes, and keep the conclusion truthful even when a wider line loses or the finish gap is visually small. Agent 7 owns music/VO; this physics layer owns no narration or fake sound.
