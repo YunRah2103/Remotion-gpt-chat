@@ -1,27 +1,12 @@
 import React from 'react';
 import {Vehicle} from '../../world-kit/components';
-import {vehicleSpec} from '../../world-kit/catalog.ts';
 import {RACE_COLORS} from '../contract.ts';
-import type {CarFrameState,RaceCarId,RaceFrameState,RacePose} from '../contract.ts';
-import {makeRacingLinePath} from '../track/racingPaths.ts';
+import type {RaceCarId,RaceFrameState,RacePose} from '../contract.ts';
+import {FORMULA_RIG,steerFromCurvature} from './motion.ts';
+export {FORMULA_RIG,steerFromCurvature,wheelRotationFromTravel,PREVIEW_SPEED_MPS,samplePreviewCar,samplePreviewRaceFrame} from './motion.ts';
 
-export const FORMULA_RIG=Object.freeze({
-  variant:'formula-modern' as const,
-  wheelbaseM:vehicleSpec('formula-modern').wheelbase,
-  tyreRadiusM:vehicleSpec('formula-modern').radius,
-  lengthM:vehicleSpec('formula-modern').length,
-  widthM:vehicleSpec('formula-modern').width,
-});
-export function steerFromCurvature(curvatureInvM:number){
-  if(!Number.isFinite(curvatureInvM))throw new Error('Curvature must be finite');
-  return Math.max(-.65,Math.min(.65,Math.atan(FORMULA_RIG.wheelbaseM*curvatureInvM)));
-}
-export function wheelRotationFromTravel(travelDistanceM:number){
-  if(!Number.isFinite(travelDistanceM))throw new Error('Travel must be finite');
-  return -travelDistanceM/FORMULA_RIG.tyreRadiusM;
-}
 export type RaceVehicleProps={id:RaceCarId;pose:RacePose;travelDistanceM:number;steerRad?:number};
-/** The existing World Kit model renders unchanged: one factory, two paint colours. */
+/** Reuse the identical approved World Kit formula-modern model twice. */
 export const RaceVehicle:React.FC<RaceVehicleProps>=({id,pose,travelDistanceM,steerRad})=>
   <Vehicle variant={FORMULA_RIG.variant}
     color={RACE_COLORS[id]} accent={id==='shortcut'?'#d9ffef':'#ffdab1'}
@@ -30,7 +15,7 @@ export const RaceVehicle:React.FC<RaceVehicleProps>=({id,pose,travelDistanceM,st
     steer={steerRad??steerFromCurvature(pose.curvatureInvM)}
     pose={{position:pose.position,yaw:pose.yaw}}/>;
 
-/** A2 simulation state takes precedence. No re-sampling of pose when supplied. */
+/** Authoritative A2 world pose, wheel travel, and steering always take precedence. */
 export const RaceCars:React.FC<{state:RaceFrameState}>=({state})=><>
   <RaceVehicle id="shortcut" pose={state.cars.shortcut.worldPose}
     travelDistanceM={state.cars.shortcut.travelDistanceM}
@@ -39,30 +24,3 @@ export const RaceCars:React.FC<{state:RaceFrameState}>=({state})=><>
     travelDistanceM={state.cars.racing.travelDistanceM}
     steerRad={state.cars.racing.steerRad}/>
 </>;
-
-/**
- * Agent-1 motion/shot demonstration only. No physical speed advantage is
- * asserted: both cars have the SAME constant illustrative speed, staggered
- * by 8m longitudinally to avoid contact near the shared apex.
- * Replace with Agent 2's authoritative sampleRaceFrame in the master film.
- */
-export const PREVIEW_SPEED_MPS=9.7;
-export function samplePreviewCar(id:RaceCarId,frame:number,fps:number):CarFrameState{
-  if(!Number.isFinite(frame)||!Number.isFinite(fps)||fps<=0)throw new Error('Invalid frame/fps');
-  const timeSeconds=Math.max(0,frame/fps),path=makeRacingLinePath(id);
-  const initialM=id==='shortcut'?12:4;
-  const pathDistanceM=Math.min(path.lengthM,initialM+PREVIEW_SPEED_MPS*timeSeconds);
-  const worldPose=path.sampleAtDistance(pathDistanceM);
-  // Preview has equal forward motion only; acceleration/braking/tyre physics is A2.
-  return {id,timeSeconds,pathDistanceM,worldPose,
-    speedMps:pathDistanceM>=path.lengthM?0:PREVIEW_SPEED_MPS,
-    longitudinalAccelMps2:0,lateralAccelMps2:PREVIEW_SPEED_MPS**2*worldPose.curvatureInvM,
-    steerRad:steerFromCurvature(worldPose.curvatureInvM),
-    travelDistanceM:pathDistanceM,brake01:0,throttle01:0,gripUtilization01:0};
-}
-export function samplePreviewRaceFrame(frame:number,fps=30):RaceFrameState{
-  return {frame,fps,timeSeconds:frame/fps,cars:{
-    shortcut:samplePreviewCar('shortcut',frame,fps),
-    racing:samplePreviewCar('racing',frame,fps),
-  }};
-}
