@@ -27,13 +27,16 @@ jobs:
       - run: npm run worldkit:export-props
       - name: Native model and environment review
         run: npm run worldkit:review-v3
+      - name: Refined vehicles native review
+        run: npm run worldkit:review-quality
       - name: Reusable prop stills
         run: npm run worldkit:environments -- --props-only --stills-only
       - uses: actions/upload-artifact@v4
         with:
-          name: YUNEX-WORLD-KIT-V3
+          name: YUNEX-WORLD-KIT-QUALITY
           path: |
             out/world-kit
             out/world-kit-v2
             out/world-kit-v3
+            out/world-kit-quality
           retention-days: 30

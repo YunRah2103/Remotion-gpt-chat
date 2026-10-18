@@ -2,6 +2,18 @@
 
 35 original generic vehicle bodies, 20 compatible 3D environments and 14 scene props. Designed for clean, modest-detail automotive explainers and stylised cinematics. No manufacturer badges or licensed model downloads. These are illustrative models, not engineering CAD or photoreal assets.
 
+## Refined vehicle geometry
+
+All 35 variants now share continuous crowned body surfaces, smoother bevel shading, rounded tyre shoulders, open alloy wheels with drilled rotors and fixed calipers, layered projector lamps and tail-light strips. Modelled door gaps, handles, mirrors, wipers, grilles and exhausts add readable detail without badges or a specific manufacturer identity.
+
+Formula cars gain wing flaps, pushrods, cooling louvres and cockpit padding; bikes gain thick fairings, fenders, fork hardware, controls and engine fins; trucks gain fitted cab trim, grille/step detail, markers and cargo hardware. Shared interiors add upholstery seams, headrest posts, belt buckles, dial faces, vent louvres and cup holders. Vehicle IDs, wheel metadata and existing configuration options remain compatible.
+
+```bash
+npm run worldkit:review-quality
+```
+
+This renders 56 native stills and a silent 21-second 960x540 / 12fps review MP4. The source composition remains 1920x1080 / 30fps. All 35 GLBs are refreshed by `npm run worldkit:export`.
+
 ## Vehicle catalogue
 
 | Family | Variant IDs |
@@ -23,10 +35,11 @@ npm ci
 npm run worldkit:studio
 ```
 
-The eleven compositions also appear under **YUNEX-World-Kit** in the regular Studio. Original films remain intact.
+The twelve compositions also appear under **YUNEX-World-Kit** in the regular Studio. Original films remain intact.
 
 - `VehiclePreview` and `VehiclePreviewPortrait`: orbiting model inspection. Props: `variant`, `angle` (radians), optional `color`.
 - `DrivingPreview` and `DrivingPreviewPortrait`: 8-second tracking shot. Props: `variant`, `environment` (see the catalogue below), `timeOfDay` (`day`, `dusk`, `night`), `seed` (integer).
+- `VehicleQualityReel`: 21-second studio and driving review across all seven families.
 - `WorldKitReel`: 35-second catalogue showing all vehicle shapes across the original three worlds.
 - `EnvironmentPreview`: wider landscape shot for inspecting each environment.
 - `EnvironmentReel`: 20-second moving catalogue, one location per second.

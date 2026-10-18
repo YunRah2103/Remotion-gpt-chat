@@ -1,8 +1,10 @@
+import {VehicleQualityReel} from './QualityReel';
 import {InteriorPreview,InteriorReel} from './InteriorPreview';
 import {PropPreview} from './PropPreview';
 import React from 'react';import {Composition,Folder} from 'remotion';
 import {VehiclePreview,DrivingPreview,WorldKitReel,EnvironmentReel} from './Showcase';
 export const WorldKitCompositions=()=> <Folder name="YUNEX-World-Kit">
+ <Composition id="VehicleQualityReel" component={VehicleQualityReel} width={1920} height={1080} fps={30} durationInFrames={630}/>
  <Composition id="VehiclePreview" component={VehiclePreview} width={1920} height={1080} fps={30} durationInFrames={120} defaultProps={{variant:'coupe',angle:.67}}/>
  <Composition id="VehiclePreviewPortrait" component={VehiclePreview} width={1080} height={1920} fps={30} durationInFrames={120} defaultProps={{variant:'saloon',angle:.67}}/>
  <Composition id="DrivingPreview" component={DrivingPreview} width={1920} height={1080} fps={30} durationInFrames={240} defaultProps={{variant:'coupe',environment:'highway' as const,timeOfDay:'day' as const,seed:12}}/>
