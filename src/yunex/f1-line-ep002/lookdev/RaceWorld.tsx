@@ -46,7 +46,7 @@ function batch(root:T.Group,name:string,geometry:T.BufferGeometry,material:T.Mat
   dummy.position.set(...p.at);dummy.rotation.set(0,p.yaw??0,0);
   dummy.scale.set(...(p.scale??[1,1,1]));dummy.updateMatrix();
   mesh.setMatrixAt(i,dummy.matrix);
-  if(p.color)mesh.setColorAt(i,p.color);
+  if(p.color)mesh.setColorAt(i,new T.Color(p.color));
  });
  mesh.instanceMatrix.needsUpdate=true;
  if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;
