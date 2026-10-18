@@ -1,3 +1,19 @@
+## Independent cinematic audit — 18 Oct 2026 (manager)
+
+**Decision: NO VISUAL AGENT FULLY APPROVED. DO NOT START A6/A7.**
+
+Manager downloaded **six verified GitHub Actions ZIP artifact packages** and inspected sampled movie frames from **12 native MP4s** at 540×960/30 fps, checking FFprobe metadata and decoding all files with FFmpeg. Proof packages: A1 `12135556056`, A2 `12135850460`, A4 `12135591424` / revised `12136045444`, A5 `12135139169` / revised `12136015896`. Clips are genuinely changing H.264 movies, but NOT final source-matched 1080×1920 movie and do not certify latest heads. A3 camera's earlier native render failed at TS/test and later attempts were in progress/cancelled; no viewable verified A3-native MP4 at audit.
+
+| Agent | Technical status | Independent art verdict / outstanding work |
+|---|---|---|
+| A1 (#147 / PR #155) | Detailed 3D parts, native two-clip renders PASS on earlier SHA; latest work pushed. A2 positive wheel angle correctly negated once in latest `poseFromSimulation`. | **REVISE**: primitive orange caliper/pale disc look and car-context closeup too distant; strengthen geometry depth, wheel macro presentation, controlled metal/shadows. One shared car with A3. |
+| A2 (#148 / PR #156) | **TECHNICAL PASS**: deterministic 240 Hz sampler, four loads, grip cap, conditional ABS, honest time mapper, native proof from earlier SHA PASS. | **NOT PICTURE-APPROVED**: isolate-wheel arrows and tiny generic car contextual shot. Integrate moving tyre patch/modulating pads into A1 + A3 frame. |
+| A3 (#149 / PR #152) | 6-shot deterministic camera source & preview workflow; native run `39125084274` FAILED at TS/test; newer reruns not yet successful. | **BLOCKED**: need real moving clips and visual QA; current camera stage always creates its own complete kit car and cannot yet replace it with A1 actual brake-equipped car (duplicate models on merge). |
+| A4 (#150 / PR #153) | Native lookdev macro/context passes as movies including updated side-branch proof. | **REVISE**: image still flat/cartoon bright, wheel macro hides rotor/caliper entirely. Refactor lookdev to apply finishes/light to A1+A3 one actual car/world, rather than making a separate full car+track. |
+| A5 (#151 / PR #154) | Native typography track/macro renders PASS including revised artifact. | **REVISE**: tiny car, weak hook and understated labels, no clear physical pads/friction/heat revealed. Use A1 true wheel, A3 macro camera and A2 true dry/ABS scenarios. |
+
+**Technical integration must use one real vehicle, one environment, one authoritative A2 sampler/time mapping, one A3 shot camera, A4 scene finishing/lighting, and A5 overlay.** Each agent received a source-specific review in issue #147–151. Their GitHub sessions do **not** restart automatically from comments: user must manually ask each to resume. Camera preview success plus true combined integration moving previews and manager visual approval are prerequisites before Agent 6 is started.
+
 # YUNEX — WHAT HAPPENS WHEN YOU BRAKE AT 200 KM/H? | Production board
 
 **Episode key:** `braking-200kmh-001`  ·  **Production phase:** SETUP / VISUAL AGENTS NOT YET LAUNCHED  
