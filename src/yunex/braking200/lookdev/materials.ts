@@ -120,7 +120,9 @@ export function applyBrakingFinishes(root:T.Object3D,kind:'car'|'track'):FinishH
       return replacement;
     };
     const updated=Array.isArray(old)?old.map(wrap):wrap(old);
-    const changed=Array.isArray(old)?updated.some((v,i)=>v!==old[i]):updated!==old;
+    const changed=Array.isArray(old)
+      ?(updated as T.Material[]).some((v:T.Material,i:number)=>v!==old[i])
+      :updated!==old;
     if(changed){
       patched.push({mesh:obj,original:old});
       obj.material=updated;
