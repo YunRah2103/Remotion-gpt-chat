@@ -79,7 +79,7 @@ jobs:
           grep -q '"pix_fmt": "yuv420p"' out/f1-ep002-agent-1/ffprobe.json
           grep -q '"width": 720' out/f1-ep002-agent-1/ffprobe.json
           grep -q '"height": 1280' out/f1-ep002-agent-1/ffprobe.json
-          test "$(cat out/f1-ep002-agent-1/frame-count.txt | tr -d '[:space:]')" -eq 240
+          test "$(head -n 1 out/f1-ep002-agent-1/frame-count.txt | cut -d, -f1 | tr -d '[:space:]')" -eq 240
           mkdir -p out/f1-ep002-agent-1/qc
           for S in 0.8 2.3 3.5 4.8 6.0 7.6; do
             ffmpeg -v error -ss "$S" -i "$F" -frames:v 1 -q:v 2 "out/f1-ep002-agent-1/qc/shot-$S.jpg"
