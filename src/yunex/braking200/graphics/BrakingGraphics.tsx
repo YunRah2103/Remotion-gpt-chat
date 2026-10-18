@@ -48,7 +48,7 @@ export const BrakingGraphics:React.FC<BrakingGraphicsProps>=({
   const f=frame??frameFromRemotion;
   const chapter=cue??activeCueAtFrame(f);
   const local=cueFrame??(cue?f:f-cueStartFrame(chapter));
-  const enter=smooth((local-2)/(fps*.52));
+  const enter=chapter==='hook'?smooth((local+7)/(fps*.34)):smooth((local-2)/(fps*.52));
   const exit=cue?1:smooth((cueEndFrame(chapter)-f)/(fps*.36));
   const opacity=enter*exit;
   const colors={...DEFAULT_BRAKING_GRAPHICS_PALETTE,...palette};
@@ -88,11 +88,10 @@ export const BrakingGraphics:React.FC<BrakingGraphicsProps>=({
       </defs>
 
       {chapter==='hook'&&<g opacity={opacity} transform={`translate(0 ${(1-enter)*32})`}>
-        <rect x="83" y="183" width="724" height="216" rx="9" fill={colors.shadow} opacity=".22" filter="url(#braking-shadow)"/>
         <path d={`M 105 174 H ${105+233*enter}`} stroke={colors.amber} strokeWidth="6" strokeLinecap="round"/>
         <text x="101" y="350" fontFamily="Arial, Helvetica, sans-serif" fontWeight="900"
           fontSize="226" letterSpacing="-12" fill="url(#braking-ink)" paintOrder="stroke"
-          stroke={colors.shadow} strokeWidth="2">{speedText(state)}</text>
+          stroke={colors.shadow} strokeWidth="3">{speedText(state)}</text>
         <text x="108" y="421" fontFamily="Arial, Helvetica, sans-serif" fontWeight="700"
           fontSize="56" letterSpacing="13" fill={colors.ivory}>KM/H</text>
         <path d={`M 104 447 h ${300*enter}`} stroke={colors.ivory} strokeOpacity=".55" strokeWidth="2"/>
@@ -127,8 +126,6 @@ export const BrakingGraphics:React.FC<BrakingGraphicsProps>=({
             stroke={colors.steel} strokeWidth={4+3*pressure} strokeLinecap="round"/>
         </g>}
         <g transform={`translate(0 ${(1-enter)*30})`}>
-          <rect x={left-18} y={baseline-labelSize*.9} width={chapter==='grip'?470:chapter==='abs'?310:480}
-            height={labelSize+56} fill={colors.shadow} opacity=".20" rx="4" filter="url(#braking-shadow)"/>
           <path d={`M ${left} ${baseline-labelSize-23} h ${Math.min(220,220*enter)}`}
             stroke={chapter==='heat'?colors.amber:colors.steel} strokeWidth="5"/>
           <text x={left} y={baseline} fontSize={labelSize} fontFamily="Arial, Helvetica, sans-serif"
