@@ -74,8 +74,8 @@ function keyPose(spec:VehicleSpec,wheel:WheelAnchor,shot:FilmCue,progress:number
     }
     case 'heat': {
       const theta=lerp(.42,-.32,eased);
-      return {eye:[wx+.25+Math.sin(theta)*.56,wy+.34+Math.cos(theta)*.30,wz+2.42],
-        aim:[wx,wy+.02,wz-.025],fov:48};
+      return {eye:[wx+.25+Math.sin(theta)*.48,wy+.34+Math.cos(theta)*.28,wz+lerp(2.20,1.65,eased)],
+        aim:[wx,wy+.02,wz-.025],fov:lerp(48,43,eased)};
     }
     case 'grip': {
       const low=wR*.10;
@@ -87,10 +87,10 @@ function keyPose(spec:VehicleSpec,wheel:WheelAnchor,shot:FilmCue,progress:number
         aim:[wx+.04,wy*.90,wz-.04],fov:47};
     }
     case 'finale': {
-      const a:Key={eye:[-length*1.55,height*1.80,width*3.10],
+      const a:Key={eye:[-length*1.42,height*1.28,width*2.84],
         aim:[-.12,height*.52,0],fov:53};
-      const b:Key={eye:[-length*1.85,height*2.20,width*3.80],
-        aim:[-.26,height*.53,0],fov:50};
+      const b:Key={eye:[-length*1.51,height*1.37,width*3.02],
+        aim:[-.26,height*.53,0],fov:53};
       return {eye:mix(a.eye,b.eye,eased),aim:mix(a.aim,b.aim,eased),fov:lerp(a.fov,b.fov,eased)};
     }
   }
