@@ -1,0 +1,83 @@
+name: F1 EP002 Agent 3 - native racing cinema previews
+on:
+  push:
+    branches:
+      - agent/f1-ep002-03-cinema
+    paths:
+      - 'src/yunex/f1-line-ep002/cinema/**'
+      - 'src/yunex/f1-line-ep002/agent-3-preview/**'
+      - 'tests/f1-line-ep002/agent-3.*'
+      - '.github/workflows/f1-line-ep002-agent-3.yml'
+  pull_request:
+    branches:
+      - production/f1-racing-line-ep002-contract
+    paths:
+      - 'src/yunex/f1-line-ep002/cinema/**'
+      - 'src/yunex/f1-line-ep002/agent-3-preview/**'
+      - 'tests/f1-line-ep002/agent-3.*'
+      - '.github/workflows/f1-line-ep002-agent-3.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cinema:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      REMOTION_BROWSER_EXECUTABLE: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install exact dependencies
+        run: npm ci
+      - name: TypeScript compatibility
+        run: npm run check
+      - name: Preserve working reusable world kit
+        run: npm run worldkit:test
+      - name: Camera state, timing and portrait projection tests
+        run: node --experimental-strip-types --test tests/f1-line-ep002/agent-3.cinema.test.mjs
+      - name: Prepare renderer
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg libgbm1 libasound2t64 libxshmfence1
+          mkdir -p out/f1-ep002-agent-3/qc
+      - name: Native eight-second cinematic action reel A
+        run: npx remotion render src/yunex/f1-line-ep002/agent-3-preview/entry.tsx F1CinemaA out/f1-ep002-agent-3/agent-3-cinema-A.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
+      - name: Native eight-second cinematic action reel B
+        run: npx remotion render src/yunex/f1-line-ep002/agent-3-preview/entry.tsx F1CinemaB out/f1-ep002-agent-3/agent-3-cinema-B.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
+      - name: Probe, fully decode and collect genuine frame inspection sheets
+        run: |
+          set -euo pipefail
+          for name in A B; do
+            input="out/f1-ep002-agent-3/agent-3-cinema-$name.mp4"
+            ffprobe -v error -show_streams -show_format -of json "$input" > "out/f1-ep002-agent-3/qc/probe-$name.json"
+            ffmpeg -nostdin -v error -xerror -i "$input" -f null -
+            ffmpeg -nostdin -hide_banner -loglevel error -i "$input" -vf "select='eq(n,9)+eq(n,45)+eq(n,75)+eq(n,105)+eq(n,135)+eq(n,165)+eq(n,195)+eq(n,225)',scale=270:480,tile=4x2" -frames:v 1 "out/f1-ep002-agent-3/qc/contact-$name.jpg"
+            ffmpeg -nostdin -hide_banner -loglevel error -i "$input" -vf "select='eq(n,9)+eq(n,75)+eq(n,135)+eq(n,225)'" -vsync 0 -f framemd5 "out/f1-ep002-agent-3/qc/motion-$name.md5"
+            python3 - "$input" "$name" <<'PY'
+          import json,subprocess,sys
+          f,name=sys.argv[1:]
+          j=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',f]))
+          video=next(s for s in j['streams'] if s['codec_type']=='video')
+          assert video['codec_name']=='h264',video
+          assert video['pix_fmt']=='yuv420p',video
+          assert video['r_frame_rate']=='30/1',video
+          assert int(video['width'])==540 and int(video['height'])==960,video
+          assert int(video.get('nb_frames','240'))==240,video
+          assert 7.95 <= float(j['format']['duration']) <= 8.05,j['format']['duration']
+          md5=open('out/f1-ep002-agent-3/qc/motion-'+name+'.md5').read().splitlines()
+          hashes=[line.rsplit(',',1)[-1].strip() for line in md5 if line and not line.startswith('#')]
+          assert len(hashes)==4 and len(set(hashes))==4, hashes
+          print('AGENT3_NATIVE_MP4_VERIFIED',name,video['codec_name'],video['pix_fmt'],'frames',video.get('nb_frames'),'unique sample frames',len(set(hashes)))
+          PY
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-F1-EP002-Agent3-Native-Cinema
+          path: out/f1-ep002-agent-3/
+          retention-days: 30
+          if-no-files-found: warn
