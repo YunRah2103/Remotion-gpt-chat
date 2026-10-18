@@ -93,3 +93,88 @@ test('8-second moving preview retains safe physical spacing, not a staged overta
  }
  assert.ok(movedA&&movedB,'both cars genuinely travel');
 });
+
+test('identical world entry and finish checkpoints: position, heading and curvature',()=>{
+ const startA=A.sampleAtDistance(A.entryDistanceM);
+ const startB=B.sampleAtDistance(B.entryDistanceM);
+ const finishA=A.sampleAtDistance(A.exitDistanceM);
+ const finishB=B.sampleAtDistance(B.exitDistanceM);
+ // This deliberately uses exact equality: offsets vanish at BOTH checkpoints,
+ // including the final spatial smoothing pass, not just at a gate plane.
+ assert.deepEqual(startA,startB,'same initial pose and tangent on the same asphalt');
+ assert.deepEqual(finishA,finishB,'same physical finish point and tangent');
+ assert.deepEqual(startA.position,sampleCornerCentre(0).position);
+ assert.deepEqual(finishA.position,sampleCornerCentre(1).position);
+ assert.deepEqual(A.markers.entry.position,B.markers.entry.position);
+ assert.deepEqual(A.markers.exit.position,B.markers.exit.position);
+ assert.deepEqual(A.markers.entry.position,startA.position);
+ assert.deepEqual(B.markers.exit.position,finishB.position);
+ assert.ok(horizontal(startA.position,finishA.position)>30,'genuine sector between gates');
+ for(const id of ['shortcut','racing']){
+  assert.equal(offsetFromCentre(id,0),0);
+  assert.equal(offsetFromCentre(id,1),0);
+  assert.equal(offsetFromCentre(id,.00001),0, 'C2 smooth departure from checkpoint');
+  assert.equal(offsetFromCentre(id,.99999),0, 'C2 smooth return to checkpoint');
+ }
+});
+
+test('separated corner lines retain smoother wide apex without an endpoint kink',()=>{
+ const aEntry=A.sampleAtDistance(0),bEntry=B.sampleAtDistance(0);
+ const aExit=A.sampleAtDistance(A.lengthM),bExit=B.sampleAtDistance(B.lengthM);
+ assert.ok(Math.abs(angleDelta(aEntry.yaw,bEntry.yaw))<1e-10);
+ assert.ok(Math.abs(angleDelta(aExit.yaw,bExit.yaw))<1e-10);
+ for(const u of [.25,.35,.5,.65,.75]){
+  assert.ok(offsetFromCentre('racing',u)>offsetFromCentre('shortcut',u)+.9,
+   `wide line must be outside shortcut at u=${u}`);
+ }
+ const curvatureAtApex=id=>{
+  const path=id==='shortcut'?A:B;
+  return Math.abs(path.sampleAtDistance(path.apexDistanceM).curvatureInvM);
+ };
+ assert.ok(curvatureAtApex('shortcut')>curvatureAtApex('racing')*1.1,
+  'the tighter inside apex requires more lateral acceleration at equal speed');
+ for(const id of ['shortcut','racing']){
+  for(const boundary of [.19,.81]){
+   const h=.0001;
+   const left=(offsetFromCentre(id,boundary)-offsetFromCentre(id,boundary-h))/h;
+   const right=(offsetFromCentre(id,boundary+h)-offsetFromCentre(id,boundary))/h;
+   assert.ok(Math.abs(left-right)<.012, `no lateral slope discontinuity at ${boundary}`);
+  }
+ }
+});
+
+test('signed inverse-metre curvature is the measured path yaw derivative dyaw/ds',()=>{
+ for(const path of [A,B]){
+  const ds=.25;
+  for(let s=1;s<path.lengthM-1;s+=.61){
+   const p=path.sampleAtDistance(s),ahead=path.sampleAtDistance(s+ds),behind=path.sampleAtDistance(s-ds);
+   const numerical=angleDelta(ahead.yaw,behind.y)/(2*ds);
+   assert.ok(Number.isFinite(numerical));
+   assert.ok(Math.abs(numerical-p.curvatureInvM)<.04,
+    `${path.id} at s=${s.toFixed(2)}m: finite diff ${numerical.toFixed(4)}, declared ${p.curvatureInvM.toFixed(4)}`);
+   if(Math.abs(numerical)>.008 && Math.abs(p.curvatureInvM)>.008)
+    assert.ok(numerical*p.curvatureInvM>0, 'actual turn sign must match wheel steering');
+  }
+  const apex=path.sampleAtDistance(path.apexDistanceM);
+  assert.ok(apex.curvatureInvM>0, `${path.id} turns right by positive yaw`);
+  assert.ok(steerFromCurvature(apex.curvatureInvM)>0);
+ }
+});
+
+test('all 240 preview frames preserve separated car bodies and rolling travel',()=>{
+ let prev=samplePreviewRaceFrame(0,30);
+ for(let frame=0;frame<240;frame++){
+  const state=samplePreviewRaceFrame(frame,30);
+  const a=state.cars.shortcut,b=state.cars.racing;
+  assert.ok(horizontal(a.worldPose.position,b.worldPose.position)>FORMULA_RIG.lengthM+.1,
+    `frame ${frame} cars too close`);
+  for(const id of ['shortcut','racing']){
+   const car=state.cars[id],old=prev.cars[id];
+   assert.ok(car.pathDistanceM+1e-8>=old.pathDistanceM);
+   assert.equal(car.travelDistanceM,car.pathDistanceM);
+   assert.ok(Math.abs(car.steerRad)<=.65);
+   assert.ok(Number.isFinite(wheelRotationFromTravel(car.travelDistanceM)));
+  }
+  prev=state;
+ }
+});
