@@ -27,8 +27,8 @@ function cameraFor(shot:number,a:{position:V3;yaw:number},b:{position:V3;yaw:num
   position:follow(b.position,b.yaw,1.7,-12.2,2.0+sway),
   target:follow(b.position,b.yaw,0,0,.49),fov:50};
  return {
-  position:follow(a.position,a.yaw,-32,-7.0,9.0+sway),
-  target:follow(a.position,a.yaw,-8,.1,.63),fov:46};
+  position:follow(a.position,a.yaw,23,-11.0,5.5+sway),
+  target:follow(a.position,a.yaw,-5,0,.56),fov:49};
 }
 /** Matched moving camera/cars/route for baseline and premium, 3 angles in six seconds.
  * NOT authoritative race physics or a winner claim. Agent 1/2 replace staging in film.
