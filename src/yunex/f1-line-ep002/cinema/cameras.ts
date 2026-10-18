@@ -33,6 +33,45 @@ function camera(origin:V3,yaw:number,pos:[number,number,number],look:[number,num
  return result;
 }
 /**
+ * Protect all four wheels and both front/rear wings in the actual 9:16 output.
+ * Fit is purely derived from the real RaceFrameState (never moves either car).
+ * The camera retains its shot direction and target while pulling back only as
+ * far as needed to keep both full-scale formula cars inside the portrait gate.
+ * This is especially important as A1/A2 trajectories diverge through the turn.
+ */
+function fitPairInPortrait(initial:RaceCameraPose,state:RaceFrameState):RaceCameraPose{
+ const target=initial.target,axis=subtract(initial.position,target);
+ const norm=(v:V3):V3=>{const d=magnitude(v);return [v[0]/d,v[1]/d,v[2]/d];};
+ const dot=(a:V3,b:V3)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+ const cross=(a:V3,b:V3):V3=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+ const focal=Math.tan(initial.fov*Math.PI/360),aspect=9/16;
+ const corners:V3[]=[];
+ for(const id of ['shortcut','racing'] as const){
+  const car=state.cars[id],o=car.worldPose.position,yaw=car.worldPose.yaw;
+  const co=Math.cos(yaw),si=Math.sin(yaw);
+  for(const front of [-2.9,2.9])for(const lateral of [-1.18,1.18])for(const height of [.13,1.45]){
+   corners.push([o[0]+front*co+lateral*si,o[1]+height,o[2]-front*si+lateral*co]);
+  }
+ }
+ const forward=norm(subtract(target,initial.position));
+ const right=norm(cross(forward,[0,1,0]));
+ const up=norm(cross(right,forward));
+ let scale=1;
+ for(let i=0;i<45;i++){
+  const p=add(target,[axis[0]*scale,axis[1]*scale,axis[2]*scale]);
+  const safe=corners.every(c=>{
+   const ray=subtract(c,p),z=dot(ray,forward);
+   return z>.5&&Math.abs(dot(ray,right)/(z*focal*aspect))<.87&&
+     Math.abs(dot(ray,up)/(z*focal))<.89;
+  });
+  if(safe)return {...initial,position:p};
+  scale*=1.09;
+ }
+ // Extreme pathological states must remain finite even if no single attractive
+ // portrait shot can contain cars arbitrarily far apart.
+ return {...initial,position:add(target,[axis[0]*scale,axis[1]*scale,axis[2]*scale])};
+}
+/**
  * Deterministic camera poses in metres. Reads authoritative car poses; NEVER advances cars.
  * frame can be sought out of order. The time wobble is small and continuous, not a whip effect.
  * Camera values are tuned for portrait 9:16 and framed to leave title-safe sky/track space.
@@ -47,7 +86,7 @@ export function getRaceCamera(shotId:CinematicShotId,state:RaceFrameState,frame:
  switch(shotId){
  case 'opening':{
   // Approach cars face-on, camera's tracking speed lets tarmac slide below them.
-  return camera(both,yaw,[15.8+arc*.35,1.28,.65+arc*.12],[0,-.55,0],57);
+  return fitPairInPortrait(camera(both,yaw,[15.8+arc*.35,1.28,.65+arc*.12],[0,-.55,0],57),state);
  }
  case 'shortcut':{
   const r=reference(state,'shortcut');
@@ -65,10 +104,10 @@ export function getRaceCamera(shotId:CinematicShotId,state:RaceFrameState,frame:
   return camera(racing.worldPose.position,yaw,[-1.15,1.44,.12],[16,.94,0],65);
  }
  case 'duel':{
-  return camera(both,yaw,[3.2,13.2,14.8+arc*.3],[0,.89,0],71);
+  return fitPairInPortrait(camera(both,yaw,[3.2,13.2,14.8+arc*.3],[0,.89,0],71),state);
  }
  case 'overhead':{
-  return camera(both,yaw,[4.5,26,8],[0,0,0],48);
+  return fitPairInPortrait(camera(both,yaw,[4.5,26,8],[0,0,0],48),state);
  }
  case 'force':{
   return camera(both,yaw,[2.8,23.5,16.4+arc*.5],[0,.1,0],52);
@@ -77,7 +116,7 @@ export function getRaceCamera(shotId:CinematicShotId,state:RaceFrameState,frame:
   return camera(both,yaw,[-15.0-arc*.3,3.9,2.7],[4,.86,0],57);
  }
  case 'final':{
-  return camera(both,yaw,[-17.2-arc*.55,6.1,8.5],[4,.9,0],51);
+  return fitPairInPortrait(camera(both,yaw,[-17.2-arc*.55,6.1,8.5],[4,.9,0],51),state);
  }
  default:
   throw new Error('Unknown cinema shot '+String(shotId));
