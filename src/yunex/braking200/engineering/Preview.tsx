@@ -7,8 +7,13 @@ import {poseFromSimulation} from './mechanics.ts';
 import {sampleBrakePreviewFixture} from './previewFixture.ts';
 import {Environment,WorldLighting,CameraAim} from '../../world-kit/components.tsx';
 import {sampleRoute} from '../../world-kit/environments.ts';
+import {wheelAnchors,BRAKING_EP001} from '../contracts.ts';
+import {vehicleSpec} from '../../world-kit/catalog.ts';
 import type {V3} from '../../world-kit/geometry.ts';
 
+const frontLeft=wheelAnchors(vehicleSpec(BRAKING_EP001.vehicleVariant))
+  .find(anchor=>anchor.id==='front-left');
+if(!frontLeft)throw new Error('A1 front-left kit wheel anchor unavailable');
 const BRAND='#e8f1f4';
 const strip: React.CSSProperties = {
   position:'absolute',left:'7%',right:'7%',bottom:'8%',
@@ -69,11 +74,11 @@ export const BrakeTrackProof:React.FC=()=>{
   // Dampen the camera's dolly, targeting the EXACT kit front-left pivot.
   // Begin as a three-quarter full-car context, end on a readable disc macro.
   const side=8.6+(1.65-8.6)*zoom,fore=8.2+(1.05-8.2)*zoom;
-  const forward=.15+(1.46-.15)*zoom;
-  const left=.10+(.88-.10)*zoom;
+  const forward=.15+(frontLeft.center[0]-.15)*zoom;
+  const left=.10+(frontLeft.center[2]-.10)*zoom;
   const center:V3=[
     carPose.position[0]+c*forward+s*left,
-    .67+(.43-.67)*zoom,
+    .67+(frontLeft.center[1]+.07-.67)*zoom,
     carPose.position[2]-s*forward+c*left,
   ];
   const eye:V3=[
