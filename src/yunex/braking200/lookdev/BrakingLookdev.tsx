@@ -21,7 +21,7 @@ export const BrakingFinishes:React.FC<{state?:BrakingSimulationState}>=({state})
  const roots=useRef<FinishMap>(new Map());
  useFrame(({scene})=>{
   const lookups:[string,'car'|'track'][]=[
-   ['YUNEX-grand-tourer','car'],['YUNEX-track','track']
+   ['YUNEX-grand-tourer','car'],['YUNEX-track','track'],\n   ['yunex-brake-front-left','car']
   ];
   for(const [name,role] of lookups){
    const object=scene.getObjectByName(name);
@@ -31,7 +31,7 @@ export const BrakingFinishes:React.FC<{state?:BrakingSimulationState}>=({state})
   }
   const heat=illustrativeHeatFromEnergy(state);
   for(const [obj,handle] of roots.current){
-   handle.setHeat(obj.name==='YUNEX-grand-tourer'?heat:0);
+   handle.setHeat(obj.name==='YUNEX-track'?0:heat);
    if(obj.parent===null){handle.dispose();roots.current.delete(obj);}
   }
  });
@@ -123,7 +123,7 @@ export const BrakingContactShadow:React.FC<{pose:RoutePose}>=({pose})=>{
    const local=a.center,x=pose.position[0]+c*local[0]+s*local[2],
     z=pose.position[2]-s*local[0]+c*local[2];
    return <group key={a.id}>
-    <mesh position={[x,.018,z]} rotation={[-Math.PI/2,0,-pose.yaw]}>
+    <mesh position={[x,.018,z]} rotation={[-Math.PI/2,0,-pose.yaw]} scale={[.58,.91,1]}>
      <circleGeometry args={[1,32]}/>
      <meshBasicMaterial color="#050b0e" transparent opacity={.24}
        depthWrite={false} polygonOffset polygonOffsetFactor={-1}/>
