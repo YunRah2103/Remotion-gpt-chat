@@ -71,3 +71,31 @@ test('independent monotone dry-film and labelled ABS-insert maps',()=>{
 test('bad sampler seconds rejected',()=>{
  for(const t of [-.1,Infinity,NaN])assert.throws(()=>sampleBrakingSimulation(t));
 });
+
+test('after physical stop: zero travel, no rotation, smooth pitch and load settlement',()=>{
+ for(const scenario of ['dry-track','low-grip-abs']){
+  let stopped;
+  for(let frame=1;frame<=420;frame++){
+   const state=sampleBrakingSimulation(frame/30,scenario);
+   if(state.speedMps===0){stopped=state;break;}
+  }
+  assert.ok(stopped,'car must stop within the simulated horizon');
+  const later=sampleBrakingSimulation(stopped.simTimeSec+.50,scenario);
+  const atRest=sampleBrakingSimulation(14,scenario);
+  near(later.traveledM,stopped.traveledM,.0001);
+  near(atRest.traveledM,stopped.traveledM,.0001);
+  near(later.brakeHeatJ,stopped.brakeHeatJ,.0001);
+  assert.ok(later.pitchRad<=stopped.pitchRad+.0000001);
+  assert.ok(atRest.pitchRad<.0001);
+  for(const id of ids){
+   const old=stopped.wheel[id],next=later.wheel[id],last=atRest.wheel[id];
+   const fraction=id.startsWith('front')?BRAKING_MODEL.staticFrontLoadFraction:1-BRAKING_MODEL.staticFrontLoadFraction;
+   const staticN=BRAKING_MODEL.illustrativeMassKg*BRAKING_MODEL.gravityMps2*fraction/2;
+   near(next.rotationRad,old.rotationRad,.00001);
+   assert.equal(next.angularSpeedRadPerSec,0);
+   assert.ok(next.brakePressure01<=old.brakePressure01+1e-7);
+   assert.ok(Math.abs(next.normalLoadN-staticN)<=Math.abs(old.normalLoadN-staticN)+1e-6);
+   near(last.normalLoadN,staticN,.01);
+  }
+ }
+});
