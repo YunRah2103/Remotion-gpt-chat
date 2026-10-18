@@ -24,11 +24,11 @@ function tuneCircuit(root:T.Group) {
   if(!(m instanceof T.MeshStandardMaterial))return;
   if(o.name==='circuit-asphalt'){
    // Reuse the kit's existing road geometry and world-space UVs; no second surface.
-   m.color.set('#434d54');m.roughness=.77;m.metalness=.065;
-   m.bumpScale=.011;m.envMapIntensity=.35;
+   m.color.set('#353e43');m.roughness=.69;m.metalness=.08;
+   m.bumpScale=.012;m.envMapIntensity=.42;
    o.receiveShadow=true;o.castShadow=false;
   }
-  if(o.name==='runoff'){m.color.set('#b9b1a0');m.roughness=.96;o.castShadow=false;}
+  if(o.name==='runoff'){m.color.set('#aca392');m.roughness=.94;o.castShadow=false;}
   if(o.name==='red-white-curbs'){m.roughness=.60;m.metalness=.03;o.castShadow=false;o.receiveShadow=true;}
   if(o.name==='circuit-barriers'){m.roughness=.52;m.metalness=.21;}
   if(o.name==='circuit-catch-fence-wires'){m.roughness=.40;m.metalness=.45;}
@@ -135,7 +135,7 @@ function buildTrackside():T.Group{
 /** Episode-scoped adapter. Owns one kit track and adds details; NEVER constructs a second road. */
 export const RaceWorld:React.FC<{quality?:RaceWorldQuality;seed?:number}>=({quality='premium',seed=12})=>{
  const world=useMemo(()=>{
-  const g=createEnvironment({kind:'track',seed,timeOfDay:'dusk'});
+  const g=createEnvironment({kind:'track',seed,timeOfDay:quality==='premium'?'dusk':'day'});
   if(quality==='premium')tuneCircuit(g);
   return g;
  },[quality,seed]);
@@ -145,10 +145,20 @@ export const RaceWorld:React.FC<{quality?:RaceWorldQuality;seed?:number}>=({qual
 };
 
 export const RaceLighting:React.FC<{quality?:RaceWorldQuality;focus?:V3}>=({quality='premium',focus=RACE_LOOK.turnAnchor})=>{
- // Reuse the kit's safe PMREM, sunset sky fill and shadow light; add restrained edge light only.
+ // Preserve the kit PMREM & baseline. Give the premium edition a long warm secondary sun,
+ // with a contained shadow frustum, plus a cool rim for silhouette separation.
+ const target=useMemo(()=>new T.Object3D(),[]);target.position.set(...focus);
  return <>
   <WorldLighting timeOfDay={quality==='premium'?'dusk':'day'} focus={focus}/>
-  {quality==='premium'&&<directionalLight position={[focus[0]-30,20,focus[2]-12]} color="#b7dbf3" intensity={.32}/>}
+  {quality==='premium'&&<>
+   <primitive object={target}/>
+   <directionalLight target={target} position={[focus[0]-25,18,focus[2]-15]}
+    color="#ffd39d" intensity={1.05} castShadow shadow-mapSize={[1024,1024]}
+    shadow-camera-left={-36} shadow-camera-right={36} shadow-camera-top={36}
+    shadow-camera-bottom={-36} shadow-camera-near={.5} shadow-camera-far={115}
+    shadow-bias={-.00035} shadow-normalBias={.045}/>
+   <directionalLight position={[focus[0]+22,15,focus[2]+27]} color="#a8cced" intensity={.25}/>
+  </>}
  </>;
 };
 
