@@ -56,11 +56,16 @@ const Preview:React.FC<{mode:Mode}>=({mode})=>{
   // Local ABS insert is a SEPARATE labelled low-grip demonstration. No claim
   // that ABS intervenes automatically during dry, high-grip braking.
   const mapTime=(f:number)=>{
-    if(isAbs)return mapAbsInsertFrameToSimulationSec(f-fromFrame);
+    // Compress the authoritative ABS insert's 145 source frames into a
+    // 33-36 frame excerpt. This is an EXPLICIT editorial time map, not a
+    // fabricated extra ABS pulse or displacement curve.
+    if(isAbs)return mapAbsInsertFrameToSimulationSec((f-fromFrame)*3.8);
     const duration=mode==='track'?210:185;
     return mapFilmFrameToSimulationSec((f/duration)*750);
   };
   const sampler=(t:number)=>sampleBrakingSimulation(t,isAbs?'low-grip-abs':'dry-track');
+  const brakingState=sampler(mapTime(frame));
+  const absActive=Object.values(brakingState.wheel).some(w=>w.absIntervening);
   const cutaway=shot==='mechanism'||shot==='heat' ?
     easing((progress01-.10)/.40)*.78:0;
   const label=shotNames[shot];
@@ -87,7 +92,8 @@ const Preview:React.FC<{mode:Mode}>=({mode})=>{
       </div>
       <div style={tech}>A1 REAL BRAKE ASSEMBLY · A2 AUTHENTIC STATE · A3 CAMERA</div>
       {isAbs&&<div style={{...tech,fontWeight:600}}>
-        ILLUSTRATIVE LOW-GRIP SCENARIO · PRESSURE MODULATION
+        {absActive?'ABS INTERVENING · BRAKE PRESSURE RELEASE':
+          'ILLUSTRATIVE LOW-GRIP / LOCK TENDENCY'}
       </div>}
     </div>}
   />;
