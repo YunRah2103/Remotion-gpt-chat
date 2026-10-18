@@ -112,7 +112,7 @@ const Overlay:React.FC<{s:BrakingSimulationState;abs:boolean;progress:number;cut
         {String(Math.round(s.speedMps*3.6)).padStart(3,'0')}
       </div><div style={{fontSize:24}}>KM/H</div>
       <div style={{marginLeft:'auto',fontSize:20,fontWeight:800,maxWidth:186,
-        textAlign:'right',color:w.absIntervening?'#e9bd81':'#a9d8df'}}>
+        textAlign:'right',color:cue.absPressureRelease?'#e9bd81':'#a9d8df'}}>
        {abs?(cue.absPressureRelease?'ABS / RELEASE':'LOW GRIP'):'FRONT AXLE LOADED'}
       </div>
     </div>
