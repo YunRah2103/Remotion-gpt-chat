@@ -134,10 +134,10 @@ const Proof:React.FC<{mode:'macro'|'track'}>=({mode})=>{
    lowGripExample={lowGripExample} palette={hexPalette}/>
   {lowGripExample&&<div style={{
     position:'absolute',bottom:'8%',left:'9%',right:'9%',
-    fontFamily:'Arial,Helvetica,sans-serif',fontSize:22,fontWeight:800,
-    letterSpacing:4,color:'#f5f2e8',textShadow:'0px 2px 7px #10232c',
+    fontFamily:'Arial,Helvetica,sans-serif',fontSize:34,fontWeight:900,
+    letterSpacing:3,color:'#f5f2e8',textShadow:'0px 2px 7px #10232c',
     opacity:absActive?1:.74,
-   }}>LOW-GRIP EXAMPLE · ABS ONLY IF WHEEL LOCK IS IMMINENT</div>}
+   }}>LOW-GRIP EXAMPLE</div>}
  </AbsoluteFill>;
 };
 export const BrakingGraphicsMacroProof:React.FC=()=> <Proof mode="macro"/>;
