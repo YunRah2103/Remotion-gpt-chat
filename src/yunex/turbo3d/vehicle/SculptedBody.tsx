@@ -172,13 +172,15 @@ export const SculptedCanopy:React.FC=()=>{
   </mesh>
   {[-1,1].map(side=><group key={side}>
    <Tube points={[[side*.70,.808,1.12],[side*.625,.968,.83],[side*.56,1.135,.42],[side*.53,1.215,.11]]}
-    radius={.015} colour="#537F89" name="RAKED_A_PILLAR"/>
+    radius={.010} colour="#244E57" name="RAKED_A_PILLAR"/>
    <Tube points={[[side*.63,.82,-1.33],[side*.57,1.0,-1.04],[side*.54,1.20,-.65],[side*.53,1.215,.10]]}
-    radius={.014} colour="#265461" name="C_PILLAR_GLASS_TRIM"/>
+    radius={.010} colour="#1D4550" name="C_PILLAR_GLASS_TRIM"/>
    <Tube points={[[side*.70,.802,1.09],[side*.69,.801,.64],[side*.65,.797,-.16],[side*.66,.797,-1.30]]}
-    radius={.017} colour="#6A9A9A" name="SIDE_WINDOW_LOWER_CHROME"/>
+    radius={.010} colour="#375E63" name="SIDE_WINDOW_LOWER_CHROME"/>
   </group>)}
-  <mesh position={[0,1.229,-.24]} castShadow><boxGeometry args={[.94,.018,.61]}/>
+  {/* A gently crowned roof insert instead of the old flat rectangular slab. */}
+  <mesh position={[0,1.225,-.24]} scale={[.485,.019,.364]} castShadow>
+   <sphereGeometry args={[1,32,12]}/>
    <meshPhysicalMaterial name="COUPE_ROOF_INSERT" color="#164952" metalness={.68} roughness={.21} clearcoat={.8}/>
   </mesh>
  </group>;

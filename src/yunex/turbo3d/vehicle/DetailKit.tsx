@@ -81,8 +81,12 @@ export const FrontDuct:React.FC<{side:number}>=({side})=><group name="FRONT_BUMP
     <meshStandardMaterial name="FRONT_DUCT_UPPER_LIP" color="#2F6365" metalness={.66} roughness={.25}/></mesh>
   {[-1,1].map(s=><mesh key={s} position={[s*.19,0,-.025]}>
     <boxGeometry args={[.013,.142,.086]}/><meshStandardMaterial color="#1A333D" metalness={.48}/></mesh>)}
-  {[-.082,0,.082].map(x=><mesh key={x} position={[x,-.001,.032]}>
-    <boxGeometry args={[.010,.112,.018]}/><meshStandardMaterial name="FRONT_INTAKE_GUIDE_VANES" color="#547E80" metalness={.7} roughness={.30}/></mesh>)}
+  {/* A single restrained horizontal aero blade reads cleaner at phone size
+       than multiple vertical teeth in the intake opening. */}
+  <mesh position={[0,-.012,.032]} castShadow>
+    <boxGeometry args={[.315,.013,.026]}/>
+    <meshStandardMaterial name="FRONT_INTAKE_GUIDE_VANES" color="#547E80" metalness={.73} roughness={.30}/>
+  </mesh>
 </group>;
 
 /** Side opening reaches inboard, with real fore/aft wall faces, a deep cavity and 3 vanes. */
@@ -124,7 +128,7 @@ export const PremiumWheel:React.FC<{side:number;z:number;travelMeters:number}>=(
         <torusGeometry args={[.27,.018,10,48]}/><meshStandardMaterial name="RIM_OUTER_LIP" color="#9EB9B9" metalness={.94} roughness={.18}/></mesh>
       <mesh rotation={[0,0,PI/2]} position={[side*.127,0,0]}>
         <cylinderGeometry args={[.246,.246,.022,42]}/>
-        <meshStandardMaterial name="RIM_GRAPHITE" color="#111D26" metalness={.86} roughness={.29}/>
+        <meshStandardMaterial name="RIM_GRAPHITE" color="#283943" metalness={.83} roughness={.29}/>
       </mesh>
       <mesh rotation={[0,PI/2,0]} position={[side*.149,0,0]}>
         <torusGeometry args={[.229,.011,8,44]}/><meshStandardMaterial color="#2A4F58" metalness={.89} roughness={.19}/></mesh>
@@ -133,7 +137,7 @@ export const PremiumWheel:React.FC<{side:number;z:number;travelMeters:number}>=(
         return <group key={i} rotation={[a,0,0]}>
           <mesh position={[side*.163,.123,-.018]} rotation={[.16,0,side*-.16]} castShadow>
             <boxGeometry args={[.027,.198,.026]}/>
-            <meshStandardMaterial name="RIM_MACHINED_SPOKE" color="#9BAEB6" metalness={.89} roughness={.20}/>
+            <meshStandardMaterial name="RIM_MACHINED_SPOKE" color="#B9CACD" metalness={.85} roughness={.23}/>
           </mesh>
           <mesh position={[side*.173,.159,.035]} rotation={[-.17,0,side*.18]} castShadow>
             <boxGeometry args={[.018,.115,.018]}/><meshStandardMaterial color="#3F7A7B" metalness={.85} roughness={.27}/></mesh>

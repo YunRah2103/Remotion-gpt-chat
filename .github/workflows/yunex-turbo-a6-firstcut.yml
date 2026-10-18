@@ -1,0 +1,97 @@
+name: YUNEX A6 First Cut Native Render
+on:
+  push:
+    branches: ['agent/turbo-3d-001-editor']
+    paths:
+      - 'src/yunex/turbo3d/editor/**'
+      - 'src/yunex/turbo3d/vehicle/**'
+      - 'src/yunex/turbo3d/Turbo3DEpisode001.tsx'
+      - 'src/Root.tsx'
+      - 'production/yunex/turbo_3d_001/agents/editor/**'
+      - '.github/workflows/yunex-turbo-a6-firstcut.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: a6-firstcut-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
+      - run: node production/yunex/turbo_3d_001/agents/cinematics/camera.test.cjs
+  render:
+    needs: preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [0,1,2,3,4,5,6,7,8,9,10,11]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --no-audit --no-fund
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Real 1080x1920 native Remotion chunk
+        env:
+          PART: ${{ matrix.part }}
+        run: |
+          set -euo pipefail
+          mkdir -p out/yunex/a6
+          first=$((PART*60))
+          last=$((first+59))
+          npx remotion render src/index.ts Turbo3DEpisode001 "out/yunex/a6/chunk-${PART}.mp4" --frames="${first}-${last}" --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
+          ffmpeg -v error -xerror -i "out/yunex/a6/chunk-${PART}.mp4" -f null -
+          ffprobe -v error -show_entries stream=codec_name,width,height,r_frame_rate,nb_frames -of json "out/yunex/a6/chunk-${PART}.mp4" > "out/yunex/a6/metadata-${PART}.json"
+          sha256sum "out/yunex/a6/chunk-${PART}.mp4" > "out/yunex/a6/sha-${PART}.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: A6-CHUNK-${{ matrix.part }}
+          path: out/yunex/a6/
+          retention-days: 30
+  assemble:
+    needs: render
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: A6-CHUNK-*
+          path: out/yunex/a6
+          merge-multiple: true
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Assemble and verify actual 24-second first cut
+        run: |
+          set -euo pipefail
+          cd out/yunex/a6
+          for i in {0..11}; do test -s "chunk-${i}.mp4"; printf "file 'chunk-%s.mp4'\n" "${i}"; done >concat.txt
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i concat.txt -c copy YUNEX_TURBO_3D_EP001_A6_FIRST_CUT.mp4
+          ffprobe -v error -show_entries stream=codec_name,width,height,pix_fmt,r_frame_rate,nb_frames:format=duration,size -of json YUNEX_TURBO_3D_EP001_A6_FIRST_CUT.mp4 >ffprobe.json
+          ffmpeg -v error -xerror -i YUNEX_TURBO_3D_EP001_A6_FIRST_CUT.mp4 -f null -
+          python3 - <<'PY'
+          import json
+          s=json.load(open('ffprobe.json'))['streams'][0]
+          assert (s['codec_name'],s['width'],s['height'],s['r_frame_rate'],int(s['nb_frames']))==('h264',1080,1920,'30/1',720),s
+          print('FULL_1080x1920_NATIVE_720_FRAME_FIRST_CUT_PASS')
+          PY
+          sha256sum YUNEX_TURBO_3D_EP001_A6_FIRST_CUT.mp4 >SHA256SUMS
+          mkdir -p frames
+          for f in 0 45 150 225 300 375 450 530 620 715; do ffmpeg -hide_banner -loglevel error -y -i YUNEX_TURBO_3D_EP001_A6_FIRST_CUT.mp4 -vf "select='eq(n,${f})',scale=360:640" -vsync vfr -frames:v 1 "frames/${f}.png"; done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-A6-EP001-FIRST-CUT-1080
+          path: |
+            out/yunex/a6/YUNEX_TURBO_3D_EP001_A6_FIRST_CUT.mp4
+            out/yunex/a6/ffprobe.json
+            out/yunex/a6/SHA256SUMS
+            out/yunex/a6/frames/
+          retention-days: 30
