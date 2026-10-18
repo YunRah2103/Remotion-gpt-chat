@@ -73,7 +73,7 @@ export const BrakingVehicle: React.FC<BrakingVehicleProps> = ({
     const poseForWheel=poseFromSimulation(
       simulation,mount.anchor.id,cutaway,selected?heatIllustration01:0,
     );
-    // No independent speed curve: kit rim and exposed rotor get identical A2 angle.
+    // No independent speed curve: both roll by -A2 positive travel angle.
     mount.roll.rotation.z=poseForWheel.wheelRotationRad;
     // Clear film-level cutaway shows the rotor instead of falsely placing it
     // on top of the kit's opaque wheel and spokes.
