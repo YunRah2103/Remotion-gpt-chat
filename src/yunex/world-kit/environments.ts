@@ -1,3 +1,4 @@
+import {enhanceEnvironment} from './world-detail.ts';
 import * as T from 'three';
 import {random,instances,trees} from './scenery.ts';
 import type {Instance} from './scenery.ts';
@@ -100,5 +101,6 @@ export function createEnvironment({kind,seed=12,timeOfDay='day'}:EnvironmentOpti
  const spec=environmentSpec(kind);const g=new T.Group();g.name=`YUNEX-${kind}`;g.userData={kind,seed,units:'metres',roadY:0};
  if(['highway','city','track'].includes(kind))box(g,surface(spec.ground),[520,.12,520],[0,-.18,0],.001,'terrain');
  if(kind==='highway')highway(g);else if(kind==='city')city(g,seed,timeOfDay==='night');else if(kind==='track')track(g);else buildNewEnvironment(g,{kind,seed,timeOfDay});
+ enhanceEnvironment(g,{kind,seed,timeOfDay},distance=>sampleRoute(kind,distance),routeLength(kind));
  return g;
 }

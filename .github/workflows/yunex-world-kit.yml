@@ -29,6 +29,8 @@ jobs:
         run: npm run worldkit:review-v3
       - name: Refined vehicles native review
         run: npm run worldkit:review-quality
+      - name: Detailed environments native review
+        run: npm run worldkit:review-worlds
       - name: Reusable prop stills
         run: npm run worldkit:environments -- --props-only --stills-only
       - uses: actions/upload-artifact@v4
@@ -39,4 +41,5 @@ jobs:
             out/world-kit-v2
             out/world-kit-v3
             out/world-kit-quality
+            out/world-kit-scenic
           retention-days: 30

@@ -17,7 +17,8 @@
     "partskit:test": "node --experimental-strip-types --test tests/parts-kit/*.test.mjs",
     "partskit:export": "node --experimental-strip-types scripts/parts-kit/export.mjs",
     "partskit:review": "node --experimental-strip-types scripts/parts-kit/review.mjs",
-    "worldkit:review-quality": "node --experimental-strip-types scripts/world-kit/render-quality.mjs"
+    "worldkit:review-quality": "node --experimental-strip-types scripts/world-kit/render-quality.mjs",
+    "worldkit:review-worlds": "node --experimental-strip-types scripts/world-kit/render-world-quality.mjs"
   },
   "dependencies": {
     "@remotion/captions": "4.0.533",

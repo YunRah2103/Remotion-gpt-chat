@@ -1,3 +1,4 @@
+import {EnvironmentOverview} from './EnvironmentOverview';
 import {VehicleQualityReel} from './QualityReel';
 import {InteriorPreview,InteriorReel} from './InteriorPreview';
 import {PropPreview} from './PropPreview';
@@ -10,6 +11,7 @@ export const WorldKitCompositions=()=> <Folder name="YUNEX-World-Kit">
  <Composition id="DrivingPreview" component={DrivingPreview} width={1920} height={1080} fps={30} durationInFrames={240} defaultProps={{variant:'coupe',environment:'highway' as const,timeOfDay:'day' as const,seed:12}}/>
  <Composition id="DrivingPreviewPortrait" component={DrivingPreview} width={1080} height={1920} fps={30} durationInFrames={240} defaultProps={{variant:'crossover',environment:'city' as const,timeOfDay:'dusk' as const,seed:12}}/>
  <Composition id="WorldKitReel" component={WorldKitReel} width={1920} height={1080} fps={30} durationInFrames={1050}/>
+ <Composition id="EnvironmentOverview" component={EnvironmentOverview} width={1920} height={1080} fps={30} durationInFrames={90} defaultProps={{environment:'coast' as const,seed:12,timeOfDay:'day' as const}}/>
  <Composition id="EnvironmentPreview" component={DrivingPreview} width={1920} height={1080} fps={30} durationInFrames={240} defaultProps={{variant:'coupe',environment:'coast' as const,timeOfDay:'day' as const,seed:12,wideView:true}}/>
  <Composition id="EnvironmentReel" component={EnvironmentReel} width={1920} height={1080} fps={30} durationInFrames={600}/>
  <Composition id="PropPreview" component={PropPreview} width={1280} height={720} fps={30} durationInFrames={90} defaultProps={{kind:'cone' as const}}/>

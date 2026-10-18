@@ -2,6 +2,10 @@
 
 35 original generic vehicle bodies, 20 compatible 3D environments and 14 scene props. Designed for clean, modest-detail automotive explainers and stylised cinematics. No manufacturer badges or licensed model downloads. These are illustrative models, not engineering CAD or photoreal assets.
 
+## Detailed environments
+
+All 20 locations now include procedural surface textures, richer scenery and location-specific architecture or road furniture. See [ENVIRONMENT_QUALITY.md](ENVIRONMENT_QUALITY.md) for the improvements and native render checks. Run `npm run worldkit:review-worlds` for 47 inspection stills and the moving 20-location reel.
+
 ## Sculpted vehicle revision
 
 Road bodies now use a continuous shaped shell with fuller fenders, a narrower lower body, rounded shoulders and real lamp/grille apertures. Rounded painted window frames and inset seals replace the exposed bar construction. Default glass opacity is 0.55; `glassOpacity` still overrides it, and the driver preview uses 0.15.
@@ -43,12 +47,13 @@ npm ci
 npm run worldkit:studio
 ```
 
-The twelve compositions also appear under **YUNEX-World-Kit** in the regular Studio. Original films remain intact.
+The thirteen compositions also appear under **YUNEX-World-Kit** in the regular Studio. Original films remain intact.
 
 - `VehiclePreview` and `VehiclePreviewPortrait`: orbiting model inspection. Props: `variant`, `angle` (radians), optional `color`.
 - `DrivingPreview` and `DrivingPreviewPortrait`: 8-second tracking shot. Props: `variant`, `environment` (see the catalogue below), `timeOfDay` (`day`, `dusk`, `night`), `seed` (integer).
 - `VehicleQualityReel`: 21-second studio and driving review across all seven families.
 - `WorldKitReel`: 35-second catalogue showing all vehicle shapes across the original three worlds.
+- `EnvironmentOverview`: high-angle location inspection with dedicated circuit, bridge and city cameras.
 - `EnvironmentPreview`: wider landscape shot for inspecting each environment.
 - `EnvironmentReel`: 20-second moving catalogue, one location per second.
 - `InteriorPreview`, `InteriorDriver`, `InteriorReel`: cutaway, driver-eye and 6-second interior catalogue.
