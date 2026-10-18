@@ -29,8 +29,13 @@ test('camera samples remain deterministic, physical and finite on all shots',()=
 test('camera is route-locked, including yaw and translation',()=>{
   const base=sampleCameraPose(70,{position:[0,0,0],yaw:0},car);
   const shifted=sampleCameraPose(70,{position:[27,2,-40],yaw:0},car);
-  assert.deepEqual(shifted.position.map((v,i)=>v-base.position[i]),[27,2,-40]);
-  assert.deepEqual(shifted.target.map((v,i)=>v-base.target[i]),[27,2,-40]);
+  for(const [actual,expected] of [
+    [shifted.position.map((v,i)=>v-base.position[i]),[27,2,-40]],
+    [shifted.target.map((v,i)=>v-base.target[i]),[27,2,-40]],
+  ]){
+    for(let i=0;i<3;i++)assert.ok(Math.abs(actual[i]-expected[i])<1e-9,
+      'route-translation invariance within floating-point precision');
+  }
   const q=vehicleToWorld([1,2,0],{position:[10,0,20],yaw:Math.PI/2});
   assert.ok(Math.abs(q[0]-10)<1e-9);
   assert.ok(Math.abs(q[1]-2)<1e-9);
