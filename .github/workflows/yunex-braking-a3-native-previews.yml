@@ -1,4 +1,4 @@
-name: YUNEX Braking A3 - Real A1 A2 Camera MP4 Proof
+name: YUNEX Braking A3 - Real A1 A2 A4 Cinematic Camera Proof
 on:
   push:
     branches:
@@ -31,6 +31,12 @@ jobs:
           ref: 0b1bf91e7004f50261bdf6804c91134d69b46dd4
           path: .integration/a2
           persist-credentials: false
+      # Agent 4 lookdev styles the SAME A1/kit meshes; adds no car or track.
+      - uses: actions/checkout@v4
+        with:
+          ref: 640ffee3a05dcc23e34acfbc078f94b23ca11fb7
+          path: .integration/a4
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -41,6 +47,7 @@ jobs:
           set -euo pipefail
           cp -a .integration/a1/src/yunex/braking200/engineering src/yunex/braking200/engineering
           cp -a .integration/a2/src/yunex/braking200/physics src/yunex/braking200/physics
+          cp -a .integration/a4/src/yunex/braking200/lookdev src/yunex/braking200/lookdev
           cp src/yunex/braking200/cameras/IntegratedProof.template \
             src/yunex/braking200/cameras/IntegratedProof.tsx
           printf '%s\n' "import {registerRoot} from 'remotion';" \
@@ -49,6 +56,7 @@ jobs:
             > src/yunex/braking200/cameras/IntegratedEntry.tsx
           printf '%s\n' "A1 source: c704dc67acd0567cb7dbde8c21a9a4b0bf4f1f0c" \
             "A2 source: 0b1bf91e7004f50261bdf6804c91134d69b46dd4" \
+            "A4 source: 640ffee3a05dcc23e34acfbc078f94b23ca11fb7" \
             "A3 source: ${GITHUB_SHA}" > /tmp/a3-sources.txt
       - name: Install pinned packages and FFmpeg
         run: |
@@ -64,6 +72,7 @@ jobs:
           node --experimental-strip-types --test src/yunex/braking200/cameras/cameraRig.test.mjs
           node --experimental-strip-types --test src/yunex/braking200/engineering/mechanics.test.mjs
           node --experimental-strip-types --test src/yunex/braking200/physics/simulation.test.mjs
+          node --experimental-strip-types --test src/yunex/braking200/lookdev/lookdev.test.mjs
       - name: Render TWO genuine 9x16 moving previews with A1 rotor A2 braking
         run: |
           set -euo pipefail
