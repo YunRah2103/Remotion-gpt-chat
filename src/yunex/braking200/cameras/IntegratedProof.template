@@ -66,8 +66,12 @@ const Preview:React.FC<{mode:Mode}>=({mode})=>{
   const sampler=(t:number)=>sampleBrakingSimulation(t,isAbs?'low-grip-abs':'dry-track');
   const brakingState=sampler(mapTime(frame));
   const absActive=Object.values(brakingState.wheel).some(w=>w.absIntervening);
-  const cutaway=shot==='mechanism'||shot==='heat' ?
-    easing((progress01-.10)/.40)*.78:0;
+  // Continuity: the disc stays exposed throughout the consecutive
+  // mechanism -> heat shots. Resetting the heat cue's progress used to
+  // reappear the opaque tyre for ~0.5s, concealing the real rotor.
+  const cutaway=shot==='mechanism'
+    ?easing((progress01-.10)/.40)*.78
+    :shot==='heat'?.78:0;
   const label=shotNames[shot];
   const wheelbase=vehicleSpec('grand-tourer').wheelbase;
   const opacity=frame<8?frame/8:frame>(mode==='track'?202:177)
