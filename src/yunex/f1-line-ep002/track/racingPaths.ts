@@ -71,7 +71,37 @@ function build(id:RaceCarId):RacingLineData{
     const arcM=previous?previous.arcM+Math.hypot(p[0]-previous.position[0],p[2]-previous.position[2]):0;
     knots.push({arcM,position:p,yaw:0,curvatureInvM:0,progress01:u});
   }
-  // Derive the actual tangent of each OFFSET curve. Do not use centreline yaw.
+  // The kit's 200-division Catmull-Rom arc mapping can create small
+  // derivative spikes around a control point when a line is laterally offset.
+  // A car cannot follow those kinks. Smooth the *spatial trajectory* over a
+  // 1.5m Gaussian scale (not merely the reported curvature). Extrapolate the
+  // endpoint tangent linearly, so we do not turn or flatten either entrance.
+  // Track width tests still use the unsmoothed approved asphalt boundary.
+  const rawPoints=knots.map(k=>k.position);
+  const radius=84,sigma=28;
+  const point=(index:number):V3=>{
+    if(index<0)return [
+      rawPoints[0][0]+index*(rawPoints[1][0]-rawPoints[0][0]),0,
+      rawPoints[0][2]+index*(rawPoints[1][2]-rawPoints[0][2])];
+    if(index>SAMPLES)return [
+      rawPoints[SAMPLES][0]+(index-SAMPLES)*(rawPoints[SAMPLES][0]-rawPoints[SAMPLES-1][0]),0,
+      rawPoints[SAMPLES][2]+(index-SAMPLES)*(rawPoints[SAMPLES][2]-rawPoints[SAMPLES-1][2])];
+    return rawPoints[index];
+  };
+  for(let i=0;i<=SAMPLES;i++){
+    let sum=0,x=0,z=0;
+    for(let k=-radius;k<=radius;k++){
+      const w=Math.exp(-.5*(k/sigma)**2),p=point(i+k);
+      x+=w*p[0];z+=w*p[2];sum+=w;
+    }
+    knots[i].position=[x/sum,0,z/sum];
+  }
+  knots[0].arcM=0;
+  for(let i=1;i<=SAMPLES;i++){
+    const a=knots[i-1].position,p=knots[i].position;
+    knots[i].arcM=knots[i-1].arcM+Math.hypot(p[0]-a[0],p[2]-a[2]);
+  }
+  // Derive the actual tangent of each SMOOTHED offset path, not centreline yaw.
   for(let i=0;i<knots.length;i++){
     const a=knots[Math.max(i-2,0)].position,b=knots[Math.min(i+2,SAMPLES)].position;
     const raw=Math.atan2(-(b[2]-a[2]),b[0]-a[0]);
