@@ -13,7 +13,7 @@ import {BRAKING_EP001,wheelAnchors} from '../contracts.ts';
 import type {BrakingSimulationState,CinematicCameraPose,FilmCue,TimedCue,Vec3} from '../contracts.ts';
 import {vehicleSpec} from '../../world-kit/catalog.ts';
 import {sampleRoute} from '../../world-kit/environments.ts';
-import {Environment,CameraAim} from '../../world-kit/components.tsx';
+import {Environment,CameraAim,WorldLighting} from '../../world-kit/components.tsx';
 // @ts-ignore Agent 1 source is hydrated at render time from owned upstream branch.
 import {BrakingVehicle} from '../engineering/BrakingVehicle.tsx';
 // @ts-ignore Agent 2 source is hydrated at render time from owned upstream branch.
@@ -22,8 +22,6 @@ import {sampleBrakingSimulation} from '../physics/simulation.ts';
 import {mapAbsInsertFrameToSimulationSec} from '../physics/timeline.ts';
 // @ts-ignore Agent 3 authoritative camera rig is hydrated at render time.
 import {sampleCameraPose} from '../cameras/cameraRig.ts';
-// @ts-ignore Agent 4 colour/lighting system hydrated in renderer checkout.
-import {BrakingWorldLighting} from '../lookdev/lighting.tsx';
 import {BrakingGraphics,DEFAULT_BRAKING_GRAPHICS_PALETTE} from './BrakingGraphics.tsx';
 import {heatVisual01,smooth} from './logic.ts';
 
@@ -108,7 +106,7 @@ const Proof:React.FC<{mode:'macro'|'track'}>=({mode})=>{
   <ThreeCanvas width={width} height={height} shadows camera={{
    position:[...camera.position],fov:camera.fovDeg,near:.035,far:350,
   }}>
-   <BrakingWorldLighting focus={route.position}/>
+   <WorldLighting timeOfDay="day" focus={route.position}/>
    <Environment kind="track" seed={BRAKING_EP001.environmentSeed} timeOfDay="day"/>
    <CameraAim position={[...camera.position]} target={[...camera.target]}
     fov={camera.fovDeg}/>
