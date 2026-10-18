@@ -59,10 +59,13 @@ function keyPose(spec:VehicleSpec,wheel:WheelAnchor,shot:FilmCue,progress:number
   // narrow horizontal field of view. Macros may intentionally crop bodywork.
   switch(shot){
     case 'hook': {
-      const a:Key={eye:[length*1.55,height*.82,width*2.35],
-        aim:[length*.10,height*.59,0],fov:53};
-      const b:Key={eye:[length*1.39,height*.71,width*2.38],
-        aim:[length*.12,height*.59,width*.04],fov:53};
+      // Start with an imposing low near-head-on tracking lens, then orbit
+      // toward the shoulder as the real A2 car travels down the track.
+      // The car remains framed within the strict portrait guard.
+      const a:Key={eye:[length*1.50,height*.52,width*1.20],
+        aim:[length*.12,height*.58,0],fov:48};
+      const b:Key={eye:[length*1.45,height*.50,width*2.10],
+        aim:[length*.12,height*.58,width*.04],fov:51};
       return {eye:mix(a.eye,b.eye,eased),aim:mix(a.aim,b.aim,eased),fov:lerp(a.fov,b.fov,eased)};
     }
     case 'mechanism': {
@@ -87,10 +90,12 @@ function keyPose(spec:VehicleSpec,wheel:WheelAnchor,shot:FilmCue,progress:number
         aim:[wx+.04,wy*.90,wz-.04],fov:47};
     }
     case 'finale': {
-      const a:Key={eye:[-length*1.42,height*1.28,width*2.84],
-        aim:[-.12,height*.52,0],fov:53};
-      const b:Key={eye:[-length*1.51,height*1.37,width*3.02],
-        aim:[-.26,height*.53,0],fov:53};
+      // Low, close rear-three-quarter frame emphasises vehicle weight and
+      // the genuine simulated stop instead of a distant rooftop view.
+      const a:Key={eye:[-length*1.45,height*1.05,width*2.75],
+        aim:[-.12,height*.53,0],fov:52};
+      const b:Key={eye:[-length*1.52,height*1.13,width*2.90],
+        aim:[-.26,height*.54,0],fov:52};
       return {eye:mix(a.eye,b.eye,eased),aim:mix(a.aim,b.aim,eased),fov:lerp(a.fov,b.fov,eased)};
     }
   }
