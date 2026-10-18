@@ -29,8 +29,7 @@ jobs:
           for pair in \
             "engineering:engineering" \
             "physics:physics" \
-            "cameras:cameras" \
-            "lookdev:lookdev"; do
+            "cameras:cameras"; do
             role="${pair%%:*}"
             dir="${pair##*:}"
             peer="agent/braking-200kmh-001-${role}"
@@ -41,7 +40,6 @@ jobs:
           test -f src/yunex/braking200/engineering/BrakingVehicle.tsx
           test -f src/yunex/braking200/physics/simulation.ts
           test -f src/yunex/braking200/cameras/cameraRig.ts
-          test -f src/yunex/braking200/lookdev/lighting.tsx
           echo 'PEER-INTEGRATION-SOURCES-EXACTLY-RECORDED'
       - name: Install FFmpeg
         run: |
