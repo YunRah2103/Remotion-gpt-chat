@@ -8,7 +8,7 @@
 - \`BrakingVehicle\` from \`BrakingVehicle.tsx\`: existing \`grand-tourer\` with four assemblies placed at contract-derived wheel anchors, matching source kit steering pivots.
 - \`poseFromSimulation\` from \`mechanics.ts\`: **pure mapping** from A2 \`BrakingSimulationState\`; never independently computes speed, grip, slip or braking pressure.
 
-\`BrakingVehicle\` accepts \`simulation\` (required), \`pose\` (kit track route), \`steerRad\`, optional \`cutawayWheel\`, \`cutaway01\` and \`heatIllustration01\`. Pass A2's genuine frame-seekable \`sampleBrakingSimulation(simTimeSec)\`. IMPORTANT: A2 should use negative \`rotationRad\` for forward +X travel, matching the kit's \`-distance/radius\`, and wheel angle must already account for any slip/ABS events.
+\`BrakingVehicle\` accepts \`simulation\` (required), \`pose\` (kit track route), \`steerRad\`, optional \`cutawayWheel\`, \`cutaway01\` and \`heatIllustration01\`. Pass A2's genuine frame-seekable \`sampleBrakingSimulation(simTimeSec)\`. IMPORTANT: Manager-confirmed A2 \`rotationRad\` is **positive** cumulative wheel progress for +X forward travel; Three.js visual roll is **negative** of that angle, matching the kit's \`-distance/radius\`. Wheel progress must already include slip/ABS effects.
 
 **Physical motion:** maximum pad travel is **0.0012 metres / 1.2 mm**, mechanical gap closes to zero under full pressure. The larger separation in educational exploded shots is identified separately as **CUTAWAY**, not pad travel. A2's pressure controls millimetre displacement; caliper, pads and hoses never spin. The hub and rotor rotate at exactly A2's wheel angle. Caliper steel/amber coloration is not a temperature measurement; optional faint orange ring is labelled illustrative only.
 
