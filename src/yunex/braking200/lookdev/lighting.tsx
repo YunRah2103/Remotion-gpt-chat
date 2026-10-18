@@ -14,11 +14,11 @@ const StudioReflection:React.FC=()=>{
     const oldEnv=scene.environment,oldIntensity=scene.environmentIntensity;
     const oldTone=gl.toneMapping,oldExposure=gl.toneMappingExposure;
     let map:T.WebGLRenderTarget<T.Texture>|undefined;
-    gl.toneMapping=T.ACESFilmicToneMapping;gl.toneMappingExposure=1.16;
+    gl.toneMapping=T.ACESFilmicToneMapping;gl.toneMappingExposure=1.09;
     try{
       const generator=new T.PMREMGenerator(gl),room=new RoomEnvironment();
       try{map=generator.fromScene(room,.04);}finally{room.dispose();generator.dispose();}
-      scene.environment=map.texture;scene.environmentIntensity=.57;
+      scene.environment=map.texture;scene.environmentIntensity=.45;
     }catch(_error){scene.environment=oldEnv;scene.environmentIntensity=oldIntensity;}
     return ()=>{
       scene.environment=oldEnv;scene.environmentIntensity=oldIntensity;
@@ -32,19 +32,19 @@ export const BrakingWorldLighting:React.FC<{focus?:Point3}>=({focus=[0,0,0]})=>{
   return <>
     <color attach="background" args={[BRAKING_PALETTE.sky]}/>
     <fog attach="fog" args={[BRAKING_PALETTE.sky,100,275]}/>
-    <hemisphereLight args={['#edf4f6','#72796b',1.35]}/>
-    <ambientLight color="#ebf1f4" intensity={.12}/>
+    <hemisphereLight args={['#edf4f6','#72796b',1.52]}/>
+    <ambientLight color="#ebf1f4" intensity={.17}/>
     <primitive object={target}/>
     <directionalLight target={target} position={[focus[0]+30,focus[1]+52,focus[2]+21]}
-      color={BRAKING_PALETTE.sun} intensity={2.75} castShadow
+      color={BRAKING_PALETTE.sun} intensity={2.47} castShadow
       shadow-mapSize={[1024,1024]} shadow-camera-left={-24}
       shadow-camera-right={24} shadow-camera-top={24}
       shadow-camera-bottom={-24} shadow-camera-near={.5}
       shadow-camera-far={150} shadow-bias={-.0003} shadow-normalBias={.026}/>
     <directionalLight position={[focus[0]-21,focus[1]+12,focus[2]-24]}
-      color="#b6d8e5" intensity={.95}/>
+      color="#b6d8e5" intensity={.82}/>
     <directionalLight position={[focus[0]-13,focus[1]+8,focus[2]+17]}
-      color="#f4cf9f" intensity={.52}/>
+      color="#f4cf9f" intensity={.40}/>
     <StudioReflection/>
   </>;
 };
