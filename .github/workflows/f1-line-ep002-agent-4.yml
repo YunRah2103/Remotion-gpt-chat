@@ -1,0 +1,88 @@
+name: YUNEX F1 EP002 Agent 4 — Premium World Moving Proof
+on:
+  push:
+    branches:
+      - agent/f1-ep002-04-world-look
+    paths:
+      - 'src/yunex/f1-line-ep002/lookdev/**'
+      - 'src/yunex/f1-line-ep002/agent-4-preview/**'
+      - 'tests/f1-line-ep002/agent-4.*'
+      - '.github/workflows/f1-line-ep002-agent-4.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      REMOTION_LOG: error
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Install native video verification tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Typecheck source
+        run: npm run check
+      - name: Existing world-kit regression suite
+        run: npm run worldkit:test
+      - name: Agent 4 deterministic geometry tests
+        run: node --experimental-strip-types --test tests/f1-line-ep002/agent-4.test.mjs
+      - name: Software GL and system FFmpeg info
+        run: |
+          ffmpeg -version | head -n 1
+          ffprobe -version | head -n 1
+          mkdir -p out/f1-agent-4
+      - name: Render 6s original kit with moving pair (matched BEFORE)
+        run: npx remotion render src/yunex/f1-line-ep002/agent-4-preview/entry.tsx F1Agent4Before out/f1-agent-4/before.mp4 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1 --log=error
+      - name: Render 6s premium look with the identical moving pair (AFTER)
+        run: npx remotion render src/yunex/f1-line-ep002/agent-4-preview/entry.tsx F1Agent4After out/f1-agent-4/after.mp4 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1 --log=error
+      - name: Normalize final native H.264 video to standard limited-range 4:2:0
+        shell: bash
+        run: |
+          set -euo pipefail
+          for name in before after; do
+            ffmpeg -y -v error -xerror -i "out/f1-agent-4/$name.mp4" -vf "format=yuv420p" -c:v libx264 -preset fast -crf 19 -pix_fmt yuv420p -color_range tv "out/f1-agent-4/$name-limited.mp4"
+            mv "out/f1-agent-4/$name-limited.mp4" "out/f1-agent-4/$name.mp4"
+          done
+      - name: Decode both native movies and verify motion, resolution, duration
+        shell: bash
+        run: |
+          set -euo pipefail
+          for name in before after; do
+            movie="out/f1-agent-4/$name.mp4"
+            ffprobe -v error -show_entries stream=codec_name,pix_fmt,nb_frames,width,height,r_frame_rate -show_entries format=duration -of json "$movie" | tee "out/f1-agent-4/$name-ffprobe.json"
+            ffmpeg -v error -xerror -i "$movie" -f null -
+            ffmpeg -v error -i "$movie" -vf "fps=1" -f framemd5 "out/f1-agent-4/$name-frames.md5"
+            ffmpeg -v error -y -i "$movie" -vf "fps=1,scale=270:-1,tile=3x2" -frames:v 1 "out/f1-agent-4/$name-contact-sheet.jpg"
+            python3 - "$movie" "out/f1-agent-4/$name-frames.md5" <<'PY'
+          import json,subprocess,sys
+          probe=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_entries','stream=codec_name,pix_fmt,color_range,width,height,r_frame_rate,nb_frames','-show_entries','format=duration','-of','json',sys.argv[1]]))
+          s=probe['streams'][0]; duration=float(probe['format']['duration'])
+          assert s['codec_name']=='h264',s
+          assert s['pix_fmt']=='yuv420p',s
+          assert s['color_range']=='tv',s
+          assert (s['width'],s['height'])==(540,960),s
+          assert s['r_frame_rate']=='30/1',s
+          assert abs(duration-6)<.08,duration
+          hashes=[line.strip().split(',')[-1].strip() for line in open(sys.argv[2]) if line and not line.startswith('#')]
+          assert len(hashes)>=5,hashes
+          assert len(set(hashes))>3,'Preview has insufficient frame-to-frame movement'
+          print('VERIFIED 6s native moving H.264:',sys.argv[1],'unique one-second samples',len(set(hashes)))
+          PY
+          done
+      - name: Save verified native MP4s and contact sheets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: f1-ep002-agent-4-before-after-native-movies
+          path: out/f1-agent-4/
+          if-no-files-found: warn
+          retention-days: 30
