@@ -21,7 +21,8 @@ export const BrakingFinishes:React.FC<{state?:BrakingSimulationState}>=({state})
  const roots=useRef<FinishMap>(new Map());
  useFrame(({scene})=>{
   const lookups:[string,'car'|'track'][]=[
-   ['YUNEX-grand-tourer','car'],['YUNEX-track','track'],\n   ['yunex-brake-front-left','car']
+   ['YUNEX-grand-tourer','car'],['YUNEX-track','track'],
+   ['yunex-brake-front-left','car']
   ];
   for(const [name,role] of lookups){
    const object=scene.getObjectByName(name);
