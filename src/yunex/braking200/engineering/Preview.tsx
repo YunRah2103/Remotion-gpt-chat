@@ -15,8 +15,8 @@ const strip: React.CSSProperties = {
   padding:'22px 24px',background:'linear-gradient(90deg, #0c1924dd, #0a162155)',
   borderLeft:'4px solid #d2a36c',color:BRAND,fontFamily:'Arial,sans-serif',
 };
-const heading:React.CSSProperties={fontSize:34,fontWeight:800,letterSpacing:1.2};
-const eyebrow:React.CSSProperties={fontSize:15,fontWeight:700,letterSpacing:3,color:'#c0ccce'};
+const heading:React.CSSProperties={fontSize:43,fontWeight:800,letterSpacing:1.2};
+const eyebrow:React.CSSProperties={fontSize:22,fontWeight:700,letterSpacing:2.4,color:'#c0ccce'};
 
 /** A1 proof 1: close enough to see actual perforations, vents, pads and pistons. */
 export const BrakeMacroProof:React.FC=()=>{
@@ -45,9 +45,9 @@ export const BrakeMacroProof:React.FC=()=>{
     </div>
     <div style={strip}>
       <div style={eyebrow}>EDUCATIONAL CUTAWAY / NOT TO SCALE SEPARATION</div>
-      <div style={{...heading,fontSize:29,marginTop:12}}>DRILLED VENTILATED DISC</div>
-      <div style={{fontSize:19,marginTop:10,lineHeight:1.4}}>Stationary four-piston caliper  ·  rotating hub</div>
-      <div style={{fontSize:17,marginTop:9,color:'#f1cf9c'}}>
+      <div style={{...heading,fontSize:38,marginTop:12}}>DRILLED VENTILATED DISC</div>
+      <div style={{fontSize:28,marginTop:10,lineHeight:1.4}}>Stationary four-piston caliper  ·  rotating hub</div>
+      <div style={{fontSize:28,marginTop:9,color:'#f1cf9c'}}>
         {'TRUE PAD TRAVEL  '+(brakePose.padTravelM*1000).toFixed(2)+' mm'}
       </div>
     </div>
@@ -62,15 +62,18 @@ export const BrakeTrackProof:React.FC=()=>{
   const carPose=sampleRoute('track',state.traveledM+30);
   const theta=carPose.yaw;
   const c=Math.cos(theta),s=Math.sin(theta);
-  const side=4.3-.8*progress,fore=2.9-.6*progress;
+  // Start with an actual whole-car contextual composition, then smoothly
+  // dolly to the exposed front-left assembly (no arbitrary hard cuts).
+  const zoom=Math.max(0,Math.min(1,(progress-.14)/.86));
+  const side=8.6-3.4*zoom,fore=8.2-4.1*zoom;
   const center:V3=[
-    carPose.position[0]+c*.85+s*.30,
-    .58,
-    carPose.position[2]-s*.85+c*.30,
+    carPose.position[0]+c*(.15+1.10*zoom)+s*(.10+.52*zoom),
+    .67-.15*zoom,
+    carPose.position[2]-s*(.15+1.10*zoom)+c*(.10+.52*zoom),
   ];
   const eye:V3=[
     center[0]+c*fore+s*side,
-    2.15-.55*progress,
+    3.05-1.30*zoom,
     center[2]-s*fore+c*side,
   ];
   return <AbsoluteFill style={{background:'#c3d4dd'}}>
@@ -78,20 +81,21 @@ export const BrakeTrackProof:React.FC=()=>{
       camera={{position:[7,3,5],fov:42,near:.1,far:380}}>
       <WorldLighting timeOfDay="day" focus={carPose.position}/>
       <Environment kind="track" seed={12} timeOfDay="day"/>
-      <CameraAim position={eye} target={center} fov={43-4*progress}/>
+      <CameraAim position={eye} target={center} fov={42-5*zoom}/>
       <BrakingVehicle simulation={state} pose={carPose}
         cutawayWheel="front-left" cutaway01={.88}
         heatIllustration01={.06*progress}/>
     </ThreeCanvas>
+    <div style={{position:'absolute',top:0,left:0,right:0,height:'24%',background:'linear-gradient(#132332bb,transparent)',pointerEvents:'none'}}/>
     <div style={{position:'absolute',top:'7%',left:'7%',right:'7%',color:BRAND,fontFamily:'Arial,sans-serif',textShadow:'0 2px 9px #15232a'}}>
       <div style={eyebrow}>ORIGINAL 3D / REUSABLE GRAND-TOURER / TRACK</div>
       <div style={{...heading,marginTop:18,fontSize:42}}>BRAKE FORCE, EXPLAINED.</div>
     </div>
     <div style={strip}>
       <div style={eyebrow}>FRONT-LEFT WHEEL REMOVED FOR CUTAWAY</div>
-      <div style={{...heading,fontSize:29,marginTop:10}}>THE ROTOR SPINS WITH THE HUB.</div>
-      <div style={{fontSize:20,marginTop:10}}>The caliper remains fixed to the steering knuckle.</div>
-      <div style={{fontSize:14,marginTop:12,color:'#d2dfe4'}}>
+      <div style={{...heading,fontSize:36,marginTop:10}}>THE ROTOR SPINS WITH THE HUB.</div>
+      <div style={{fontSize:27,marginTop:10}}>The caliper remains fixed to the steering knuckle.</div>
+      <div style={{fontSize:21,marginTop:12,color:'#d2dfe4'}}>
         TEST FIXTURE ONLY · AGENT 2 PHYSICS REPLACES PREVIEW DATA
       </div>
     </div>
