@@ -25,8 +25,9 @@ type WheelMount = {
   roll: THREE.Group;
   rig: BrakeRig;
 };
+type DecorativeSill = {side:'left'|'right'; object:THREE.Object3D};
 
-function createContextVehicle():{model:THREE.Group;mounts:WheelMount[]} {
+function createContextVehicle():{model:THREE.Group;mounts:WheelMount[];sills:DecorativeSill[]} {
   const spec=vehicleSpec(BRAKING_EP001.vehicleVariant);
   const model=createVehicle({
     variant:BRAKING_EP001.vehicleVariant,
@@ -35,8 +36,14 @@ function createContextVehicle():{model:THREE.Group;mounts:WheelMount[]} {
     lights:false,
   });
   const mounts:WheelMount[]=[];
+  const sills:DecorativeSill[]=[];
   const anchors=wheelAnchors(spec);
-  model.traverse(obj=>{if(obj.name==='brake-caliper') obj.visible=false;});
+  model.traverse(obj=>{
+    if(obj.name==='brake-caliper') obj.visible=false;
+    if(obj.name==='sill'){
+      sills.push({side:obj.position.z>=0?'left':'right',object:obj});
+    }
+  });
   for(const anchor of anchors){
     let pivot:THREE.Group|undefined;
     model.traverse(obj=>{
@@ -57,7 +64,7 @@ function createContextVehicle():{model:THREE.Group;mounts:WheelMount[]} {
     mounts.push({anchor,roll,rig});
   }
   if(mounts.length!==4) throw new Error('Four braking rigs required');
-  return {model,mounts};
+  return {model,mounts,sills};
 }
 
 /** Reuses the untouched kit car and steering pivots; A2 state is authoritative. */
@@ -67,6 +74,14 @@ export const BrakingVehicle: React.FC<BrakingVehicleProps> = ({
   const context=useMemo(createContextVehicle,[]);
   useEffect(()=>()=>disposeObject(context.model),[context]);
   animateVehicle(context.model,simulation.traveledM,steerRad);
+  // The generic kit's thin decorative side sill traverses the wheel opening.
+  // In this FILM-ONLY cutaway hide the near-side sill instead of allowing a
+  // black chassis strip to cover the educational rotor macro. The upstream
+  // car model, other films and the far-side sill remain untouched.
+  const exposed=cutawayWheel!==undefined && clamp01(cutaway01)>=.35;
+  for(const sill of context.sills){
+    sill.object.visible=!(exposed && cutawayWheel?.endsWith('-'+sill.side));
+  }
   for (const mount of context.mounts){
     const selected=mount.anchor.id===cutawayWheel;
     const cutaway=selected?clamp01(cutaway01):0;
