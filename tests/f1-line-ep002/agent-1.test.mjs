@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createVehicle} from '../../src/yunex/world-kit/vehicles.ts';
 import {animateVehicle} from '../../src/yunex/world-kit/motion.ts';
 import {CORNER_GEOMETRY,RACING_CORNER,getRacingLineData,makeRacingLinePath,offsetFromCentre,projectOntoCornerRoad,sampleCornerCentre} from '../../src/yunex/f1-line-ep002/track/racingPaths.ts';
-import {FORMULA_RIG,samplePreviewRaceFrame,steerFromCurvature,wheelRotationFromTravel} from '../../src/yunex/f1-line-ep002/cars/RaceCars.tsx';
+import {FORMULA_RIG,samplePreviewRaceFrame,steerFromCurvature,wheelRotationFromTravel} from '../../src/yunex/f1-line-ep002/cars/motion.ts';
 
 const A=getRacingLineData('shortcut'),B=getRacingLineData('racing');
 const horizontal=(p,q)=>Math.hypot(p[0]-q[0],p[2]-q[2]);
