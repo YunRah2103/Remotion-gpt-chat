@@ -32,7 +32,7 @@ export const BrakeMacroProof:React.FC=()=>{
   const cutaway=.15+.55*Math.max(0,Math.min(1,(progress-.24)/.35));
   const brakePose=poseFromSimulation(state,'front-left',cutaway,.15*progress);
   // Three-quarter studio macro catches rotor thickness and caliper relief.
-  const eye:V3=[.44+Math.sin(progress*1.7)*.08,.29+Math.sin(progress*2)*.035,1.49-.13*progress];
+  const eye:V3=[.38+Math.sin(progress*1.7)*.06,.29+Math.sin(progress*2)*.035,1.68-.12*progress];
   return <AbsoluteFill style={{background:'#0b1420'}}>
     <ThreeCanvas width={width} height={height} shadows
       camera={{position:[0,.2,1.6],fov:33,near:.01,far:80}}>
@@ -42,7 +42,7 @@ export const BrakeMacroProof:React.FC=()=>{
       <directionalLight position={[1.4,2.8,3.0]} intensity={2.05} color="#f0e7de" castShadow/>
       <directionalLight position={[-2,1.2,-1.9]} intensity={1.35} color="#a4bdd5"/>
       <pointLight position={[-.48,.48,1.25]} intensity={4.5} color="#eac49a" distance={4}/>
-      <CameraAim position={eye} target={[0,0,0]} fov={32}/>
+      <CameraAim position={eye} target={[.055,0,0]} fov={35}/>
       <BrakeAssembly wheelRadiusM={.36} wheel="front-left"
         accent="#d2a36c" pose={brakePose}/>
     </ThreeCanvas>
@@ -98,6 +98,7 @@ export const BrakeTrackProof:React.FC=()=>{
       <CameraAim position={eye} target={center} fov={41-7*zoom}/>
       <BrakingVehicle simulation={state} pose={carPose}
         cutawayWheel="front-left" cutaway01={.88}
+        isolateOppositeRimInCutaway
         heatIllustration01={.06*progress}/>
     </ThreeCanvas>
     <div style={{position:'absolute',top:0,left:0,right:0,height:'24%',background:'linear-gradient(#132332bb,transparent)',pointerEvents:'none'}}/>
@@ -106,7 +107,7 @@ export const BrakeTrackProof:React.FC=()=>{
       <div style={{...heading,marginTop:18,fontSize:42}}>BRAKE FORCE, EXPLAINED.</div>
     </div>
     <div style={strip}>
-      <div style={eyebrow}>FRONT-LEFT WHEEL REMOVED FOR CUTAWAY</div>
+      <div style={eyebrow}>FRONT AXLE RIMS HIDDEN FOR EDUCATIONAL CUTAWAY</div>
       <div style={{...heading,fontSize:36,marginTop:10}}>THE ROTOR SPINS WITH THE HUB.</div>
       <div style={{fontSize:27,marginTop:10}}>The caliper remains fixed to the steering knuckle.</div>
       <div style={{fontSize:21,marginTop:12,color:'#d2dfe4'}}>
