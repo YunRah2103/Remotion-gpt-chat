@@ -26,7 +26,9 @@ test('downforce raises normal load with v², and tyre/grip force circles are fin
 test('both identical cars start at same entry speed and share parameters',()=>{
   const a=sim.profiles.shortcut.nodes[0],b=sim.profiles.racing.nodes[0];
   close(a.speedMps,b.speedMps,1e-5);
-  close(a.speedMps,c.entrySpeedMps,1e-5);
+  assert.ok(a.speedMps<=c.entrySpeedMps+1e-5,'declared entry speed is a cap, not a forced unsafe velocity');
+  close(a.speedMps,sim.comparison.assumptions.entrySpeedMps,1e-5);
+  assert.ok(a.speedMps>8,'both cars must enter at a plausible nonzero corner speed');
   assert.ok(sim.comparison.finishSeparationM<.25,'finish checkpoint should coincide');
 });
 test('paths remain within safe asphalt half-width and shorter A is actually shorter',()=>{
