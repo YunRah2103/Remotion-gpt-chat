@@ -17,6 +17,7 @@ import {sampleBrakingSimulation} from '../physics/simulation.ts';
 import {mapFilmFrameToSimulationSec,mapAbsInsertFrameToSimulationSec} from '../physics/timeline.ts';
 import {sampleRoute} from '../../world-kit/environments.ts';
 import {vehicleSpec} from '../../world-kit/catalog.ts';
+import {BrakingLookdev} from '../lookdev/BrakingLookdev.tsx';
 
 type Mode = 'track'|'macro';
 const CUES:Record<Mode,readonly TimedCue[]>={
@@ -42,11 +43,14 @@ const shotNames:Record<FilmCue,string>={
   abs:'LOW-GRIP ABS DEMONSTRATION',
   finale:'SPEED TO ZERO',
 };
-const HUD:React.CSSProperties={position:'absolute',bottom:95,left:65,right:70,
-  font:'600 29px Arial,sans-serif',letterSpacing:2,
-  textShadow:'0 2px 8px rgba(3,10,20,.8)',color:'#f8faf8'};
-const tech:React.CSSProperties={fontSize:16,letterSpacing:1.2,marginTop:9,
-  color:'#e7eae2',fontWeight:400};
+// Camera QA typography: legible at 432×768 while keeping the approved
+// editorial motion-graphics department independent.
+const HUD:React.CSSProperties={position:'absolute',bottom:112,left:78,right:75,
+  font:'700 48px Arial,sans-serif',letterSpacing:1.7,
+  textShadow:'0 4px 20px rgba(0,0,0,.8),0 1px 5px rgba(0,0,0,.8)',
+  color:'#fcfcfa',pointerEvents:'none'};
+const tech:React.CSSProperties={fontSize:23,letterSpacing:1.7,marginTop:11,
+  color:'#f0eee9',fontWeight:500,lineHeight:1.30};
 const clamp01=(x:number)=>Math.min(1,Math.max(0,x));
 const easing=(x:number)=>{const t=clamp01(x);return t*t*(3-2*t);};
 const Preview:React.FC<{mode:Mode}>=({mode})=>{
@@ -74,13 +78,16 @@ const Preview:React.FC<{mode:Mode}>=({mode})=>{
     :shot==='heat'?.78:0;
   const label=shotNames[shot];
   const wheelbase=vehicleSpec('grand-tourer').wheelbase;
-  const opacity=frame<8?frame/8:frame>(mode==='track'?202:177)
+  const opacity=frame>(mode==='track'?202:177)
     ?clamp01(((mode==='track'?210:185)-frame)/8):1;
   return <BrakingCameraStage
     sampleBrakingSimulation={sampler}
     simulationTimeAtFilmFrame={mapTime}
     startDistanceM={18}
     cameraOptions={{cues}}
+    renderLighting={({state,route})=><BrakingLookdev
+      state={state} route={route} focus={route.position}
+      environmentDressing contactShadow />}
     renderVehicle={({state,route})=>{
       const ahead=sampleRoute('track',18+state.traveledM+.75);
       const deltaYaw=Math.atan2(Math.sin(ahead.yaw-route.yaw),Math.cos(ahead.yaw-route.yaw));
@@ -91,14 +98,23 @@ const Preview:React.FC<{mode:Mode}>=({mode})=>{
       heatIllustration01={shot==='heat'?.16:0}
     />;}}
     overlay={<div style={{...HUD,opacity}} aria-label={label}>
-      <div style={{display:'inline-block',borderTop:'2px solid #d2a36c',paddingTop:14}}>
-        {label}
+      {shot==='hook'?<div style={{display:'flex',alignItems:'baseline',gap:18}}>
+        <span style={{fontSize:153,fontWeight:800,lineHeight:.97,letterSpacing:-7}}>
+          {Math.round(brakingState.speedMps*3.6)}
+        </span>
+        <span style={{fontSize:37,fontWeight:750,letterSpacing:3}}>KM/H</span>
+      </div>:null}
+      <div style={{display:'inline-block',borderTop:'3px solid #ddb27c',
+        paddingTop:17,marginTop:shot==='hook'?13:0}}>
+        {shot==='hook'?'WHAT HAPPENS WHEN YOU BRAKE?':label}
       </div>
-      <div style={tech}>A1 REAL BRAKE ASSEMBLY · A2 AUTHENTIC STATE · A3 CAMERA</div>
-      {isAbs&&<div style={{...tech,fontWeight:600}}>
+      {shot==='abs'&&<div style={{...tech,fontWeight:650}}>
         {absActive?'ABS INTERVENING · BRAKE PRESSURE RELEASE':
-          'ILLUSTRATIVE LOW-GRIP / LOCK TENDENCY'}
+          'ILLUSTRATIVE LOW-GRIP SCENARIO'}
       </div>}
+      <div style={{...tech,fontSize:18,opacity:.65}}>
+        YUNEX / ENGINEERING FILM PROOF
+      </div>
     </div>}
   />;
 };
