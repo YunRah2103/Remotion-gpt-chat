@@ -56,20 +56,24 @@ function fitPairInPortrait(initial:RaceCameraPose,state:RaceFrameState):RaceCame
  const forward=norm(subtract(target,initial.position));
  const right=norm(cross(forward,[0,1,0]));
  const up=norm(cross(right,forward));
- let scale=1;
- for(let i=0;i<45;i++){
+ const safeAt=(scale:number)=>{
   const p=add(target,[axis[0]*scale,axis[1]*scale,axis[2]*scale]);
-  const safe=corners.every(c=>{
+  return corners.every(c=>{
    const ray=subtract(c,p),z=dot(ray,forward);
    return z>.5&&Math.abs(dot(ray,right)/(z*focal*aspect))<.87&&
      Math.abs(dot(ray,up)/(z*focal))<.89;
   });
-  if(safe)return {...initial,position:p};
-  scale*=1.09;
+ };
+ // Binary search avoids visible 9%-per-frame scale jumps from a quantised
+ // camera fit. Result depends on the current pose alone, not previous frames.
+ if(safeAt(1))return initial;
+ let lo=1,hi=1;
+ for(let i=0;i<45&&!safeAt(hi);i++){lo=hi;hi*=1.09;}
+ if(safeAt(hi))for(let i=0;i<28;i++){
+  const mid=(lo+hi)/2;
+  if(safeAt(mid))hi=mid;else lo=mid;
  }
- // Extreme pathological states must remain finite even if no single attractive
- // portrait shot can contain cars arbitrarily far apart.
- return {...initial,position:add(target,[axis[0]*scale,axis[1]*scale,axis[2]*scale])};
+ return {...initial,position:add(target,[axis[0]*hi,axis[1]*hi,axis[2]*hi])};
 }
 /**
  * Deterministic camera poses in metres. Reads authoritative car poses; NEVER advances cars.
