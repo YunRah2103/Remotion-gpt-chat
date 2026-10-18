@@ -31,15 +31,17 @@ export const BrakeMacroProof:React.FC=()=>{
   const state=sampleBrakePreviewFixture(progress*2.4);
   const cutaway=.15+.55*Math.max(0,Math.min(1,(progress-.24)/.35));
   const brakePose=poseFromSimulation(state,'front-left',cutaway,.15*progress);
-  const eye:V3=[.23+Math.sin(progress*1.7)*.18,.21+Math.sin(progress*2)*.10,1.65-.20*progress];
-  return <AbsoluteFill style={{background:'#121e29'}}>
+  // Three-quarter studio macro catches rotor thickness and caliper relief.
+  const eye:V3=[.44+Math.sin(progress*1.7)*.08,.29+Math.sin(progress*2)*.035,1.49-.13*progress];
+  return <AbsoluteFill style={{background:'#0b1420'}}>
     <ThreeCanvas width={width} height={height} shadows
       camera={{position:[0,.2,1.6],fov:33,near:.01,far:80}}>
-      <color attach="background" args={['#111d29']}/>
-      <ambientLight intensity={1.35} color="#b5cde0"/>
-      <directionalLight position={[1.0,2.4,2.5]} intensity={3.5} color="#f6d6ae"/>
-      <directionalLight position={[-2,1.5,-1.5]} intensity={2} color="#7db5de"/>
-      <pointLight position={[-.45,.12,1.1]} intensity={12} color="#d2a36c" distance={4}/>
+      <color attach="background" args={['#0b1420']}/>
+      <ambientLight intensity={.75} color="#d0d9e4"/>
+      <hemisphereLight args={['#b4c6d6','#233548',.55]}/>
+      <directionalLight position={[1.4,2.8,3.0]} intensity={2.05} color="#f0e7de" castShadow/>
+      <directionalLight position={[-2,1.2,-1.9]} intensity={1.35} color="#a4bdd5"/>
+      <pointLight position={[-.48,.48,1.25]} intensity={4.5} color="#eac49a" distance={4}/>
       <CameraAim position={eye} target={[0,0,0]} fov={32}/>
       <BrakeAssembly wheelRadiusM={.36} wheel="front-left"
         accent="#d2a36c" pose={brakePose}/>
@@ -73,7 +75,9 @@ export const BrakeTrackProof:React.FC=()=>{
   const zoom=t*t*(3-2*t);
   // Dampen the camera's dolly, targeting the EXACT kit front-left pivot.
   // Begin as a three-quarter full-car context, end on a readable disc macro.
-  const side=8.6+(1.65-8.6)*zoom,fore=8.2+(1.05-8.2)*zoom;
+  // Side-on conclusion keeps the entire brake face visible without the
+  // bonnet swallowing the 9:16 composition; start closer for cinematic scale.
+  const side=6.4+(1.90-6.4)*zoom,fore=6.1+(.25-6.1)*zoom;
   const forward=.15+(frontLeft.center[0]-.15)*zoom;
   const left=.10+(frontLeft.center[2]-.10)*zoom;
   const center:V3=[
@@ -83,7 +87,7 @@ export const BrakeTrackProof:React.FC=()=>{
   ];
   const eye:V3=[
     center[0]+c*fore+s*side,
-    3.05+(1.05-3.05)*zoom,
+    2.70+(.83-2.70)*zoom,
     center[2]-s*fore+c*side,
   ];
   return <AbsoluteFill style={{background:'#c3d4dd'}}>
@@ -91,7 +95,7 @@ export const BrakeTrackProof:React.FC=()=>{
       camera={{position:[7,3,5],fov:42,near:.1,far:380}}>
       <WorldLighting timeOfDay="day" focus={carPose.position}/>
       <Environment kind="track" seed={12} timeOfDay="day"/>
-      <CameraAim position={eye} target={center} fov={42-4*zoom}/>
+      <CameraAim position={eye} target={center} fov={41-7*zoom}/>
       <BrakingVehicle simulation={state} pose={carPose}
         cutawayWheel="front-left" cutaway01={.88}
         heatIllustration01={.06*progress}/>
