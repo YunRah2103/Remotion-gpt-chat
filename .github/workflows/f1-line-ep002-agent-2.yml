@@ -1,14 +1,6 @@
 name: F1 EP002 Agent 2 - physics and native moving previews
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - agent/f1-ep002-02-dynamics
-    paths:
-      - 'src/yunex/f1-line-ep002/physics/**'
-      - 'src/yunex/f1-line-ep002/agent-2-preview/**'
-      - 'tests/f1-line-ep002/agent-2*'
-      - '.github/workflows/f1-line-ep002-agent-2.yml'
   pull_request:
     branches:
       - production/f1-racing-line-ep002-contract
@@ -17,6 +9,9 @@ on:
       - 'src/yunex/f1-line-ep002/agent-2-preview/**'
       - 'tests/f1-line-ep002/agent-2*'
       - '.github/workflows/f1-line-ep002-agent-2.yml'
+concurrency:
+  group: f1-ep002-agent-2-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
