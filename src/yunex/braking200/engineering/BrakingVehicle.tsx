@@ -100,6 +100,11 @@ export const BrakingVehicle: React.FC<BrakingVehicleProps> = ({
       cutawayWheel!==undefined && mount.anchor.id!==cutawayWheel &&
       mount.anchor.axle===cutawayWheel.split('-')[0];
     mount.roll.visible=cutaway<.35 && !oppositeRimOccluded;
+    // Wheel-arch geometry is open in the generic kit. In explicitly opted-in
+    // educational axle isolation the far-side rotor would otherwise be
+    // visible directly behind the featured disc. Hide BOTH its rim and rig,
+    // but keep ordinary production vehicles physically intact by default.
+    mount.rig.root.visible=!oppositeRimOccluded;
     applyBrakeAssemblyPose(mount.rig,poseForWheel);
   }
   if(pose) placeVehicle(context.model,pose);
