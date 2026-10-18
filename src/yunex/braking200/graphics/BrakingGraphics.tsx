@@ -58,15 +58,15 @@ export const BrakingGraphics:React.FC<BrakingGraphicsProps>=({
  const p=pointed;
  const label=chapter==='mechanism'?'FRICTION':chapter==='heat'?'HEAT':
    chapter==='grip'?'TYRE GRIP':chapter==='abs'?'ABS':'';
- const big=chapter==='grip'?86:chapter==='mechanism'?98:chapter==='heat'?130:156;
+ const big=chapter==='grip'?106:chapter==='mechanism'?120:chapter==='heat'?150:190;
  const alignedRight=Boolean(p&&p.x<520);
- const labelX=alignedRight?476:95;
+ const labelX=chapter==='grip'?95:alignedRight?476:95;
  const labelY=p&&p.y>1260?465:1530;
  const lineStartX=alignedRight?labelX:labelX+Math.min(480,big*4.2);
  const lineStartY=labelY+37;
  const force=p&&focusWorld&&cameraPose?projectWorldPoint(
    oppositeTravelPoint(focusWorld,travelDirectionWorld,.2+grip*.48),cameraPose):null;
- const energyOpacity=alpha*(.14+.73*opticalHeat);
+ const energyOpacity=alpha*(.44+.52*opticalHeat);
  const micro=chapter==='abs'?lowGripExample?'LOW-GRIP EXAMPLE':'':'';
  return <AbsoluteFill style={{pointerEvents:'none',overflow:'hidden',zIndex:20}}>
   <svg viewBox="0 0 1080 1920" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
@@ -103,13 +103,13 @@ export const BrakingGraphics:React.FC<BrakingGraphicsProps>=({
      {/* Real 3D attachment projection, never an invented screen marker. */}
      {p&&<g>
       {chapter==='heat'&&<g opacity={energyOpacity}>
-       <circle cx={p.x} cy={p.y} r={radius*1.70} fill="url(#yunex-disc-heat)"/>
+       <circle cx={p.x} cy={p.y} r={radius*1.80} fill="url(#yunex-disc-heat)"/>
        {[0,1,2].map(i=><path key={i}
         d={`M ${p.x+Math.cos((f*.019+i*2.09))*radius*.70} ${p.y+Math.sin((f*.019+i*2.09))*radius*.70}
           A ${radius*.70} ${radius*.70} 0 0 1
           ${p.x+Math.cos((f*.019+i*2.09)+.93)*radius*.70}
           ${p.y+Math.sin((f*.019+i*2.09)+.93)*radius*.70}`}
-        stroke={colors.amber} fill="none" strokeWidth={3+2*opticalHeat}
+        stroke={colors.amber} fill="none" strokeWidth={4+3*opticalHeat}
         opacity={.28+.35*opticalHeat} strokeLinecap="round"/> )}
        <circle cx={p.x} cy={p.y} r={radius*.9} stroke={colors.amber}
          strokeOpacity={.10+.24*opticalHeat} strokeWidth="1.6" fill="none"/>
