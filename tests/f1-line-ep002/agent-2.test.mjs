@@ -1,108 +1,143 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  fixtureSimulator,fixtureRacePaths,makeRaceSimulator,REPRESENTATIVE_F1_CONFIG,
-  lateralAccelerationMps2,effectiveNormalLoadN,tyreForceLimitN,
-  remainingLongitudinalAccelerationMps2,localSpeedLimitMps
+  raceSimulator,AUTHORITATIVE_RACE_PATHS,sampleRaceFrame,makeRaceSimulator,
+  REPRESENTATIVE_F1_CONFIG,lateralAccelerationMps2,effectiveNormalLoadN,
+  tyreForceLimitN,remainingLongitudinalAccelerationMps2,localSpeedLimitMps
 } from '../../src/yunex/f1-line-ep002/physics/index.ts';
-const c=REPRESENTATIVE_F1_CONFIG;
-const sim=fixtureSimulator,eps=1e-7;
-const close=(a,b,tolerance)=>assert.ok(Math.abs(a-b)<=tolerance,`Expected ${a} ~ ${b} ±${tolerance}`);
-
-test('a_lat=v²/r: physical cornering demand doubles squared with speed',()=>{
-  close(lateralAccelerationMps2(20,1/40),10,eps);
-  close(lateralAccelerationMps2(40,1/40),40,eps);
-  close(lateralAccelerationMps2(20,-1/40),10,eps);
+import {makeRacingLinePath} from '../../src/yunex/f1-line-ep002/track/racingPaths.ts';
+const sim=raceSimulator,c=sim.config,paths=AUTHORITATIVE_RACE_PATHS;
+const near=(a,b,epsilon=1e-6)=>assert.ok(Math.abs(a-b)<=epsilon,`expected ${a} ≈ ${b}, tol=${epsilon}`);
+const distance=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2]);
+test('uses exact, current Agent 1 authored path objects and IDs',()=>{
+  assert.equal(paths.shortcut,makeRacingLinePath('shortcut'));
+  assert.equal(paths.racing,makeRacingLinePath('racing'));
+  assert.equal(sim.profiles.shortcut.path,paths.shortcut);
+  assert.equal(sim.profiles.racing.path,paths.racing);
 });
-test('downforce raises normal load with v², and tyre/grip force circles are finite',()=>{
-  close(effectiveNormalLoadN(0,c),c.massKg*c.gravityMps2,eps);
-  close(effectiveNormalLoadN(30,c)-effectiveNormalLoadN(0,c),c.downforceNPerMps2*900,eps);
-  const v=16,k=.03,F=tyreForceLimitN(v,c);
-  const lat=c.massKg*lateralAccelerationMps2(v,k);
-  const longitudinal=c.massKg*remainingLongitudinalAccelerationMps2(v,k,c);
-  assert.ok(Math.hypot(lat,longitudinal)<=F+1e-5);
-  assert.ok(localSpeedLimitMps(.13,c)<localSpeedLimitMps(.05,c));
+test('identical physical entry and common finish; aligned yaw and curvature',()=>{
+  const a=paths.shortcut,b=paths.racing;
+  for(const d of [0,1]){
+    const sa=a.sampleAtDistance(a.lengthM*d),sb=b.sampleAtDistance(b.lengthM*d);
+    near(distance(sa.position,sb.position),0,1e-6);
+    near(Math.atan2(Math.sin(sa.yaw-sb.yaw),Math.cos(sa.yaw-sb.yaw)),0,1e-5);
+    near(sa.curvatureInvM,sb.curvatureInvM,1e-5);
+  }
+  near(sim.comparison.finishSeparationM,0,1e-6);
 });
-test('both identical cars start at same entry speed and share parameters',()=>{
-  const a=sim.profiles.shortcut.nodes[0],b=sim.profiles.racing.nodes[0];
-  close(a.speedMps,b.speedMps,1e-5);
-  assert.ok(a.speedMps<=c.entrySpeedMps+1e-5,'declared entry speed is a cap, not a forced unsafe velocity');
-  close(a.speedMps,sim.comparison.assumptions.entrySpeedMps,1e-5);
-  assert.ok(a.speedMps>8,'both cars must enter at a plausible nonzero corner speed');
-  assert.ok(sim.comparison.finishSeparationM<.25,'finish checkpoint should coincide');
+test('same configuration AND same feasible initial speed',()=>{
+  const vA=sim.profiles.shortcut.nodes[0].speedMps,vB=sim.profiles.racing.nodes[0].speedMps;
+  near(vA,vB,1e-4);
+  near(vA,c.entrySpeedMps,1e-4);
+  assert.ok(vA>0 && vA<=REPRESENTATIVE_F1_CONFIG.entrySpeedMps+1e-5);
 });
-test('paths remain within safe asphalt half-width and shorter A is actually shorter',()=>{
-  assert.ok(sim.comparison.shortcut.pathLengthM<sim.comparison.racing.pathLengthM);
-  assert.ok(sim.comparison.shortcut.pathLengthM>110);
-  assert.ok(sim.comparison.racing.pathLengthM<145);
-  for(const path of Object.values(fixtureRacePaths)){
-    for(let i=0;i<=120;i++){
-      const p=path.sampleAtDistance(path.lengthM*i/120);
-      assert.ok(p.position.every(Number.isFinite));
-      assert.ok(Number.isFinite(p.yaw)&&Number.isFinite(p.curvatureInvM));
-      assert.ok(Math.abs(p.curvatureInvM)<.3);
+test('centripetal force v squared / r, and pressure rises with quadratic downforce',()=>{
+  near(lateralAccelerationMps2(20,1/40),10);
+  near(lateralAccelerationMps2(40,-1/40),40);
+  near(effectiveNormalLoadN(30,c)-effectiveNormalLoadN(0,c),c.downforceNPerMps2*900);
+  const v=16,k=.025;
+  const used=c.massKg*lateralAccelerationMps2(v,k);
+  const remaining=c.massKg*remainingLongitudinalAccelerationMps2(v,k,c);
+  assert.ok(Math.hypot(used,remaining)<=tyreForceLimitN(v,c)+1e-5);
+  assert.ok(localSpeedLimitMps(.09,c)<localSpeedLimitMps(.04,c));
+});
+test('signed path curvature matches finite difference dyaw/ds',()=>{
+  for(const path of Object.values(paths)){
+    for(let i=3;i<=97;i++){
+      const d=path.lengthM*i/100,h=.22;
+      const a=path.sampleAtDistance(d-h),b=path.sampleAtDistance(d+h);
+      const measured=Math.atan2(Math.sin(b.yaw-a.yaw),Math.cos(b.yaw-a.yaw))/(2*h);
+      const center=path.sampleAtDistance(d);
+      assert.ok(Number.isFinite(center.curvatureInvM));
+      near(center.curvatureInvM,measured,.015);
+      assert.ok(Math.abs(center.curvatureInvM)<.22,'unexpectedly tight / kinked trajectory');
     }
   }
 });
-test('distance, node times, speed and road-load constraints remain admissible',()=>{
+test('curvature/grip bound, monotonic s and time, braking + acceleration caps',()=>{
   for(const p of Object.values(sim.profiles)){
     for(let i=0;i<p.nodes.length;i++){
-      const n=p.nodes[i],prev=p.nodes[i-1];
-      assert.ok(n.speedMps>=0&&Number.isFinite(n.speedMps));
-      assert.ok(n.speedMps<=localSpeedLimitMps(n.curvatureInvM,c)+1e-6);
-      assert.ok(Number.isFinite(n.timeSeconds));
+      const node=p.nodes[i],prev=p.nodes[i-1];
+      assert.ok(Number.isFinite(node.speedMps)&&node.speedMps>=0);
+      assert.ok(node.speedMps<=localSpeedLimitMps(node.curvatureInvM,c)+1e-5);
+      assert.ok(Number.isFinite(node.timeSeconds));
       if(prev){
-        assert.ok(n.distanceM>prev.distanceM&&n.timeSeconds>prev.timeSeconds);
-        const acceleration=(n.speedMps**2-prev.speedMps**2)/(2*(n.distanceM-prev.distanceM));
-        assert.ok(acceleration<c.accelerationCapMps2+.2,'accel cap');
-        assert.ok(acceleration>-(c.brakingCapMps2+2),'brake cap with aero');
-        assert.ok(Number.isFinite(acceleration));
+        const ds=node.distanceM-prev.distanceM;
+        assert.ok(ds>0&&node.timeSeconds>prev.timeSeconds);
+        const acceleration=(node.speedMps**2-prev.speedMps**2)/(2*ds);
+        assert.ok(acceleration<=c.accelerationCapMps2+1e-3,'unphysical drive cap');
+        assert.ok(acceleration>=-c.brakingCapMps2-2,'unphysical braking cap');
       }
     }
   }
 });
-test('frames deterministic, independent of render order, and wheel travel follows exact arc metres',()=>{
-  const sample=sim.sample;
-  const before=sample(177,30),first=sample(5,30),after=sample(177,30);
-  assert.deepEqual(before,after);
-  assert.deepEqual(first,sample(5,30));
-  for(const frame of [0,7,28,64,120,177]){
-    const s=sample(frame,30);
-    for(const car of Object.values(s.cars)){
-      assert.ok(Number.isFinite(car.speedMps)&&car.speedMps>=0);
-      assert.ok(Number.isFinite(car.steerRad));
-      close(car.travelDistanceM,car.pathDistanceM,eps);
-      close(car.lateralAccelMps2,car.speedMps**2*Math.abs(car.worldPose.curvatureInvM),1e-6);
-      assert.ok(car.gripUtilization01<=1&&car.gripUtilization01>=0);
-      assert.ok(car.brake01<=1&&car.throttle01<=1);
-      assert.ok(car.steerRad*car.worldPose.curvatureInvM>=-1e-10);
+test('frame independence, backwards seeking, SI values and wheel travel',()=>{
+  const one=sampleRaceFrame(112,30),two=sampleRaceFrame(11,30),again=sampleRaceFrame(112,30);
+  assert.deepEqual(one,again);
+  assert.deepEqual(two,sim.sample(11,30));
+  for(const frame of [0,13,26,56,112,180,230,300]){
+    const st=sampleRaceFrame(frame,30);
+    for(const state of Object.values(st.cars)){
+      near(state.travelDistanceM,state.pathDistanceM,1e-9);
+      near(state.lateralAccelMps2,
+        state.speedMps**2*Math.abs(state.worldPose.curvatureInvM),1e-6);
+      assert.ok(Number.isFinite(state.speedMps)&&Number.isFinite(state.steerRad));
+      assert.ok(state.speedMps>=0);
+      assert.ok(state.gripUtilization01>=0 && state.gripUtilization01<=1);
+      assert.ok(state.brake01>=0 && state.brake01<=1);
+      assert.ok(state.throttle01>=0 && state.throttle01<=1);
+      assert.ok(state.steerRad*state.worldPose.curvatureInvM>=-1e-8);
     }
   }
 });
-test('monotonically progressing forward position and speed/interpolated time',()=>{
+test('cars progress monotonically and stop at correct world-space finish',()=>{
   const previous={shortcut:-1,racing:-1};
-  for(let f=0;f<180;f++){
-    const st=sim.sample(f,30);
+  for(let f=0;f<=360;f++){
+    const frame=sampleRaceFrame(f,30);
     for(const id of ['shortcut','racing']){
-      const car=st.cars[id];
-      assert.ok(car.pathDistanceM>=previous[id]);
+      const car=frame.cars[id];
+      assert.ok(car.pathDistanceM>=previous[id]-1e-8);
       previous[id]=car.pathDistanceM;
+      assert.ok(car.pathDistanceM<=paths[id].lengthM+1e-8);
     }
   }
+  const finished=sampleRaceFrame(1200,30);
+  for(const id of ['shortcut','racing'])
+    near(finished.cars[id].pathDistanceM,paths[id].lengthM,1e-6);
 });
-test('comparison is measured at same downstream endpoint; no hard-coded winner',()=>{
+test('signed measured race outcome is derived strictly from actual elapsed times',()=>{
   const m=sim.comparison;
-  close(m.racingFinishAdvantageSeconds,m.shortcut.finishTimeSeconds-m.racing.finishTimeSeconds,eps);
-  assert.ok(Number.isFinite(m.shortcut.minimumCornerSpeedMps));
-  assert.ok(Number.isFinite(m.racing.minimumCornerSpeedMps));
-  assert.ok(m.racing.exitSpeedMps>m.shortcut.exitSpeedMps,
-    'illustrative scenario should show an earned wider-line exit speed');
-  // If line geometry updates and the result reverses, recalibrate the example,
-  // NEVER bypass computed timing with a fake advantage.
-  assert.equal(m.fasterAtCommonFinish,'racing',
-    'this documented fixture should yield B at the actual common finish line');
+  near(m.racingFinishAdvantageSeconds,m.shortcut.finishTimeSeconds-m.racing.finishTimeSeconds);
+  const correct=m.racingFinishAdvantageSeconds>1e-6?'racing':
+    m.racingFinishAdvantageSeconds< -1e-6?'shortcut':'tie';
+  assert.equal(m.fasterAtCommonFinish,correct);
+  for(const id of ['shortcut','racing']){
+    const metric=m[id],profile=sim.profiles[id];
+    near(metric.pathLengthM,paths[id].lengthM);
+    near(metric.finishTimeSeconds,profile.elapsedSeconds);
+    assert.ok(Number.isFinite(metric.minimumCornerSpeedMps));
+    assert.ok(Number.isFinite(metric.exitSpeedMps));
+    assert.ok(metric.apexTimeSeconds<=metric.finishTimeSeconds);
+  }
 });
-test('injectable A1 RacePath preserves replay determinism',()=>{
-  const independent=makeRaceSimulator(fixtureRacePaths);
-  assert.deepEqual(independent.sample(119,30),sim.sample(119,30));
+test('cannot fabricate a finish result by supplying unequal physical checkpoints',()=>{
+  const original=paths.racing;
+  const shifted={...original,sampleAtDistance:(s)=>{
+    const pose=original.sampleAtDistance(s);
+    return {...pose,position:[pose.position[0]+1,pose.position[1],pose.position[2]]};
+  }};
+  assert.throws(()=>makeRaceSimulator({shortcut:paths.shortcut,racing:shifted}),/checkpoints/);
+});
+test('identical trajectories produce a tie, not a forced wide-line win',()=>{
+  const a=paths.shortcut;
+  const b={...a,id:'racing'};
+  const equal=makeRaceSimulator({shortcut:a,racing:b});
+  near(equal.comparison.racingFinishAdvantageSeconds,0);
+  assert.equal(equal.comparison.fasterAtCommonFinish,'tie');
+});
+test('authoritative path injection replays exactly as default and is independent of call order',()=>{
+  const one=sampleRaceFrame(76,30,paths);
+  const two=sampleRaceFrame(190,30);
+  assert.deepEqual(one,sampleRaceFrame(76,30));
+  assert.deepEqual(two,sim.sample(190,30));
 });
