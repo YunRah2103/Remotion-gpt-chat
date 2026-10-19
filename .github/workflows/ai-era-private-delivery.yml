@@ -1,0 +1,37 @@
+name: AI ERA - Private MP4 Handoff
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/ai-era-private-delivery.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  handoff:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Retrieve private expanded AI ERA film
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p private-delivery
+          gh release download ai-era-expanded-v3-private-39241594762 --repo "$GITHUB_REPOSITORY" --pattern 'AI_ERA_ALL_AGENTS_1080x1920.mp4' --dir private-delivery
+          test -s private-delivery/AI_ERA_ALL_AGENTS_1080x1920.mp4
+      - name: Validate actual video and audio before handoff
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          ffprobe -v error -show_entries format=duration,size -show_entries stream=codec_name,width,height -of json private-delivery/AI_ERA_ALL_AGENTS_1080x1920.mp4 | tee private-delivery/verified-probe.json
+          ffmpeg -hide_banner -loglevel error -xerror -i private-delivery/AI_ERA_ALL_AGENTS_1080x1920.mp4 -f null -
+          sha256sum private-delivery/AI_ERA_ALL_AGENTS_1080x1920.mp4 > private-delivery/verified-sha256.txt
+      - name: Attach private MP4 for owner access
+        uses: actions/upload-artifact@v4
+        with:
+          name: AI-ERA-All-Agents-Real-Footage-Private-MP4
+          path: private-delivery/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
