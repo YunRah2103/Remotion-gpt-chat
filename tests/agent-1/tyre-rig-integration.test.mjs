@@ -122,3 +122,49 @@ test('pinned Agent 2 source drives real hub/world offsets, yaw, compression and 
     assert.deepEqual(Array.from(rig.meshes.find(x=>x.kind==='tyre').mesh.geometry.attributes.position.array),failGeometry);
   } finally {disposeTyreRig(rig);}
 });
+
+test('nonzero pitch and roll use true axes while every hub remains world-authoritative across reverse seeks',async()=>{
+  const {Vector3}=await import('three');
+  const rig=prepareTyreRig('front-right');
+  const offset=[-73,0,4.25],src=sampleDynamics(1.35);
+  const state={...src,positionM:[src.positionM[0]+5,.04,src.positionM[2]-2],
+    yawRad:.132,pitchRad:.089,rollRad:-.063,
+    wheels:Object.fromEntries(Object.entries(src.wheels).map(([id,w])=>[id,{
+      ...w,hubWorldM:[w.hubWorldM[0]+5,w.hubWorldM[1]+.04,w.hubWorldM[2]-2]
+    }]))};
+  const opposite={...state,pitchRad:-.071,rollRad:.054};
+  const f=(dyn)=>({...sampleTyreFailure(dyn.tSec,{
+    angularPhaseRad:dyn.wheels['front-right'].spinRad}),
+    effectiveRadiusM:dyn.wheels['front-right'].rollingRadiusM});
+  const check=(dyn)=>{
+    applyTyreFrame(rig,f(dyn),{dynamics:dyn,worldOffsetM:offset});
+    assert.equal(rig.vehicle.rotation.order,'YXZ');
+    assert.ok(Math.abs(rig.vehicle.rotation.x-dyn.pitchRad)<1e-12,'X is pitch');
+    assert.ok(Math.abs(rig.vehicle.rotation.y-dyn.yawRad)<1e-12,'Y is yaw');
+    assert.ok(Math.abs(rig.vehicle.rotation.z-dyn.rollRad)<1e-12,'Z is roll');
+    const hub=rig.steering.getWorldPosition(new Vector3());
+    for(let i=0;i<3;i++)assert.ok(
+      Math.abs(hub.toArray()[i]-(dyn.wheels['front-right'].hubWorldM[i]+offset[i]))<2e-6,
+      'rig hub '+i+' world position must match Agent 2 without double vertical compression'
+    );
+    const allHubs=[];
+    rig.vehicle.traverse(o=>{
+      if(!o.children?.some(c=>c.userData.wheel))return;
+      allHubs.push(o.getWorldPosition(new Vector3()));
+    });
+    assert.equal(allHubs.length,4,'reused original four wheels only');
+    for(const wheel of Object.values(dyn.wheels)){
+      assert.ok(allHubs.some(p=>p.distanceTo(new Vector3(
+        wheel.hubWorldM[0]+offset[0],wheel.hubWorldM[1]+offset[1],wheel.hubWorldM[2]+offset[2]
+      ))<2e-6),'all wheel hubs remain exactly authoritative after 3-axis rotation');
+    }
+  };
+  try{
+    check(state);
+    const first=Array.from(rig.meshes.find(x=>x.kind==='tyre').mesh.geometry.attributes.position.array);
+    check(opposite);
+    check(state);
+    assert.deepEqual(Array.from(rig.meshes.find(x=>x.kind==='tyre').mesh.geometry.attributes.position.array),first,
+      'out-of-order seeking does not accumulate pitch/roll deformation');
+  }finally{disposeTyreRig(rig);}
+});
