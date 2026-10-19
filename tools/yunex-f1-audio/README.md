@@ -24,11 +24,15 @@ The approved final performance is the **supplied recording**, not a new read of 
 
    `node --experimental-strip-types tools/yunex-f1-audio/export-physics.mjs out/f1-ep002-audio/physics.json`
 
-2. Use the included Python production mixer with that JSON and the user-supplied MP3, for example:
+2. Re-time the supplied Cedar recording at natural phrase pauses (no speech speed or pitch changes):
 
-   `python tools/yunex-f1-audio/mix.py --physics out/f1-ep002-audio/physics.json --voice /path/to/openai-fm-cedar-audio.mp3 --out out/f1-ep002-audio/stems`
+   `python tools/yunex-f1-audio/retime-cedar-voice.py --voice /path/to/openai-fm-cedar-audio.mp3 --out out/f1-ep002-audio/voice-timed.wav`
 
-3. Master at approximately -14 LUFS, true peak under -1 dBTP, preserve 48 kHz stereo, and validate. Stream-copy the *latest approved* native picture track; do not re-render Agent 6's picture during mux.
+3. Use the Python production mixer with the actual Agent 2 states and timed voice:
+
+   `python tools/yunex-f1-audio/mix.py --physics out/f1-ep002-audio/physics.json --voice out/f1-ep002-audio/voice-timed.wav --out out/f1-ep002-audio/stems`
+
+4. Master at approximately -14 LUFS, true peak under -1 dBTP, preserve 48 kHz stereo, and validate. Use `tools/yunex-f1-audio/master-and-mux.sh APPROVED_NATIVE_PICTURE.mp4 out/f1-ep002-audio/stems/05_premaster.wav out/f1-ep002-audio/final --picture-approved` **only after actual picture lock**. Without `--picture-approved`, the output is correctly labelled an audio review. Stream-copy the approved picture track; do not re-render or modify Agent 6's picture.
 
 ## Picture/edit frame cues
 
@@ -43,6 +47,6 @@ The approved final performance is the **supplied recording**, not a new read of 
 
 ## Truth-in-labeling / QC
 
-The downloaded ChatGPT audio-first review in the delivery workspace is measured -14.0 LUFS, -1.5 dBTP, 48kHz stereo AAC when muxed. **Its first pass uses approximate published physics anchors**, and its temporary native picture is from the earlier successful Agent 6 render, not the currently running final colour-corrected native movie. Therefore the preview must NOT be renamed `_FINAL.mp4` or described as picture-locked. The repository exporter above provides the proper exact-state input for the next verified source-truth render.
+The downloaded ChatGPT audio-first review in the delivery workspace is measured -14.0 LUFS, -1.5 dBTP, 48kHz stereo AAC when muxed. **Its final audio revision uses exact Agent 2 per-frame physics exported by successful Agent 7 run 39185208565**, and its natural Cedar phrases are now cut into the correct picture windows without altered speaking speed. Its temporary native picture is still from the earlier successful Agent 6 render, not the currently running final colour-corrected native movie. Therefore the preview must NOT be renamed `_FINAL.mp4` or described as picture-locked. The authoritative physics exporter and exact-state mix have now been verified. Latest mix measures -14.0 LUFS and -1.5 dBTP. Native colour-corrected 1080p picture-lock approval remains the only blocker for a truthful final MP4.
 
 No third-party licensed music or engine library was used. All engine, road, braking, whoosh and impact layers are original DSP synthesis; no invented gears or collisions. Stems and analysis must be retained for approval.
