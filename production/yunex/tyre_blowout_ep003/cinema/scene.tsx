@@ -9,6 +9,7 @@ import {EP003_SCENE} from '../shared/contract.ts';
 import {sampleCinemaCamera,type CinemaShot,type CameraPose} from './cameras.ts';
 import {prepareTyreRig,applyTyreFrame,disposeTyreRig} from '../mechanics/tyreRig.ts';
 import {buildEpisodeHighway,EpisodeLight,finishGrandTourer} from '../look/world.tsx';
+import {ContactOcclusion} from '../look/contact.tsx';
 
 /** Backwards-compatible plain world-kit motion adapter; actual CinemaVehicle
  * now uses Agent 1's real rubber deformation, below. */
@@ -79,6 +80,8 @@ export const CinematicScene:React.FC<CinematicSceneProps>=({
   }}>
    <EpisodeLight focus={dynamics.positionM}/>
    <primitive object={highway}/>
+   {/* Agent 4's wheel-contact shading tracks the authoritative hub positions. */}
+   <ContactOcclusion dynamics={dynamics}/>
    <CinematicVehicle dynamics={dynamics} tyre={tyre}/>
    {/* Gentle front-right fill to resolve rubber on the first dark macro frame. */}
    <pointLight position={[dynamics.positionM[0]+2.8,4.6,dynamics.positionM[2]-4.1]}

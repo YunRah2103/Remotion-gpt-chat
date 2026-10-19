@@ -47,3 +47,24 @@ test('end region is geometric refuge context, not fabricated lane switch or safe
  assert.ok(p.dynamics.worldSpeedMps>1);
  assert.ok(p.dynamics.positionM[2]>-7.05); // stays on travel side until Agent 2 designs real lane transition
 });
+
+test('premium opening visibly collapses real front-right tyre within first 0.5s',()=>{
+ const intact=samplePreviewState(0,'opening');
+ const emerging=samplePreviewState(.28,'opening');
+ const collapsed=samplePreviewState(.45,'opening');
+ assert.equal(intact.tyre.failureProgress,0);
+ assert.ok(emerging.tyre.failureProgress>.5);
+ assert.ok(collapsed.tyre.failureProgress>.99);
+ assert.ok(collapsed.tyre.effectiveRadiusM<intact.tyre.effectiveRadiusM-.04);
+});
+test('elevated median-side recovery view exposes the right-hand refuge',async()=>{
+ const {sampleCinemaCamera}=await import('../../production/yunex/tyre_blowout_ep003/cinema/cameras.ts');
+ const p=samplePreviewState(8.1,'montage');
+ const pose=sampleCinemaCamera({tSec:p.sourceTimeSec,shot:p.cut.shot,
+  dynamics:p.dynamics,tyre:p.tyre,progress01:p.progress01});
+ assert.equal(p.cut.shot,'safe-stop');
+ assert.ok(pose.position[2]>p.dynamics.positionM[2]+4.5);
+ assert.ok(pose.target[2]<p.dynamics.positionM[2]-2.7);
+ assert.ok(pose.position[1]>2.8&&pose.fovDeg>=55);
+ assert.ok(p.dynamics.worldSpeedMps>1);
+});

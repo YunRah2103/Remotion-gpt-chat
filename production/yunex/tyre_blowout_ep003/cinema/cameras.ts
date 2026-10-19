@@ -52,12 +52,14 @@ export function sampleCinemaCamera(input:CinemaCameraInput):CameraPose{
    from=lerp3([-5.45,1.72,-4.82],[-5.82,1.94,-4.95],p);
    at=[-.10,.72,-.10];fov=47;break;
   case 'safe-stop':
-   // Camera shows an APPROACH along Agent 4's refuge, not a fabricated stop.
-   from=lerp3([6.15,1.97,-5.30],[5.28,1.63,-5.54],p);
-   at=[.35,.75,-.1];fov=mix(48,45,p);break;
+   // Moving recovery, MEDIAN-side elevated reveal: actual widened right-hand
+   // refuge beyond the moving car. Never stage a physically unproved stop.
+   from=lerp3([-6.0,3.40,5.70],[-6.55,3.48,5.95],p);
+   at=lerp3([2.50,.60,-3.40],[3.0,.62,-3.70],p);
+   fov=mix(58,56,p);break;
   default:throw new Error('Unknown camera shot: '+shot);
  }
- const eventAge=tSec-.26;
+ const eventAge=tSec-.75;
  const shock=input.subtleImpactShake===false?0:
   .007*Math.sin(2*Math.PI*7.5*eventAge)*clamp(tyre.failureProgress)*Math.exp(-Math.max(0,eventAge)*5);
  return {shot,position:vehicleLocalToWorld([from[0],Math.max(.11,from[1]+shock),from[2]],d),

@@ -8,19 +8,12 @@ on:
       - 'production/yunex/tyre_blowout_ep003/cinema/**'
       - 'previews/agent-3/**'
       - 'tests/agent-3/**'
-  pull_request:
-    branches: [production/yunex-ep003-base]
-    paths:
-      - '.github/workflows/ep003-agent3-native-previews.yml'
-      - 'production/yunex/tyre_blowout_ep003/cinema/**'
-      - 'previews/agent-3/**'
-      - 'tests/agent-3/**'
 
 permissions:
   contents: read
 
 concurrency:
-  group: ep003-agent3-native-${{ github.ref }}
+  group: ep003-agent3-native-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:

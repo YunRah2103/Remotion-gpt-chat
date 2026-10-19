@@ -8,7 +8,7 @@ import {OPENING_CUTS,MONTAGE_CUTS,selectCut} from './cameras.ts';
 import type {Cut} from './cameras.ts';
 // Reference failure remains at the authoritative .75s; the preview starts
 // later in that SAME scenario so collapse is visible during the first second.
-export const CAMERA_PREVIEW_SOURCE_OFFSET_SEC=.46;
+export const CAMERA_PREVIEW_SOURCE_OFFSET_SEC=.65;
 export type PreviewState={
   dynamics:VehicleDynamicsFrame;tyre:TyreFrame;tSec:number;sourceTimeSec:number;
   cut:Cut;progress01:number;cameraWorldRebaseXM:number;
