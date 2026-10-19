@@ -10,6 +10,9 @@ on:
       - '.github/workflows/yunex-ep003-agent1-mechanics.yml'
 permissions:
   contents: read
+concurrency:
+  group: ep003-agent1-mechanics-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   native-mechanics:
     runs-on: ubuntu-24.04
