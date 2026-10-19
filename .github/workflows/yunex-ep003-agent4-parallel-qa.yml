@@ -1,0 +1,156 @@
+name: YUNEX EP003 Agent 4 - Parallel Native Picture Proof
+on:
+  push:
+    branches: [agent/ep003-04-look]
+    paths:
+      - '.github/workflows/yunex-ep003-agent4-parallel-qa.yml'
+      - 'production/yunex/tyre_blowout_ep003/look/**'
+      - 'production/yunex/tyre_blowout_ep003/previews/agent-4/**'
+      - 'tests/agent-4/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ep003-agent4-parallel-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  scene-regressions:
+    name: Typecheck and real Three.js scene tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
+      - run: npx --no-install tsc -p tests/agent-4/tsconfig.json --noEmit
+      - run: node --experimental-strip-types --test tests/agent-4/*.test.mjs
+
+  native-picture:
+    name: Native H264 / ${{ matrix.composition }}
+    needs: scene-regressions
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - composition: EP003LookBeforeBeauty
+            width: 480
+            height: 270
+            frames: 150
+          - composition: EP003LookAfterBeauty
+            width: 480
+            height: 270
+            frames: 150
+          - composition: EP003LookBeforePortrait
+            width: 270
+            height: 480
+            frames: 210
+          - composition: EP003LookAfterPortrait
+            width: 270
+            height: 480
+            frames: 210
+          - composition: EP003RefugeInspection
+            width: 270
+            height: 480
+            frames: 150
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    steps:
+      - name: Checkout identical verified commit
+        uses: actions/checkout@v4
+      - name: Node.js pinned dependencies
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install FFmpeg and headless WebGL renderer
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          npm ci --no-audit --no-fund
+          npx --no-install remotion browser ensure
+      - name: Render complete native moving picture
+        shell: bash
+        env:
+          COMP: ${{ matrix.composition }}
+        run: |
+          set -euo pipefail
+          mkdir -p out/agent4/${COMP}
+          printf '%s\n' "${{ github.sha }}" > out/agent4/${COMP}/source-sha.txt
+          npx --no-install remotion render \
+            production/yunex/tyre_blowout_ep003/previews/agent-4/entry.tsx \
+            "${COMP}" "out/agent4/${COMP}/${COMP}.mp4" \
+            --gl=swangle --scale=.25 --codec=h264 \
+            --pixel-format=yuv420p --concurrency=1 --log=error
+      - name: FFprobe, full bitstream decode, temporal stills and report
+        shell: bash
+        env:
+          COMP: ${{ matrix.composition }}
+          EXPECT_W: ${{ matrix.width }}
+          EXPECT_H: ${{ matrix.height }}
+          EXPECT_FRAMES: ${{ matrix.frames }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, json, subprocess, hashlib
+          from pathlib import Path
+          comp=os.environ['COMP']
+          root=Path('out/agent4')/comp
+          mp4=root/(comp+'.mp4')
+          if not mp4.is_file(): raise SystemExit('Missing actual Remotion movie')
+          metadata=json.loads(subprocess.check_output([
+            'ffprobe','-v','error','-show_entries',
+            'stream=width,height,codec_name,pix_fmt,nb_frames,avg_frame_rate:format=duration',
+            '-of','json',str(mp4)],text=True))
+          video=metadata['streams'][0]
+          frames=int(os.environ['EXPECT_FRAMES'])
+          duration=float(metadata['format']['duration'])
+          assert(video['width'],video['height'])==(int(os.environ['EXPECT_W']),int(os.environ['EXPECT_H']))
+          assert video['codec_name']=='h264'
+          assert video['pix_fmt'] in ('yuv420p','yuvj420p')
+          assert video['avg_frame_rate']=='30/1'
+          assert int(video['nb_frames'])==frames
+          assert abs(duration-frames/30)<.1
+          subprocess.run(['ffmpeg','-hide_banner','-v','error','-xerror','-i',
+            str(mp4),'-f','null','-'],check=True)
+          hashes=[]
+          for i,t in enumerate((.12,duration*.25,duration*.5,duration*.75,duration-.12)):
+            image=root/(f'frame-{i}.png')
+            subprocess.run(['ffmpeg','-hide_banner','-v','error','-y','-ss',str(t),
+              '-i',str(mp4),'-frames:v','1',str(image)],check=True)
+            hashes.append(hashlib.sha256(image.read_bytes()).hexdigest())
+          assert len(set(hashes))>=3,'Frozen or stationary movie, not actual animation'
+          report={'source_sha':os.environ['GITHUB_SHA'],'composition':comp,
+            'source_dimensions':[1920,1080] if 'Beauty' in comp else [1080,1920],
+            'review_dimensions':[video['width'],video['height']],'fps':30,
+            'frames':frames,'duration_s':duration,'h264':True,
+            'full_ffmpeg_decode':'PASS','distinct_temporal_frames':len(set(hashes)),
+            'bytes':mp4.stat().st_size,'sha256':hashlib.sha256(mp4.read_bytes()).hexdigest(),
+            'director_artistic_signoff':'PENDING',
+            'refuge_stop_validated':False}
+          (root/'verification.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report,indent=2))
+          PY
+      - name: Publish verified MP4 and all five frame grabs
+        uses: actions/upload-artifact@v4
+        with:
+          name: ep003-agent4-${{ matrix.composition }}-${{ github.run_id }}
+          path: out/agent4/${{ matrix.composition }}/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Reference exact playable video artifact
+        shell: bash
+        run: |
+          echo "### ${{ matrix.composition }} native Remotion proof" >> "$GITHUB_STEP_SUMMARY"
+          echo "Source SHA: ${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "FFprobe + full FFmpeg decode + five moving frames: PASS" >> "$GITHUB_STEP_SUMMARY"
+          echo "Download the matching MP4 from the Artifacts panel on this run." >> "$GITHUB_STEP_SUMMARY"
+          echo "9:16 refuge is **staged geometric inspection**, not a demonstrated safe stop." >> "$GITHUB_STEP_SUMMARY"
