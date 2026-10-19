@@ -142,7 +142,14 @@ export function applyTyreFrame(rig:PreparedTyreRig,frame:TyreFrame,options:{
     animatePart(rig.suspension,{compression:Math.max(0,Math.min(1,fraction))});
     rig.suspension.visible=(options.exposure??1)>0;
   }
-  deformRubber(rig,{...frame,angularPhaseRad:spin});
+  // Use the ACTUAL Agent 2 hub altitude for road-space clipping. Its small
+  // extra dynamic suspension displacement changes real ground clearance; the
+  // effective rolling radius is still owned by Agent 2 (not decremented twice).
+  vehicle.updateMatrixWorld(true);
+  const hubHeight=steering.getWorldPosition(new T.Vector3()).y;
+  const contactRadius=d?Math.min(frame.effectiveRadiusM,hubHeight):frame.effectiveRadiusM;
+  deformRubber(rig,{...frame,angularPhaseRad:spin,
+    effectiveRadiusM:Math.max(0,contactRadius)});
   vehicle.updateMatrixWorld(true);
 }
 export const disposeTyreRig=(rig:PreparedTyreRig)=>disposeObject(rig.vehicle);
