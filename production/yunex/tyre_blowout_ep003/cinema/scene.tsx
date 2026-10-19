@@ -4,31 +4,20 @@ import {ThreeCanvas} from '@remotion/three';
 import {useThree} from '@react-three/fiber';
 import * as T from 'three';
 import {disposeObject} from '../../../../src/yunex/world-kit/geometry.ts';
-import type {TyreFrame,VehicleDynamicsFrame,WheelId} from '../shared/contract.ts';
+import type {TyreFrame,VehicleDynamicsFrame} from '../shared/contract.ts';
 import {EP003_SCENE} from '../shared/contract.ts';
 import {sampleCinemaCamera,type CinemaShot,type CameraPose} from './cameras.ts';
 import {prepareTyreRig,applyTyreFrame,disposeTyreRig} from '../mechanics/tyreRig.ts';
 import {buildEpisodeHighway,EpisodeLight,finishGrandTourer} from '../look/world.tsx';
 import {ContactOcclusion} from '../look/contact.tsx';
+import {alignCinematicBodyAndHubs} from './axes.ts';
 
 /** Backwards-compatible plain world-kit motion adapter; actual CinemaVehicle
  * now uses Agent 1's real rubber deformation, below. */
 export function updateCinematicVehicle(model:T.Group,d:VehicleDynamicsFrame,tyre:TyreFrame,_previewCosmeticOnly=false):void{
  if(!Number.isFinite(tyre.failureProgress))throw new Error('Invalid tyre frame');
- model.position.set(...d.positionM);
- model.rotation.set(d.rollRad,d.yawRad,d.pitchRad,'YXZ');
- model.updateMatrixWorld(true);
- model.traverse(o=>{
-  if(o.userData.cabinSteering)o.rotation.x=-d.driverSteerRad*10;
-  if(!(o instanceof T.Group)||!o.children.some(v=>v.userData.wheel))return;
-  const id=(((o.position.x>0)?'front':'rear')+'-'+((o.position.z<0)?'right':'left')) as WheelId;
-  const w=d.wheels[id];if(!w)return;
-  o.position.copy(model.worldToLocal(new T.Vector3(...w.hubWorldM)));
-  o.rotation.y=w.steeringRad;
-  const rotating=o.children.find(v=>v.userData.wheel);
-  if(rotating)rotating.rotation.z=w.spinRad;
- });
- model.updateMatrixWorld(true);
+ alignCinematicBodyAndHubs(model,d);
+ model.traverse(o=>{if(o.userData.cabinSteering)o.rotation.x=-d.driverSteerRad*10;});
 }
 
 /** Cinematic vehicle reuses ALL original GT mechanics, plus Agent 1's cloned
@@ -56,7 +45,13 @@ export const CinematicVehicle:React.FC<{
   return prepared;
  },[cutaway,interiorCamera]);
  useEffect(()=>()=>disposeTyreRig(rig),[rig]);
- useLayoutEffect(()=>applyTyreFrame(rig,tyre,{dynamics,exposure:cutaway?.65:0}),[rig,dynamics,tyre,cutaway]);
+ useLayoutEffect(()=>{
+  // Agent 1's current renderer uses legacy roll/pitch Euler ordering. Re-align
+  // the existing rig and ALL FOUR hubs to Agent 2's explicit X=pitch/Z=roll
+  // after deformation; leaves rubber geometry and physics authoritative.
+  applyTyreFrame(rig,tyre,{dynamics,exposure:cutaway?.65:0});
+  alignCinematicBodyAndHubs(rig.vehicle,dynamics);
+ },[rig,dynamics,tyre,cutaway]);
  return <primitive object={rig.vehicle}/>;
 };
 export const CinematicCameraRig:React.FC<{pose:CameraPose}>=({pose})=>{

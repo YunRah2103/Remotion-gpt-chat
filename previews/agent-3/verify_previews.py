@@ -13,6 +13,30 @@ def run(args):
  if p.returncode: raise RuntimeError(f"Exited {p.returncode}: {' '.join(args)}\n{p.stderr[-4000:]}")
  return p.stdout
 
+
+def all_frame_contrast(movie, expected_frames):
+ """Small-grayscale full decode catches gantry/guardrail blank shots missed by hashes."""
+ width,height=96,170
+ proc=subprocess.run(["ffmpeg","-v","error","-xerror","-i",str(movie),
+  "-vf",f"scale={width}:{height},format=gray","-f","rawvideo","-"],
+  stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+ if proc.returncode:
+  raise RuntimeError(f"Full grayscale decode failed: {proc.stderr.decode(errors='replace')[-1400:]}")
+ payload=proc.stdout;frame_bytes=width*height
+ if len(payload)!=expected_frames*frame_bytes:
+  raise RuntimeError(f"Full contrast frame count mismatch: {len(payload)} bytes, expected {expected_frames*frame_bytes}")
+ result=[]
+ for n in range(expected_frames):
+  im=Image.frombytes("L",(width,height),payload[n*frame_bytes:(n+1)*frame_bytes])
+  sd=ImageStat.Stat(im).stddev[0]
+  result.append(sd)
+ minimum=min(result)
+ if minimum<12:
+  bad=result.index(minimum)
+  raise RuntimeError(f"Visual occlusion (low spatial contrast): frame {bad}, grayscale standard deviation {minimum:.2f}")
+ return {"minimum_spatial_contrast":round(minimum,2),
+  "minimum_spatial_contrast_frame":result.index(minimum),"tested_frames":len(result)}
+
 def inspect(name, config, directory):
  movie=directory/(name+".mp4")
  if not movie.is_file() or movie.stat().st_size<2048: raise RuntimeError(f"Missing movie {movie}")
@@ -26,6 +50,7 @@ def inspect(name, config, directory):
  assert int(stream["nb_read_frames"])==config["frames"],stream
  assert math.isclose(float(data["format"]["duration"]),config["duration"],abs_tol=.08),data
  run(["ffmpeg","-v","error","-xerror","-i",str(movie),"-f","null","-"])
+ contrast=all_frame_contrast(movie,config["frames"])
  folder=directory/"frames"/name;folder.mkdir(parents=True,exist_ok=True)
  frames=[]
  for n in config["samples"]:
@@ -55,7 +80,7 @@ def inspect(name, config, directory):
   "bytes":movie.stat().st_size,"source_composition":"1080x1920 @30fps",
   "review_resolution":"540x960 (scale=0.5)","h264":True,"frames":int(stream["nb_read_frames"]),
   "duration_seconds":float(data["format"]["duration"]),"full_ffmpeg_decode":True,
-  "motion_scores_first_second":motion,"sampled_frames":config["samples"],
+  "motion_scores_first_second":motion,"full_frame_contrast":contrast,"sampled_frames":config["samples"],
   "sampled_luminance":[round(v[2],2) for v in frames],
   "limitations":"Uses authoritative Agent 2 motion and Agent 1 rubber at recorded source SHAs. Hard-cut-only road X rebasing. Moving refuge is NOT a validated safe stop; director approval pending."}
 

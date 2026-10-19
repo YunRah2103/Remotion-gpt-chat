@@ -79,3 +79,26 @@ test("real driver's camera avoids headrest and seat shell",async()=>{
  assert.ok(pose.position[1]>1.12&&pose.position[1]<1.20);
  assert.ok(pose.fovDeg>=68&&pose.fovDeg<=70);
 });
+
+test('authoritative pitch(X)/yaw(Y)/roll(Z) and all four hub world poses survive cinematic binding',async()=>{
+ const T=await import('three');
+ const {alignCinematicBodyAndHubs}=await import('../../production/yunex/tyre_blowout_ep003/cinema/axes.ts');
+ const d={...sampleDynamics(2.12),positionM:[13,0,-1.85],pitchRad:.034,rollRad:-.027,yawRad:.061};
+ const g=new T.Group();
+ for(const id of ['front-left','front-right','rear-left','rear-right']){
+  const o=new T.Group();
+  o.name='steer-'+id;o.position.set(id.startsWith('front')?1.46:-1.46,.36,id.endsWith('right')?-.88:.88);
+  const rot=new T.Group();rot.userData.wheel=true;o.add(rot);g.add(o);
+ }
+ alignCinematicBodyAndHubs(g,d);
+ assert.equal(g.rotation.order,'YXZ');
+ assert.equal(g.rotation.x,d.pitchRad);
+ assert.equal(g.rotation.y,d.yawRad);
+ assert.equal(g.rotation.z,d.rollRad);
+ for(const id of ['front-left','front-right','rear-left','rear-right']){
+  const o=g.getObjectByName('steer-'+id);
+  const world=o.getWorldPosition(new T.Vector3()).toArray();
+  assert.ok(Math.hypot(...world.map((v,i)=>v-d.wheels[id].hubWorldM[i]))<1e-8,id+' hub detached');
+  assert.equal(o.children[0].rotation.z,d.wheels[id].spinRad);
+ }
+});
