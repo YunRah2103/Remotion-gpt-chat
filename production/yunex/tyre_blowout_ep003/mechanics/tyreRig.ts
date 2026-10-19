@@ -104,7 +104,10 @@ export function applyTyreFrame(rig:PreparedTyreRig,frame:TyreFrame,options:{
   if(d){
     const offset=options.worldOffsetM??[0,0,0];
     vehicle.position.set(d.positionM[0]+offset[0],d.positionM[1]+offset[1],d.positionM[2]+offset[2]);
-    vehicle.rotation.set(d.rollRad,d.yawRad,d.pitchRad,'YXZ');
+    // Three Euler axes are X=pitch, Y=yaw, Z=roll. The former swapped X/Z.
+    // This preserves Agent 2's true body attitude while wheels remain placed
+    // at their authoritative world-space hub coordinates below.
+    vehicle.rotation.set(d.pitchRad,d.yawRad,d.rollRad,'YXZ');
   }else {vehicle.position.set(0,0,0);vehicle.rotation.set(0,0,0);}
   roll.rotation.z=spin;
   // The preview has one illustrated collapsing corner. In final integration,
