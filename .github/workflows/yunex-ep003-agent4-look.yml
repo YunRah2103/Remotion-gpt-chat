@@ -131,23 +131,40 @@ jobs:
           not Agent 2's actual physical recovery trajectory. Director artistic
           inspection and Agent 1/2/3 integration remain pending.
           EOF
-          gh release create "$TAG" \
-            --repo "${{ github.repository }}" --target "${{ github.sha }}" \
-            --title "EP003 Agent 4 real Remotion look evidence / ${{ github.run_id }}" \
-            --notes-file out/ep003-agent4/release-notes.md
-          gh release upload "$TAG" out/ep003-agent4/*.mp4 \
-            out/ep003-agent4/*.png out/ep003-agent4/machine-verification.json \
-            --repo "${{ github.repository }}"
-          LINK="https://github.com/${{ github.repository }}/releases/tag/$TAG"
+          # Some organization integrations disallow GitHub Release writes even
+          # with contents:write. A RELEASE 403 is a publishing limitation,
+          # NEVER a native-render failure. Upload-artifact above is mandatory.
+          LINK="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          if gh release create "$TAG" \\
+            --repo "${{ github.repository }}" --target "${{ github.sha }}" \\
+            --title "EP003 Agent 4 real Remotion look evidence / ${{ github.run_id }}" \\
+            --notes-file out/ep003-agent4/release-notes.md; then
+            if gh release upload "$TAG" out/ep003-agent4/*.mp4 \\
+               out/ep003-agent4/*.png out/ep003-agent4/machine-verification.json \\
+               --repo "${{ github.repository }}"; then
+              LINK="https://github.com/${{ github.repository }}/releases/tag/$TAG"
+              echo 'GitHub Release publishing succeeded.'
+            else
+              echo 'Release upload failed; verified GitHub Actions artifact remains available.'
+            fi
+          else
+            echo 'Release creation not authorized. Use mandatory GitHub Actions artifact.'
+          fi
           {
-            echo "### Agent 4 native render verification / run ${{ github.run_id }}"
+            echo "### Agent 4 native verification / source ${{ github.sha }}"
             echo
-            echo "Real playable H264 MP4s and five-frame visual inspection sequences: $LINK"
+            echo "Verified playable native MP4s, images and machine report: $LINK"
+            echo "Open run Artifacts and download ep003-agent4-native-${{ github.run_id }}."
             echo
-            echo "Before/after 5s beauty and 7s portrait pairs, plus 5s staged refuge clearance."
-            echo "Source SHA: ${{ github.sha }}; FFprobe/FFmpeg/full decode: PASS; details in machine-verification.json."
-            echo "Review-scale 25% from 1080x1920/1920x1080 @ 30fps source compositions."
-            echo "Footage/physics approval NOT IMPLIED. Camera and tyre need integrated verification."
+            echo "Five files: 5s beauty before/after, 7s portrait before/after, 5s staged refuge."
+            echo "Source ${{ github.sha }}; H.264 / FFprobe / full FFmpeg decode: PASS."
+            echo "Review copies are quarter-size from 1080x1920 or 1920x1080 @30fps sources."
+            echo "Director artwork approval and real Agent 2 recovery path remain pending."
           } > out/ep003-agent4/comment.md
-          gh issue comment 197 --repo "${{ github.repository }}" --body-file out/ep003-agent4/comment.md
-          gh pr comment 200 --repo "${{ github.repository }}" --body-file out/ep003-agent4/comment.md
+          # Posting comments may be separately permission-restricted. The
+          # verified artifact URL always stays accessible in the job Summary.
+          cat out/ep003-agent4/comment.md >> "$GITHUB_STEP_SUMMARY"
+          gh issue comment 197 --repo "${{ github.repository }}" \\
+            --body-file out/ep003-agent4/comment.md || echo 'Issue comment write unauthorized; step summary available.'
+          gh pr comment 200 --repo "${{ github.repository }}" \\
+            --body-file out/ep003-agent4/comment.md || echo 'PR comment write unauthorized; step summary available.'
