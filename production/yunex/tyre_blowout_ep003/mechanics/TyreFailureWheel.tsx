@@ -103,7 +103,10 @@ export const TyreMechanicsPreview:React.FC<{kind:PreviewKind}>=({kind})=>{
       <group position={[...offset] as [number,number,number]}><ContactOcclusion dynamics={dyn}/></group>
       <CameraAim position={camera} target={target} fov={cam.fov}/>
       {macro
-        ?<TyreCutaway tSec={t} dynamics={dyn} sceneOffsetM={offset} exposure={.69}/>
+        ?/* Exterior front-right tyre closeup uses original opaque car. Intentional
+          suspension X-ray remains exposed via TyreCutaway in deliberate cutaways;
+          exterior previews must not display an unmounted floating spring. */
+         <TyreFailureWheel tSec={t} dynamics={dyn} sceneOffsetM={offset} exposure={0}/>
         :<TyreFailureWheel tSec={t} dynamics={dyn} sceneOffsetM={offset}/>}
     </ThreeCanvas>
     <div style={{...note,position:'absolute',top:'7%',left:'7%',right:'7%',fontWeight:700,fontSize:macro?33:32,letterSpacing:.7}}>
