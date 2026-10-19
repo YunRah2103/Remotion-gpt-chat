@@ -36,7 +36,7 @@ by the independent QA Agent in PR #204.
 the integration base yet, Agent 1 review previews use
 `mechanics/agent2-dynamics-snapshot.ts`, an exact copy of Agent 2's
 `dynamics/model.ts` at source commit
-`cbb0281d2720821d48f4a77c1be74075dd906655`.
+`197e02ca94c9d9687f8cc43dac3d89173eb4dfd2`.
 The body/4 wheels use its actual `sampleDynamics(tSec)` states:
 `positionM`, yaw/roll/pitch, `hubWorldM`, `spinRad`, steering,
 `rollingRadiusM`, and `verticalCompressionM`.
@@ -48,9 +48,9 @@ When manager merges Agent 2's PR, replace the import in
 snapshot. This must be done before final creative approval.
 
 When dynamics is supplied, `TyreFailureWheel` trusts Agent 2's loaded
-rolling radius (0.287 m fully failed for this illustrative model),
+rolling radius (0.300 m fully failed for this illustrative model),
 *not* its own 0.300 m fallback. There is no double support loss.
-The approved original metal rim outer lip (~0.278 m) has roughly 9 mm clearance.
+The approved original metal rim outer lip (~0.278 m) has roughly 22 mm clearance.
 The supplied constant preview scene translation moves body and every wheel hub
 identically, without resetting/synthesizing Agent 2's physical motion.
 
@@ -77,3 +77,9 @@ measured tyre response. An MP4 passing FFprobe, full decode and frame variation
 is **not** by itself visually approved. In particular, inspect real pixels
 for road penetration, alloy rim clearance, car cropping, contact behaviour and
 camera cut quality. User / Agent 0 has final acceptance authority.
+
+## Latest Agent 0 directive (Issue #194)
+
+The latest visual correction increases the **axial sidewall ballooning** of the original lathe tyre only in a shoulder band (radii 0.282–0.359m). The inner band next to the preserved metal lip and the tread shoulder remain fixed to the original original rubber structure. The dent itself stays world/road-fixed under actual Agent 2 wheel spin; 4mm maximum rubber-fold amplitude follows the rotating material. Under integrated dynamics the road clip cap is computed from **actual Agent 2 world-space hub altitude**, not from a second guessed support drop. A complete native render and full video review are mandatory to confirm these actually read on mobile.
+
+**Agent 3** exports `sampleCinemaCamera` and a cross-integrated `CinematicScene` from branch `agent/ep003-03-cinema`; it already overlays this Agent 1 original rubber rig and **Agent 4 `EpisodeLight`** in the coordinated composition. Integration should inspect 0.75s onset / ~1.05s post-collapse at the Agent 3 wheel macro angle. Standalone Agent 1 preview uses the approved baseline `WorldLighting` and deliberately does not import A3/A4's unmerged module trees into this branch. No original world-kit, PARTS kit or Episode contract files were edited.
