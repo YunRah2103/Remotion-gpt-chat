@@ -22,7 +22,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ep003-agent2-native-${{ github.event.pull_request.number || github.ref }}
+  group: ep003-agent2-native-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
