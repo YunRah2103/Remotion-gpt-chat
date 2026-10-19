@@ -2,6 +2,8 @@ import React from 'react';
 import {AbsoluteFill,Sequence,interpolate,useCurrentFrame,useVideoConfig} from 'remotion';
 import {ThreeCanvas} from '@remotion/three';
 import {getRaceCamera} from '../cinema/cameras.ts';
+import {getPremiumEditorialCamera} from './premiumCamera.ts';
+import {CameraAim} from '../../world-kit/components';
 import {RaceCameraRig} from '../cinema/RaceCameraRig.tsx';
 import {RaceCar,RaceLighting,RaceWorld} from '../lookdev/index.ts';
 import {RaceLineWorld} from '../graphics/WorldGraphics.tsx';
@@ -56,12 +58,14 @@ const Headline:React.FC<{eyebrow:string;main:string;detail?:string;alpha:number;
     lineHeight:1.3,marginTop:12*scale}}>{detail}</div>}
  </div>;
 
-export const F1RacingLinePicture:React.FC=()=>{
+export const F1RacingLinePicture:React.FC<{premiumCamera?:boolean}>=({premiumCamera=false})=>{
  const frame=useCurrentFrame();
  const {fps,width,height}=useVideoConfig();
  const edit=editAtFrame(frame);
  const state=sampleRaceFrame(edit.sourceSeconds*fps,fps);
- const view=getRaceCamera(edit.shot,state,edit.sourceFrame);
+ const view=premiumCamera
+  ?getPremiumEditorialCamera(edit,state,frame)
+  :getRaceCamera(edit.shot,state,edit.sourceFrame);
  const a=state.cars.shortcut,b=state.cars.racing;
  const gap=Math.hypot(a.worldPose.position[0]-b.worldPose.position[0],
    a.worldPose.position[2]-b.worldPose.position[2]);
@@ -87,7 +91,9 @@ export const F1RacingLinePicture:React.FC=()=>{
    <color attach="background" args={['#739ebc']}/>
    <fog attach="fog" args={['#839dad',165,405]}/>
    <RaceWorld quality="premium" seed={12}/>
-   <RaceCameraRig shot={edit.shot} state={state} frame={edit.sourceFrame}/>
+   {premiumCamera
+    ?<CameraAim position={view.position} target={view.target} fov={view.fov}/>
+    :<RaceCameraRig shot={edit.shot} state={state} frame={edit.sourceFrame}/>}
    <GhostAwareCars state={state} focus={focus}/>
    {showWorldLines&&<RaceLineWorld paths={P}
     progressM={{shortcut:a.pathDistanceM,racing:b.pathDistanceM}}
