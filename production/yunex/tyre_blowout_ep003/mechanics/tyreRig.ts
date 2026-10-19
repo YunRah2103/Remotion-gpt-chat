@@ -6,7 +6,7 @@ import {createPart} from '../../../../src/yunex/parts-kit/models.ts';
 import {animatePart} from '../../../../src/yunex/parts-kit/motion.ts';
 import {EP003_SCENE} from '../shared/contract.ts';
 import type {TyreFrame,WheelFrame,WheelId,VehicleDynamicsFrame} from '../shared/contract.ts';
-import {sampleTyreFailure} from './sampleTyreFailure.ts';
+import {MAX_LOADED_DROP_M,sampleTyreFailure} from './sampleTyreFailure.ts';
 import {sampleRubberVertex} from './roadContact.ts';
 import type {TyreFailureParams} from './sampleTyreFailure.ts';
 
@@ -92,6 +92,8 @@ export function applyTyreFrame(rig:PreparedTyreRig,frame:TyreFrame,options:{
   /** Only for the clearly-labelled preview motion fixture, never final footage. */
   fixtureDistanceM?:number;
   fixtureSteerRad?:number;
+  /** Visual world translation only. Applied identically to Agent 2 body AND all four hub poses. */
+  worldOffsetM?:readonly [number,number,number];
   exposure?:number;
 }={}):void {
   const {vehicle,steering,roll}=rig;
@@ -100,7 +102,8 @@ export function applyTyreFrame(rig:PreparedTyreRig,frame:TyreFrame,options:{
   const spin=currentWheel?.spinRad??frame.angularPhaseRad;
   animateVehicle(vehicle,d?.distanceTravelledM??options.fixtureDistanceM??0,d?.driverSteerRad??options.fixtureSteerRad??0);
   if(d){
-    vehicle.position.set(...d.positionM);
+    const offset=options.worldOffsetM??[0,0,0];
+    vehicle.position.set(d.positionM[0]+offset[0],d.positionM[1]+offset[1],d.positionM[2]+offset[2]);
     vehicle.rotation.set(d.rollRad,d.yawRad,d.pitchRad,'YXZ');
   }else {vehicle.position.set(0,0,0);vehicle.rotation.set(0,0,0);}
   roll.rotation.z=spin;
@@ -120,7 +123,9 @@ export function applyTyreFrame(rig:PreparedTyreRig,frame:TyreFrame,options:{
       const id:WheelId=`${front?'front':'rear'}-${right?'right':'left'}`;
       const state=options.wheelFrame&&id===rig.wheelId?options.wheelFrame:d.wheels[id];
       if(!state)return;
-      const local=vehicle.worldToLocal(new T.Vector3(...state.hubWorldM));
+      const offset=options.worldOffsetM??[0,0,0];
+      const local=vehicle.worldToLocal(new T.Vector3(
+        state.hubWorldM[0]+offset[0],state.hubWorldM[1]+offset[1],state.hubWorldM[2]+offset[2]));
       o.position.copy(local);
       o.rotation.y=state.steeringRad;
       const rotating=o.children.find(v=>v.userData.wheel);
@@ -128,8 +133,13 @@ export function applyTyreFrame(rig:PreparedTyreRig,frame:TyreFrame,options:{
     });
   }
   if(rig.suspension.visible){
-    // PARTS suspension rises when compression increases, hence inverted on collapse.
-    animatePart(rig.suspension,{compression:Math.max(0,Math.min(1,(frame.effectiveRadiusM-.30)/.12))});
+    // Drive the reused double-wishbone with Agent 2's actual vertical-compression state.
+    // In development-only previews, fallback derives the same visual range from tyre support.
+    const compression=d?.wheels[rig.wheelId].verticalCompressionM;
+    const fraction=compression===undefined
+      ?(EP003_SCENE.wheelRadiusM-frame.effectiveRadiusM)/MAX_LOADED_DROP_M
+      :(compression-.010)/.054;
+    animatePart(rig.suspension,{compression:Math.max(0,Math.min(1,fraction))});
     rig.suspension.visible=(options.exposure??1)>0;
   }
   deformRubber(rig,{...frame,angularPhaseRad:spin});
