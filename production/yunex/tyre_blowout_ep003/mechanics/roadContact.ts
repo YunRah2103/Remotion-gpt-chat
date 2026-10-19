@@ -24,6 +24,13 @@ export function sampleRubberVertex(
   if(c>0&&worldSin<-.06) {
     newR=Math.min(newR,frame.effectiveRadiusM/(-worldSin));
   }
+  // Optional restrained shoulder scuff: a few millimetres of irregular loss,
+// attached to the physical rubber material, not to an exploding wheel.
+  if(kind==='tyre'&&frame.treadSeparation>0){
+    const shoulder=clamp((r-.312)/.035,0,1);
+    const tooth=Math.pow(Math.sin(Math.atan2(y,x)*9),2);
+    newR-=Math.min(.004, .004*frame.treadSeparation*shoulder*tooth);
+  }
   const ratio=newR/r;
   const sidewall=kind==='tyre'?clamp((.345-r)/.074,0,1):0;
   const bulge=.021*c*sidewall*Math.pow(Math.max(0,-worldSin),5);
