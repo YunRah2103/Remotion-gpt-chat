@@ -34,7 +34,13 @@ export function sampleRubberVertex(
   const ratio=newR/r;
   const sidewall=kind==='tyre'?clamp((.345-r)/.074,0,1):0;
   const bulge=.021*c*sidewall*Math.pow(Math.max(0,-worldSin),5);
-  return [x*ratio,y*ratio,z+Math.sign(z)*bulge];
+  // Small circumferential sidewall creases travel WITH the tyre material while
+  // contact compression itself remains road-fixed. Axial-only displacement
+  // prevents wrinkles from poking below the road or folding across the rim.
+  const angle=Math.atan2(y,x);
+  const wrinkle=.0030*c*sidewall*Math.sin(12*angle+z*18)
+    *(.18+.82*Math.pow(Math.max(0,-worldSin),2));
+  return [x*ratio,y*ratio,z+Math.sign(z)*(bulge+wrinkle)];
 }
 export const toRoadHeight=(v:RubberVertex,phase:number,hubHeightM:number)=>
   hubHeightM + v[0]*Math.sin(phase)+v[1]*Math.cos(phase);
