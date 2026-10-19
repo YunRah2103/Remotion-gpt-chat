@@ -1,10 +1,9 @@
 /**
- * PINNED AUTHORITATIVE INTEGRATION SNAPSHOT (Agent 2 PR #199)
- * Source branch agent/ep003-02-dynamics @ cbb0281d2720821d48f4a77c1be74075dd906655
- * This is a BYTE-FOR-BYTE copy of Agent 2's model.ts body (below), used ONLY
- * to run standalone Agent 1 review previews before #199 is integrated.
- * On integration base, import directly from ../dynamics/model.ts and delete
- * this snapshot. Agent 2 is sole authority over parameters and trajectories.
+ * PINNED AUTHORITATIVE INTEGRATION SNAPSHOT (Agent 2 PR #199).
+ * Source agent/ep003-02-dynamics @ 197e02ca94c9d9687f8cc43dac3d89173eb4dfd2.
+ * Below this comment is exactly the current Agent 2 dynamics/model.ts body.
+ * This temporary review-only branch adapter must be deleted after integration;
+ * import ../dynamics/model.ts directly once #199 reaches the shared base.
  */
 /**
  * YUNEX EP003 / Agent 2. Illustrative deterministic planar four-contact vehicle dynamics.
@@ -48,7 +47,7 @@ export const DYNAMICS_ASSUMPTIONS = Object.freeze({
   rearAxleCorneringStiffnessNPerRad: 102000,
   failedCorneringStiffnessRatio: 0.55,
   nominalWheelRadiusM: EP003_SCENE.wheelRadiusM,
-  failedRadiusLossM: 0.073,
+  failedRadiusLossM: 0.060,
   integrationHz: 240,
   simulationHorizonSec: 32,
 });
