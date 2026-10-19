@@ -101,7 +101,7 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import hashlib, json, subprocess
-          from PIL import Image, ImageOps, ImageDraw
+          from PIL import Image, ImageOps, ImageDraw, ImageStat
 
           out=Path('previews/agent-2')
           cases=[('incident',150,[0.2,0.8,1.6,2.7,3.6,4.7]),
@@ -131,6 +131,22 @@ jobs:
               unique_hashes={line.split(',')[-1].strip() for line in framemd5.splitlines()
                              if line.strip() and not line.startswith('#')}
               assert len(unique_hashes)>=10, f'{name} insufficient temporal change: {len(unique_hashes)}'
+              # Guard against occluded/featureless moving frames: the old
+              # incident frame 108 was grey despite distinct temporal hashes.
+              fw,fh=72,128
+              raw=subprocess.check_output([
+                  'ffmpeg','-hide_banner','-v','error','-i',str(mp4),
+                  '-vf',f'scale={fw}:{fh},format=gray',
+                  '-pix_fmt','gray','-f','rawvideo','-'])
+              chunk=fw*fh
+              assert len(raw)==frames*chunk, f'{name}: incomplete raw-frame extraction'
+              contrasts=[]
+              for k in range(frames):
+                  frame=Image.frombytes('L',(fw,fh),raw[k*chunk:(k+1)*chunk])
+                  contrast=ImageStat.Stat(frame.crop((0,0,fw,111))).stddev[0]
+                  contrasts.append(contrast)
+              occluded=[(k,round(v,2)) for k,v in enumerate(contrasts) if v<12]
+              assert not occluded, f'{name} occluded source frames: {occluded[:25]}'
               thumbs=[]
               for i,t in enumerate(times):
                   still=out/f'{name}-{i:02d}.png'
@@ -148,6 +164,7 @@ jobs:
               qa['clips'].append({
                   'file':mp4.name,'frames':frames,'durationSec':frames/30,
                   'video':stream,'uniqueSampledFrameHashes':len(unique_hashes),
+                  'minimumVisualFrameContrast':round(min(contrasts),2),
                   'fullDecode':'passed','sha256':hashlib.sha256(mp4.read_bytes()).hexdigest(),
                   'bytes':mp4.stat().st_size})
           (out/'qa.json').write_text(json.dumps(qa,indent=2)+'\n')
