@@ -27,7 +27,7 @@ import {SteadyHands3D} from '../story/SteadyHands3D.tsx';
 import {ImpactEffects3D} from '../impact/Preview.tsx';
 import {rebaseDynamicsX,resolveBranchFrame} from './branchReplay.ts';
 import {DEFAULT_BRANCH_REPLAY} from './branchReplay.ts';
-import {sampleControlledFrame} from './developmentAdapter.ts';
+import {sampleControlledFrame} from './agent8Integration.ts';
 import {AGENT9_CHOICE_SCENE_X,sampleRealAgent8Wrong,sampleRealAgent2Correct} from './agent8Integration.ts';
 import {ChoiceOverlay,RewindVisualTransition} from './RewindVisualTransition.tsx';
 
@@ -122,8 +122,14 @@ const NativeAgent9Scene:React.FC<{
 }>=({d,tyre,impact,shot,tSec,width,height})=>{
  const road=useMemo(buildEpisodeHighway,[]);
  useEffect(()=>()=>disposeObject(road),[road]);
- const pose=sampleCinemaCamera({dynamics:d,tyre,shot,tSec,
+ const candidate=sampleCinemaCamera({dynamics:d,tyre,shot,tSec,
    progress01:.45,subtleImpactShake:false});
+ // 9:16 overhead: extra real lens height avoids cropping the whole car on
+ // a phone and keeps both road line and collision rail readable.
+ const pose=shot==='overhead-dynamics'
+   ? {...candidate,position:[candidate.position[0],candidate.position[1]+4.5,
+       candidate.position[2]] as const,fovDeg:52}
+   : candidate;
  return <AbsoluteFill style={{backgroundColor:'#b8cad5'}}>
    <ThreeCanvas width={width} height={height} shadows camera={{
      position:[...pose.position],near:pose.nearM,far:pose.farM,fov:pose.fovDeg}}>

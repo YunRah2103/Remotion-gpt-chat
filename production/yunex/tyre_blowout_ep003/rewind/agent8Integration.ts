@@ -10,7 +10,11 @@
 import type {VehicleDynamicsFrame,WheelId} from '../shared/contract.ts';
 import type {CrashOutcomeFrame} from '../impact/model.ts';
 import {crashIncidentFromDynamics,sampleCrashOutcome} from '../impact/model.ts';
-import {sampleControlledFrame} from './developmentAdapter.ts';
+import {sampleDynamics,DYNAMICS_DEFAULTS} from '../dynamics/model.ts';
+export const AGENT9_70MPH_PARAMS={...DYNAMICS_DEFAULTS,initialSpeedMps:70*0.44704};
+export function sampleControlledFrame(tSec:number):VehicleDynamicsFrame{
+  return sampleDynamics(tSec,AGENT9_70MPH_PARAMS);
+}
 import {DEFAULT_BRANCH_REPLAY} from './branchReplay.ts';
 
 const wheelIds:readonly WheelId[]=['front-left','front-right','rear-left','rear-right'];
