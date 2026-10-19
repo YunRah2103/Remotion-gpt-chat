@@ -40,7 +40,7 @@ export const DYNAMICS_ASSUMPTIONS = Object.freeze({
   rearAxleCorneringStiffnessNPerRad: 102000,
   failedCorneringStiffnessRatio: 0.55,
   nominalWheelRadiusM: EP003_SCENE.wheelRadiusM,
-  failedRadiusLossM: 0.073,
+  failedRadiusLossM: 0.060,
   integrationHz: 240,
   simulationHorizonSec: 32,
 });
