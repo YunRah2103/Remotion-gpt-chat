@@ -19,7 +19,7 @@ permissions:
   pull-requests: write
 concurrency:
   group: ep003-agent8-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   agent8-native:
     runs-on: ubuntu-24.04
@@ -78,7 +78,32 @@ jobs:
               "out/agent-8/hydrated-impact-$frame.png" --frame="$frame" \
               --gl=swangle --scale=0.25 --log=error
           done
-      - name: Render THREE REAL moving Remotion videos including A1/A2/A4
+      - name: Render authoritative A1 A2 A4 integrated crash FIRST
+        run: |
+          set -euxo pipefail
+          git rev-parse HEAD > out/agent-8/source-sha.txt
+          HYDRO=production/yunex/tyre_blowout_ep003/impact/HydratedEntry.tsx
+          npx --no-install remotion render "$HYDRO" EP003Agent8HydratedCrash \
+            out/agent-8/EP003Agent8HydratedCrash.mp4 \
+            --gl=swangle --scale=0.25 --codec=h264 --pixel-format=yuv420p \
+            --concurrency=1 --log=error
+          ffprobe -v error -show_entries stream=codec_name,width,height,avg_frame_rate,nb_frames \
+            -of json out/agent-8/EP003Agent8HydratedCrash.mp4 > out/agent-8/hydrated-ffprobe.json
+          ffmpeg -v error -xerror -i out/agent-8/EP003Agent8HydratedCrash.mp4 -f null -
+      - name: Upload EARLY decoded A1 A2 A4 integrated moving H264 preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: EP003-agent8-hydrated-first
+          path: |
+            out/agent-8/EP003Agent8HydratedCrash.mp4
+            out/agent-8/hydrated-impact-*.png
+            out/agent-8/hydrated-ffprobe.json
+            out/agent-8/integrated-physics-proof.json
+            out/agent-8/integration-pins.txt
+            out/agent-8/source-sha.txt
+          retention-days: 30
+          if-no-files-found: error
+      - name: Render remaining two original-GT crash shots
         run: |
           set -euxo pipefail
           mkdir -p out/agent-8
@@ -89,8 +114,6 @@ jobs:
               --gl=swangle --scale=0.25 --codec=h264 --pixel-format=yuv420p \
               --concurrency=1 --log=error
           done
-          HYDRO=production/yunex/tyre_blowout_ep003/impact/HydratedEntry.tsx
-          npx --no-install remotion render "$HYDRO" EP003Agent8HydratedCrash             out/agent-8/EP003Agent8HydratedCrash.mp4             --gl=swangle --scale=0.25 --codec=h264 --pixel-format=yuv420p             --concurrency=1 --log=error
       - name: FFprobe, full decode, time-separated frames and motion proof
         run: |
           set -euxo pipefail
