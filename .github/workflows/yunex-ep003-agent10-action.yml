@@ -98,6 +98,14 @@ jobs:
           npx --no-install remotion still previews/agent-10/entry.tsx EP003Agent10CrashAction \
             previews/agent-10/out/early-frames/genuine-rewind.png \
             --frame=143 --scale=0.5 --gl=swangle
+          # The contact is at 14.22s A9 master time -> ~79f in this 180f review.
+          # Phone QA must inspect BOTH the impact moment and final recovery.
+          npx --no-install remotion still previews/agent-10/entry.tsx EP003Agent10CrashAction \
+            previews/agent-10/out/early-frames/actual-contact-wide.png \
+            --frame=79 --scale=0.5 --gl=swangle
+          npx --no-install remotion still previews/agent-10/entry.tsx EP003Agent10RecoveryAction \
+            previews/agent-10/out/early-frames/recovery-unobstructed.png \
+            --frame=194 --scale=0.5 --gl=swangle
           npx --no-install remotion still previews/agent-10/entry.tsx EP003Agent10RecoveryAction             previews/agent-10/out/early-frames/hands-driving.png             --frame=30 --scale=0.5 --gl=swangle
       - name: Publish early frame proof
         if: always()
