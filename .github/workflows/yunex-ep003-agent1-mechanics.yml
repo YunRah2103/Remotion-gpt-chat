@@ -1,0 +1,58 @@
+name: YUNEX EP003 Agent 1 - native mechanics previews
+on:
+  push:
+    branches:
+      - agent/ep003-01-mechanics
+    paths:
+      - 'production/yunex/tyre_blowout_ep003/mechanics/**'
+      - 'previews/agent-1/**'
+      - 'tests/agent-1/**'
+      - '.github/workflows/yunex-ep003-agent1-mechanics.yml'
+permissions:
+  contents: read
+concurrency:
+  group: ep003-agent1-mechanics-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  native-mechanics:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Check out exact agent commit
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install FFmpeg and native Remotion dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          npm ci --no-audit --no-fund
+      - name: TypeScript and agent-specific real unit tests
+        run: |
+          npm run check
+          npx --no-install tsc --noEmit --project previews/agent-1/tsconfig.json
+          node --experimental-strip-types --test tests/agent-1/*.test.mjs
+          npm run worldkit:test
+          npm run partskit:test
+      - name: Render BOTH native Remotion moving MP4s and verify full decode
+        env:
+          REVIEW_SCALE: '0.5'
+        run: node previews/agent-1/render-previews.mjs
+      - name: Machine-readable media and sample-frame proof
+        if: success()
+        run: |
+          cat out/ep003-agent-1/preview-validation.json
+          find out/ep003-agent-1 -maxdepth 1 -type f -printf '%f %s bytes\n' | sort
+          sha256sum out/ep003-agent-1/*.mp4 | tee out/ep003-agent-1/SHA256SUMS.txt
+      - name: Upload two genuine moving review MP4s with contact stills
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EP003-AGENT1-MECHANICS-MP4-${{ github.run_id }}
+          path: out/ep003-agent-1
+          retention-days: 30
+          if-no-files-found: warn
