@@ -33,10 +33,10 @@ export function railBuckleAt(x:number,f:CrashOutcomeFrame):number {
 type Rail={root:T.Group;geom:T.BufferGeometry;original:Float32Array;
  material:T.MeshStandardMaterial};
 /** Keep opposite (-X/+Z) rail and the posts as the same original world-kit. */
-function prepareWorld():Rail {
- const root=createEnvironment({kind:'highway',timeOfDay:'day',seed:12});
+function prepareWorld(factory?:()=>T.Group):Rail {
+ const root=factory?factory():createEnvironment({kind:'highway',timeOfDay:'day',seed:12});
  root.traverse(o=>{
-  if(o instanceof T.Mesh&&o.name==='guardrail'&&o.position.z<0){
+  if(o instanceof T.Mesh&&((o.name==='guardrail'&&o.position.z<0)||o.name==='refuge-guardrail')){
    o.visible=false; // exactly one right rail, replaced by a deformable tube
   }
  });
@@ -63,8 +63,8 @@ function prepareWorld():Rail {
  root.add(mesh);
  return {root,geom:geometry,original:new Float32Array(positions),material};
 }
-export const CrashBarrierWorld:React.FC<{frame:CrashOutcomeFrame}>=({frame})=>{
- const prepared=useMemo(prepareWorld,[]);
+export const CrashBarrierWorld:React.FC<{frame:CrashOutcomeFrame;worldFactory?:()=>T.Group}>=({frame,worldFactory})=>{
+ const prepared=useMemo(()=>prepareWorld(worldFactory),[worldFactory]);
  useEffect(()=>()=>disposeObject(prepared.root),[prepared]);
  const attr=prepared.geom.getAttribute('position') as T.BufferAttribute;
  const arr=attr.array as Float32Array,initial=prepared.original;
