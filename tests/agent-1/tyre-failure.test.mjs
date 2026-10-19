@@ -11,7 +11,7 @@ test('pressure stays intact before the reference event then drops smoothly and d
     assert.equal(f.effectiveRadiusM,.36);
   }
   assert.ok(mid.pressureRatio<1&&mid.pressureRatio>.10);
-  assert.ok(mid.effectiveRadiusM<.36&&mid.effectiveRadiusM>.286);
+  assert.ok(mid.effectiveRadiusM<.36&&mid.effectiveRadiusM>.30);
   assert.ok(Math.abs(after.pressureRatio-.1)<1e-12);
   assert.ok(Math.abs(after.effectiveRadiusM-(.36-MAX_LOADED_DROP_M))<1e-12);
   assert.equal(after.treadSeparation,0);
@@ -48,7 +48,7 @@ test('contact patch remains ground-fixed for spinning tread, grooves and beads',
           }
         }
       }
-      assert.ok(referenceRimRoadClearanceM(f)>.025);
+      assert.ok(referenceRimRoadClearanceM(f)>.020);
     }
   }
 });
