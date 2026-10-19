@@ -32,14 +32,19 @@ export function sampleRubberVertex(
     newR-=Math.min(.004, .004*frame.treadSeparation*shoulder*tooth);
   }
   const ratio=newR/r;
-  const sidewall=kind==='tyre'?clamp((.345-r)/.074,0,1):0;
-  const bulge=.021*c*sidewall*Math.pow(Math.max(0,-worldSin),5);
-  // Small circumferential sidewall creases travel WITH the tyre material while
-  // contact compression itself remains road-fixed. Axial-only displacement
-  // prevents wrinkles from poking below the road or folding across the rim.
+  // Reuse the EXISTING lathe tyre's sidewall rings. The inner band next to the
+  // .278m rim remains attached, while the middle carcass balloons at the loaded
+  // lower shoulders. This reads at phone resolution without destroying tread.
+  const smooth=(a:number,b:number,v:number)=>{const u=clamp((v-a)/(b-a),0,1);return u*u*(3-2*u);};
+  const shoulder=kind==='tyre'
+    ?smooth(.282,.316,r)*(1-smooth(.342,.359,r)):0;
+  const groundArc=Math.pow(Math.max(0,-worldSin),3);
+  const bulge=.047*c*shoulder*groundArc;
+  // Fine creases belong to rubber material (angle/z), not the ground-fixed
+  // squashed patch, so they visibly flow past the stationary contact region.
   const angle=Math.atan2(y,x);
-  const wrinkle=.0030*c*sidewall*Math.sin(12*angle+z*18)
-    *(.18+.82*Math.pow(Math.max(0,-worldSin),2));
+  const wrinkle=.004*c*shoulder*Math.sin(13*angle+z*19)
+    *(.15+.85*groundArc);
   return [x*ratio,y*ratio,z+Math.sign(z)*(bulge+wrinkle)];
 }
 export const toRoadHeight=(v:RubberVertex,phase:number,hubHeightM:number)=>
