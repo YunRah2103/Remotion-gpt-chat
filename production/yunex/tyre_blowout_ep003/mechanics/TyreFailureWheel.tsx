@@ -62,7 +62,8 @@ type PreviewKind='macro'|'portrait';
 export const TyreMechanicsPreview:React.FC<{kind:PreviewKind}>=({kind})=>{
   const f=useCurrentFrame(),{fps,width,height}=useVideoConfig();
   const t=f/fps,macro=kind==='macro',dyn=sampleDynamics(t,DYNAMICS_DEFAULTS);
-  const offset:readonly [number,number,number]=[-72,0,0];
+  // Full physical travel remains within the existing world-kit's finite 220m road.
+  const offset:readonly [number,number,number]=[-91,0,0];
   const x=offset[0]+dyn.positionM[0],z=dyn.positionM[2];
   const failed=dyn.wheels['front-right'];
   const frame=sampleTyreFailure(t,{angularPhaseRad:failed.spinRad});
