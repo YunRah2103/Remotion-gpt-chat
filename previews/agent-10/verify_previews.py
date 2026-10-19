@@ -3,14 +3,15 @@
 from __future__ import annotations
 import argparse
 import json
+import hashlib
 import subprocess
 from pathlib import Path
 from PIL import Image,ImageDraw,ImageOps
 
 EXPECTED={"crash-impact-rewind.mp4":(180,6.0),
           "moving-recovery.mp4":(210,7.0)}
-TIMES={"crash-action-blocking.mp4":[.25,1.45,2.75,3.25,4.15,4.65,5.5],
-       "moving-recovery.mp4":[.25,1.2,1.85,3.5,4.7,5.7,6.65]}
+TIMES={"crash-impact-rewind.mp4":[.25,.85,1.45,2.10,2.43,2.63,2.85,3.05,3.35,3.85,4.45,5.20,5.85],
+       "moving-recovery.mp4":[.25,1.20,1.85,3.10,3.50,4.70,5.40,5.85,6.35,6.75]}
 
 def run(*args:str)->str:
     result=subprocess.run(args,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
@@ -63,7 +64,8 @@ def verify(video:Path,expected_frames:int,expected_duration:float):
         draw.text((i*tile_w+9,489),f"{sec:.2f}s",fill="white")
     contact=video.parent/(video.stem+"-contact-sheet.jpg")
     sheet.save(contact,quality=91,subsampling=0)
-    return {"file":video.name,"fps":30,"frames":expected_frames,
+    return {"file":video.name,"sha256":hashlib.sha256(video.read_bytes()).hexdigest(),
+      "fps":30,"frames":expected_frames,
       "durationSec":duration,"codec":"h264","width":540,"height":960,
       "fullFFmpegDecode":True,"motion":evidence,"contactSheet":contact.name,
       "claim":"native A8 collision + A9 reverse-time camera proof (engineering still illustrative)"
