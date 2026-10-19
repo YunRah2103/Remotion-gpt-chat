@@ -47,6 +47,7 @@ test('bounded control transition: stabilise before accelerator easing or braking
   assert.ok(c.driverThrottle01<a.driverThrottle01);
   assert.equal(a.driverBrake01,0);
   assert.equal(c.driverBrake01,0);
+  assert.equal(c.stage,'gradual-slowdown');
   assert.ok(d.driverBrake01>0&&d.driverBrake01<.15);
   for(const t of [0,1,2,4,6,8,10])assert.ok(Math.abs(sample(t).driverSteerRad)<=.055+1e-9);
 });
@@ -58,7 +59,8 @@ test('motion remains finite, forward, road-bounded and slowly decelerates',()=>{
       assert.ok(Number.isFinite(v),'no NaN or Infinity');
     assert.ok(x.distanceTravelledM>old.distanceTravelledM);
     assert.ok(x.positionM[0]>old.positionM[0]);
-    assert.ok(Math.abs(x.yawRad)<.3);
+    assert.ok(Math.abs(x.yawRad)<.08);
+    assert.ok(Math.abs(x.positionM[2]+1.85)<.70,'recover in initial lane without invented run-off');
     assert.ok(Math.abs(x.rollRad)<.045);
     assert.ok(Math.abs(x.pitchRad)<.045);
     for(const id of wheels){
