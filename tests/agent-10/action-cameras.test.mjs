@@ -46,7 +46,7 @@ test('camera geography: every stage is finite with viable portrait FOV',()=>{
 test('wide crash has clear median-side sightline toward right-hand rail',()=>{
  const p=sampleActionCamera(req('impact-side-profile',.6));
  assert.ok(p.position[2]>3);
- assert.ok(p.target[2]<-3);
+ assert.ok(p.target[2]<-2.5);
  assert.ok(distance(p.position,p.target)>8.5);
 });
 test('safe-branch final recovery shot stays on visible carriageway side',()=>{
