@@ -5,6 +5,7 @@ import path from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {build} from 'esbuild';
 import * as THREE from 'three';
+import {refugeRailZ} from '../../production/yunex/tyre_blowout_ep003/look/refuge-profile.ts';
 
 /** Real Three.js factory regression—not only algebraic refuge-profile tests.
  * Bundles JSX using the repository's existing Remotion/esbuild dependency.
