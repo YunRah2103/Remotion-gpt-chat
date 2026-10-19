@@ -10,7 +10,7 @@ import {sampleTyreFailure} from './sampleTyreFailure.ts';
 import {sampleRubberVertex} from './roadContact.ts';
 import type {TyreFailureParams} from './sampleTyreFailure.ts';
 
-export type TyreDamageStyle='pressure-only'|'frayed-edge';
+export type TyreDamageStyle='pressure-only'|'light-scuff';
 type DeformedMesh={mesh:T.Mesh;rest:Float32Array;kind:'tyre'|'groove'|'bead'};
 export type PreparedTyreRig={
   vehicle:T.Group; wheelId:WheelId; steering:T.Group; roll:T.Group;
