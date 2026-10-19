@@ -13,7 +13,7 @@ import {disposeObject} from '../../../../src/yunex/world-kit/geometry.ts';
 import {CameraAim,WorldLighting} from '../../../../src/yunex/world-kit/components.tsx';
 import type {WheelId} from '../shared/contract.ts';
 import {EP003_SCENE} from '../shared/contract.ts';
-import {sampleDynamics,previewRebasedPosition,DYNAMICS_DEFAULTS} from './model.ts';
+import {sampleDynamics,previewRebasedPosition,previewRebasedHubWorld,DYNAMICS_DEFAULTS} from './model.ts';
 
 type Shot = 'tyre-front-right'|'high-chase'|'rear-three-quarter'|'overhead';
 type Edit = {sourceSec:number;sourceAnchorSec:number;sceneX:number;shot:Shot};
@@ -51,7 +51,8 @@ const MovingCar:React.FC<{tSec:number;sceneX:number;anchorDistanceM:number}>=({t
   const position=previewRebasedPosition(data,anchorDistanceM,sceneX);
   root.position.set(...position);
   root.rotation.order='YXZ';
-  root.rotation.set(data.rollRad,data.yawRad,data.pitchRad,'YXZ');
+  // Three Euler pitch is X and body roll is Z; do not interchange them.
+  root.rotation.set(data.pitchRad,data.yawRad,data.rollRad,'YXZ');
   // Apply world-space authoritative hubs, not arbitrary local offsets.
   // Keeping this path identical to Agent 1's final rig prevents mismatched
   // suspension, wheel spin or tyre/body transforms on cross-agent handoff.
@@ -62,7 +63,10 @@ const MovingCar:React.FC<{tSec:number;sceneX:number;anchorDistanceM:number}>=({t
   root.updateMatrixWorld(true);
   for(const {pivot,id} of pivots){
     const wheel=data.wheels[id];
-    pivot.position.copy(root.worldToLocal(new T.Vector3(...wheel.hubWorldM)));
+    // The cut-local chassis and hubs MUST share the identical X offset.
+    pivot.position.copy(root.worldToLocal(new T.Vector3(
+      ...previewRebasedHubWorld(data,id,anchorDistanceM,sceneX)
+    )));
     pivot.rotation.y=wheel.steeringRad;
     const roll=pivot.getObjectByName('wheel-roll');
     if(roll){
