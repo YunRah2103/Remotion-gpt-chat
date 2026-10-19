@@ -1,6 +1,9 @@
 import * as T from 'three';
-import {createVehicle, animateVehicle, disposeObject} from '../../../../src/yunex/world-kit/index.ts';
-import {createPart, animatePart} from '../../../../src/yunex/parts-kit/index.ts';
+import {createVehicle} from '../../../../src/yunex/world-kit/vehicles.ts';
+import {animateVehicle} from '../../../../src/yunex/world-kit/motion.ts';
+import {disposeObject} from '../../../../src/yunex/world-kit/geometry.ts';
+import {createPart} from '../../../../src/yunex/parts-kit/models.ts';
+import {animatePart} from '../../../../src/yunex/parts-kit/motion.ts';
 import {EP003_SCENE} from '../shared/contract.ts';
 import type {TyreFrame,WheelFrame,WheelId,VehicleDynamicsFrame} from '../shared/contract.ts';
 import {sampleTyreFailure} from './sampleTyreFailure.ts';
@@ -46,7 +49,7 @@ export function prepareTyreRig(wheelId:WheelId='front-right',exposure=0):Prepare
     const opacity=1-.78*exposure;
     const mats=new Set<T.Material>();
     vehicle.traverse(o=>{
-      if(o instanceof T.Mesh&&o!==suspension){
+      if(o instanceof T.Mesh){
         if(['arched-body','body-shell','bonnet','hood','roof','door-skin','fender','front-fender','sill','cabin','side-window','windscreen','windshield'].includes(o.name)){
           for(const mat of Array.isArray(o.material)?o.material:[o.material])mats.add(mat);
         }
@@ -88,8 +91,9 @@ export function deformRubber(rig:PreparedTyreRig,frame:TyreFrame):void {
       if(sin<-.06&&compression>0){
         const touching=hubHeight/(-sin);
         if(kind==='bead'||tread>.05){
-          const capped=Math.min(newR,touching);
-          newR=newR+(capped-newR)*clamp(compression*3,0,1)*tread;
+          // Apply full ground cap even at the first frame of pressure loss.
+          // Partial blending can briefly drive rubber through the road.
+          newR=Math.min(newR,touching);
         }
       }
       // A little extra sidewall fullness near the bottom, never inflated outwards radially.
