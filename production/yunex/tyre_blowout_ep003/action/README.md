@@ -1,41 +1,57 @@
-# Agent 10 — moving action camera integration
+# Agent 10 — native impact and rewind cinematography
 
-Source of truth: [Issue #209](https://github.com/YunRah2103/Remotion-gpt-chat/issues/209). Owned code only under `action/**`, `previews/agent-10/**`, `tests/agent-10/**`, and the dedicated workflow.
+Scope: [Issue #209](https://github.com/YunRah2103/Remotion-gpt-chat/issues/209).
+Separate DRAFT [PR #210](https://github.com/YunRah2103/Remotion-gpt-chat/pull/210)
+targets `production/yunex-ep003-base`. No Agent 6 editor/timeline/root edits.
 
-## API for Agent 6
+## Real integrated video paths
+
+- `EP003Agent10CrashAction` 180 frames at 30fps (6s; 1080×1920 source, 540×960 review encode) integrates **Agent 8's real** `sampleCrashOutcome` via Agent 9's `resolveBranchFrame` / `sampleRealAgent8Wrong`. Same A8 collision event controls heading, rail contact, dent amounts and sparks/particles. The original A1 deforming front-right rubber, real kit GT, A4 original highway/daylight and A3 Three.js camera remain intact. No mock sideways movement, placeholder crash or fabricated collision state.
+- `EP003Agent10RecoveryAction` 210 frames (7s) uses **Agent 2's real** controlled response and A5 original wheel + driver hands. Variable outside camera shots and road parallax show the still-moving car slowing down; it does NOT imply guaranteed refuge stopping.
+- A9 playback explicitly reverses the physical collision source clock, including damage and particles; then resets to the exact A2 choice state with tyre still damaged. No fake repair.
+- Keep the informative **HYPOTHETICAL WRONG REACTION** disclaimer and Rewind/TRY AGAIN cue. Heavy braking does not *always* cause a collision.
+
+## Immutable department pins for review reproducibility
+
+- A1 mechanics: `7d47746d2fc584e935b5a9766eb1150e5b3dac38`
+- A2 dynamics: `e724786fc087b080e9de19e9e26bda6a815ce276`
+- A3 cinema: `938628271f9b50d975ee55491881a8fd2d4807a5`
+- A4 world: `a44f1b6c9c31105edd1a9b0d2de7f233d1223952`
+- A5 hands: `cd03c64f77705aa03ee5d5071e5cf18c669fa4ea`
+- A8 impact: `9aa1a092591336e4b6a2b1944e3e817c71e99271`
+- A9 rewind: `6b767e381418f51ace0aea53fbb7bf3f071a5f8d`
+
+The dedicated workflow Git-restores each pinned source directory without touching their PR branches or adding their code to the Agent 10 PR. A final merge of all departments is Agent 0/6 responsibility.
+
+## Exact API for Agent 6
 
 ```ts
-import {sampleActionCamera,selectActionCut,ACTION_CRASH_CUTS} from '../action/cameras.ts';
-const {cut,progress01} = selectActionCut(filmTimeSec,ACTION_CRASH_CUTS);
-const pose = sampleActionCamera({
-  stage:cut.stage,
-  sourceTimeSec:sourceTimeFromEditor, // external A2 / A8 / A9 clock
-  progress01,
-  dynamics:actualVehicleState,
-  impactFrame:{actualBarrierContact:impact.contact,contact01:impact.intensity}
+import {sampleActionCamera,ACTION_CRASH_CUTS,selectActionCut}
+  from '../action/cameras.ts';
+import {actionPreviewState} from '../action/previewState.ts';
+
+// Preview action film uses its own 0..6s clock.
+// Final master instead supplies the *real* A9 sampleBranchReplay()
+// movie->sourceTime mapping and true A8 sampleRealAgent8Wrong() state.
+const {cut,progress01}=selectActionCut(localShotTime,ACTION_CRASH_CUTS);
+const pose=sampleActionCamera({
+  stage:cut.stage,progress01,
+  sourceTimeSec:actualReplay.sourceTimeSec,
+  dynamics:actualVehicleFrame,
+  impactFrame:{
+    actualBarrierContact:Boolean(actualA8Impact?.contact.occurred),
+    contact01:actualA8Impact?actualA8Impact.bumperCrushM/.24:0
+  }
 });
 ```
 
-`sampleActionCamera` returns a world pose, lens, and `roadParallaxMps`. It NEVER modifies physical state. Apply to the actual Three camera and original GT rig. For cut-specific road rebases apply the same translation to all four `hubWorldM` centres, body root, impact FX and rail reference in the same world, never yaw/steering/wheel spin. `rebaseActionFrame` provides the body/wheel part of that operation. Never rebase midway through a shot or assume a static barrier follows the moving car.
+`ActionPreviewState` is a dedicated **review** edit sampler: local 0..6s preview maps to the A9 editorial span 12.83..16.015s, preserving the true A8 source clock rather than inventing a collision. The last preview frames return to the same safe-reaction choice state. The final Agent 6 master retains 800 frames/26.664s Cedar narration and is not created here.
 
-### Time / continuity
+- `sampleActionCamera` is deterministic, controls only camera pose/lens/shake and never changes physics or VO.
+- +X vehicle forward, -Z right rail, A4 upstream rail approx Z=-7.8.
+- All 4 hub X coordinates, car and A8 FX share the same cut rebase. Agent9's `rebaseDynamicsX` is used for the impact branch; independent A8 effect contact is already in scene world X.
+- True collision body/damage uses `Agent10DamagedOriginalCar`, which clones the original kit mesh before applying A8 bumper/fender/lamp state; A1 wheel remains the only failed wheel.
 
-- **filmTimeSec:** where the shot sits in the 800-frame Agent 6 narrative.
-- **sourceTimeSec:** absolute sampled physics/impact clock; only Agent 6 + Agent 9 decide the mapping.
-- **progress01:** 0–1 within a camera cut. This only dollies the camera. No physics acceleration is generated.
-- **impactFrame:** only from actual Agent 8 barrier contact. No shake without an actual contact signal.
-- Front-right tyre = negative Z. Camera reveal and driver POV match Agent 3.
-- Prefer 35–65° vertical FOV outdoors; 70° cockpit. No camera-roll gimmicks or grain.
+## Verification
 
-Suggested narration-aligned insertions for Agent 6: `emergency-pull` in 0–5s; `barrier-approach` 12.8–14.0s; `impact-side-profile` at the actual A8 first contact around 14–15.3s; `reverse-sweep` on the **genuine A9 time-reversed car and scene** 14.4–16.0s; `steady-driver` with A5 hands 16–19.8s; `moving-recovery-hero` 20–26.7s. Select other angles as needed; never displace the user's original 26.664s Cedar VO.
-
-## Evidence and honesty
-
-The dedicated compositions are **camera-blocking development previews**, not approved full EP003.
-
-- `EP003Agent10CrashAction` (6s) shows a temporary rightward displacement specifically to inspect where the rail is relative to the original moving car. This is **not Agent 8 collision dynamics or damage**. It is watermarked throughout. The last shot is a camera demonstration; there is NO genuine Agent 9 reverse. **Do not represent this as verified A8 impact.**
-- `EP003Agent10RecoveryAction` (7s) uses actual Agent 2 sampleDynamics, Agent 1 rubber, Agent 4 road and Agent 5 hands, with independently retimed moving angles. Never infer a successful stationary safe stop.
-- Workflow hydrates immutable vetted Agents 1–5 from their individual branches at the approved SHAs. `npm run check`, the agent-specific TS project, kit tests, and native MP4 render must pass. Artifacts include 540×960 30fps H.264 full-decode movies, contact sheets at event times, frame-motion statistics, and branch/commit provenance.
-- Final crash+rewind approval is BLOCKED until Agent 8's actual impact and Agent 9's actual reverse mapping are integrated and MP4s rerendered. Only Agent 6 can edit the final 800-frame timeline, then Agent 7 mixes audio.
-
-`previews/agent-10/verify_previews.py` rejects missing/undecodable files, wrong fps/frame count/duration or unacceptably static previews. Human phone-screen visual review is still necessary; numerical FFmpeg motion is not proof of cinematic quality, physics or safety.
+Workflow `.github/workflows/yunex-ep003-agent10-action.yml` runs native Remotion, FFprobe frame and H264 codec checks, complete FFmpeg decode, sampled temporal-motion statistics and impact/rewind contact sheets. Green workflow and inspectable artifact are mandatory before claiming playable delivery; code commits alone do not satisfy that. Visual phone review is required before Agent 6 picture lock. No accepted final mixed MP4 is implied by these independent previews.
