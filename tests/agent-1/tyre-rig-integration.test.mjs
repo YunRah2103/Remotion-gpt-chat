@@ -168,3 +168,31 @@ test('nonzero pitch and roll use true axes while every hub remains world-authori
       'out-of-order seeking does not accumulate pitch/roll deformation');
   }finally{disposeTyreRig(rig);}
 });
+
+test('actual rolling tread, original beads and grooves never clip world asphalt under pitch roll and steering',async()=>{
+  const {Vector3}=await import('three');
+  const rig=prepareTyreRig('front-right',0);
+  try{
+    assert.equal(rig.suspension.visible,false,'exterior view must not expose a free-floating PARTS spring');
+    for(const t of [.4,.95,1.35,2.1]){
+      const d=sampleDynamics(t);
+      const tilted={...d,pitchRad:.072*Math.sin(t*2),rollRad:-.067*Math.cos(t*3),
+        yawRad:d.yawRad+.049};
+      const wheel=tilted.wheels['front-right'];
+      const tyre={...sampleTyreFailure(t,{angularPhaseRad:wheel.spinRad}),
+        effectiveRadiusM:wheel.rollingRadiusM};
+      applyTyreFrame(rig,tyre,{dynamics:tilted});
+      let low=Infinity;
+      for(const entry of rig.meshes){
+        const a=entry.mesh.geometry.attributes.position.array;
+        for(let i=0;i<a.length;i+=3){
+          const h=new Vector3(a[i],a[i+1],a[i+2]).applyMatrix4(entry.mesh.matrixWorld).y;
+          if(h<low)low=h;
+          assert.ok(h>=-2e-4,
+            `world road crossing at t=${t}, kind=${entry.kind}, vertex=${i/3}: ${h}`);
+        }
+      }
+      assert.ok(low<.04,'rubber must remain near road, not float above it');
+    }
+  }finally{disposeTyreRig(rig);}
+});
