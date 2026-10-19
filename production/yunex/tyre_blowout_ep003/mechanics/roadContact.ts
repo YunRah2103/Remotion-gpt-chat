@@ -32,4 +32,4 @@ export function sampleRubberVertex(
 export const toRoadHeight=(v:RubberVertex,phase:number,hubHeightM:number)=>
   hubHeightM + v[0]*Math.sin(phase)+v[1]*Math.cos(phase);
 export const referenceRimRoadClearanceM=(f:TyreFrame)=>
-  f.effectiveRadiusM-EP003_SCENE.wheelRadiusM*.71;
+  f.effectiveRadiusM-(EP003_SCENE.wheelRadiusM*.71+.022);
