@@ -1,0 +1,216 @@
+name: AI ERA Expanded - V3 Film Editor
+
+on:
+  workflow_dispatch:
+    inputs:
+      rights_cleared:
+        description: 'I have confirmed redistribution rights for all footage and music'
+        type: boolean
+        required: true
+        default: false
+  push:
+    branches: [main, feature/ai-era-expanded-real-footage-20261019]
+    paths: ['src/ai-era/**','src/Root.tsx','.github/workflows/ai-era-expanded-v3.yml']
+  pull_request:
+    paths: ['src/ai-era/**','src/Root.tsx','.github/workflows/ai-era-expanded-v3.yml']
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm}
+      - run: npm ci
+      - run: npm run check
+      - name: V3 edit lab unit tests
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages 'Pillow>=10,<13'
+          python -m unittest discover -s production/tests -p test_yunex_edit_lab.py -v
+
+  render:
+    if: github.event_name == 'workflow_dispatch'
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    permissions: {contents: write, issues: read}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm}
+      - name: Prepare source scouting and editor tools
+        run: |
+          set -euo pipefail
+          npm ci
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --break-system-packages 'Pillow>=10,<13'
+      - id: atlas
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with:
+          issue_number: '186'
+          token: ${{ github.token }}
+          destination: work/ai-era-expanded/atlas
+      - id: chatgpt
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with:
+          issue_number: '172'
+          token: ${{ github.token }}
+          destination: work/ai-era-expanded/chatgpt
+      - id: claude
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with:
+          issue_number: '173'
+          token: ${{ github.token }}
+          destination: work/ai-era-expanded/claude
+      - id: gemini
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with:
+          issue_number: '174'
+          token: ${{ github.token }}
+          destination: work/ai-era-expanded/gemini
+      - id: deepseek
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with:
+          issue_number: '177'
+          token: ${{ github.token }}
+          destination: work/ai-era-expanded/deepseek
+      - id: grok
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with:
+          issue_number: '178'
+          token: ${{ github.token }}
+          destination: work/ai-era-expanded/grok
+      - id: kimi
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with:
+          issue_number: '175'
+          token: ${{ github.token }}
+          destination: work/ai-era-expanded/kimi
+      - id: qwen
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with:
+          issue_number: '176'
+          token: ${{ github.token }}
+          destination: work/ai-era-expanded/qwen
+      - id: perplexity
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with:
+          issue_number: '181'
+          token: ${{ github.token }}
+          destination: work/ai-era-expanded/perplexity
+      - id: mistral
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with:
+          issue_number: '184'
+          token: ${{ github.token }}
+          destination: work/ai-era-expanded/mistral
+      - id: copilot
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with:
+          issue_number: '182'
+          token: ${{ github.token }}
+          destination: work/ai-era-expanded/copilot
+      - id: meta
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with:
+          issue_number: '183'
+          token: ${{ github.token }}
+          destination: work/ai-era-expanded/meta
+      - id: sora
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with:
+          issue_number: '185'
+          token: ${{ github.token }}
+          destination: work/ai-era-expanded/sora
+      - name: Stage all verified real-footage sources and exact music
+        env:
+          SOURCE_ATLAS: ${{ steps.atlas.outputs.asset_path }}
+          SOURCE_CHATGPT: ${{ steps.chatgpt.outputs.asset_path }}
+          SOURCE_CLAUDE: ${{ steps.claude.outputs.asset_path }}
+          SOURCE_GEMINI: ${{ steps.gemini.outputs.asset_path }}
+          SOURCE_DEEPSEEK: ${{ steps.deepseek.outputs.asset_path }}
+          SOURCE_GROK: ${{ steps.grok.outputs.asset_path }}
+          SOURCE_KIMI: ${{ steps.kimi.outputs.asset_path }}
+          SOURCE_QWEN: ${{ steps.qwen.outputs.asset_path }}
+          SOURCE_PERPLEXITY: ${{ steps.perplexity.outputs.asset_path }}
+          SOURCE_MISTRAL: ${{ steps.mistral.outputs.asset_path }}
+          SOURCE_COPILOT: ${{ steps.copilot.outputs.asset_path }}
+          SOURCE_META: ${{ steps.meta.outputs.asset_path }}
+          SOURCE_SORA: ${{ steps.sora.outputs.asset_path }}
+        run: |
+          set -euo pipefail
+          mkdir -p public/ai-era-expanded out/ai-era-expanded
+          for model in atlas chatgpt claude gemini deepseek grok kimi qwen perplexity mistral copilot meta sora; do
+            upper=$(echo "$model" | tr '[:lower:]' '[:upper:]')
+            variable="SOURCE_$upper"
+            source_file="${!variable}"
+            test -s "$source_file"
+            duration=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$source_file")
+            awk -v t="$duration" 'BEGIN{if(t<15.5) exit 1}' || { echo "Source too short: $model" >&2; exit 1; }
+            cp "$source_file" "public/ai-era-expanded/$model.mp4"
+            sha256sum "public/ai-era-expanded/$model.mp4" >> out/ai-era-expanded/sources.sha256
+          done
+          curl -fLSs --retry 3 --max-time 90 \
+            'https://150cc436-fd69-4b0a-b8e6-22057b2f61f6.sandbox.floot.app/_cdn/static/eb220e8b-79d2-4cb6-822f-cc62f9878cca-ai_era_original_audio.mp3' \
+            -o public/ai-era-expanded/audio.mp3
+          echo '49c31510000ef0e92f644f8b1013192d566c805ea569f603db15f16f065f1f15  public/ai-era-expanded/audio.mp3' | sha256sum -c -
+      - name: V3 real-shot scouting and source contact sheets
+        run: |
+          set -euo pipefail
+          for model in atlas chatgpt claude gemini deepseek grok kimi qwen perplexity mistral copilot meta sora; do
+            python production/toolkits/yunex_edit_lab.py scout \
+              --video "public/ai-era-expanded/$model.mp4" \
+              --output "out/ai-era-expanded/v3-scout/$model" \
+              --max-shots 12
+          done
+      - name: V3 original soundtrack true-peak and loudness measurement
+        run: |
+          python production/toolkits/yunex_edit_lab.py meter \
+            --file public/ai-era-expanded/audio.mp3 \
+            --output out/ai-era-expanded/v3-original-audio-meter.json
+      - name: Native 35.6 second full-resolution Remotion render
+        run: |
+          npx remotion render src/index.ts AIEraAllAgents \
+            out/ai-era-expanded/AI_ERA_ALL_AGENTS_1080x1920.mp4 \
+            --codec=h264 --pixel-format=yuv420p --crf=18 --gl=swangle --concurrency=2
+      - name: V3 finished mix metering and full media QA
+        run: |
+          set -euo pipefail
+          MASTER=out/ai-era-expanded/AI_ERA_ALL_AGENTS_1080x1920.mp4
+          python production/toolkits/yunex_edit_lab.py meter \
+            --file "$MASTER" --output out/ai-era-expanded/v3-master-audio-meter.json
+          ffmpeg -hide_banner -loglevel error -xerror -i "$MASTER" -f null -
+          ffprobe -v error -show_entries stream=codec_name,width,height,avg_frame_rate \
+            -show_entries format=duration,size -of json "$MASTER" > out/ai-era-expanded/master-probe.json
+          ffmpeg -v error -ss 2.68 -i "$MASTER" -frames:v 1 -y out/ai-era-expanded/opening-hit.jpg
+          ffmpeg -v error -ss 22.37 -i "$MASTER" -frames:v 1 -y out/ai-era-expanded/second-hit.jpg
+          ffmpeg -v error -ss 31.31 -i "$MASTER" -frames:v 1 -y out/ai-era-expanded/finale.jpg
+          sha256sum "$MASTER" > out/ai-era-expanded/master.sha256
+      - name: Store only in private owner-review draft until rights clearance
+        if: inputs.rights_cleared != true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create "ai-era-expanded-v3-private-$GITHUB_RUN_ID" \
+            --draft --title 'AI ERA V3 - PRIVATE all AI real-footage edit' \
+            --notes 'Private review. Genuine 13-source YouTube excerpts; publication rights not verified. Do not publish this draft without permission.' \
+            out/ai-era-expanded/AI_ERA_ALL_AGENTS_1080x1920.mp4 \
+            out/ai-era-expanded/master.sha256 \
+            out/ai-era-expanded/master-probe.json \
+            out/ai-era-expanded/v3-original-audio-meter.json \
+            out/ai-era-expanded/v3-master-audio-meter.json
+          echo 'PRIVATE DRAFT RELEASE CREATED; not a publicly licensed edit.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Deliver rights-cleared final and V3 source reports
+        if: inputs.rights_cleared == true
+        uses: actions/upload-artifact@v4
+        with:
+          name: AI-ERA-ALL-AGENTS-V3-1080x1920
+          path: out/ai-era-expanded/
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: error
