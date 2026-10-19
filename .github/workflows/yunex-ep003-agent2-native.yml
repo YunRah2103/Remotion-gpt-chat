@@ -4,6 +4,12 @@ name: EP003 Agent 2 - actual native Remotion previews
 # compositions. Existing production-pr-review only discovers src/Root.tsx
 # and would otherwise smoke-test the unrelated legacy GpuDriveFilm.
 on:
+  push:
+    branches: ['agent/ep003-02-dynamics']
+    paths:
+      - 'production/yunex/tyre_blowout_ep003/dynamics/**'
+      - 'tests/agent-2/**'
+      - '.github/workflows/yunex-ep003-agent2-native.yml'
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
