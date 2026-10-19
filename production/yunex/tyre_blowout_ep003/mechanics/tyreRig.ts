@@ -107,6 +107,11 @@ export function applyTyreFrame(rig:PreparedTyreRig,frame:TyreFrame,options:{
   // The preview has one illustrated collapsing corner. In final integration,
   // Agent 2 owns ALL wheel hubs, individual spins, and steering angles.
   steering.position.y=frame.effectiveRadiusM;
+  if(!d&&currentWheel){
+    vehicle.updateMatrixWorld(true);
+    steering.position.copy(vehicle.worldToLocal(new T.Vector3(...currentWheel.hubWorldM)));
+    steering.rotation.y=currentWheel.steeringRad;
+  }
   if(d){
     vehicle.updateMatrixWorld(true);
     vehicle.traverse(o=>{
