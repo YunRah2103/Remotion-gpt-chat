@@ -27,7 +27,8 @@ ffmpeg -nostdin -hide_banner -loglevel error -y -i "$picture" -i "$voice" \
   -af 'loudnorm=I=-16:TP=-1.5:LRA=9,apad=pad_dur=0.1' \
   -t 26.6666667 -movflags +faststart "$out"
 [[ "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=noprint_wrappers=1:nokey=1 "$out")" == 800 ]] || exit 4
-[[ "$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of default=noprint_wrappers=1:nokey=1 "$out")" == '1080,1920' ]] || exit 4
+[[ "$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of default=noprint_wrappers=1:nokey=1 "$out")" == 1080 ]] || exit 4
+[[ "$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=noprint_wrappers=1:nokey=1 "$out")" == 1920 ]] || exit 4
 [[ "$(ffprobe -v error -select_streams a:0 -show_entries stream=sample_rate -of default=noprint_wrappers=1:nokey=1 "$out")" == 48000 ]] || exit 4
 [[ "$(ffprobe -v error -select_streams v:0 -show_entries stream=index -of default=noprint_wrappers=1:nokey=1 "$out" | wc -l)" -eq 1 ]] || exit 4
 [[ "$(ffprobe -v error -select_streams a:0 -show_entries stream=index -of default=noprint_wrappers=1:nokey=1 "$out" | wc -l)" -eq 1 ]] || exit 4
