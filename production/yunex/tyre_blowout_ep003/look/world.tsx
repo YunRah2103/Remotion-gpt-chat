@@ -241,6 +241,29 @@ export function finishGrandTourer(model: T.Group): T.Group {
   return model;
 }
 
+/** Uses Agent 2's exact wheel centres, rotation phases and steering; the
+ * original wheel hierarchy, brake assembly and entire kit body are retained.
+ */
+export function applyDynamicsToGrandTourer(model:T.Group, frame:VehicleDynamicsFrame):void {
+  animateVehicle(model,frame.distanceTravelledM,frame.driverSteerRad);
+  model.position.set(...frame.positionM);
+  model.rotation.set(frame.rollRad,frame.yawRad,frame.pitchRad,'YXZ');
+  model.updateMatrixWorld(true);
+  model.traverse(object=>{
+    if(!(object instanceof T.Group) || !object.name.startsWith('steer-') ||
+      typeof object.userData.steering!=='boolean') return;
+    const front=object.position.x>0,right=object.position.z<0;
+    const id=(front?'front-':'rear-')+(right?'right':'left');
+    const wheel=frame.wheels[id as keyof VehicleDynamicsFrame['wheels']];
+    if(!wheel)return;
+    const desiredHub=model.worldToLocal(new T.Vector3(...wheel.hubWorldM));
+    object.position.copy(desiredHub);
+    object.rotation.y=wheel.steeringRad;
+    const roll=object.getObjectByName('wheel-roll');
+    if(roll)roll.rotation.z=wheel.spinRad;
+  });
+}
+
 /** Look department consumes authoritative motion; it never samples its own. */
 export const EpisodeWorld:React.FC=()=>{
   const model=useMemo(buildEpisodeHighway,[]);
@@ -276,11 +299,7 @@ export const EpisodeGrandTourer:React.FC<{
   const model=useMemo(()=>finishGrandTourer(createVehicle({
     variant:'grand-tourer',color:EP003_SCENE.paint,lights})),[lights]);
   useEffect(()=>()=>disposeObject(model),[model]);
-  animateVehicle(model,dynamics.distanceTravelledM,dynamics.driverSteerRad);
-  model.position.set(...dynamics.positionM);
-  model.rotation.order='YXZ';
-  // Three +Y yaw; +Z pitch and +X roll, both small angles as supplied.
-  model.rotation.set(dynamics.rollRad,dynamics.yawRad,dynamics.pitchRad,'YXZ');
+  applyDynamicsToGrandTourer(model,dynamics);
   return <>
     <ContactOcclusion dynamics={dynamics}/>
     <primitive object={model}/>
