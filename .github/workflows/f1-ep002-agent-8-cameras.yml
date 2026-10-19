@@ -1,0 +1,104 @@
+name: YUNEX F1 EP002 — 23s2 Premium Cinematography
+on:
+  push:
+    branches: [agent/f1-ep002-08-camera-polish]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - name: Original picture / physics / camera safety
+        run: |
+          node --experimental-strip-types --test \
+            tests/f1-line-ep002/agent-2.test.mjs \
+            tests/f1-line-ep002/agent-3.cinema.test.mjs \
+            tests/f1-line-ep002/agent-6.picture.test.mjs \
+            tests/f1-line-ep002/agent-8.premium-camera.test.mjs
+  render:
+    needs: tests
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - composition: YUNEXF1EP002Premium23s2Preview
+            tier: 540p-review
+          - composition: YUNEXF1EP002Premium23s2
+            tier: native-1080p
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Install FFmpeg and prepare output
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          mkdir -p "out/f1-ep002-camera/${{ matrix.tier }}/stills"
+      - name: Render all 696 physically animated 3D frames
+        run: |
+          npx remotion render src/yunex/f1-line-ep002/editor/entry.tsx \
+            ${{ matrix.composition }} \
+            "out/f1-ep002-camera/${{ matrix.tier }}/browser.mp4" \
+            --gl=swangle --codec=h264 --pixel-format=yuv420p \
+            --concurrency=1 --log=error
+      - name: Preserve Agent 6's approved native BT709 picture grade
+        run: |
+          set -euo pipefail
+          dir="out/f1-ep002-camera/${{ matrix.tier }}"
+          ffmpeg -nostdin -y -v error -xerror -i "$dir/browser.mp4" \
+            -vf "scale=in_range=pc:out_range=tv,hqdn3d=0.8:0.6:1.3:0.9,eq=contrast=1.20:saturation=1.28:brightness=-0.018:gamma=0.98,colorbalance=rs=-0.012:bs=0.045:bm=0.018,unsharp=5:5:0.24:3:3:0.0,format=yuv420p" \
+            -c:v libx264 -crf 16 -preset slow -pix_fmt yuv420p \
+            -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 \
+            -movflags +faststart "$dir/YUNEX_EP002_PREMIUM_23S2_PICTURE.mp4"
+          rm "$dir/browser.mp4"
+      - name: Verify all video frames and native H264 playback
+        run: |
+          set -euo pipefail
+          dir="out/f1-ep002-camera/${{ matrix.tier }}"
+          vid="$dir/YUNEX_EP002_PREMIUM_23S2_PICTURE.mp4"
+          ffprobe -v error -show_entries stream=codec_type,codec_name,width,height,nb_frames,r_frame_rate,pix_fmt,color_range -show_entries format=duration -of json "$vid" > "$dir/ffprobe.json"
+          ffmpeg -nostdin -v error -xerror -i "$vid" -f null -
+          ffmpeg -nostdin -v error -xerror -i "$vid" -vf fps=1 -f framemd5 "$dir/motion.md5"
+          ffmpeg -nostdin -v info -i "$vid" -vf "blackdetect=d=.15:pix_th=.05:pic_th=.98" -f null - 2>"$dir/blackdetect.log"
+          for time in .2 1.5 3.5 5.5 7.5 9.5 12 14.5 17.5 19.6 20.8 21.8 22.9; do
+            ffmpeg -nostdin -v error -y -ss "$time" -i "$vid" -frames:v 1 "$dir/stills/frame-$time.jpg"
+          done
+          ffmpeg -nostdin -v error -y -i "$vid" -vf "fps=1/2.9,scale=270:480,tile=3x3" -frames:v 1 "$dir/contact-sheet.jpg"
+          python3 - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('out/f1-ep002-camera/${{ matrix.tier }}')
+          j=json.loads((p/'ffprobe.json').read_text())
+          v=next(x for x in j['streams'] if x['codec_type']=='video')
+          assert v['codec_name']=='h264' and v['pix_fmt']=='yuv420p' and v['color_range']=='tv',v
+          assert v['r_frame_rate']=='30/1' and int(v['nb_frames'])==696,v
+          assert (v['width'],v['height'])==((540,960) if '${{ matrix.tier }}'=='540p-review' else (1080,1920)),v
+          assert abs(float(j['format']['duration'])-23.2)<.01,j
+          h=[x.rsplit(',',1)[-1] for x in (p/'motion.md5').read_text().splitlines() if x and not x.startswith('#')]
+          assert len(h)>=23 and len(set(h))>=19,h
+          assert 'black_start:' not in (p/'blackdetect.log').read_text()
+          assert len(list((p/'stills').glob('*.jpg')))==13
+          (p/'QC_OK.json').write_text(json.dumps({'frames':696,'seconds':23.2,'fps':30,'native1080p':('${{ matrix.tier }}'=='native-1080p'),'completeDecode':True,'uniqueOneSecondFrames':len(set(h))},indent=2))
+          print('PASS 696-frame cinematic film')
+          PY
+      - name: Publish new picture-only movie + real proof stills
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-F1-EP002-Premium-Cameras-${{ matrix.tier }}-23s2
+          path: out/f1-ep002-camera/${{ matrix.tier }}/
+          retention-days: 21
+          if-no-files-found: warn
