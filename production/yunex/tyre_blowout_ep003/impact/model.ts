@@ -94,7 +94,11 @@ function build(p:Required<CrashBranchParams>):readonly Step[]{
    pitch=lerp(pitch,clamp(.024*brake,-.035,.032),dt*7);
    const rail=impactRailZ(x);
    if(z-projectedRightHalfWidthM(yaw)<=rail){
-    hitAt=t;hitX=x;hitZ=rail;hitSpeed=v;
+    hitAt=t;
+    // The front-right bumper/fender corner, not the centre of the car,
+    // is the actual first contact with the right-hand steel barrier.
+    hitX=x+HALF_LENGTH*Math.cos(yaw)-HALF_WIDTH*Math.sin(yaw);
+    hitZ=rail;hitSpeed=v;
     z=rail+projectedRightHalfWidthM(yaw)+.028;
     v*=.65;rate*=.28;
    }
