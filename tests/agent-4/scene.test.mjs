@@ -6,6 +6,7 @@ import {pathToFileURL} from 'node:url';
 import {build} from 'esbuild';
 import * as THREE from 'three';
 import {refugeRailZ} from '../../production/yunex/tyre_blowout_ep003/look/refuge-profile.ts';
+import {makePremiumAsphaltTexture} from '../../production/yunex/tyre_blowout_ep003/look/asphalt.ts';
 
 /** Real Three.js factory regression—not only algebraic refuge-profile tests.
  * Bundles JSX using the repository's existing Remotion/esbuild dependency.
@@ -37,6 +38,13 @@ test('real Three scene retains kit world and upward-facing contiguous paved refu
     assert.ok(world.getObjectByName('road'),'kit asphalt must survive');
     assert.ok(world.getObjectByName('arched-body')===undefined,'vehicle must remain a separate component');
     const tarmac=world.getObjectByName('real-refuge-asphalt');
+    const mainRoad=world.getObjectByName('road');
+    assert.ok(mainRoad?.material instanceof THREE.MeshStandardMaterial);
+    assert.ok(mainRoad.material.map instanceof THREE.DataTexture,
+      'clean asphalt should have low-frequency material variation, not a flat colour');
+    assert.equal(mainRoad.material.bumpMap,null,'no glittering high-frequency bump');
+    assert.equal(mainRoad.material.map,tarmac.material.map,
+      'refuge and road must use the same restrained asphalt texture');
     assert.ok(tarmac instanceof THREE.Mesh,'actual THREE.Mesh road extension required');
     const p=tarmac.geometry.getAttribute('position');
     const normal=tarmac.geometry.getAttribute('normal');
@@ -103,4 +111,22 @@ test('soft wheel-contact texture is deterministic and fades smoothly to zero',as
     assert.equal(data[1],0,'corners must be fully transparent');
     assert.ok(data[(Math.floor(height/2)*width+width-1)*4+1]<10);
   }finally{texture.dispose();}
+});
+
+test('premium asphalt tone is restrained, tileable, deterministic and has mipmaps',()=>{
+  const first=makePremiumAsphaltTexture(),second=makePremiumAsphaltTexture();
+  try {
+    assert.deepEqual(first.image.data,second.image.data,'no temporal random grain');
+    assert.equal(first.image.width,128);
+    assert.equal(first.image.height,128);
+    assert.equal(first.wrapS,THREE.RepeatWrapping);
+    assert.equal(first.wrapT,THREE.RepeatWrapping);
+    assert.equal(first.minFilter,THREE.LinearMipmapLinearFilter);
+    assert.equal(first.colorSpace,THREE.SRGBColorSpace);
+    const values=[];
+    for(let i=0;i<first.image.data.length;i+=4)values.push(first.image.data[i]);
+    assert.ok(Math.min(...values)>=240,'avoid black speckle');
+    assert.ok(Math.max(...values)<=252,'avoid washed out white flecks');
+    assert.ok(new Set(values).size>=5,'subtle macro tone must not be a flat fill');
+  } finally {first.dispose();second.dispose();}
 });
