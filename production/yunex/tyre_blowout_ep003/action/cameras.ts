@@ -139,9 +139,9 @@ export function sampleActionCamera(req:ActionCameraRequest):ActionCameraPose {
       // Original A2 car keeps rolling: elevated rear-right tracking shot.
       // Camera is INSIDE the right rail on carriageway (-Z) not behind
       // A4's solid concrete median; 9:16 lens retains full undamaged GT.
-      position=lerp3([-7.45,3.30,-3.05],[-5.0,3.65,-2.65],eased);
-      target=lerp3([.35,.83,.1],[.95,.84,.1],eased);
-      fov=mix(55,57,eased);break;
+      position=lerp3([-12.8,4.25,-3.65],[-11.2,4.65,-3.05],eased);
+      target=lerp3([.20,.83,.05],[.65,.84,.05],eased);
+      fov=mix(53,55,eased);break;
     }
     default: throw new Error('Agent 10: unknown stage');
   }
