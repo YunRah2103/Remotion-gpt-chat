@@ -150,6 +150,17 @@ test('Agent 8 actual collision and Agent 9 reversed-time A8 damage',()=>{
  assert.ok(restart.tyre.failureProgress>.9,
    'A9 restart must NOT magically repair the front-right tyre');
 });
+test('FIRST Agent8 contact occurs in wide rail-impact camera, not aftermath cut',()=>{
+  let first=null;
+  for(let i=0;i<95;i++){
+    const sample=actionPreviewState(i/30,'crash-action');
+    if(sample.impact?.contact.occurred){first=sample;break;}
+  }
+  assert.ok(first,'Agent8 actual contact must be sampled inside review');
+  assert.equal(first.stage,'impact-side-profile',
+    'wide full-car view must show actual FIRST CONTACT, not aftermath');
+  assert.ok(first.filmTimeSec>=1.21&&first.filmTimeSec<2.43);
+});
 test('A8 rail strike is real and not a fake script-driven camera event',()=>{
  let foundContact=false,foundDamage=false,earlier=null;
  for(let i=0;i<180;i++){
