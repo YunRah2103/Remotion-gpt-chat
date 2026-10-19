@@ -1,0 +1,108 @@
+name: AI ERA - Real S25 V4 Footage
+on:
+  workflow_dispatch:
+    inputs:
+      rights_cleared:
+        description: 'I confirm I hold rights to publish the resulting edit and its soundtrack'
+        type: boolean
+        default: false
+        required: true
+  push:
+    branches: [feature/ai-aura-real-footage-remotion-20261019]
+    paths: ['src/ai-era/**', 'src/Root.tsx', '.github/workflows/ai-era-real-footage.yml']
+  pull_request:
+    paths: ['src/ai-era/**', 'src/Root.tsx', '.github/workflows/ai-era-real-footage.yml']
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm}
+      - run: npm ci
+      - run: npm run check
+  render:
+    if: github.event_name == 'workflow_dispatch'
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 110
+    permissions: {contents: write, issues: read}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm}
+      - name: Install tools
+        run: |
+          npm ci
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - id: chatgpt
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with: {issue_number: '172', token: ${{ github.token }}, destination: work/ai-era/chatgpt}
+      - id: claude
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with: {issue_number: '173', token: ${{ github.token }}, destination: work/ai-era/claude}
+      - id: gemini
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with: {issue_number: '174', token: ${{ github.token }}, destination: work/ai-era/gemini}
+      - id: kimi
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with: {issue_number: '175', token: ${{ github.token }}, destination: work/ai-era/kimi}
+      - id: qwen
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with: {issue_number: '176', token: ${{ github.token }}, destination: work/ai-era/qwen}
+      - id: deepseek
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with: {issue_number: '177', token: ${{ github.token }}, destination: work/ai-era/deepseek}
+      - id: grok
+        uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
+        with: {issue_number: '178', token: ${{ github.token }}, destination: work/ai-era/grok}
+      - name: Stage phone MP4s and exact original audio
+        env:
+          CHATGPT: ${{ steps.chatgpt.outputs.asset_path }}
+          CLAUDE: ${{ steps.claude.outputs.asset_path }}
+          GEMINI: ${{ steps.gemini.outputs.asset_path }}
+          KIMI: ${{ steps.kimi.outputs.asset_path }}
+          QWEN: ${{ steps.qwen.outputs.asset_path }}
+          DEEPSEEK: ${{ steps.deepseek.outputs.asset_path }}
+          GROK: ${{ steps.grok.outputs.asset_path }}
+        run: |
+          set -euo pipefail
+          mkdir -p public/ai-era out/ai-era
+          for model in chatgpt claude gemini kimi qwen deepseek grok; do
+            upper=$(echo "$model" | tr '[:lower:]' '[:upper:]')
+            source_path=$(printenv "$upper")
+            test -s "$source_path"
+            ffprobe -v error -select_streams v:0 -show_entries stream=width,height,codec_name -of default=nw=1 "$source_path" > "out/ai-era/$model-source.txt"
+            duration=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$source_path")
+            awk -v v="$duration" 'BEGIN{if(v < 12.1) exit 1}' || { echo "Source too short: $model" >&2; exit 1; }
+            cp "$source_path" "public/ai-era/$model.mp4"
+          done
+          curl -fLSs --retry 3 --max-time 75 \
+            'https://150cc436-fd69-4b0a-b8e6-22057b2f61f6.sandbox.floot.app/_cdn/static/eb220e8b-79d2-4cb6-822f-cc62f9878cca-ai_era_original_audio.mp3' \
+            -o public/ai-era/audio.mp3
+          echo '49c31510000ef0e92f644f8b1013192d566c805ea569f603db15f16f065f1f15  public/ai-era/audio.mp3' | sha256sum -c -
+      - name: Render native Remotion movie
+        run: |
+          set -euo pipefail
+          npx remotion render src/index.ts AIEraRealFootage out/ai-era/AI_ERA_Real_1080x1920.mp4 --codec=h264 --pixel-format=yuv420p --crf=18 --gl=swangle --concurrency=2
+      - name: Full video/audio decoding and proof
+        run: |
+          set -euo pipefail
+          ffmpeg -hide_banner -loglevel error -xerror -i out/ai-era/AI_ERA_Real_1080x1920.mp4 -f null -
+          ffprobe -v error -show_entries stream=codec_name,width,height,avg_frame_rate -show_entries format=duration,size -of json out/ai-era/AI_ERA_Real_1080x1920.mp4 | tee out/ai-era/probe.json
+          ffmpeg -hide_banner -loglevel error -ss 3.7 -i out/ai-era/AI_ERA_Real_1080x1920.mp4 -frames:v 1 -y out/ai-era/opening.jpg
+          ffmpeg -hide_banner -loglevel error -ss 30.4 -i out/ai-era/AI_ERA_Real_1080x1920.mp4 -frames:v 1 -y out/ai-era/finale.jpg
+          sha256sum out/ai-era/AI_ERA_Real_1080x1920.mp4 > out/ai-era/master.sha256
+      - name: Keep unlicensed source clips private
+        if: inputs.rights_cleared != true
+        run: echo 'Rendered and verified locally; no downloadable public artifact because publishing rights were not confirmed.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Share completed MP4 only if authorised for publication
+        if: inputs.rights_cleared == true
+        uses: actions/upload-artifact@v4
+        with:
+          name: AI-ERA-real-video-1080x1920
+          path: out/ai-era/
+          retention-days: 14
+          compression-level: 0
