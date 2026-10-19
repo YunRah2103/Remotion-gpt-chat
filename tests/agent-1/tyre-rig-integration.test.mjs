@@ -58,3 +58,34 @@ test('standalone wheel frame overrides preview fixture hub and steer',()=>{
     assert.equal(rig.roll.rotation.z,-91);
   } finally {disposeTyreRig(rig);}
 });
+
+test('authoritative dynamics drives all four spins, hubs and steering independently',()=>{
+  const rig=prepareTyreRig();
+  try{
+    const names=['front-left','front-right','rear-left','rear-right'];
+    const wheels=Object.fromEntries(names.map((id,i)=>{
+      const front=id.startsWith('front'),right=id.endsWith('right');
+      const x=(front?1.46:-1.46),z=(right?-.88:.88);
+      return [id,{wheel:id,hubWorldM:[15+x,.35,-1.85+z],
+        spinRad:-91-i,steeringRad:front?.02+i*.01:0,
+        rollingRadiusM:id==='front-right'?.3:.36,
+        verticalCompressionM:0}];
+    }));
+    const dynamics={tSec:1.2,positionM:[15,0,-1.85],yawRad:0,pitchRad:0,rollRad:0,
+      worldSpeedMps:27,distanceTravelledM:31,driverSteerRad:.3,
+      driverThrottle01:.1,driverBrake01:0,wheels,stage:'rapid-deflation'};
+    applyTyreFrame(rig,params(1.2,-3),{dynamics});
+    let found=0;
+    rig.vehicle.traverse(o=>{
+      if(!o.children?.some(v=>v.userData.wheel))return;
+      const x=o.position.x,z=o.position.z;
+      const id=`${x>0?'front':'rear'}-${z<0?'right':'left'}`;
+      const state=wheels[id],spin=o.children.find(v=>v.userData.wheel);
+      assert.ok(Math.abs(o.position.y-.35)<1e-9);
+      assert.equal(o.rotation.y,state.steeringRad);
+      assert.equal(spin.rotation.z,state.spinRad);
+      found++;
+    });
+    assert.equal(found,4);
+  }finally {disposeTyreRig(rig);}
+});
