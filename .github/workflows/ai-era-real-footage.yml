@@ -39,25 +39,46 @@ jobs:
           sudo apt-get install -y -qq ffmpeg
       - id: chatgpt
         uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
-        with: {issue_number: '172', token: ${{ github.token }}, destination: work/ai-era/chatgpt}
+        with:
+          issue_number: '172'
+          token: ${{ github.token }}
+          destination: work/ai-era/chatgpt
       - id: claude
         uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
-        with: {issue_number: '173', token: ${{ github.token }}, destination: work/ai-era/claude}
+        with:
+          issue_number: '173'
+          token: ${{ github.token }}
+          destination: work/ai-era/claude
       - id: gemini
         uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
-        with: {issue_number: '174', token: ${{ github.token }}, destination: work/ai-era/gemini}
+        with:
+          issue_number: '174'
+          token: ${{ github.token }}
+          destination: work/ai-era/gemini
       - id: kimi
         uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
-        with: {issue_number: '175', token: ${{ github.token }}, destination: work/ai-era/kimi}
+        with:
+          issue_number: '175'
+          token: ${{ github.token }}
+          destination: work/ai-era/kimi
       - id: qwen
         uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
-        with: {issue_number: '176', token: ${{ github.token }}, destination: work/ai-era/qwen}
+        with:
+          issue_number: '176'
+          token: ${{ github.token }}
+          destination: work/ai-era/qwen
       - id: deepseek
         uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
-        with: {issue_number: '177', token: ${{ github.token }}, destination: work/ai-era/deepseek}
+        with:
+          issue_number: '177'
+          token: ${{ github.token }}
+          destination: work/ai-era/deepseek
       - id: grok
         uses: YunRah2103/Remotion-gpt-chat/.github/actions/yunex-v4-import@main
-        with: {issue_number: '178', token: ${{ github.token }}, destination: work/ai-era/grok}
+        with:
+          issue_number: '178'
+          token: ${{ github.token }}
+          destination: work/ai-era/grok
       - name: Stage phone MP4s and exact original audio
         env:
           CHATGPT: ${{ steps.chatgpt.outputs.asset_path }}
