@@ -82,12 +82,27 @@ jobs:
           set -euo pipefail
           f="out/agent6/part-${{ matrix.part }}.mp4"
           ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,width,height,avg_frame_rate,nb_frames -of default=nw=1 "$f" | tee out/agent6/part-${{ matrix.part }}.txt
-          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of csv=p=0 "$f")" = 1080
-          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=p=0 "$f")" = 1920
-          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of csv=p=0 "$f")" = 200
-          ffmpeg -hide_banner -v error -xerror -i "$f" -f null -
+          echo "::group::Explicit native segment probe"
+          ffprobe -v error -select_streams v:0 -show_entries stream=width,height,avg_frame_rate,nb_frames,codec_name -of json "$f" | tee "out/agent6/part-${{ matrix.part }}-probe.json"
+          python3 - "$f" <<'PY'
+          import json,subprocess,sys
+          f=sys.argv[1]
+          data=json.loads(subprocess.check_output(['ffprobe','-v','error','-select_streams','v:0','-show_entries','stream=codec_name,width,height,avg_frame_rate,nb_frames','-of','json',f],text=True))
+          video=data['streams'][0]
+          expected={'codec_name':'h264','width':1080,'height':1920,'avg_frame_rate':'30/1','nb_frames':'200'}
+          print('Actual video:',repr(video),flush=True)
+          for field,value in expected.items():
+              assert str(video.get(field)) == str(value),f'{field}: actual {video.get(field)!r}, expected {value!r}'
+          print('PASS exact 200-frame 1080×1920/30fps/H264 probe',flush=True)
+          PY
+          echo "::endgroup::"
+          echo "::group::True FFmpeg full decode"
+          ffmpeg -hide_banner -v warning -xerror -i "$f" -f null -
+          echo "PASS: decoded all 200 native frames"
+          echo "::endgroup::"
           sha256sum "$f" >out/agent6/part-${{ matrix.part }}.sha256
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: ep003-agent6-native-part-${{ matrix.part }}
           path: out/agent6/
@@ -125,10 +140,14 @@ jobs:
           cd ../ep003
           f=EP003_PICTURE_NATIVE_1080x1920.mp4
           ffprobe -v error -show_entries format=duration,size -show_entries stream=index,codec_type,codec_name,width,height,r_frame_rate,nb_frames -of json "$f" | tee ffprobe.json
-          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of csv=p=0 "$f")" = 1080
-          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=p=0 "$f")" = 1920
-          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of csv=p=0 "$f")" = 800
-          ffmpeg -hide_banner -v error -xerror -i "$f" -f null -
+          python3 - "$f" <<'PY'
+          import json,subprocess,sys
+          d=json.loads(subprocess.check_output(['ffprobe','-v','error','-select_streams','v:0','-show_entries','stream=codec_name,width,height,avg_frame_rate,nb_frames','-of','json',sys.argv[1]],text=True))['streams'][0]
+          print('Final native full film probe:',d,flush=True)
+          assert (d.get('width'),d.get('height'),d.get('avg_frame_rate'),d.get('nb_frames')) == (1080,1920,'30/1','800'), 'Expected 1080×1920, 30fps, 800 frames'
+          PY
+          ffmpeg -hide_banner -v warning -xerror -i "$f" -f null -
+          echo "PASS full 800-frame native decode"
           ffmpeg -hide_banner -loglevel error -y -i "$f" \
             -vf "select='not(mod(n,50))',scale=270:480,tile=4x4" -frames:v 1 -update 1 contact-sheet.png
           ffmpeg -hide_banner -loglevel error -y -ss 0.30 -i "$f" -frames:v 1 frame-0p30.png
