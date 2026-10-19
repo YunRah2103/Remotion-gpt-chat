@@ -51,7 +51,10 @@ export const LookPreview:React.FC<LookPreviewProps>=({mode,baseline})=>{
   } else {
     // The camera demonstrates the independently modelled refuge. This preview
     // NEVER claims the still-moving car has stopped safely.
-    camera=[x+8.1,16.0,3.7];target=[x,.18,-4.8];fov=51;
+    // A close rear-three-quarter tracking shot keeps the moving car legible
+    // instead of shrinking it to a dot over a large strip of roadside grass.
+    // The separately registered EP003RefugeInspection handles the bay overview.
+    camera=[x-7.7,3.15,-9.8];target=[x+2.2,.90,-3.1];fov=44;
   }
   return <AbsoluteFill style={{background:'#b7ced8'}}>
     <ThreeCanvas width={width} height={height} shadows camera={{
@@ -79,6 +82,6 @@ export const LookPreview:React.FC<LookPreviewProps>=({mode,baseline})=>{
       color:'#e9eee8',fontFamily:'Arial, sans-serif',
       fontSize:Math.round(width*(portrait?.018:.012)),
       letterSpacing:1.1,textShadow:'0 2px 5px #15212a',
-    }}>{portrait?'MATERIAL MACRO → REFUGE SWEEP':'IDENTICAL CAMERA / COMPARATIVE LIGHTING'}</div>
+    }}>{portrait?'TYRE MACRO → MOVING HERO → REAR CHASE':'IDENTICAL CAMERA / COMPARATIVE LIGHTING'}</div>
   </AbsoluteFill>;
 };
