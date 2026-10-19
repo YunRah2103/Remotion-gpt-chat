@@ -100,7 +100,7 @@ export function buildEpisodeHighway(): T.Group {
   root.name = 'EP003-original-highway-with-refuge';
   clearRightSideIntrusions(root);
   const asphaltTone=makePremiumAsphaltTexture();
-  const asphalt = new T.MeshStandardMaterial({color:'#3c474d',map:asphaltTone, roughness:.94, metalness:.015, side:T.DoubleSide});
+  const asphalt = new T.MeshStandardMaterial({color:'#363f45',map:asphaltTone, roughness:.94, metalness:.015, side:T.DoubleSide});
   const grit = new T.MeshStandardMaterial({color:'#5b666b',roughness:.96,transparent:true,opacity:.095,depthWrite:false});
   const white = new T.MeshStandardMaterial({color:'#d9ddd1',roughness:.89});
   const amber = new T.MeshStandardMaterial({color:'#d2b76b',roughness:.83});
@@ -113,7 +113,19 @@ export function buildEpisodeHighway(): T.Group {
       const mat = node.material;
       if (mat instanceof T.MeshStandardMaterial) {
         const oldMap = mat.map, oldBump = mat.bumpMap;
-        mat.map = asphaltTone; mat.bumpMap = null; mat.color.set('#3e474c');
+        mat.map = asphaltTone; mat.bumpMap = null; mat.color.set('#363f45');
+        // Extruded world-kit road UVs span a full 220m and would mismatch
+        // the refuge's 4m world-space tile. Remap ONLY this new episode
+        // instance to the same ground-plane UV system (no kit changes).
+        const pos=node.geometry.getAttribute('position');
+        const uv=node.geometry.getAttribute('uv');
+        if(pos && uv && pos.count===uv.count){
+          for(let i=0;i<pos.count;i++){
+            uv.setXY(i,(pos.getX(i)+node.position.x)/4,
+              (pos.getZ(i)+node.position.z)/4);
+          }
+          uv.needsUpdate=true;
+        }
         // These unique highway surface maps were kit-generated for this root.
         oldMap?.dispose(); oldBump?.dispose();
         mat.roughness = .94; mat.metalness = .015; mat.needsUpdate = true;
@@ -286,7 +298,7 @@ const EpisodeColorPipeline:React.FC=()=>{
   useLayoutEffect(()=>{
     const oldTone=gl.toneMapping, oldExposure=gl.toneMappingExposure;
     gl.toneMapping=T.ACESFilmicToneMapping;
-    gl.toneMappingExposure=1.16;
+    gl.toneMappingExposure=.95;
     return ()=>{gl.toneMapping=oldTone;gl.toneMappingExposure=oldExposure;};
   },[gl]);
   return null;
@@ -294,7 +306,7 @@ const EpisodeColorPipeline:React.FC=()=>{
 export const EpisodeLight:React.FC<{focus?:Vec3}>=({focus=[0,0,0]})=><>
   <EpisodeColorPipeline/>
   <WorldLighting timeOfDay="day" focus={[...focus] as V3}/>
-  <directionalLight position={[-14,19,-17]} color="#d6e6ec" intensity={.39}/>
+  <directionalLight position={[-14,19,-17]} color="#d6e6ec" intensity={.24}/>
 </>;
 
 export const EpisodeGrandTourer:React.FC<{
