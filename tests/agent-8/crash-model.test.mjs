@@ -52,3 +52,12 @@ test('editor can supply original Agent 2 incident with independent absolute time
  assert.equal(actual.wheelSpinRad,-30);
  assert.ok(Math.abs(sampleCrashOutcome(0,{incident:actual}).scenePositionM[2]+2.3)<.01);
 });
+
+test('front-right rail contact coordinates track the actual bumper corner',()=>{
+ const contact=Array.from({length:136},(_,i)=>frame(i/30)).find(s=>s.contact.occurred);
+ assert.ok(contact?.contact.firstContactX!==null&&contact?.contact.firstContactSec!==null);
+ const first=frame(contact.contact.firstContactSec);
+ const cornerX=first.scenePositionM[0]+2.47*Math.cos(first.headingRad)-.97*Math.sin(first.headingRad);
+ assert.ok(Math.abs(contact.contact.firstContactX-cornerX)<.12,'sparks detached from right-front bumper');
+ assert.ok(first.contact.clearanceM>=.015);
+});
