@@ -60,44 +60,63 @@ def physics_at_samples(path):
     return frames, idx, fields
 
 def engine_layer(car, frames, idx, p, rng):
-    v = smooth(p[car, 'speedMps'], .015)
-    brake, throttle = p[car, 'brake01'], p[car, 'throttle01']
-    # Audible combustion pulse maps monotonically to actual speed, but is an
-    # explicitly stylised sonic mapping, NOT an unsupported literal F1 RPM/gear.
-    fundamental_hz = np.clip(340 + (v - 16.863761545) * 19, 210, 520)
-    phase = 2 * np.pi * np.cumsum(fundamental_hz) / SR
-    signal = (.62*np.sin(phase) + .24*np.sin(2*phase+.21) +
-              .14*np.sin(3*phase+.45) + .09*np.sin(.5*phase) +
-              .07*np.sin(4*phase+.35) + .045*np.sin(6*phase))
-    exhaust = filt(rng.standard_normal(N), lo=140, hi=2100)
-    signal = np.tanh(1.75 * (signal + exhaust * (.07 + .07*throttle)))
-    shots = np.array([f['shot'] for f in frames], dtype=object)[idx]
-    beats = np.array([f['beat'] for f in frames], dtype=object)[idx]
-    primary = np.where(beats == 'shortcut', 'shortcut', 'racing') == car
-    close = np.where(np.isin(shots, ['apex', 'onboard', 'exit', 'opening']), 1,
-                     np.where(np.isin(shots, ['overhead', 'force']), .5, .7))
-    amplitude = smooth(np.where(primary, 1, .24) * close *
-                       (.62 + .30*throttle + .08*brake), .025)
-    pan = smooth(np.where(shots == 'overhead', .05,
-                          np.where(primary, .11, -.18)) *
-                 (1 if car == 'racing' else -1), .06)
-    return .20*np.column_stack((signal*amplitude*np.sqrt((1-pan)/2),
-                                signal*amplitude*np.sqrt((1+pan)/2)))
+    """Throaty low-mid exhaust rather than the former 340-3000 Hz bee-like loop.
+
+    Engine timbre is identical for both simulated Formula cars; different A2
+    speeds, throttle/brake state, editorial shots and microphone perspective
+    create the difference. Pitch is an illustration, not literal gear/RPM data.
+    """
+    speed=smooth(p[car,'speedMps'],.028)
+    throttle=smooth(p[car,'throttle01'],.032)
+    brake=smooth(p[car,'brake01'],.025)
+    freq=np.clip(71.5+3.4*speed,105,153)
+    phase=2*np.pi*np.cumsum(freq)/SR
+    pulses=np.maximum(.5+.5*np.sin(phase),0)**2
+    low=filt(rng.standard_normal(N),lo=42,hi=520)
+    low=low/(np.sqrt(np.mean(low*low))+1e-12)
+    mid=filt(rng.standard_normal(N),lo=140,hi=1550)
+    mid=mid/(np.sqrt(np.mean(mid*mid))+1e-12)
+    exhaust=(.42*low+.20*mid)*(.45+1.2*pulses)
+    piston=.27*np.sin(phase)+.15*np.sin(2*phase+.12)+.11*np.sin(phase*.5+.11)
+    signal=filt(np.tanh(1.05*(piston+exhaust)),hi=1100)
+    shots=np.array([f['shot'] for f in frames],dtype=object)[idx]
+    beats=np.array([f['beat'] for f in frames],dtype=object)[idx]
+    is_teal=car=='shortcut'
+    focused=np.where(beats=='shortcut',is_teal,np.where(
+        beats=='wide',not is_teal,np.where(beats=='payoff',True,not is_teal)))
+    focused=np.where(focused,1.,.26)
+    proximity=np.where(shots=='overhead',.62,np.where(shots=='force',.35,
+                       np.where(shots=='onboard',1.,.85)))
+    editorial=np.where(beats=='hook',.75,np.where(beats=='shortcut',.62,
+        np.where(beats=='wide',.68,np.where(beats=='explain',.11,
+            np.where(beats=='payoff',1.15,.50)))))
+    amplitude=smooth(focused*proximity*(.68+.38*throttle)*
+                     (1-.12*brake)*editorial,.042)
+    tail=np.ones(N)
+    tail[round(23.4*SR):]=np.linspace(1,.085,N-round(23.4*SR))
+    amplitude*=tail
+    pan=smooth(np.where(shots=='overhead',0,np.where(shots=='wide-entry',.22,
+               np.where(shots=='shortcut',-.22,.06)))*
+               (-1 if is_teal else 1),.07)
+    signal*=.115*amplitude
+    return np.column_stack((signal*np.sqrt((1-pan)/2),
+                            signal*np.sqrt((1+pan)/2)))
 
 def racing_textures(frames, idx, p, rng):
     avg = lambda k: (p['shortcut', k]+p['racing', k])/2
     v, grip, brake = avg('speedMps'), avg('gripUtilization01'), avg('brake01')
-    tyre = filt(rng.standard_normal(N), lo=600, hi=8500)
-    air = filt(rng.standard_normal(N), lo=95, hi=4800)
-    mech = filt(rng.standard_normal(N), lo=850, hi=2700)
+    tyre = filt(rng.standard_normal(N), lo=400, hi=1850)
+    air = filt(rng.standard_normal(N), lo=250, hi=3000)
+    mech = filt(rng.standard_normal(N), lo=290, hi=1200)
     tyre /= np.std(tyre)+1e-9
     air /= np.std(air)+1e-9
     mech /= np.std(mech)+1e-9
-    signal = (tyre * (.012+.012*np.clip(grip,0,1)) +
-              air * (.010+.008*np.clip(v/22,0,1)) +
-              mech * .008*np.clip(brake,0,1))
+    signal = (tyre * (.0045+.007*np.clip(grip,0,1)) +
+              air * (.006+.005*np.clip(v/22,0,1)) +
+              mech * .007*np.clip(brake,0,1))
     shots = np.array([f['shot'] for f in frames], dtype=object)[idx]
-    signal *= 1 + .55*smooth((shots == 'onboard').astype(float), .08)
+    signal *= 1 + .48*smooth((shots == 'onboard').astype(float), .08)
+    signal *= np.where(np.array([f['beat'] for f in frames],dtype=object)[idx] == 'explain',.24,.72)
     pan = np.where(shots == 'shortcut', -.22,
                    np.where(shots == 'wide-entry', .22, 0))
     return np.column_stack((signal*(1-.45*pan), signal*(1+.45*pan)))
@@ -124,9 +143,7 @@ def transitions(rng):
             sound = sound[:end-start]*level
             mix[start:end, 0] += sound*np.sqrt((1-pan)/2)
             mix[start:end, 1] += sound*np.sqrt((1+pan)/2)
-    for t, pan in [(1.2,-.12),(2,-.3),(4,-.12),(6,.3),(8.333,.22),
-                   (10.067,.12),(11,0),(13.4,-.08),(16,0),(18,.08),
-                   (19.6,.09),(23.9,.17)]:
+    for t, pan in [(1.2,-.12),(6,.3),(11,0),(16,0),(21.8,0),(25.35,.13)]:
         put(t, accent(rng), .033, pan)
     put(0, accent(rng,.25,'impact'),.050,0)
     put(16,accent(rng,.24,'click'),.025,0)
@@ -155,11 +172,11 @@ def main():
     voice[:len(speech),0] = voice[:len(speech),1] = speech
     padded = np.pad(original, (0,N-len(original)))
     energy = np.sqrt(np.maximum(smooth(padded*padded,.055),0))
-    activity = smooth((energy>.010).astype(float),.105)
+    activity = smooth((energy>.008).astype(float),.14)
     engine = engine_layer('shortcut',frames,idx,p,rng) + engine_layer('racing',frames,idx,p,rng)
-    engine *= (1-.59*activity)[:,None]
-    road = racing_textures(frames,idx,p,rng)*(1-.5*activity)[:,None]
-    cuts = transitions(rng)*(1-.36*activity)[:,None]
+    engine *= (1-.79*activity)[:,None]
+    road = racing_textures(frames,idx,p,rng)*(1-.68*activity)[:,None]
+    cuts = transitions(rng)*(1-.60*activity)[:,None]
     tail = np.ones(N)
     tail[-round(.46*SR):] = np.linspace(1,0,round(.46*SR))
     engine *= tail[:,None]
