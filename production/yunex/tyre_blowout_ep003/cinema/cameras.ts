@@ -26,19 +26,22 @@ export function sampleCinemaCamera(input:CinemaCameraInput):CameraPose{
    const reveal=smooth((q-.22)/.16);
    // Slight front-quarter offset reduces overlapping far-wheel silhouettes.
    // Lower aim exposes the real compressed lower sidewall and contact edge.
-   from=lerp3([2.03,.54,-2.43],[7.55,2.45,-7.88],reveal);
+   // Last native run frame 23/.77s placed the tracking lens at the road's
+   // right lamp-pole line (Z=-9), causing a wide pole occlusion. Pull back
+   // from INSIDE the -Z rail, with sidewall held macro until .30s.
+   from=lerp3([2.03,.54,-2.43],[8.95,2.52,-5.35],reveal);
    at=lerp3([1.42,.245,-.88],[0,.68,0],reveal);
-   fov=mix(37,52,reveal);near=.027;break;
+   fov=mix(37,55,reveal);near=.027;break;
   }
   case 'front-three-quarter':
    // Keep both bumpers inside the tight 9:16 horizontal field of view.
    from=lerp3([8.0,2.50,-7.05],[7.8,2.40,-7.15],p);
    at=lerp3([0,.70,0],[0,.68,0],p);fov=mix(52,53,p);break;
   case 'low-tracking':
-   // Inside the right barrier, lower tracking with both bumpers still visible.
-   // Strong moving markings behind the silhouette sell highway velocity.
-   from=lerp3([6.0,.95,-8.15],[5.8,.90,-7.9],p);
-   at=[0,.72,0];fov=55;break;
+   // Previous real frame 36 had a huge guardrail in foreground because camera
+   // world-Z was beyond the -7.8m barrier. Track INSIDE on the lane side.
+   from=lerp3([7.35,.95,-5.35],[7.05,.90,-5.30],p);
+   at=[0,.73,0];fov=56;break;
   case 'wheel-cutaway':
   case 'underbody':
    // Framed directly along the right-side contact patch, lens stays outside

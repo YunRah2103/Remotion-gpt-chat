@@ -158,3 +158,21 @@ test('full-car 9:16 camera framings keep the original 4.94m grand-tourer on scre
   }
  }
 });
+
+test('real video first-second hero and low tracking lenses stay INSIDE right safety rail',async()=>{
+ const {sampleCinemaCamera}=await import('../../production/yunex/tyre_blowout_ep003/cinema/cameras.ts');
+ for(const [mode,ts] of [['opening',[.47,.58,.67,.73,.77,.9,1.05]],
+                         ['montage',[.48,.67,.73,.77,1.35,1.58,2.1]]]){
+  for(const time of ts){
+   const p=samplePreviewState(time,mode);
+   const pose=sampleCinemaCamera({tSec:p.sourceTimeSec,shot:p.cut.shot,
+    dynamics:p.dynamics,tyre:p.tyre,progress01:p.progress01});
+   assert.ok(['tyre-hook','low-tracking'].includes(pose.shot),'only inspect offending lenses');
+   // Highway -Z (right) rail at -7.8m; steel lamp pole line at -9m.
+   // Camera should not look THROUGH a lamp or over the foreground guardrail.
+   assert.ok(pose.position[2]>-8.15,
+      mode+' '+time+'s shot '+pose.shot+' camera behind barrier: '+pose.position[2]);
+   assert.ok(pose.position[1]>.65,'camera remains above moving asphalt');
+  }
+ }
+});
