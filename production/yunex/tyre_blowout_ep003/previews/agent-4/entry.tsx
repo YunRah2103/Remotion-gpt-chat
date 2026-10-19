@@ -2,9 +2,12 @@ import {registerRoot} from 'remotion';
 import React from 'react';
 import {Composition} from 'remotion';
 import {LookPreview} from './LookPreview.tsx';
+import {RefugeInspection} from './RefugeInspection.tsx';
 
 const LOOK_FPS=30;
 const PreviewRoot=()=> <>
+  <Composition id="EP003RefugeInspection" component={RefugeInspection}
+    width={1080} height={1920} fps={LOOK_FPS} durationInFrames={150}/>
   <Composition id="EP003LookBeforeBeauty" component={LookPreview}
     width={1920} height={1080} fps={LOOK_FPS} durationInFrames={150}
     defaultProps={{mode:'beauty' as const,baseline:true}}/>
