@@ -114,7 +114,7 @@ export function buildEpisodeHighway(): T.Group {
     vertices.push(x,.003,-7.43, x,.003,railZ+.19);
     if (i<samples) {
       const j=i*2;
-      triangles.push(j,j+1,j+2,j+1,j+3,j+2);
+      triangles.push(j,j+2,j+1,j+1,j+2,j+3); // +Y face normals for proper daylight and shadows
     }
   }
   const surface = new T.BufferGeometry();
