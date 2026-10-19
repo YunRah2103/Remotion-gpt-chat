@@ -87,5 +87,5 @@ export const AIEraAllAgents:React.FC = () => <AbsoluteFill style={{backgroundCol
     const to=Math.round(shot.end*FPS);
     return <Sequence from={from} durationInFrames={to-from} key={i}><SourceShot shot={shot}/></Sequence>;
   })}
-  <Audio src={staticFile('ai-era-expanded/audio.mp3')}/>
+  <Audio src={staticFile('ai-era-expanded/audio.mp3')} volume={0.77}/>
 </AbsoluteFill>;
