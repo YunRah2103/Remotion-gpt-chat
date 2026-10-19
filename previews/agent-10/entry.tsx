@@ -5,7 +5,7 @@ import {ActionPreviewFilm} from '../../production/yunex/tyre_blowout_ep003/actio
 const Root:React.FC=()=> <>
   <Composition id="EP003Agent10CrashAction" component={ActionPreviewFilm}
     width={1080} height={1920} fps={30} durationInFrames={180}
-    defaultProps={{mode:'crash-blocking' as const}}/>
+    defaultProps={{mode:'crash-action' as const}}/>
   <Composition id="EP003Agent10RecoveryAction" component={ActionPreviewFilm}
     width={1080} height={1920} fps={30} durationInFrames={210}
     defaultProps={{mode:'recovery' as const}}/>
