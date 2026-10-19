@@ -5,15 +5,14 @@ import {ThreeCanvas} from '@remotion/three';
 import * as T from 'three';
 import {createVehicle} from '../../../../src/yunex/world-kit/vehicles.ts';
 import {animateVehicle} from '../../../../src/yunex/world-kit/motion.ts';
-import {createEnvironment} from '../../../../src/yunex/world-kit/environments.ts';
 import {disposeObject} from '../../../../src/yunex/world-kit/geometry.ts';
 import {WorldLighting,CameraAim} from '../../../../src/yunex/world-kit/components.tsx';
 import {EP003_SCENE} from '../shared/contract.ts';
 import {sampleCrashOutcome} from './model.ts';
+import {CrashBarrierWorld,ImpactRailScars3D} from './Barrier.tsx';
 import type {CrashOutcomeFrame} from './model.ts';
 
 type V3=[number,number,number];
-const sceneRoad=-7.8;
 const clamp=(v:number,a=0,b=1)=>Math.min(b,Math.max(a,v));
 function makeOriginalGrandTourer():T.Group{
  const root=createVehicle({variant:'grand-tourer',color:EP003_SCENE.paint,
@@ -56,7 +55,7 @@ export const CrashCarRig:React.FC<{frame:CrashOutcomeFrame}>=({frame})=>{
   const originalPositions=new Map<T.Object3D,[number,number,number]>();
   original.traverse(o=>{
    if(o.name==='lamp-lens'||o.name==='headlamp-housing'||
-      o.name==='lamp-reflector'||o.name==='front-lip'||o.name==='front-lip'){
+      o.name==='lamp-reflector'||o.name==='front-lip'){
     originalPositions.set(o,[o.position.x,o.position.y,o.position.z]);
    }
   });return originalPositions;
@@ -87,11 +86,6 @@ export const CrashCarRig:React.FC<{frame:CrashOutcomeFrame}>=({frame})=>{
   if(tyre)tyre.scale.y=.84-.08*(1-frame.frontRightPressureRatio);
  });
  return <primitive object={original}/>;
-};
-const OriginalRoad:React.FC=()=>{
- const obj=useMemo(()=>createEnvironment({kind:'highway',timeOfDay:'day',seed:12}),[]);
- useEffect(()=>()=>disposeObject(obj),[obj]);
- return <primitive object={obj}/>;
 };
 /** Seek-safe debris from frozen first-contact point; no random renderer mutation. */
 export const CrashDebris:React.FC<{frame:CrashOutcomeFrame}>=({frame})=>{
@@ -132,17 +126,19 @@ export const CrashDebris:React.FC<{frame:CrashOutcomeFrame}>=({frame})=>{
   })}
  </group>;
 };
-export const ImpactEffects3D:React.FC<{frame:CrashOutcomeFrame}>=({frame})=>
- <CrashDebris frame={frame}/>;
+export const ImpactEffects3D:React.FC<{frame:CrashOutcomeFrame}>=({frame})=><>
+ <CrashDebris frame={frame}/>
+ <ImpactRailScars3D frame={frame}/>
+</>;
 const useCamera=(frame:CrashOutcomeFrame,kind:'approach'|'close')=>{
- const [x,,z]=frame.scenePositionM,impact=frame.contact.occurred;
- // Cinematic tracking remains above the original road or just outside
- // its solid metal rail, never teleports the physics state.
+ const [x,,z]=frame.scenePositionM;
+ // Visual QA: previous low camera put a median in the chase view and
+ // blocked frontal damage behind the guardrail. Rise above its upper lip.
  const position:V3=kind==='approach'
-  ?[x-10.8,4.2,z+5.7]
-  :[x+5.6,2.75,sceneRoad-3.0];
- const target:V3=[x+(.5),.72,z];
- return {position,target,fov:kind==='approach'?(impact?43:47):39};
+  ?[x-9.8,5.5,Math.min(-1.15,z+1.3)]
+  :[x+5.9,5.5,Math.min(-9.8,z-4.2)];
+ const target:V3=kind==='approach'?[x+.6,.72,z-.55]:[x+.82,.66,z-.65];
+ return {position,target,fov:kind==='approach'?49:46};
 };
 export const CrashPreview:React.FC<{kind:'approach'|'close'}>=({kind})=>{
  const videoFrame=useCurrentFrame(),{fps,width,height}=useVideoConfig();
@@ -153,7 +149,7 @@ export const CrashPreview:React.FC<{kind:'approach'|'close'}>=({kind})=>{
   <ThreeCanvas width={width} height={height} shadows
    camera={{position:camera.position,fov:camera.fov,near:.1,far:310}}>
    <WorldLighting timeOfDay="day" focus={[crash.scenePositionM[0],0,crash.scenePositionM[2]]}/>
-   <OriginalRoad/>
+   <CrashBarrierWorld frame={crash}/>
    <CameraAim position={camera.position} target={camera.target} fov={camera.fov}/>
    <CrashCarRig frame={crash}/>
    <ImpactEffects3D frame={crash}/>
