@@ -34,11 +34,19 @@ export function updateCinematicVehicle(model:T.Group,d:VehicleDynamicsFrame,tyre
 /** Cinematic vehicle reuses ALL original GT mechanics, plus Agent 1's cloned
  * rubber vertex displacement driven by Agent 2 hub/spin/steering states. */
 export const CinematicVehicle:React.FC<{
- dynamics:VehicleDynamicsFrame;tyre:TyreFrame;previewCosmeticOnly?:boolean;cutaway?:boolean;
-}>=({dynamics,tyre,cutaway=false})=>{
+ dynamics:VehicleDynamicsFrame;tyre:TyreFrame;previewCosmeticOnly?:boolean;cutaway?:boolean;interiorCamera?:boolean;
+}>=({dynamics,tyre,cutaway=false,interiorCamera=false})=>{
  const rig=useMemo(()=>{
   const prepared=prepareTyreRig(EP003_SCENE.failedWheel,cutaway?.65:0);
   finishGrandTourer(prepared.vehicle);
+  // A standard cinema "wild roof" for ONE inside-car camera only. The physical
+  // GT body/interior, windshield, wheel and exterior hero shots stay intact.
+  // This avoids a black roof plane obscuring the top 30% of the portrait POV.
+  if(interiorCamera){
+   prepared.vehicle.traverse(o=>{
+    if(o instanceof T.Mesh && (o.name==='roof'||o.name==='roof-liner'))o.visible=false;
+   });
+  }
   prepared.vehicle.traverse(o=>{
    if(o instanceof T.Mesh&&(o.name==='tyre'||o.name==='sidewall-bead')){
     const m=o.material;
@@ -46,7 +54,7 @@ export const CinematicVehicle:React.FC<{
    }
   });
   return prepared;
- },[cutaway]);
+ },[cutaway,interiorCamera]);
  useEffect(()=>()=>disposeTyreRig(rig),[rig]);
  useLayoutEffect(()=>applyTyreFrame(rig,tyre,{dynamics,exposure:cutaway?.65:0}),[rig,dynamics,tyre,cutaway]);
  return <primitive object={rig.vehicle}/>;
@@ -82,7 +90,7 @@ export const CinematicScene:React.FC<CinematicSceneProps>=({
    <primitive object={highway}/>
    {/* Agent 4's wheel-contact shading tracks the authoritative hub positions. */}
    <ContactOcclusion dynamics={dynamics}/>
-   <CinematicVehicle dynamics={dynamics} tyre={tyre}/>
+   <CinematicVehicle dynamics={dynamics} tyre={tyre} interiorCamera={shot==='driver-cockpit'}/>
    {/* Gentle front-right fill to resolve rubber on the first dark macro frame. */}
    <pointLight position={[dynamics.positionM[0]+2.8,4.6,dynamics.positionM[2]-4.1]}
     color="#e1e9eb" intensity={24} distance={14} decay={2}/>

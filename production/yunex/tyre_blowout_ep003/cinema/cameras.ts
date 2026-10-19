@@ -21,9 +21,11 @@ export function sampleCinemaCamera(input:CinemaCameraInput):CameraPose{
   case 'tyre-hook':{
    // The wheel MUST deflate visibly before the camera leaves it; continuous
    // dolly (rather than a magic zoom) exposes original front 3/4 silhouette.
-   const reveal=smooth((q-.26)/.56);
-   from=lerp3([1.52,.58,-2.34],[5.15,1.83,-5.62],reveal);
-   at=lerp3([1.45,.33,-.88],[.38,.67,-.1],reveal);
+   const reveal=smooth((q-.16)/.55);
+   // Slight front-quarter offset reduces overlapping far-wheel silhouettes.
+   // Lower aim exposes the real compressed lower sidewall and contact edge.
+   from=lerp3([2.03,.54,-2.43],[5.15,1.83,-5.62],reveal);
+   at=lerp3([1.42,.245,-.88],[.38,.67,-.1],reveal);
    fov=mix(37,49,reveal);near=.027;break;
   }
   case 'front-three-quarter':
