@@ -46,11 +46,11 @@ export const CinematicVehicle:React.FC<{
  },[cutaway,interiorCamera]);
  useEffect(()=>()=>disposeTyreRig(rig),[rig]);
  useLayoutEffect(()=>{
-  // Agent 1's current renderer uses legacy roll/pitch Euler ordering. Re-align
-  // the existing rig and ALL FOUR hubs to Agent 2's explicit X=pitch/Z=roll
-  // after deformation; leaves rubber geometry and physics authoritative.
+  // Agent 1's corrected authoritative rig already applies X=pitch, Y=yaw,
+  // Z=roll and places all four world-space hubs BEFORE road-relative rubber
+  // deformation. Never rotate or re-project AFTER deformRubber: doing so can
+  // invalidate the actual contact patch under body pitch/roll.
   applyTyreFrame(rig,tyre,{dynamics,exposure:cutaway?.65:0});
-  alignCinematicBodyAndHubs(rig.vehicle,dynamics);
  },[rig,dynamics,tyre,cutaway]);
  return <primitive object={rig.vehicle}/>;
 };

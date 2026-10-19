@@ -47,12 +47,13 @@ jobs:
             "agent/ep003-02-dynamics dynamics" \
             "agent/ep003-04-look look"; do
             read -r branch folder <<< "$item"
-            # Fetch reachable history so the last confirmed A1 source can be pinned
-            # while A1 repairs its current malformed roadContact.ts declaration.
+            # Pin the now-corrected A1 rig, verified by its production TS CI.
+            # Its own motion handler applies the real 3D pose BEFORE rubber
+            # contact deformation; do not add a second camera-side transform.
             git fetch --no-tags --depth=80 origin "refs/heads/$branch"
             sha=$(git rev-parse FETCH_HEAD)
             if [[ "$folder" == mechanics ]]; then
-              sha=5e6debcbfa54b05fff68640b919eddc2e8e6cd3a
+              sha=7d47746d2fc584e935b5a9766eb1150e5b3dac38
               git cat-file -e "$sha^{commit}"
             fi
             printf '%s %s %s\n' "$branch" "$folder" "$sha" | tee -a previews/agent-3/out/authoritative-sources.txt
