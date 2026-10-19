@@ -81,6 +81,11 @@ export const F1RacingLinePicture:React.FC=()=>{
    camera={{position:view.position,fov:view.fov,near:.1,far:500}}
    style={{width:'100%',height:'100%'}}>
    <RaceLighting quality="premium" focus={[65,0,18]}/>
+   {/* Film-only clean blue-hour atmosphere. The kit's dusk preset uses a muted
+       lavender sky and short fog range that wash out the cars/track in portrait.
+       These overrides preserve A4's actual circuit, car and lighting objects. */}
+   <color attach="background" args={['#739ebc']}/>
+   <fog attach="fog" args={['#839dad',165,405]}/>
    <RaceWorld quality="premium" seed={12}/>
    <RaceCameraRig shot={edit.shot} state={state} frame={edit.sourceFrame}/>
    <GhostAwareCars state={state} focus={focus}/>
