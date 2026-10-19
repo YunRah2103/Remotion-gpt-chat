@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {prepareTyreRig,applyTyreFrame,disposeTyreRig} from '../../production/yunex/tyre_blowout_ep003/mechanics/tyreRig.ts';
 import {sampleTyreFailure} from '../../production/yunex/tyre_blowout_ep003/mechanics/sampleTyreFailure.ts';
+import {sampleDynamics} from '../../production/yunex/tyre_blowout_ep003/mechanics/agent2-dynamics-snapshot.ts';
+import {referenceRimRoadClearanceM} from '../../production/yunex/tyre_blowout_ep003/mechanics/roadContact.ts';
 
 const snap=(a)=>Array.from(a);
 const rubber=(r)=>r.meshes.find(x=>x.kind==='tyre').mesh;
@@ -88,4 +90,35 @@ test('authoritative dynamics drives all four spins, hubs and steering independen
     });
     assert.equal(found,4);
   }finally {disposeTyreRig(rig);}
+});
+
+test('pinned Agent 2 source drives real hub/world offsets, yaw, compression and tyre radius',async()=>{
+  const rig=prepareTyreRig('front-right',.6);
+  try {
+    const offset=[-72,0,0], before=sampleDynamics(.4), after=sampleDynamics(1.4);
+    assert.equal(before.stage,'pre-failure');
+    assert.ok(after.wheels['front-right'].rollingRadiusM<.3);
+    assert.ok(after.wheels['front-right'].verticalCompressionM>before.wheels['front-right'].verticalCompressionM);
+    assert.ok(after.wheels['front-right'].spinRad<before.wheels['front-right'].spinRad);
+    const f=(dyn)=>{
+      const base=sampleTyreFailure(dyn.tSec,{angularPhaseRad:dyn.wheels['front-right'].spinRad});
+      return {...base,effectiveRadiusM:dyn.wheels['front-right'].rollingRadiusM};
+    };
+    applyTyreFrame(rig,f(after),{dynamics:after,worldOffsetM:offset});
+    assert.ok(Math.abs(rig.vehicle.position.x-(after.positionM[0]+offset[0]))<1e-9);
+    assert.ok(Math.abs(rig.vehicle.position.z-after.positionM[2])<1e-9);
+    assert.ok(Math.abs(rig.vehicle.rotation.y-after.yawRad)<1e-9);
+    assert.ok(Math.abs(rig.roll.rotation.z-after.wheels['front-right'].spinRad)<1e-9);
+    const center=rig.steering.getWorldPosition(new (await import('three')).Vector3());
+    for(let i=0;i<3;i++)
+      assert.ok(Math.abs(center.toArray()[i]-(after.wheels['front-right'].hubWorldM[i]+offset[i]))<.002,
+        'actual hub '+i+' '+center.toArray()[i]);
+    assert.ok(referenceRimRoadClearanceM(f(after))>.005,'Agent 2 wheel remains above metal rim');
+    const failGeometry=Array.from(rig.meshes.find(x=>x.kind==='tyre').mesh.geometry.attributes.position.array);
+    applyTyreFrame(rig,f(before),{dynamics:before,worldOffsetM:offset});
+    const beforeGeometry=Array.from(rig.meshes.find(x=>x.kind==='tyre').mesh.geometry.attributes.position.array);
+    assert.notDeepEqual(failGeometry,beforeGeometry);
+    applyTyreFrame(rig,f(after),{dynamics:after,worldOffsetM:offset});
+    assert.deepEqual(Array.from(rig.meshes.find(x=>x.kind==='tyre').mesh.geometry.attributes.position.array),failGeometry);
+  } finally {disposeTyreRig(rig);}
 });
