@@ -58,7 +58,7 @@ jobs:
           npx tsc --noEmit -p production/yunex/tyre_blowout_ep003/dynamics/tsconfig.json
           npm run worldkit:test
           npm run partskit:test
-          node --experimental-strip-types --test tests/agent-2/dynamics.test.mjs
+          node --experimental-strip-types --test tests/agent-2/*.test.mjs
 
       - name: Render 5-second genuine moving incident MP4
         shell: bash
