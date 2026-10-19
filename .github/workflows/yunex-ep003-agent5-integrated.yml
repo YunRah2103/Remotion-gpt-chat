@@ -1,0 +1,152 @@
+name: EP003 Agent 5 - Real Tyre + Dynamics Story MP4
+on:
+  push:
+    branches:
+      - agent/ep003-05-story
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+jobs:
+  story-native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Overlay exact agent-owned implementation at build time, NEVER commit it
+        shell: bash
+        run: |
+          set -euxo pipefail
+          git fetch --no-tags --depth=1 origin \
+            '+refs/heads/agent/ep003-01-mechanics:refs/remotes/origin/agent/ep003-01-mechanics' \
+            '+refs/heads/agent/ep003-02-dynamics:refs/remotes/origin/agent/ep003-02-dynamics' \
+            '+refs/heads/agent/ep003-03-cinema:refs/remotes/origin/agent/ep003-03-cinema' \
+            '+refs/heads/agent/ep003-04-look:refs/remotes/origin/agent/ep003-04-look'
+          git restore --source=refs/remotes/origin/agent/ep003-01-mechanics --worktree -- production/yunex/tyre_blowout_ep003/mechanics
+          git restore --source=refs/remotes/origin/agent/ep003-02-dynamics --worktree -- production/yunex/tyre_blowout_ep003/dynamics
+          git restore --source=refs/remotes/origin/agent/ep003-03-cinema --worktree -- production/yunex/tyre_blowout_ep003/cinema
+          git restore --source=refs/remotes/origin/agent/ep003-04-look --worktree -- production/yunex/tyre_blowout_ep003/look
+          mkdir -p out/ep003-agent5
+          {
+            echo "agent5_sha=$(git rev-parse HEAD)"
+            for N in 01-mechanics 02-dynamics 03-cinema 04-look; do
+              echo "agent_${N}_sha=$(git rev-parse refs/remotes/origin/agent/ep003-${N})"
+            done
+          } > out/ep003-agent5/source-commits.txt
+          cat out/ep003-agent5/source-commits.txt
+          git status --short
+      - name: Install dependencies and system renderer
+        shell: bash
+        run: |
+          set -euxo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          npm ci --no-audit --no-fund
+          npm run check
+          npm run worldkit:test
+          npm run partskit:test
+          node --experimental-strip-types --test tests/agent-5/*.test.mjs
+          npx --no-install tsc -p production/yunex/tyre_blowout_ep003/previews/agent-5/tsconfig.json --noEmit
+          npx --no-install remotion browser ensure
+          ffmpeg -version | head -n 1
+      - name: Render two ACTUAL native Remotion 9-16 compositions
+        shell: bash
+        run: |
+          set -euxo pipefail
+          ENTRY=production/yunex/tyre_blowout_ep003/previews/agent-5/integrated-entry.tsx
+          npx --no-install remotion render "$ENTRY" EP003StoryHookReal out/ep003-agent5/EP003StoryHookReal.mp4 \
+            --gl=swangle --scale=0.25 --codec=h264 --pixel-format=yuv420p --concurrency=1
+          npx --no-install remotion render "$ENTRY" EP003StoryModuleReal out/ep003-agent5/EP003StoryModuleReal.mp4 \
+            --gl=swangle --scale=0.25 --codec=h264 --pixel-format=yuv420p --concurrency=1
+      - name: Verify FFprobe, all decoded frames, frame change and sample screenshots
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import glob, subprocess, json, hashlib, pathlib
+          out=pathlib.Path('out/ep003-agent5')
+          clips=sorted(out.glob('*.mp4'))
+          assert len(clips)==2, f'expected TWO MP4s, found {len(clips)}'
+          report=[]
+          for file in clips:
+              info=json.loads(subprocess.check_output(['ffprobe','-v','error','-select_streams','v:0',
+                  '-show_entries','stream=codec_name,pix_fmt,width,height,nb_frames,avg_frame_rate:format=duration',
+                  '-of','json',str(file)],text=True))
+              v=info['streams'][0]
+              duration=float(info['format']['duration'])
+              assert v['codec_name']=='h264',info
+              # FFprobe labels many valid H.264 4:2:0 full-range review clips
+              # 'yuvj420p'. These need the same complete decode and visual QA.
+              assert v['pix_fmt'] in ('yuv420p','yuvj420p'),info
+              assert (int(v['width']),int(v['height']))==(270,480),info
+              assert v['avg_frame_rate']=='30/1',info
+              assert abs(int(v['nb_frames'])-duration*30)<2,info
+              assert 3<=duration<=9,info
+              subprocess.run(['ffmpeg','-hide_banner','-v','error','-xerror','-i',str(file),
+                  '-f','null','-'],check=True)
+              samples=[0.08,0.35,0.65,1.2,duration*.56,duration-.25]
+              hashes=[]
+              for j,s in enumerate(samples):
+                  p=out/(file.stem+f'-frame{j}.png')
+                  subprocess.run(['ffmpeg','-hide_banner','-v','error','-y','-ss',str(s),
+                      '-i',str(file),'-frames:v','1',str(p)],check=True)
+                  hashes.append(hashlib.sha256(p.read_bytes()).hexdigest())
+              assert len(set(hashes))>=4, f'Insufficient visual motion in {file.name}'
+              report.append({'asset':file.name,'sha256':hashlib.sha256(file.read_bytes()).hexdigest(),
+                'size_bytes':file.stat().st_size,'source_1080x1920_30fps':True,
+                'review_scale':.25,'ffprobe':info,'full_decode':'PASS',
+                'sample_seconds':samples,'sample_frame_sha256':hashes,
+                'creative_approval':'PENDING HUMAN VIDEO REVIEW',
+                'physics':'Agent 2 frame, Agent 1 wheel, Agent 3 camera, Agent 4 environment'})
+          (out/'verification.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EP003-AGENT5-REAL-MP4-${{ github.run_id }}
+          path: out/ep003-agent5/
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Publish only if TWO moving native MP4s are independently decoded
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="ep003-agent5-real-${GITHUB_RUN_ID}"
+          cat > out/ep003-agent5/RELEASE_NOTES.md <<'EOF'
+          EP003 Agent 5 / 1080x1920 source compositions at 30fps.
+          These are 25%-resolution actual moving Remotion MP4 review copies.
+          Tyre: Agent 1 real deformation; vehicle: Agent 2 real deterministic model;
+          cameras: Agent 3; highway & lighting: Agent 4; storytelling: Agent 5.
+          FFprobe / full FFmpeg decode / six temporal frame samples per MP4 are recorded.
+          Movie is ILLUSTRATIVE, not experimentally validated traffic behaviour.
+          No safe parked-car endpoint is claimed. Artistic approval requires director playback.
+          EOF
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "EP003 Agent 5 real integrated native previews / ${GITHUB_RUN_ID}" \
+            --notes-file out/ep003-agent5/RELEASE_NOTES.md --prerelease
+          gh release upload "$tag" out/ep003-agent5/*.mp4 out/ep003-agent5/*.png \
+            out/ep003-agent5/verification.json out/ep003-agent5/source-commits.txt \
+            --repo "$GITHUB_REPOSITORY"
+          page="https://github.com/${GITHUB_REPOSITORY}/releases/tag/${tag}"
+          cat > out/ep003-agent5/proof-comment.md <<EOF
+          Native real-integrated Agent 5 moving MP4s: ${page}
+
+          - Source: ${GITHUB_SHA} + exact Agent 1/2/3/4 SHAs in source-commits.txt.
+          - EP003StoryHookReal: real deforming wheel, actual 3D motion, 1080x1920/30fps source, 25% review.
+          - EP003StoryModuleReal: real dynamics, real mechanical cutaway, signed force cue, driver wheel response.
+          - Both FFprobe-validated / full FFmpeg decoded; six frame grabs each; proof JSON in release.
+          - Motion and editorial quality **require director visual inspection**; no physical approval/safe-stop claim.
+          EOF
+          gh issue comment 198 --repo "$GITHUB_REPOSITORY" --body-file out/ep003-agent5/proof-comment.md
+          gh pr comment 203 --repo "$GITHUB_REPOSITORY" --body-file out/ep003-agent5/proof-comment.md
