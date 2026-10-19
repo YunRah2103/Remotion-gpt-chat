@@ -147,3 +147,25 @@ test('premium asphalt tone is restrained, tileable, deterministic and has mipmap
     assert.ok(new Set(values).size>=5,'subtle macro tone must not be a flat fill');
   } finally {first.dispose();second.dispose();}
 });
+
+
+test('authoritative world tilt uses Three X pitch and Z roll, even with nonzero yaw',async()=>{
+  const {applyDynamicsToGrandTourer}=await createWorldFactory();
+  const model=new THREE.Group();
+  const frame={
+    positionM:[18,0,-1.85],pitchRad:0.087,yawRad:0.13,rollRad:-0.037,
+    distanceTravelledM:25,driverSteerRad:0,
+  };
+  applyDynamicsToGrandTourer(model,frame);
+  assert.equal(model.rotation.order,'YXZ');
+  assert.ok(Math.abs(model.rotation.x-frame.pitchRad)<1e-10,'pitch must rotate about X');
+  assert.ok(Math.abs(model.rotation.y-frame.yawRad)<1e-10,'yaw must rotate about Y');
+  assert.ok(Math.abs(model.rotation.z-frame.rollRad)<1e-10,'roll must rotate about Z');
+  const correct=new THREE.Quaternion().setFromEuler(
+    new THREE.Euler(frame.pitchRad,frame.yawRad,frame.rollRad,'YXZ'));
+  assert.ok(model.quaternion.angleTo(correct)<1e-6);
+  const firstQuaternion=model.quaternion.clone();
+  applyDynamicsToGrandTourer(model,frame);
+  assert.ok(model.quaternion.angleTo(firstQuaternion)<1e-6,
+    'out-of-order seek / duplicate frame must not accumulate rotation');
+});
