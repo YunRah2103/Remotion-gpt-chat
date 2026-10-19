@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {sampleDynamics, failureProgressAt, DYNAMICS_DEFAULTS, DYNAMICS_ASSUMPTIONS} from '../../production/yunex/tyre_blowout_ep003/dynamics/model.ts';
+import {sampleDynamics, failureProgressAt, DYNAMICS_DEFAULTS, DYNAMICS_ASSUMPTIONS, timestepSensitivityAt} from '../../production/yunex/tyre_blowout_ep003/dynamics/model.ts';
 
 const sample=t=>sampleDynamics(t);
 const wheels=['front-left','front-right','rear-left','rear-right'];
@@ -82,4 +82,14 @@ test('input validation and assumption introspection',()=>{
   assert.throws(()=>sampleDynamics(Number.NaN));
   assert.throws(()=>sampleDynamics(33));
   assert.throws(()=>sampleDynamics(1,{...DYNAMICS_DEFAULTS,roadGripScale:3}));
+});
+
+test('120Hz / 480Hz independent integrations converge over incident and recovery',()=>{
+  for(const t of [1.25,4.25,8.25]){
+    const diff=timestepSensitivityAt(t);
+    assert.ok(diff.yawDeltaRad<.01,JSON.stringify({t,diff}));
+    assert.ok(diff.lateralDeltaM<.25,JSON.stringify({t,diff}));
+    assert.ok(diff.longitudinalDeltaM<.25,JSON.stringify({t,diff}));
+    assert.ok(diff.speedDeltaMps<.20,JSON.stringify({t,diff}));
+  }
 });
