@@ -1,5 +1,5 @@
 import type {RaceCameraPose,RaceFrameState,RaceCarId,V3} from '../contract.ts';
-import {add,localOffset,magnitude,mix,subtract} from '../cinema/math.ts';
+import {add,localOffset,magnitude,subtract} from '../cinema/math.ts';
 import {getRaceCamera} from '../cinema/cameras.ts';
 import type {EditSegment} from './timeline.ts';
 
@@ -141,7 +141,10 @@ export function getPremiumEditorialCamera(
              edit.shot==='apex'||edit.shot==='final';
  const ids:readonly RaceCarId[]=both?['shortcut','racing']:
   [edit.shot==='shortcut'?'shortcut':'racing'];
- candidate=portraitProtect(candidate,state,ids);
+ // The onboard camera is intentionally inside the Formula cockpit: the
+ // vehicle body is BEHIND the lens and must not be fitted into the viewport.
+ // Fitting would turn the cockpit POV into a distant chase camera.
+ if(edit.shot!=='onboard')candidate=portraitProtect(candidate,state,ids);
  for(const n of [...candidate.position,...candidate.target,candidate.fov]){
   if(!Number.isFinite(n))throw new Error('Nonfinite film camera state');
  }
