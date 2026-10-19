@@ -1,18 +1,18 @@
 # YUNEX EP003 — Production manager status
 
-Last manager update: 2026-10-19 (UK). **Phase 1: PREPARED / NOT LAUNCHED**.
+Last manager update: 2026-10-19 (UK). **Phase 1: CONTRACT + FIVE BRANCHES + SIX ISSUES CREATED / NOT LAUNCHED**.
 Repository: `YunRah2103/Remotion-gpt-chat`.
 Asset base pinned to PR #145 `d31fbaa0f95abc468a3294ef2a1b2f6baa84bccb`; PR #145 remains open/unmerged and is divergent from `main` (12 ahead, 8 behind at first inspection). 
-Production base: `production/yunex-ep003-base`. Agent branches fork **after** contract commit.
+Production base: `production/yunex-ep003-base`. All five agent branches forked after shared contract commit `a9be63db0074a4763a8b90af232e1aa8a0f40a8e`. Agent issues: #194–#198; master #193.
 Director: Agent 0. Do not represent GitHub issue creation as AI agent invocation.
 
 | Department | Issue | Branch | Agent launched? | Actual code | PR | Real moving MP4 | Approval |
 |---|---|---|---|---|---|---|---|
-| 1 — Mechanics | pending | `agent/ep003-01-mechanics` | NO | NOT STARTED | none | none | NO |
-| 2 — Dynamics | pending | `agent/ep003-02-dynamics` | NO | NOT STARTED | none | none | NO |
-| 3 — Cinematography | pending | `agent/ep003-03-cinema` | NO | NOT STARTED | none | none | NO |
-| 4 — Look/World | pending | `agent/ep003-04-look` | NO | NOT STARTED | none | none | NO |
-| 5 — Graphics/Story | pending | `agent/ep003-05-story` | NO | NOT STARTED | none | none | NO |
+| 1 — Mechanics | [#194](https://github.com/YunRah2103/Remotion-gpt-chat/issues/194) | `agent/ep003-01-mechanics` | NO | NOT STARTED | none | none | NO |
+| 2 — Dynamics | [#195](https://github.com/YunRah2103/Remotion-gpt-chat/issues/195) | `agent/ep003-02-dynamics` | NO | NOT STARTED | none | none | NO |
+| 3 — Cinematography | [#196](https://github.com/YunRah2103/Remotion-gpt-chat/issues/196) | `agent/ep003-03-cinema` | NO | NOT STARTED | none | none | NO |
+| 4 — Look/World | [#197](https://github.com/YunRah2103/Remotion-gpt-chat/issues/197) | `agent/ep003-04-look` | NO | NOT STARTED | none | none | NO |
+| 5 — Graphics/Story | [#198](https://github.com/YunRah2103/Remotion-gpt-chat/issues/198) | `agent/ep003-05-story` | NO | NOT STARTED | none | none | NO |
 
 ## Immediate blockers and required checks
 1. Independent agents must be **manually launched** via the five prompts; branches/issues do not start agents.
