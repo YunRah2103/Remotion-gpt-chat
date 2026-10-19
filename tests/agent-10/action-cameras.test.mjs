@@ -59,8 +59,10 @@ test('safe-branch final recovery shot stays on visible carriageway side',()=>{
  assert.ok(pose.position[2]>-7.8,
    'camera stays INSIDE actual signed right-hand steel rail');
  assert.ok(pose.position[1]>3.2,'lens clears roadside geometry');
- assert.ok(pose.position[0]<s.dynamics.positionM[0],
-   'lens tracks the full GT from behind');
+ assert.ok(pose.position[0]<s.dynamics.positionM[0]-10,
+   'portrait lens must be far enough BACK to fit full original GT');
+ assert.ok(Math.hypot(...pose.position.map((v,i)=>v-s.dynamics.positionM[i]))>11,
+   'full-car framing must not repeat earlier bumper clip');
  assert.ok(s.dynamics.worldSpeedMps>0,'still moving, no fictitious safe stop');
 });
 test('rewind view remains higher rear-three-quarter, never side-on clipping',()=>{
