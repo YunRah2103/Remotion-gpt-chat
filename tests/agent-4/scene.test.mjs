@@ -83,7 +83,12 @@ test('real scene does not leave foreground trees occupying paved refuge',async()
 });
 
 test('soft wheel-contact texture is deterministic and fades smoothly to zero',async()=>{
-  const {makeContactAlphaTexture}=await createWorldFactory();
+  const root=process.cwd();
+  const outfile=path.join(root,'out','ep003-agent4-tests','contact-'+process.pid+'.mjs');
+  await build({entryPoints:[path.join(root,'production/yunex/tyre_blowout_ep003/look/contact.tsx')],
+    outfile,bundle:true,format:'esm',platform:'node',packages:'external',target:'es2022',logLevel:'silent'});
+  const {makeContactAlphaTexture}=await import(pathToFileURL(outfile).href);
+  await fs.rm(outfile,{force:true});
   const texture=makeContactAlphaTexture();
   try{
     const {data,width,height}=texture.image;
