@@ -1,0 +1,8 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": [
+    "entry.tsx",
+    "../../production/yunex/tyre_blowout_ep003/cinema/**/*.ts",
+    "../../production/yunex/tyre_blowout_ep003/cinema/**/*.tsx"
+  ]
+}
