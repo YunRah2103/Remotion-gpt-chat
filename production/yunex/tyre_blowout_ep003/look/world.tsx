@@ -54,13 +54,17 @@ function clearRightSideIntrusions(root: T.Group) {
       for (let i=0; i<node.count; i++) {
         node.getMatrixAt(i, tmp);
         p.setFromMatrixPosition(tmp);
-        // The purchased kit keeps rich roadside trees; reposition individual
-        // right-hand instances behind the refuge so a real stopping bay does
-        // not have a 7m conifer directly behind its guardrail or camera.
+        // Clear tall kit foliage only from the active bay and its immediate
+        // sight-line: shifting tree-crowns independently from trunks creates
+        // disconnected floating canopies in the moving refuge sweep. Preserve
+        // all other original trees untouched.
         if (['tree-trunks','tree-crowns','conifer-tiers','conifer-snow'].includes(node.name)) {
-          if(p.x>=REFUGE.startX && p.x<=REFUGE.endX && p.z<0 && p.z>-32) {
-            tmp.setPosition(p.x,p.y,-35-Math.abs(p.z)%3);
-            node.setMatrixAt(i,tmp);touched=true;
+          const inBay = p.x>=REFUGE.startX-3 && p.x<=REFUGE.endX+3 &&
+            p.z<0 && p.z>refugeRailZ(p.x)-5.5;
+          if(inBay) {
+            displaced.makeScale(0,0,0);
+            node.setMatrixAt(i,displaced);
+            touched=true;
           }
           continue;
         }
@@ -117,6 +121,25 @@ export function buildEpisodeHighway(): T.Group {
 
   const g = new T.Group(); g.name = 'EP003-refuge-extension';
   root.add(g);
+  // Underside earth fill meets original terrain instead of a floating asphalt
+  // membrane. 6cm paving over a sloped granular shoulder is intentionally
+  // subdued so it does not become a bright unnatural kerb in tracking shots.
+  const fill=new T.MeshStandardMaterial({color:'#696e68',roughness:1});
+  const earthVertices:number[]=[],earthIndices:number[]=[];
+  for(let k=0;k<=106;k++){
+    const x=REFUGE.startX+(REFUGE.endX-REFUGE.startX)*k/106;
+    const outside=refugeRailZ(x)+.05;
+    earthVertices.push(x,-.004,-7.43,x,-.004,outside,x,-.16,outside-.22);
+    if(k<106){const j=k*3;for(const d of [0,1]) {
+      earthIndices.push(j+d,j+d+3,j+d+1,j+d+1,j+d+3,j+d+4);
+    }}
+  }
+  const earthGeo=new T.BufferGeometry();
+  earthGeo.setAttribute('position',new T.Float32BufferAttribute(earthVertices,3));
+  earthGeo.setIndex(earthIndices);earthGeo.computeVertexNormals();
+  const groundFill=new T.Mesh(earthGeo,fill);groundFill.name='refuge-earth-fill';
+  groundFill.receiveShadow=true;groundFill.castShadow=false;g.add(groundFill);
+
   // Road and original -Z edge are constant height (y=0). The extra surface is
   // added as a tessellated polygon, not a floating slab over the soft verge.
   const vertices: number[] = [], triangles: number[] = [];
@@ -142,12 +165,17 @@ export function buildEpisodeHighway(): T.Group {
     for (let k=0;k<3;k++) addBox(g,'asphalt-wear',[4,.002,.075],
       [x+k*.9,.008,-8.25-k*1.45],grit).castShadow=false;
   }
-  // Deliberate edge line and bay markings; keep the original highway lane
-  // markings intact. Clear separation from live carriageway.
-  addBox(g,'refuge-separation-line',[69,.012,.12],[75.5,.016,-7.35],white).castShadow=false;
-  addBox(g,'refuge-bay-outer-line',[58,.016,.12],[77,.015,-13.50],white).castShadow=false;
-  for (let x=50;x<=100;x+=5) addBox(g,'refuge-chevron',[2.4,.012,.10],
-    [x,.016,-8.14],amber).rotation.y=-.36;
+  // A continuous white separator across the entire taper would visually
+  // prevent entrance. The inbound transition instead has spaced guide dashes;
+  // a continuous line separates the refuge from through-traffic downstream.
+  for(let x=8;x<=39;x+=7)
+    addBox(g,'refuge-entry-guide',[3.7,.012,.13],[x,.017,-7.20],white).castShadow=false;
+  addBox(g,'refuge-separation-line',[58,.012,.12],[81,.018,-7.37],white).castShadow=false;
+  addBox(g,'refuge-bay-outer-line',[57,.016,.12],[77,.017,-13.50],white).castShadow=false;
+  for (let x=51;x<=94;x+=5) {
+    const arrow=addBox(g,'refuge-chevron',[2.4,.012,.10],
+      [x,.020,-8.12],amber); arrow.rotation.y=-.36;arrow.castShadow=false;
+  }
 
   const railStart=-110, railEnd=110;
   for(let x=railStart;x<railEnd;x+=2) {
