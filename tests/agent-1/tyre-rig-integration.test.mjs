@@ -42,7 +42,7 @@ test('real wheel hierarchy accepts arbitrary failure side, with the shared GT pr
     assert.equal(rig.wheelId,'rear-left');
     assert.equal(rig.steering.position.x,-1.46);
     assert.equal(rig.steering.position.z,.88);
-    assert.equal(rig.steering.userData.steering,undefined);
+    assert.equal(rig.steering.userData.steering,false);
     assert.ok(rig.roll.children.some(o=>o.name==='rim-barrel'));
   } finally {disposeTyreRig(rig);}
 });
