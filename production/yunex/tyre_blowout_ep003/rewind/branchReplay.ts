@@ -33,8 +33,8 @@ export const DEFAULT_BRANCH_REPLAY: BranchReplaySettings = Object.freeze({
   correctFilmSec: 16.015,
   // Same origin handed to Agent 8, Agent 2, and tyre mechanics.
   choiceSourceSec: 4.0,
-  // Time-compressed BAD branch; not presented as real-time crash physics.
-  impactSourceSec: 6.1,
+  // Time-compressed A8 bad branch: 3.5 simulated seconds, NOT 1.39s of real-time crash physics.
+  impactSourceSec: 7.5,
   controlledTimeRate: 0.82,
   preChoiceTimeRate: 0.65,
 });
