@@ -116,6 +116,6 @@ export const AIEraRealFootage: React.FC = () => (
         <RealShot shot={shot}/>
       </Sequence>
     ))}
-    <Audio src={staticFile('ai-era/audio.mp3')}/>
+    <Audio src={staticFile('ai-era/audio.mp3')} volume={0.77}/>
   </AbsoluteFill>
 );

@@ -116,12 +116,19 @@ jobs:
           ffmpeg -hide_banner -loglevel error -ss 3.7 -i out/ai-era/AI_ERA_Real_1080x1920.mp4 -frames:v 1 -y out/ai-era/opening.jpg
           ffmpeg -hide_banner -loglevel error -ss 30.4 -i out/ai-era/AI_ERA_Real_1080x1920.mp4 -frames:v 1 -y out/ai-era/finale.jpg
           sha256sum out/ai-era/AI_ERA_Real_1080x1920.mp4 > out/ai-era/master.sha256
+      - name: V3 mastering QC - reject true peak above minus one dBTP
+        run: |
+          set -euo pipefail
+          python production/toolkits/yunex_edit_lab.py meter \
+            --file out/ai-era/AI_ERA_Real_1080x1920.mp4 \
+            --output out/ai-era/v3-master-loudness.json
+          python -c 'import json; x=json.load(open("out/ai-era/v3-master-loudness.json")); peak=x["measurement"]["input_tp"]; print("Final true peak:",peak,"dBTP"); assert peak <= -1.0, "master true-peak requires additional headroom"'
       - name: Save finished film as an owner-only draft release
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "ai-era-review-$GITHUB_RUN_ID" --draft --title "AI ERA - Private review" --notes "Unverified third-party media; owner-only preview, not for publication" out/ai-era/AI_ERA_Real_1080x1920.mp4 out/ai-era/probe.json out/ai-era/master.sha256
+          gh release create "ai-era-review-$GITHUB_RUN_ID" --draft --title "AI ERA - Private review" --notes "Unverified third-party media; owner-only preview, not for publication" out/ai-era/AI_ERA_Real_1080x1920.mp4 out/ai-era/probe.json out/ai-era/master.sha256 out/ai-era/v3-master-loudness.json
       - name: Keep unlicensed source clips private
         if: inputs.rights_cleared != true
         run: echo 'Rendered and verified locally; no downloadable public artifact because publishing rights were not confirmed.' >> "$GITHUB_STEP_SUMMARY"
