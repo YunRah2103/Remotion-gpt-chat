@@ -42,7 +42,7 @@ export function prepareTyreRig(wheelId:WheelId='front-right',exposure=0):Prepare
   // Geometry of the approved wheel, hub and brake is never duplicated.
   const suspension=createPart({variant:'double-wishbone',accent:'#caa96b'});
   suspension.name='ep003-exposed-front-suspension';
-  suspension.position.set(x,.168, (right?-1:1)*.50);
+  suspension.position.set(x,.18, (right?-1:1)*.50);
   suspension.rotation.y=right?Math.PI:0;
   suspension.visible=exposure>0;
   vehicle.add(suspension);
@@ -113,7 +113,7 @@ export function applyTyreFrame(rig:PreparedTyreRig,frame:TyreFrame,options:{
   }
   if(rig.suspension.visible){
     // PARTS suspension rises when compression increases, hence inverted on collapse.
-    animatePart(rig.suspension,{compression:.6*(1-frame.failureProgress)});
+    animatePart(rig.suspension,{compression:Math.max(0,Math.min(1,(frame.effectiveRadiusM-.30)/.12))});
     rig.suspension.visible=(options.exposure??1)>0;
   }
   deformRubber(rig,{...frame,angularPhaseRad:spin});
