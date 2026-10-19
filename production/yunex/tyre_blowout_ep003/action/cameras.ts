@@ -101,8 +101,8 @@ export function sampleActionCamera(req:ActionCameraRequest):ActionCameraPose {
     case 'impact-side-profile': {
       // Wide geography FIRST: view from median side, so the near-side rail
       // cannot mask the contact. A deliberate short lateral dolly, no spin.
-      position=lerp3([1.9,3.0,10.1],[4.0,2.75,10.4],eased);
-      target=lerp3([.20,.82,-2.7],[.5,.80,-3.6],eased);
+      position=lerp3([0.0,4.15,15.5],[.5,4.0,15.8],eased);
+      target=lerp3([.10,.82,-1.1],[.30,.80,-1.7],eased);
       fov=58;break;
     }
     case 'impact-overhead': {
@@ -118,8 +118,8 @@ export function sampleActionCamera(req:ActionCameraRequest):ActionCameraPose {
     case 'reverse-sweep': {
       // Agent 9 supplies reverse-time vehicle state. Camera simply dollies
       // back with it. A reverse clock NEVER lives inside the camera sampler.
-      position=lerp3([5.6,4.65,7.2],[-7.2,3.0,5.9],eased);
-      target=lerp3([0,.84,-1.8],[1.4,.80,-1.7],eased);
+      position=lerp3([8.3,5.35,14.2],[-8.6,4.7,14.6],eased);
+      target=lerp3([0,.86,-1.1],[.30,.80,-1.0],eased);
       fov=mix(60,52,eased);break;
     }
     case 'steady-driver': {
