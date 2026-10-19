@@ -7,17 +7,10 @@ on:
       - 'production/yunex/tyre_blowout_ep003/action/**'
       - 'previews/agent-10/**'
       - 'tests/agent-10/**'
-  pull_request:
-    branches: [production/yunex-ep003-base]
-    paths:
-      - '.github/workflows/yunex-ep003-agent10-action.yml'
-      - 'production/yunex/tyre_blowout_ep003/action/**'
-      - 'previews/agent-10/**'
-      - 'tests/agent-10/**'
 permissions:
   contents: read
 concurrency:
-  group: ep003-agent10-native-${{ github.ref }}-${{ github.sha }}
+  group: ep003-agent10-native-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   motion-camera-native:
@@ -69,7 +62,26 @@ jobs:
           test -f production/yunex/tyre_blowout_ep003/cinema/scene.tsx
           test -f production/yunex/tyre_blowout_ep003/look/world.tsx
           test -f production/yunex/tyre_blowout_ep003/story/SteadyHands3D.tsx
-          printf '%s\n' 'CRASH BLOCKING ONLY: Agent8 impact and Agent9 rewind not yet integrated'             >> previews/agent-10/out/provenance.txt
+          # Agent8 and Agent9 are separate owned branch sources, pinned by exact SHA.
+          integrations=(
+            'agent/ep003-08-crash-vfx impact 9aa1a092591336e4b6a2b1944e3e817c71e99271'
+            'agent/ep003-09-rewind-story rewind 6b767e381418f51ace0aea53fbb7bf3f071a5f8d'
+          )
+          for spec in "${integrations[@]}"; do
+            read -r sourceBranch folder sha <<< "$spec"
+            git fetch --no-tags --depth=120 origin "refs/heads/$sourceBranch"
+            if ! git cat-file -e "${sha}^{commit}" 2>/dev/null; then
+              git fetch --no-tags --depth=1 origin "$sha"
+            fi
+            git cat-file -e "${sha}^{commit}"
+            git restore --source="$sha" --worktree -- "production/yunex/tyre_blowout_ep003/$folder/"
+            printf '%s %s %s\n' "$sourceBranch" "$folder" "$sha" | tee -a previews/agent-10/out/provenance.txt
+          done
+          test -f production/yunex/tyre_blowout_ep003/impact/model.ts
+          test -f production/yunex/tyre_blowout_ep003/impact/Preview.tsx
+          test -f production/yunex/tyre_blowout_ep003/rewind/branchReplay.ts
+          test -f production/yunex/tyre_blowout_ep003/rewind/agent8Integration.ts
+          printf '%s\n' 'INTEGRATED: exact-pin A8 impact + A9 rewind, NO provisional crash fixture'             >> previews/agent-10/out/provenance.txt
       - name: Check TS and original world/parts tests
         run: |
           set -euo pipefail
@@ -83,6 +95,9 @@ jobs:
           set -euo pipefail
           mkdir -p previews/agent-10/out/early-frames
           npx --no-install remotion still previews/agent-10/entry.tsx EP003Agent10CrashAction             previews/agent-10/out/early-frames/barrier-approach.png             --frame=88 --scale=0.5 --gl=swangle
+          npx --no-install remotion still previews/agent-10/entry.tsx EP003Agent10CrashAction \
+            previews/agent-10/out/early-frames/genuine-rewind.png \
+            --frame=143 --scale=0.5 --gl=swangle
           npx --no-install remotion still previews/agent-10/entry.tsx EP003Agent10RecoveryAction             previews/agent-10/out/early-frames/hands-driving.png             --frame=30 --scale=0.5 --gl=swangle
       - name: Publish early frame proof
         if: always()
@@ -97,7 +112,7 @@ jobs:
       - name: Render two actual native 3D H264 portrait MP4 previews
         run: |
           set -euo pipefail
-          npx --no-install remotion render previews/agent-10/entry.tsx EP003Agent10CrashAction             previews/agent-10/out/crash-action-blocking.mp4             --gl=swangle --scale=0.5 --codec=h264 --pixel-format=yuv420p --concurrency=1
+          npx --no-install remotion render previews/agent-10/entry.tsx EP003Agent10CrashAction             previews/agent-10/out/crash-impact-rewind.mp4             --gl=swangle --scale=0.5 --codec=h264 --pixel-format=yuv420p --concurrency=1
           npx --no-install remotion render previews/agent-10/entry.tsx EP003Agent10RecoveryAction             previews/agent-10/out/moving-recovery.mp4             --gl=swangle --scale=0.5 --codec=h264 --pixel-format=yuv420p --concurrency=1
       - name: Count frames, fully decode, inspect moving frames and create contact sheets
         run: |
