@@ -32,7 +32,7 @@ jobs:
           python -m unittest discover -s production/tests -p test_yunex_edit_lab.py -v
 
   render:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 120
@@ -190,6 +190,21 @@ jobs:
           ffmpeg -v error -ss 22.37 -i "$MASTER" -frames:v 1 -y out/ai-era-expanded/second-hit.jpg
           ffmpeg -v error -ss 31.31 -i "$MASTER" -frames:v 1 -y out/ai-era-expanded/finale.jpg
           sha256sum "$MASTER" > out/ai-era-expanded/master.sha256
+      - name: Package V3 contact sheets and timing evidence for private review
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile, ZIP_DEFLATED
+          root=Path('out/ai-era-expanded')
+          src=root/'v3-scout'
+          dest=root/'v3-all-13-source-scouts.zip'
+          paths=sorted(p for p in src.rglob('*') if p.is_file())
+          assert len(paths)>=13, 'Expected V3 scouting for 13 real sources'
+          with ZipFile(dest,'w',compression=ZIP_DEFLATED,compresslevel=6) as z:
+              for p in paths: z.write(p,arcname=p.relative_to(root))
+          print('V3 scout records packaged:',len(paths))
+          PY
       - name: Store only in private owner-review draft until rights clearance
         if: inputs.rights_cleared != true
         env:
@@ -203,7 +218,11 @@ jobs:
             out/ai-era-expanded/master.sha256 \
             out/ai-era-expanded/master-probe.json \
             out/ai-era-expanded/v3-original-audio-meter.json \
-            out/ai-era-expanded/v3-master-audio-meter.json
+            out/ai-era-expanded/v3-master-audio-meter.json \
+            out/ai-era-expanded/v3-all-13-source-scouts.zip \
+            out/ai-era-expanded/opening-hit.jpg \
+            out/ai-era-expanded/second-hit.jpg \
+            out/ai-era-expanded/finale.jpg
           echo 'PRIVATE DRAFT RELEASE CREATED; not a publicly licensed edit.' >> "$GITHUB_STEP_SUMMARY"
       - name: Deliver rights-cleared final and V3 source reports
         if: inputs.rights_cleared == true
