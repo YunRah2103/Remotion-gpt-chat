@@ -36,7 +36,11 @@ function view(shot:Shot,x:number,z:number):{position:[number,number,number];targ
   switch(shot){
     case 'tyre-front-right':return {position:[x+5.45,1.43,z-4.3],target:[x+1.03,0.48,z-.62],fov:46};
     case 'high-chase':return {position:[x-11.8,4.2,z+6.2],target:[x+.4,.62,z],fov:48};
-    case 'rear-three-quarter':return {position:[x-10.4,4.1,z-6.5],target:[x+.25,.65,z],fov:46};
+    case 'rear-three-quarter':
+      // Keep the moving tracking camera over the paved road, not out beside
+      // the -Z metal barrier/gantry support at x≈31. Earlier native film
+      // frame 108 was completely occluded as that support crossed the camera.
+      return {position:[x-10.8,5.2,z-4.25],target:[x+.25,.65,z],fov:45};
     case 'overhead':return {position:[x-3.3,26,z-1.7],target:[x,0.4,z],fov:39};
   }
 }
