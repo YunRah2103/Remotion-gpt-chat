@@ -66,6 +66,29 @@ jobs:
           npm run worldkit:test
           npm run partskit:test
           node --experimental-strip-types --test tests/agent-3/*.test.mjs
+      - name: Render early visual inspection PNGs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p previews/agent-3/out/early-frames
+          npx --no-install remotion still previews/agent-3/entry.tsx EP003CameraOpening \
+            previews/agent-3/out/early-frames/opening-first-collapse.png \
+            --frame=12 --scale=0.5 --gl=swangle
+          npx --no-install remotion still previews/agent-3/entry.tsx EP003CameraMontage \
+            previews/agent-3/out/early-frames/montage-cockpit.png \
+            --frame=172 --scale=0.5 --gl=swangle
+          npx --no-install remotion still previews/agent-3/entry.tsx EP003CameraMontage \
+            previews/agent-3/out/early-frames/montage-refuge.png \
+            --frame=248 --scale=0.5 --gl=swangle
+      - name: Upload early frame evidence before long MP4 renders
+        uses: actions/upload-artifact@v4
+        with:
+          name: EP003-AGENT3-EARLY-SHOTS-${{ github.run_id }}
+          path: |
+            previews/agent-3/out/early-frames/
+            previews/agent-3/out/authoritative-sources.txt
+          retention-days: 21
+          if-no-files-found: error
       - name: Render genuine software-WebGL native Remotion portrait MP4s
         run: |
           set -euo pipefail

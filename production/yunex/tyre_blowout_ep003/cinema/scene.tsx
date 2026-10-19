@@ -86,6 +86,10 @@ export const CinematicScene:React.FC<CinematicSceneProps>=({
    {/* Gentle front-right fill to resolve rubber on the first dark macro frame. */}
    <pointLight position={[dynamics.positionM[0]+2.8,4.6,dynamics.positionM[2]-4.1]}
     color="#e1e9eb" intensity={24} distance={14} decay={2}/>
+   {/* Soft wheel-side bounce keeps collapsing rubber distinguishable from the
+       turning aluminium rim without bleaching exterior paint. */}
+   <pointLight position={[dynamics.positionM[0]+1.85,1.48,dynamics.positionM[2]-2.5]}
+    color="#dce6ed" intensity={7} distance={5} decay={2}/>
    <CinematicCameraRig pose={pose}/>
   </ThreeCanvas>
  </AbsoluteFill>;

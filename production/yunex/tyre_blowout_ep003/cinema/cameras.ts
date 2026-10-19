@@ -43,8 +43,11 @@ export function sampleCinemaCamera(input:CinemaCameraInput):CameraPose{
    from=lerp3([-.42,13.0,-1.65],[-1.2,12.2,-2.00],p);
    at=[.20,.52,-.13];fov=46;break;
   case 'driver-cockpit':
-   from=lerp3([-.52,1.07,-.39],[-.48,1.08,-.40],p);
-   at=lerp3([9.7,1.08,-.34],[9.5,1.10,-.22],p);fov=69;near=.012;break;
+   // Follow the world-kit grand-tourer driver's eye line. The earlier
+   // negative-X camera intersected the seat headrest and blocked the lens.
+   // Seat shell extends behind x=-.16, keep pupil forward of its trim.
+   from=lerp3([.02,1.145,-.456],[.06,1.155,-.474],p);
+   at=lerp3([6.8,1.005,-.45],[6.2,.975,-.42],p);fov=mix(70,68,p);near=.025;break;
   case 'chase-recovery':
    from=lerp3([-7.8,2.13,-2.55],[-6.65,1.86,-2.48],p);
    at=lerp3([.51,.84,-.18],[1.20,.80,-.14],p);fov=mix(48,44,p);break;

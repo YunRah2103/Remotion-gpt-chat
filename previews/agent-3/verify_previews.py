@@ -37,6 +37,8 @@ def inspect(name, config, directory):
    frame=im.convert("RGB")
    lum=ImageStat.Stat(frame.convert("L")).mean[0]
    if lum<10: raise RuntimeError(f"Black frame {name} {n}: luminance {lum}")
+   if name=="montage" and n in (171,172) and lum<72:
+    raise RuntimeError(f"Cockpit is obstructed at frame {n}: luminance {lum:.1f} (minimum 72)")
    frames.append((n,frame.copy(),lum))
  early=[(n,im) for n,im,_ in frames if n<30]
  motion=[sum(ImageStat.Stat(ImageChops.difference(a[1],b[1])).mean)/3 for a,b in zip(early,early[1:])]
@@ -55,7 +57,7 @@ def inspect(name, config, directory):
   "duration_seconds":float(data["format"]["duration"]),"full_ffmpeg_decode":True,
   "motion_scores_first_second":motion,"sampled_frames":config["samples"],
   "sampled_luminance":[round(v[2],2) for v in frames],
-  "limitations":"Camera-blocking fixture: NOT Agent 2 physics or Agent 1 damage."}
+  "limitations":"Uses authoritative Agent 2 motion and Agent 1 rubber at recorded source SHAs. Hard-cut-only road X rebasing. Moving refuge is NOT a validated safe stop; director approval pending."}
 
 def main():
  p=argparse.ArgumentParser();p.add_argument("--dir",default="previews/agent-3/out")
