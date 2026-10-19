@@ -12,6 +12,9 @@ import {buildEpisodeHighway,EpisodeLight,finishGrandTourer} from '../look/world.
 import {ContactOcclusion} from '../look/contact.tsx';
 import {SteadyHands3D} from '../story/SteadyHands3D.tsx';
 import {sampleActionCamera} from './cameras.ts';
+import {Agent10DamagedOriginalCar} from './CrashCar.tsx';
+import {ImpactEffects3D} from '../impact/Preview.tsx';
+import {ChoiceOverlay,RewindVisualTransition} from '../rewind/RewindVisualTransition.tsx';
 import type {ActionCameraPose} from './cameras.ts';
 import {actionPreviewState} from './previewState.ts';
 
@@ -48,14 +51,14 @@ const MovingCockpit:React.FC<{d:VehicleDynamicsFrame;tyre:TyreFrame}>=({d,tyre})
 };
 
 /** Working native 3D Remotion camera previews; NO screenshot montage or zoom. */
-export const ActionPreviewFilm:React.FC<{mode:'crash-blocking'|'recovery'}>=({mode})=>{
+export const ActionPreviewFilm:React.FC<{mode:'crash-action'|'recovery'}>=({mode})=>{
   const frame=useCurrentFrame(),{fps,width,height}=useVideoConfig();
   const state=actionPreviewState(frame/fps,mode);
   const pose=sampleActionCamera({
     stage:state.stage,sourceTimeSec:state.sourceTimeSec,
     progress01:state.progress01,dynamics:state.dynamics,
-    // Agent 8 has not supplied actual contact; never falsely shake camera.
-    impactFrame:{contact01:state.contact01,actualBarrierContact:false}
+    // Genuine A8 barrier contact: never shake during deflation alone.
+    impactFrame:{contact01:state.contact01,actualBarrierContact:Boolean(state.impact?.contact.occurred)}
   });
   const highway=useMemo(buildEpisodeHighway,[]);
   useEffect(()=>()=>disposeObject(highway),[highway]);
@@ -67,23 +70,25 @@ export const ActionPreviewFilm:React.FC<{mode:'crash-blocking'|'recovery'}>=({mo
       <EpisodeLight focus={state.dynamics.positionM}/>
       <primitive object={highway}/>
       <ContactOcclusion dynamics={state.dynamics}/>
-      {cockpit
-        ? <MovingCockpit d={state.dynamics} tyre={state.tyre}/>
-        : <CinematicVehicle dynamics={state.dynamics} tyre={state.tyre}/>}
+      {state.impact
+        ? <Agent10DamagedOriginalCar dynamics={state.dynamics}
+            tyre={state.tyre} impact={state.impact}/>
+        : cockpit
+          ? <MovingCockpit d={state.dynamics} tyre={state.tyre}/>
+          : <CinematicVehicle dynamics={state.dynamics} tyre={state.tyre}/>}
+      {state.impact&&<ImpactEffects3D frame={state.impact}/>}
       <pointLight position={[
         state.dynamics.positionM[0]+2.6,4.5,state.dynamics.positionM[2]-4.0
       ]} color="#dee9f0" intensity={22} distance={14} decay={2}/>
       <ActionCameraRig pose={pose}/>
     </ThreeCanvas>
-    {mode==='crash-blocking' &&
-      <div style={{
-        position:'absolute',bottom:70,left:42,right:42,padding:'12px 16px',
-        fontFamily:'Arial,sans-serif',fontSize:23,letterSpacing:.3,
-        lineHeight:1.25,background:'rgba(13,23,30,.78)',color:'#ffffff'
-      }}>CAMERA BLOCKING ONLY · TEMPORARY CRASH PATH
-        <div style={{fontSize:19,opacity:.90}}>
-          Agent 8 collision / Agent 9 rewind NOT YET integrated
-        </div>
-      </div>}
+    {state.replay&&<RewindVisualTransition replay={state.replay}/>}
+    {state.replay&&<ChoiceOverlay replay={state.replay}/>}
+    {state.replay&&<div style={{
+      position:'absolute',bottom:66,left:46,right:46,
+      color:'#f5f9fc',fontFamily:'Arial,sans-serif',
+      fontSize:18,textAlign:'center',fontWeight:700,
+      textShadow:'0 3px 12px #172532'
+    }}>HYPOTHETICAL WRONG REACTION · NOT AN INEVITABLE OUTCOME</div>}
   </AbsoluteFill>;
 };
