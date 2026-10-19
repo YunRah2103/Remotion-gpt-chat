@@ -49,7 +49,7 @@ function applyOriginalKitDamage(target:DentTarget|undefined,frame:CrashOutcomeFr
  }
  position.needsUpdate=true;target.mesh.geometry.computeVertexNormals();
 }
-const CrashCarRig:React.FC<{frame:CrashOutcomeFrame}>=({frame})=>{
+export const CrashCarRig:React.FC<{frame:CrashOutcomeFrame}>=({frame})=>{
  const original=useMemo(makeOriginalGrandTourer,[]);
  const dent=useMemo(()=>setupDent(original),[original]);
  const trim=useMemo(()=>{
@@ -81,6 +81,8 @@ const CrashCarRig:React.FC<{frame:CrashOutcomeFrame}>=({frame})=>{
   if(!o.name.startsWith('steer-')||!o.userData.steering)return;
   const rightFront=o.position.x>0&&o.position.z<0;
   if(!rightFront)return;
+  const wheelRoll=o.getObjectByName('wheel-roll');
+  if(wheelRoll)wheelRoll.rotation.z=frame.frontRightWheelSpinRad;
   const tyre=o.getObjectByName('tyre');
   if(tyre)tyre.scale.y=.84-.08*(1-frame.frontRightPressureRatio);
  });
