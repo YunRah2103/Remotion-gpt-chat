@@ -28,20 +28,8 @@ export const StoryEffects3D: React.FC<{request: StoryRequest; showForce?: boolea
   }) : [];
 
   return <>
-    {/* Low-contrast pressure contours orbit the existing failed wheel, not a fake wheel. */}
-    {s.segment === 'pressure' && s.pressureLoss01 > .03 &&
-      <group position={s.wheelCenterM}>
-        <mesh position={[0,0,-.21]} scale={1 + s.deformation01 * .085}>
-          <torusGeometry args={[s.wheelRadiusM * .96,.006,5,64]}/>
-          <meshBasicMaterial color="#E7BA83" opacity={s.pressureLoss01 * .47}
-            transparent depthWrite={false}/>
-        </mesh>
-        <mesh position={[0,0,-.245]} scale={1 + .10 * s.pressureLoss01}>
-          <torusGeometry args={[s.wheelRadiusM*.74,.0028,4,64]}/>
-          <meshBasicMaterial color="#D7F0E9" opacity={s.releaseMist01 * .30}
-            transparent depthWrite={false}/>
-        </mesh>
-      </group>}
+    {/* No rim-tracing halos: the actual Agent 1 deforming sidewall carries the explanation.
+        Sparse airflow particles and a faint road contact cue are deliberately secondary. */}
     {/* Real wheel hub anchors every vent particle; airflow trails backward (-X) and outward (-Z). */}
     {particles.length > 0 && <group position={s.wheelCenterM}>
       {particles.map(p => <mesh key={p.i}
