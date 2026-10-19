@@ -45,6 +45,23 @@ test('real Three scene retains kit world and upward-facing contiguous paved refu
     assert.equal(mainRoad.material.bumpMap,null,'no glittering high-frequency bump');
     assert.equal(mainRoad.material.map,tarmac.material.map,
       'refuge and road must use the same restrained asphalt texture');
+    const roadPositions=mainRoad.geometry.getAttribute('position');
+    const roadUvs=mainRoad.geometry.getAttribute('uv');
+    const refugePositions=tarmac.geometry.getAttribute('position');
+    const refugeUvs=tarmac.geometry.getAttribute('uv');
+    assert.ok(roadUvs && refugeUvs,'both surfaces need matching UV layout');
+    // New road/refuge texture is world anchored, not stretched over 220m.
+    for(const i of [0,Math.floor(roadPositions.count/2),roadPositions.count-1]){
+      const u=(roadPositions.getX(i)+mainRoad.position.x)/4;
+      const v=(roadPositions.getZ(i)+mainRoad.position.z)/4;
+      assert.ok(Math.abs(roadUvs.getX(i)-u)<1e-4);
+      assert.ok(Math.abs(roadUvs.getY(i)-v)<1e-4);
+    }
+    for(const i of [0,Math.floor(refugePositions.count/2),refugePositions.count-1]){
+      assert.ok(Math.abs(refugeUvs.getX(i)-refugePositions.getX(i)/4)<1e-4);
+      assert.ok(Math.abs(refugeUvs.getY(i)-refugePositions.getZ(i)/4)<1e-4);
+    }
+
     assert.ok(tarmac instanceof THREE.Mesh,'actual THREE.Mesh road extension required');
     const p=tarmac.geometry.getAttribute('position');
     const normal=tarmac.geometry.getAttribute('normal');
