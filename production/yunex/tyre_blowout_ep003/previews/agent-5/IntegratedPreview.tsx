@@ -86,15 +86,17 @@ export const IntegratedStoryPreview:React.FC<{variant:IntegratedKind}>=({variant
   const request:StoryRequest={tSec,dynamics,tyre,segment:beat.segment};
   const sampledCamera=sampleCinemaCamera({tSec,shot:beat.shot,dynamics,tyre,
     progress01,subtleImpactShake:true});
-  // Agent 3's stock cockpit POV sits behind the seat shell on this particular
-  // grand-tourer body. Shift the EYE FORWARD of that shell, preserving the
-  // genuine steering column/hand animation and the authoritative car pose.
+  // In this grand-tourer, the seat shell extends to approximately local
+  // x=-.08. The pupil at x=-.02 stays CLEAR of the real shell but far enough
+  // behind the factory steering wheel (x~.46) to frame BOTH hands rather
+  // than only an oversize clipped wheel rim. Aim slightly lower to keep the
+  // steering correction visible, while retaining the real road ahead.
   // Keep all other shots on Agent 3's sampled cinematic presets.
   const pose=beat.shot==='driver-cockpit'
     ? {...sampledCamera,
-        position:vehicleLocalToWorld([.20,1.13,-.45],dynamics),
-        target:vehicleLocalToWorld([2.9,1.025,-.45],dynamics),
-        fovDeg:66,nearM:.018}
+        position:vehicleLocalToWorld([-.02,1.15,-.456],dynamics),
+        target:vehicleLocalToWorld([2.65,.86,-.456],dynamics),
+        fovDeg:70,nearM:.018}
     : beat.shot==='wheel-cutaway'
     ? {...sampledCamera,
         // Keep failed wheel and the surrounding factory wheel arch in the SAME
