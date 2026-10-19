@@ -18,9 +18,9 @@ import {sampleDynamics,previewRebasedPosition,DYNAMICS_DEFAULTS} from './model.t
 type Shot = 'tyre-front-right'|'high-chase'|'rear-three-quarter'|'overhead';
 type Edit = {sourceSec:number;sourceAnchorSec:number;sceneX:number;shot:Shot};
 const EDITS:readonly {at:number;end:number;sourceStart:number;shot:Shot;sceneX:number}[]=[
-  {at:0,end:2.6,sourceStart:0.1,shot:'tyre-front-right',sceneX:-42},
-  {at:2.6,end:5.35,sourceStart:1.9,shot:'overhead',sceneX:-35},
-  {at:5.35,end:8,sourceStart:4.2,shot:'rear-three-quarter',sceneX:-35},
+  {at:0,end:2.6,sourceStart:1.20,shot:'high-chase',sceneX:-42},
+  {at:2.6,end:5.35,sourceStart:3.50,shot:'overhead',sceneX:-35},
+  {at:5.35,end:8,sourceStart:5.15,shot:'rear-three-quarter',sceneX:-35},
 ];
 function shotAt(videoSec:number,variant:'tight'|'context'):Edit {
   if(variant==='tight')return {
@@ -34,10 +34,10 @@ function shotAt(videoSec:number,variant:'tight'|'context'):Edit {
 function view(shot:Shot,x:number,z:number):{position:[number,number,number];target:[number,number,number];fov:number}{
   const target:[number,number,number]=[x,0.7,z];
   switch(shot){
-    case 'tyre-front-right':return {position:[x+5.3,1.57,z-3.7],target:[x+1.02,0.51,z-.50],fov:36};
-    case 'high-chase':return {position:[x-9.5,3.65,z+4.7],target,fov:39};
-    case 'rear-three-quarter':return {position:[x-8.4,3.3,z-5.0],target,fov:38};
-    case 'overhead':return {position:[x-3,16,z-1.9],target:[x+1.4,0,z-.4],fov:30};
+    case 'tyre-front-right':return {position:[x+5.45,1.43,z-4.3],target:[x+1.03,0.48,z-.62],fov:46};
+    case 'high-chase':return {position:[x-11.8,4.2,z+6.2],target:[x+.4,.62,z],fov:48};
+    case 'rear-three-quarter':return {position:[x-10.4,4.1,z-6.5],target:[x+.25,.65,z],fov:46};
+    case 'overhead':return {position:[x-3.3,26,z-1.7],target:[x,0.4,z],fov:39};
   }
 }
 const ids:readonly WheelId[]=['front-left','front-right','rear-left','rear-right'];
@@ -52,29 +52,28 @@ const MovingCar:React.FC<{tSec:number;sceneX:number;anchorDistanceM:number}>=({t
   root.position.set(...position);
   root.rotation.order='YXZ';
   root.rotation.set(data.rollRad,data.yawRad,data.pitchRad,'YXZ');
-  const pivots:T.Object3D[]=[];
+  // Apply world-space authoritative hubs, not arbitrary local offsets.
+  // Keeping this path identical to Agent 1's final rig prevents mismatched
+  // suspension, wheel spin or tyre/body transforms on cross-agent handoff.
+  const pivots:{pivot:T.Object3D;id:WheelId}[]=[];
   root.traverse(o=>{
-    if(!o.name.startsWith('steer-'))return;
-    const id=idFromPivot(o);
-    pivots.push(o);
-    o.position.y=EP003_SCENE.wheelRadiusM;
-    o.rotation.y=data.wheels[id].steeringRad;
-    const roll=o.getObjectByName('wheel-roll');
-    if(roll) {
-      roll.rotation.z=data.wheels[id].spinRad;
-      // Department-specific preview proxy only: car's original rim and brakes
-      // remain intact; Agent 1 provides final pressure-dependent tyre mesh.
-      const tyre=roll.getObjectByName('tyre');
-      if(tyre)tyre.scale.y=id==='front-right'
-        ?data.wheels[id].rollingRadiusM/EP003_SCENE.wheelRadiusM:1;
-    }
+    if(o.name.startsWith('steer-'))pivots.push({pivot:o,id:idFromPivot(o)});
   });
   root.updateMatrixWorld(true);
-  const q=new T.Vector3();
-  for(const pivot of pivots){
-    const id=idFromPivot(pivot);
-    pivot.getWorldPosition(q);
-    pivot.position.y+=data.wheels[id].hubWorldM[1]-q.y;
+  for(const {pivot,id} of pivots){
+    const wheel=data.wheels[id];
+    pivot.position.copy(root.worldToLocal(new T.Vector3(...wheel.hubWorldM)));
+    pivot.rotation.y=wheel.steeringRad;
+    const roll=pivot.getObjectByName('wheel-roll');
+    if(roll){
+      roll.rotation.z=wheel.spinRad;
+      // Temporary visual-only proxy. Agent 1's genuinely deforming rubber
+      // replaces this scaling once PR #202 is integrated; NO tyre mesh
+      // is removed and the original brake, axle and rim stay untouched.
+      const tyre=roll.getObjectByName('tyre');
+      if(tyre)tyre.scale.y=id==='front-right'
+        ?wheel.rollingRadiusM/EP003_SCENE.wheelRadiusM:1;
+    }
   }
   root.updateMatrixWorld(true);
   return <primitive object={root}/>;
