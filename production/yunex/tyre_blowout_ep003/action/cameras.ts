@@ -116,11 +116,12 @@ export function sampleActionCamera(req:ActionCameraRequest):ActionCameraPose {
       fov=56;break;
     }
     case 'reverse-sweep': {
-      // Agent 9 supplies reverse-time vehicle state. Camera simply dollies
-      // back with it. A reverse clock NEVER lives inside the camera sampler.
-      position=lerp3([5.6,4.4,7.9],[-6.2,4.1,8.1],eased);
-      target=lerp3([0,.82,-.65],[.35,.80,-.55],eased);
-      fov=mix(53,51,eased);break;
+      // Agent 9 reverses the physical collision state and particles. Follow
+      // from high REAR quarter instead of orbiting broadside through the
+      // narrow portrait frustum. A reverse clock NEVER lives in cameras.
+      position=lerp3([-7.6,4.55,7.15],[-5.25,5.0,9.1],eased);
+      target=lerp3([.35,.82,-.30],[.5,.80,-.30],eased);
+      fov=mix(55,59,eased);break;
     }
     case 'steady-driver': {
       // Same in-car seating as Agent 3; A5 original hands must be visible.
@@ -135,12 +136,12 @@ export function sampleActionCamera(req:ActionCameraRequest):ActionCameraPose {
       fov=mix(53,56,eased);break;
     }
     case 'safe-slowdown-follow': {
-      // Original A2 car keeps rolling: median-side elevated tracking shot.
-      // +Z carriageway camera sits clear of the A4 right-side guardrail,
-      // instead of looking THROUGH its giant foreground concrete refuge edge.
-      position=lerp3([-7.9,3.45,5.15],[-4.65,3.75,5.85],eased);
-      target=lerp3([.20,.83,-.10],[.9,.84,-.10],eased);
-      fov=mix(52,55,eased);break;
+      // Original A2 car keeps rolling: elevated rear-right tracking shot.
+      // Camera is INSIDE the right rail on carriageway (-Z) not behind
+      // A4's solid concrete median; 9:16 lens retains full undamaged GT.
+      position=lerp3([-7.45,3.30,-3.05],[-5.0,3.65,-2.65],eased);
+      target=lerp3([.35,.83,.1],[.95,.84,.1],eased);
+      fov=mix(55,57,eased);break;
     }
     default: throw new Error('Agent 10: unknown stage');
   }
