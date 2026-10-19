@@ -63,23 +63,27 @@ test('real Three scene retains kit world and upward-facing contiguous paved refu
     }});}
 });
 
-test('real scene does not leave foreground trees occupying paved refuge',async()=>{
+test('real scene contains no visible trees over the refuge and keeps background forest',async()=>{
   const {buildEpisodeHighway}=await createWorldFactory();
+  const {refugeRailZ}=await import(pathToFileURL(path.resolve(
+    'production/yunex/tyre_blowout_ep003/look/refuge-profile.ts')).href);
   const world=buildEpisodeHighway();
   const matrix=new THREE.Matrix4(),p=new THREE.Vector3(),q=new THREE.Quaternion(),s=new THREE.Vector3();
-  let moved=0;
+  let hidden=0,visibleOutside=0;
   world.traverse(node=>{
     if(!(node instanceof THREE.InstancedMesh))return;
     if(!['tree-trunks','tree-crowns','conifer-tiers','conifer-snow'].includes(node.name))return;
     for(let i=0;i<node.count;i++){
       node.getMatrixAt(i,matrix);matrix.decompose(p,q,s);
-      if(p.x>=4&&p.x<=110&&p.z<0){
-        assert.ok(p.z<=-32,'tree mesh obstructs refuge pavement or guardrail');
-        moved++;
-      }
+      if(s.lengthSq()<1e-10){hidden++;continue;}
+      const obstructing=p.x>=4&&p.x<=110&&p.z<0&&
+        p.z>refugeRailZ(p.x)-5.5;
+      assert.equal(obstructing,false,'visible tree still obstructs refuge approach/guardrail');
+      visibleOutside++;
     }
   });
-  assert.ok(moved>=1,'verification must exercise relocated tree instances');
+  assert.ok(hidden>=1,'the original tree instances must be cleared from bay');
+  assert.ok(visibleOutside>=1,'keep surrounding approved kit scenery');
 });
 
 test('soft wheel-contact texture is deterministic and fades smoothly to zero',async()=>{
