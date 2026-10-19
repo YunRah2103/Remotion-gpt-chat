@@ -1,4 +1,6 @@
-import React,{useEffect,useMemo} from 'react';
+import React,{useEffect,useMemo,useLayoutEffect} from 'react';
+import {useThree} from '@react-three/fiber';
+import * as T from 'three';
 import {AbsoluteFill,useCurrentFrame,useVideoConfig,Composition,Folder} from 'remotion';
 import {ThreeCanvas} from '@remotion/three';
 import {WorldLighting,Environment,CameraAim} from '../../../../src/yunex/world-kit/components.tsx';
@@ -7,6 +9,7 @@ import type {TyreFrame,WheelId,VehicleDynamicsFrame} from '../shared/contract.ts
 import type {TyreFailureParams} from './sampleTyreFailure.ts';
 import {sampleTyreFailure} from './sampleTyreFailure.ts';
 import {sampleDynamics,DYNAMICS_DEFAULTS} from './agent2-dynamics-snapshot.ts';
+import {ContactOcclusion} from './agent4-contact-snapshot.tsx';
 import {applyTyreFrame,disposeTyreRig,prepareTyreRig} from './tyreRig.ts';
 import type {TyreDamageStyle} from './tyreRig.ts';
 
@@ -50,6 +53,22 @@ export const TyreCutaway:React.FC<Omit<TyreFailureWheelProps,'exposure'>&{exposu
   exposure=.9,...props
 })=><TyreFailureWheel {...props} exposure={exposure}/>;
 
+/** Same ACES exposure / front-quarter fill as Agent 4 PR #200, pinned for standalone review.
+ * Do not change the approved kit or imply this is a new lighting design.
+ */
+const Agent4PreviewLight:React.FC<{focus:[number,number,number]}>=({focus})=>{
+  const {gl}=useThree();
+  useLayoutEffect(()=>{
+    const previous=gl.toneMapping, exposure=gl.toneMappingExposure;
+    gl.toneMapping=T.ACESFilmicToneMapping;
+    gl.toneMappingExposure=.95;
+    return ()=>{gl.toneMapping=previous;gl.toneMappingExposure=exposure;};
+  },[gl]);
+  return <>
+    <WorldLighting timeOfDay="day" focus={focus}/>
+    <directionalLight position={[-14,19,-17]} color="#d6e6ec" intensity={.24}/>
+  </>;
+};
 const note:React.CSSProperties={fontFamily:'Arial,Helvetica,sans-serif',color:'#f1f5f4',letterSpacing:1,textShadow:'0 2px 10px #142029'};
 const fig=(v:number)=>Math.round(v*100);
 type PreviewKind='macro'|'portrait';
@@ -78,8 +97,10 @@ export const TyreMechanicsPreview:React.FC<{kind:PreviewKind}>=({kind})=>{
   const target=cam.target as [number,number,number];
   return <AbsoluteFill style={{background:'#adccd4'}}>
     <ThreeCanvas width={width} height={height} shadows camera={{position:camera,fov:cam.fov,near:.08,far:325}}>
-      <WorldLighting timeOfDay="day" focus={[x,0,z]}/>
+      <Agent4PreviewLight focus={[x,0,z]}/>
       <Environment kind="highway" seed={12} timeOfDay="day"/>
+      {/* Agent 4 conservative ground contact AO: offset applies equally to all four hubs. */}
+      <group position={[...offset] as [number,number,number]}><ContactOcclusion dynamics={dyn}/></group>
       <CameraAim position={camera} target={target} fov={cam.fov}/>
       {macro
         ?<TyreCutaway tSec={t} dynamics={dyn} sceneOffsetM={offset} exposure={.69}/>
