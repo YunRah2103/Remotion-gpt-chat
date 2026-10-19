@@ -83,8 +83,10 @@ function driver(s:State,t:number,p:EpisodeParams):Controls {
   const response=smooth((elapsed-0.12)/0.75);
   const lateralError=s.z+1.85;
   // Positive yaw = vehicle heading to its right; negative steering corrects left.
-  const corrective=-0.37*s.yaw-0.58*s.yawRate-0.024*lateralError
-    -0.22*Math.atan2(s.vz,Math.max(2,s.vx));
+  // A negative lateral-position or velocity error means drifting RIGHT (-Z):
+  // request LEFT (negative) steer, not another rightward correction.
+  const corrective=-0.37*s.yaw-0.58*s.yawRate+0.024*lateralError
+    +0.22*Math.atan2(s.vz,Math.max(2,s.vx));
   const steer=clamp(corrective*response,-0.055,0.055);
   // NHTSA-inspired illustrative sequence: stabilise first; THEN ease the pedal.
   const throttle=lerp(0.216,0.07,smooth((elapsed-1.20)/2.2))
@@ -241,7 +243,7 @@ export function sampleDynamics(tSec:number,params:EpisodeParams=DYNAMICS_DEFAULT
   const elapsed=tSec-params.failureStartSec;
   const stage:VehicleDynamicsFrame['stage']=elapsed<0?'pre-failure':
     elapsed<params.pressureFallSec?'rapid-deflation':
-    elapsed<4.9?'initial-stabilisation':'gradual-slowdown';
+    elapsed<1.20?'initial-stabilisation':'gradual-slowdown';
   return {
     tSec,positionM:[s.x,0,s.z],yawRad:s.yaw,rollRad:s.roll,pitchRad:s.pitch,
     worldSpeedMps:Math.hypot(s.vx,s.vz),distanceTravelledM:s.distance,
