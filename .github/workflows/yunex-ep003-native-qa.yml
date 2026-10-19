@@ -87,10 +87,12 @@ jobs:
           if [[ "${{ matrix.agent }}" == "4" ]]; then
             npx --no-install tsc -p tests/agent-4/tsconfig.json --noEmit
           fi
-      - name: Confirm Remotion browser and FFmpeg tools
+      - name: Install system FFmpeg and confirm Remotion browser
         shell: bash
         run: |
           set -euxo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
           npx --no-install remotion browser ensure
           ffmpeg -version | head -n 1
           ffprobe -version | head -n 1
