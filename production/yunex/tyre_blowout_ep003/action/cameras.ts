@@ -9,7 +9,7 @@ import type {Vec3, VehicleDynamicsFrame} from '../shared/contract.ts';
 export type ActionStage =
   | 'emergency-pull' | 'barrier-approach' | 'impact-side-profile'
   | 'impact-overhead' | 'damage-scrape' | 'reverse-sweep'
-  | 'steady-driver' | 'moving-recovery-hero';
+  | 'steady-driver' | 'moving-recovery-hero' | 'safe-slowdown-follow';
 
 export type ImpactCameraSignal = Readonly<{
   /** Agent 8 collision solver: zero pre-contact; 0..1 after first impact. */
@@ -101,9 +101,9 @@ export function sampleActionCamera(req:ActionCameraRequest):ActionCameraPose {
     case 'impact-side-profile': {
       // Wide geography FIRST: view from median side, so the near-side rail
       // cannot mask the contact. A deliberate short lateral dolly, no spin.
-      position=lerp3([0.0,4.15,15.5],[.5,4.0,15.8],eased);
-      target=lerp3([.10,.82,-1.1],[.30,.80,-1.7],eased);
-      fov=58;break;
+      position=lerp3([4.5,3.65,8.5],[5.2,3.9,9.2],eased);
+      target=lerp3([.18,.82,-.85],[.20,.77,-1.05],eased);
+      fov=54;break;
     }
     case 'impact-overhead': {
       position=lerp3([-1.7,15.8,4.1],[-2.8,14.8,5.3],eased);
@@ -118,9 +118,9 @@ export function sampleActionCamera(req:ActionCameraRequest):ActionCameraPose {
     case 'reverse-sweep': {
       // Agent 9 supplies reverse-time vehicle state. Camera simply dollies
       // back with it. A reverse clock NEVER lives inside the camera sampler.
-      position=lerp3([8.3,5.35,14.2],[-8.6,4.7,14.6],eased);
-      target=lerp3([0,.86,-1.1],[.30,.80,-1.0],eased);
-      fov=mix(60,52,eased);break;
+      position=lerp3([5.6,4.4,7.9],[-6.2,4.1,8.1],eased);
+      target=lerp3([0,.82,-.65],[.35,.80,-.55],eased);
+      fov=mix(53,51,eased);break;
     }
     case 'steady-driver': {
       // Same in-car seating as Agent 3; A5 original hands must be visible.
@@ -133,6 +133,14 @@ export function sampleActionCamera(req:ActionCameraRequest):ActionCameraPose {
       position=lerp3([-9.5,2.35,2.15],[-7.2,2.60,-6.5],eased);
       target=lerp3([0,.76,0],[.75,.73,-.2],eased);
       fov=mix(53,56,eased);break;
+    }
+    case 'safe-slowdown-follow': {
+      // Original A2 car keeps rolling: median-side elevated tracking shot.
+      // +Z carriageway camera sits clear of the A4 right-side guardrail,
+      // instead of looking THROUGH its giant foreground concrete refuge edge.
+      position=lerp3([-7.9,3.45,5.15],[-4.65,3.75,5.85],eased);
+      target=lerp3([.20,.83,-.10],[.9,.84,-.10],eased);
+      fov=mix(52,55,eased);break;
     }
     default: throw new Error('Agent 10: unknown stage');
   }
@@ -160,7 +168,7 @@ export const ACTION_RECOVERY_CUTS:readonly ActionCut[]=[
   {stage:'moving-recovery-hero',fromSec:1.65,toSec:3.05,purpose:'Moving rear chase, full-bodied car'},
   {stage:'emergency-pull',fromSec:3.05,toSec:4.18,purpose:'Original front-right tyre, full-body speed'},
   {stage:'moving-recovery-hero',fromSec:4.18,toSec:5.32,purpose:'Side-rear parallax and controlled lane tracking'},
-  {stage:'barrier-approach',fromSec:5.32,toSec:7.00,purpose:'Rail and safe refuge context, car still moving'},
+  {stage:'safe-slowdown-follow',fromSec:5.32,toSec:7.00,purpose:'Unobstructed full GT, lane markings, still-moving controlled slowdown'},
 ];
 export function selectActionCut(timeSec:number,cuts:readonly ActionCut[]):{
   cut:ActionCut;progress01:number;index:number
