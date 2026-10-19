@@ -69,7 +69,7 @@ test('elevated median-side recovery view exposes the right-hand refuge',async()=
  assert.ok(p.dynamics.worldSpeedMps>1);
 });
 
-test('real driver's camera avoids headrest and seat shell',async()=>{
+test("real driver's camera avoids headrest and seat shell",async()=>{
  const {sampleCinemaCamera,vehicleLocalToWorld}=await import('../../production/yunex/tyre_blowout_ep003/cinema/cameras.ts');
  const p=samplePreviewState(5.6,'montage');
  const pose=sampleCinemaCamera({tSec:p.sourceTimeSec,shot:'driver-cockpit',
