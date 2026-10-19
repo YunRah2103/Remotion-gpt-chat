@@ -9,6 +9,7 @@ import {WorldLighting} from '../../../../src/yunex/world-kit/components';
 import {EP003_SCENE} from '../shared/contract.ts';
 import type {VehicleDynamicsFrame, Vec3} from '../shared/contract.ts';
 import {REFUGE, refugeRailZ, refugePavedWidthM} from './refuge-profile.ts';
+import {ContactOcclusion} from './contact.tsx';
 
 type V3 = [number, number, number];
 const LIGHT = '#e0edee';
@@ -216,7 +217,10 @@ export function finishGrandTourer(model: T.Group): T.Group {
 export const EpisodeWorld:React.FC=()=>{
   const model=useMemo(buildEpisodeHighway,[]);
   useEffect(()=>()=>disposeObject(model),[model]);
-  return <primitive object={model}/>;
+  return <>
+    <primitive object={model}/>
+    <ContactOcclusion dynamics={dynamics}/>
+  </>;
 };
 
 /**
