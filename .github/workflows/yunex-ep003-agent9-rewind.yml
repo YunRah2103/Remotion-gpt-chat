@@ -11,8 +11,8 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: ep003-agent9-${{ github.sha }}
-  cancel-in-progress: false
+  group: ep003-agent9-branch-rewind
+  cancel-in-progress: true
 jobs:
   development-motion-proof:
     name: Agent9 real A8 impact+damage reversal and controlled original A2 restart

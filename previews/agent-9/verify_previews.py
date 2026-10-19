@@ -59,6 +59,6 @@ for name,frames in settings:
                 "frames":frames,"codec":meta,"decoded":True,
                 "sample_count":len(images),"meaningful_change_pairs":meaningful,
                 "motion_deltas":motion,
-                "approval":"DEVELOPMENT ONLY: original GT + illustrative adapter; no A8 crash damage"}
+                "approval":"REAL A8 impact model + A1 original tyre/car + A2 good-branch + A3 camera + A4 road/GT + A5 hands; agent6 picture lock remains separate"}
 (output/"motion-evidence.json").write_text(json.dumps(data,indent=2)+"\n")
 print(json.dumps(data,indent=2),flush=True)
