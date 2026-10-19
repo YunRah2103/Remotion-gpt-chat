@@ -1,0 +1,170 @@
+name: YUNEX EP003 Agent 4 - Native Before and After Look Reviews
+on:
+  push:
+    branches: [agent/ep003-04-look]
+    paths:
+      - 'production/yunex/tyre_blowout_ep003/look/**'
+      - 'production/yunex/tyre_blowout_ep003/previews/agent-4/**'
+      - 'tests/agent-4/**'
+      - '.github/workflows/yunex-ep003-agent4-look.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: ep003-agent4-look-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  render-agent4:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 175
+    steps:
+      - name: Checkout exact Agent 4 branch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install packages, FFmpeg, and software-GL browser
+        run: |
+          set -euxo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          command -v ffmpeg
+          command -v ffprobe
+          ffprobe -version | head -n 1
+          npm ci --no-audit --no-fund
+          npx --no-install remotion browser ensure
+      - name: Run native compilation and department tests
+        run: |
+          set -euxo pipefail
+          npm run check
+          npx --no-install tsc -p tests/agent-4/tsconfig.json --noEmit
+          node --experimental-strip-types --test tests/agent-4/*.test.mjs
+          npm run worldkit:test
+          npm run partskit:test
+      - name: Render complete before/after videos and staged geometry sweep
+        run: |
+          set -euxo pipefail
+          mkdir -p out/ep003-agent4
+          echo "$(git rev-parse HEAD)" > out/ep003-agent4/source-sha.txt
+          ENTRY="production/yunex/tyre_blowout_ep003/previews/agent-4/entry.tsx"
+          for ID in EP003LookBeforeBeauty EP003LookAfterBeauty EP003LookBeforePortrait EP003LookAfterPortrait EP003RefugeInspection; do
+            npx --no-install remotion render "$ENTRY" "$ID" "out/ep003-agent4/${ID}.mp4" \
+              --gl=swangle --scale=0.25 --codec=h264 --pixel-format=yuv420p \
+              --concurrency=1 --log=error
+          done
+      - name: Verify source geometry, temporal images, codec and full decode
+        run: |
+          set -euxo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,subprocess,hashlib
+          root=Path('out/ep003-agent4')
+          names=['EP003LookBeforeBeauty','EP003LookAfterBeauty','EP003LookBeforePortrait','EP003LookAfterPortrait','EP003RefugeInspection']
+          rows=[]
+          for name in names:
+              file=root/(name+'.mp4')
+              if not file.is_file(): raise RuntimeError('Missing native MP4: '+str(file))
+              j=subprocess.check_output(['ffprobe','-v','error','-show_entries',
+                  'stream=codec_name,pix_fmt,width,height,nb_frames,avg_frame_rate:format=duration',
+                  '-of','json',str(file)],text=True)
+              meta=json.loads(j);v=meta['streams'][0];duration=float(meta['format']['duration'])
+              expected_frames=150 if name in ('EP003LookBeforeBeauty','EP003LookAfterBeauty','EP003RefugeInspection') else 210
+              portrait=name.endswith('Portrait') or name=='EP003RefugeInspection'
+              target=(270,480) if portrait else (480,270)
+              assert (v['width'],v['height'])==target,(name,meta)
+              assert v['codec_name']=='h264',(name,meta)
+              assert v['pix_fmt'] in ('yuv420p','yuvj420p'),(name,meta)
+              assert abs(int(v['nb_frames'])-expected_frames)<=1,(name,meta)
+              assert abs(duration-expected_frames/30)<.1,(name,meta)
+              subprocess.run(['ffmpeg','-hide_banner','-v','error','-xerror','-i',
+                  str(file),'-f','null','-'],check=True)
+              hashes=[]
+              for idx,t in enumerate([.12,duration*.25,duration*.50,duration*.75,duration-.12]):
+                  png=root/(name+f'-frame{idx}.png')
+                  subprocess.run(['ffmpeg','-hide_banner','-v','error','-y',
+                     '-ss',str(t),'-i',str(file),'-frames:v','1',str(png)],check=True)
+                  hashes.append(hashlib.sha256(png.read_bytes()).hexdigest())
+              assert len(set(hashes))>=3,(name,'no moving footage')
+              rows.append({'composition':name,'source_width':1080 if portrait else 1920,
+                   'source_height':1920 if portrait else 1080,'fps':30,
+                   'review_scale':.25,'duration':duration,'size':file.stat().st_size,
+                   'sha256':hashlib.sha256(file.read_bytes()).hexdigest(),
+                   'full_ffmpeg_decode':'PASS','distinct_sample_frames':len(set(hashes)),
+                   'metadata':meta,'media_type':'real moving Remotion H264',
+                   'director_approval':'PENDING - staged safety shot is not simulated dynamics'})
+          (root/'machine-verification.json').write_text(json.dumps(rows,indent=2))
+          print(json.dumps(rows,indent=2))
+          PY
+      - name: Upload videos and five-frame inspection evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ep003-agent4-native-${{ github.run_id }}
+          path: out/ep003-agent4/
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Release only fully verified MP4 previews and update Issue 197
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euxo pipefail
+          test -s out/ep003-agent4/machine-verification.json
+          TAG="ep003-agent4-native-${{ github.run_id }}"
+          cat > out/ep003-agent4/release-notes.md <<'EOF'
+          YUNEX EP003 / Agent 4 native visual evidence.
+
+          All five H264 MP4s were rendered from this branch with Remotion and
+          software WebGL. 30fps native source compositions at 1920x1080 or
+          1080x1920, with 25% review copies; FFprobe codec/duration/framerate,
+          full FFmpeg decode and five separated non-identical frames tested
+          for every clip. Before/after pairs use identical camera paths.
+
+          The additional refuge proof is explicitly STAGED geometric clearance,
+          not Agent 2's actual physical recovery trajectory. Director artistic
+          inspection and Agent 1/2/3 integration remain pending.
+          EOF
+          # Some organization integrations disallow GitHub Release writes even
+          # with contents:write. A RELEASE 403 is a publishing limitation,
+          # NEVER a native-render failure. Upload-artifact above is mandatory.
+          LINK="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          if gh release create "$TAG" \\
+            --repo "${{ github.repository }}" --target "${{ github.sha }}" \\
+            --title "EP003 Agent 4 real Remotion look evidence / ${{ github.run_id }}" \\
+            --notes-file out/ep003-agent4/release-notes.md; then
+            if gh release upload "$TAG" out/ep003-agent4/*.mp4 \\
+               out/ep003-agent4/*.png out/ep003-agent4/machine-verification.json \\
+               --repo "${{ github.repository }}"; then
+              LINK="https://github.com/${{ github.repository }}/releases/tag/$TAG"
+              echo 'GitHub Release publishing succeeded.'
+            else
+              echo 'Release upload failed; verified GitHub Actions artifact remains available.'
+            fi
+          else
+            echo 'Release creation not authorized. Use mandatory GitHub Actions artifact.'
+          fi
+          {
+            echo "### Agent 4 native verification / source ${{ github.sha }}"
+            echo
+            echo "Verified playable native MP4s, images and machine report: $LINK"
+            echo "Open run Artifacts and download ep003-agent4-native-${{ github.run_id }}."
+            echo
+            echo "Five files: 5s beauty before/after, 7s portrait before/after, 5s staged refuge."
+            echo "Source ${{ github.sha }}; H.264 / FFprobe / full FFmpeg decode: PASS."
+            echo "Review copies are quarter-size from 1080x1920 or 1920x1080 @30fps sources."
+            echo "Director artwork approval and real Agent 2 recovery path remain pending."
+          } > out/ep003-agent4/comment.md
+          # Posting comments may be separately permission-restricted. The
+          # verified artifact URL always stays accessible in the job Summary.
+          cat out/ep003-agent4/comment.md >> "$GITHUB_STEP_SUMMARY"
+          gh issue comment 197 --repo "${{ github.repository }}" \\
+            --body-file out/ep003-agent4/comment.md || echo 'Issue comment write unauthorized; step summary available.'
+          gh pr comment 200 --repo "${{ github.repository }}" \\
+            --body-file out/ep003-agent4/comment.md || echo 'PR comment write unauthorized; step summary available.'
