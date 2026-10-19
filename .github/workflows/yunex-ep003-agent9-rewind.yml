@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   development-motion-proof:
-    name: Agent9 real GT / reverse time native developer previews (NOT Agent8 crash approval)
+    name: Agent9 real A8 impact+damage reversal and controlled original A2 restart
     runs-on: ubuntu-24.04
     timeout-minutes: 140
     steps:
@@ -31,7 +31,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
           npm ci --no-audit --no-fund
-      - name: Hydrate A1-A5 original authoritative sources by exact pinned commit — NO branch merge
+      - name: Hydrate A1-A5 and A8 original exact pinned commits — NO branch merge
         shell: bash
         run: |
           set -euo pipefail
@@ -42,6 +42,7 @@ jobs:
           agent/ep003-03-cinema cinema 938628271f9b50d975ee55491881a8fd2d4807a5 3
           agent/ep003-04-look look a44f1b6c9c31105edd1a9b0d2de7f233d1223952 4
           agent/ep003-05-story story cd03c64f77705aa03ee5d5071e5cf18c669fa4ea 5
+          agent/ep003-08-crash-vfx impact 6d28e332d289e11ef7cacfc6682b35a43d41a332 8
           PINS
           while read -r agent folder pin number; do
             git fetch --no-tags --depth=160 origin "refs/heads/$agent"
@@ -58,12 +59,14 @@ jobs:
             dynamics/model.ts \
             cinema/scene.tsx \
             look/world.tsx \
-            story/SteadyHands3D.tsx; do
+            story/SteadyHands3D.tsx \
+            impact/model.ts \
+            impact/Preview.tsx; do
               test -s "production/yunex/tyre_blowout_ep003/$file"
           done
-          echo "NOTICE: Real Agent8 impact/ source is NOT present. These are labelled DEVELOPMENT previews." \
+          echo "REAL INTEGRATION: Agent8 impact SHA 6d28e332d289e11ef7cacfc6682b35a43d41a332 + original A1-A5 source; explicit native QA pending." \
             | tee previews/agent-9/out/approval-status.txt
-      - name: TypeScript, world/parts kit, all Agent9 phase/restart/source-motion regressions
+      - name: TypeScript, A8 model, source restart/reverse mechanics tests
         shell: bash
         run: |
           set -euo pipefail
@@ -71,6 +74,7 @@ jobs:
           npm run worldkit:test
           npm run partskit:test
           node --experimental-strip-types --test tests/agent-9/*.test.mjs
+          node --experimental-strip-types --test tests/agent-8/*.test.mjs
       - name: Render real early portrait motion inspection frames
         shell: bash
         run: |
@@ -88,7 +92,7 @@ jobs:
       - name: Upload actual intermediate frame evidence
         uses: actions/upload-artifact@v4
         with:
-          name: EP003-AGENT9-DEV-EARLY-IMAGES-${{ github.run_id }}
+          name: EP003-AGENT9-A8-EARLY-IMAGES-${{ github.run_id }}
           path: |
             previews/agent-9/out/*.png
             previews/agent-9/out/provenance.txt
@@ -110,11 +114,11 @@ jobs:
         run: |
           set -euo pipefail
           python3 previews/agent-9/verify_previews.py previews/agent-9/out
-      - name: Publish two MP4s and independent verification; NEVER label as Agent8 damage pass
+      - name: Publish two actual A8 damage-rewind and controlled-restart MP4s after verification
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: EP003-AGENT9-DEVELOPMENT-REWIND-${{ github.run_id }}
+          name: EP003-AGENT9-REAL-A8-REWIND-${{ github.run_id }}
           path: previews/agent-9/out/
           retention-days: 30
           if-no-files-found: warn
