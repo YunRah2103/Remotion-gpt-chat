@@ -51,7 +51,7 @@ export const LookPreview:React.FC<LookPreviewProps>=({mode,baseline})=>{
   } else {
     // The camera demonstrates the independently modelled refuge. This preview
     // NEVER claims the still-moving car has stopped safely.
-    camera=[x+9.0,13.5,4.5];target=[x+3,.15,-9.9];fov=52;
+    camera=[x+7.5,12.8,3.3];target=[x,.18,-6.8];fov=50;
   }
   return <AbsoluteFill style={{background:'#b7ced8'}}>
     <ThreeCanvas width={width} height={height} shadows camera={{
