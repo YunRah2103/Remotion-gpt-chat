@@ -7,6 +7,7 @@ import {animatePart} from '../../../../src/yunex/parts-kit/motion.ts';
 import {EP003_SCENE} from '../shared/contract.ts';
 import type {TyreFrame,WheelFrame,WheelId,VehicleDynamicsFrame} from '../shared/contract.ts';
 import {sampleTyreFailure} from './sampleTyreFailure.ts';
+import {sampleRubberVertex} from './roadContact.ts';
 import type {TyreFailureParams} from './sampleTyreFailure.ts';
 
 export type TyreDamageStyle='pressure-only'|'frayed-edge';
@@ -62,48 +63,18 @@ export function prepareTyreRig(wheelId:WheelId='front-right',exposure=0):Prepare
   }
   return {vehicle,wheelId,steering,roll,meshes,suspension,restPivotY:steering.position.y};
 }
-const clamp=(n:number,a:number,b:number)=>Math.max(a,Math.min(b,n));
 /**
- * Contact deformation is evaluated in the road frame by adding wheel spin to
- * each ORIGINAL mesh vertex. This avoids the classic "dent spinning with wheel"
- * error. No cumulative geometry edits: every frame begins from pristine vertices.
- * Only rubber, tread grooves and sidewall beads deform; rim/caliper stay rigid.
+ * Contact deformation evaluated in the road frame after applying wheel spin:
+ * contact patch stays under the hub while rotating rubber flows through it.
+ * All positions are calculated from the stored original geometry per frame.
  */
 export function deformRubber(rig:PreparedTyreRig,frame:TyreFrame):void {
-  const nominal=EP003_SCENE.wheelRadiusM;
-  const hubHeight=frame.effectiveRadiusM;
-  const phase=frame.angularPhaseRad;
-  const compression=clamp(frame.sidewallCompression,0,1);
   for(const {mesh,rest,kind} of rig.meshes){
     const attr=mesh.geometry.getAttribute('position') as T.BufferAttribute;
     const out=attr.array as Float32Array;
     for(let i=0;i<rest.length;i+=3){
-      const x=rest[i],y=rest[i+1],z=rest[i+2];
-      const r=Math.hypot(x,y);
-      if(r<1e-8){out[i]=x;out[i+1]=y;out[i+2]=z;continue;}
-      const theta=Math.atan2(y,x)+phase;
-      const sin=Math.sin(theta);
-      const tread=kind==='groove'?1:kind==='bead'?.50:clamp((r-.265)/.09,0,1);
-      const shrink=.023*compression*tread;
-      let newR=r-shrink;
-      // Actual contact plateau: minimum tyre y = wheel hub height - tyre radius.
-      // This cap is in ground coordinates, NOT the spinning wheel's texture frame.
-      if(sin<-.06&&compression>0){
-        const touching=hubHeight/(-sin);
-        if(kind==='bead'||tread>.05){
-          // Apply full ground cap even at the first frame of pressure loss.
-          // Partial blending can briefly drive rubber through the road.
-          newR=Math.min(newR,touching);
-        }
-      }
-      // A little extra sidewall fullness near the bottom, never inflated outwards radially.
-      const sidewall=(kind==='tyre'?clamp((.345-r)/.074,0,1):0);
-      const nearGround=Math.pow(Math.max(0,-sin),5);
-      const bulge=.021*compression*sidewall*nearGround;
-      const ratio=newR/r;
-      out[i]=x*ratio;
-      out[i+1]=y*ratio;
-      out[i+2]=z+Math.sign(z)*bulge;
+      const [x,y,z]=sampleRubberVertex([rest[i],rest[i+1],rest[i+2]],frame,kind);
+      out[i]=x;out[i+1]=y;out[i+2]=z;
     }
     attr.needsUpdate=true;
     mesh.geometry.computeVertexNormals();
