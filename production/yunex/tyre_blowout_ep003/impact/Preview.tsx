@@ -73,8 +73,8 @@ export const CrashCarRig:React.FC<{frame:CrashOutcomeFrame;
   const shadow=new T.MeshStandardMaterial({color:'#263a48',metalness:.50,roughness:.62,side:T.DoubleSide});
   for(let i=0;i<7;i++){
    const metal=new T.Mesh(new T.BoxGeometry(.09,.018,.13+i*.013),i%2===0?exposed:shadow);
-   metal.position.set(2.22+i*.027,.67-i*.026,-.45-i*.045);
-   metal.rotation.set(.16*i,.20+i*.11,-.14+i*.043);
+   metal.position.set(2.08+i*.043,1.018-i*.007,-.43-i*.064);
+   metal.rotation.set(.08+i*.015,.18+i*.09,-.12+i*.035);
    root.add(metal);
   }
   original.add(root);
@@ -118,19 +118,19 @@ export const CrashDebris:React.FC<{frame:CrashOutcomeFrame}>=({frame})=>{
  const age=frame.relativeTimeSec-frame.contact.firstContactSec;
  const impactX=frame.contact.firstContactX,railZ=frame.contact.firstContactZ;
  return <group>
-  {Array.from({length:30},(_,i)=>{
+  {Array.from({length:38},(_,i)=>{
    const seed=(n:number)=>Math.abs(Math.sin((i+1)*n*17.151)*43758.5453)%1;
    const phase=age, vx=2.4+seed(3)*8.5, vz=-1.5+seed(5)*3.0;
    const vy=.9+seed(7)*2.3;
    const x=impactX+vx*phase, y=Math.max(.055,.42+vy*phase-4.9*phase*phase);
    const z=railZ+.10+vz*phase;
-   const isSpark=i<12;
-   const life=isSpark?.54:1.2;
+   const isSpark=i<20;
+   const life=isSpark?.49:1.2;
    if(age>life||phase<0)return null;
-   const opacity=clamp((life-age)/life)*.92;
-   const radius=isSpark?.018:.027+seed(9)*.037;
+   const opacity=clamp((life-age)/life)*.96;
+   const radius=isSpark?.032+seed(9)*.014:.027+seed(9)*.037;
    return <mesh key={i} position={[x,y,z]} rotation={[phase*6,i*.7,phase*8]}>
-    <boxGeometry args={[radius*(isSpark?4:1),radius,radius]}/>
+    <boxGeometry args={[radius*(isSpark?6:1),radius*.65,radius]}/>
     <meshStandardMaterial color={isSpark?'#f5b568':(i%3===0?'#272a2a':'#647377')}
       emissive={isSpark?'#f2852a':'#000000'} emissiveIntensity={isSpark?.75:0}
       transparent opacity={opacity} roughness={.8}/>
@@ -140,12 +140,12 @@ export const CrashDebris:React.FC<{frame:CrashOutcomeFrame}>=({frame})=>{
    if(age>1.35)return null;
    const seed=(i+1)/6;
    const x=impactX+age*(2.1+seed*3.3),z=railZ+.14+seed*.35;
-   const radius=.25+age*.85;
+   const radius=.31+age*.75;
    return <mesh key={'dust'+i} position={[x,.22+age*.16,z]}
     scale={[radius,radius*.5,radius]}>
     <sphereGeometry args={[1,10,7]}/>
     <meshStandardMaterial color="#9aa09b" roughness={1} transparent
-      opacity={.22*(1-clamp(age/1.35))} depthWrite={false}/>
+      opacity={.32*(1-clamp(age/1.35))} depthWrite={false}/>
    </mesh>;
   })}
  </group>;
@@ -160,9 +160,9 @@ const useCamera=(frame:CrashOutcomeFrame,kind:'approach'|'close')=>{
  // blocked frontal damage behind the guardrail. Rise above its upper lip.
  const position:V3=kind==='approach'
   ?[x-9.8,5.5,Math.min(-1.15,z+1.3)]
-  :[x+5.9,5.5,Math.min(-9.8,z-4.2)];
- const target:V3=kind==='approach'?[x+.6,.72,z-.55]:[x+.82,.66,z-.65];
- return {position,target,fov:kind==='approach'?49:46};
+  :[x+6.5,9.8,Math.min(-10.2,z-4.7)];
+ const target:V3=kind==='approach'?[x+.6,.72,z-.55]:[x+1.05,.90,z-.30];
+ return {position,target,fov:kind==='approach'?49:43};
 };
 export const CrashPreview:React.FC<{kind:'approach'|'close'}>=({kind})=>{
  const videoFrame=useCurrentFrame(),{fps,width,height}=useVideoConfig();
