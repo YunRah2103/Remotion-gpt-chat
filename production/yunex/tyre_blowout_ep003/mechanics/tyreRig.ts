@@ -81,7 +81,9 @@ export function deformRubber(rig:PreparedTyreRig,frame:TyreFrame):void {
       const e=mesh.matrixWorld.elements;
       const localRadialWorldY=e[1]*x+e[5]*y;
       const roadWorldY=localRadialWorldY+e[9]*z+e[13];
-      if(roadWorldY<0 && localRadialWorldY<-1e-8){
+      // Ignore sub-micron Float32 roundoff at exact road tangency: this also
+      // guarantees an undeformed pre-failure mesh matches its source bytes.
+      if(roadWorldY<-1e-6 && localRadialWorldY<-1e-8){
         const scale=Math.max(0,Math.min(1,(-e[9]*z-e[13])/localRadialWorldY));
         x*=scale;y*=scale;
       }
