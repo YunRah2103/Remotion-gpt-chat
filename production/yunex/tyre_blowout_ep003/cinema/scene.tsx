@@ -9,7 +9,7 @@ import type {TyreFrame,VehicleDynamicsFrame,WheelId} from '../shared/contract.ts
 import {EP003_SCENE} from '../shared/contract.ts';
 import {sampleCinemaCamera,type CinemaShot,type CameraPose} from './cameras.ts';
 const idFor=(position:THREE.Vector3):WheelId=>
- (position.x>0?'front':'rear')+'-'+(position.z>0?'left':'right') as WheelId;
+ ((position.x>0?'front':'rear')+'-'+(position.z>0?'left':'right')) as WheelId;
 /** All moving geometry follows absolute-frame Agent 2 state, not a camera sim. */
 export function updateCinematicVehicle(model:THREE.Group,d:VehicleDynamicsFrame,tyre:TyreFrame,previewCosmeticOnly=false):void{
  model.position.set(...d.positionM);
