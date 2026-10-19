@@ -47,7 +47,9 @@ export const LookPreview:React.FC<LookPreviewProps>=({mode,baseline})=>{
   } else if(t<2.1) {
     camera=[x+2.15,.89,-5.2];target=[x+1.46,.36,-2.73];fov=29;
   } else if(t<4.65) {
-    camera=[x+6.7,2.75,-8.9];target=[x,.77,-1.85];fov=45;
+    // Keep front bumper visible throughout 9:16 moving three-quarter shot.
+    // Extreme positive-X obliques require more camera standoff on a narrow FOV.
+    camera=[x+10,3.0,-11.5];target=[x,.80,-1.85];fov=43;
   } else {
     // The camera demonstrates the independently modelled refuge. This preview
     // NEVER claims the still-moving car has stopped safely.
