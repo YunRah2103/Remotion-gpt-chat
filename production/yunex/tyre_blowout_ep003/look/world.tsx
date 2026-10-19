@@ -218,7 +218,7 @@ const EpisodeColorPipeline:React.FC=()=>{
   useLayoutEffect(()=>{
     const oldTone=gl.toneMapping, oldExposure=gl.toneMappingExposure;
     gl.toneMapping=T.ACESFilmicToneMapping;
-    gl.toneMappingExposure=.88;
+    gl.toneMappingExposure=1.16;
     return ()=>{gl.toneMapping=oldTone;gl.toneMappingExposure=oldExposure;};
   },[gl]);
   return null;
@@ -226,7 +226,7 @@ const EpisodeColorPipeline:React.FC=()=>{
 export const EpisodeLight:React.FC<{focus?:Vec3}>=({focus=[0,0,0]})=><>
   <EpisodeColorPipeline/>
   <WorldLighting timeOfDay="day" focus={[...focus] as V3}/>
-  <directionalLight position={[-14,19,-17]} color="#c5dfed" intensity={.21}/>
+  <directionalLight position={[-14,19,-17]} color="#d6e6ec" intensity={.39}/>
 </>;
 
 export const EpisodeGrandTourer:React.FC<{
