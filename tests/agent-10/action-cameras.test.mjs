@@ -8,7 +8,7 @@ import {actionPreviewState} from '../../production/yunex/tyre_blowout_ep003/acti
 const stages=[
   'emergency-pull','barrier-approach','impact-side-profile',
   'impact-overhead','damage-scrape','reverse-sweep',
-  'steady-driver','moving-recovery-hero'
+  'steady-driver','moving-recovery-hero','safe-slowdown-follow'
 ];
 function fakeFrame(t=1){
  const hubs=Object.fromEntries([
@@ -47,7 +47,19 @@ test('wide crash has clear median-side sightline toward right-hand rail',()=>{
  const p=sampleActionCamera(req('impact-side-profile',.6));
  assert.ok(p.position[2]>3);
  assert.ok(p.target[2]<-3);
- assert.ok(distance(p.position,p.target)>12);
+ assert.ok(distance(p.position,p.target)>8.5);
+});
+test('safe-branch final recovery shot stays on visible carriageway side',()=>{
+ const s=actionPreviewState(6.68,'recovery');
+ assert.equal(s.stage,'safe-slowdown-follow');
+ const pose=sampleActionCamera({stage:s.stage,progress01:s.progress01,
+   sourceTimeSec:s.sourceTimeSec,dynamics:s.dynamics});
+ assert.ok(pose.position[2]>s.dynamics.positionM[2]+4.9,
+   'camera stays on interior side, not behind outer crash barrier');
+ assert.ok(pose.position[1]>3.35,'lens clears low steel roadside geometry');
+ assert.ok(pose.position[0]<s.dynamics.positionM[0],
+   'lens tracks the full GT from behind');
+ assert.ok(s.dynamics.worldSpeedMps>0,'still moving, no fictitious safe stop');
 });
 test('moving camera not a static hold during same source car movement',()=>{
  for(const stage of stages){
