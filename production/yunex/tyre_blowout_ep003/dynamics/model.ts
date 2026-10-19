@@ -258,6 +258,25 @@ export function previewRebasedPosition(frame:VehicleDynamicsFrame,anchorDistance
   return [sceneX+frame.positionM[0]-anchorDistanceM,frame.positionM[1],frame.positionM[2]];
 }
 
+/**
+ * Rebase an absolute authoritative wheel hub by exactly the same rigid
+ * TRANSLATION applied to the vehicle body at a hard editorial cut.
+ * This is render-space ONLY. sampleDynamics remains in a continuous global
+ * frame with no teleports, path edits, or modified wheel spin phases.
+ */
+export function previewRebasedHubWorld(
+  frame:VehicleDynamicsFrame,
+  wheel:WheelId,
+  anchorDistanceM:number,
+  sceneX=-55,
+):readonly[number,number,number] {
+  if(!IDS.includes(wheel))throw Error('unknown wheel for preview hub');
+  const rootX=previewRebasedPosition(frame,anchorDistanceM,sceneX)[0];
+  const shift=rootX-frame.positionM[0];
+  const hub=frame.wheels[wheel].hubWorldM;
+  return [hub[0]+shift,hub[1],hub[2]];
+}
+
 /** Re-integrates a scenario from the SAME initial state at 120Hz and 480Hz.
  * Report convergence deltas rather than claiming exact vehicle truth. */
 export function timestepSensitivityAt(tSec:number,params:EpisodeParams=DYNAMICS_DEFAULTS):{
