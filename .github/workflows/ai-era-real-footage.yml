@@ -115,7 +115,15 @@ jobs:
           ffprobe -v error -show_entries stream=codec_name,width,height,avg_frame_rate -show_entries format=duration,size -of json out/ai-era/AI_ERA_Real_1080x1920.mp4 | tee out/ai-era/probe.json
           ffmpeg -hide_banner -loglevel error -ss 3.7 -i out/ai-era/AI_ERA_Real_1080x1920.mp4 -frames:v 1 -y out/ai-era/opening.jpg
           ffmpeg -hide_banner -loglevel error -ss 30.4 -i out/ai-era/AI_ERA_Real_1080x1920.mp4 -frames:v 1 -y out/ai-era/finale.jpg
-          sha256sum out/ai-era/AI_ERA_Real_1080x1920.mp4 > out/ai-era/master.sha256
+          sha256sum out/ai-era/AI_ERA_Real_1080x1920.mp4 > out/ai-era/master.sha256 \
+            out/ai-era/v3-master-loudness.json
+      - name: V3 mastering QC - reject true peak above minus one dBTP
+        run: |
+          set -euo pipefail
+          python production/toolkits/yunex_edit_lab.py meter \
+            --file out/ai-era/AI_ERA_Real_1080x1920.mp4 \
+            --output out/ai-era/v3-master-loudness.json
+          python -c 'import json; x=json.load(open("out/ai-era/v3-master-loudness.json")); peak=x["measurement"]["input_tp"]; print("Final true peak:",peak,"dBTP"); assert peak <= -1.0, "master true-peak requires additional headroom"'
       - name: Save finished film as an owner-only draft release
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
