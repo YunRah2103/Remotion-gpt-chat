@@ -45,13 +45,17 @@ function clearRightSideIntrusions(root: T.Group) {
     }
     if (node instanceof T.InstancedMesh) {
       if (!['barrier-posts', 'lamp-poles', 'lamp-arms', 'lamp-heads',
-        'road-delineators', 'road-reflectors', 'shoulder-rumble'].includes(node.name)) return;
+        'road-delineators', 'road-reflectors', 'shoulder-rumble',
+        'natural-verge-grasses'].includes(node.name)) return;
       let touched = false;
       for (let i=0; i<node.count; i++) {
         node.getMatrixAt(i, tmp);
         p.setFromMatrixPosition(tmp);
-        if (p.z > -6.9) continue;
-        if (node.name === 'barrier-posts' ||
+        const displacedGrass = node.name === 'natural-verge-grasses' &&
+          p.x >= REFUGE.startX && p.x <= REFUGE.endX &&
+          p.z < -7.4 && p.z >= refugeRailZ(p.x) - .45;
+        if (p.z > -6.9 || (node.name === 'natural-verge-grasses' && !displacedGrass)) continue;
+        if (displacedGrass || node.name === 'barrier-posts' ||
             (p.x >= REFUGE.startX && p.z < -6.9)) {
           displaced.makeScale(0, 0, 0); // kit's matching left-side instances survive
           node.setMatrixAt(i, displaced);
@@ -89,7 +93,10 @@ export function buildEpisodeHighway(): T.Group {
     if (node instanceof T.Mesh && node.name === 'road') {
       const mat = node.material;
       if (mat instanceof T.MeshStandardMaterial) {
+        const oldMap = mat.map, oldBump = mat.bumpMap;
         mat.map = null; mat.bumpMap = null; mat.color.set('#3e474c');
+        // These unique highway surface maps were kit-generated for this root.
+        oldMap?.dispose(); oldBump?.dispose();
         mat.roughness = .94; mat.metalness = .015; mat.needsUpdate = true;
       }
     }
