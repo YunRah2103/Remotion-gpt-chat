@@ -245,10 +245,7 @@ export function finishGrandTourer(model: T.Group): T.Group {
 export const EpisodeWorld:React.FC=()=>{
   const model=useMemo(buildEpisodeHighway,[]);
   useEffect(()=>()=>disposeObject(model),[model]);
-  return <>
-    <primitive object={model}/>
-    <ContactOcclusion dynamics={dynamics}/>
-  </>;
+  return <primitive object={model}/>;
 };
 
 /**
@@ -284,5 +281,8 @@ export const EpisodeGrandTourer:React.FC<{
   model.rotation.order='YXZ';
   // Three +Y yaw; +Z pitch and +X roll, both small angles as supplied.
   model.rotation.set(dynamics.rollRad,dynamics.yawRad,dynamics.pitchRad,'YXZ');
-  return <primitive object={model}/>;
+  return <>
+    <ContactOcclusion dynamics={dynamics}/>
+    <primitive object={model}/>
+  </>;
 };
