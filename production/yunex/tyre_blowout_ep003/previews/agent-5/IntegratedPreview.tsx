@@ -6,7 +6,7 @@ import {disposeTyreRig,prepareTyreRig,applyTyreFrame} from '../../mechanics/tyre
 import {sampleTyreFailure} from '../../mechanics/sampleTyreFailure.ts';
 import {sampleDynamics,DYNAMICS_DEFAULTS} from '../../dynamics/model.ts';
 import {EpisodeWorld,EpisodeLight,finishGrandTourer} from '../../look/world.tsx';
-import {sampleCinemaCamera} from '../../cinema/cameras.ts';
+import {sampleCinemaCamera,vehicleLocalToWorld} from '../../cinema/cameras.ts';
 import type {CinemaShot} from '../../cinema/cameras.ts';
 import {StoryEffects3D} from '../../story/StoryEffects3D';
 import {StoryOverlay} from '../../story/StoryOverlay';
@@ -84,8 +84,18 @@ export const IntegratedStoryPreview:React.FC<{variant:IntegratedKind}>=({variant
   const dynamics=rebaseSceneX(authoritative,offsetX);
   const tyre=sampleTyreFailure(tSec,{angularPhaseRad:authoritative.wheels['front-right'].spinRad});
   const request:StoryRequest={tSec,dynamics,tyre,segment:beat.segment};
-  const pose=sampleCinemaCamera({tSec,shot:beat.shot,dynamics,tyre,
+  const sampledCamera=sampleCinemaCamera({tSec,shot:beat.shot,dynamics,tyre,
     progress01,subtleImpactShake:true});
+  // Agent 3's stock cockpit POV sits behind the seat shell on this particular
+  // grand-tourer body. Shift the EYE FORWARD of that shell, preserving the
+  // genuine steering column/hand animation and the authoritative car pose.
+  // Keep all other shots on Agent 3's sampled cinematic presets.
+  const pose=beat.shot==='driver-cockpit'
+    ? {...sampledCamera,
+        position:vehicleLocalToWorld([.20,1.13,-.45],dynamics),
+        target:vehicleLocalToWorld([2.9,1.025,-.45],dynamics),
+        fovDeg:66,nearM:.018}
+    : sampledCamera;
   const focus:Vec3=[dynamics.positionM[0],0,dynamics.positionM[2]];
   return <AbsoluteFill style={{background:'#BDD0D6'}}>
     <ThreeCanvas width={width} height={height} shadows camera={{
