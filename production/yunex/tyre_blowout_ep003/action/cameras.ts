@@ -149,11 +149,11 @@ export function sampleActionCamera(req:ActionCameraRequest):ActionCameraPose {
 
 /** Two native preview edit decision lists, distinct from absolute physics time. */
 export const ACTION_CRASH_CUTS:readonly ActionCut[]=[
-  {stage:'emergency-pull',fromSec:0,toSec:1.15,purpose:'Tyre reveals the full original blue GT'},
-  {stage:'barrier-approach',fromSec:1.15,toSec:2.90,purpose:'Road flow and right-hand rail geography'},
-  {stage:'impact-side-profile',fromSec:2.90,toSec:4.62,purpose:'Unobscured complete car and barrier impact'},
-  {stage:'damage-scrape',fromSec:4.62,toSec:5.30,purpose:'Immediate moving consequence, no gore'},
-  {stage:'reverse-sweep',fromSec:5.30,toSec:6.00,purpose:'Camera ready for Agent 9 reverse-time state'},
+  {stage:'emergency-pull',fromSec:0,toSec:.68,purpose:'Failed right tyre then original GT reveal before wrong branch'},
+  {stage:'barrier-approach',fromSec:.68,toSec:2.26,purpose:'Continuous real A8 veer and upcoming right-hand barrier'},
+  {stage:'impact-side-profile',fromSec:2.26,toSec:2.95,purpose:'Wide continuous A8 rail strike, car not obscured'},
+  {stage:'damage-scrape',fromSec:2.95,toSec:3.12,purpose:'Brief A8 impacted metal and road debris'},
+  {stage:'reverse-sweep',fromSec:3.12,toSec:6.00,purpose:'A9 reverses physical car damage debris and collision source clock'},
 ];
 export const ACTION_RECOVERY_CUTS:readonly ActionCut[]=[
   {stage:'steady-driver',fromSec:0,toSec:1.65,purpose:'A5 hands and road visible through windshield'},
