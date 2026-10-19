@@ -1,0 +1,145 @@
+name: YUNEX EP003 Agent 6 Native Full-Resolution Picture
+on:
+  push:
+    branches: [agent/ep003-06-editor-vo]
+    paths: ['.github/workflows/yunex-ep003-agent6-picture.yml', 'production/yunex/tyre_blowout_ep003/editor/**', 'tests/agent-6/**', 'src/Root.tsx']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ep003-agent6-picture-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  render:
+    name: Remotion native 1080p segment ${{ matrix.part }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        include:
+          - {part: 0, frames: "0-199"}
+          - {part: 1, frames: "200-399"}
+          - {part: 2, frames: "400-599"}
+          - {part: 3, frames: "600-799"}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install FFmpeg and pinned npm
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          npm ci --no-audit --no-fund
+      - name: Hydrate immutable department sources (NO PR MERGES)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/agent6
+          cat >/tmp/ep003-pins <<'PINS'
+          agent/ep003-01-mechanics mechanics 7d47746d2fc584e935b5a9766eb1150e5b3dac38 1
+          agent/ep003-02-dynamics dynamics e724786fc087b080e9de19e9e26bda6a815ce276 2
+          agent/ep003-03-cinema cinema 938628271f9b50d975ee55491881a8fd2d4807a5 3
+          agent/ep003-04-look look a44f1b6c9c31105edd1a9b0d2de7f233d1223952 4
+          agent/ep003-05-story story cd03c64f77705aa03ee5d5071e5cf18c669fa4ea 5
+          PINS
+          while read -r agent folder pin number; do
+            git fetch --no-tags --depth=1 origin "refs/heads/$agent"
+            actual=$(git rev-parse FETCH_HEAD)
+            [[ "$actual" == "$pin" ]] || { echo "::error::Source moved $agent $actual vs $pin"; exit 1; }
+            git restore --source="$pin" --worktree -- "production/yunex/tyre_blowout_ep003/$folder/"
+            if git cat-file -e "$pin:tests/agent-$number" 2>/dev/null; then
+              git restore --source="$pin" --worktree -- "tests/agent-$number/"
+            fi
+            echo "$number $folder $pin" | tee -a out/agent6/sources.txt
+          done </tmp/ep003-pins
+          echo "EDITOR $(git rev-parse HEAD)" >>out/agent6/sources.txt
+          for p in mechanics/tyreRig.ts dynamics/model.ts cinema/scene.tsx look/world.tsx story/SteadyHands3D.tsx; do
+            test -f "production/yunex/tyre_blowout_ep003/$p"
+          done
+      - name: All mandatory source checks and editor regressions
+        run: |
+          set -euo pipefail
+          npm run check
+          npm run worldkit:test
+          npm run partskit:test
+          node --experimental-strip-types --test tests/agent-6/*.test.mjs
+          node --experimental-strip-types --test tests/agent-2/*.test.mjs
+      - name: Render actual moving 1080x1920 30FPS segment
+        run: |
+          set -euo pipefail
+          npx --no-install remotion render \
+            production/yunex/tyre_blowout_ep003/editor/entry.tsx EP003PictureOnly \
+            "out/agent6/part-${{ matrix.part }}.mp4" \
+            --frames="${{ matrix.frames }}" --gl=swangle \
+            --codec=h264 --pixel-format=yuv420p --concurrency=1
+      - name: Full decode each 200-frame segment
+        run: |
+          set -euo pipefail
+          f="out/agent6/part-${{ matrix.part }}.mp4"
+          ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,width,height,avg_frame_rate,nb_frames -of default=nw=1 "$f" | tee out/agent6/part-${{ matrix.part }}.txt
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of csv=p=0 "$f")" = 1080
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=p=0 "$f")" = 1920
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of csv=p=0 "$f")" = 200
+          ffmpeg -hide_banner -v error -xerror -i "$f" -f null -
+          sha256sum "$f" >out/agent6/part-${{ matrix.part }}.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ep003-agent6-native-part-${{ matrix.part }}
+          path: out/agent6/
+          retention-days: 30
+          if-no-files-found: error
+
+  assemble:
+    name: Concat / FFprobe / 800-frame full decode / contact sheet
+    needs: render
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: ep003-agent6-native-part-*
+          path: out/segments
+          merge-multiple: true
+      - name: Assemble and independently verify 1080x1920 complete picture
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/ep003
+          cd out/segments
+          : >concat.txt
+          for i in 0 1 2 3; do
+            test -s "part-$i.mp4"
+            printf "file '%s'\n" "part-$i.mp4" >>concat.txt
+          done
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i concat.txt -c copy ../ep003/EP003_PICTURE_NATIVE_1080x1920.mp4
+          cd ../ep003
+          f=EP003_PICTURE_NATIVE_1080x1920.mp4
+          ffprobe -v error -show_entries format=duration,size -show_entries stream=index,codec_type,codec_name,width,height,r_frame_rate,nb_frames -of json "$f" | tee ffprobe.json
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of csv=p=0 "$f")" = 1080
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=p=0 "$f")" = 1920
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of csv=p=0 "$f")" = 800
+          ffmpeg -hide_banner -v error -xerror -i "$f" -f null -
+          ffmpeg -hide_banner -loglevel error -y -i "$f" \
+            -vf "select='not(mod(n,50))',scale=270:480,tile=4x4" -frames:v 1 -update 1 contact-sheet.png
+          ffmpeg -hide_banner -loglevel error -y -ss 0.30 -i "$f" -frames:v 1 frame-0p30.png
+          ffmpeg -hide_banner -loglevel error -y -ss 0.77 -i "$f" -frames:v 1 frame-0p77.png
+          ffmpeg -hide_banner -loglevel error -y -ss 26.20 -i "$f" -frames:v 1 frame-26p2.png
+          sha256sum "$f" > SHA256SUMS.txt
+          cp ../../production/yunex/tyre_blowout_ep003/editor/VOICEOVER_PROVENANCE.json .
+          echo "FULL 1080p PICTURE ONLY. Do not claim final VO until the user-supplied Cedar original is muxed and checked." >README.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EP003-AGENT6-FULL-PICTURE-${{ github.run_id }}
+          path: out/ep003/
+          retention-days: 30
+          if-no-files-found: error
