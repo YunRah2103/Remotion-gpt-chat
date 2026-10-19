@@ -39,7 +39,9 @@ export function sampleRubberVertex(
   const shoulder=kind==='tyre'
     ?smooth(.282,.316,r)*(1-smooth(.342,.359,r)):0;
   const groundArc=Math.pow(Math.max(0,-worldSin),3);
-  // Controlled 40mm lower-shoulder displacement avoids the overly broad 47mm lobe\n  // seen in first exact-source moving review while remaining phone-readable.\n  const bulge=.040*c*shoulder*groundArc;
+  // Controlled 40mm lower-shoulder displacement avoids an oversized bulge.
+  // Still readable at phone resolution while keeping the original carcass.
+  const bulge=.040*c*shoulder*groundArc;
   // Fine creases belong to rubber material (angle/z), not the ground-fixed
   // squashed patch, so they visibly flow past the stationary contact region.
   const angle=Math.atan2(y,x);
