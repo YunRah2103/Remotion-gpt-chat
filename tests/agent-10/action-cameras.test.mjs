@@ -54,12 +54,25 @@ test('safe-branch final recovery shot stays on visible carriageway side',()=>{
  assert.equal(s.stage,'safe-slowdown-follow');
  const pose=sampleActionCamera({stage:s.stage,progress01:s.progress01,
    sourceTimeSec:s.sourceTimeSec,dynamics:s.dynamics});
- assert.ok(pose.position[2]>s.dynamics.positionM[2]+4.9,
-   'camera stays on interior side, not behind outer crash barrier');
- assert.ok(pose.position[1]>3.35,'lens clears low steel roadside geometry');
+ assert.ok(pose.position[2]<s.dynamics.positionM[2]-2.5,
+   'camera must face from NEGATIVE Z carriageway, not giant central divider');
+ assert.ok(pose.position[2]>-7.8,
+   'camera stays INSIDE actual signed right-hand steel rail');
+ assert.ok(pose.position[1]>3.2,'lens clears roadside geometry');
  assert.ok(pose.position[0]<s.dynamics.positionM[0],
    'lens tracks the full GT from behind');
  assert.ok(s.dynamics.worldSpeedMps>0,'still moving, no fictitious safe stop');
+});
+test('rewind view remains higher rear-three-quarter, never side-on clipping',()=>{
+ const s=actionPreviewState(4.78,'crash-action');
+ assert.equal(s.stage,'reverse-sweep');
+ assert.equal(s.replay.direction,-1);
+ const pose=sampleActionCamera({stage:s.stage,sourceTimeSec:s.sourceTimeSec,
+   progress01:s.progress01,dynamics:s.dynamics});
+ const longitudinal=pose.position[0]-s.dynamics.positionM[0];
+ assert.ok(longitudinal<-4,'rewind camera stays BEHIND original GT');
+ assert.ok(pose.position[1]>4.4,'camera rises above guardrail');
+ assert.ok(pose.fovDeg>=55,'phone portrait lens wide enough for full car');
 });
 test('moving camera not a static hold during same source car movement',()=>{
  for(const stage of stages){
