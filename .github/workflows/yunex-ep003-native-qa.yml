@@ -1,0 +1,244 @@
+name: YUNEX EP003 - Ten Native Department MP4s and Evidence
+
+on:
+  push:
+    branches:
+      - agent/ep003-native-render-qa
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    name: Agent ${{ matrix.agent }} - ${{ matrix.label }} - two native MP4s
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - agent: 1
+            label: mechanics
+            branch: agent/ep003-01-mechanics
+            entry: production/yunex/tyre_blowout_ep003/mechanics/preview-entry.tsx
+            first: EP003TyreMacro
+            second: EP003TyrePortrait
+          - agent: 2
+            label: dynamics
+            branch: agent/ep003-02-dynamics
+            entry: production/yunex/tyre_blowout_ep003/dynamics/entry.tsx
+            first: EP003Agent2Incident
+            second: EP003Agent2Recovery
+          - agent: 3
+            label: cinematography
+            branch: agent/ep003-03-cinema
+            entry: previews/agent-3/entry.tsx
+            first: EP003CameraOpening
+            second: EP003CameraMontage
+          - agent: 4
+            label: highway-look
+            branch: agent/ep003-04-look
+            entry: production/yunex/tyre_blowout_ep003/previews/agent-4/entry.tsx
+            first: EP003LookBeforePortrait
+            second: EP003LookAfterPortrait
+          - agent: 5
+            label: storytelling
+            branch: agent/ep003-05-story
+            entry: production/yunex/tyre_blowout_ep003/previews/agent-5/entry.tsx
+            first: Ep003StoryHook
+            second: Ep003StoryModule
+
+    steps:
+      - name: Check out exact visual department branch (never main)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
+          persist-credentials: false
+      - name: Record source revision
+        id: source
+        shell: bash
+        run: |
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          git show -s --format='%h %s'
+          mkdir -p out/ep003-native
+          printf '%s\n' "agent=${{ matrix.agent }}" "department=${{ matrix.label }}" "branch=${{ matrix.branch }}" "sha=$(git rev-parse HEAD)" "entry=${{ matrix.entry }}" > out/ep003-native/source.txt
+      - name: Node 22 and npm cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install real repository dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Check TypeScript and real department tests
+        shell: bash
+        run: |
+          set -euxo pipefail
+          npm run check
+          npm run partskit:test
+          npm run worldkit:test
+          shopt -s nullglob
+          tests=(tests/agent-${{ matrix.agent }}/*.test.mjs)
+          if (( ${#tests[@]} > 0 )); then
+            node --experimental-strip-types --test "${tests[@]}"
+          else
+            echo 'No agent-specific .test.mjs files found: TEST COVERAGE MISSING' | tee out/ep003-native/test-gap.txt
+          fi
+          if [[ "${{ matrix.agent }}" == "4" ]]; then
+            npx --no-install tsc -p tests/agent-4/tsconfig.json --noEmit
+          fi
+      - name: Confirm Remotion browser and FFmpeg tools
+        shell: bash
+        run: |
+          set -euxo pipefail
+          npx --no-install remotion browser ensure
+          ffmpeg -version | head -n 1
+          ffprobe -version | head -n 1
+      - name: Render both actual portrait compositions, full temporal range
+        shell: bash
+        env:
+          ENTRY: ${{ matrix.entry }}
+          FIRST: ${{ matrix.first }}
+          SECOND: ${{ matrix.second }}
+          AGENT: ${{ matrix.agent }}
+        run: |
+          set -euxo pipefail
+          for ID in "$FIRST" "$SECOND"; do
+            npx --no-install remotion render "$ENTRY" "$ID" "out/ep003-native/agent${AGENT}-${ID}.mp4" \
+              --gl=swangle --scale=0.25 --codec=h264 --pixel-format=yuv420p \
+              --concurrency=1 --log=verbose
+          done
+      - name: FFprobe all frames, full FFmpeg decode, multi-time frame hashes
+        shell: bash
+        env:
+          AGENT: ${{ matrix.agent }}
+          FIRST: ${{ matrix.first }}
+          SECOND: ${{ matrix.second }}
+          BRANCH: ${{ matrix.branch }}
+          SOURCE_SHA: ${{ steps.source.outputs.sha }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os,glob,json,hashlib,subprocess,pathlib
+          root=pathlib.Path('out/ep003-native')
+          files=sorted(root.glob('*.mp4'))
+          assert len(files)==2, f'Expected two genuine MP4s, got {files}'
+          reports=[]
+          def execute(command):
+              return subprocess.run(command,check=True,capture_output=True,text=True).stdout
+          for path in files:
+              meta=json.loads(execute(['ffprobe','-v','error','-select_streams','v:0',
+                  '-show_entries','stream=codec_name,pix_fmt,width,height,nb_frames,avg_frame_rate:format=duration',
+                  '-of','json',str(path)]))
+              video=meta['streams'][0]
+              duration=float(meta['format']['duration'])
+              assert video['codec_name']=='h264',meta
+              assert video['pix_fmt']=='yuv420p',meta
+              assert video['width'] in (270,480) and video['height'] in (270,480),meta
+              assert abs(int(video['nb_frames'])-duration*30)<2,meta
+              assert 3 <= duration <= 11,meta
+              execute(['ffmpeg','-hide_banner','-v','error','-xerror','-i',str(path),'-f','null','-'])
+              stamps=[.15,.8,duration*.4,duration*.67,duration-.2]
+              hashes=[]
+              for i,t in enumerate(stamps):
+                  png=root/(path.stem+f'-frame{i}.png')
+                  execute(['ffmpeg','-hide_banner','-v','error','-y','-ss',str(max(0,t)),
+                    '-i',str(path),'-frames:v','1',str(png)])
+                  digest=hashlib.sha256(png.read_bytes()).hexdigest()
+                  hashes.append(digest)
+              assert len(set(hashes))>=3, f'No convincing frame-to-frame changes in {path}'
+              movie_hash=hashlib.sha256(path.read_bytes()).hexdigest()
+              reports.append({'asset':path.name,'sha256':movie_hash,'byte_count':path.stat().st_size,
+                  'source_branch':os.environ['BRANCH'],'source_sha':os.environ['SOURCE_SHA'],
+                  'source_composition_width':1080,'source_composition_height':1920,
+                  'review_scale':0.25,'metadata':meta,'full_ffmpeg_decode':'passed',
+                  'frame_seconds':stamps,'frame_sha256':hashes,'distinct_frames':len(set(hashes)),
+                  'artistic_approval':'NOT CHECKED: moving video requires director inspection'})
+          (root/'agent-report.json').write_text(json.dumps(reports,indent=2))
+          print(json.dumps(reports,indent=2))
+          PY
+      - name: Upload native clips, inspection PNGs, raw validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ep003-department-agent-${{ matrix.agent }}-${{ github.run_id }}
+          path: out/ep003-native/
+          if-no-files-found: warn
+          retention-days: 30
+
+  publish:
+    name: Publish independently decoded MP4s to public GitHub Release
+    if: always()
+    needs: [render]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - name: Checkout verification branch for gh
+        uses: actions/checkout@v4
+      - name: Download all successfully uploaded evidence packages
+        uses: actions/download-artifact@v4
+        with:
+          pattern: ep003-department-agent-*
+          path: received
+          merge-multiple: false
+      - name: Publish only validated files, never failed/absent renders
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          VERIFY_RESULT: ${{ needs.render.result }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,glob,pathlib,hashlib,shutil
+          root=pathlib.Path('received')
+          out=pathlib.Path('release-media')
+          out.mkdir(exist_ok=True)
+          notes=[]
+          for manifest in sorted(root.glob('*/agent-report.json')):
+              for entry in json.loads(manifest.read_text()):
+                  p=manifest.parent/entry['asset']
+                  if not p.exists() or hashlib.sha256(p.read_bytes()).hexdigest()!=entry['sha256']:
+                      raise RuntimeError(f'MP4 evidence integrity mismatch for {p}')
+                  shutil.copyfile(p,out/entry['asset'])
+                  for frame in sorted(manifest.parent.glob(p.stem+'-frame*.png')):
+                      shutil.copyfile(frame,out/frame.name)
+                  notes.append(entry)
+          (out/'machine-verification.json').write_text(json.dumps(notes,indent=2))
+          (out/'summary.md').write_text('# YUNEX EP003 / actual native Remotion review media\n\n'
+            'Automated QA: full FFmpeg decode, H.264 / FFprobe metadata and independent frame hashes. '
+            'These are 25% resolution review copies from portrait 1080x1920 at 30fps source compositions. '
+            'Source branch SHA and codec metadata are in machine-verification.json. '
+            'Creative inspection and authoritative cross-department physics integration remain pending. '
+            'Temporary demonstration motion MUST NOT be presented as physically approved.\n\n'
+            + '\n'.join(f"- {v['asset']} — {v['byte_count']} bytes, {v['metadata']['format']['duration']}s, SHA256 {v['sha256']}, source {v['source_sha']}" for v in notes)
+            + '\n')
+          print(f'VALIDATED_CLIPS={len(notes)}')
+          PY
+          count=$(find release-media -maxdepth 1 -name '*.mp4' -type f | wc -l)
+          echo "Actual native and fully decoded MP4 count: $count"
+          [[ "$count" -ge 1 ]] || { echo "No verified videos, no release created"; exit 1; }
+          tag="ep003-native-qa-${RUN_ID}"
+          gh release create "$tag" --repo "$REPO" --target "${GITHUB_SHA}" \
+            --title "YUNEX EP003 native Remotion visual QA / run ${RUN_ID}" \
+            --notes-file release-media/summary.md
+          gh release upload "$tag" release-media/*.mp4 release-media/*.png release-media/machine-verification.json \
+            --repo "$REPO" --clobber
+          page="https://github.com/${REPO}/releases/tag/${tag}"
+          echo "PUBLISHED_RELEASE=$page"
+          {
+            echo "### Verified native media from GitHub Actions run ${RUN_ID}"
+            echo
+            echo "Machine-verified playable/downloadable MP4 assets: $page"
+            echo
+            echo "Actual verified clip count: $count (10 required for complete phase-1 preview coverage)."
+            echo
+            echo "Source SHA, FFprobe output, FFmpeg full decode, five temporal PNGs/video and SHA256: [machine verification](https://github.com/${REPO}/releases/download/${tag}/machine-verification.json)."
+            echo
+            echo "Render matrix conclusion: ${VERIFY_RESULT}. Creative/physical approval remains pending full playback inspection; fixture previews are not authoritative integration."
+          } > issue-comment.md
+          gh issue comment 193 --repo "$REPO" --body-file issue-comment.md
