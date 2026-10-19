@@ -24,7 +24,7 @@ export function prepareTyreRig(wheelId:WheelId='front-right',exposure=0):Prepare
   const x=(front?1:-1)*EP003_SCENE.wheelbaseM/2;
   const z=(right?-1:1)*(EP003_SCENE.vehicleWidthM/2-.09);
   let steering:T.Group|undefined;
-  vehicle.traverse(o=>{if(o instanceof T.Group&&o.userData.steering&&Math.abs(o.position.x-x)<1e-5&&Math.abs(o.position.z-z)<1e-5)steering=o;});
+  vehicle.traverse(o=>{if(o instanceof T.Group&&o.children.some(v=>v.userData.wheel)&&Math.abs(o.position.x-x)<1e-5&&Math.abs(o.position.z-z)<1e-5)steering=o;});
   const roll=steering?.children.find(o=>o.userData.wheel);
   if(!steering||!(roll instanceof T.Group))throw new Error('Original wheel hierarchy not found');
   const meshes:DeformedMesh[]=[];
@@ -104,12 +104,23 @@ export function applyTyreFrame(rig:PreparedTyreRig,frame:TyreFrame,options:{
     vehicle.rotation.set(d.rollRad,d.yawRad,d.pitchRad,'YXZ');
   }else {vehicle.position.set(0,0,0);vehicle.rotation.set(0,0,0);}
   roll.rotation.z=spin;
-  // Contact-lowering preview fixture; authoritative hubWorldM supersedes it.
+  // The preview has one illustrated collapsing corner. In final integration,
+  // Agent 2 owns ALL wheel hubs, individual spins, and steering angles.
   steering.position.y=frame.effectiveRadiusM;
-  if(currentWheel&&d){
+  if(d){
     vehicle.updateMatrixWorld(true);
-    const local=vehicle.worldToLocal(new T.Vector3(...currentWheel.hubWorldM));
-    steering.position.y=local.y;
+    vehicle.traverse(o=>{
+      if(!(o instanceof T.Group)||!o.children.some(v=>v.userData.wheel))return;
+      const front=o.position.x>0,right=o.position.z<0;
+      const id:WheelId=`${front?'front':'rear'}-${right?'right':'left'}`;
+      const state=options.wheelFrame&&id===rig.wheelId?options.wheelFrame:d.wheels[id];
+      if(!state)return;
+      const local=vehicle.worldToLocal(new T.Vector3(...state.hubWorldM));
+      o.position.copy(local);
+      o.rotation.y=state.steeringRad;
+      const rotating=o.children.find(v=>v.userData.wheel);
+      if(rotating)rotating.rotation.z=state.spinRad;
+    });
   }
   if(rig.suspension.visible){
     // PARTS suspension rises when compression increases, hence inverted on collapse.
