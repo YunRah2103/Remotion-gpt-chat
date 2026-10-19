@@ -8,7 +8,7 @@ on:
         default: false
         required: true
   push:
-    branches: [feature/ai-aura-real-footage-remotion-20261019]
+    branches: [main, feature/ai-aura-real-footage-remotion-20261019]
     paths: ['src/ai-era/**', 'src/Root.tsx', '.github/workflows/ai-era-real-footage.yml']
   pull_request:
     paths: ['src/ai-era/**', 'src/Root.tsx', '.github/workflows/ai-era-real-footage.yml']
@@ -23,7 +23,7 @@ jobs:
       - run: npm ci
       - run: npm run check
   render:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 110
