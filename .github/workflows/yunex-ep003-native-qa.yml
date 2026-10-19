@@ -135,7 +135,7 @@ jobs:
               video=meta['streams'][0]
               duration=float(meta['format']['duration'])
               assert video['codec_name']=='h264',meta
-              assert video['pix_fmt']=='yuv420p',meta
+              assert video['pix_fmt'] in ('yuv420p','yuvj420p'),meta # FFprobe may report full-range 4:2:0 as yuvj420p
               assert video['width'] in (270,480) and video['height'] in (270,480),meta
               assert abs(int(video['nb_frames'])-duration*30)<2,meta
               assert 3 <= duration <= 11,meta
