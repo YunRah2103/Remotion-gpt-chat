@@ -1,0 +1,127 @@
+name: EP003 Agent 8 - Actual Crash Video QA
+on:
+  push:
+    branches: [agent/ep003-08-crash-vfx]
+    paths:
+      - 'production/yunex/tyre_blowout_ep003/impact/**'
+      - 'tests/agent-8/**'
+      - '.github/workflows/yunex-ep003-agent8-crash.yml'
+  pull_request:
+    branches: [production/yunex-ep003-base]
+    paths:
+      - 'production/yunex/tyre_blowout_ep003/impact/**'
+      - 'tests/agent-8/**'
+      - '.github/workflows/yunex-ep003-agent8-crash.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+concurrency:
+  group: ep003-agent8-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  agent8-native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 155
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install FFmpeg, dependencies, Chromium for software GL
+        run: |
+          set -euxo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          command -v ffmpeg
+          command -v ffprobe
+          npm ci --no-audit --no-fund
+          npx --no-install remotion browser ensure
+      - name: Check entire TS repository, crash regression, original kits
+        run: |
+          set -euxo pipefail
+          npm run check
+          node --experimental-strip-types --test tests/agent-8/*.test.mjs
+          npm run worldkit:test
+          npm run partskit:test
+      - name: Render two REAL moving Remotion videos
+        run: |
+          set -euxo pipefail
+          mkdir -p out/agent-8
+          git rev-parse HEAD > out/agent-8/source-sha.txt
+          ENTRY=production/yunex/tyre_blowout_ep003/impact/entry.tsx
+          for ID in EP003Agent8CrashApproach EP003Agent8ImpactClose; do
+            npx --no-install remotion render "$ENTRY" "$ID" "out/agent-8/$ID.mp4" \
+              --gl=swangle --scale=0.25 --codec=h264 --pixel-format=yuv420p \
+              --concurrency=1 --log=error
+          done
+      - name: FFprobe, full decode, time-separated frames and motion proof
+        run: |
+          set -euxo pipefail
+          python3 - <<'PY'
+          import pathlib,json,subprocess,hashlib
+          root=pathlib.Path("out/agent-8")
+          rows=[]
+          for name,frames in [("EP003Agent8CrashApproach",120),("EP003Agent8ImpactClose",100)]:
+              path=root/(name+".mp4")
+              assert path.is_file() and path.stat().st_size>20000,path
+              data=json.loads(subprocess.check_output(
+                  ["ffprobe","-v","error","-show_entries",
+                   "stream=codec_name,pix_fmt,width,height,avg_frame_rate,nb_frames:format=duration",
+                   "-of","json",str(path)],text=True))
+              stream=next(v for v in data["streams"] if v.get("codec_name")=="h264")
+              duration=float(data["format"]["duration"])
+              assert (stream["width"],stream["height"])==(270,480),(name,data)
+              assert stream["pix_fmt"] in ("yuv420p","yuvj420p"),(name,data)
+              assert stream["avg_frame_rate"]=="30/1",(name,data)
+              assert abs(int(stream["nb_frames"])-frames)<=1,(name,data)
+              assert abs(duration-frames/30)<.1,(name,data)
+              subprocess.run(["ffmpeg","-hide_banner","-loglevel","error","-xerror",
+                  "-i",str(path),"-f","null","-"],check=True)
+              sample_sec=[.07,duration*.20,duration*.40,duration*.60,duration*.80,duration-.08]
+              hashes=[]
+              for i,sec in enumerate(sample_sec):
+                  png=root/(name+"-evidence-"+str(i)+".png")
+                  subprocess.run(["ffmpeg","-hide_banner","-loglevel","error","-y",
+                      "-ss",str(sec),"-i",str(path),"-frames:v","1",str(png)],check=True)
+                  hashes.append(hashlib.sha256(png.read_bytes()).hexdigest())
+              assert len(set(hashes))>=4,(name,"Only static / duplicate images")
+              rows.append({"composition":name,"frames":frames,"fps":30,
+                  "native_source_dimensions":[1080,1920],
+                  "review_dimensions":[270,480],"codec":"h264",
+                  "full_decode":"PASS","distinct_sample_frames":len(set(hashes)),
+                  "duration":duration,"sha256":hashlib.sha256(path.read_bytes()).hexdigest(),
+                  "source_sha":(root/"source-sha.txt").read_text().strip(),
+                  "artistic_review":"PENDING","integration":"A1/A2/A4/Agent6 PENDING"})
+          (root/"verification.json").write_text(json.dumps(rows,indent=2))
+          print(json.dumps(rows,indent=2))
+          PY
+      - name: Upload source SHA, real MP4s, PNGs, verification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: EP003-agent8-moving-crash-${{ github.run_id }}
+          path: out/agent-8/
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Publish verified evidence to Issue 207 and manager 193
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test -s out/agent-8/verification.json
+          {
+            echo "### Agent 8 real native crash-video verification"
+            echo "Source: ${{ github.sha }}"
+            echo "Actions run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo "Artifact: EP003-agent8-moving-crash-${{ github.run_id }}"
+            echo "Both 1080x1920 / 30fps source compositions rendered as quarter-scale moving H264 MP4s."
+            echo "Both: FFprobe / complete FFmpeg decode / 6 time-separated PNGs with >=4 distinct images PASS."
+            echo "Illustrative hypothetical branch only; A1 tyre, A4 final road, Agent 2 true start state and Agent 6 editorial integration remain REQUIRED."
+            echo "No final picture or artistic approval claimed."
+          } > out/agent-8/publish.md
+          cat out/agent-8/publish.md >> "$GITHUB_STEP_SUMMARY"
+          gh issue comment 207 --repo "${{ github.repository }}" --body-file out/agent-8/publish.md || true
+          gh issue comment 193 --repo "${{ github.repository }}" --body-file out/agent-8/publish.md || true
