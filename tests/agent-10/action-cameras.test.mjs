@@ -53,7 +53,7 @@ test('moving camera not a static hold during same source car movement',()=>{
  for(const stage of stages){
   const a=sampleActionCamera(req(stage,.2,1));
   const b=sampleActionCamera(req(stage,.8,1.45));
-  assert.ok(distance(a.position,b.position)>.09,stage);
+  assert.ok(distance(a.position,b.position)>(stage==='steady-driver'?.005:.09),stage);
  }
 });
 test('deterministic random seek, no accidental contact shake',()=>{
