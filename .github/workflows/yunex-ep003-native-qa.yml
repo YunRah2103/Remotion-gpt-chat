@@ -45,9 +45,9 @@ jobs:
           - agent: 5
             label: storytelling
             branch: agent/ep003-05-story
-            entry: production/yunex/tyre_blowout_ep003/previews/agent-5/entry.tsx
-            first: Ep003StoryHook
-            second: Ep003StoryModule
+            entry: production/yunex/tyre_blowout_ep003/previews/agent-5/integrated-entry.tsx
+            first: EP003StoryHookReal
+            second: EP003StoryModuleReal
 
     steps:
       - name: Check out exact visual department branch (never main)
@@ -63,6 +63,34 @@ jobs:
           git show -s --format='%h %s'
           mkdir -p out/ep003-native
           printf '%s\n' "agent=${{ matrix.agent }}" "department=${{ matrix.label }}" "branch=${{ matrix.branch }}" "sha=$(git rev-parse HEAD)" "entry=${{ matrix.entry }}" > out/ep003-native/source.txt
+      - name: Hydrate authoritative modules for real cinematography and story (ephemeral CI only)
+        if: ${{ matrix.agent == 3 || matrix.agent == 5 }}
+        shell: bash
+        run: |
+          set -euxo pipefail
+          modules=(mechanics dynamics look)
+          if [[ "${{ matrix.agent }}" == "5" ]]; then modules+=(cinema); fi
+          for module in "${modules[@]}"; do
+            case "$module" in
+              mechanics) source_branch=agent/ep003-01-mechanics ;;
+              dynamics) source_branch=agent/ep003-02-dynamics ;;
+              look) source_branch=agent/ep003-04-look ;;
+              cinema) source_branch=agent/ep003-03-cinema ;;
+              *) exit 2 ;;
+            esac
+            git fetch --no-tags --depth=1 origin "refs/heads/$source_branch"
+            source_sha=$(git rev-parse FETCH_HEAD)
+            [[ "${#source_sha}" -eq 40 ]]
+            git restore --source=FETCH_HEAD --worktree -- "production/yunex/tyre_blowout_ep003/$module/"
+            printf 'overlay_%s_branch=%s\noverlay_%s_sha=%s\n' "$module" "$source_branch" "$module" "$source_sha" | tee -a out/ep003-native/source.txt
+          done
+          test -f production/yunex/tyre_blowout_ep003/dynamics/model.ts
+          test -f production/yunex/tyre_blowout_ep003/mechanics/tyreRig.ts
+          test -f production/yunex/tyre_blowout_ep003/look/world.tsx
+          if [[ "${{ matrix.agent }}" == "5" ]]; then
+            test -f production/yunex/tyre_blowout_ep003/cinema/cameras.ts
+            test -f production/yunex/tyre_blowout_ep003/previews/agent-5/IntegratedPreview.tsx
+          fi
       - name: Node 22 and npm cache
         uses: actions/setup-node@v4
         with:
@@ -87,6 +115,15 @@ jobs:
           if [[ "${{ matrix.agent }}" == "4" ]]; then
             npx --no-install tsc -p tests/agent-4/tsconfig.json --noEmit
           fi
+          if [[ "${{ matrix.agent }}" == "1" ]]; then
+            npx --no-install tsc -p previews/agent-1/tsconfig.json --noEmit
+          fi
+          if [[ "${{ matrix.agent }}" == "3" ]]; then
+            npx --no-install tsc -p previews/agent-3/tsconfig.json --noEmit
+          fi
+          if [[ "${{ matrix.agent }}" == "5" ]]; then
+            npx --no-install tsc -p production/yunex/tyre_blowout_ep003/previews/agent-5/tsconfig.json --noEmit
+          fi
       - name: Install system FFmpeg and confirm Remotion browser
         shell: bash
         run: |
@@ -94,6 +131,8 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
           npx --no-install remotion browser ensure
+          command -v ffmpeg
+          command -v ffprobe
           ffmpeg -version | head -n 1
           ffprobe -version | head -n 1
       - name: Render both actual portrait compositions, full temporal range
@@ -136,7 +175,8 @@ jobs:
               duration=float(meta['format']['duration'])
               assert video['codec_name']=='h264',meta
               assert video['pix_fmt'] in ('yuv420p','yuvj420p'),meta # FFprobe may report full-range 4:2:0 as yuvj420p
-              assert video['width'] in (270,480) and video['height'] in (270,480),meta
+              assert (int(video['width']),int(video['height']))==(270,480),meta
+              assert video['avg_frame_rate']=='30/1',meta
               assert abs(int(video['nb_frames'])-duration*30)<2,meta
               assert 3 <= duration <= 11,meta
               execute(['ffmpeg','-hide_banner','-v','error','-xerror','-i',str(path),'-f','null','-'])
@@ -152,6 +192,7 @@ jobs:
               movie_hash=hashlib.sha256(path.read_bytes()).hexdigest()
               reports.append({'asset':path.name,'sha256':movie_hash,'byte_count':path.stat().st_size,
                   'source_branch':os.environ['BRANCH'],'source_sha':os.environ['SOURCE_SHA'],
+                  'dependency_revisions':(root/'source.txt').read_text(),
                   'source_composition_width':1080,'source_composition_height':1920,
                   'review_scale':0.25,'metadata':meta,'full_ffmpeg_decode':'passed',
                   'frame_seconds':stamps,'frame_sha256':hashes,'distinct_frames':len(set(hashes)),
@@ -201,15 +242,35 @@ jobs:
           out=pathlib.Path('release-media')
           out.mkdir(exist_ok=True)
           notes=[]
-          for manifest in sorted(root.glob('*/agent-report.json')):
-              for entry in json.loads(manifest.read_text()):
+          manifests=sorted(root.glob('*/agent-report.json'))
+          if len(manifests)!=5:
+              raise RuntimeError(f'Incomplete departmental evidence: expected 5 validation manifests, found {len(manifests)}')
+          for manifest in manifests:
+              rows=json.loads(manifest.read_text())
+              if len(rows)!=2:
+                  raise RuntimeError(f'Expected two fully validated native videos in {manifest}, got {len(rows)}')
+              for entry in rows:
                   p=manifest.parent/entry['asset']
                   if not p.exists() or hashlib.sha256(p.read_bytes()).hexdigest()!=entry['sha256']:
                       raise RuntimeError(f'MP4 evidence integrity mismatch for {p}')
+                  if p.stat().st_size < 100000 or not entry.get('full_ffmpeg_decode')=='passed':
+                      raise RuntimeError(f'Not a fully decoded, nonempty native video: {p}')
+                  if entry['metadata']['streams'][0]['codec_name']!='h264' or len(entry['frame_sha256'])!=5 or entry['distinct_frames']<3:
+                      raise RuntimeError(f'Missing codec and motion evidence for {p}')
                   shutil.copyfile(p,out/entry['asset'])
                   for frame in sorted(manifest.parent.glob(p.stem+'-frame*.png')):
                       shutil.copyfile(frame,out/frame.name)
+                  shutil.copyfile(manifest.parent/'source.txt',out/(p.stem+'-source.txt'))
                   notes.append(entry)
+          expected={
+              'agent1-EP003TyreMacro.mp4','agent1-EP003TyrePortrait.mp4',
+              'agent2-EP003Agent2Incident.mp4','agent2-EP003Agent2Recovery.mp4',
+              'agent3-EP003CameraOpening.mp4','agent3-EP003CameraMontage.mp4',
+              'agent4-EP003LookBeforePortrait.mp4','agent4-EP003LookAfterPortrait.mp4',
+              'agent5-EP003StoryHookReal.mp4','agent5-EP003StoryModuleReal.mp4',
+          }
+          if len(notes)!=10 or {v['asset'] for v in notes}!=expected:
+              raise RuntimeError(f'Incomplete native ten-clip acceptance gate: {[v["asset"] for v in notes]}')
           (out/'machine-verification.json').write_text(json.dumps(notes,indent=2))
           (out/'summary.md').write_text('# YUNEX EP003 / actual native Remotion review media\n\n'
             'Automated QA: full FFmpeg decode, H.264 / FFprobe metadata and independent frame hashes. '
@@ -223,12 +284,13 @@ jobs:
           PY
           count=$(find release-media -maxdepth 1 -name '*.mp4' -type f | wc -l)
           echo "Actual native and fully decoded MP4 count: $count"
-          [[ "$count" -ge 1 ]] || { echo "No verified videos, no release created"; exit 1; }
+          [[ "$VERIFY_RESULT" == "success" ]] || { echo "Matrix did not fully succeed: $VERIFY_RESULT"; exit 1; }
+          [[ "$count" -eq 10 ]] || { echo "Need all TEN independently decoded native MP4s, got $count; no release"; exit 1; }
           tag="ep003-native-qa-${RUN_ID}"
           gh release create "$tag" --repo "$REPO" --target "${GITHUB_SHA}" \
             --title "YUNEX EP003 native Remotion visual QA / run ${RUN_ID}" \
             --notes-file release-media/summary.md
-          gh release upload "$tag" release-media/*.mp4 release-media/*.png release-media/machine-verification.json \
+          gh release upload "$tag" release-media/*.mp4 release-media/*.png release-media/*-source.txt release-media/machine-verification.json \
             --repo "$REPO" --clobber
           page="https://github.com/${REPO}/releases/tag/${tag}"
           echo "PUBLISHED_RELEASE=$page"
@@ -244,3 +306,4 @@ jobs:
             echo "Render matrix conclusion: ${VERIFY_RESULT}. Creative/physical approval remains pending full playback inspection; fixture previews are not authoritative integration."
           } > issue-comment.md
           gh issue comment 193 --repo "$REPO" --body-file issue-comment.md
+          gh pr comment 204 --repo "$REPO" --body-file issue-comment.md
