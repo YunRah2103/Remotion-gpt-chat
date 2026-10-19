@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": [
+    "../../production/yunex/tyre_blowout_ep003/look/**/*.ts",
+    "../../production/yunex/tyre_blowout_ep003/look/**/*.tsx",
+    "../../production/yunex/tyre_blowout_ep003/previews/agent-4/**/*.tsx",
+    "../../production/yunex/tyre_blowout_ep003/shared/contract.ts"
+  ]
+}
