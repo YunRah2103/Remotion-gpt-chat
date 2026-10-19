@@ -210,7 +210,7 @@ jobs:
           retention-days: 30
 
   publish:
-    name: Publish independently decoded MP4s to public GitHub Release
+    name: Assemble verified 10-video artifact (release optional)
     if: always()
     needs: [render]
     runs-on: ubuntu-24.04
@@ -287,23 +287,53 @@ jobs:
           [[ "$VERIFY_RESULT" == "success" ]] || { echo "Matrix did not fully succeed: $VERIFY_RESULT"; exit 1; }
           [[ "$count" -eq 10 ]] || { echo "Need all TEN independently decoded native MP4s, got $count; no release"; exit 1; }
           tag="ep003-native-qa-${RUN_ID}"
-          gh release create "$tag" --repo "$REPO" --target "${GITHUB_SHA}" \
-            --title "YUNEX EP003 native Remotion visual QA / run ${RUN_ID}" \
-            --notes-file release-media/summary.md
-          gh release upload "$tag" release-media/*.mp4 release-media/*.png release-media/*-source.txt release-media/machine-verification.json \
-            --repo "$REPO" --clobber
-          page="https://github.com/${REPO}/releases/tag/${tag}"
-          echo "PUBLISHED_RELEASE=$page"
+          run_page="https://github.com/${REPO}/actions/runs/${RUN_ID}"
+          verified_artifact="ep003-ten-verified-native-mp4s-${RUN_ID}"
+          published="GitHub Actions artifact (release permission restricted)"
+          page="$run_page"
+          # This repository's Actions integration returned HTTP 403 on
+          # POST /releases in run 39287865546. Keep the verified MP4s
+          # accessible as an Actions artifact without pretending a Release exists.
+          if gh release create "$tag" --repo "$REPO" --target "${GITHUB_SHA}" \
+              --title "YUNEX EP003 native Remotion visual QA / run ${RUN_ID}" \
+              --notes-file release-media/summary.md; then
+            if gh release upload "$tag" release-media/*.mp4 release-media/*.png \
+                release-media/*-source.txt release-media/machine-verification.json \
+                --repo "$REPO" --clobber; then
+              page="https://github.com/${REPO}/releases/tag/${tag}"
+              published="GitHub Release with ten MP4s"
+            else
+              echo "::warning::Release asset write restricted; complete media remains in Actions artifact"
+            fi
+          else
+            echo "::warning::Release creation denied; complete native media will be uploaded as an Actions artifact"
+          fi
           {
-            echo "### Verified native media from GitHub Actions run ${RUN_ID}"
+            echo "### Ten genuine fully decoded EP003 native MP4s / run ${RUN_ID}"
             echo
-            echo "Machine-verified playable/downloadable MP4 assets: $page"
+            echo "Source-verified native H264 previews: ${run_page}"
             echo
-            echo "Actual verified clip count: $count (10 required for complete phase-1 preview coverage)."
+            echo "Download the ten-MP4 bundle under Artifacts: ${verified_artifact}"
             echo
-            echo "Source SHA, FFprobe output, FFmpeg full decode, five temporal PNGs/video and SHA256: [machine verification](https://github.com/${REPO}/releases/download/${tag}/machine-verification.json)."
+            echo "Publication: ${published}; public release, only if actually uploaded: ${page}"
             echo
-            echo "Render matrix conclusion: ${VERIFY_RESULT}. Creative/physical approval remains pending full playback inspection; fixture previews are not authoritative integration."
-          } > issue-comment.md
-          gh issue comment 193 --repo "$REPO" --body-file issue-comment.md
-          gh pr comment 204 --repo "$REPO" --body-file issue-comment.md
+            echo "Actual verified MP4 count: ${count}. All five rendering jobs: ${VERIFY_RESULT}."
+            echo
+            echo "All media SHA256s, exact source branch SHAs, FFprobe metadata, full FFmpeg decode, and five distinct temporal PNG frames/video are in machine-verification.json."
+            echo
+            echo "Creative / physical sign-off NOT implied; Agent 0 must watch the ten genuine clips and inspect the correct-physics recovery."
+          } | tee issue-comment.md >> "$GITHUB_STEP_SUMMARY"
+          if ! gh issue comment 193 --repo "$REPO" --body-file issue-comment.md; then
+            echo "::warning::Issue write permission restricted; report available in Actions job summary and artifacts"
+          fi
+          if ! gh pr comment 204 --repo "$REPO" --body-file issue-comment.md; then
+            echo "::warning::PR write permission restricted; report available in Actions job summary and artifacts"
+          fi
+      - name: Upload COMPLETE ten-video playable QA bundle even when Releases API is forbidden
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ep003-ten-verified-native-mp4s-${{ github.run_id }}
+          path: release-media/
+          if-no-files-found: error
+          retention-days: 30
