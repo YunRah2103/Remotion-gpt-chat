@@ -7,7 +7,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: ep003-agent6-picture-${{ github.ref }}
+  group: ep003-agent6-picture-${{ github.sha }}
   cancel-in-progress: false
 jobs:
   render:
@@ -62,6 +62,7 @@ jobs:
             test -f "production/yunex/tyre_blowout_ep003/$p"
           done
       - name: All mandatory source checks and editor regressions
+        if: matrix.part == 0
         run: |
           set -euo pipefail
           npm run check
