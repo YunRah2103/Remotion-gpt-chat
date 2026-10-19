@@ -157,11 +157,14 @@ export function sampleActionCamera(req:ActionCameraRequest):ActionCameraPose {
 
 /** Two native preview edit decision lists, distinct from absolute physics time. */
 export const ACTION_CRASH_CUTS:readonly ActionCut[]=[
-  {stage:'emergency-pull',fromSec:0,toSec:.68,purpose:'Failed right tyre then original GT reveal before wrong branch'},
-  {stage:'barrier-approach',fromSec:.68,toSec:2.26,purpose:'Continuous real A8 veer and upcoming right-hand barrier'},
-  {stage:'impact-side-profile',fromSec:2.26,toSec:2.95,purpose:'Wide continuous A8 rail strike, car not obscured'},
-  {stage:'damage-scrape',fromSec:2.95,toSec:3.12,purpose:'Brief A8 impacted metal and road debris'},
-  {stage:'reverse-sweep',fromSec:3.12,toSec:6.00,purpose:'A9 reverses physical car damage debris and collision source clock'},
+  {stage:'emergency-pull',fromSec:0,toSec:.55,purpose:'Original failed tyre into whole moving blue GT'},
+  {stage:'barrier-approach',fromSec:.55,toSec:1.21,purpose:'Continuous real A8 drift toward visible right barrier'},
+  // A8 A2-seeded first contact is ~1.95s after choice. In A9's accelerated
+  // review source clock this projects to ~1.41s, NOT 2.65s. Keep the
+  // *physical FIRST CONTACT* inside the WIDE actual-strike view.
+  {stage:'impact-side-profile',fromSec:1.21,toSec:2.43,purpose:'WIDE full original car reaches and strikes actual right rail'},
+  {stage:'damage-scrape',fromSec:2.43,toSec:3.12,purpose:'Original bumper/fender and real debris continue scraping barrier'},
+  {stage:'reverse-sweep',fromSec:3.12,toSec:6.00,purpose:'A9 reverses real car dent, debris, source-time and eventual reset'},
 ];
 export const ACTION_RECOVERY_CUTS:readonly ActionCut[]=[
   {stage:'steady-driver',fromSec:0,toSec:1.65,purpose:'A5 hands and road visible through windshield'},
