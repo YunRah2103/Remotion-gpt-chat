@@ -108,11 +108,12 @@ test('the tyre-to-car dolly clears macro scale by 0.47s without jumping',async()
  const at=(t)=>{const p=samplePreviewState(t,'opening');return sampleCinemaCamera({
   tSec:p.sourceTimeSec,shot:p.cut.shot,dynamics:p.dynamics,tyre:p.tyre,progress01:p.progress01
  });};
- const near=at(.15),full=at(.47);
+ const near=at(.15),underPressure=at(.30),full=at(.47);
  const distance=(p)=>Math.hypot(...p.position.map((x,i)=>x-p.target[i]));
  assert.equal(near.shot,'tyre-hook');
  assert.equal(full.shot,'tyre-hook');
  assert.ok(distance(near)<3,'macro retains wheel-level framing');
+ assert.ok(distance(underPressure)<3.3,'macro stays close while actual tyre loses pressure');
  assert.ok(distance(full)>5.5,'0.47s camera reveals substantial vehicle');
 });
 test('rear chase lens stays behind and near centerline with clear forward target',async()=>{

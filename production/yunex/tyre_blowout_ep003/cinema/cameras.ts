@@ -23,7 +23,7 @@ export function sampleCinemaCamera(input:CinemaCameraInput):CameraPose{
    // dolly (rather than a magic zoom) exposes original front 3/4 silhouette.
    // Hold the damaged contact patch until the loss is legible, then finish
    // the pullback in the first half-second, WITHOUT clipping the full car.
-   const reveal=smooth((q-.09)/.30);
+   const reveal=smooth((q-.22)/.16);
    // Slight front-quarter offset reduces overlapping far-wheel silhouettes.
    // Lower aim exposes the real compressed lower sidewall and contact edge.
    from=lerp3([2.03,.54,-2.43],[7.55,2.45,-7.88],reveal);
