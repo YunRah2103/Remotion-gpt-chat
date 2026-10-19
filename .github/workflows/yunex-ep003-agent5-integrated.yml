@@ -83,7 +83,9 @@ jobs:
               v=info['streams'][0]
               duration=float(info['format']['duration'])
               assert v['codec_name']=='h264',info
-              assert v['pix_fmt']=='yuv420p',info
+              # FFprobe labels many valid H.264 4:2:0 full-range review clips
+              # 'yuvj420p'. These need the same complete decode and visual QA.
+              assert v['pix_fmt'] in ('yuv420p','yuvj420p'),info
               assert (int(v['width']),int(v['height']))==(270,480),info
               assert v['avg_frame_rate']=='30/1',info
               assert abs(int(v['nb_frames'])-duration*30)<2,info
