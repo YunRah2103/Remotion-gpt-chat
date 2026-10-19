@@ -66,14 +66,23 @@ export const HydratedCrashPreview:React.FC=()=>{
  const f=sampleHydratedCrash(videoFrame/fps),[x,,z]=f.scenePositionM;
  // Mobile-friendly elevated 3/4 geometry camera: original GT and actual right
  // rail both visible, car always on carriageway side at source time 4s.
- const position:[number,number,number]=[x-9.9,5.5,Math.min(-1.15,z+1.3)];
- const target:[number,number,number]=[x+.65,.7,z-.54];
+ // Intentional editor-friendly camera CUT at 1.53sec, before actual
+ // authoritative front-right strike (~1.95sec), to reveal the bumper/rail.
+ // High roadside viewpoint sees over the rail rather than straight through it.
+ const reveal=videoFrame>=46;
+ const position:[number,number,number]=reveal
+  ?[x+6.5,9.8,Math.min(-10.2,z-4.7)]
+  :[x-9.9,5.5,Math.min(-1.15,z+1.3)];
+ const target:[number,number,number]=reveal
+  ?[x+1.05,.90,z-.30]
+  :[x+.65,.7,z-.54];
+ const fov=reveal?43:49;
  return <AbsoluteFill style={{background:'#a9c8d0'}}>
   <ThreeCanvas width={width} height={height} shadows
-   camera={{position,fov:49,near:.1,far:310}}>
+   camera={{position,fov,near:.1,far:310}}>
    <EpisodeLight focus={[x,0,z]}/>
    <CrashBarrierWorld frame={f} worldFactory={buildEpisodeHighway}/>
-   <CameraAim position={position} target={target} fov={49}/>
+   <CameraAim position={position} target={target} fov={fov}/>
    <HydroCar frame={f}/>
    <ImpactEffects3D frame={f}/>
   </ThreeCanvas>
