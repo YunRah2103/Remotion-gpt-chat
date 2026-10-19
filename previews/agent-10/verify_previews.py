@@ -7,7 +7,7 @@ import subprocess
 from pathlib import Path
 from PIL import Image,ImageDraw,ImageOps
 
-EXPECTED={"crash-action-blocking.mp4":(180,6.0),
+EXPECTED={"crash-impact-rewind.mp4":(180,6.0),
           "moving-recovery.mp4":(210,7.0)}
 TIMES={"crash-action-blocking.mp4":[.25,1.45,2.75,3.25,4.15,4.65,5.5],
        "moving-recovery.mp4":[.25,1.2,1.85,3.5,4.7,5.7,6.65]}
@@ -66,7 +66,7 @@ def verify(video:Path,expected_frames:int,expected_duration:float):
     return {"file":video.name,"fps":30,"frames":expected_frames,
       "durationSec":duration,"codec":"h264","width":540,"height":960,
       "fullFFmpegDecode":True,"motion":evidence,"contactSheet":contact.name,
-      "claim":"provisional camera blocking, not approved impact simulation"
+      "claim":"native A8 collision + A9 reverse-time camera proof (engineering still illustrative)"
       if "crash" in video.name else "A2 safe-response moving camera proof"}
 
 def main():
