@@ -41,7 +41,7 @@ export function sampleCinemaCamera(input:CinemaCameraInput):CameraPose{
    // Previous real frame 36 had a huge guardrail in foreground because camera
    // world-Z was beyond the -7.8m barrier. Track INSIDE on the lane side.
    from=lerp3([7.35,.95,-5.35],[7.05,.90,-5.30],p);
-   at=[0,.73,0];fov=56;break;
+   at=[0,.73,0];fov=59;break;
   case 'wheel-cutaway':
   case 'underbody':
    // Framed directly along the right-side contact patch, lens stays outside
