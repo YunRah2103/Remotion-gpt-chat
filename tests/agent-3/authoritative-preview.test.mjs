@@ -102,3 +102,28 @@ test('authoritative pitch(X)/yaw(Y)/roll(Z) and all four hub world poses survive
   assert.equal(o.children[0].rotation.z,d.wheels[id].spinRad);
  }
 });
+
+test('the tyre-to-car dolly clears macro scale by 0.47s without jumping',async()=>{
+ const {sampleCinemaCamera}=await import('../../production/yunex/tyre_blowout_ep003/cinema/cameras.ts');
+ const at=(t)=>{const p=samplePreviewState(t,'opening');return sampleCinemaCamera({
+  tSec:p.sourceTimeSec,shot:p.cut.shot,dynamics:p.dynamics,tyre:p.tyre,progress01:p.progress01
+ });};
+ const near=at(.15),full=at(.47);
+ const distance=(p)=>Math.hypot(...p.position.map((x,i)=>x-p.target[i]));
+ assert.equal(near.shot,'tyre-hook');
+ assert.equal(full.shot,'tyre-hook');
+ assert.ok(distance(near)<3,'macro retains wheel-level framing');
+ assert.ok(distance(full)>5.5,'0.47s camera reveals substantial vehicle');
+});
+test('rear chase lens stays behind and near centerline with clear forward target',async()=>{
+ const {sampleCinemaCamera}=await import('../../production/yunex/tyre_blowout_ep003/cinema/cameras.ts');
+ for(const t of [2.25,3.4,4.96]){
+  const p=samplePreviewState(t,'opening');
+  const pose=sampleCinemaCamera({tSec:p.sourceTimeSec,shot:p.cut.shot,
+   dynamics:p.dynamics,tyre:p.tyre,progress01:p.progress01});
+  assert.equal(pose.shot,'chase-recovery');
+  assert.ok(pose.position[0]<p.dynamics.positionM[0]-6);
+  assert.ok(Math.abs(pose.position[2]-p.dynamics.positionM[2])<2.2);
+  assert.ok(pose.position[1]>1.9);
+ }
+});

@@ -21,7 +21,7 @@ export function sampleCinemaCamera(input:CinemaCameraInput):CameraPose{
   case 'tyre-hook':{
    // The wheel MUST deflate visibly before the camera leaves it; continuous
    // dolly (rather than a magic zoom) exposes original front 3/4 silhouette.
-   const reveal=smooth((q-.16)/.55);
+   const reveal=smooth((q-.08)/.42);
    // Slight front-quarter offset reduces overlapping far-wheel silhouettes.
    // Lower aim exposes the real compressed lower sidewall and contact edge.
    from=lerp3([2.03,.54,-2.43],[5.15,1.83,-5.62],reveal);
@@ -51,8 +51,10 @@ export function sampleCinemaCamera(input:CinemaCameraInput):CameraPose{
    from=lerp3([.02,1.145,-.456],[.06,1.155,-.474],p);
    at=lerp3([6.8,1.005,-.45],[6.2,.975,-.42],p);fov=mix(70,68,p);near=.025;break;
   case 'chase-recovery':
-   from=lerp3([-7.8,2.13,-2.55],[-6.65,1.86,-2.48],p);
-   at=lerp3([.51,.84,-.18],[1.20,.80,-.14],p);fov=mix(48,44,p);break;
+   // Full original GT in portrait: closer to the road centerline and aim
+   // downward toward the rear axle, not into distant sky/right edge.
+   from=lerp3([-7.8,2.25,-1.65],[-7.20,2.12,-1.52],p);
+   at=lerp3([-.40,.56,-.08],[-.15,.55,-.06],p);fov=mix(49,46,p);break;
   case 'rear-three-quarter':
    from=lerp3([-5.45,1.72,-4.82],[-5.82,1.94,-4.95],p);
    at=[-.10,.72,-.10];fov=47;break;
