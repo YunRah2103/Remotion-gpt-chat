@@ -1,10 +1,10 @@
 import React from 'react';
 import {AbsoluteFill,useCurrentFrame,useVideoConfig} from 'remotion';
 import {ThreeCanvas} from '@remotion/three';
-import {CameraAim,Environment,Vehicle,WorldLighting} from '../../../../src/yunex/world-kit/components';
-import {EP003_SCENE} from '../shared/contract.ts';
+import {CameraAim,Environment,Vehicle,WorldLighting} from '../../../../../src/yunex/world-kit/components';
+import {EP003_SCENE} from '../../shared/contract.ts';
 import type {VehicleDynamicsFrame,WheelFrame,WheelId} from '../shared/contract.ts';
-import {EpisodeWorld,EpisodeLight,EpisodeGrandTourer} from '../look/world.tsx';
+import {EpisodeWorld,EpisodeLight,EpisodeGrandTourer} from '../../look/world.tsx';
 
 export type LookPreviewProps={
   mode:'beauty'|'portrait';
