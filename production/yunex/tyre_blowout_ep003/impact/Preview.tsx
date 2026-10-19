@@ -60,12 +60,31 @@ export const CrashCarRig:React.FC<{frame:CrashOutcomeFrame}>=({frame})=>{
    }
   });return originalPositions;
  },[original]);
+ const damageFolds=useMemo(()=>{
+  // Add a few sharply folded metal accents to the original car front corner.
+  // These do not replace the body. The canonical arched-body mesh is crushed
+  // separately in actual vertex-space by applyOriginalKitDamage.
+  const root=new T.Group();
+  root.name='A8-original-car-right-front-deformation';
+  const exposed=new T.MeshStandardMaterial({color:'#738995',metalness:.66,roughness:.46,side:T.DoubleSide});
+  const shadow=new T.MeshStandardMaterial({color:'#263a48',metalness:.50,roughness:.62,side:T.DoubleSide});
+  for(let i=0;i<7;i++){
+   const metal=new T.Mesh(new T.BoxGeometry(.09,.018,.13+i*.013),i%2===0?exposed:shadow);
+   metal.position.set(2.22+i*.027,.67-i*.026,-.45-i*.045);
+   metal.rotation.set(.16*i,.20+i*.11,-.14+i*.043);
+   root.add(metal);
+  }
+  original.add(root);
+  return root;
+ },[original]);
  useEffect(()=>()=>disposeObject(original),[original]);
  // Original kit car body, cabin, wheels and interior are NEVER replaced with a box.
  animateVehicle(original,frame.distanceTravelledM,frame.driverSteerRad);
  original.position.set(...frame.scenePositionM);
  original.rotation.set(frame.pitchRad,frame.headingRad,frame.rollRad,'YXZ');
  applyOriginalKitDamage(dent,frame);
+ damageFolds.visible=frame.bumperCrushM>.012;
+ damageFolds.scale.setScalar(.45+frame.bumperCrushM*2.4);
  trim.forEach((p,node)=>{
   node.position.set(...p);
   if(p[0]>1.7&&p[2]<-.12){
