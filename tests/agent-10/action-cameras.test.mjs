@@ -119,15 +119,57 @@ test('recovery preview uses real A2 source progression, not a reset',()=>{
   previous=s;
  }
 });
-test('crash fixture is unambiguously PROVISIONAL; not falsely A8-verified',()=>{
- const a=actionPreviewState(1.9,'crash-blocking');
- const b=actionPreviewState(4.3,'crash-blocking');
- assert.equal(a.provisionalCrash,true);
- assert.equal(b.provisionalCrash,true);
- assert.ok(b.dynamics.positionM[2]<a.dynamics.positionM[2]-2);
- assert.ok(b.contact01>0);
- for(const id of Object.keys(b.dynamics.wheels)){
-  const rootB=b.dynamics.positionM[2]-b.dynamics.wheels[id].hubWorldM[2];
-  assert.ok(Number.isFinite(rootB));
+test('Agent 8 actual collision and Agent 9 reversed-time A8 damage',()=>{
+ const forward=actionPreviewState(2.55,'crash-action');
+ const freeze=actionPreviewState(2.83,'crash-action');
+ const backward=actionPreviewState(4.65,'crash-action');
+ const restart=actionPreviewState(5.98,'crash-action');
+ assert.equal(forward.provisionalCrash,false);
+ assert.ok(forward.replay);
+ assert.ok(forward.impact);
+ assert.ok(freeze.impact);
+ assert.equal(backward.replay.direction,-1);
+ assert.ok(backward.impact);
+ assert.ok(backward.sourceTimeSec<freeze.sourceTimeSec);
+ assert.ok(backward.impact.relativeTimeSec<freeze.impact.relativeTimeSec);
+ assert.ok(backward.impact.bumperCrushM<=freeze.impact.bumperCrushM);
+ assert.equal(restart.replay.direction,0);
+ assert.equal(restart.impact,null);
+ assert.ok(restart.tyre.failureProgress>.9,
+   'A9 restart must NOT magically repair the front-right tyre');
+});
+test('A8 rail strike is real and not a fake script-driven camera event',()=>{
+ let foundContact=false,foundDamage=false,earlier=null;
+ for(let i=0;i<180;i++){
+   const s=actionPreviewState(i/30,'crash-action');
+   if(s.impact?.contact.occurred){
+     foundContact=true;
+     assert.ok(s.impact.contact.clearanceM>=0);
+     if(s.impact.bumperCrushM>.01)foundDamage=true;
+   }
+   if(s.replay?.phase==='reverse-crash'){
+     if(earlier)assert.ok(s.sourceTimeSec<=earlier+.00001);
+     earlier=s.sourceTimeSec;
+   }
+   assert.ok(s.dynamics.positionM.every(Number.isFinite));
  }
+ assert.ok(foundContact,'A8 actual rail collision must occur on camera');
+ assert.ok(foundDamage,'A8 actual body crush must be visible');
+});
+test('crash camera and rail share A8 world X rebasing and front-right side',()=>{
+ const s=actionPreviewState(2.50,'crash-action');
+ assert.ok(s.impact);
+ assert.ok(Math.abs(s.dynamics.positionM[0]-
+   s.impact.scenePositionM[0])<.00001);
+ assert.ok(Math.abs(s.dynamics.positionM[2]-
+   s.impact.scenePositionM[2])<.00001);
+ assert.ok(s.impact.contact.barrierZ<-7.0);
+ for(const id of Object.keys(s.dynamics.wheels)){
+   assert.ok(s.dynamics.wheels[id].hubWorldM.every(Number.isFinite));
+ }
+ const actual=sampleActionCamera({stage:s.stage,sourceTimeSec:s.sourceTimeSec,
+   progress01:s.progress01,dynamics:s.dynamics,
+   impactFrame:{actualBarrierContact:s.impact.contact.occurred,
+     contact01:s.contact01}});
+ assert.ok(actual.position[2]>s.dynamics.positionM[2]);
 });
