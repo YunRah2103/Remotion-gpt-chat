@@ -7,6 +7,7 @@ import type {TyreFrame,WheelId,VehicleDynamicsFrame} from '../shared/contract.ts
 import type {TyreFailureParams} from './sampleTyreFailure.ts';
 import {sampleTyreFailure} from './sampleTyreFailure.ts';
 import {applyTyreFrame,disposeTyreRig,prepareTyreRig} from './tyreRig.ts';
+import type {TyreDamageStyle} from './tyreRig.ts';
 
 export type TyreFailureWheelProps={
   tSec:number;
@@ -15,7 +16,7 @@ export type TyreFailureWheelProps={
   params?:TyreFailureParams;
   wheel?:WheelId;
   exposure?:number;
-  damageStyle?:'pressure-only'|'light-scuff';
+  damageStyle?:TyreDamageStyle;
 };
 /** Reuses the real grand-tourer, original rim, brake, steering pivot, wheel roll. */
 export const TyreFailureWheel:React.FC<TyreFailureWheelProps>=({
