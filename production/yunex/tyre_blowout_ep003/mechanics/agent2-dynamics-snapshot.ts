@@ -1,9 +1,9 @@
 /**
- * PINNED AUTHORITATIVE INTEGRATION SNAPSHOT (Agent 2 PR #199).
- * Source agent/ep003-02-dynamics @ 197e02ca94c9d9687f8cc43dac3d89173eb4dfd2.
- * Below this comment is exactly the current Agent 2 dynamics/model.ts body.
- * This temporary review-only branch adapter must be deleted after integration;
- * import ../dynamics/model.ts directly once #199 reaches the shared base.
+ * TEMPORARY, BYTE-IDENTICAL AGENT 2 PR #199 SOURCE SNAPSHOT.
+ * Dynamics source SHA e724786fc087b080e9de19e9e26bda6a815ce276,
+ * model.ts original source below exactly unchanged. Dynamics and 60mm failed
+ * tyre radius remain Agent 2's authoritative code. After integration replace
+ * imports with ../dynamics/model.ts and delete this snapshot.
  */
 /**
  * YUNEX EP003 / Agent 2. Illustrative deterministic planar four-contact vehicle dynamics.
@@ -263,6 +263,25 @@ export function sampleDynamics(tSec:number,params:EpisodeParams=DYNAMICS_DEFAULT
  * declared hard cut. The physical vehicle state (including yaw/spin) is unchanged. */
 export function previewRebasedPosition(frame:VehicleDynamicsFrame,anchorDistanceM:number,sceneX=-55):readonly[number,number,number]{
   return [sceneX+frame.positionM[0]-anchorDistanceM,frame.positionM[1],frame.positionM[2]];
+}
+
+/**
+ * Rebase an absolute authoritative wheel hub by exactly the same rigid
+ * TRANSLATION applied to the vehicle body at a hard editorial cut.
+ * This is render-space ONLY. sampleDynamics remains in a continuous global
+ * frame with no teleports, path edits, or modified wheel spin phases.
+ */
+export function previewRebasedHubWorld(
+  frame:VehicleDynamicsFrame,
+  wheel:WheelId,
+  anchorDistanceM:number,
+  sceneX=-55,
+):readonly[number,number,number] {
+  if(!IDS.includes(wheel))throw Error('unknown wheel for preview hub');
+  const rootX=previewRebasedPosition(frame,anchorDistanceM,sceneX)[0];
+  const shift=rootX-frame.positionM[0];
+  const hub=frame.wheels[wheel].hubWorldM;
+  return [hub[0]+shift,hub[1],hub[2]];
 }
 
 /** Re-integrates a scenario from the SAME initial state at 120Hz and 480Hz.
