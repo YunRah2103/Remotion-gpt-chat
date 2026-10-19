@@ -48,8 +48,11 @@ function applyOriginalKitDamage(target:DentTarget|undefined,frame:CrashOutcomeFr
  }
  position.needsUpdate=true;target.mesh.geometry.computeVertexNormals();
 }
-export const CrashCarRig:React.FC<{frame:CrashOutcomeFrame}>=({frame})=>{
- const original=useMemo(makeOriginalGrandTourer,[]);
+export const CrashCarRig:React.FC<{frame:CrashOutcomeFrame;
+ makeVehicle?:()=>T.Group;
+ afterPose?:(vehicle:T.Group,frame:CrashOutcomeFrame)=>void;
+}>=({frame,makeVehicle,afterPose})=>{
+ const original=useMemo(()=>makeVehicle?makeVehicle():makeOriginalGrandTourer(),[makeVehicle]);
  const dent=useMemo(()=>setupDent(original),[original]);
  const trim=useMemo(()=>{
   const originalPositions=new Map<T.Object3D,[number,number,number]>();
@@ -95,7 +98,7 @@ export const CrashCarRig:React.FC<{frame:CrashOutcomeFrame}>=({frame})=>{
  });
  // Same original failed front-right tyre/rim/brake hierarchy. This standalone
  // kit fixture compresses rubber only; Agent 1's final rig slots in at merge.
- original.traverse(o=>{
+ if(!afterPose)original.traverse(o=>{
   if(!o.name.startsWith('steer-')||!o.userData.steering)return;
   const rightFront=o.position.x>0&&o.position.z<0;
   if(!rightFront)return;
@@ -104,6 +107,8 @@ export const CrashCarRig:React.FC<{frame:CrashOutcomeFrame}>=({frame})=>{
   const tyre=o.getObjectByName('tyre');
   if(tyre)tyre.scale.y=.84-.08*(1-frame.frontRightPressureRatio);
  });
+ original.updateMatrixWorld(true);
+ afterPose?.(original,frame);
  return <primitive object={original}/>;
 };
 /** Seek-safe debris from frozen first-contact point; no random renderer mutation. */
