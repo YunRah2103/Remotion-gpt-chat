@@ -21,20 +21,24 @@ export function sampleCinemaCamera(input:CinemaCameraInput):CameraPose{
   case 'tyre-hook':{
    // The wheel MUST deflate visibly before the camera leaves it; continuous
    // dolly (rather than a magic zoom) exposes original front 3/4 silhouette.
-   const reveal=smooth((q-.08)/.42);
+   // Hold the damaged contact patch until the loss is legible, then finish
+   // the pullback in the first half-second, WITHOUT clipping the full car.
+   const reveal=smooth((q-.09)/.30);
    // Slight front-quarter offset reduces overlapping far-wheel silhouettes.
    // Lower aim exposes the real compressed lower sidewall and contact edge.
-   from=lerp3([2.03,.54,-2.43],[5.15,1.83,-5.62],reveal);
-   at=lerp3([1.42,.245,-.88],[.38,.67,-.1],reveal);
-   fov=mix(37,49,reveal);near=.027;break;
+   from=lerp3([2.03,.54,-2.43],[7.55,2.45,-7.88],reveal);
+   at=lerp3([1.42,.245,-.88],[0,.68,0],reveal);
+   fov=mix(37,52,reveal);near=.027;break;
   }
   case 'front-three-quarter':
-   from=lerp3([6.9,2.22,-5.25],[6.00,1.83,-5.65],p);
-   at=lerp3([.48,.72,-.15],[.07,.67,-.12],p);fov=mix(49,46,p);break;
+   // Keep both bumpers inside the tight 9:16 horizontal field of view.
+   from=lerp3([8.0,2.50,-7.05],[7.8,2.40,-7.15],p);
+   at=lerp3([0,.70,0],[0,.68,0],p);fov=mix(52,53,p);break;
   case 'low-tracking':
-   // Road-inside-barrier camera, not outside the right-hand highway rail.
-   from=lerp3([3.9,.80,-5.20],[2.90,.66,-5.40],p);
-   at=[.55,.77,-.14];fov=51;break;
+   // Inside the right barrier, lower tracking with both bumpers still visible.
+   // Strong moving markings behind the silhouette sell highway velocity.
+   from=lerp3([6.0,.95,-8.15],[5.8,.90,-7.9],p);
+   at=[0,.72,0];fov=55;break;
   case 'wheel-cutaway':
   case 'underbody':
    // Framed directly along the right-side contact patch, lens stays outside
@@ -53,11 +57,12 @@ export function sampleCinemaCamera(input:CinemaCameraInput):CameraPose{
   case 'chase-recovery':
    // Full original GT in portrait: closer to the road centerline and aim
    // downward toward the rear axle, not into distant sky/right edge.
-   from=lerp3([-7.8,2.25,-1.65],[-7.20,2.12,-1.52],p);
-   at=lerp3([-.40,.56,-.08],[-.15,.55,-.06],p);fov=mix(49,46,p);break;
+   from=lerp3([-8.8,2.35,-1.25],[-8.7,2.23,-1.15],p);
+   at=lerp3([0,.70,0],[0,.68,0],p);fov=mix(51,50,p);break;
   case 'rear-three-quarter':
-   from=lerp3([-5.45,1.72,-4.82],[-5.82,1.94,-4.95],p);
-   at=[-.10,.72,-.10];fov=47;break;
+   // Make the complete 4.94m car visible; former frame 68 cut BOTH bumpers.
+   from=lerp3([-7.35,2.22,-7.3],[-7.65,2.40,-7.50],p);
+   at=[0,.72,0];fov=53;break;
   case 'safe-stop':
    // Moving recovery, MEDIAN-side elevated reveal: actual widened right-hand
    // refuge beyond the moving car. Never stage a physically unproved stop.

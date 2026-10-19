@@ -127,3 +127,33 @@ test('rear chase lens stays behind and near centerline with clear forward target
   assert.ok(pose.position[1]>1.9);
  }
 });
+
+test('full-car 9:16 camera framings keep the original 4.94m grand-tourer on screen',async()=>{
+ const T=await import('three');
+ const {sampleCinemaCamera}=await import('../../production/yunex/tyre_blowout_ep003/cinema/cameras.ts');
+ const situations=[
+  ['opening',.62,'tyre-hook'],['opening',1.02,'tyre-hook'],
+  ['opening',1.42,'front-three-quarter'],['opening',2.12,'front-three-quarter'],
+  ['opening',2.45,'chase-recovery'],['opening',4.97,'chase-recovery'],
+  ['montage',1.36,'low-tracking'],['montage',2.15,'low-tracking'],
+  ['montage',2.36,'rear-three-quarter'],['montage',3.10,'rear-three-quarter']
+ ];
+ for(const [mode,t,expected] of situations){
+  const p=samplePreviewState(t,mode);
+  assert.equal(p.cut.shot,expected,'check requested video shot');
+  const pose=sampleCinemaCamera({tSec:p.sourceTimeSec,shot:p.cut.shot,
+   dynamics:p.dynamics,tyre:p.tyre,progress01:p.progress01});
+  const camera=new T.PerspectiveCamera(pose.fovDeg,540/960,pose.nearM,pose.farM);
+  camera.position.set(...pose.position);camera.lookAt(...pose.target);
+  camera.updateProjectionMatrix();camera.updateMatrixWorld(true);
+  const root=new T.Group();root.position.set(...p.dynamics.positionM);
+  root.rotation.set(p.dynamics.pitchRad,p.dynamics.yawRad,p.dynamics.rollRad,'YXZ');
+  root.updateMatrixWorld(true);
+  for(const x of [-2.47,2.47])for(const y of [.10,1.34])for(const z of [-.97,.97]){
+   const point=root.localToWorld(new T.Vector3(x,y,z)).project(camera);
+   assert.ok(Number.isFinite(point.x)&&Number.isFinite(point.y),'finite projection');
+   assert.ok(Math.abs(point.x)<1.01,
+     mode+' '+t+'s '+expected+' clips original car in portrait X: '+point.x);
+  }
+ }
+});
