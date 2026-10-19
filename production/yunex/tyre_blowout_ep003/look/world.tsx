@@ -10,6 +10,7 @@ import {EP003_SCENE} from '../shared/contract.ts';
 import type {VehicleDynamicsFrame, Vec3} from '../shared/contract.ts';
 import {REFUGE, refugeRailZ, refugePavedWidthM} from './refuge-profile.ts';
 import {ContactOcclusion} from './contact.tsx';
+import {makePremiumAsphaltTexture} from './asphalt.ts';
 
 type V3 = [number, number, number];
 const LIGHT = '#e0edee';
@@ -98,7 +99,8 @@ export function buildEpisodeHighway(): T.Group {
   const root = createEnvironment({kind: 'highway', timeOfDay: 'day', seed: 12});
   root.name = 'EP003-original-highway-with-refuge';
   clearRightSideIntrusions(root);
-  const asphalt = new T.MeshStandardMaterial({color:'#3c474d', roughness:.94, metalness:.015, side:T.DoubleSide});
+  const asphaltTone=makePremiumAsphaltTexture();
+  const asphalt = new T.MeshStandardMaterial({color:'#3c474d',map:asphaltTone, roughness:.94, metalness:.015, side:T.DoubleSide});
   const grit = new T.MeshStandardMaterial({color:'#5b666b',roughness:.96,transparent:true,opacity:.095,depthWrite:false});
   const white = new T.MeshStandardMaterial({color:'#d9ddd1',roughness:.89});
   const amber = new T.MeshStandardMaterial({color:'#d2b76b',roughness:.83});
@@ -111,7 +113,7 @@ export function buildEpisodeHighway(): T.Group {
       const mat = node.material;
       if (mat instanceof T.MeshStandardMaterial) {
         const oldMap = mat.map, oldBump = mat.bumpMap;
-        mat.map = null; mat.bumpMap = null; mat.color.set('#3e474c');
+        mat.map = asphaltTone; mat.bumpMap = null; mat.color.set('#3e474c');
         // These unique highway surface maps were kit-generated for this root.
         oldMap?.dispose(); oldBump?.dispose();
         mat.roughness = .94; mat.metalness = .015; mat.needsUpdate = true;
@@ -142,12 +144,14 @@ export function buildEpisodeHighway(): T.Group {
 
   // Road and original -Z edge are constant height (y=0). The extra surface is
   // added as a tessellated polygon, not a floating slab over the soft verge.
-  const vertices: number[] = [], triangles: number[] = [];
+  const vertices: number[] = [], triangles: number[] = [], uvs:number[] = [];
   const samples = 106;
   for (let i=0; i<=samples; i++) {
     const x=REFUGE.startX+(REFUGE.endX-REFUGE.startX)*i/samples;
     const railZ=refugeRailZ(x);
     vertices.push(x,.003,-7.43, x,.003,railZ+.19);
+    // Match kit road's world-space UVs, preventing visible texture seams.
+    uvs.push(x/4,-7.43/4, x/4,(railZ+.19)/4);
     if (i<samples) {
       const j=i*2;
       triangles.push(j,j+2,j+1,j+1,j+2,j+3); // +Y face normals for proper daylight and shadows
@@ -155,6 +159,7 @@ export function buildEpisodeHighway(): T.Group {
   }
   const surface = new T.BufferGeometry();
   surface.setAttribute('position',new T.Float32BufferAttribute(vertices,3));
+  surface.setAttribute('uv',new T.Float32BufferAttribute(uvs,2));
   surface.setIndex(triangles); surface.computeVertexNormals();
   const tarmac = new T.Mesh(surface,asphalt);tarmac.name='real-refuge-asphalt';
   tarmac.receiveShadow=true;g.add(tarmac);
