@@ -55,7 +55,7 @@ const fig=(v:number)=>Math.round(v*100);
 type PreviewKind='macro'|'portrait';
 /**
  * Both review scenes use EXACTLY Agent 2's deterministic VehicleDynamicsFrame.
- * Snapshot matches agent/ep003-02-dynamics @ cbb0281...; replace snapshot import
+ * Snapshot matches agent/ep003-02-dynamics @ 197e02ca...; replace snapshot import
  * with ../dynamics/model.ts as soon as PR #199 is merged into integration base.
  * Hard-cut camera angles, never a physics or road teleport.
  */
