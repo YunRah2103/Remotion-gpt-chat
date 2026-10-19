@@ -15,15 +15,18 @@ export type TyreFailureWheelProps={
   params?:TyreFailureParams;
   wheel?:WheelId;
   exposure?:number;
+  damageStyle?:'pressure-only'|'light-scuff';
 };
 /** Reuses the real grand-tourer, original rim, brake, steering pivot, wheel roll. */
 export const TyreFailureWheel:React.FC<TyreFailureWheelProps>=({
-  tSec,tyreFrame,dynamics,params={},wheel='front-right',exposure=0
+  tSec,tyreFrame,dynamics,params={},wheel='front-right',exposure=0,
+  damageStyle='pressure-only'
 })=>{
   const rig=useMemo(()=>prepareTyreRig(wheel,exposure),[wheel,exposure]);
   useEffect(()=>()=>disposeTyreRig(rig),[rig]);
   const phase=dynamics?.wheels[wheel].spinRad??-EP003_SCENE.illustrativeInitialSpeedMps*tSec/EP003_SCENE.wheelRadiusM;
-  const frame=tyreFrame??sampleTyreFailure(tSec,{...params,wheel,angularPhaseRad:phase});
+  const frame=tyreFrame??sampleTyreFailure(tSec,{...params,wheel,angularPhaseRad:phase,
+    treadSeparation:params.treadSeparation??(damageStyle==='light-scuff'?.35:0)});
   applyTyreFrame(rig,frame,{
     dynamics,fixtureDistanceM:EP003_SCENE.illustrativeInitialSpeedMps*tSec,
     exposure
