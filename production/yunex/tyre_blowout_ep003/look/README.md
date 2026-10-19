@@ -1,23 +1,23 @@
 # EP003 / Agent 4 — World & look package
 
-**Asset identity:** unchanged \`highway\` created by kit \`createEnvironment\`,
-unchanged \`grand-tourer\` created by kit \`createVehicle\`. The root models are
+**Asset identity:** unchanged `highway` created by kit `createEnvironment`,
+unchanged `grand-tourer` created by kit `createVehicle`. The root models are
 created fresh per composition; all episode material changes operate on those
-instances and nothing in \`src/yunex/world-kit\` is rewritten.
+instances and nothing in `src/yunex/world-kit` is rewritten.
 
 ## Public APIs
 
-- \`buildEpisodeHighway()\`: original highway + episode-specific paved
+- `buildEpisodeHighway()`: original highway + episode-specific paved
   right-hand emergency refuge; moves conflict posts/lights/gantry supports;
   draws connected outer guardrail with continuous cubic easing
-- \`EpisodeWorld\`: deterministic three.js world component and disposal
-- \`EpisodeLight({focus})\`: inherits \`WorldLighting\` for full environment
+- `EpisodeWorld`: deterministic three.js world component and disposal
+- `EpisodeLight({focus})`: inherits `WorldLighting` for full environment
   reflections and daylight, with a gentle directional surface fill
-- \`finishGrandTourer(root)\`: modifies *one* freshly created vehicle instance
+- `finishGrandTourer(root)`: modifies *one* freshly created vehicle instance
   to retain midnight slate paint #4A667E, polished coat, legible rubber,
   satin wheel finish and non-black glass
-- \`EpisodeGrandTourer({dynamics})\`: consumes Agent 2's **authoritative**
-  \`VehicleDynamicsFrame\` pose/distance/steer/roll/pitch; no invented motion
+- `EpisodeGrandTourer({dynamics})`: consumes Agent 2's **authoritative**
+  `VehicleDynamicsFrame` pose/distance/steer/roll/pitch; no invented motion
 
 ## Required geography for Agent 2 + Agent 3
 
@@ -32,10 +32,10 @@ includes a continuous protective outer rail, new posts, roadside signs
 and luminaires. The old inside-right rail/post/lamp objects are suppressed
 only in this episode's model; the opposite side survives.
 
-\`fitsStoppedGrandTourer(x,z)\` conservatively checks the 4.94m × 1.94m
+`fitsStoppedGrandTourer(x,z)` conservatively checks the 4.94m × 1.94m
 complete vehicle footprint with 0.55m extra lateral clearance from the
 lane edge and guardrail and an x boundary between 48..101.
-\`(x=74,z=-10.5)\` passes **geometric** clearance checks; this is **not**
+`(x=74,z=-10.5)` passes **geometric** clearance checks; this is **not**
 a claim that a damaged vehicle will always reach the bay, that an approach
 path is physically possible, or that it is safe in any real incident.
 
@@ -46,7 +46,7 @@ cannot be integrated, the final safe-stop shot remains BLOCKED.
 
 ## Preview-only fixture — not real dynamics
 
-Until Agent 2 exists, \`previews/agent-4/LookPreview.tsx\` supplies constant
+Until Agent 2 exists, `previews/agent-4/LookPreview.tsx` supplies constant
 27.78 m/s straight-ahead travel strictly for *moving light/material/geometry*
 comparison. It NEVER depicts validated tyre failure or a full recovery.
 The portrait sweeps wheel macro → moving GT hero → stationary infrastructure
@@ -56,7 +56,7 @@ renders 960×540 and 540×960 respectively.
 
 ## Commands to reproduce locally with dependencies
 
-\`\`\`bash
+```bash
 npm ci
 npm run check
 npm run worldkit:test
@@ -64,10 +64,10 @@ npm run partskit:test
 npx tsc -p tests/agent-4/tsconfig.json --noEmit
 node --experimental-strip-types --test tests/agent-4/*.test.mjs
 bash production/yunex/tyre_blowout_ep003/previews/agent-4/render.sh
-\`\`\`
+```
 
 The render script produces paired **moving** before/after beauty and portrait
-MP4s and frame grabs; \`ffprobe\` metadata and an FFmpeg full-frame decode
+MP4s and frame grabs; `ffprobe` metadata and an FFmpeg full-frame decode
 run for each file. Do not claim native renders passed until outputs are actually
 available and examined. Review baseline/after from identical camera frame
 numbers, not from independent stills.
