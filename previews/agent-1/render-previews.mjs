@@ -34,8 +34,14 @@ for(const [composition,seconds,samples] of [
   const meta=JSON.parse(capture('ffprobe',['-v','error','-select_streams','v:0',
     '-show_entries','stream=codec_name,pix_fmt,width,height,nb_frames,avg_frame_rate:format=duration',
     '-of','json',filename]));
-  if(!meta.streams?.[0]||Math.abs(Number(meta.format.duration)-seconds)>.075)
-    throw Error('Missing stream or unexpected duration: '+composition);
+  const stream=meta.streams?.[0];
+  const expectedWidth=Math.round(1080*Number(scale));
+  const expectedHeight=Math.round(1920*Number(scale));
+  if(!stream||stream.codec_name!=='h264'||!['yuv420p','yuvj420p'].includes(stream.pix_fmt)||
+    stream.width!==expectedWidth||stream.height!==expectedHeight||
+    Number(stream.nb_frames)!==Math.round(seconds*30)||
+    stream.avg_frame_rate!=='30/1'||Math.abs(Number(meta.format.duration)-seconds)>.075)
+    throw Error('Native clip stream/frame validation failed: '+composition+' '+JSON.stringify(meta));
   run('ffmpeg',['-v','error','-xerror','-i',filename,'-f','null','-']);
   const hashes=[];
   for(const sec of samples){
