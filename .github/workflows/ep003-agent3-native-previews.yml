@@ -47,10 +47,16 @@ jobs:
             "agent/ep003-02-dynamics dynamics" \
             "agent/ep003-04-look look"; do
             read -r branch folder <<< "$item"
-            git fetch --no-tags origin "refs/heads/$branch"
+            # Fetch reachable history so the last confirmed A1 source can be pinned
+            # while A1 repairs its current malformed roadContact.ts declaration.
+            git fetch --no-tags --depth=80 origin "refs/heads/$branch"
             sha=$(git rev-parse FETCH_HEAD)
+            if [[ "$folder" == mechanics ]]; then
+              sha=5e6debcbfa54b05fff68640b919eddc2e8e6cd3a
+              git cat-file -e "$sha^{commit}"
+            fi
             printf '%s %s %s\n' "$branch" "$folder" "$sha" | tee -a previews/agent-3/out/authoritative-sources.txt
-            git restore --source=FETCH_HEAD --worktree -- "production/yunex/tyre_blowout_ep003/$folder/"
+            git restore --source="$sha" --worktree -- "production/yunex/tyre_blowout_ep003/$folder/"
           done
           test -f production/yunex/tyre_blowout_ep003/dynamics/model.ts
           test -f production/yunex/tyre_blowout_ep003/mechanics/tyreRig.ts
