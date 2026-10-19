@@ -66,6 +66,12 @@ function build(p:Required<CrashBranchParams>):readonly Step[]{
  let hitAt:number|null=null,hitX:number|null=null,hitZ:number|null=null,hitSpeed:number|null=null;
  for(let i=0;i<=Math.round(DURATION*HZ);i++){
   const t=i*dt,panic=p.reaction==='panic-brake-and-overcorrect';
+  // Exact branch equality: frame zero is the identical injected Agent 2 state.
+  if(i===0){
+   a.push({t,x,z,v,yaw,rate,distance,steer,brake,roll,pitch,spin,
+    hitAt,hitX,hitZ,hitSpeed});
+   continue;
+  }
   const ramp=smooth((t-.47)/.32),release=smooth((t-1.65)/.85);
   steer=panic?.083*ramp*(1-.80*release):0;
   brake=panic?.90*ramp:0;
