@@ -19,8 +19,8 @@ type Shot = 'tyre-front-right'|'high-chase'|'rear-three-quarter'|'overhead';
 type Edit = {sourceSec:number;sourceAnchorSec:number;sceneX:number;shot:Shot};
 const EDITS:readonly {at:number;end:number;sourceStart:number;shot:Shot;sceneX:number}[]=[
   {at:0,end:2.6,sourceStart:1.20,shot:'high-chase',sceneX:-42},
-  {at:2.6,end:5.35,sourceStart:3.50,shot:'overhead',sceneX:-35},
-  {at:5.35,end:8,sourceStart:5.15,shot:'rear-three-quarter',sceneX:-35},
+  {at:2.6,end:5.35,sourceStart:3.80,shot:'overhead',sceneX:-35},
+  {at:5.35,end:8,sourceStart:6.55,shot:'rear-three-quarter',sceneX:-35},
 ];
 function shotAt(videoSec:number,variant:'tight'|'context'):Edit {
   if(variant==='tight')return {
