@@ -66,10 +66,10 @@ export function rebaseActionFrame(d:VehicleDynamicsFrame, offsetX:number):Vehicl
   if(!Number.isFinite(offsetX))throw new Error('Nonfinite shot rebase');
   return {...d, positionM:[d.positionM[0]+offsetX,d.positionM[1],d.positionM[2]],
     wheels:{
-      'front-left':{...d.wheels['front-left'],hubWorldM:[d.wheels['front-left'].hubWorldM[0]+offsetX,...d.wheels['front-left'].hubWorldM.slice(1)] as Vec3},
-      'front-right':{...d.wheels['front-right'],hubWorldM:[d.wheels['front-right'].hubWorldM[0]+offsetX,...d.wheels['front-right'].hubWorldM.slice(1)] as Vec3},
-      'rear-left':{...d.wheels['rear-left'],hubWorldM:[d.wheels['rear-left'].hubWorldM[0]+offsetX,...d.wheels['rear-left'].hubWorldM.slice(1)] as Vec3},
-      'rear-right':{...d.wheels['rear-right'],hubWorldM:[d.wheels['rear-right'].hubWorldM[0]+offsetX,...d.wheels['rear-right'].hubWorldM.slice(1)] as Vec3},
+      'front-left':{...d.wheels['front-left'],hubWorldM:[d.wheels['front-left'].hubWorldM[0]+offsetX,d.wheels['front-left'].hubWorldM[1],d.wheels['front-left'].hubWorldM[2]] as Vec3},
+      'front-right':{...d.wheels['front-right'],hubWorldM:[d.wheels['front-right'].hubWorldM[0]+offsetX,d.wheels['front-right'].hubWorldM[1],d.wheels['front-right'].hubWorldM[2]] as Vec3},
+      'rear-left':{...d.wheels['rear-left'],hubWorldM:[d.wheels['rear-left'].hubWorldM[0]+offsetX,d.wheels['rear-left'].hubWorldM[1],d.wheels['rear-left'].hubWorldM[2]] as Vec3},
+      'rear-right':{...d.wheels['rear-right'],hubWorldM:[d.wheels['rear-right'].hubWorldM[0]+offsetX,d.wheels['rear-right'].hubWorldM[1],d.wheels['rear-right'].hubWorldM[2]] as Vec3},
     }};
 }
 
