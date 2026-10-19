@@ -73,7 +73,18 @@ export function deformRubber(rig:PreparedTyreRig,frame:TyreFrame):void {
     const attr=mesh.geometry.getAttribute('position') as T.BufferAttribute;
     const out=attr.array as Float32Array;
     for(let i=0;i<rest.length;i+=3){
-      const [x,y,z]=sampleRubberVertex([rest[i],rest[i+1],rest[i+2]],frame,kind);
+      let [x,y,z]=sampleRubberVertex([rest[i],rest[i+1],rest[i+2]],frame,kind);
+      // Contact is fixed in *world* asphalt coordinates, not just the wheel
+      // plane: body pitch/roll and steering tilt its local radial axes.
+      // A final small radial carcass flattening prevents sidewall vertices
+      // from piercing y=0 as the real 3D pose changes. Hub remains untouched.
+      const e=mesh.matrixWorld.elements;
+      const localRadialWorldY=e[1]*x+e[5]*y;
+      const roadWorldY=localRadialWorldY+e[9]*z+e[13];
+      if(roadWorldY<0 && localRadialWorldY<-1e-8){
+        const scale=Math.max(0,Math.min(1,(-e[9]*z-e[13])/localRadialWorldY));
+        x*=scale;y*=scale;
+      }
       out[i]=x;out[i+1]=y;out[i+2]=z;
     }
     attr.needsUpdate=true;
