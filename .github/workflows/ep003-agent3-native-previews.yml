@@ -1,0 +1,120 @@
+name: EP003 Agent 3 — Native Portrait Camera Previews
+
+on:
+  push:
+    branches: [agent/ep003-03-cinema]
+    paths:
+      - '.github/workflows/ep003-agent3-native-previews.yml'
+      - 'production/yunex/tyre_blowout_ep003/cinema/**'
+      - 'previews/agent-3/**'
+      - 'tests/agent-3/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ep003-agent3-native-${{ github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  camera-render:
+    name: Test / Render / Decode / Inspect EP003 Cameras
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned dependencies and decode tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --quiet Pillow==11.3.0
+          npm ci --no-audit --no-fund
+      - name: Hydrate authoritative Agent 1 / 2 / 4 modules without committing others' code
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p previews/agent-3/out
+          for item in \
+            "agent/ep003-01-mechanics mechanics" \
+            "agent/ep003-02-dynamics dynamics" \
+            "agent/ep003-04-look look"; do
+            read -r branch folder <<< "$item"
+            # Pin the now-corrected A1 rig, verified by its production TS CI.
+            # Its own motion handler applies the real 3D pose BEFORE rubber
+            # contact deformation; do not add a second camera-side transform.
+            git fetch --no-tags --depth=80 origin "refs/heads/$branch"
+            sha=$(git rev-parse FETCH_HEAD)
+            if [[ "$folder" == mechanics ]]; then
+              sha=7d47746d2fc584e935b5a9766eb1150e5b3dac38
+              git cat-file -e "$sha^{commit}"
+            fi
+            printf '%s %s %s\n' "$branch" "$folder" "$sha" | tee -a previews/agent-3/out/authoritative-sources.txt
+            git restore --source="$sha" --worktree -- "production/yunex/tyre_blowout_ep003/$folder/"
+          done
+          test -f production/yunex/tyre_blowout_ep003/dynamics/model.ts
+          test -f production/yunex/tyre_blowout_ep003/mechanics/tyreRig.ts
+          test -f production/yunex/tyre_blowout_ep003/look/world.tsx
+      - name: Typecheck original kit and camera deliverable
+        run: |
+          set -euo pipefail
+          npm run check
+          npx --no-install tsc -p previews/agent-3/tsconfig.json
+      - name: Run base asset and agent-owned tests
+        run: |
+          set -euo pipefail
+          npm run worldkit:test
+          npm run partskit:test
+          node --experimental-strip-types --test tests/agent-3/*.test.mjs
+      - name: Render early visual inspection PNGs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p previews/agent-3/out/early-frames
+          npx --no-install remotion still previews/agent-3/entry.tsx EP003CameraOpening \
+            previews/agent-3/out/early-frames/opening-first-collapse.png \
+            --frame=12 --scale=0.5 --gl=swangle
+          npx --no-install remotion still previews/agent-3/entry.tsx EP003CameraMontage \
+            previews/agent-3/out/early-frames/montage-cockpit.png \
+            --frame=172 --scale=0.5 --gl=swangle
+          npx --no-install remotion still previews/agent-3/entry.tsx EP003CameraMontage \
+            previews/agent-3/out/early-frames/montage-refuge.png \
+            --frame=248 --scale=0.5 --gl=swangle
+      - name: Upload early frame evidence before long MP4 renders
+        uses: actions/upload-artifact@v4
+        with:
+          name: EP003-AGENT3-EARLY-SHOTS-${{ github.run_id }}
+          path: |
+            previews/agent-3/out/early-frames/
+            previews/agent-3/out/authoritative-sources.txt
+          retention-days: 21
+          if-no-files-found: error
+      - name: Render genuine software-WebGL native Remotion portrait MP4s
+        run: |
+          set -euo pipefail
+          mkdir -p previews/agent-3/out
+          npx --no-install remotion render previews/agent-3/entry.tsx EP003CameraOpening \
+            previews/agent-3/out/opening.mp4 --scale=0.5 --gl=swangle \
+            --codec=h264 --pixel-format=yuv420p --concurrency=1
+          npx --no-install remotion render previews/agent-3/entry.tsx EP003CameraMontage \
+            previews/agent-3/out/montage.mp4 --scale=0.5 --gl=swangle \
+            --codec=h264 --pixel-format=yuv420p --concurrency=1
+      - name: FFprobe / full FFmpeg decode / frame and motion inspection
+        run: |
+          set -euo pipefail
+          python previews/agent-3/verify_previews.py --dir previews/agent-3/out
+      - name: Publish real media and validation artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: EP003-AGENT3-PORTRAIT-CAMERA-PREVIEWS-${{ github.run_id }}
+          path: previews/agent-3/out/
+          retention-days: 21
+          if-no-files-found: warn
