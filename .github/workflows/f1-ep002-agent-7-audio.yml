@@ -1,0 +1,62 @@
+name: YUNEX F1 EP002 Agent 7 — Authoritative audio regression
+on:
+  push:
+    branches: [agent/f1-ep002-07-voice-engines-sfx]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-accurate-audio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Locked dependencies
+        run: npm ci
+      - name: Export exact 780 Agent 2 states using Agent 6 source timeline
+        run: node --experimental-strip-types tools/yunex-f1-audio/export-physics.mjs out/f1-ep002-audio/physics.json
+      - name: Verify physics, real-time reset and 0.132s win
+        run: |
+          python3 - <<'PY'
+          import json
+          j=json.load(open('out/f1-ep002-audio/physics.json'))
+          f=j['frames']
+          assert len(f)==780 and f[480]['sourceSeconds']==0
+          assert abs(f[540]['sourceSeconds']-2.0)<1e-10
+          assert abs(f[588]['sourceSeconds']-3.6)<1e-10
+          assert not f[480]['replay'] and not f[653]['replay']
+          assert f[654]['replay']
+          assert f[150]['beat']=='shortcut' and f[260]['beat']=='wide'
+          assert abs(j['comparison']['racingFinishAdvantageSeconds']-.13218395)<.00001
+          print('Physics-driven audio export synchronized to actual 780-frame picture: PASS')
+          PY
+      - name: Audio dependencies
+        run: |
+          python3 -m pip install --break-system-packages numpy scipy soundfile
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y ffmpeg
+      - name: Test DSP with synthetic input (NOT USER VOICE)
+        run: |
+          mkdir -p out/f1-ep002-audio
+          ffmpeg -v error -y -f lavfi -i "sine=frequency=200:duration=21.912:sample_rate=24000" -ac 1 \
+            -c:a libmp3lame -q:a 8 out/f1-ep002-audio/QA_FIXTURE_NOT_FOR_DELIVERY.mp3
+          python3 tools/yunex-f1-audio/mix.py \
+            --physics out/f1-ep002-audio/physics.json \
+            --voice out/f1-ep002-audio/QA_FIXTURE_NOT_FOR_DELIVERY.mp3 \
+            --out out/f1-ep002-audio/QC-only
+          ffmpeg -nostdin -v error -xerror -i out/f1-ep002-audio/QC-only/05_premaster.wav -f null -
+      - name: Preserve actual physics and generated engine SFX QA
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-F1-EP002-Agent7-physics-engine-QA-NO-REAL-VOICE
+          path: |
+            out/f1-ep002-audio/physics.json
+            out/f1-ep002-audio/QC-only/02_engines.wav
+            out/f1-ep002-audio/QC-only/03_track_brakes_tyres_air.wav
+            out/f1-ep002-audio/QC-only/04_cinematic_transitions.wav
+          retention-days: 14

@@ -1,0 +1,74 @@
+# YUNEX F1 EP002 — Agent 7 / Voice + Engines + SFX ONLY
+
+**User-approved audio direction (19 Oct 2026): NO music or soundtrack bed.** User will add music separately. Do not add orchestral layers or alter Agent 6's 3D picture.
+
+## Picture/source contract
+
+- Base commit: `73b33e595a54833018b676d52250af5ca5361f87` (Agent 6 PR #170, clean-blue/contrast picture code).
+- 26.000 s / 780 frames / 30 fps, 1080 × 1920. Fourteen source-aware edit segments in `editor/timeline.ts`.
+- B's **0.13218395 s** win is from representative simulation, not measured F1 telemetry.
+- Frames 480–653 are genuine real-time simulation. Every explanation and hero shot outside this window is a replay; audio must follow `editAtFrame(frame).sourceSeconds`.
+- Teal / amber have the same synthesized engine timbre; only physical A2 velocity, brake and throttle change the envelopes.
+
+## Voice source
+
+The supplied, authorised Cedar narration is `openai-fm-cedar-audio.mp3`, **21.912 s / 24kHz mono**. It lives in the ChatGPT delivery workspace and is not committed into this repository; never silently swap in an unrelated or synthetic placeholder. The user supplied these words:
+
+> Why do F1 drivers take the longer way around corners? Watch these two cars. The first takes the shortest route, but the second starts wide, clips the inside, then exits wide. That wider curve lets the car carry more speed through the turn, and with a straight coming up, a faster exit can make all the difference.
+
+The approved final performance is the **supplied recording**, not a new read of the words above. Do not time-stretch it or add music.
+
+## Reproduction
+
+1. Export synchronized physical state from the integrated picture branch:
+
+   `node --experimental-strip-types tools/yunex-f1-audio/export-physics.mjs out/f1-ep002-audio/physics.json`
+
+2. Re-time the supplied Cedar recording at natural phrase pauses (no speech speed or pitch changes):
+
+   `python tools/yunex-f1-audio/retime-cedar-voice.py --voice /path/to/openai-fm-cedar-audio.mp3 --out out/f1-ep002-audio/voice-timed.wav`
+
+3. Use the Python production mixer with the actual Agent 2 states and timed voice:
+
+   `python tools/yunex-f1-audio/mix.py --physics out/f1-ep002-audio/physics.json --voice out/f1-ep002-audio/voice-timed.wav --out out/f1-ep002-audio/stems`
+
+4. Master at approximately -14 LUFS, true peak under -1 dBTP, preserve 48 kHz stereo, and validate. Use `tools/yunex-f1-audio/master-and-mux.sh APPROVED_NATIVE_PICTURE.mp4 out/f1-ep002-audio/stems/05_premaster.wav out/f1-ep002-audio/final --picture-approved` **only after actual picture lock**. Without `--picture-approved`, the output is correctly labelled an audio review. Stream-copy the approved picture track; do not re-render or modify Agent 6's picture.
+
+## Picture/edit frame cues
+
+| Film frames | Picture focus | Sound |
+| --- | --- | --- |
+| 000–059 | Two Formula cars hook | Immediate harmonically-rich engines; short opening air-impact |
+| 060–179 | Teal shorter route and tight apex | Slower throttle/pitch under braking; restrained tyre load |
+| 180–329 | Amber wide entry / curve | Smoother engine, panned pass and onboard air |
+| 330–479 | Grip and apex teaching | Voice clear; softer texture |
+| 480–653 | Actual A2 comparison | Real simulation's per-frame throttle, braking and speed; B finishes at ~648, A at ~652 |
+| 654–779 | Reveal / racing exit | Short non-musical result accent at 21.8 s; expressive but controlled engine tail |
+
+## Truth-in-labeling / QC
+
+The downloaded ChatGPT audio-first review in the delivery workspace is measured -14.0 LUFS, -1.5 dBTP, 48kHz stereo AAC when muxed. **Its final audio revision uses exact Agent 2 per-frame physics exported by successful Agent 7 run 39185208565**, and its natural Cedar phrases are now cut into the correct picture windows without altered speaking speed. Its temporary native picture is still from the earlier successful Agent 6 render, not the currently running final colour-corrected native movie. Therefore the preview must NOT be renamed `_FINAL.mp4` or described as picture-locked. The authoritative physics exporter and exact-state mix have now been verified. Latest mix measures -14.0 LUFS and -1.5 dBTP. Native colour-corrected 1080p picture-lock approval remains the only blocker for a truthful final MP4.
+
+No third-party licensed music or engine library was used. All engine, road, braking, whoosh and impact layers are original DSP synthesis; no invented gears or collisions. Stems and analysis must be retained for approval.
+
+## Revision V2 — engine fatigue fix (user listening feedback)
+
+The initial review sound was rejected as **a continuous high-pitched, bee-like engine**. Rebuilt `mix.py` to use a low-mid, noisy exhaust/combustion signature instead of fixed 340–500 Hz sine harmonic stacks. The same velocity-dependent engine mapping is used for teal and amber, without fictional RPM or gears. The physics explanation beats nearly silence the engine while voiced; engine ducking around Cedar speech is strengthened. Ambient tyre hiss is filtered lower, and repetitive transition hits have been removed. **Still no music.**
+
+Validation: source-accurate GitHub Action run [39186538195](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39186538195) **SUCCESS** after the repo DSP change. The independently produced ChatGPT V2 listening/review export uses the exact authoritative physics JSON from prior successful Agent 7 export, preserves user's natural Cedar voice and uses the *new* native 1080p colour-corrected Agent 6 video from action [39182696333](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39182696333), picture artifact `12158191112`. Full 780-frame MP4 decodes successfully. V2 stereo WAV measured -14.3 LUFS/-1.5 dBTP; final AAC from video measured -14.4 LUFS / -1.4 dBTP. New synthetic engine layer overall RMS reduced approximately **9 dB**, and 300–1100 Hz integrated power reduced approximately **12.5 dB**, compared with the earlier fatiguing version. The original video track is **stream-copied**, not rerendered. No formal subjective playback approval has been claimed.
+
+ChatGPT user-facing deliverables: `YUNEX_F1_EP002_AUDIO_FIXED_REVIEW.mp4`, `YUNEX_EP002_V2_VOICE_ENGINES_SFX_MASTER.m4a` and `YUNEX_EP002_V2_STEMS_NO_MUSIC.zip`. Retain review status until user approves the sound and picture.
+
+
+## V3 — tighter final editing / 23.2 seconds (user request)
+
+**This supersedes the older 26.0-second audio-review edit.** The 26-second Agent 6 picture remains available unchanged, but the intended new cut ends at **exactly frame 695** (696 total frames) after the racing finish and final result card. It no longer leaves a nearly four-second gap before the last narrated phrase or a long empty tail after it.
+
+- New reproduction tool: `python tools/yunex-f1-audio/tighten-ep002.py voice --input original-26s-timed-Cedar.wav --out new-26s-voice-source.wav` uses the original approved 26-second timing stem, moving complete phrases only; **no speech stretching or pitch edits**.
+- Re-run `mix.py` with `--voice new-26s-voice-source.wav` and the A2 real frame-state JSON to recalculate engine ducking around the new dialogue.
+- `python tools/yunex-f1-audio/tighten-ep002.py stems --input new-26s-stems --out new-23s2-stems` trims exactly 23.2 seconds and fades effects naturally over the last 0.82s, leaving the original voice intact.
+- Run the same two-pass mastering to approximately -14 LUFS and -1.5 dBTP. Then `bash tools/yunex-f1-audio/mux-23s2.sh AGENT6_1080P_APPROVED_PICTURE.mp4 mastered-23s2.wav OUT_DIR`. **Do not use generic `-t 23.2` on a B-frame H264 input**: it exported 698 frames (23.267s) in early QC. The fixed script stream-copies exactly **696 frames** and checks sample rate, duration and full decode.
+- Revised words: “That wider curve” at 12.12–13.30s, its explanation at 13.50–15.95s, “and with a straight coming up” at 17.05–18.22s, and the last line “a faster exit can make all the difference” at **19.60–21.89s**. The final result appears at approximately 21.80s and continues to 23.20s. The authoritative racing comparison timestamps remain untouched.
+- **Verified ChatGPT V3 export:** H264 native original 1080×1920 30fps 696 frames/23.200s, video track stream-copied; AAC 48kHz stereo. Full FFmpeg decode PASS, -14.2 LUFS integrated/-1.5 dBTP AAC. Delivers shortened review MP4, standalone audio-only M4A and separate 23.2s WAV stems ZIP, no music.
+
+These assets are ChatGPT conversation attachments; they are not claimed as GitHub Actions artifacts. User audiovisual approval remains outstanding, so the revised MP4 is labelled **REVIEW**, not FINAL.
