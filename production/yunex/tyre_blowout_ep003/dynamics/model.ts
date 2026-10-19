@@ -186,9 +186,9 @@ function step(s:State,t:number,dt:number,p:EpisodeParams):State {
     roll:lerp(s.roll,rollTarget,response),pitch:lerp(s.pitch,pitchTarget,response),spins
   };
 }
-function makeTable(p:EpisodeParams):Snapshot[] {
-  const dt=1/A.integrationHz;
-  const total=Math.ceil(A.simulationHorizonSec*A.integrationHz);
+function makeTable(p:EpisodeParams,hz:number=A.integrationHz):Snapshot[] {
+  const dt=1/hz;
+  const total=Math.ceil(A.simulationHorizonSec*hz);
   let s=initial(p);
   const table:Snapshot[]=[];
   for(let i=0;i<=total;i++){
@@ -254,4 +254,25 @@ export function sampleDynamics(tSec:number,params:EpisodeParams=DYNAMICS_DEFAULT
  * declared hard cut. The physical vehicle state (including yaw/spin) is unchanged. */
 export function previewRebasedPosition(frame:VehicleDynamicsFrame,anchorDistanceM:number,sceneX=-55):readonly[number,number,number]{
   return [sceneX+frame.positionM[0]-anchorDistanceM,frame.positionM[1],frame.positionM[2]];
+}
+
+/** Re-integrates a scenario from the SAME initial state at 120Hz and 480Hz.
+ * Report convergence deltas rather than claiming exact vehicle truth. */
+export function timestepSensitivityAt(tSec:number,params:EpisodeParams=DYNAMICS_DEFAULTS):{
+  longitudinalDeltaM:number;lateralDeltaM:number;yawDeltaRad:number;speedDeltaMps:number
+}{
+  assertEpisodeTime(tSec);
+  if(tSec>A.simulationHorizonSec)throw Error('invalid sensitivity time');
+  validate(params);
+  const pose=(hz:number):State=>{
+    const table=makeTable(params,hz),u=tSec*hz,i=Math.min(table.length-2,Math.floor(u));
+    return interpolateState(table[i].state,table[i+1].state,u-i);
+  };
+  const lo=pose(120),hi=pose(480);
+  return {
+    longitudinalDeltaM:Math.abs(lo.x-hi.x),
+    lateralDeltaM:Math.abs(lo.z-hi.z),
+    yawDeltaRad:Math.abs(lo.yaw-hi.yaw),
+    speedDeltaMps:Math.hypot(lo.vx-hi.vx,lo.vz-hi.vz),
+  };
 }
