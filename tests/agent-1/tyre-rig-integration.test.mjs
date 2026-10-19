@@ -97,7 +97,7 @@ test('pinned Agent 2 source drives real hub/world offsets, yaw, compression and 
   try {
     const offset=[-72,0,0], before=sampleDynamics(.4), after=sampleDynamics(1.4);
     assert.equal(before.stage,'pre-failure');
-    assert.ok(after.wheels['front-right'].rollingRadiusM<.3);
+    assert.ok(Math.abs(after.wheels['front-right'].rollingRadiusM-.300)<1e-9,'Agent 2 and tyre loaded radius agree at 0.300m');
     assert.ok(after.wheels['front-right'].verticalCompressionM>before.wheels['front-right'].verticalCompressionM);
     assert.ok(after.wheels['front-right'].spinRad<before.wheels['front-right'].spinRad);
     const f=(dyn)=>{
