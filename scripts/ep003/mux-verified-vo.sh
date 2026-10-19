@@ -8,12 +8,12 @@ out="${3:-YUNEX_TYRE_EP003_PICTURE_VO.mp4}"
 [[ -s "$picture" && -s "$voice" && "$out" != "$picture" && "$out" != "$voice" ]] || {
   echo "Required picture/audio missing or output overwrites source" >&2; exit 2;
 }
-getv() { ffprobe -v error -select_streams v:0 -show_entries "stream=$1" -of csv=p=0 "$picture"; }
+getv() { ffprobe -v error -select_streams v:0 -show_entries "stream=$1" -of default=noprint_wrappers=1:nokey=1 "$picture"; }
 [[ "$(getv width)" == 1080 && "$(getv height)" == 1920 ]] || { echo "Not original 1080x1920" >&2; exit 3; }
 [[ "$(getv avg_frame_rate)" == 30/1 && "$(getv nb_frames)" == 800 && "$(getv codec_name)" == h264 ]] || {
   echo "Not the complete native 800-frame H264/30fps picture" >&2; exit 3;
 }
-vo_seconds=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$voice")
+vo_seconds=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$voice")
 python3 - "$vo_seconds" <<'PY'
 import sys
 duration=float(sys.argv[1])
@@ -26,11 +26,11 @@ ffmpeg -nostdin -hide_banner -loglevel error -y -i "$picture" -i "$voice" \
   -map 0:v:0 -map 1:a:0 -c:v copy -c:a aac -b:a 192k -ac 1 -ar 48000 \
   -af 'loudnorm=I=-16:TP=-1.5:LRA=9,apad=pad_dur=0.1' \
   -t 26.6666667 -movflags +faststart "$out"
-[[ "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of csv=p=0 "$out")" == 800 ]] || exit 4
-[[ "$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 "$out")" == '1080,1920' ]] || exit 4
-[[ "$(ffprobe -v error -select_streams a:0 -show_entries stream=sample_rate -of csv=p=0 "$out")" == 48000 ]] || exit 4
-[[ "$(ffprobe -v error -select_streams v:0 -show_entries stream=index -of csv=p=0 "$out" | wc -l)" -eq 1 ]] || exit 4
-[[ "$(ffprobe -v error -select_streams a:0 -show_entries stream=index -of csv=p=0 "$out" | wc -l)" -eq 1 ]] || exit 4
+[[ "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=noprint_wrappers=1:nokey=1 "$out")" == 800 ]] || exit 4
+[[ "$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of default=noprint_wrappers=1:nokey=1 "$out")" == '1080,1920' ]] || exit 4
+[[ "$(ffprobe -v error -select_streams a:0 -show_entries stream=sample_rate -of default=noprint_wrappers=1:nokey=1 "$out")" == 48000 ]] || exit 4
+[[ "$(ffprobe -v error -select_streams v:0 -show_entries stream=index -of default=noprint_wrappers=1:nokey=1 "$out" | wc -l)" -eq 1 ]] || exit 4
+[[ "$(ffprobe -v error -select_streams a:0 -show_entries stream=index -of default=noprint_wrappers=1:nokey=1 "$out" | wc -l)" -eq 1 ]] || exit 4
 # Completely decode both streams (not an FFprobe-only claim).
 ffmpeg -nostdin -hide_banner -v error -xerror -i "$out" -f null -
 ffprobe -v error -show_entries format=duration,size -show_entries stream=index,codec_type,codec_name,width,height,avg_frame_rate,nb_frames,sample_rate -of json "$out" > "${out%.mp4}.ffprobe.json"
