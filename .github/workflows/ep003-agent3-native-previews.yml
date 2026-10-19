@@ -44,6 +44,24 @@ jobs:
           sudo apt-get install -y -qq ffmpeg
           python -m pip install --quiet Pillow==11.3.0
           npm ci --no-audit --no-fund
+      - name: Hydrate authoritative Agent 1 / 2 / 4 modules without committing others' code
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p previews/agent-3/out
+          for item in \
+            "agent/ep003-01-mechanics mechanics" \
+            "agent/ep003-02-dynamics dynamics" \
+            "agent/ep003-04-look look"; do
+            read -r branch folder <<< "$item"
+            git fetch --no-tags origin "refs/heads/$branch"
+            sha=$(git rev-parse FETCH_HEAD)
+            printf '%s %s %s\n' "$branch" "$folder" "$sha" | tee -a previews/agent-3/out/authoritative-sources.txt
+            git restore --source=FETCH_HEAD --worktree -- "production/yunex/tyre_blowout_ep003/$folder/"
+          done
+          test -f production/yunex/tyre_blowout_ep003/dynamics/model.ts
+          test -f production/yunex/tyre_blowout_ep003/mechanics/tyreRig.ts
+          test -f production/yunex/tyre_blowout_ep003/look/world.tsx
       - name: Typecheck original kit and camera deliverable
         run: |
           set -euo pipefail
