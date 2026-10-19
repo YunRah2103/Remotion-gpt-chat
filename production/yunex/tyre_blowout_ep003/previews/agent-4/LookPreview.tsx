@@ -54,7 +54,9 @@ export const LookPreview:React.FC<LookPreviewProps>=({mode,baseline})=>{
     // A close rear-three-quarter tracking shot keeps the moving car legible
     // instead of shrinking it to a dot over a large strip of roadside grass.
     // The separately registered EP003RefugeInspection handles the bay overview.
-    camera=[x-7.7,3.15,-9.8];target=[x+2.2,.90,-3.1];fov=44;
+    // Film-space centre is the whole car, not a point 2m ahead of its nose.
+    // At 9:16 even a subtle target bias can clip the rear-quarter at the edge.
+    camera=[x-10.3,3.3,-12.0];target=[x,.85,-1.85];fov=42;
   }
   return <AbsoluteFill style={{background:'#b7ced8'}}>
     <ThreeCanvas width={width} height={height} shadows camera={{
