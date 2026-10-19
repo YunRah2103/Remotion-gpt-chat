@@ -47,11 +47,22 @@ function clearRightSideIntrusions(root: T.Group) {
     if (node instanceof T.InstancedMesh) {
       if (!['barrier-posts', 'lamp-poles', 'lamp-arms', 'lamp-heads',
         'road-delineators', 'road-reflectors', 'shoulder-rumble',
-        'natural-verge-grasses'].includes(node.name)) return;
+        'natural-verge-grasses', 'tree-trunks', 'tree-crowns',
+        'conifer-tiers', 'conifer-snow'].includes(node.name)) return;
       let touched = false;
       for (let i=0; i<node.count; i++) {
         node.getMatrixAt(i, tmp);
         p.setFromMatrixPosition(tmp);
+        // The purchased kit keeps rich roadside trees; reposition individual
+        // right-hand instances behind the refuge so a real stopping bay does
+        // not have a 7m conifer directly behind its guardrail or camera.
+        if (['tree-trunks','tree-crowns','conifer-tiers','conifer-snow'].includes(node.name)) {
+          if(p.x>=REFUGE.startX && p.x<=REFUGE.endX && p.z<0 && p.z>-32) {
+            tmp.setPosition(p.x,p.y,-35-Math.abs(p.z)%3);
+            node.setMatrixAt(i,tmp);touched=true;
+          }
+          continue;
+        }
         const displacedGrass = node.name === 'natural-verge-grasses' &&
           p.x >= REFUGE.startX && p.x <= REFUGE.endX &&
           p.z < -7.4 && p.z >= refugeRailZ(p.x) - .45;
@@ -151,7 +162,7 @@ export function buildEpisodeHighway(): T.Group {
   // Reposition the right-side highway luminaires behind the safety rail, and
   // bridge both relocated gantry legs to their existing signs without an
   // unsupported floating structure.
-  for(const x of [18,45,72,99]) {
+  for(const x of [18,99]) {
     const z=refugeRailZ(x)-1.4;
     addBox(g,'outer-highway-lamp-post',[.13,6.8,.13],[x,3.4,z],metal);
     addBox(g,'outer-highway-lamp-arm',[.10,.11,2.3],[x,6.75,z+1.15],metal);
