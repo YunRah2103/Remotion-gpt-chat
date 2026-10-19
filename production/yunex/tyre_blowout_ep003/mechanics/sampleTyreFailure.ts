@@ -14,12 +14,12 @@ export type TyreFailureParams = {
 };
 const clamp01=(v:number)=>Math.max(0,Math.min(1,v));
 const ease=(v:number)=>{const s=clamp01(v);return s*s*(3-2*s);};
-export const MAX_LOADED_DROP_M=.074;
+export const MAX_LOADED_DROP_M=.060;
 export const LOW_PRESSURE_RATIO=.10;
 
 /**
- * At 100% illustrative failure, R_loaded = 0.360 - 0.074 = 0.286 m.
- * Rim lip radius is ~0.255 m, giving at least 31 mm road clearance.
+ * At 100% illustrative failure, R_loaded = 0.360 - 0.060 = 0.300 m.
+ * Outer metallic rim lip radius is ~0.278 m, leaving >22 mm road clearance.
  * Frame-local, deterministic, seekable/reversible. No speed, yaw or force claims.
  */
 export function sampleTyreFailure(tSec:number,params:TyreFailureParams={}):TyreFrame {
