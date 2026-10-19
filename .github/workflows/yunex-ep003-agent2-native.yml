@@ -73,6 +73,27 @@ jobs:
           set -euo pipefail
           npx remotion render             production/yunex/tyre_blowout_ep003/dynamics/entry.tsx             EP003Agent2Recovery previews/agent-2/recovery.mp4             --gl=swangle --scale=0.4 --codec=h264             --pixel-format=yuv420p --concurrency=1
 
+
+      - name: Normalize Remotion software-rendered full-range YUV for portable H264 review
+        shell: bash
+        run: |
+          set -euo pipefail
+          for name in incident recovery; do
+            original="previews/agent-2/${name}.mp4"
+            pix=$(ffprobe -v error -select_streams v:0 -show_entries stream=pix_fmt -of default=nw=1:nk=1 "$original")
+            if [[ "$pix" == yuvj420p ]]; then
+              ffmpeg -hide_banner -loglevel error -y -i "$original" \
+                -vf 'scale=in_range=pc:out_range=tv,format=yuv420p' \
+                -c:v libx264 -preset veryfast -crf 17 -pix_fmt yuv420p \
+                -color_range tv -movflags +faststart -an \
+                "previews/agent-2/${name}-limited.mp4"
+              mv "previews/agent-2/${name}-limited.mp4" "$original"
+            elif [[ "$pix" != yuv420p ]]; then
+              echo "Unexpected pixel format: $pix" >&2
+              exit 1
+            fi
+          done
+
       - name: Fully decode, verify H264/frame counts and generate contact sheets
         shell: bash
         run: |
