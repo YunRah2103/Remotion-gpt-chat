@@ -1,4 +1,5 @@
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect, useLayoutEffect, useMemo} from 'react';
+import {useThree} from '@react-three/fiber';
 import * as T from 'three';
 import {createEnvironment} from '../../../../src/yunex/world-kit/environments.ts';
 import {createVehicle} from '../../../../src/yunex/world-kit/vehicles.ts';
@@ -207,7 +208,23 @@ export const EpisodeWorld:React.FC=()=>{
   return <primitive object={model}/>;
 };
 
+/**
+ * The kit's bright sun used without a display transform clips paint and asphalt
+ * to milky highlights. ACES maps those values into a natural daylight roll-off.
+ * Scope is one ThreeCanvas and restore the renderer on unmount.
+ */
+const EpisodeColorPipeline:React.FC=()=>{
+  const {gl}=useThree();
+  useLayoutEffect(()=>{
+    const oldTone=gl.toneMapping, oldExposure=gl.toneMappingExposure;
+    gl.toneMapping=T.ACESFilmicToneMapping;
+    gl.toneMappingExposure=.88;
+    return ()=>{gl.toneMapping=oldTone;gl.toneMappingExposure=oldExposure;};
+  },[gl]);
+  return null;
+};
 export const EpisodeLight:React.FC<{focus?:Vec3}>=({focus=[0,0,0]})=><>
+  <EpisodeColorPipeline/>
   <WorldLighting timeOfDay="day" focus={[...focus] as V3}/>
   <directionalLight position={[-14,19,-17]} color="#c5dfed" intensity={.21}/>
 </>;
