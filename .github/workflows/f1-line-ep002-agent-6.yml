@@ -1,0 +1,122 @@
+name: YUNEX F1 EP002 - Agent 6 native master picture
+on:
+  push:
+    branches: [agent/f1-ep002-06-master-edit]
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  physics-and-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install locked production dependencies
+        run: npm ci
+      - name: TypeScript production gate
+        run: npm run check
+      - name: World-kit regression
+        run: npm run worldkit:test
+      - name: A1-A5 actual-geometry, simulation, camera, graphics and Agent 6 edit suites
+        run: |
+          node --experimental-strip-types --test \
+            tests/f1-line-ep002/agent-1.test.mjs \
+            tests/f1-line-ep002/agent-2.test.mjs \
+            tests/f1-line-ep002/agent-3.cinema.test.mjs \
+            tests/f1-line-ep002/agent-4.test.mjs \
+            tests/f1-line-ep002/agent-5.test.mjs \
+            tests/f1-line-ep002/integration-review.test.mjs \
+            tests/f1-line-ep002/agent-6.picture.test.mjs
+
+  native-picture:
+    needs: physics-and-integration
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - composition: YUNEXF1EP002Preview
+            resolution: 540x960
+            tier: preview
+          - composition: YUNEXF1EP002Master
+            resolution: 1080x1920
+            tier: 1080p-picture
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Reproducible Remotion installation
+        run: npm ci
+      - name: Install video validation tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          mkdir -p "out/f1-ep002-agent6/${{ matrix.tier }}/stills"
+      - name: Render all 780 genuinely animated 3D frames
+        run: |
+          npx remotion render src/yunex/f1-line-ep002/editor/entry.tsx \
+            ${{ matrix.composition }} \
+            "out/f1-ep002-agent6/${{ matrix.tier }}/picture-browser.mp4" \
+            --gl=swangle --codec=h264 --pixel-format=yuv420p \
+            --concurrency=1 --log=error
+      - name: Normalize native browser-video full-range into H.264 TV-range
+        run: |
+          set -euo pipefail
+          p="out/f1-ep002-agent6/${{ matrix.tier }}"
+          ffmpeg -nostdin -y -v error -xerror -i "$p/picture-browser.mp4" \
+            -vf "scale=in_range=pc:out_range=tv,format=yuv420p" \
+            -c:v libx264 -crf 18 -preset medium -pix_fmt yuv420p \
+            -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 \
+            -movflags +faststart "$p/YUNEX_F1_RACING_LINE_EP002_PICTURE.mp4"
+          rm "$p/picture-browser.mp4"
+      - name: Decode every frame and verify native picture deliverable
+        run: |
+          set -euo pipefail
+          p="out/f1-ep002-agent6/${{ matrix.tier }}"
+          movie="$p/YUNEX_F1_RACING_LINE_EP002_PICTURE.mp4"
+          ffprobe -v error -show_entries stream=codec_name,pix_fmt,color_range,width,height,r_frame_rate,nb_frames -show_entries format=duration -of json "$movie" | tee "$p/ffprobe.json"
+          ffmpeg -nostdin -v error -xerror -i "$movie" -f null -
+          ffmpeg -nostdin -v error -xerror -i "$movie" -vf fps=1 -f framemd5 "$p/motion.md5"
+          ffmpeg -nostdin -v info -i "$movie" -vf "blackdetect=d=0.15:pix_th=0.05:pic_th=0.98" -f null - 2> "$p/blackdetect.log" || exit 1
+          for tm in 0.2 1.5 3.5 5.5 7.5 9.5 12 14.5 17.5 20 21.6 23.5 25.5; do
+            ffmpeg -nostdin -v error -y -ss "$tm" -i "$movie" -frames:v 1 "$p/stills/frame-${tm}.jpg"
+          done
+          ffmpeg -nostdin -v error -y -i "$movie" -vf "fps=1/3,scale=270:480,tile=3x3" -frames:v 1 "$p/contact-sheet.jpg"
+          python3 - <<'PY'
+          import json,re,pathlib,os
+          tier=os.environ['TIER']
+          p=pathlib.Path('out/f1-ep002-agent6')/tier
+          j=json.loads((p/'ffprobe.json').read_text())
+          s=j['streams'][0]
+          assert s['codec_name']=='h264',s
+          assert s['pix_fmt']=='yuv420p' and s['color_range']=='tv',s
+          assert s['r_frame_rate']=='30/1',s
+          assert (s['width'],s['height'])==((1080,1920) if tier=='1080p-picture' else (540,960)),s
+          assert int(s['nb_frames'])==780,s
+          assert abs(float(j['format']['duration'])-26)<.05,j
+          hashes=[l.rsplit(',',1)[-1].strip() for l in (p/'motion.md5').read_text().splitlines() if l and not l.startswith('#')]
+          assert len(hashes)>=25 and len(set(hashes))>=19,hashes
+          black=(p/'blackdetect.log').read_text()
+          assert not re.search(r'black_start:',black), 'Long black picture detected'
+          assert len(list((p/'stills').glob('frame-*.jpg')))==13
+          (p/'validated.json').write_text(json.dumps({'tier':tier,'frames':780,'seconds':26.0,'fps':30,'uniqueOneSecondFrames':len(set(hashes)),'completeDecode':True,'blackSegmentDetected':False},indent=2))
+          print('780-frame 26-second native film metadata/decode/motion QC PASSED',tier)
+          PY
+        env:
+          TIER: ${{ matrix.tier }}
+      - name: Publish MP4, FFprobe, decode and actual QC frames
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-F1-EP002-Agent6-${{ matrix.tier }}-picture
+          path: out/f1-ep002-agent6/${{ matrix.tier }}/
+          retention-days: 30
+          if-no-files-found: warn
