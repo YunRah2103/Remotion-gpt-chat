@@ -8,13 +8,16 @@
  * Only visual X rebasing is permitted at genuine hard cuts.
  */
 import type {VehicleDynamicsFrame, WheelId, TyreFrame, StoryRequest} from '../shared/contract.ts';
-import {sampleDynamics} from '../dynamics/model.ts';
+import {sampleDynamics,DYNAMICS_DEFAULTS} from '../dynamics/model.ts';
 import {sampleTyreFailure} from '../mechanics/sampleTyreFailure.ts';
 import type {CinemaShot} from '../cinema/cameras.ts';
 
 export const EP003_FPS=30;
 export const EP003_DURATION_FRAMES=800; // 26.6667s; recording 26.664s.
 export const EP003_RECORDING_SEC=26.664;
+/** The actual narration says 70 mph, not the 100 km/h preview default. */
+export const EP003_NARRATED_SPEED_MPS=70*0.44704;
+const EP003_FILM_PHYSICS={...DYNAMICS_DEFAULTS,initialSpeedMps:EP003_NARRATED_SPEED_MPS};
 
 export type VoiceCue={id:string;start:number;end:number;text:string};
 export const VO_CUES:readonly VoiceCue[]=[
@@ -78,8 +81,8 @@ export function pictureFrame(filmTime:number):{
 }{
  const {edit,progress01}=cutAt(filmTime);
  const t=sourceTime(filmTime);
- const d=sampleDynamics(t);
- const origin=sampleDynamics(sourceTime(edit.from));
+ const d=sampleDynamics(t,EP003_FILM_PHYSICS);
+ const origin=sampleDynamics(sourceTime(edit.from),EP003_FILM_PHYSICS);
  const dx=edit.sceneX-origin.positionM[0];
  const wheels={} as VehicleDynamicsFrame['wheels'];
  (Object.keys(d.wheels) as WheelId[]).forEach(id=>{
