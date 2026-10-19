@@ -43,11 +43,11 @@ export const LookPreview:React.FC<LookPreviewProps>=({mode,baseline})=>{
   // Identical deterministic camera poses in BEFORE and AFTER versions.
   let camera:[number,number,number],target:[number,number,number],fov=40;
   if(!portrait) {
-    camera=[x+8.2,3.35,-12.6];target=[x,.73,-1.85];fov=38;
+    camera=[x+6.25,2.7,-9.0];target=[x,.73,-1.85];fov=40;
   } else if(t<2.1) {
-    camera=[x+2.50,.87,-5.7];target=[x+1.46,.36,-2.73];fov=29;
+    camera=[x+2.15,.89,-5.2];target=[x+1.46,.36,-2.73];fov=29;
   } else if(t<4.65) {
-    camera=[x+8.6,3.0,-10.8];target=[x,.77,-1.85];fov=45;
+    camera=[x+6.7,2.75,-8.9];target=[x,.77,-1.85];fov=45;
   } else {
     // The camera demonstrates the independently modelled refuge. This preview
     // NEVER claims the still-moving car has stopped safely.
