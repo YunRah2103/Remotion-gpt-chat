@@ -264,7 +264,8 @@ export function finishGrandTourer(model: T.Group): T.Group {
 export function applyDynamicsToGrandTourer(model:T.Group, frame:VehicleDynamicsFrame):void {
   animateVehicle(model,frame.distanceTravelledM,frame.driverSteerRad);
   model.position.set(...frame.positionM);
-  model.rotation.set(frame.rollRad,frame.yawRad,frame.pitchRad,'YXZ');
+  // Three.js Euler X=pitch, Y=yaw, Z=roll; semantic names must not be swapped.
+  model.rotation.set(frame.pitchRad,frame.yawRad,frame.rollRad,'YXZ');
   model.updateMatrixWorld(true);
   model.traverse(object=>{
     if(!(object instanceof T.Group) || !object.name.startsWith('steer-') ||
