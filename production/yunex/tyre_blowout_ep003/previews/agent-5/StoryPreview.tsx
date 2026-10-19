@@ -92,7 +92,7 @@ export const StoryPreview:React.FC<{variant:'hook'|'module'}>=({variant})=>{
   return <AbsoluteFill style={{background:'#B7CED8'}}>
     <ThreeCanvas width={width} height={height} shadows
       camera={{position:[...camera] as [number,number,number],fov,near:.09,far:280}}>
-      <WorldLighting timeOfDay="day" focus={focus}/>
+      <WorldLighting timeOfDay="day" focus={[...focus] as [number,number,number]}/>
       <Environment kind="highway" seed={12} timeOfDay="day"/>
       <CameraAim position={[...camera] as [number,number,number]} target={[...target] as [number,number,number]} fov={fov}/>
       <FixtureVehicle request={request} cutaway={cutaway}/>
