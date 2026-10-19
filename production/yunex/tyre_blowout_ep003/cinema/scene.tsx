@@ -44,7 +44,7 @@ export const CinematicVehicle:React.FC<{
   // This avoids a black roof plane obscuring the top 30% of the portrait POV.
   if(interiorCamera){
    prepared.vehicle.traverse(o=>{
-    if(o instanceof T.Mesh && (o.name==='roof'||o.name==='roof-liner'))o.visible=false;
+    if(o instanceof T.Mesh && (o.name==='roof'||o.name==='roof-liner'||o.name==='windshield-seal'))o.visible=false;
    });
   }
   prepared.vehicle.traverse(o=>{
