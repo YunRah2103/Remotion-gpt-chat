@@ -61,3 +61,15 @@ test('contact deformation is not wheel-phase-locked',()=>{
   assert.ok(Math.hypot(a[0],a[1])<.31);
   assert.equal(frame(0).pressureRatio,1);
 });
+
+test('mobile-readable sidewall bulge is restrained to the lower original rubber shoulder, not the metal lip',()=>{
+  const f=frame(1.5,0);
+  const shoulder=sampleRubberVertex([0,-.327,.115],f,'tyre');
+  const before=sampleRubberVertex([0,-.327,.115],frame(0,0),'tyre');
+  const atRim=sampleRubberVertex([0,-.278,.115],f,'tyre');
+  assert.ok(shoulder[2]-before[2]>.030,'collapsed loaded shoulder visibly bulges in axial direction');
+  assert.ok(Math.abs(atRim[2]-.115)<.005,'inner rim-adjacent band cannot balloon away from metal');
+  assert.ok(toRoadHeight(shoulder,0,f.effectiveRadiusM)>=-1e-9,'bulge must not pierce asphalt');
+  const half=sampleRubberVertex([0,-.327,.115],frame(.9,0),'tyre');
+  assert.ok(half[2]>before[2]&&half[2]<shoulder[2], 'deflation bulge should progress smoothly');
+});
