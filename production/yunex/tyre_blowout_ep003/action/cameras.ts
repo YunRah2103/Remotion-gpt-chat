@@ -103,7 +103,7 @@ export function sampleActionCamera(req:ActionCameraRequest):ActionCameraPose {
       // failed corner, elevated above the steel rail. The former left-side
       // broadside hid both the bumper deformation and the collision itself.
       // A wide portrait-safe front-right three-quarter dolly retains the GT.
-      position=lerp3([8.3,5.05,-5.8],[8.9,5.35,-6.1],eased);
+      position=lerp3([7.85,7.55,-4.85],[8.45,7.85,-5.20],eased);
       target=lerp3([.70,.79,-1.05],[.85,.76,-1.30],eased);
       fov=57;break;
     }
@@ -115,7 +115,7 @@ export function sampleActionCamera(req:ActionCameraRequest):ActionCameraPose {
       // Continue looking AT the crushed front-right bumper/lamp, not the
       // undamaged rear: preserve rail geography while the real A8 damage
       // and debris evolve, with the lens above rail height.
-      position=lerp3([7.0,3.65,-5.25],[7.8,4.05,-5.75],eased);
+      position=lerp3([7.25,6.25,-4.65],[7.90,6.60,-5.05],eased);
       target=lerp3([1.20,.68,-1.10],[1.05,.66,-1.28],eased);
       fov=59;break;
     }
