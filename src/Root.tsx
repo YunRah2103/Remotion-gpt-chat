@@ -1,4 +1,6 @@
 import {WorldKitCompositions} from './yunex/world-kit/registrations';
+import {EP003FinalPicture} from '../production/yunex/tyre_blowout_ep003/editor/EP003FinalPicture';
+import {EP003_DURATION_FRAMES} from '../production/yunex/tyre_blowout_ep003/editor/timeline';
 import React from 'react';
 import {ChironFourTurbosFilm} from './yunex/ChironFourTurbosFilm';
 import {GtrAttesaFilm} from './yunex/GtrAttesaFilm';
@@ -11,6 +13,8 @@ import {TwoVersionFilm} from './advanced/TwoVersionFilm';
 
 export const VideoRoot=()=> <>
   <WorldKitCompositions/>
+  <Composition id="EP003FinalPicture" component={EP003FinalPicture} width={1080} height={1920} fps={30} durationInFrames={EP003_DURATION_FRAMES} defaultProps={{includeVoice:true}}/>
+  <Composition id="EP003PictureOnly" component={EP003FinalPicture} width={1080} height={1920} fps={30} durationInFrames={EP003_DURATION_FRAMES} defaultProps={{includeVoice:false}}/>
   <Composition id="ChironFourTurbosFilm" component={ChironFourTurbosFilm} width={1080} height={1920} fps={30} durationInFrames={858} defaultProps={{includeVoice:false,includeMusic:false}}/>
   <Composition id="GtrAttesaFilm" component={GtrAttesaFilm} width={1920} height={1080} fps={30} durationInFrames={825} defaultProps={{includeVoice:false,includeMusic:false}}/>
   <Composition id="GpuDriveFilm" component={GpuDriveFilm} width={1080} height={1920} fps={30} durationInFrames={180}/>

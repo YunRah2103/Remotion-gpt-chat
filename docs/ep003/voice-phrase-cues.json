@@ -1,0 +1,110 @@
+{
+  "episode": "YUNEX EP003 — tyre blowout",
+  "version": "Agent 6 Phase 2 / voice-aligned first cut",
+  "source": "User-uploaded authorized openai-fm-cedar-audio (1).mp3; not in public repository",
+  "durationSec": 26.664,
+  "format": "24kHz MP3 mono -> 48kHz PCM mono WAV",
+  "alignment": "Measured phrase boundaries from original speech waveform; NOT forced word-level timestamps",
+  "timingUnits": "seconds",
+  "videoFps": 30,
+  "videoFrames": 800,
+  "cutBoundaryPolicy": "Use recorded phrase start/stop; do not insert fake narration or stretch words",
+  "cues": [
+    {
+      "id": "vo-01",
+      "start": 0,
+      "end": 1.2,
+      "text": "Seventy miles an hour."
+    },
+    {
+      "id": "vo-02",
+      "start": 1.755,
+      "end": 3.285,
+      "text": "One tyre suddenly gives way."
+    },
+    {
+      "id": "vo-03",
+      "start": 3.81,
+      "end": 5.71,
+      "text": "The car pulls to the right, but why?"
+    },
+    {
+      "id": "vo-04",
+      "start": 6.35,
+      "end": 7.4,
+      "text": "As the tyre collapses,"
+    },
+    {
+      "id": "vo-05",
+      "start": 7.945,
+      "end": 9.23,
+      "text": "the forces at that wheel change,"
+    },
+    {
+      "id": "vo-06",
+      "start": 9.65,
+      "end": 10.98,
+      "text": "dragging the car off course."
+    },
+    {
+      "id": "vo-07",
+      "start": 11.665,
+      "end": 12.38,
+      "text": "Your first instinct?"
+    },
+    {
+      "id": "vo-08",
+      "start": 12.83,
+      "end": 13.57,
+      "text": "Slam the brakes."
+    },
+    {
+      "id": "vo-09",
+      "start": 14.045,
+      "end": 15.35,
+      "text": "But that could make things even worse."
+    },
+    {
+      "id": "vo-10",
+      "start": 16.015,
+      "end": 16.595,
+      "text": "Grip the wheel,"
+    },
+    {
+      "id": "vo-11",
+      "start": 16.915,
+      "end": 17.735,
+      "text": "steer smoothly,"
+    },
+    {
+      "id": "vo-12",
+      "start": 18.08,
+      "end": 19.84,
+      "text": "and gradually ease off the accelerator."
+    },
+    {
+      "id": "vo-13",
+      "start": 20.425,
+      "end": 21.405,
+      "text": "Let the car slow down,"
+    },
+    {
+      "id": "vo-14",
+      "start": 21.905,
+      "end": 23.015,
+      "text": "then pull over when it's safe."
+    },
+    {
+      "id": "vo-15",
+      "start": 23.8,
+      "end": 24.7,
+      "text": "One tyre fails."
+    },
+    {
+      "id": "vo-16",
+      "start": 25.26,
+      "end": 26.39,
+      "text": "The next few seconds matter."
+    }
+  ]
+}

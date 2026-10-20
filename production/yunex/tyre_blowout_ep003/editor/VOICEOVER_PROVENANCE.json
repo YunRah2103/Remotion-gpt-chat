@@ -1,0 +1,29 @@
+{
+  "recording": "openai-fm-cedar-audio (1).mp3",
+  "suppliedBy": "user-upload in Agent6 conversation; archive the authorized source with delivered final master",
+  "durationSec": 26.664,
+  "sourceFormat": "mono MP3 24kHz",
+  "timeline": "production/yunex/tyre_blowout_ep003/editor/timeline.ts",
+  "timingVerification": "phrase boundaries from actual waveform; this is not per-word forced alignment",
+  "visualPictureDurationFrames": 800,
+  "fps": 30,
+  "instructions": "Place the supplied PCM WAV at public/ep003/vo_master.wav to render EP003FinalPicture with Remotion; without it render EP003PictureOnly and mux exactly the actual supplied WAV after verified full-res picture render. Never substitute fabricated or newly generated narration.",
+  "shots": [
+    "0.0 Tyre hook and vehicle reveal",
+    "1.755 full car",
+    "3.810 rear three-quarter pull",
+    "5.25 overhead yaw",
+    "6.35 underbody actual tyre",
+    "7.945 force/contact",
+    "9.65 overhead trajectory",
+    "11.665 cockpit reaction",
+    "12.830 low tracking, NO brake slam depicted",
+    "14.045 moving chase",
+    "16.015 in-car driver hands",
+    "18.08 steering/throttle ease",
+    "20.425 moving recovery",
+    "21.905 moving refuge reveal only",
+    "23.8 tyre",
+    "25.26 moving car final"
+  ]
+}
