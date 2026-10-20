@@ -7,7 +7,7 @@ import {StoryOverlay,type ScreenAnchor,type WordCaption} from './StoryOverlay';
 export type StorySequenceProps=Readonly<{
  /** Physics supplies the real data. This layer MUST NOT fabricate vehicle motion or sparks. */
  requestAt:(globalTimeSec:number,shot:ShotId,localSec:number,durationSec:number)=>StoryRequest;
- /** cue.second is purely editorial. The motion/contacts/particles remain authoritative. */
+ /** cue is purely editorial. The motion/contacts/particles remain authoritative. */
  renderShot:(request:StoryRequest,cue:StoryVisualCue)=>React.ReactNode;
  timing?:StoryTiming;
  startAtSec?:number;
