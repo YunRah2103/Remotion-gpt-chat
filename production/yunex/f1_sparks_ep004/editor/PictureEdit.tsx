@@ -11,6 +11,7 @@ import {
   CAPTION_SAFE_BOTTOM_PX,
   captionAtFrame,
   shotAtFrame,
+  sourceTimeAtFrame,
   missingPicturePrerequisites,
   type ReadinessInput,
   type PicturePlan,
@@ -20,6 +21,8 @@ export type VisualShotProps = Readonly<{
   shot: ShotId;
   globalFrame: number;
   globalSec: number;
+  /** The absolute time to sample from authoritative Agent 2 motion, skids and sparks. */
+  sourceSec: number;
   shotLocalSec: number;
   shotDurationSec: number;
   sourceWordIndex: number;
@@ -50,6 +53,7 @@ export function makeEP004PictureEdit(IntegratedVisualShot: React.ComponentType<V
     }
     const cut = shotAtFrame(frame, plan.cuts);
     const caption = showCaptions ? captionAtFrame(frame, plan.captions) : null;
+    const captionEntrance01 = caption ? Math.min(1,(frame-caption.startFrame+1)/4) : 1;
     const activeTime = frame / config.fps;
     const wordIndex = caption?.wordIndices.find(i => {
       const word = plan.words[i];
@@ -61,6 +65,7 @@ export function makeEP004PictureEdit(IntegratedVisualShot: React.ComponentType<V
           shot={cut.shot}
           globalFrame={frame}
           globalSec={activeTime}
+          sourceSec={sourceTimeAtFrame(frame,plan.cuts)}
           shotLocalSec={(frame - cut.startFrame) / config.fps}
           shotDurationSec={cut.durationFrames / config.fps}
           sourceWordIndex={cut.sourceWordIndex}
@@ -72,7 +77,8 @@ export function makeEP004PictureEdit(IntegratedVisualShot: React.ComponentType<V
               position: 'absolute',
               bottom: CAPTION_SAFE_BOTTOM_PX,
               left: '50%',
-              transform: 'translateX(-50%)',
+              transform: `translate(-50%, ${Math.round((1-captionEntrance01)*8)}px)`,
+              opacity: captionEntrance01,
               width: CAPTION_MAX_WIDTH_PX,
               display: 'flex',
               justifyContent: 'center',
@@ -90,6 +96,8 @@ export function makeEP004PictureEdit(IntegratedVisualShot: React.ComponentType<V
               letterSpacing: '-0.7px',
               textShadow: '0 3px 8px rgba(0,0,0,0.8)',
               boxSizing: 'border-box',
+              overflowWrap: 'anywhere',
+              maxWidth: 'calc(100% - 92px)',
               border: '1px solid rgba(255,255,255,0.12)',
             }}>
               {caption.wordIndices.map(i => (
