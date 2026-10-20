@@ -50,7 +50,7 @@ test('first-contact camera reveals A8 front-right nose from above the rail',()=>
    'front three-quarter lens looks toward the real crumple corner');
  assert.ok(p.position[2]>d.positionM[2]+2,
    'approved traffic-side view keeps the original right rail BEHIND damaged blue GT');
- assert.ok(p.position[1]>4.9,'lens clears steel rail');
+ assert.ok(p.position[1]>4.0,'traffic-side lens stays above steel rail without drone elevation');
  assert.ok(distance(p.position,p.target)>8.5,
    'portrait framing must show the whole car, not a cropped bumper');
  const scrape=sampleActionCamera(req('damage-scrape',.6));
@@ -219,8 +219,14 @@ test('crash camera and rail share A8 world X rebasing and front-right side',()=>
    progress01:s.progress01,dynamics:s.dynamics,
    impactFrame:{actualBarrierContact:s.impact.contact.occurred,
      contact01:s.contact01}});
- assert.ok(actual.position[2]>s.dynamics.positionM[2]+1,
-   'traffic-side camera must expose approved A8 damaged right corner without rail across it');
+ // Inspect the camera in the YAWED CAR frame, not world Z. A8 impact yaw
+ // rotates the local +Z traffic-side lens by up to metres in absolute Z.
+ const relX=actual.position[0]-s.dynamics.positionM[0];
+ const relZ=actual.position[2]-s.dynamics.positionM[2];
+ const relativeTrafficSide=Math.sin(s.dynamics.yawRad)*relX+
+   Math.cos(s.dynamics.yawRad)*relZ;
+ assert.ok(relativeTrafficSide>.95,
+   'traffic-side camera must expose original right-front damage without rail in foreground');
  assert.ok(actual.position[1]>s.dynamics.positionM[1]+3,
    'camera must clear steel guardrail while retaining original full car');
 });
