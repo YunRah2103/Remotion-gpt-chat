@@ -10,6 +10,7 @@ import React,{useMemo} from 'react';
 import * as THREE from 'three';
 import {AbsoluteFill} from 'remotion';
 import {ThreeCanvas} from '@remotion/three';
+import {useThree} from '@react-three/fiber';
 import {WorldLighting} from '../../../../src/yunex/world-kit/components';
 import {F1HeroVehicle,UnderfloorReveal,getSkidDescriptors} from '../mechanics/index';
 import {sampleDynamics,sampleContactDrivenSparks,localToWorld} from '../physics/index';
@@ -101,7 +102,7 @@ export function projectRealSkid(req:StoryRequest):ScreenAnchor|undefined{
  return {x01:(v.x+1)/2,y01:(1-v.y)/2,object:'metal-skid'};
 }
 const SceneCamera:React.FC<{pose:CameraPose}>=({pose})=>{
- const {camera}=require('@react-three/fiber').useThree() as {camera:THREE.Camera};
+ const {camera}=useThree();
  camera.position.set(...pose.positionWorld);
  camera.up.set(0,1,0);
  camera.lookAt(...pose.targetWorld);
@@ -147,7 +148,6 @@ const UnderfloorMaterialKey:React.FC<{request:StoryRequest;opacity:number}>=({re
   fontFamily:'Arial,sans-serif',fontSize:24,fontWeight:750,letterSpacing:1.8,
   textShadow:'0 2px 9px #000',maxWidth:'50%'
  }}>
-  <div style={{color:'#f6d5a9'}}>● SILVER METAL SKID</div>
   <div style={{color:'#c5b69c'}}>● TAN COMPOSITE PLANK</div>
   <div style={{color:'#83acbc'}}>● DARK CARBON FLOOR</div>
  </div>;
