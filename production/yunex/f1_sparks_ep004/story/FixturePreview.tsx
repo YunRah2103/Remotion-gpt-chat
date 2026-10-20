@@ -39,7 +39,7 @@ const fixtureShot:(shot:ShotId)=>Vec3=(shot)=>({
  'aero-load':[.5,1.0,-5.7],
  'contact-macro':[.1,.35,-2.35],
  'racing-payoff':[-9,2.1,-5],
-})[shot];
+} as Record<ShotId,Vec3>)[shot];
 const FixtureShot:React.FC<{request:StoryRequest}>=({request})=>{
  const m=request.motion;
  const target=relativeWorld(m,request.shot==='underfloor-reveal'||request.shot==='contact-macro'?[0,.2,0]:[0,.56,0]);
