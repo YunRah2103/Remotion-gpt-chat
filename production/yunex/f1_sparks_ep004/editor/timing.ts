@@ -29,11 +29,15 @@ export type WordLinkedCut = Readonly<{
   // The word whose START marks this shot's entry, except shot 1 which
   // always starts at frame zero to preserve the very-first-frame hook.
   wordIndex: number;
+  // Optional approved PHYSICS source-time offset. Enables a genuine spark-contact
+  // flash-forward at frame zero; original voice and edit time never change.
+  sourceStartSec?: number;
 }>;
 
 export type Cut = Readonly<{
   shot: ShotId;
   sourceWordIndex: number;
+  sourceStartSec?: number;
   startFrame: number;
   endFrameExclusive: number;
   durationFrames: number;
@@ -151,6 +155,7 @@ export function buildPicturePlan(input: PlanInput): PicturePlan {
   const starts = input.cuts.map((anchor, i) => {
     requireValid(anchor.shot === SHOT_ORDER[i], 'wrong shot ordering at ' + i);
     requireValid(Number.isInteger(anchor.wordIndex) && anchor.wordIndex >= 0 && anchor.wordIndex < input.words.length, 'invalid cut word index ' + i);
+    if (anchor.sourceStartSec !== undefined) requireValid(Number.isFinite(anchor.sourceStartSec) && anchor.sourceStartSec >= 0, 'invalid real physics source time ' + i);
     if (i === 0) {
       requireValid(anchor.wordIndex === 0, 'opening hook must begin at first transcript word');
       return 0;
@@ -167,6 +172,7 @@ export function buildPicturePlan(input: PlanInput): PicturePlan {
     return {
       shot: cut.shot,
       sourceWordIndex: cut.wordIndex,
+      ...(cut.sourceStartSec === undefined ? {} : {sourceStartSec:cut.sourceStartSec}),
       startFrame,
       endFrameExclusive,
       durationFrames: endFrameExclusive - startFrame,
@@ -193,4 +199,14 @@ export function shotAtFrame(frame: number, cuts: readonly Cut[]): Cut {
 
 export function captionAtFrame(frame: number, captions: readonly CaptionGroup[]): CaptionGroup | null {
   return captions.find(c => frame >= c.startFrame && frame < c.endFrameExclusive) ?? null;
+}
+
+/** The spoken-word movie frame and actual world/physics source time are distinct.
+ * Allows a frame-zero flash-forward to a TRUE metal-contact event without
+ * inventing particles, changing VO, or moving unrelated original events.
+ */
+export function sourceTimeAtFrame(frame: number, cuts: readonly Cut[]): number {
+  const cut = shotAtFrame(frame,cuts);
+  const movieTime = frame / EP004_FPS;
+  return cut.sourceStartSec === undefined ? movieTime : cut.sourceStartSec + (frame-cut.startFrame)/EP004_FPS;
 }
