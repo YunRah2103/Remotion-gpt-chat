@@ -15,7 +15,11 @@ test('arbitrary-frame seek returns identical full vehicle and wheel states',()=>
  assert.deepEqual(sampled[1],sampled[5]);
  assert.deepEqual(sampled[2],sampled[6]);
  for(const s of sampled){assert.ok(s.heaveM>=-.085);assert.ok(s.heaveM<=.12);
-   assert.ok(s.worldPosition.every(Number.isFinite));}
+   assert.ok(s.worldPosition.every(Number.isFinite));
+   assert.ok(!('wheelCompression' in s),'do not emit old typo; Agent 1 needs wheelCompressionM');
+   assert.deepEqual(Object.keys(s.wheelCompressionM).sort(),['front-left','front-right','rear-left','rear-right']);
+   assert.ok(Object.values(s.wheelCompressionM).every(v=>Number.isFinite(v)&&v>=0&&v<=.032));
+ }
 });
 test('world transform round-trips under combined yaw pitch roll',()=>{
  for(const t of [.01,.2,1.67]){const m=sampleDynamics(t);
