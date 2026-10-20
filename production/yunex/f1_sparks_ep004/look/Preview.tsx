@@ -62,16 +62,16 @@ const RacePreview3D: React.FC<{
 
   // Camera position depends on moving route pose, never a rotating hero turntable.
   const chase = mode === 'race-follow';
-  const eyeD = chase ? distanceM - 10.8 : distanceM + 4.5;
-  const eyeLateral = chase ? -5.35 + 0.5 * Math.sin(tSec * 0.6) : -10.1;
+  const eyeD = chase ? distanceM - 15.4 : distanceM + 6.5;
+  const eyeLateral = chase ? -7.35 + 0.38 * Math.sin(tSec * 0.6) : -13.0;
   const eye = sampleCircuitRoadPoint(eyeD, eyeLateral);
-  eye.y += chase ? 2.1 : 2.65;
-  const ahead = sampleCircuitRoadPoint(distanceM + (chase ? 0.9 : -0.6), 0);
+  eye.y += chase ? 2.9 : 3.15;
+  const ahead = sampleCircuitRoadPoint(distanceM + (chase ? 0.1 : -0.15), 0);
   const carTarget: Vec3 = [ahead.x, carHeight + 0.53, ahead.z];
   return <>
     <NightCircuitWorld tSec={tSec} motion={motion} referenceDistanceM={distanceM} particles={particles}/>
     <primitive object={factoryCar}/>
-    <CameraAim position={posArray(eye)} target={carTarget} fov={chase ? 46 : 54}/>
+    <CameraAim position={posArray(eye)} target={carTarget} fov={chase ? 58 : 61}/>
   </>;
 };
 
