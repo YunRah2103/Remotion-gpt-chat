@@ -99,25 +99,26 @@ export function sampleActionCamera(req:ActionCameraRequest):ActionCameraPose {
       fov=mix(55,59,eased);break;
     }
     case 'impact-side-profile': {
-      // Show the ACTUAL first A8 front-right rail strike from ahead of the
-      // failed corner, elevated above the steel rail. The former left-side
-      // broadside hid both the bumper deformation and the collision itself.
-      // A wide portrait-safe front-right three-quarter dolly retains the GT.
-      position=lerp3([7.85,7.55,-4.85],[8.45,7.85,-5.20],eased);
-      target=lerp3([.70,.79,-1.05],[.85,.76,-1.30],eased);
-      fov=57;break;
+      // Film the ACTUAL A8 contact from the TRAFFIC side of the right rail:
+      // the car and deformed barrier remain in one shot, but the near rail
+      // can no longer mask the right-front bumper/lamp. Lower lens and a
+      // subtle forward dolly preserve phone-sized vehicle scale and speed.
+      // These are camera-only offsets; no A8 damage/rail physics is changed.
+      position=lerp3([7.60,4.10,2.90],[8.20,4.80,2.20],eased);
+      target=lerp3([.70,.77,-1.30],[.95,.73,-1.50],eased);
+      fov=53;break;
     }
     case 'impact-overhead': {
       position=lerp3([-1.7,15.8,4.1],[-2.8,14.8,5.3],eased);
       target=[1.2,.65,-2.9];fov=48;break;
     }
     case 'damage-scrape': {
-      // Continue looking AT the crushed front-right bumper/lamp, not the
-      // undamaged rear: preserve rail geography while the real A8 damage
-      // and debris evolve, with the lens above rail height.
-      position=lerp3([7.25,6.25,-4.65],[7.90,6.60,-5.05],eased);
-      target=lerp3([1.20,.68,-1.10],[1.05,.66,-1.28],eased);
-      fov=59;break;
+      // Traffic-side LOWER moving three-quarter aftermath: original right
+      // headlamp/bonnet fold and buckled rail are not behind foreground steel.
+      // Retain the same collision source frame and physically bounded damage.
+      position=lerp3([6.30,3.50,1.50],[6.75,3.95,1.20],eased);
+      target=lerp3([1.35,.68,-1.35],[1.15,.66,-1.45],eased);
+      fov=53;break;
     }
     case 'reverse-sweep': {
       // Agent 9 reverses the physical collision state and particles. Follow
