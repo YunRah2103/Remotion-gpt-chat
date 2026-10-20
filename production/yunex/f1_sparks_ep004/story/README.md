@@ -5,7 +5,7 @@ Owned by Agent 5 on `agent/ep004-05-story`; do NOT modify shared contract, car, 
 ## Main exports
 - `StorySequence` renders supplied real-world shots: `requestAt(globalTime,shot,shotLocal,duration)` and `renderShot(StoryRequest)`. It does not animate its own car or generate any particle/trajectory. Transition layers evaluate the SAME global time.
 - `StoryOverlay` consumes source `StoryRequest`, keyed word captions and optional actual 3D skid-point screen projection. A leader line is rendered ONLY with the metal-skid semantic anchor, never guessed screen coords. Captions sit 15.5% above the bottom edge.
-- `storyLocation`, `storyLayers`, `compareRideHeight`, `SHOT_TO_SCRIPT` are pure source utilities. The default chapter lengths are guides until original recorded speech is timed.
+- `storyLocation`, `storyLayers`, `compareRideHeight`, `SHOT_TO_SCRIPT` are pure source utilities. `getStoryVisualCue` supplies section reveal and aerodynamic compare strength without altering physics or car placement. `AeroContrast` crossfades **two Agent 2-provided** motion states only after validating identical route/time/world pose. The default chapter lengths are guides until original recorded speech is timed.
 - `FixturePreview.tsx`: **provisional kit-only fixture**, uses the factory `formula-modern` with the real shared circuit route and NO synthetic contacts/sparks. This is useful to inspect composition, perspective and shot switching before Agents 1–4 merge. It is **not** skid contact proof and is not the integrated episode.
 
 ## Retimeable semantic map / edit handles
@@ -22,6 +22,8 @@ Editor receives `StoryTiming` six durations with min 0.35s; may retime any scene
 
 ## Direct fixture render commands (once dependency install/runner available)
 ```bash
+npx tsc -p production/yunex/f1_sparks_ep004/story/tsconfig.json
+node --experimental-strip-types --test production/yunex/f1_sparks_ep004/tests/agent-5/*.test.mjs
 npx remotion render production/yunex/f1_sparks_ep004/story/preview-entry.tsx EP004Agent5Hook out/ep004/agent-5-hook.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p
 npx remotion render production/yunex/f1_sparks_ep004/story/preview-entry.tsx EP004Agent5Middle out/ep004/agent-5-middle.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p
 ffprobe -v error -select_streams v:0 -count_frames -show_entries stream=width,height,avg_frame_rate,nb_read_frames,duration -of json out/ep004/agent-5-hook.mp4
