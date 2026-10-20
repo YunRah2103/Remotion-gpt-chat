@@ -65,7 +65,7 @@ jobs:
           # Agent8 and Agent9 are separate owned branch sources, pinned by exact SHA.
           integrations=(
             'agent/ep003-08-crash-vfx impact 8e703e70218e9c0b9e9b7768112f2d8388ae31c8'
-            'agent/ep003-09-rewind-story rewind 0b459955d7b7ac676275d7fb957fd8a12732e6ab'
+            'agent/ep003-09-rewind-story rewind 6884664e265c680e314b3d44b81d33b6d6439977'
           )
           for spec in "${integrations[@]}"; do
             read -r sourceBranch folder sha <<< "$spec"

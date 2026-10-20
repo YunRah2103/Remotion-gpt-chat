@@ -101,24 +101,24 @@ export function sampleActionCamera(req:ActionCameraRequest):ActionCameraPose {
     case 'impact-side-profile': {
       // Film the ACTUAL A8 contact from the TRAFFIC side of the right rail:
       // the car and deformed barrier remain in one shot, but the near rail
-      // can no longer mask the right-front bumper/lamp. Lower lens and a
-      // subtle forward dolly preserve phone-sized vehicle scale and speed.
+      // can no longer mask the right-front bumper/lamp. Portrait-safe widened lens and deeper traffic-side camera retain ALL
+      // original GT corners while keeping bent rail and damaged front visible.
       // These are camera-only offsets; no A8 damage/rail physics is changed.
-      position=lerp3([7.60,4.10,2.90],[8.20,4.80,2.20],eased);
-      target=lerp3([.70,.77,-1.30],[.95,.73,-1.50],eased);
-      fov=53;break;
+      position=lerp3([9.20,4.90,4.00],[9.80,5.20,3.80],eased);
+      target=lerp3([-.35,.79,.05],[-.15,.76,-.05],eased);
+      fov=60;break;
     }
     case 'impact-overhead': {
       position=lerp3([-1.7,15.8,4.1],[-2.8,14.8,5.3],eased);
       target=[1.2,.65,-2.9];fov=48;break;
     }
     case 'damage-scrape': {
-      // Traffic-side LOWER moving three-quarter aftermath: original right
+      // Traffic-side lower moving three-quarter aftermath: FULL original right
       // headlamp/bonnet fold and buckled rail are not behind foreground steel.
       // Retain the same collision source frame and physically bounded damage.
-      position=lerp3([6.30,3.50,1.50],[6.75,3.95,1.20],eased);
-      target=lerp3([1.35,.68,-1.35],[1.15,.66,-1.45],eased);
-      fov=53;break;
+      position=lerp3([9.60,4.00,4.20],[10.00,4.20,3.80],eased);
+      target=lerp3([.45,.73,-.10],[.35,.72,-.20],eased);
+      fov=57;break;
     }
     case 'reverse-sweep': {
       // Agent 9 reverses the physical collision state and particles. Follow

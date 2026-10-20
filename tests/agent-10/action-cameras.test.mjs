@@ -241,3 +241,38 @@ test('approved A8 bent right rail replaces static rail ONLY in crash branch',()=
  assert.match(car,/<CrashCarRig frame=\{impact\} makeVehicle=\{makeVehicle\}/);
  assert.match(car,/applyTyreFrame\(rig,tyre,\{dynamics,exposure:0\}\)/);
 });
+
+test('approved impact and aftermath cameras fit original full GT in portrait 9:16',()=>{
+ // Vehicle-kit original GT: ±2.5m wheelbase/body x, ±1.05m z width;
+ // y 0..1.7. Camera relative to car, so tests remain valid even if A8
+ // authentic yaw is nonzero (camera world transforms rigidly with car).
+ const dot=(a,b)=>a.reduce((sum,x,i)=>sum+x*b[i],0);
+ const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],
+   a[0]*b[1]-a[1]*b[0]];
+ const unit=a=>{const len=Math.hypot(...a);return a.map(x=>x/len)};
+ const corners=[];
+ for(const x of [-2.5,2.5])for(const y of [0,1.7])
+   for(const z of [-1.05,1.05])corners.push([x,y,z]);
+ for(const stage of ['impact-side-profile','damage-scrape']){
+   for(const p of [0,.12,.38,.64,.86,1]){
+     const pose=sampleActionCamera(req(stage,p));
+     const eye=pose.position,target=pose.target;
+     const forward=unit(target.map((x,i)=>x-eye[i]));
+     const right=unit(cross(forward,[0,1,0]));
+     const up=cross(right,forward);
+     const tanHalf=Math.tan(pose.fovDeg*Math.PI/360);
+     const portraitAspect=540/960;
+     for(const originalCorner of corners){
+       const delta=originalCorner.map((x,i)=>x-eye[i]);
+       const depth=dot(delta,forward);
+       assert.ok(depth>.2,'full GT must be in front of lens');
+       const nx=dot(delta,right)/(depth*tanHalf*portraitAspect);
+       const ny=dot(delta,up)/(depth*tanHalf);
+       assert.ok(Math.abs(nx)<.88,
+         stage+' crop at '+p+': full body horizontal NDC '+nx);
+       assert.ok(Math.abs(ny)<.84,
+         stage+' crop at '+p+': full body vertical NDC '+ny);
+     }
+   }
+ }
+});
