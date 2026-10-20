@@ -26,15 +26,18 @@ export function getStoryVisualCue(req:StoryRequest):StoryVisualCue{
   keepWorldTrajectory:true,
  };
 }
-/** Full-vehicle ride-height contrast MUST use two physics samples at same route & time.
- * Changes to speed, route distance, yaw or world position would be two trajectories, not
- * an underbody aero comparison. Each arm is computed and provided by Agent 2. */
+/** Ride-height contrast uses two Agent 2 physics samples at same route & time.
+ * Vertical root Y, pitch, heave and compression MUST be allowed to change:
+ * that's the aerodynamic comparison itself. X/Z, speed, yaw and t stay locked. */
 export function validateAeroPair(unloaded:VehicleMotionState,loaded:VehicleMotionState):void{
  const near=(a:number,b:number,epsilon:number)=>Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-b)<=epsilon;
  if(!near(unloaded.tSec,loaded.tSec,1e-5)
  || !near(unloaded.routeDistanceM,loaded.routeDistanceM,1e-4)
  || !near(unloaded.yawRad,loaded.yawRad,1e-4)
- || unloaded.worldPosition.some((v,i)=>!near(v,loaded.worldPosition[i],1e-4))){
-  throw new Error('Aero comparisons must retain the identical physics route, time and pose');
+ || !near(unloaded.speedMps,loaded.speedMps,1e-4)
+ || !near(unloaded.worldPosition[0],loaded.worldPosition[0],1e-4)
+ || !near(unloaded.worldPosition[2],loaded.worldPosition[2],1e-4)
+ || !Number.isFinite(unloaded.worldPosition[1]) || !Number.isFinite(loaded.worldPosition[1])){
+  throw new Error('Aero comparisons must retain identical route, time, lateral path, heading and speed');
  }
 }
