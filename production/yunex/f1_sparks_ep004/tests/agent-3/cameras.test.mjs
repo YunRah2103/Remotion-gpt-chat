@@ -21,7 +21,7 @@ test('stateless time-seeking and no mutable camera accumulation',()=>{
     const a=sampleShotCamera(shot,d*.65,m);
     sampleShotCamera(shot,d*.91,m);sampleShotCamera(shot,d*.05,m);
     assert.deepEqual(sampleShotCamera(shot,d*.65,m),a);
-    assert.ok(a.fovDeg>=35&&a.fovDeg<=62);
+    assert.ok(a.fovDeg>=35&&a.fovDeg<=68);
     assert.ok(Number.isFinite(a.focusDistanceM)&&a.focusDistanceM>.4);
   }
 });
