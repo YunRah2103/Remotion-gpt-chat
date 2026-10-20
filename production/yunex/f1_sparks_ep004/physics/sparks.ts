@@ -8,7 +8,7 @@ import type {DynamicsParams} from './dynamics.ts';
 const clamp=(v:number,lo:number,hi:number)=>Math.max(lo,Math.min(hi,v));
 const hash=(x:number)=>{let u=x>>>0;u=Math.imul(u^(u>>>16),0x7feb352d);u=Math.imul(u^(u>>>15),0x846ca68b);return ((u^(u>>>16))>>>0)/4294967296;};
 const ids:Readonly<Record<SkidId,number>>={forward:1,middle:2,rear:3};
-const HZ=100,IMPULSES=12,MAX_LIFE=.78,MAX_PARTICLES=260;
+const HZ=100,IMPULSES=8,MAX_LIFE=.78,MAX_PARTICLES=260;
 type SparkParams= DynamicsParams & {samplingHz?:number};
 
 /** All births are sampled at fixed absolute 10-ms ticks, not frame boundaries.

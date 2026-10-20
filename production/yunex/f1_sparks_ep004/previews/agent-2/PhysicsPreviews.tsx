@@ -15,7 +15,7 @@ const PREVIEW_SKIDS:readonly SkidDescriptor[]=[{id:'forward',metal:true,localBot
 // After Agent 0 merges PR #225 into the base, import mechanics/skids.ts:getSkidDescriptors
 // and mechanics/F1HeroVehicle; never release independently fitted geometry.
 const ORIGIN=69.0;
-const SPARK_STRETCH=new T.Vector3(0,0,1);
+const SPARK_STRETCH=new T.Vector3(0,1,0);
 const carForward=(yaw:number,x:number,z:number):[number,number] =>
   [Math.cos(yaw)*x+Math.sin(yaw)*z,-Math.sin(yaw)*x+Math.cos(yaw)*z];
 
@@ -63,8 +63,9 @@ const ParticleInstances:React.FC<{particles:readonly SparkParticle[]}>=({particl
    // Spatial motion blur from each particle's own ballistic velocity.
    // 1/30-second streak: not a flat 2D/glowing exhaust overlay.
    const speed=Math.hypot(...p.velocityWorld);
-   scale.set(Math.max(.012,p.radiusM*1.6),Math.max(.012,p.radiusM*1.6),
-     Math.max(.07,Math.min(.42,speed/60)));
+   const radius=Math.max(.004,p.radiusM*.50);
+   const streakLength=Math.max(.08,Math.min(.30,speed/100));
+   scale.set(radius,streakLength,radius);
    matrix.compose(position,quat,scale);inst.setMatrixAt(i,matrix);
    const warm=new T.Color('#fff3bb').lerp(new T.Color('#ff8d3a'),Math.min(1,p.ageSec/p.lifetimeSec));
    inst.setColorAt(i,warm.multiplyScalar(Math.max(.05,p.luminance01)));
@@ -73,7 +74,7 @@ const ParticleInstances:React.FC<{particles:readonly SparkParticle[]}>=({particl
   if(inst.instanceColor)inst.instanceColor.needsUpdate=true;
  },[particles,matrix,position,scale,quat,heading]);
  return <instancedMesh ref={ref} args={[undefined,undefined,260]} frustumCulled={false}>
-   <sphereGeometry args={[1,5,4]}/>
+   <cylinderGeometry args={[1,1,1,8]}/>
    <meshBasicMaterial color="#fff1b2" toneMapped={false} transparent opacity={.98}/>
  </instancedMesh>;
 };
@@ -113,7 +114,7 @@ export const Agent2PhysicsPreview:React.FC<{mode:'technical'|'portrait'}>=({mode
   </ThreeCanvas>
   <div style={{position:'absolute',top:90,left:56,color:'#e7f8ff',fontFamily:'Arial,sans-serif',background:'#101823ca',padding:'20px 24px',borderLeft:'4px solid #46e8d0'}}>
    <div style={{fontSize:27,letterSpacing:3,fontWeight:800}}>{technical?'CONTACT PHYSICS / FIXTURE':'YUNEX EP004 / SPARK MOTION'}</div>
-   <div style={{fontSize:22,marginTop:12,color:active?'#ffce78':'#9acbd5'}}>METAL SKID {active?'TOUCHING ASPHALT':'CLEAR OF ASPHALT'}</div>
+   <div style={{fontSize:22,marginTop:12,color:active?'#ffce78':'#9acbd5'}}>METAL SKID {active?'TOUCHING ASPHALT':particles.length?'CLEAR — OLD GLINTS IN FLIGHT':'CLEAR OF ASPHALT'}</div>
    <div style={{fontSize:21,marginTop:6}}>GAP {strongest.signedGapM>=0?'+':''}{(strongest.signedGapM*1000).toFixed(1)} mm · {Math.round(motion.speedMps*3.6)} km/h · {particles.length} GLINTS</div>
   </div>
   <div style={{position:'absolute',bottom:90,left:60,color:'#d6dce5',fontFamily:'Arial,sans-serif',fontSize:20,background:'#0c1325bb',padding:'12px 16px'}}>
