@@ -107,8 +107,8 @@ test('approved A8 bend/rail scars follow exact same crash sample in real moving 
  // Verify the ACTUAL native scene uses Agent8-owned damage, steel and scars
  // rather than retaining its old A4 rigid-rail + custom deformation renderer.
  const scene=readFileSync(new URL('../../production/yunex/tyre_blowout_ep003/rewind/EP003Agent9Preview.tsx',import.meta.url),'utf8');
- assert.match(scene,/CrashBarrierWorld frame=\\{impact\\}/);
- assert.match(scene,/CrashCarRig frame=\\{impact\\}/);
- assert.match(scene,/ImpactEffects3D frame=\\{impact\\}/);
- assert.match(scene,/worldFactory=\\{buildEpisodeHighway\\}/);
+ assert.ok(scene.includes('CrashBarrierWorld frame={impact}'));
+ assert.ok(scene.includes('CrashCarRig frame={impact}'));
+ assert.ok(scene.includes('ImpactEffects3D frame={impact}'));
+ assert.ok(scene.includes('worldFactory={buildEpisodeHighway}'));
 });
