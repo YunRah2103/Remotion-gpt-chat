@@ -1,0 +1,89 @@
+name: YUNEX EP004 contract QA and optional motion render
+
+on:
+  pull_request:
+    branches:
+      - production/yunex-ep004-base
+    paths:
+      - 'production/yunex/f1_sparks_ep004/**'
+      - '.github/workflows/yunex-ep004-review.yml'
+  workflow_dispatch:
+    inputs:
+      render_preview:
+        description: 'Render 150 frames of an EP004 composition after the entry exists'
+        required: true
+        type: boolean
+        default: false
+      composition:
+        description: 'Verified EP004 composition ID from entry.tsx'
+        required: true
+        type: string
+        default: 'EP004MotionReview'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: TypeScript and EP004 deterministic contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: node --experimental-strip-types --test production/yunex/f1_sparks_ep004/tests/shared/*.test.mjs
+      - name: Verify EP004 isolation
+        shell: bash
+        run: |
+          test -s production/yunex/f1_sparks_ep004/PRODUCTION_CONTRACT.md
+          test -s production/yunex/f1_sparks_ep004/shared/contract.ts
+          test -s production/yunex/f1_sparks_ep004/HANDOFF.md
+          test -s production/yunex/f1_sparks_ep004/LAUNCH_PROMPTS.md
+
+  native-preview:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.render_preview }}
+    needs: validate
+    name: Optional five-second native moving MP4 + full decode
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Require a REAL EP004 episode entry
+        run: test -f production/yunex/f1_sparks_ep004/entry.tsx
+      - name: Render moving portrait at native dimensions
+        env:
+          EP004_COMP: ${{ inputs.composition }}
+        run: |
+          mkdir -p out/ep004
+          npx remotion render production/yunex/f1_sparks_ep004/entry.tsx "$EP004_COMP" out/ep004/EP004-5s-native.mp4 --frames=0-149 --gl=swangle --codec=h264 --pixel-format=yuv420p --log=error
+      - name: Validate full video and report frame count
+        run: |
+          ffprobe -v error -select_streams v:0 -count_frames -show_entries stream=width,height,avg_frame_rate,nb_read_frames -of json out/ep004/EP004-5s-native.mp4 > out/ep004/probe.json
+          python3 - <<'PY'
+          import json
+          s=json.load(open('out/ep004/probe.json'))['streams'][0]
+          assert (s['width'],s['height'])==(1080,1920), s
+          assert s['avg_frame_rate']=='30/1', s
+          assert int(s['nb_read_frames'])==150, s
+          print('Native portrait 1080x1920, 30fps, 150 frames verified by decoding')
+          PY
+          ffmpeg -v error -xerror -i out/ep004/EP004-5s-native.mp4 -f null -
+          for sec in 0.3 2.3 4.3; do
+            ffmpeg -v error -y -ss "$sec" -i out/ep004/EP004-5s-native.mp4 -frames:v 1 "out/ep004/frame-$sec.png"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-EP004-NATIVE-MOVING-REVIEW
+          path: out/ep004
+          retention-days: 30
+          if-no-files-found: error
