@@ -75,6 +75,8 @@ export function applyNightCircuitFinish(root: THREE.Object3D): THREE.Object3D {
     });
     obj.material = Array.isArray(obj.material) ? replacements : replacements[0];
   });
+  // Each preview factory model owns these originals; release replaced materials.
+  for (const original of copies.keys()) original.dispose();
   if (!usedCarbon) carbon.dispose();
   return root;
 }
