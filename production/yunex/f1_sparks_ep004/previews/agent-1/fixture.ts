@@ -1,4 +1,4 @@
-import {sampleRoute} from '../../../../src/yunex/world-kit/index.ts';
+import {sampleRoute} from '../../../../../src/yunex/world-kit/index.ts';
 import {EP004} from '../../shared/contract.ts';
 import {sampleTrackSurface} from '../../shared/track.ts';
 import type {VehicleMotionState, WheelId} from '../../shared/contract.ts';
