@@ -47,7 +47,7 @@ jobs:
 
   specialist-native:
     name: Native EP004 specialist moving MP4s and frame proof
-    if: ${{ github.event_name == 'pull_request' && startsWith(github.head_ref, 'agent/ep004-0') }}
+    if: ${{ github.event_name == 'pull_request' && (github.head_ref == 'agent/ep004-01-mechanics' || github.head_ref == 'agent/ep004-02-physics' || github.head_ref == 'agent/ep004-03-cinema' || github.head_ref == 'agent/ep004-04-look' || github.head_ref == 'agent/ep004-05-story') }}
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 110
