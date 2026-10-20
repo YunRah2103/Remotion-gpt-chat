@@ -8,7 +8,7 @@
  * is sampled deterministically at sourceTimeSec, including in REVERSE.
  * These dedicated roots never modify Agent6's 800-frame VO master.
  */
-import React,{useEffect,useLayoutEffect,useMemo} from 'react';
+import React,{useCallback,useEffect,useLayoutEffect,useMemo} from 'react';
 import {AbsoluteFill,useCurrentFrame,useVideoConfig} from 'remotion';
 import {ThreeCanvas} from '@remotion/three';
 import * as T from 'three';
@@ -24,7 +24,8 @@ import {sampleTyreFailure} from '../mechanics/sampleTyreFailure.ts';
 import {buildEpisodeHighway,EpisodeLight,finishGrandTourer} from '../look/world.tsx';
 import {ContactOcclusion} from '../look/contact.tsx';
 import {SteadyHands3D} from '../story/SteadyHands3D.tsx';
-import {ImpactEffects3D} from '../impact/Preview.tsx';
+import {CrashCarRig,ImpactEffects3D} from '../impact/Preview.tsx';
+import {CrashBarrierWorld} from '../impact/Barrier.tsx';
 import {rebaseDynamicsX,resolveBranchFrame} from './branchReplay.ts';
 import {DEFAULT_BRANCH_REPLAY} from './branchReplay.ts';
 import {sampleControlledFrame} from './agent8Integration.ts';
@@ -57,63 +58,25 @@ const OriginalCockpit:React.FC<{d:VehicleDynamicsFrame;tyre:TyreFrame}>=({d,tyre
  return <primitive object={rig.vehicle}><SteadyHands3D dynamics={d} steeringSide="right"/></primitive>;
 };
 
-/** Agent9 collision-ready renderer: deforms A1 ORIGINAL car body based on
- * A8 authoritative BUMPER/FENDER/LAMP damage curves. Never swaps a fake car.
- * A1 retains the original rubber, metal wheel/rim and brake hierarchy. */
-type BodyDamage=Readonly<{
- mesh:T.Mesh;
- pos:T.BufferAttribute;
- rest:Float32Array;
- trim:Map<T.Object3D,{p:T.Vector3;s:T.Vector3}>;
-}>;
+/**
+ * Approved A8 original GT nose/lamp/fender deformable rig, over the SAME
+ * Agent1 four-wheel + failed-rubber vehicle. Agent8 exclusively owns its
+ * damage geometry. In afterPose the authoritative Agent2/A8-derived hubs,
+ * road contact and tyre phase are applied exactly once and on EVERY frame,
+ * including decreasing sourceTimeSec during rewind. No duplicate car.
+ */
 const OriginalDamagedGrandTourer:React.FC<{
- d:VehicleDynamicsFrame;tyre:TyreFrame;impact:CrashOutcomeFrame
+ d:VehicleDynamicsFrame;tyre:TyreFrame;impact:CrashOutcomeFrame;
 }>=({d,tyre,impact})=>{
- const rig=useMemo(()=>{
-   const r=prepareTyreRig(EP003_SCENE.failedWheel,0);
-   finishGrandTourer(r.vehicle);
-   return r;
- },[]);
- const dent=useMemo(():BodyDamage|null=>{
-   const body=rig.vehicle.getObjectByName('arched-body');
-   if(!(body instanceof T.Mesh)||!(body.geometry instanceof T.BufferGeometry))return null;
-   // Private clone per composition: no shared-kit geometry mutation.
-   body.geometry=body.geometry.clone();
-   const pos=body.geometry.getAttribute('position') as T.BufferAttribute;
-   const trim=new Map<T.Object3D,{p:T.Vector3;s:T.Vector3}>();
-   rig.vehicle.traverse(o=>{
-     if(['lamp-lens','headlamp-housing','lamp-reflector','front-lip'].includes(o.name))
-       trim.set(o,{p:o.position.clone(),s:o.scale.clone()});
-   });
-   return {mesh:body,pos,rest:new Float32Array(pos.array as ArrayLike<number>),trim};
- },[rig]);
- useEffect(()=>()=>disposeTyreRig(rig),[rig]);
- useLayoutEffect(()=>{
+ const rig=useMemo(()=>prepareTyreRig(EP003_SCENE.failedWheel,0),[]);
+ const makeVehicle=useCallback(()=>finishGrandTourer(rig.vehicle),[rig]);
+ const afterPose=useCallback((_vehicle:T.Group,_frame:CrashOutcomeFrame)=>{
+   // Impact physical body + all four hubs have already been consistently
+   // rebased into the declared A8 scene cut at X=-86 by resolveBranchFrame.
+   // A1 deformRubber keeps the original front-right puncture on the rewind.
    applyTyreFrame(rig,tyre,{dynamics:d,exposure:0});
-   if(!dent)return;
-   const {rest,pos,mesh,trim}=dent;
-   for(let i=0;i<pos.count;i++){
-     const j=i*3,ox=rest[j],oy=rest[j+1],oz=rest[j+2];
-     const nose=Math.max(0,Math.min(1,(ox-1.42)/1));
-     const side=Math.max(0,Math.min(1,(-oz-.30)/.72));
-     const blend=nose*nose*side*side;
-     pos.setXYZ(i,ox-impact.bumperCrushM*blend,
-       oy+impact.fenderCrushM*.18*blend,
-       oz+impact.fenderCrushM*.72*blend);
-   }
-   pos.needsUpdate=true;
-   mesh.geometry.computeVertexNormals();
-   trim.forEach((original,node)=>{
-     node.position.copy(original.p);node.scale.copy(original.s);
-     if(original.p.x>1.7&&original.p.z<-.12){
-       node.position.x-=impact.lampCrushM*.8;
-       node.position.z+=impact.lampCrushM*.35;
-       if(node.name==='lamp-lens')
-         node.scale.x=original.s.x*(1-impact.lampCrushM*.9);
-     }
-   });
- },[rig,d,tyre,impact,dent]);
- return <primitive object={rig.vehicle}/>;
+ },[rig,tyre,d]);
+ return <CrashCarRig frame={impact} makeVehicle={makeVehicle} afterPose={afterPose}/>;
 };
 const NativeAgent9Scene:React.FC<{
  d:VehicleDynamicsFrame;tyre:TyreFrame;
@@ -134,7 +97,9 @@ const NativeAgent9Scene:React.FC<{
    <ThreeCanvas width={width} height={height} shadows camera={{
      position:[...pose.position],near:pose.nearM,far:pose.farM,fov:pose.fovDeg}}>
      <EpisodeLight focus={d.positionM}/>
-     <primitive object={road}/>
+     {impact
+       ? <CrashBarrierWorld frame={impact} worldFactory={buildEpisodeHighway}/>
+       : <primitive object={road}/>}
      <ContactOcclusion dynamics={d}/>
      {impact
        ? <OriginalDamagedGrandTourer d={d} tyre={tyre} impact={impact}/>
