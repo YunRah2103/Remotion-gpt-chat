@@ -263,7 +263,8 @@ test('approved impact and aftermath cameras fit original full GT in portrait 9:1
      const tanHalf=Math.tan(pose.fovDeg*Math.PI/360);
      const portraitAspect=540/960;
      for(const originalCorner of corners){
-       const delta=originalCorner.map((x,i)=>x-eye[i]);
+       const worldCorner=originalCorner.map((x,i)=>x+fakeFrame().positionM[i]);
+       const delta=worldCorner.map((x,i)=>x-eye[i]);
        const depth=dot(delta,forward);
        assert.ok(depth>.2,'full GT must be in front of lens');
        const nx=dot(delta,right)/(depth*tanHalf*portraitAspect);
