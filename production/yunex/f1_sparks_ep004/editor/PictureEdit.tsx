@@ -11,6 +11,8 @@ import {
   CAPTION_SAFE_BOTTOM_PX,
   captionAtFrame,
   shotAtFrame,
+  missingPicturePrerequisites,
+  type ReadinessInput,
   type PicturePlan,
 } from './timing.ts';
 
@@ -25,6 +27,7 @@ export type VisualShotProps = Readonly<{
 
 export type EditProps = Readonly<{
   plan: PicturePlan;
+  readiness: ReadinessInput;
   showCaptions?: boolean;
 }>;
 
@@ -34,7 +37,11 @@ export type EditProps = Readonly<{
  * dynamics and calls actual Agent 1/3/4/5 visual exports.
  */
 export function makeEP004PictureEdit(IntegratedVisualShot: React.ComponentType<VisualShotProps>) {
-  function EP004PictureEdit({plan, showCaptions = true}: EditProps) {
+  function EP004PictureEdit({plan, readiness, showCaptions = true}: EditProps) {
+    const missing = missingPicturePrerequisites(readiness);
+    if (missing.length > 0) {
+      throw new Error('EP004 picture render blocked: ' + missing.join('; '));
+    }
     const frame = useCurrentFrame();
     const config = useVideoConfig();
     if (config.width !== 1080 || config.height !== 1920 || config.fps !== 30 ||
