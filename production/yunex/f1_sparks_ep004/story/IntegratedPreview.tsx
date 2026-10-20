@@ -14,7 +14,7 @@ import {useThree} from '@react-three/fiber';
 import {WorldLighting} from '../../../../src/yunex/world-kit/components';
 import {F1HeroVehicle,UnderfloorReveal,getSkidDescriptors} from '../mechanics/index';
 import {sampleDynamics,sampleContactDrivenSparks,localToWorld} from '../physics/index';
-import {NightCircuitWorld} from '../look/index';
+import {NightCircuitWorld} from '../look/NightCircuitWorld';
 import type {ShotId,StoryRequest,VehicleMotionState,CameraPose,Vec3,SparkParticle} from '../shared/contract';
 import {StorySequence} from './StorySequence';
 import {clamp01,smoothstep,type StoryTiming} from './beats';
