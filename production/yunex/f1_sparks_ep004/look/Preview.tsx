@@ -69,7 +69,7 @@ const RacePreview3D: React.FC<{
   const ahead = sampleCircuitRoadPoint(distanceM + (chase ? 0.9 : -0.6), 0);
   const carTarget: Vec3 = [ahead.x, carHeight + 0.53, ahead.z];
   return <>
-    <NightCircuitWorld tSec={tSec} motion={motion} particles={particles}/>
+    <NightCircuitWorld tSec={tSec} motion={motion} referenceDistanceM={distanceM} particles={particles}/>
     <primitive object={factoryCar}/>
     <CameraAim position={posArray(eye)} target={carTarget} fov={chase ? 46 : 54}/>
   </>;
