@@ -12,9 +12,9 @@ function CameraFollow({position,yaw,tSec,technical}:{
 }) {
  const {camera}=useThree();
  const sweep=Math.max(0,Math.min(1,tSec/5.7));
- const ox=technical?1.15-2.25*sweep:-7.5;
- const oy=technical?-.42:2.2;
- const oz=technical?1.1+.06*Math.cos(tSec*.55):4.7;
+ const ox=technical?1.15-2.25*sweep:-9.4;
+ const oy=technical?-1.15:2.65;
+ const oz=technical?.68+.06*Math.cos(tSec*.55):6.25;
  const localToWorld=(dx:number,dz:number)=>{
    return [Math.cos(yaw)*dx+Math.sin(yaw)*dz,-Math.sin(yaw)*dx+Math.cos(yaw)*dz] as const;
  };
@@ -23,13 +23,13 @@ function CameraFollow({position,yaw,tSec,technical}:{
  const camPosition=new T.Vector3(position[0]+xx,position[1]+oy,position[2]+zz);
  const lookTarget=new T.Vector3(position[0]+tx,position[1]+(technical?.12:.55),position[2]+tz);
  // Camera property setting during frame evaluation is deterministic and seek safe.
- if(camera instanceof T.PerspectiveCamera){camera.fov=technical?56:39;camera.updateProjectionMatrix();}
+ if(camera instanceof T.PerspectiveCamera){camera.fov=technical?55:44;camera.updateProjectionMatrix();}
  camera.position.copy(camPosition);camera.lookAt(lookTarget);
  return null;
 }
 const TechnicalStage:React.FC<{position:readonly[number,number,number];yaw:number}>=({position,yaw})=>{
  const matte=useMemo(()=>new T.MeshStandardMaterial({color:'#1e2832',metalness:.16,roughness:.82}),[]);
- return <group position={[position[0],-1.3,position[2]]} rotation={[0,yaw,0]}>
+ return <group position={[position[0],-2.1,position[2]]} rotation={[0,yaw,0]}>
   <mesh material={matte} rotation={[-Math.PI/2,0,0]} receiveShadow>
     <planeGeometry args={[24,13]}/>
   </mesh>
@@ -52,7 +52,7 @@ export const MechanicsPreview:React.FC<{mode:'technical'|'context'}>=({mode})=>{
  const fade=technical?Math.min(1,Math.max(0,(tSec-.35)/1.35)):0;
  return <AbsoluteFill style={{backgroundColor:'#071320'}}>
   <ThreeCanvas width={1080} height={1920}
-    camera={{fov:technical?56:39,near:.02,far:500,position:[0,1.8,6]}}
+    camera={{fov:technical?55:44,near:.02,far:500,position:[0,1.8,6]}}
     gl={{antialias:true,preserveDrawingBuffer:true}}>
    <color attach="background" args={[technical?'#0d1720':'#0b1421']}/>
    <fog attach="fog" args={['#0b1421',technical?22:90,technical?90:220]}/>
