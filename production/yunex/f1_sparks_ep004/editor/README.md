@@ -38,3 +38,39 @@ ffmpeg -v error -xerror -i out/ep004/EP004-picture-VO.mp4 -f null -
 Confirm original speech is clear and synchronized, visual frames at every six-cut boundary actually move, no cropped subtitles or clipped wheels, and the payoff holds visual geography with a controlled ending. Only then open picture approval review for Agent 0 and the owner. Agent 7 must not alter picture or voice afterward.
 
 **NOT YET PERFORMED:** no final EP004 MP4, no visual inspection, no ffprobe/full-decode; cannot claim picture review-ready until dependencies are met.
+
+## Verified native-delivery tooling added 20 Oct
+- `editor/native-qa.mjs` verifies a **real moving MP4**: playable file, `ffprobe -count_frames` 1080×1920/30 exact expected frames, original-voice audio stream present, full decode with `ffmpeg -xerror`, >=2 different decoded pixel hashes from 1fps samples, and PNGs for start/mid/end. Emits `native-report.json`, explicitly noting that visual/audio HUMAN sign-off remains pending.
+- `editor/render-native.mjs` is a **fail-closed** 2-output native Remotion renderer. It refuses to start without a checked recorded-VO manifest, original audio file, approved integration entry and five approved agents. It measures actual recording duration using ffprobe, validates word-linked six-cut EDL and writes exactly two variants once real prerequisites exist: `EP004PictureWithOriginalVO` (with phone-safe captions) and `EP004CleanWithOriginalVO` (clean frame, same original voice). Both go through the full MP4 audit; placeholders and EP003 audio are rejected.
+- `tests/agent-6/native-qa.test.mjs` covers frame-count / portrait / fps / audio-stream / decoded hash error gates without claiming a scene render.
+- No unsigned fake manifest, synthetic original voice, or mock hero scene was added. The future manager-owned `entry.tsx` must register these two actual integration compositions from accepted Agents 1–5.
+
+**After Agent 0 provides fully approved integrated visuals and actual EP004 voice**, create a local manifest with:
+```json
+{
+  "originalRecordedAudioFile": "/absolute/path/to/original-ep004-voice.wav",
+  "entryFile": "/absolute/path/to/integrated-ep004/entry.tsx",
+  "outputDir": "out/ep004-editor",
+  "readiness": {
+    "approvedAgents": [1, 2, 3, 4, 5],
+    "integrationCommitSha": "40-character-real-integration-SHA",
+    "allSixMovingScenesIntegrated": true,
+    "originalRecordedNarrationPresent": true,
+    "wordTimestampsVerifiedAgainstRecording": true
+  },
+  "plan": {
+    "audioSrc": "actual-remotion-served-original-EP004-audio-url",
+    "audioDurationSec": 0,
+    "words": [],
+    "cuts": []
+  }
+}
+```
+Here `0` and empty arrays are **deliberate invalid placeholders**; replace exclusively with measured recording duration, real per-word timestamps, and semantic cut-word indices. The script throws rather than rendering until all information is genuine.
+
+```bash
+node --experimental-strip-types --test production/yunex/f1_sparks_ep004/tests/agent-6/*.test.mjs
+node --experimental-strip-types production/yunex/f1_sparks_ep004/editor/render-native.mjs /path/to/approved-ep004-edit.json
+```
+
+**Current outcome:** editor source and tests are committed; no original EP004 voice, accepted integrated live scene or native editor pair yet, so **no final editor MP4 verification or picture lock can honestly be declared.**
