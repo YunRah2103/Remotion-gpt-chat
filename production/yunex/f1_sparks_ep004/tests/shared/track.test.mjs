@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {sampleTrackSurface} from '../../production/yunex/f1_sparks_ep004/shared/track.ts';
+import {sampleTrackSurface} from '../../shared/track.ts';
 
 test('EP004 track contact profile is finite and deterministic for out-of-order frames',()=>{
   const distances=[0,72,71.7,138,150,72,0,138];
