@@ -16,6 +16,7 @@ import {crashIncidentFromDynamics,sampleCrashOutcome} from './model.ts';
 import type {CrashOutcomeFrame} from './model.ts';
 import {CrashBarrierWorld} from './Barrier.tsx';
 import {CrashCarRig,ImpactEffects3D} from './Preview.tsx';
+import {lensForHydratedTime,sampleCrashCamera} from './Camera.ts';
 
 const wheelIds=['front-left','front-right','rear-left','rear-right'] as const;
 const sourceSec=4;
@@ -64,19 +65,11 @@ const HydroCar:React.FC<{frame:CrashOutcomeFrame}>=({frame})=>{
 export const HydratedCrashPreview:React.FC=()=>{
  const videoFrame=useCurrentFrame(),{fps,width,height}=useVideoConfig();
  const f=sampleHydratedCrash(videoFrame/fps),[x,,z]=f.scenePositionM;
- // Mobile-friendly elevated 3/4 geometry camera: original GT and actual right
- // rail both visible, car always on carriageway side at source time 4s.
- // Intentional editor-friendly camera CUT at 1.53sec, before actual
- // authoritative front-right strike (~1.95sec), to reveal the bumper/rail.
- // High roadside viewpoint sees over the rail rather than straight through it.
- const reveal=videoFrame>=46;
- const position:[number,number,number]=reveal
-  ?[x+6.5,9.8,Math.min(-10.2,z-4.7)]
-  :[x-9.9,5.5,Math.min(-1.15,z+1.3)];
- const target:[number,number,number]=reveal
-  ?[x+1.05,.90,z-.30]
-  :[x+.65,.7,z-.54];
- const fov=reveal?43:49;
+ // Tight, physically grounded camera cuts: rear approach, road/traffic-side
+ // BEFORE->AT contact, then low metal-lip-right-side crumple after impact.
+ // Only the lens moves. A1/A2/A4 rigid world and sampled path stay unchanged.
+ const camera=sampleCrashCamera(f,lensForHydratedTime(videoFrame/fps));
+ const position=camera.position,target=camera.target,fov=camera.fov;
  return <AbsoluteFill style={{background:'#a9c8d0'}}>
   <ThreeCanvas width={width} height={height} shadows
    camera={{position,fov,near:.1,far:310}}>
@@ -87,12 +80,12 @@ export const HydratedCrashPreview:React.FC=()=>{
    <ImpactEffects3D frame={f}/>
   </ThreeCanvas>
   <div style={{position:'absolute',top:'8%',left:'7%',right:'7%',
-   fontSize:29,fontWeight:800,color:'#f0f7f7',fontFamily:'Arial,sans-serif',
+   fontSize:24,fontWeight:800,color:'#f0f7f7',fontFamily:'Arial,sans-serif',
    textShadow:'0 2px 8px #12252a'}}>
    HYPOTHETICAL BAD REACTION
   </div>
   <div style={{position:'absolute',bottom:'7%',left:'7%',right:'7%',
-   fontSize:16,color:'#f1f4f4',fontFamily:'Arial,sans-serif',
+   fontSize:13,color:'#f1f4f4',fontFamily:'Arial,sans-serif',
    background:'rgba(16,27,32,.7)',padding:14}}>
    REAL A1 TYRE + A2 70 MPH SEED + A4 ROAD · ILLUSTRATIVE PANIC BRANCH
   </div>
