@@ -93,7 +93,17 @@ function buildNightWorld(): THREE.Group {
   // Preserve original geometry and shared source, just clone its PBR materials.
   const grade = new Map<THREE.Material, Map<number, THREE.Material>>();
   factory.traverse(node => {
-    if (!(node instanceof THREE.Mesh) || node.name === 'gradient-sky') return;
+    if (!(node instanceof THREE.Mesh)) return;
+    if (node.name === 'gradient-sky') {
+      // The world-kit sky is a self-illuminated vertex-gradient dome: darken
+      // its material, NOT the shared mesh vertex positions or night palette.
+      // Without this, horizon stays unrealistically blue under track floodlights.
+      const skyMaterial = node.material as THREE.MeshBasicMaterial;
+      const nightSky = skyMaterial.clone();
+      nightSky.color.multiplyScalar(0.37);
+      node.material = nightSky;
+      return;
+    }
     const name = node.name;
     const dark = name === 'runoff' ? 0.15
       : name === 'terrain-relief' ? 0.19
