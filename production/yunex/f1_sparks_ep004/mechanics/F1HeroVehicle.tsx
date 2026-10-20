@@ -38,6 +38,7 @@ function link(parent:T.Group,name:string,a:readonly [number,number,number],
   m.name=name;m.position.copy(start).add(end).multiplyScalar(.5);
   m.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),delta.normalize());
   m.castShadow=true;parent.add(m);
+  return m;
 }
 const WHEEL_IDS: Readonly<Record<string, WheelId>>={
   '1.71,0.83':'front-left', '1.71,-0.83':'front-right',
@@ -131,8 +132,17 @@ export function buildF1HeroVehicle(): T.Group {
     tube(root,'EP004-flow-vane',[[.38,.32,sign*.40],[.10,.38,sign*.61],[-.40,.43,sign*.73]],.012,carbonEdge);
     for(const axleX of [-EP004.wheelbaseM/2,EP004.wheelbaseM/2]){
       const inner=sign*.31,outer=sign*.73;
-      link(root,'EP004-suspension-lower',[axleX+ .14,.305,inner],[axleX,.365,outer],.018,trim);
-      link(root,'EP004-suspension-upper',[axleX-.16,.52,inner],[axleX,.37,outer],.013,carbonEdge);
+      const id: WheelId = axleX>0?(sign>0?'front-left':'front-right'):(sign>0?'rear-left':'rear-right');
+      const lA:[number,number,number]=[axleX+.14,.305,inner],lB:[number,number,number]=[axleX,.365,outer];
+      const uA:[number,number,number]=[axleX-.16,.52,inner],uB:[number,number,number]=[axleX,.37,outer];
+      for (const [name,a,b,r,mat] of [
+        ['EP004-suspension-lower',lA,lB,.018,trim],
+        ['EP004-suspension-upper',uA,uB,.013,carbonEdge],
+      ] as const) {
+        const linkMesh=link(root,name,a,b,r,mat);
+        linkMesh.userData={ep004Suspension:true,attachmentId:id,inner:[...a],outer:[...b],
+          originalLengthM:new T.Vector3(...a).distanceTo(new T.Vector3(...b))};
+      }
     }
   }
   // Give the kit's body a local, independently adjustable fade for reveal shots.
@@ -159,6 +169,16 @@ export function applyF1HeroMotion(root:T.Group,motion:VehicleMotionState,reveal0
   // +Y yaw, +Z pitch (nose-up), +X roll (vehicle-longitudinal).
   root.rotation.set(motion.rollRad,motion.yawRad,motion.pitchRad);
   root.traverse(o=>{
+    if(o.userData.ep004Suspension && o instanceof T.Mesh){
+      const id=o.userData.attachmentId as WheelId;
+      const a=new T.Vector3(...(o.userData.inner as [number,number,number]));
+      const b=new T.Vector3(...(o.userData.outer as [number,number,number]));
+      b.y+=Math.max(0,motion.wheelCompressionM[id]??0);
+      const delta=b.clone().sub(a),distance=delta.length();
+      o.position.copy(a.add(b).multiplyScalar(.5));
+      o.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),delta.normalize());
+      o.scale.y=distance/(o.userData.originalLengthM as number);
+    }
     if(o.userData.steering && o.name.startsWith('steer-')){
       const key=`${Math.round(o.position.x*100)/100},${Math.round(o.position.z*100)/100}`;
       const id=WHEEL_IDS[key];
