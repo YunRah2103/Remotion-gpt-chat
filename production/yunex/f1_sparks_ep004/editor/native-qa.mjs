@@ -67,7 +67,7 @@ export function beatMotionFrameNumbers(cuts, totalFrames) {
 
 export function assertEachBeatChanges(frameHashContent, cuts, totalFrames) {
   const expected = beatMotionFrameNumbers(cuts, totalFrames);
-  const entries = frameHashContent.split(/\\r?\\n/).filter(line => line && !line.startsWith('#'));
+  const entries = frameHashContent.split(/\r?\n/).filter(line => line && !line.startsWith('#'));
   if (entries.length !== expected.length) throw new Error('EP004 native audit: missing per-beat decoded frames');
   const report = [];
   for (let i=0; i<cuts.length; i++) {
@@ -94,7 +94,7 @@ export function verifyNativeMp4(filePath, expectedFrames, {audioRequired = true,
   let sceneMotionProof = null;
   if (cuts !== null) {
     const sampleFrames=beatMotionFrameNumbers(cuts,expectedFrames);
-    const select=sampleFrames.map(frame => 'eq(n\\\\,'+frame+')').join('+');
+    const select=sampleFrames.map(frame => 'eq(n\\,'+frame+')').join('+');
     const sampleMd5=run('ffmpeg',['-hide_banner','-v','error','-nostdin','-i',absolute,'-map',VIDEO_HASH_STREAM_SELECTOR,'-vf','select='+select,'-fps_mode','vfr','-f','framemd5','-']);
     sceneMotionProof=assertEachBeatChanges(sampleMd5,cuts,expectedFrames);
   }
