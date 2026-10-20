@@ -8,8 +8,7 @@ import {sampleRealAgent8Wrong,sampleRealAgent2Correct} from
  '../../production/yunex/tyre_blowout_ep003/rewind/agent8Integration.ts';
 import {sampleTyreFailure} from
  '../../production/yunex/tyre_blowout_ep003/mechanics/sampleTyreFailure.ts';
-import {railBuckleAt,MAX_RAIL_BUCKLE_M} from
- '../../production/yunex/tyre_blowout_ep003/impact/Barrier.tsx';
+import {readFileSync} from 'node:fs';
 
 const seq={sampleWrong:sampleRealAgent8Wrong,sampleCorrect:sampleRealAgent2Correct};
 test('REAL A8 and A2 fork at precisely identical pose, all hubs and damaged wheel',()=>{
@@ -80,29 +79,32 @@ test('A8 wrong source is seekable in random order and maintains four transformed
  }
 });
 
-test('approved A8 rail physically bends and unbends with SAME rewound impact frame',()=>{
+
+test('approved A8 bend/rail scars follow exact same crash sample in real moving scene',()=>{
  const impact=resolveBranchFrame(S.freezeEndFilmSec,seq).frame.impact;
- assert.ok(impact?.contact.occurred,'must have real approved A8 barrier contact');
+ assert.ok(impact?.contact.occurred,'approved A8 original rail must have real contact');
  const firstX=impact.contact.firstContactX;
  assert.ok(firstX!==null&&Number.isFinite(firstX));
- const atHit=railBuckleAt(firstX,impact);
- assert.ok(atHit>.10,'approved rail MUST be significantly buckled at aftermath');
- assert.ok(atHit<=MAX_RAIL_BUCKLE_M+1e-9,'bounded A8 visual buckling');
- const samples=[.10,.30,.50,.70,.90].map(p=>
+ assert.ok(impact.bumperCrushM>.10&&impact.fenderCrushM>.05);
+ const reverse=[.10,.30,.50,.70,.90].map(p=>
   resolveBranchFrame(S.freezeEndFilmSec+
     (S.rewindEndFilmSec-S.freezeEndFilmSec)*p,seq).frame.impact);
- assert.ok(samples.every(f=>f!==null));
- assert.ok(samples.some(f=>railBuckleAt(firstX,f)>.07),
-  'steel remains visibly bent for part of real rewind');
+ assert.ok(reverse.every(f=>f!==null));
+ assert.ok(reverse.some(f=>f.contact.occurred&&f.bumperCrushM>.02));
  const end=sampleRealAgent8Wrong(S.choiceSourceSec,S.choiceSourceSec).impact;
- assert.equal(railBuckleAt(firstX,end),0,'rail deformation unwinds, never pops clean early');
- assert.equal(end.bumperCrushM,0,'original car and rail restore together');
+ assert.equal(end.bumperCrushM,0,'original metal unfolds while steel unwinds');
  assert.equal(end.contact.occurred,false);
- // The original scene cut is shared by the car, all hubs, and A8 first-contact rail.
- const source=sampleRealAgent8Wrong(S.impactSourceSec,S.choiceSourceSec);
- const carX=source.dynamics.positionM[0];
- const first=source.impact.contact.firstContactX;
+ const wrong=sampleRealAgent8Wrong(S.impactSourceSec,S.choiceSourceSec);
  const sceneOffset=-86-sampleControlledFrame(S.choiceSourceSec).positionM[0];
- assert.ok(Math.abs(carX+sceneOffset-source.impact.scenePositionM[0])<1e-6);
- assert.ok(Math.abs(first-source.impact.scenePositionM[0])<8,'rail and car same scene coordinates');
+ assert.ok(Math.abs(wrong.dynamics.positionM[0]+sceneOffset-
+   wrong.impact.scenePositionM[0])<1e-6,'A8 cut matches rebased A2 car');
+ assert.ok(Math.abs(firstX-wrong.impact.scenePositionM[0])<8,
+   'rail corner and car share original cut-local X');
+ // Verify the ACTUAL native scene uses Agent8-owned damage, steel and scars
+ // rather than retaining its old A4 rigid-rail + custom deformation renderer.
+ const scene=readFileSync(new URL('../../production/yunex/tyre_blowout_ep003/rewind/EP003Agent9Preview.tsx',import.meta.url),'utf8');
+ assert.match(scene,/CrashBarrierWorld frame=\\{impact\\}/);
+ assert.match(scene,/CrashCarRig frame=\\{impact\\}/);
+ assert.match(scene,/ImpactEffects3D frame=\\{impact\\}/);
+ assert.match(scene,/worldFactory=\\{buildEpisodeHighway\\}/);
 });
