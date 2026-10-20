@@ -56,7 +56,7 @@ export function verifyNativeMp4(filePath, expectedFrames, {audioRequired = true,
   const metadata = JSON.parse(run('ffprobe', ffprobeArgs));
   const video = validateVideoMetadata(metadata, expectedFrames, {audioRequired});
   run('ffmpeg', ['-hide_banner','-v','error','-xerror','-nostdin','-i',absolute,'-f','null','-']);
-  const hashes = uniqueDecodedFrameHashes(run('ffmpeg', ['-hide_banner','-v','error','-nostdin','-i',absolute,'-vf','fps=1','-f','framemd5','-']));
+  const hashes = uniqueDecodedFrameHashes(run('ffmpeg', ['-hide_banner','-v','error','-nostdin','-i',absolute,'-map','0:v:0','-vf','fps=1','-f','framemd5','-']));
   if (hashes < 2) throw new Error('EP004 native audit: no real time-evolving frames found by sampled decoded pixel hashes');
   const screenshots = [];
   for (const frame of [0, Math.floor(expectedFrames / 2), expectedFrames - 1]) {
