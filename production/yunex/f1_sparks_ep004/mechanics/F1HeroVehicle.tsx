@@ -154,8 +154,40 @@ export function buildF1HeroVehicle(): T.Group {
       o.userData.ep004GhostShell=true;
     }
   });
+  // Runtime QA is exercised by BOTH native Remotion previews. It compares the
+  // actual mesh bounds, not just independently duplicated descriptor constants.
+  assertHeroSkidGeometry(root);
   root.userData={...root.userData,ep004:true,skidDescriptors:getSkidDescriptors()};
   return root;
+}
+
+/** Fail fast if contact coordinates diverge from actual *metal* mesh bottoms.
+ * Agent 2 samples these points for real skid/asphalt contact; the entire
+ * factory stays in metric vehicle-local space and has no hidden offsets.
+ */
+export function assertHeroSkidGeometry(root:T.Group):void {
+  for (const descriptor of getSkidDescriptors()) {
+    const named=root.getObjectByName(`EP004-skid-${descriptor.id}`);
+    if (!(named instanceof T.Mesh) || named.userData.metalSkid!==true) {
+      throw new Error(`Missing physical metallic skid geometry: ${descriptor.id}`);
+    }
+    const bounds=named.geometry.boundingBox ?? (named.geometry.computeBoundingBox(),named.geometry.boundingBox);
+    if(!bounds)throw new Error(`Missing geometric bounds: ${descriptor.id}`);
+    const expected=descriptor.localBottomPoint;
+    const actual:[number,number,number]=[
+      named.position.x+(bounds.min.x+bounds.max.x)*.5,
+      named.position.y+bounds.min.y,
+      named.position.z+(bounds.min.z+bounds.max.z)*.5,
+    ];
+    // All skid parents are at vehicle-local origin, so this mesh-bounds point
+    // becomes the exact contact location before authoritative vehicle motion.
+    if (actual.some((v,i)=>Math.abs(v-expected[i])>1e-6)){
+      throw new Error(`Metal skid ${descriptor.id} mesh/descriptor mismatch: ${actual.join(',')}`);
+    }
+    if(Math.abs(actual[1]-EP004.initialSkidBottomClearanceM)>1e-6) {
+      throw new Error(`Metal skid ${descriptor.id} fails baseline clearance`);
+    }
+  }
 }
 
 /** Absolute-frame setting; no frame integration and no second route solver. */
