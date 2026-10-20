@@ -58,3 +58,26 @@ test('retime, crossfade, finite guards and invalid duration',()=>{
   assert.throws(()=>sampleRetimedShotCamera('aero-load',0,0,m));
   assert.throws(()=>sampleShotCamera('aero-load',NaN,m));
 });
+
+
+test('entire approved outline clears portrait left/right edges in each wide shot',()=>{
+  const dot=(a,b)=>a.reduce((acc,v,i)=>acc+v*b[i],0);
+  const norm=(a)=>Math.hypot(...a);
+  for(const shot of ['spark-hook','rear-mystery','aero-load','racing-payoff']){
+    const dur=CAMERA_SHOTS[shot].suggestedDurationSec;
+    for(const fraction of [0,.25,.5,.75,1]){
+      const {positionWorld:eye,targetWorld:target,fovDeg:fov}=sampleShotCamera(shot,fraction*dur,fixtures());
+      const forward=target.map((v,i)=>(v-eye[i])/norm(target.map((q,j)=>q-eye[j])));
+      const right=[-forward[2],0,forward[0]];
+      const rightLength=norm(right),unitRight=right.map(v=>v/rightLength);
+      const limit=Math.tan(fov*Math.PI/360)*(1080/1920);
+      for(const x of [-2.75,2.75])for(const y of [0,1.05])for(const z of [-1.05,1.05]){
+        const displacement=[x-eye[0],y-eye[1],z-eye[2]];
+        const distance=dot(displacement,forward);
+        assert.ok(distance>0,shot+' corner behind camera');
+        const horizontal=dot(displacement,unitRight)/(distance*limit);
+        assert.ok(Math.abs(horizontal)<1,shot+' crops a vehicle corner at '+fraction+': '+horizontal);
+      }
+    }
+  }
+});
