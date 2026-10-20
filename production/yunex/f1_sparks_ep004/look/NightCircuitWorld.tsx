@@ -95,12 +95,12 @@ function buildNightWorld(): THREE.Group {
   factory.traverse(node => {
     if (!(node instanceof THREE.Mesh) || node.name === 'gradient-sky') return;
     const name = node.name;
-    const dark = name === 'runoff' ? 0.23
-      : name === 'terrain-relief' ? 0.35
-      : name === 'terrain' ? 0.30
-      : name.includes('tree-') || name.includes('conifer-') ? 0.34
-      : name.includes('grandstand') ? 0.52
-      : name.includes('circuit-barriers') || name.includes('fence-') ? 0.64
+    const dark = name === 'runoff' ? 0.15
+      : name === 'terrain-relief' ? 0.19
+      : name === 'terrain' ? 0.17
+      : name.includes('tree-') || name.includes('conifer-') ? 0.20
+      : name.includes('grandstand') ? 0.42
+      : name.includes('circuit-barriers') || name.includes('fence-') ? 0.53
       : name.includes('pit') || name.includes('garage') ? 0.58
       : 1;
     if (dark >= 1) return;
