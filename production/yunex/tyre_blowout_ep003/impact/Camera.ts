@@ -29,10 +29,12 @@ export function sampleCrashCamera(frame:CrashOutcomeFrame,lens:CrashLens):CrashC
   return {position:[x+6.65+impulse,2.42,z+5.18],
    target:[x+.98,.88,z-.22],fov:45,lens};
  }
- // After impact, specifically display original bent bumper/right headlamp.
- // Short GLANCING outside-rail shot, camera above its 0.75m steel lip.
- return {position:[x+5.45+impulse,2.66,z-3.06],
-  target:[x+1.48,.95,z-.32],fov:43,lens};
+ // Front-right headlamp/bumper reveal from AHEAD, still INSIDE the road.
+ // The rail runs BESIDE the bonnet, NOT between lens and crumpled car.
+ // Lower 2.2m eye height and 6.1m forward offset are close enough to read
+ // the approved 0.24m nose dent without falsely increasing its magnitude.
+ return {position:[x+6.1+impulse,2.20,z-.35],
+  target:[x+1.12,.79,z-.58],fov:43,lens};
 }
 /** Hard editorial camera cuts only; physical car path NEVER jumps. */
 export function lensForHydratedTime(t:number):CrashLens{
