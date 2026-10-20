@@ -13,10 +13,13 @@ import {WorldLighting} from '../../../../src/yunex/world-kit/components.tsx';
 import {disposeObject} from '../../../../src/yunex/world-kit/geometry.ts';
 import type {SparkParticle, VehicleMotionState, Vec3} from '../shared/contract.ts';
 import {buildCircuitPaint, buildDriveableAsphalt, sampleCircuitRoadPoint} from './road.ts';
+import {lampIntensityWeight} from './fixture-lighting.ts';
 
 export type NightCircuitWorldProps = {
   tSec?: number;
   motion?: VehicleMotionState;
+  /** Moving reference fixture centreline, only used when physics motion is absent. */
+  referenceDistanceM?: number;
   /** Authoritative, already spawned particles from Agent 2; NEVER fabricate here. */
   particles?: readonly SparkParticle[];
   /** Film lighting levels can be dialled by integration, but do not strobe. */
@@ -69,6 +72,8 @@ function addFloodlightTower(parent: THREE.Group, distanceM: number, side: number
   const glow = new THREE.PointLight('#cce9ff', 64, 38, 2);
   glow.position.set(side > 0 ? -1 : 1, 8.9, 0);
   glow.name = 'ep004-steady-local-circuit-light';
+  glow.userData.ep004LightDistanceM = distanceM;
+  glow.userData.ep004FullIntensity = 64;
   root.add(glow);
   parent.add(root);
 }
@@ -170,9 +175,21 @@ export function deriveContactSparkLights(
 }
 
 export const NightCircuitWorld: React.FC<NightCircuitWorldProps> = ({
-  particles = [], exposure = 1, showEnvironment = true,
+  motion, referenceDistanceM, particles = [], exposure = 1, showEnvironment = true,
 }) => {
   const scene = useMemo(buildNightWorld, []);
+  const activeDistanceM = motion?.routeDistanceM ?? referenceDistanceM;
+  // These twelve emissive lamp fixtures remain visible. Software WebGL only
+  // shades nearby dynamic point lights, avoiding twelve costly full-frame lights.
+  // Absolute-distance selection makes out-of-order Remotion frames deterministic.
+  scene.traverse(node => {
+    if (!(node instanceof THREE.PointLight) || node.name !== 'ep004-steady-local-circuit-light') return;
+    const d = node.userData.ep004LightDistanceM as number;
+    const weight = activeDistanceM === undefined ? 0.24 :
+      lampIntensityWeight(activeDistanceM, d, routeLength('track'));
+    node.visible = weight > 0.08;
+    node.intensity = 64 * weight;
+  });
   useEffect(() => () => disposeObject(scene), [scene]);
   const contactLights = useMemo(() => deriveContactSparkLights(particles, exposure), [particles, exposure]);
 
