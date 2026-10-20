@@ -1,12 +1,14 @@
 import React from 'react';
 import {AbsoluteFill,useCurrentFrame,useVideoConfig} from 'remotion';
 import type {ShotId, StoryRequest} from '../shared/contract';
-import {defaultTiming,storyLayers,type StoryTiming} from './beats';
+import {defaultTiming,storyLayers,storyLocation,type StoryTiming} from './beats';
+import {getStoryVisualCue,type StoryVisualCue} from './visual-cues';
 import {StoryOverlay,type ScreenAnchor,type WordCaption} from './StoryOverlay';
 export type StorySequenceProps=Readonly<{
  /** Physics supplies the real data. This layer MUST NOT fabricate vehicle motion or sparks. */
  requestAt:(globalTimeSec:number,shot:ShotId,localSec:number,durationSec:number)=>StoryRequest;
- renderShot:(request:StoryRequest)=>React.ReactNode;
+ /** cue.second is purely editorial. The motion/contacts/particles remain authoritative. */
+ renderShot:(request:StoryRequest,cue:StoryVisualCue)=>React.ReactNode;
  timing?:StoryTiming;
  startAtSec?:number;
  captions?:readonly WordCaption[];
@@ -14,8 +16,8 @@ export type StorySequenceProps=Readonly<{
  showLabels?:boolean;
  showCaptions?:boolean;
 }>;
-/** Shot-local handle is passed unchanged; editor may change any duration after VO analysis.
- * Both transition layers evaluate exactly the SAME globalTimeSec, so no car teleport. */
+/** Same global time in all layers, so no car teleport. Captions live above the
+ * shot blend so they don't ghost/double during camera match transitions. */
 export const StorySequence:React.FC<StorySequenceProps>=({
  requestAt,renderShot,timing=defaultTiming,startAtSec=0,captions=[],
  metalSkidScreenAnchor,showLabels=true,showCaptions=true
@@ -23,17 +25,21 @@ export const StorySequence:React.FC<StorySequenceProps>=({
  const frame=useCurrentFrame(),{fps,width,height}=useVideoConfig();
  const globalTimeSec=frame/fps+startAtSec;
  const layers=storyLayers(globalTimeSec,timing);
+ const active=storyLocation(globalTimeSec,timing);
+ const activeReq=requestAt(globalTimeSec,active.shot,active.shotLocalSec,active.shotDurationSec);
+ if(activeReq.shot!==active.shot||Math.abs(activeReq.tSec-globalTimeSec)>.001)
+  throw new Error('StoryRequest must match editorial shot and global physics time');
  return <AbsoluteFill style={{background:'#081018',overflow:'hidden'}}>
   {layers.map(layer=>{
     const req=requestAt(globalTimeSec,layer.shot,layer.shotLocalSec,layer.shotDurationSec);
     if(req.shot!==layer.shot)throw new Error('StoryRequest shot disagrees with editorial layer');
     if(Math.abs(req.tSec-globalTimeSec)>0.001)throw new Error('StoryRequest and scene must share global time');
     return <AbsoluteFill key={layer.shot} style={{opacity:layer.opacity}}>
-     {renderShot(req)}
-     <StoryOverlay request={req} globalTimeSec={globalTimeSec} width={width} height={height}
-       captions={captions} showLabels={showLabels} showCaptions={showCaptions}
-       metalSkidScreenAnchor={metalSkidScreenAnchor?.(req)}/>
+     {renderShot(req,getStoryVisualCue(req))}
     </AbsoluteFill>;
   })}
+  <StoryOverlay request={activeReq} globalTimeSec={globalTimeSec} width={width} height={height}
+    captions={captions} showLabels={showLabels} showCaptions={showCaptions}
+    metalSkidScreenAnchor={metalSkidScreenAnchor?.(activeReq)}/>
  </AbsoluteFill>;
 };
