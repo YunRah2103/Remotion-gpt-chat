@@ -14,6 +14,7 @@ import {useThree} from '@react-three/fiber';
 import {WorldLighting} from '../../../../src/yunex/world-kit/components';
 import {F1HeroVehicle,getSkidDescriptors} from '../mechanics/index';
 import {StoryMechanicalCutaway} from './StoryMechanicalCutaway';
+import {SparkLensGlints} from './SparkLensGlints';
 import {contactCaption} from './scene-captions';
 import {sampleDynamics,sampleContactDrivenSparks,sampleSkidContacts,localToWorld} from '../physics/index';
 import {NightCircuitWorld} from '../look/NightCircuitWorld';
@@ -85,10 +86,10 @@ export function integratedStoryCamera(req:StoryRequest):CameraPose{
   case 'underfloor-reveal':
    // Camera is below Agent 4's opaque road FOR THE CUTAWAY ONLY.
    // Look upward at the real silver skid and tan plank, not a ghost arrow.
-   pos=[.45+p*.36,-.46,2.65+p*.12];target=[.70,.105,0];fovDeg=49;break;
-  case 'aero-load':pos=[.24,1.42,10.1-p*.4];target=[0,.94,0];fovDeg=50;break;
-  case 'contact-macro':pos=[1.0,.78,9.3+p*.3];target=[.8,.69,0];fovDeg=49;break;
-  default:pos=[-1.9+p*1.1,1.70,10.2-p*.7];target=[-.30,.91,0];fovDeg=49;break;
+   pos=[.45+p*.42,-1.27,3.05+p*.14];target=[.70,.105,0];fovDeg=51;break;
+  case 'aero-load':pos=[.24,1.44,12.25-p*.35];target=[0,.90,0];fovDeg=52;break;
+  case 'contact-macro':pos=[.7,.88,12.2+p*.1];target=[.50,.82,0];fovDeg=52;break;
+  default:pos=[-2.2+p*.75,1.73,12.15-p*.35];target=[.0,.88,0];fovDeg=52;break;
  }
  const position=localWorld(m,pos),cameraTarget=localWorld(m,target);
  // Aero camera remains tied to road, NOT the heaving body: lowering is visible.
@@ -211,6 +212,7 @@ const RealShot:React.FC<{request:StoryRequest;cue:StoryVisualCue}>=({request,cue
     <F1HeroVehicle motion={request.motion}/>}
    {!mechanism&&<RealSparkParticles particles={request.particles}/>}
   </ThreeCanvas>
+  {!mechanism&&<SparkLensGlints particles={request.particles} pose={pose}/>}
   {mechanism&&<UnderfloorMaterialKey request={request} opacity={smoothstep(request.shotLocalSec/.42)}/>}
   {request.shot==='aero-load'&&<AeroHeightGuide request={request}/>}
  </AbsoluteFill>;
