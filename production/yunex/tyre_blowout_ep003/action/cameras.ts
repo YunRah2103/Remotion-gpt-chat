@@ -99,21 +99,25 @@ export function sampleActionCamera(req:ActionCameraRequest):ActionCameraPose {
       fov=mix(55,59,eased);break;
     }
     case 'impact-side-profile': {
-      // Wide geography FIRST: view from median side, so the near-side rail
-      // cannot mask the contact. A deliberate short lateral dolly, no spin.
-      position=lerp3([4.5,3.65,8.5],[5.2,3.9,9.2],eased);
-      target=lerp3([.18,.82,-.85],[.20,.77,-1.05],eased);
-      fov=54;break;
+      // Show the ACTUAL first A8 front-right rail strike from ahead of the
+      // failed corner, elevated above the steel rail. The former left-side
+      // broadside hid both the bumper deformation and the collision itself.
+      // A wide portrait-safe front-right three-quarter dolly retains the GT.
+      position=lerp3([8.3,5.05,-5.8],[8.9,5.35,-6.1],eased);
+      target=lerp3([.70,.79,-1.05],[.85,.76,-1.30],eased);
+      fov=57;break;
     }
     case 'impact-overhead': {
       position=lerp3([-1.7,15.8,4.1],[-2.8,14.8,5.3],eased);
       target=[1.2,.65,-2.9];fov=48;break;
     }
     case 'damage-scrape': {
-      // Low aftermath, still includes full impact direction and road speed.
-      position=lerp3([-5.5,1.15,4.5],[-6.8,1.45,3.6],eased);
-      target=lerp3([1.40,.57,-2.60],[1.7,.60,-2.9],eased);
-      fov=56;break;
+      // Continue looking AT the crushed front-right bumper/lamp, not the
+      // undamaged rear: preserve rail geography while the real A8 damage
+      // and debris evolve, with the lens above rail height.
+      position=lerp3([7.0,3.65,-5.25],[7.8,4.05,-5.75],eased);
+      target=lerp3([1.20,.68,-1.10],[1.05,.66,-1.28],eased);
+      fov=59;break;
     }
     case 'reverse-sweep': {
       // Agent 9 reverses the physical collision state and particles. Follow
