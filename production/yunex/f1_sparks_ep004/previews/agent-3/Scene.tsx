@@ -23,8 +23,8 @@ export type CameraBeat=Readonly<{
 }>;
 export const CAMERA_SEQUENCE:readonly CameraBeat[]=[
   {shot:'rear-mystery',fromSec:0,durationSec:2.25,startDistanceM:63.55,startTimeSec:.13,playRate:.21},
-  {shot:'underfloor-reveal',fromSec:2.25,durationSec:3.55,startDistanceM:132.30,startTimeSec:.055,playRate:.033},
-  {shot:'contact-macro',fromSec:5.80,durationSec:2.30,startDistanceM:134.00,startTimeSec:.04,playRate:.030},
+  {shot:'underfloor-reveal',fromSec:2.25,durationSec:3.55,startDistanceM:132.30,startTimeSec:.092,playRate:.0015},
+  {shot:'contact-macro',fromSec:5.80,durationSec:2.30,startDistanceM:134.00,startTimeSec:.065,playRate:.0025},
   {shot:'racing-payoff',fromSec:8.10,durationSec:2.90,startDistanceM:63.55,startTimeSec:.145,playRate:.22},
 ];
 export const OPENING_BEAT:CameraBeat={
