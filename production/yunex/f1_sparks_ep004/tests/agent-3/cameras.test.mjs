@@ -60,12 +60,13 @@ test('retime, crossfade, finite guards and invalid duration',()=>{
 });
 
 
-test('entire approved outline clears portrait left/right edges in each wide shot',()=>{
+test('full vehicle outline is safely framed during wide shot phases after intentional close-up inserts',()=>{
   const dot=(a,b)=>a.reduce((acc,v,i)=>acc+v*b[i],0);
   const norm=(a)=>Math.hypot(...a);
   for(const shot of ['spark-hook','rear-mystery','aero-load','racing-payoff']){
     const dur=CAMERA_SHOTS[shot].suggestedDurationSec;
-    for(const fraction of [0,.25,.5,.75,1]){
+    const fractions=shot==='spark-hook'?[.70,.85,1]:shot==='racing-payoff'?[.66,.85,1]:[0,.25,.5,.75,1];
+    for(const fraction of fractions){
       const {positionWorld:eye,targetWorld:target,fovDeg:fov}=sampleShotCamera(shot,fraction*dur,fixtures());
       const forward=target.map((v,i)=>(v-eye[i])/norm(target.map((q,j)=>q-eye[j])));
       const right=[-forward[2],0,forward[0]];
