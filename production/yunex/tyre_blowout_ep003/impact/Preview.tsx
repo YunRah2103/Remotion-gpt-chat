@@ -65,19 +65,23 @@ export const CrashCarRig:React.FC<{frame:CrashOutcomeFrame;
   });return originalPositions;
  },[original]);
  const damageFolds=useMemo(()=>{
-  // Add a few sharply folded metal accents to the original car front corner.
-  // These do not replace the body. The canonical arched-body mesh is crushed
-  // separately in actual vertex-space by applyOriginalKitDamage.
+  // Thin, flush creased paint edges ON the original front-right metalwork.
+  // Earlier visual inspection found seven protruding blocks on the bonnet;
+  // those were NOT credible damage and have been removed. The underlying
+  // original arched-body mesh itself is still vertex-deformed above.
   const root=new T.Group();
-  root.name='A8-original-car-right-front-deformation';
-  const exposed=new T.MeshStandardMaterial({color:'#738995',metalness:.66,roughness:.46,side:T.DoubleSide});
-  const shadow=new T.MeshStandardMaterial({color:'#263a48',metalness:.50,roughness:.62,side:T.DoubleSide});
-  for(let i=0;i<7;i++){
-   const metal=new T.Mesh(new T.BoxGeometry(.09,.018,.13+i*.013),i%2===0?exposed:shadow);
-   metal.position.set(2.08+i*.043,1.018-i*.007,-.43-i*.064);
-   metal.rotation.set(.08+i*.015,.18+i*.09,-.12+i*.035);
-   root.add(metal);
-  }
+  root.name='A8-front-right-metal-crease-edges';
+  const exposed=new T.MeshStandardMaterial({color:'#758d99',metalness:.68,roughness:.50,side:T.DoubleSide});
+  const shadow=new T.MeshStandardMaterial({color:'#1b3444',metalness:.46,roughness:.70,side:T.DoubleSide});
+  const lip=new T.Mesh(new T.BoxGeometry(.19,.016,.095),exposed);
+  lip.position.set(2.34,.776,-.895);lip.rotation.set(.06,.35,-.16);
+  root.add(lip);
+  const score=new T.Mesh(new T.BoxGeometry(.29,.012,.028),shadow);
+  score.position.set(2.25,.876,-.918);score.rotation.set(.12,.31,-.11);
+  root.add(score);
+  const fold=new T.Mesh(new T.BoxGeometry(.16,.015,.082),exposed);
+  fold.position.set(2.39,.696,-.890);fold.rotation.set(.02,.19,.19);
+  root.add(fold);
   original.add(root);
   return root;
  },[original]);
