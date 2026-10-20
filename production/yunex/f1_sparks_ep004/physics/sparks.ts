@@ -6,7 +6,7 @@ import type {DynamicsParams} from './dynamics.ts';
 const clamp=(v:number,lo:number,hi:number)=>Math.max(lo,Math.min(hi,v));
 const hash=(x:number)=>{let u=x>>>0;u=Math.imul(u^(u>>>16),0x7feb352d);u=Math.imul(u^(u>>>15),0x846ca68b);return ((u^(u>>>16))>>>0)/4294967296;};
 const ids:Readonly<Record<SkidId,number>>={forward:1,middle:2,rear:3};
-const HZ=100,MAX_LIFE=.78,MAX_PARTICLES=260;
+const HZ=100,IMPULSES=12,MAX_LIFE=.78,MAX_PARTICLES=260;
 type SparkParams= DynamicsParams & {samplingHz?:number};
 
 /** All births are sampled at fixed absolute 10-ms ticks, not frame boundaries.
@@ -45,8 +45,12 @@ export function sampleSparkParticles(
     const pastContacts=sampleSkidContacts(born,pastMotion,skidArray);
     for(const c of pastContacts){
       if(!c.active||c.signedGapM>0||c.relativeSpeedMps<=.5)continue;
-      const j=ids[c.skidId],seed=(tick*1777+j*124129)>>>0;
-      const emissionProb=clamp((.22+.76*c.contactIntensity01)*c.relativeSpeedMps/78,0,.92);
+      const j=ids[c.skidId];
+      // A physical sliding point releases many microscopic glints per 10ms tick;
+      // each is a separate seeded hot chip, not an arbitrarily timed sheet.
+      for(let chip=0;chip<IMPULSES;chip++){
+      const seed=(tick*1777+j*124129+chip*92821)>>>0;
+      const emissionProb=clamp((.18+.80*c.contactIntensity01)*c.relativeSpeedMps/78,0,.92);
       if(hash(seed+12)>emissionProb)continue;
       const lifespan=.33+.45*hash(seed+21);
       if(age>lifespan)continue;
@@ -82,9 +86,10 @@ export function sampleSparkParticles(
       const velocityWorld:Vec3=[v0[0]*Math.exp(-drag*age),vyFinal,v0[2]*Math.exp(-drag*age)];
       const luminance01=clamp(Math.pow(1-age/lifespan,1.45)*(.60+.4*hash(seed+93)),0,1);
       const radiusM=.006+.017*hash(seed+13)*(1-age/lifespan);
-      result.push({id:tick*10+j,emitterSkidId:c.skidId,startSec:born,ageSec:age,
+      result.push({id:tick*100+j*16+chip,emitterSkidId:c.skidId,startSec:born,ageSec:age,
         lifetimeSec:lifespan,positionWorld,velocityWorld,radiusM,luminance01});
       if(result.length>=MAX_PARTICLES)return result;
+      }
     }
   }
   return result;
