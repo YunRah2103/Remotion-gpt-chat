@@ -28,7 +28,7 @@ export const CAMERA_SEQUENCE:readonly CameraBeat[]=[
   {shot:'racing-payoff',fromSec:8.10,durationSec:2.90,startDistanceM:63.55,startTimeSec:.145,playRate:.22},
 ];
 export const OPENING_BEAT:CameraBeat={
-  shot:'spark-hook',fromSec:0,durationSec:5,startDistanceM:63.65,startTimeSec:.145,playRate:.30,
+  shot:'spark-hook',fromSec:0,durationSec:5,startDistanceM:63.65,startTimeSec:.21,playRate:.30,
 };
 export function previewBeat(screenSec:number,hook:boolean):{beat:CameraBeat;localSec:number;physicsSec:number}{
   if(!Number.isFinite(screenSec)||screenSec<0)throw new Error('invalid sequence time');
