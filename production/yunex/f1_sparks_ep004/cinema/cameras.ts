@@ -30,10 +30,13 @@ type Key = readonly [progress:number,position:Vec3,target:Vec3,fovDeg:number];
  */
 const KEYS: Readonly<Record<ShotId,readonly Key[]>> = {
   'spark-hook': [
-    [0,[2.60,.62,8.75],[0,.50,0],65],
-    [.20,[3.40,.58,8.60],[0,.50,0],65],
-    [.60,[4.50,.62,8.30],[0,.50,0],63],
-    [1,[5.20,.74,8.10],[-.12,.55,0],63],
+    // Low rear three-quarter first: hot metal chips trail visibly BEHIND
+    // the car. Dolly diagonally across its flank for real perspective change.
+    [0,[-4.80,.57,8.20],[0,1.26,0],68],
+    [.18,[-2.60,.51,8.35],[0,1.22,0],66],
+    [.43,[.45,.52,8.40],[0,1.18,0],65],
+    [.72,[3.25,.62,8.40],[0,1.17,0],65],
+    [1,[4.80,.78,8.15],[-.06,1.17,0],66],
   ],
   'rear-mystery': [
     [0,[-9.30,1.22,1.72],[-.55,.57,0],55],
@@ -41,11 +44,14 @@ const KEYS: Readonly<Record<ShotId,readonly Key[]>> = {
     [1,[-7.90,.75,1.36],[-1.15,.43,0],57],
   ],
   'underfloor-reveal': [
+    // First one second is a rapid but wheel-safe rear exterior approach.
+    // Once the genuine factory mesh is sectioned, the lens climbs ABOVE
+    // skid level to reveal the SILVER metal top next to BROWN composite.
     [0,[-7.90,.75,1.36],[-1.15,.43,0],57],
-    [.30,[-3.85,.27,1.62],[-.90,.18,0],53],
-    [.55,[-1.30,.18,1.48],[.35,.09,0],50],
-    [.76,[.42,.14,1.29],[1.08,.078,0],51],
-    [1,[1.05,.14,1.22],[1.18,.065,0],52],
+    [.22,[-2.20,1.04,2.04],[.35,.45,0],56],
+    [.37,[2.20,1.22,1.66],[1.18,.15,0],45],
+    [.63,[2.05,1.10,1.38],[1.18,.095,0],42],
+    [1,[1.87,.92,1.25],[1.18,.085,0],42],
   ],
   'aero-load': [
     [0,[.20,1.72,12.3],[0,.57,0],55],
@@ -53,14 +59,17 @@ const KEYS: Readonly<Record<ShotId,readonly Key[]>> = {
     [1,[.13,1.47,12.4],[0,.51,0],55],
   ],
   'contact-macro': [
-    [0,[1.05,.14,1.22],[1.18,.065,0],52],
-    [.5,[1.12,.14,1.21],[1.18,.065,0],54],
-    [1,[1.18,.14,1.20],[1.18,.065,0],55],
+    [0,[1.87,.92,1.25],[1.18,.085,0],42],
+    [.48,[1.79,.82,1.23],[1.18,.078,0],41],
+    [1,[1.72,.78,1.21],[1.18,.071,0],42],
   ],
   'racing-payoff': [
-    [0,[6.80,1.45,7.45],[.15,.56,0],61],
-    [.50,[6.38,1.20,7.15],[.12,.52,0],61],
-    [1,[6.72,1.18,7.43],[-.08,.54,0],62],
+    // Distinct from hook: compact low rear follow, then elevated
+    // rear quarter with passing floodlights, never a repetitive side view.
+    [0,[-6.40,1.10,6.45],[.20,1.04,0],66],
+    [.38,[-5.90,1.28,6.20],[.04,1.04,0],65],
+    [.74,[-4.75,1.56,6.55],[.05,1.10,0],64],
+    [1,[-4.20,1.58,6.75],[.18,1.18,0],64],
   ],
 };
 const clamp=(n:number,a=0,b=1)=>Math.max(a,Math.min(b,n));
