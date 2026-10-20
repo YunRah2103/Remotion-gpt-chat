@@ -39,11 +39,11 @@ test('all six editorial scenes must contain true moving frames',()=>{
   const frames=beatMotionFrameNumbers(cuts,180);
   assert.equal(frames.length,18);
   assert.deepEqual(frames.slice(0,3),[4,15,25]);
-  const movingMd5=Array.from({length:18},(_,i)=>'0, '+i+', '+i+', 100, hash'+i).join('\\n');
+  const movingMd5=Array.from({length:18},(_,i)=>'0, '+i+', '+i+', 100, hash'+i).join('\n');
   const proof=assertEachBeatChanges(movingMd5,cuts,180);
   assert.equal(proof.length,6);
   assert.ok(proof.every(p=>p.distinctPixelHashes===3));
-  const staticBeat=Array.from({length:18},(_,i)=>'0, '+i+', '+i+', 100, hash'+(i>=6 && i<9?6:i)).join('\\n');
+  const staticBeat=Array.from({length:18},(_,i)=>'0, '+i+', '+i+', 100, hash'+(i>=6 && i<9?6:i)).join('\n');
   assert.throws(()=>assertEachBeatChanges(staticBeat,cuts,180),/static or duplicate footage in scene scene-2/);
 });
 test('disallow noncontiguous, short or unfinished native editorial cuts',()=>{
