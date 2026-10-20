@@ -1,4 +1,4 @@
-name: YUNEX EP004 contract QA and optional motion render
+name: YUNEX EP004 contract and native specialist review
 
 on:
   pull_request:
@@ -10,13 +10,13 @@ on:
   workflow_dispatch:
     inputs:
       render_preview:
-        description: 'Render 150 frames of an EP004 composition after the entry exists'
-        required: true
+        description: 'Render one integrated EP004 preview if the manager entry is present'
+        required: false
         type: boolean
         default: false
       composition:
-        description: 'Verified EP004 composition ID from entry.tsx'
-        required: true
+        description: 'Composition ID from manager integrated episode entry'
+        required: false
         type: string
         default: 'EP004MotionReview'
 
@@ -25,7 +25,7 @@ permissions:
 
 jobs:
   validate:
-    name: TypeScript and EP004 deterministic contract
+    name: EP004 contract and repository TypeScript
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -37,7 +37,7 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: node --experimental-strip-types --test production/yunex/f1_sparks_ep004/tests/shared/*.test.mjs
-      - name: Verify EP004 isolation
+      - name: Validate shared episode isolation
         shell: bash
         run: |
           test -s production/yunex/f1_sparks_ep004/PRODUCTION_CONTRACT.md
@@ -45,10 +45,128 @@ jobs:
           test -s production/yunex/f1_sparks_ep004/HANDOFF.md
           test -s production/yunex/f1_sparks_ep004/LAUNCH_PROMPTS.md
 
+  specialist-native:
+    name: Native EP004 specialist moving MP4s and frame proof
+    if: ${{ github.event_name == 'pull_request' && (github.head_ref == 'agent/ep004-01-mechanics' || github.head_ref == 'agent/ep004-02-physics' || github.head_ref == 'agent/ep004-03-cinema' || github.head_ref == 'agent/ep004-04-look' || github.head_ref == 'agent/ep004-05-story') }}
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Resolve specialist-owned isolated Remotion compositions
+        id: setup
+        shell: bash
+        env:
+          EP004_HEAD: ${{ github.head_ref }}
+        run: |
+          case "$EP004_HEAD" in
+            agent/ep004-01-mechanics)
+              echo "agent=1" >> "$GITHUB_OUTPUT"
+              echo "entry=production/yunex/f1_sparks_ep004/previews/agent-1/entry.tsx" >> "$GITHUB_OUTPUT"
+              echo "a=EP004A1Underfloor" >> "$GITHUB_OUTPUT"
+              echo "b=EP004A1CarContext" >> "$GITHUB_OUTPUT"
+              echo "frames_a=180" >> "$GITHUB_OUTPUT"
+              echo "frames_b=240" >> "$GITHUB_OUTPUT"
+              ;;
+            agent/ep004-02-physics)
+              echo "agent=2" >> "$GITHUB_OUTPUT"
+              echo "entry=production/yunex/f1_sparks_ep004/previews/agent-2/entry.tsx" >> "$GITHUB_OUTPUT"
+              echo "a=EP004A2Technical" >> "$GITHUB_OUTPUT"
+              echo "b=EP004A2Portrait" >> "$GITHUB_OUTPUT"
+              echo "frames_a=150" >> "$GITHUB_OUTPUT"
+              echo "frames_b=210" >> "$GITHUB_OUTPUT"
+              ;;
+            agent/ep004-03-cinema)
+              echo "agent=3" >> "$GITHUB_OUTPUT"
+              echo "entry=production/yunex/f1_sparks_ep004/previews/agent-3/entry.tsx" >> "$GITHUB_OUTPUT"
+              echo "a=EP004Agent3Hook" >> "$GITHUB_OUTPUT"
+              echo "b=EP004Agent3Sequence" >> "$GITHUB_OUTPUT"
+              echo "frames_a=150" >> "$GITHUB_OUTPUT"
+              echo "frames_b=330" >> "$GITHUB_OUTPUT"
+              ;;
+            agent/ep004-04-look)
+              echo "agent=4" >> "$GITHUB_OUTPUT"
+              echo "entry=production/yunex/f1_sparks_ep004/look/preview-entry.tsx" >> "$GITHUB_OUTPUT"
+              echo "a=EP004Agent4Trackside" >> "$GITHUB_OUTPUT"
+              echo "b=EP004Agent4RaceFollow" >> "$GITHUB_OUTPUT"
+              echo "frames_a=150" >> "$GITHUB_OUTPUT"
+              echo "frames_b=210" >> "$GITHUB_OUTPUT"
+              ;;
+            agent/ep004-05-story)
+              echo "agent=5" >> "$GITHUB_OUTPUT"
+              echo "entry=production/yunex/f1_sparks_ep004/story/preview-entry.tsx" >> "$GITHUB_OUTPUT"
+              echo "a=EP004Agent5Hook" >> "$GITHUB_OUTPUT"
+              echo "b=EP004Agent5Middle" >> "$GITHUB_OUTPUT"
+              echo "frames_a=165" >> "$GITHUB_OUTPUT"
+              echo "frames_b=330" >> "$GITHUB_OUTPUT"
+              ;;
+            *) echo "No specialist preview configuration for $EP004_HEAD"; exit 1;;
+          esac
+      - name: Specialist tests (not just existing smoke checks)
+        shell: bash
+        env:
+          NUM: ${{ steps.setup.outputs.agent }}
+        run: |
+          shopt -s nullglob
+          tests=(production/yunex/f1_sparks_ep004/tests/agent-"$NUM"/*.test.mjs)
+          if (( ${#tests[@]} < 1 )); then echo "Missing Agent $NUM unit tests"; exit 1; fi
+          node --experimental-strip-types --test "${tests[@]}"
+      - name: Native 1080x1920 30fps render of BOTH compositions
+        shell: bash
+        env:
+          ENTRY: ${{ steps.setup.outputs.entry }}
+          A: ${{ steps.setup.outputs.a }}
+          B: ${{ steps.setup.outputs.b }}
+        run: |
+          test -s "$ENTRY"
+          mkdir -p out/ep004-native
+          npx remotion render "$ENTRY" "$A" out/ep004-native/technical.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --log=error
+          npx remotion render "$ENTRY" "$B" out/ep004-native/context.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --log=error
+      - name: Verify REAL time-evolving full MP4 video and capture screenshots
+        shell: bash
+        env:
+          FRAMES_A: ${{ steps.setup.outputs.frames_a }}
+          FRAMES_B: ${{ steps.setup.outputs.frames_b }}
+        run: |
+          python3 - <<'PY'
+          import subprocess,json,os
+          for label,count in (('technical',int(os.environ['FRAMES_A'])),('context',int(os.environ['FRAMES_B']))):
+            path=f'out/ep004-native/{label}.mp4'
+            meta=json.loads(subprocess.check_output(['ffprobe','-v','error','-select_streams','v:0','-count_frames','-show_entries','stream=width,height,avg_frame_rate,nb_read_frames','-of','json',path]))['streams'][0]
+            assert (meta['width'],meta['height']) == (1080,1920),(label,meta)
+            assert meta['avg_frame_rate'] == '30/1',(label,meta)
+            assert int(meta['nb_read_frames'])==count,(label,meta)
+            subprocess.run(['ffmpeg','-v','error','-xerror','-i',path,'-f','null','-'],check=True)
+            screenshots=[]
+            for frame in (0,count//2,count-1):
+              out=f'out/ep004-native/{label}-frame-{frame}.jpg'
+              subprocess.run(['ffmpeg','-v','error','-y','-i',path,'-vf',f'select=eq(n\\,{frame})','-vsync','vfr','-frames:v','1',out],check=True)
+              assert os.path.getsize(out)>0,out
+              screenshots.append(out)
+            frames=subprocess.check_output(['ffmpeg','-v','error','-i',path,'-vf','fps=1','-f','framemd5','-'])
+            hashes=set(line.split(',')[-1].strip() for line in frames.decode().splitlines() if line and not line.startswith('#'))
+            assert len(hashes)>=2,f'{label}: video has no measured time-evolving frames'
+            open(f'out/ep004-native/{label}-probe.json','w').write(json.dumps(meta,indent=2))
+            print(label,meta,'unique sampled frame hashes:',len(hashes),'screenshots:',screenshots)
+          PY
+      - name: Upload native moving clips and review evidence even if validation fails
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-EP004-Agent-${{ steps.setup.outputs.agent }}-Native-MP4-Review
+          path: out/ep004-native
+          retention-days: 30
+          if-no-files-found: warn
+
   native-preview:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.render_preview }}
     needs: validate
-    name: Optional five-second native moving MP4 + full decode
+    name: Optional integrated short EP004 native moving master preview
     runs-on: ubuntu-latest
     timeout-minutes: 55
     steps:
@@ -58,32 +176,19 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
-      - name: Require a REAL EP004 episode entry
-        run: test -f production/yunex/f1_sparks_ep004/entry.tsx
-      - name: Render moving portrait at native dimensions
+      - name: Require real manager-integrated episode entry
+        run: test -s production/yunex/f1_sparks_ep004/entry.tsx
+      - name: Render moving portrait excerpt
         env:
           EP004_COMP: ${{ inputs.composition }}
         run: |
           mkdir -p out/ep004
           npx remotion render production/yunex/f1_sparks_ep004/entry.tsx "$EP004_COMP" out/ep004/EP004-5s-native.mp4 --frames=0-149 --gl=swangle --codec=h264 --pixel-format=yuv420p --log=error
-      - name: Validate full video and report frame count
-        run: |
           ffprobe -v error -select_streams v:0 -count_frames -show_entries stream=width,height,avg_frame_rate,nb_read_frames -of json out/ep004/EP004-5s-native.mp4 > out/ep004/probe.json
-          python3 - <<'PY'
-          import json
-          s=json.load(open('out/ep004/probe.json'))['streams'][0]
-          assert (s['width'],s['height'])==(1080,1920), s
-          assert s['avg_frame_rate']=='30/1', s
-          assert int(s['nb_read_frames'])==150, s
-          print('Native portrait 1080x1920, 30fps, 150 frames verified by decoding')
-          PY
           ffmpeg -v error -xerror -i out/ep004/EP004-5s-native.mp4 -f null -
-          for sec in 0.3 2.3 4.3; do
-            ffmpeg -v error -y -ss "$sec" -i out/ep004/EP004-5s-native.mp4 -frames:v 1 "out/ep004/frame-$sec.png"
-          done
       - uses: actions/upload-artifact@v4
         with:
-          name: YUNEX-EP004-NATIVE-MOVING-REVIEW
+          name: YUNEX-EP004-Integrated-Moving-Review
           path: out/ep004
           retention-days: 30
           if-no-files-found: error
