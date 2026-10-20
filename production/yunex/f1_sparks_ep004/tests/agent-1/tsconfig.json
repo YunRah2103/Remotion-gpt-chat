@@ -1,0 +1,10 @@
+{
+  "extends": "../../../../../tsconfig.json",
+  "include": [
+    "../../mechanics/**/*.ts",
+    "../../mechanics/**/*.tsx",
+    "../../previews/agent-1/**/*.ts",
+    "../../previews/agent-1/**/*.tsx",
+    "../../shared/**/*.ts"
+  ]
+}
