@@ -23,6 +23,6 @@ export function sampleAgent1Fixture(tSec: number): VehicleMotionState {
   worldPosition:[pose.position[0],sampleTrackSurface(distance).heightM+heave,pose.position[2]],
   yawRad:pose.yaw,pitchRad:.003*Math.sin(tSec*2.1),rollRad:.005*Math.sin(tSec*1.32),
   wheelRotationRad:-distance/EP004.wheelRadiusM,heaveM:heave,
-  wheelCompression, downforceProxy01:.72,
+  wheelCompressionM: wheelCompression, downforceProxy01:.72,
  };
 }
