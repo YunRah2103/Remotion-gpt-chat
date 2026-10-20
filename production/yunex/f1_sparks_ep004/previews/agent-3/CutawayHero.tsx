@@ -22,13 +22,13 @@ export function shouldShowOnUnderfloorSection(meshName:string):boolean {
 function opticalMaterial(name:string):THREE.Material{
  if(name.startsWith('EP004-skid-')){
    return new THREE.MeshStandardMaterial({
-     color:'#d8eaf3',emissive:'#648d9d',emissiveIntensity:.22,
+     color:'#e9f5f7',emissive:'#b8f0ff',emissiveIntensity:.54,
      metalness:.72,roughness:.24,
    });
  }
  if(name.startsWith('EP004-composite-plank-')){
    return new THREE.MeshStandardMaterial({
-     color:'#ac8b63',emissive:'#6c4c2b',emissiveIntensity:.28,
+     color:'#a16d3a',emissive:'#b77b38',emissiveIntensity:.34,
      metalness:.02,roughness:.72,
    });
  }
@@ -41,7 +41,7 @@ function opticalMaterial(name:string):THREE.Material{
  // F1 chassis and tyres with a 3D X-ray presentation, not a loose tray.
  const opacity=name==='EP004-carbon-floor'?.20:.11;
  return new THREE.MeshBasicMaterial({
-   color:'#65dbd5',transparent:true,opacity,depthWrite:false,
+   color:'#325967',transparent:true,opacity:opacity*.20,depthWrite:false,
    side:THREE.DoubleSide,
  });
 }
@@ -51,7 +51,7 @@ export const CutawayHero:React.FC<{motion:VehicleMotionState}>=({motion})=>{
    root.traverse(node=>{
      if(!(node instanceof THREE.Mesh))return;
      node.material=opticalMaterial(node.name);
-     node.visible=true;
+     node.visible=shouldShowOnUnderfloorSection(node.name)||/single-seater-body|sidepod|engine-cover|tyre|tire|wheel|rim|front-wing|rear-wing|EP004-carbon-floor|EP004-floor-edge/i.test(node.name);
      if(!shouldShowOnUnderfloorSection(node.name)){
        // Hero shell is a faint optical context rather than occluding plank.
        node.castShadow=false;node.receiveShadow=false;
