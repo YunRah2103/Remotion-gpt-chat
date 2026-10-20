@@ -25,7 +25,9 @@ test('contact cue is based on actual active signed-gap and particles persist ind
 });
 test('comparison enforces a shared route, pose and exact source time',()=>{
  assert.doesNotThrow(()=>validateAeroPair(m(),m(2,72,-.02)));
- assert.throws(()=>validateAeroPair(m(),m(2.3)),/identical physics/);
- assert.throws(()=>validateAeroPair(m(),m(2,75)),/identical physics/);
- assert.throws(()=>validateAeroPair(m(),{...m(),worldPosition:[3,0,1]}),/identical physics/);
+ // Agent 2 places the same car lower in WORLD Y under load: this is legitimate.
+ assert.doesNotThrow(()=>validateAeroPair(m(),{...m(2,72,-.02),worldPosition:[2,-.043,1]}));
+ assert.throws(()=>validateAeroPair(m(),m(2.3)),/identical route/);
+ assert.throws(()=>validateAeroPair(m(),m(2,75)),/identical route/);
+ assert.throws(()=>validateAeroPair(m(),{...m(),worldPosition:[3,0,1]}),/identical route/);
 });
