@@ -63,20 +63,14 @@ jobs:
           done < /tmp/agent8-pins
           node --experimental-strip-types production/yunex/tyre_blowout_ep003/impact/verify-hydrated.mjs \
             | tee out/agent-8/integrated-physics-proof.json
-      - name: Render six decisive collision evidence PNGs before video encodes
+      - name: Render six authoritative contact frames, from pre-hit through bent steel
         run: |
           set -euxo pipefail
-          ENTRY=production/yunex/tyre_blowout_ep003/impact/entry.tsx
           HYDRO=production/yunex/tyre_blowout_ep003/impact/HydratedEntry.tsx
-          for frame in 48 66 72 92; do
-            npx --no-install remotion still "$ENTRY" EP003Agent8CrashApproach \
-              "out/agent-8/approach-early-$frame.png" --frame="$frame" \
-              --gl=swangle --scale=0.25 --log=error
-          done
-          for frame in 66 75; do
+          for frame in 51 57 59 62 66 75; do
             npx --no-install remotion still "$HYDRO" EP003Agent8HydratedCrash \
-              "out/agent-8/hydrated-impact-$frame.png" --frame="$frame" \
-              --gl=swangle --scale=0.25 --log=error
+              "out/agent-8/Hydrated-impact-frame-$frame.png" --frame="$frame" \
+              --gl=swangle --scale=0.35 --log=error
           done
       - name: Render authoritative A1 A2 A4 integrated crash FIRST
         run: |
@@ -85,7 +79,7 @@ jobs:
           HYDRO=production/yunex/tyre_blowout_ep003/impact/HydratedEntry.tsx
           npx --no-install remotion render "$HYDRO" EP003Agent8HydratedCrash \
             out/agent-8/EP003Agent8HydratedCrash.mp4 \
-            --gl=swangle --scale=0.25 --codec=h264 --pixel-format=yuv420p \
+            --gl=swangle --scale=0.35 --codec=h264 --pixel-format=yuv420p \
             --concurrency=1 --log=error
           ffprobe -v error -show_entries stream=codec_name,width,height,avg_frame_rate,nb_frames \
             -of json out/agent-8/EP003Agent8HydratedCrash.mp4 > out/agent-8/hydrated-ffprobe.json
@@ -96,24 +90,21 @@ jobs:
           name: EP003-agent8-hydrated-first
           path: |
             out/agent-8/EP003Agent8HydratedCrash.mp4
-            out/agent-8/hydrated-impact-*.png
+            out/agent-8/Hydrated-impact-frame-*.png
             out/agent-8/hydrated-ffprobe.json
             out/agent-8/integrated-physics-proof.json
             out/agent-8/integration-pins.txt
             out/agent-8/source-sha.txt
           retention-days: 30
           if-no-files-found: error
-      - name: Render remaining two original-GT crash shots
+      - name: Render integrated original-GT close contact and bent-rail aftermath
         run: |
           set -euxo pipefail
-          mkdir -p out/agent-8
-          git rev-parse HEAD > out/agent-8/source-sha.txt
           ENTRY=production/yunex/tyre_blowout_ep003/impact/entry.tsx
-          for ID in EP003Agent8CrashApproach EP003Agent8ImpactClose; do
-            npx --no-install remotion render "$ENTRY" "$ID" "out/agent-8/$ID.mp4" \
-              --gl=swangle --scale=0.25 --codec=h264 --pixel-format=yuv420p \
-              --concurrency=1 --log=error
-          done
+          npx --no-install remotion render "$ENTRY" EP003Agent8ImpactClose \
+            out/agent-8/EP003Agent8ImpactClose.mp4 \
+            --gl=swangle --scale=0.35 --codec=h264 --pixel-format=yuv420p \
+            --concurrency=1 --log=error
       - name: FFprobe, full decode, time-separated frames and motion proof
         run: |
           set -euxo pipefail
@@ -121,7 +112,7 @@ jobs:
           import pathlib,json,subprocess,hashlib
           root=pathlib.Path("out/agent-8")
           rows=[]
-          for name,frames in [("EP003Agent8CrashApproach",120),("EP003Agent8ImpactClose",100),("EP003Agent8HydratedCrash",120)]:
+          for name,frames in [("EP003Agent8HydratedCrash",120),("EP003Agent8ImpactClose",100)]:
               path=root/(name+".mp4")
               assert path.is_file() and path.stat().st_size>20000,path
               data=json.loads(subprocess.check_output(
@@ -130,7 +121,7 @@ jobs:
                    "-of","json",str(path)],text=True))
               stream=next(v for v in data["streams"] if v.get("codec_name")=="h264")
               duration=float(data["format"]["duration"])
-              assert (stream["width"],stream["height"])==(270,480),(name,data)
+              assert (stream["width"],stream["height"])==(378,672),(name,data)
               assert stream["pix_fmt"] in ("yuv420p","yuvj420p"),(name,data)
               assert stream["avg_frame_rate"]=="30/1",(name,data)
               assert abs(int(stream["nb_frames"])-frames)<=1,(name,data)
@@ -147,7 +138,7 @@ jobs:
               assert len(set(hashes))>=4,(name,"Only static / duplicate images")
               rows.append({"composition":name,"frames":frames,"fps":30,
                   "native_source_dimensions":[1080,1920],
-                  "review_dimensions":[270,480],"codec":"h264",
+                  "review_dimensions":[378,672],"codec":"h264",
                   "full_decode":"PASS","distinct_sample_frames":len(set(hashes)),
                   "duration":duration,"sha256":hashlib.sha256(path.read_bytes()).hexdigest(),
                   "source_sha":(root/"source-sha.txt").read_text().strip(),
@@ -174,8 +165,8 @@ jobs:
             echo "Source: ${{ github.sha }}"
             echo "Actions run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             echo "Artifact: EP003-agent8-moving-crash-${{ github.run_id }}"
-            echo "Three 1080x1920 / 30fps source compositions rendered as quarter-scale moving H264 MP4s, including A1 original deformed tyre, A2 4s at 70mph and A4 original highway."
-            echo "All three: FFprobe / complete FFmpeg decode / 6 time-separated PNGs with >=4 distinct images PASS."
+            echo "Two 1080x1920 / 30fps source compositions rendered as 378x672 moving H264 MP4s: hydrated real A1 original tyre + A2 70mph trajectory + A4 roadway and a closer original-GT impact/deformation insert."
+            echo "Both: FFprobe / complete FFmpeg decode / 6 time-separated PNGs with >=4 distinct images PASS."
             echo "Illustrative hypothetical crash branch; A1/A2/A4 physically hydrated for third preview, but Agent 6 final timeline integration and artistic signoff still REQUIRED."
             echo "No final picture or artistic approval claimed."
           } > out/agent-8/publish.md
