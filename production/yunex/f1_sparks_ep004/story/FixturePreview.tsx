@@ -1,8 +1,8 @@
 import React from 'react';
 import {AbsoluteFill} from 'remotion';
 import {ThreeCanvas} from '@remotion/three';
-import {sampleRoute} from '../../../src/yunex/world-kit/environments';
-import {Vehicle,Environment,CameraAim,WorldLighting} from '../../../src/yunex/world-kit/components';
+import {sampleRoute} from '../../../../src/yunex/world-kit/environments';
+import {Vehicle,Environment,CameraAim,WorldLighting} from '../../../../src/yunex/world-kit/components';
 import type {StoryRequest,ShotId,VehicleMotionState,Vec3} from '../shared/contract';
 import {EP004} from '../shared/contract';
 import {StorySequence} from './StorySequence';
