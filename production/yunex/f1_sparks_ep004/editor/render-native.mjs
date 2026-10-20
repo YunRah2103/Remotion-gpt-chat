@@ -9,6 +9,7 @@ import {dirname, resolve, join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {buildPicturePlan, missingPicturePrerequisites} from './timing.ts';
 import {verifyNativeMp4} from './native-qa.mjs';
+import {verifyOriginalNarration} from './audio-qa.mjs';
 
 const issue = (message) => {throw new Error('EP004 Agent 6 render preflight: ' + message);};
 const run = (bin,args) => {
@@ -57,7 +58,8 @@ export function renderApprovedEditorPair(manifestPath) {
     writeFileSync(propsPath,JSON.stringify({plan,readiness:m.readiness,showCaptions})+'\n');
     run('npx',['remotion','render',entry,composition,outPath,'--props',propsPath,'--gl=swangle','--codec=h264','--pixel-format=yuv420p','--log=error']);
     const evidence=verifyNativeMp4(outPath,plan.totalFrames,{audioRequired:true,cuts:plan.cuts});
-    result.push({composition,output:outPath,evidence});
+    const originalVoiceProof=verifyOriginalNarration(audio,outPath);
+    result.push({composition,output:outPath,evidence,originalVoiceProof});
   }
   writeFileSync(join(destination,'EP004-editor-pair-audit.json'),JSON.stringify(result,null,2)+'\n');
   return result;
