@@ -10,6 +10,7 @@ import {fileURLToPath} from 'node:url';
 import {buildPicturePlan, missingPicturePrerequisites} from './timing.ts';
 import {verifyNativeMp4} from './native-qa.mjs';
 import {verifyOriginalNarration} from './audio-qa.mjs';
+import {assertGenuineSparkHook} from './contact-hook.ts';
 
 const issue = (message) => {throw new Error('EP004 Agent 6 render preflight: ' + message);};
 const run = (bin,args) => {
@@ -27,6 +28,8 @@ export function validateManifest(m, availableAudioSec) {
   if (!m.originalRecordedAudioFile || /ep003/i.test(m.originalRecordedAudioFile)) issue('must specify EP004-only original audio recording path');
   if (!m.entryFile || /ep003/i.test(m.entryFile)) issue('integrated EP004 composition entry path missing');
   const plan=buildPicturePlan(m.plan);
+  if(plan.cuts[0].sourceStartSec===undefined) issue('frame-zero spark must cite an actual approved Agent 2 metal-contact source time');
+  assertGenuineSparkHook(plan.cuts[0].sourceStartSec);
   if (Number.isFinite(availableAudioSec) && Math.abs(availableAudioSec-plan.audioDurationSec)>0.085) {
     issue('recorded voice measured by ffprobe differs from transcript plan by more than 85ms');
   }
