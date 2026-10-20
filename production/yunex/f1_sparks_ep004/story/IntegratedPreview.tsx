@@ -82,15 +82,15 @@ export function integratedStoryCamera(req:StoryRequest):CameraPose{
  const m=req.motion,p=clamp01(req.shotLocalSec/req.shotDurationSec);
  let pos:Vec3,target:Vec3,fovDeg:number;
  switch(req.shot){
-  case 'spark-hook':pos=[-4.7+p*.4,1.55,4.75];target=[.10,.84,0];fovDeg=62;break;
+  case 'spark-hook':pos=[-4.7+p*.4,1.55,4.75];target=[.10,.84,0];fovDeg=67;break;
   case 'rear-mystery':pos=[-7.6+p*.6,1.55,5.2-p*.4];target=[-.40,.93,0];fovDeg=52;break;
   case 'underfloor-reveal':
    // Camera is below Agent 4's opaque road FOR THE CUTAWAY ONLY.
    // Look upward at the real silver skid and tan plank, not a ghost arrow.
    pos=[.99+p*.08,-.28,1.32+p*.05];target=[1.00,.115,0];fovDeg=59;break;
   case 'aero-load':pos=[.24,1.44,12.25-p*.35];target=[0,.90,0];fovDeg=52;break;
-  case 'contact-macro':pos=[-5.95+p*.4,1.68,4.65];target=[.15,.82,0];fovDeg=62;break;
-  default:pos=[-5.2+p*.75,1.83,4.62];target=[.2,.84,0];fovDeg=60;break;
+  case 'contact-macro':pos=[-5.95+p*.4,1.68,4.65];target=[.15,.82,0];fovDeg=68;break;
+  default:pos=[-5.2+p*.75,1.83,4.62];target=[.2,.84,0];fovDeg=70;break;
  }
  const position=localWorld(m,pos),cameraTarget=localWorld(m,target);
  // Aero camera remains tied to road, NOT the heaving body: lowering is visible.
