@@ -42,10 +42,10 @@ test('rear->underfloor->macro camera cut-free endpoints',()=>{
     assert.deepEqual(end,begin, a+' to '+b);
   }
 });
-test('portrait FOV and stable passing car frame',()=>{
+test('portrait spark-origin macro and readable full-car racing exit with controlled FOV',()=>{
   const hook=sampleShotCamera('spark-hook',0,fixtures());
   const w=visibleWidthAtTarget(hook);
-  assert.ok(w>3.5&&w<8, '9:16 projected width '+w);
+  assert.ok(w>1.7&&w<3.2,'intentional phone-readable tight first-frame spark macro width '+w);
   assert.ok(hook.positionWorld[1]>.35&&hook.positionWorld[1]<.9);
   const finish=sampleShotCamera('racing-payoff',CAMERA_SHOTS['racing-payoff'].suggestedDurationSec,fixtures());
   assert.ok(finish.positionWorld[1]>0.8);
