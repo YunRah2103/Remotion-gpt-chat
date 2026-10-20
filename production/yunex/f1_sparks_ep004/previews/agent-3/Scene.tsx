@@ -46,13 +46,22 @@ const ContactSparkVisuals:React.FC<{particles:readonly SparkParticle[]}>=({parti
     {shown.map(p=>{
       const direction=new THREE.Vector3(...p.velocityWorld);
       if(direction.lengthSq()<1e-9)direction.set(0,0,1);
-      const size=.012+.020*p.luminance01;
-      const length=.09+.22*Math.min(1,direction.length()/40)*p.luminance01;
+      // Camera shutter integration of the particle's real instantaneous
+      // velocity (~1/50 s), not a synthetic emitter or screen-space flare.
+      const size=.018+.024*p.luminance01;
+      const length=.14+.65*Math.min(1,direction.length()/47)*p.luminance01;
       const quat=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,0,1),direction.normalize());
-      return <mesh key={p.id} position={p.positionWorld} quaternion={quat}>
-        <boxGeometry args={[size,size,length]}/>
-        <meshBasicMaterial color={p.luminance01>.67?'#fff7d3':'#ffbf72'} toneMapped={false}/>
-      </mesh>;
+      const whiteHot=p.luminance01>.67;
+      return <group key={p.id} position={p.positionWorld} quaternion={quat}>
+        <mesh>
+          <boxGeometry args={[size,size,length]}/>
+          <meshBasicMaterial color={whiteHot?'#fffce5':'#ffc076'} toneMapped={false}/>
+        </mesh>
+        <mesh>
+          <sphereGeometry args={[.026+.029*p.luminance01,7,6]}/>
+          <meshBasicMaterial color={whiteHot?'#fff8d4':'#ffad58'} toneMapped={false}/>
+        </mesh>
+      </group>;
     })}
   </>;
 };
