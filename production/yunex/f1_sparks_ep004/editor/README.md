@@ -87,3 +87,26 @@ Root `npm run check` checks `src/**` only and is **not** evidence this editor-lo
 - The final two outputs are **not allowed to pass** on a changing opening alone: the native verifier now samples three actual decoded frames **inside EACH of six contiguous shots** for every output and rejects static/duplicate beats. Each editorial beat must occupy at least 18 frames (0.6s); no black placeholder or near-zero-duration transition silently passes. Captions and clean variants receive separate full QA reports.
 - Video-only `-map 0:v:0` is mandatory before `framemd5`. Without it, voice/audio packets could cause false-positive movement.
 - A source MP4 or synthetic verifier test is **not** a finished Agent 6 film. Final editor A+B MP4s still need approved integrated hero/physics/cinema/look/story plus **actual recorded original EP004 voiceover and word timings**. No default synthetic voice, no EP003 Cedar reuse.
+
+## V2 cinematic picture-edit safeguards — after master #215 latest integrations
+
+**Approved source dependency:** Agent 0 has merged actual Agent 1 vehicle+metal skids, Agent 2 contact-born 100Hz spark physics, and Agent 4 matching night road. Agents 3 and 5 are still under creative corrections. Voice recording and real word timestamps are **not yet provided**.
+
+### Make frame zero spectacular without faking physics
+`editor/contact-hook.ts` scans **actual integrated vehicle/road/skid physics** to discover the strongest verified metal-on-road contact/spark moment (no decorative spawn event or user-selected false spark timestamp). It returns a source-time cue. The EDL accepts optional `sourceStartSec` on the first `spark-hook` cut. From video frame 0 the injected `IntegratedVisualShot` receives `sourceSec` corresponding to that genuine contact. At the second cut, authoritative source time returns to continuous narration/world time unless a separately reviewed anchor is supplied. This creates an honest cold-open flash-forward (real contact, nonchronological cinematic edit), not physics manipulation or a false science explanation. The manager-injected scene must sample its car, road, and particles at `sourceSec`, **not** at voice `globalSec`; the latter remains the actual word-aligned narration clock. Strict final-run preflight refuses render if opening source time is omitted or doesn't have currently real metal-contact particle evidence. Cinematic visibility at frame 0 still requires **human shot review**, and the Agent 3/5 camera/story must visually reveal the spark rather than hide it.
+
+For deriving the truthful event in Node after source integration:
+```bash
+node --experimental-strip-types --input-type=module -e "import {findAuthenticSparkMoment} from './production/yunex/f1_sparks_ep004/editor/contact-hook.ts'; console.log(findAuthenticSparkMoment({endSec:12}))"
+```
+
+### Preserve original British male narrator in both actual MP4 exports
+`editor/audio-qa.mjs` now decodes the **real encoded final MP4 audio** and the independently provided approved original EP004 speech recording into 8 kHz mono PCM, calculates 80ms RMS speech envelopes and verifies the time-zero correlation (>=0.82), no relative voice level loss below 0.65 or excessive boost above 1.4, no material speech offset, no silence and no time-length truncation. It is wired into `render-native.mjs` for **BOTH** captioned and clean variants. An arbitrary replacement narrator or desynchronized audio cannot be waved through merely because `ffprobe` sees an AAC track. Background music belongs to Agent 7 **after picture lock**; this correlation check covers Agent 6's original-VO picture versions before any later final mix. Audio comparison is a quantitative signal check, not a substitute for human listening.
+
+Run all new targeted tests in the manager-controlled editor workflow:
+```bash
+npx tsc -p production/yunex/f1_sparks_ep004/editor/tsconfig.json
+node --experimental-strip-types --test production/yunex/f1_sparks_ep004/tests/agent-6/*.test.mjs
+```
+
+**No new playable Agent 6 final MP4 or true narrator is supplied by these improvements.** All original-VO gate conditions still apply; do not merge the editor film as complete without accepted Agents 3+5, integrated `entry.tsx`, recorded EP004 voice, verified word timings and actual MP4/full-frame/audio/visual proofs.
