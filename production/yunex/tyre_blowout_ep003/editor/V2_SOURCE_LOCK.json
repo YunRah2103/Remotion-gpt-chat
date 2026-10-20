@@ -1,0 +1,16 @@
+{
+  "stage": "AGENT6_V2_FIRST_CUT",
+  "fps": 30,
+  "frames": 800,
+  "voice": "Original user-supplied Cedar 26.664s — no redubbing",
+  "pins": {
+    "A1": "7d47746d2fc584e935b5a9766eb1150e5b3dac38",
+    "A2": "e724786fc087b080e9de19e9e26bda6a815ce276",
+    "A3": "938628271f9b50d975ee55491881a8fd2d4807a5",
+    "A4": "a44f1b6c9c31105edd1a9b0d2de7f233d1223952",
+    "A5": "cd03c64f77705aa03ee5d5071e5cf18c669fa4ea",
+    "A8": "8e703e70218e9c0b9e9b7768112f2d8388ae31c8",
+    "A9": "6884664e265c680e314b3d44b81d33b6d6439977",
+    "A10": "8b00be7b1546ff3a5a17d1ea73a6ab36d57800c3"
+  }
+}

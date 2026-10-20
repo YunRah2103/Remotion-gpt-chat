@@ -46,6 +46,9 @@ jobs:
           agent/ep003-03-cinema cinema 938628271f9b50d975ee55491881a8fd2d4807a5 3
           agent/ep003-04-look look a44f1b6c9c31105edd1a9b0d2de7f233d1223952 4
           agent/ep003-05-story story cd03c64f77705aa03ee5d5071e5cf18c669fa4ea 5
+          agent/ep003-08-crash-vfx impact 8e703e70218e9c0b9e9b7768112f2d8388ae31c8 8
+          agent/ep003-09-rewind-story rewind 6884664e265c680e314b3d44b81d33b6d6439977 9
+          agent/ep003-10-action-cameras action 8b00be7b1546ff3a5a17d1ea73a6ab36d57800c3 10
           PINS
           while read -r agent folder pin number; do
             git fetch --no-tags --depth=1 origin "refs/heads/$agent"
@@ -58,7 +61,7 @@ jobs:
             echo "$number $folder $pin" | tee -a out/agent6/sources.txt
           done </tmp/ep003-pins
           echo "EDITOR $(git rev-parse HEAD)" >>out/agent6/sources.txt
-          for p in mechanics/tyreRig.ts dynamics/model.ts cinema/scene.tsx look/world.tsx story/SteadyHands3D.tsx; do
+          for p in mechanics/tyreRig.ts dynamics/model.ts cinema/scene.tsx look/world.tsx story/SteadyHands3D.tsx impact/model.ts rewind/branchReplay.ts action/cameras.ts; do
             test -f "production/yunex/tyre_blowout_ep003/$p"
           done
       - name: All mandatory source checks and editor regressions
@@ -70,6 +73,9 @@ jobs:
           npm run partskit:test
           node --experimental-strip-types --test tests/agent-6/*.test.mjs
           node --experimental-strip-types --test tests/agent-2/*.test.mjs
+          node --experimental-strip-types --test tests/agent-8/*.test.mjs
+          node --experimental-strip-types --test tests/agent-9/*.test.mjs
+          node --experimental-strip-types --test tests/agent-10/*.test.mjs
       - name: Render actual moving 1080x1920 30FPS segment
         run: |
           set -euo pipefail
@@ -156,7 +162,8 @@ jobs:
           ffmpeg -hide_banner -loglevel error -y -ss 26.20 -i "$f" -frames:v 1 frame-26p2.png
           sha256sum "$f" > SHA256SUMS.txt
           cp ../../production/yunex/tyre_blowout_ep003/editor/VOICEOVER_PROVENANCE.json .
-          echo "FULL 1080p PICTURE ONLY. Do not claim final VO until the user-supplied Cedar original is muxed and checked." >README.txt
+          cp ../segments/sources.txt ./SOURCES-V2.txt
+          echo "V2 FULL 1080p PICTURE ONLY, exact A8/A9/A10. Original Cedar 26.664s voice is muxed independently for user approval, not silently replaced." >README.txt
       - uses: actions/upload-artifact@v4
         with:
           name: EP003-AGENT6-FULL-PICTURE-${{ github.run_id }}
