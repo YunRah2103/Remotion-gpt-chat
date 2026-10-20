@@ -45,7 +45,7 @@ const FixtureShot:React.FC<{request:StoryRequest}>=({request})=>{
  const target=relativeWorld(m,request.shot==='underfloor-reveal'||request.shot==='contact-macro'?[0,.2,0]:[0,.56,0]);
  const camera=relativeWorld(m,fixtureShot(request.shot));
  return <AbsoluteFill>
-  <ThreeCanvas width={1080} height={1920} camera={{position:camera,fov:40,near:.05,far:350}} shadows>
+  <ThreeCanvas width={1080} height={1920} camera={{position:[...camera] as [number,number,number],fov:40,near:.05,far:350}} shadows>
    <WorldLighting timeOfDay="night" focus={[...m.worldPosition] as [number,number,number]}/>
    <Environment kind="track" timeOfDay="night" seed={EP004.trackSeed}/>
    <CameraAim position={[...camera] as [number,number,number]} target={[...target] as [number,number,number]} fov={request.shot==='racing-payoff'?43:38}/>
