@@ -80,3 +80,10 @@ node --experimental-strip-types production/yunex/f1_sparks_ep004/editor/render-n
 npx tsc -p production/yunex/f1_sparks_ep004/editor/tsconfig.json
 ```
 Root `npm run check` checks `src/**` only and is **not** evidence this editor-local TypeScript was compiled. Agent 0 should add this command plus `tests/agent-6/*.test.mjs` to its editor acceptance gate after the two native deliverables are permitted.
+
+## 20 October Agent 6 render reliability update
+
+- The Agent 6 branch has been safely synchronized with latest manager EP004 base via a non-force two-parent merge commit, preserving every `editor/**` and `tests/agent-6/**` blob and importing only manager-owned CI/status changes. Main and EP003 remain untouched.
+- The final two outputs are **not allowed to pass** on a changing opening alone: the native verifier now samples three actual decoded frames **inside EACH of six contiguous shots** for every output and rejects static/duplicate beats. Each editorial beat must occupy at least 18 frames (0.6s); no black placeholder or near-zero-duration transition silently passes. Captions and clean variants receive separate full QA reports.
+- Video-only `-map 0:v:0` is mandatory before `framemd5`. Without it, voice/audio packets could cause false-positive movement.
+- A source MP4 or synthetic verifier test is **not** a finished Agent 6 film. Final editor A+B MP4s still need approved integrated hero/physics/cinema/look/story plus **actual recorded original EP004 voiceover and word timings**. No default synthetic voice, no EP003 Cedar reuse.
