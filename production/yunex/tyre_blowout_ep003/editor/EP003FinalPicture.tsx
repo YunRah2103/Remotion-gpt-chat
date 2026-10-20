@@ -49,7 +49,7 @@ const CockpitWithHands:React.FC<{d:VehicleDynamicsFrame;tyre:TyreFrame}>=({d,tyr
  </primitive>;
 };
 
-export const EP003FinalPicture:React.FC<{includeVoice?:boolean}>=({includeVoice=true})=>{
+export const EP003FinalPicture:React.FC<{includeVoice?:boolean;hideStoryLabels?:boolean}>=({includeVoice=true,hideStoryLabels=false})=>{
  const frame=useCurrentFrame();
  const {fps,width,height}=useVideoConfig();
  const time=frame/fps;
@@ -79,9 +79,11 @@ export const EP003FinalPicture:React.FC<{includeVoice?:boolean}>=({includeVoice=
     color="#dce6ed" intensity={7} distance={5} decay={2}/>
    <CinematicCameraRig pose={pose}/>
   </ThreeCanvas>
-  <StoryOverlay request={request}
+  {/* V4 subtitles own the entire lower-third. Suppress legacy bottom labels
+      only in V4; preserve original standalone V1 editor behavior. */}
+  {!hideStoryLabels&&<StoryOverlay request={request}
    hideLabel={!(segment==='pressure'||segment==='forces')||cut.shot==='driver-cockpit'}
-   placement="bottom"/>
+   placement="bottom"/>}
   {/* The WAV source lives in public/ep003/vo_master.wav in the full-audio
       staging bundle. Picture-only GitHub Action is deliberately silent;
       no fake replacement voice is generated and no SFX/music here. */}

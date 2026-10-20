@@ -25,7 +25,7 @@ import {CrashBarrierWorld} from '../impact/Barrier.tsx';
 import {ImpactEffects3D} from '../impact/Preview.tsx';
 import {Agent10DamagedOriginalCar} from '../action/CrashCar.tsx';
 import {actionPreviewState} from '../action/previewState.ts';
-import {rebaseActionFrame,sampleActionCamera} from '../action/cameras.ts';
+import {rebaseActionFrame,sampleActionCamera,actionVehicleToWorld} from '../action/cameras.ts';
 import type {ActionStage,ActionCameraPose} from '../action/cameras.ts';
 import {sampleControlledFrame} from '../rewind/agent8Integration.ts';
 import {sampleBranchReplay,DEFAULT_BRANCH_REPLAY} from '../rewind/branchReplay.ts';
@@ -49,10 +49,10 @@ export const V2_RECOVERY_CUTS:readonly {
  {from:18.95,to:19.84,stage:'emergency-pull',sceneX:-58},
  {from:19.84,to:20.425,stage:'moving-recovery-hero',sceneX:-51},
  {from:20.425,to:21.905,stage:'safe-slowdown-follow',sceneX:-52},
- {from:21.905,to:23.30,stage:'moving-recovery-hero',sceneX:-46},
- {from:23.30,to:24.12,stage:'emergency-pull',sceneX:-55},
- {from:24.12,to:25.18,stage:'safe-slowdown-follow',sceneX:30},
- {from:25.18,to:END,stage:'moving-recovery-hero',sceneX:-55},
+ {from:21.905,to:23.80,stage:'moving-recovery-hero',sceneX:-46},
+ // Three-second FINISHING HOLD: the REAL car continues moving; its CAMERA
+ // stays attached to a nearly fixed rear-three-quarter viewpoint.
+ {from:23.80,to:END,stage:'safe-slowdown-follow',sceneX:-55},
 ] as const;
 
 type V2Frame={
@@ -144,10 +144,21 @@ const OriginalMovingActionScene:React.FC<{time:number}>=({time})=>{
    :time<15.26?'contact'
    :null) : null;
  const crashLens=lens&&impact?sampleCrashCamera(impact,lens):null;
- const pose:ActionCameraPose=crashLens
+ // V4: no end-of-film camera orbit or rapid re-cut.
+ // Camera remains in the moving car's coordinate system with <=0.24m drift.
+ // Vehicle, tyres, four hubs and highway still sample real A2 physics.
+ const finalProgress=clamp((time-23.80)/(END-23.80));
+ const finalEase=finalProgress*finalProgress*(3-2*finalProgress);
+ const steadyHero:ActionCameraPose|undefined=time>=23.80?{
+   ...basePose,insideCabin:false,fovDeg:55,nearM:.06,
+   position:actionVehicleToWorld(
+     [-9.5+finalEase*.20,3.2+finalEase*.08,-3.05-finalEase*.08],dynamics),
+   target:actionVehicleToWorld([.25,.78,0],dynamics),
+ }:undefined;
+ const pose:ActionCameraPose=steadyHero??(crashLens
    ? {...basePose,position:crashLens.position,target:crashLens.target,
       fovDeg:crashLens.fov,nearM:.055,insideCabin:false}
-   : basePose;
+   : basePose);
  const world=useMemo(buildEpisodeHighway,[]);
  useEffect(()=>()=>disposeObject(world),[world]);
  return <AbsoluteFill style={{backgroundColor:'#b8cad5'}}>
@@ -171,12 +182,7 @@ const OriginalMovingActionScene:React.FC<{time:number}>=({time})=>{
   </ThreeCanvas>
   <ChoiceOverlay replay={replay}/>
   <RewindVisualTransition replay={replay}/>
-  {(replay.phase==='wrong-outcome'||replay.phase==='freeze-impact')&&
-   <div style={{position:'absolute',bottom:86,left:65,right:65,
-    textAlign:'center',color:'#f1f8fa',fontSize:22,fontWeight:700,
-    textShadow:'0 3px 12px #142534',fontFamily:'Arial,sans-serif'}}>
-    ILLUSTRATIVE PANIC OUTCOME · NOT INEVITABLE
-   </div>}
+
  </AbsoluteFill>;
 };
 
@@ -191,13 +197,17 @@ const CaptionTrack:React.FC<{time:number}>=({time})=>{
  if(!cue)return null;
  const fade=Math.min(1,(time-cue.start)/.13,(cue.end-time)/.15);
  const emphasis=cue.id==='vo-08'||cue.id==='vo-09'?'#ffcc9b':'#ffffff';
+ // Portrait 1080×1920 safe zone. Bottom 320px leaves room for phone
+ // controls, and side insets protect every long Cedar phrase from clipping.
+ // Preserve the user's approved rounded charcoal subtitle pill and wording.
  return <AbsoluteFill style={{pointerEvents:'none'}}>
-  <div style={{position:'absolute',bottom:146,left:60,right:60,
+  <div style={{position:'absolute',bottom:320,left:114,right:114,
    display:'flex',justifyContent:'center',opacity:Math.max(0,fade)}}>
    <span style={{display:'inline-block',maxWidth:'100%',textAlign:'center',
-    padding:'19px 26px',borderRadius:22,boxSizing:'border-box',
-    fontFamily:'Arial,sans-serif',fontSize:50,lineHeight:1.2,fontWeight:800,
-    color:emphasis,background:'rgba(7,20,32,.67)',
+    padding:'18px 25px',borderRadius:22,boxSizing:'border-box',
+    overflowWrap:'break-word',whiteSpace:'normal',
+    fontFamily:'Arial,sans-serif',fontSize:46,lineHeight:1.23,fontWeight:800,
+    color:emphasis,background:'rgba(7,20,32,.74)',
     boxShadow:'0 5px 25px rgba(0,0,0,.14)',
     textShadow:'0 2px 9px rgba(0,0,0,.70)'}}>
     {cue.text}
@@ -213,7 +223,7 @@ export const EP003V2FinalPicture:React.FC<{includeVoice?:boolean}>=({includeVoic
  return <AbsoluteFill style={{background:'#a9bfcb'}}>
   <AbsoluteFill style={{filter:'contrast(1.12) saturate(1.16)'}}>
    {time<CHOICE
-     ? <ApprovedOriginalOpening includeVoice={false}/>
+     ? <ApprovedOriginalOpening includeVoice={false} hideStoryLabels/>
      : <OriginalMovingActionScene time={time}/>}
   </AbsoluteFill>
   <AbsoluteFill style={{pointerEvents:'none',
