@@ -12,7 +12,7 @@ function CameraFollow({position,yaw,tSec,technical}:{
 }) {
  const {camera}=useThree();
  const ox=technical?-.30-.40*Math.sin(tSec*.54):-7.6;
- const oy=technical?.28:2.55;
+ const oy=technical?.032:2.55;
  const oz=technical?2.28+.24*Math.cos(tSec*.44):4.95;
  const localToWorld=(dx:number,dz:number)=>{
    return [Math.cos(yaw)*dx+Math.sin(yaw)*dz,-Math.sin(yaw)*dx+Math.cos(yaw)*dz] as const;
