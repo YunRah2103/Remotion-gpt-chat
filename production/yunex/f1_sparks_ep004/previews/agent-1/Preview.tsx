@@ -155,3 +155,4 @@ export const MechanicsPreview:React.FC<{mode:'technical'|'context'}>=({mode})=>{
   </ThreeCanvas>
   <TitleOverlay technical={technical} tSec={tSec}/>
  </AbsoluteFill>;
+};
