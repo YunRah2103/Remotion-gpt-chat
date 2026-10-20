@@ -1,0 +1,31 @@
+name: YUNEX EP003 Agent 7 Audio Source QA
+on:
+  push:
+    branches:
+      - agent/ep003-07-final-audio
+    paths:
+      - 'production/yunex/tyre_blowout_ep003/audio/**'
+      - 'tests/agent-7/**'
+      - '.github/workflows/yunex-ep003-agent7-audio.yml'
+  pull_request:
+    paths:
+      - 'production/yunex/tyre_blowout_ep003/audio/**'
+      - 'tests/agent-7/**'
+      - '.github/workflows/yunex-ep003-agent7-audio.yml'
+  workflow_dispatch:
+jobs:
+  source-contract:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check audio Python syntax
+        run: python -m py_compile production/yunex/tyre_blowout_ep003/audio/mix_ep003_v4.py
+      - name: Verify source and sixteen locked Cedar cues
+        run: python tests/agent-7/test_locked_contract.py
+      - name: Declare binary-input boundary
+        run: echo "CI checks code only. V4 master is user media; full audio render and decode were performed externally using hash-verified bytes."
