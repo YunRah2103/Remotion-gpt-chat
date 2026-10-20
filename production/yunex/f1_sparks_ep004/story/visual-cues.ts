@@ -1,5 +1,5 @@
 import type {ShotId,StoryRequest,VehicleMotionState} from '../shared/contract';
-import {clamp01,smoothstep,onMetalContact} from './beats';
+import {clamp01,smoothstep,onMetalContact} from './beats.ts';
 /** These are editorial animation controls, never physics calculations.
  * The camera/mechanics collaborators must use true geometry and supplied motion. */
 export type StoryVisualCue=Readonly<{
