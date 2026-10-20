@@ -35,8 +35,8 @@ export function sampleDynamics(tSec:number,params:DynamicsParams={}):VehicleMoti
   // Air load scales approximately with v² and saturates; this is a VISUAL proxy.
   const downforceProxy01=clamp(aeroLoad01*Math.pow(speedMps/EP004.previewSpeedMps,2),0,1);
   // Road-shape-driven compression: no trigger frames or particle-onset timestamps.
-  const bump01=clamp(surface.heightM/.029,0,1);
-  const compressionM=.020*bump01;
+  const bump01=clamp(surface.heightM/.019,0,1);
+  const compressionM=.032*bump01;
   const aeroSquatM=.042*downforceProxy01;
   const heaveM=clamp(offset-aeroSquatM-compressionM,-.085,.12);
   // Following a rising/falling grade tilts the chassis, with a small dive from compression.
