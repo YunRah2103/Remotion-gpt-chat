@@ -19,7 +19,7 @@ export function sampleCrashCamera(frame:CrashOutcomeFrame,lens:CrashLens):CrashC
  const impulse=age>=0&&age<.34?(1-smooth(age/.34))*Math.sin(age*76)*.077:0;
  if(lens==='establish'){
   // Chase from carriageway, strongly visible lateral movement and road speed.
-  return {position:[x-8.9,3.05,z+5.05],target:[x+.42,.85,z-.35],
+  return {position:[x-10.6,3.15,z+1.45],target:[x+.42,.85,z-.35],
    fov:47,lens};
  }
  if(lens==='contact'){
