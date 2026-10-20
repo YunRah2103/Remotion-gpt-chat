@@ -22,7 +22,8 @@ test('spark captions come from REAL particles, never a 9–11s fixed fiction',()
  assert.equal(dry.particles.length,0,'no ghost fireworks at dry ending');
  assert.equal(contactCaption(dry),'METAL. NOT THE ENGINE.');
  const previous=real(7.1,origin,'contact-macro');
- assert.ok(!contactCaption(previous)?.includes('SPARKS') || previous.particles.some(p=>p.luminance01>.08));
+ if(previous.particles.some(p=>p.luminance01>.08))assert.match(contactCaption(previous)??'',/SPARKS/);
+ else assert.equal(contactCaption(previous),'NO CONTACT. NO SPARKS.');
 });
 test('opening labels are withheld until genuine physics particles exist',()=>{
  const event=real(.04,72,'spark-hook');
