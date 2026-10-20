@@ -46,12 +46,12 @@ const FixtureShot:React.FC<{request:StoryRequest}>=({request})=>{
  const camera=relativeWorld(m,fixtureShot(request.shot));
  return <AbsoluteFill>
   <ThreeCanvas width={1080} height={1920} camera={{position:camera,fov:40,near:.05,far:350}} shadows>
-   <WorldLighting timeOfDay="night" focus={m.worldPosition}/>
+   <WorldLighting timeOfDay="night" focus={[...m.worldPosition] as [number,number,number]}/>
    <Environment kind="track" timeOfDay="night" seed={EP004.trackSeed}/>
-   <CameraAim position={camera} target={target} fov={request.shot==='racing-payoff'?43:38}/>
+   <CameraAim position={[...camera] as [number,number,number]} target={[...target] as [number,number,number]} fov={request.shot==='racing-payoff'?43:38}/>
    <Vehicle variant="formula-modern" color="#0a797b" accent="#edc58b" lights
      distance={m.routeDistanceM}
-     pose={{position:m.worldPosition as [number,number,number],yaw:m.yawRad}}/>
+     pose={{position:[...m.worldPosition] as [number,number,number],yaw:m.yawRad}}/>
   </ThreeCanvas>
  </AbsoluteFill>;
 };
