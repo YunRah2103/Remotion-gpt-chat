@@ -88,6 +88,40 @@ function buildNightWorld(): THREE.Group {
     }
   });
 
+  // Art-directed night grade on this EP004 environment instance only.
+  // Untinted factory relief/runoff reads like daylight under the broad kit fill.
+  // Preserve original geometry and shared source, just clone its PBR materials.
+  const grade = new Map<THREE.Material, Map<number, THREE.Material>>();
+  factory.traverse(node => {
+    if (!(node instanceof THREE.Mesh) || node.name === 'gradient-sky') return;
+    const name = node.name;
+    const dark = name === 'runoff' ? 0.23
+      : name === 'terrain-relief' ? 0.35
+      : name === 'terrain' ? 0.30
+      : name.includes('tree-') || name.includes('conifer-') ? 0.34
+      : name.includes('grandstand') ? 0.52
+      : name.includes('circuit-barriers') || name.includes('fence-') ? 0.64
+      : name.includes('pit') || name.includes('garage') ? 0.58
+      : 1;
+    if (dark >= 1) return;
+    const apply = (mat: THREE.Material) => {
+      let byGain = grade.get(mat);
+      if (!byGain) { byGain = new Map(); grade.set(mat, byGain); }
+      let clone = byGain.get(dark);
+      if (!clone) {
+        clone = mat.clone();
+        if (clone instanceof THREE.MeshStandardMaterial) {
+          clone.color.multiplyScalar(dark);
+          clone.roughness = Math.max(clone.roughness, 0.58);
+          if (clone.emissiveIntensity > 0) clone.emissiveIntensity *= 0.7;
+        }
+        byGain.set(dark, clone);
+      }
+      return clone;
+    };
+    node.material = Array.isArray(node.material) ? node.material.map(apply) : apply(node.material);
+  });
+
   const group = new THREE.Group();
   group.name = 'EP004-NIGHT-CIRCUIT-WORLD';
   group.add(factory);
