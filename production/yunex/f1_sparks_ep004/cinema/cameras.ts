@@ -30,13 +30,14 @@ type Key = readonly [progress:number,position:Vec3,target:Vec3,fovDeg:number];
  */
 const KEYS: Readonly<Record<ShotId,readonly Key[]>> = {
   'spark-hook': [
-    // Low rear three-quarter first: hot metal chips trail visibly BEHIND
-    // the car. Dolly diagonally across its flank for real perspective change.
-    [0,[-4.80,.57,8.20],[0,1.26,0],68],
-    [.18,[-2.60,.51,8.35],[0,1.22,0],66],
-    [.43,[.45,.52,9.40],[0,1.18,0],67],
-    [.72,[3.25,.62,8.50],[0,1.17,0],68],
-    [1,[4.80,.78,8.15],[-.06,1.17,0],66],
+    // Intentional spark-origin tyre / metal rear detail for first 0.8 seconds:
+    // show the hot chip physics at phone size, THEN pull back to the entire hero.
+    // This is a cinematic close-up, not an unexplained accidental car crop.
+    [0,[-3.70,.35,2.70],[-1.30,.29,0],56],
+    [.15,[-4.05,.40,3.65],[-1.15,.37,0],59],
+    [.36,[-5.20,.54,6.50],[0,.54,0],64],
+    [.65,[-2.50,.64,7.80],[0,.56,0],66],
+    [1,[4.35,.73,8.80],[0,.56,0],65],
   ],
   'rear-mystery': [
     [0,[-9.30,1.22,1.72],[-.55,.57,0],55],
@@ -44,14 +45,13 @@ const KEYS: Readonly<Record<ShotId,readonly Key[]>> = {
     [1,[-7.90,.75,1.36],[-1.15,.43,0],57],
   ],
   'underfloor-reveal': [
-    // First one second is a rapid but wheel-safe rear exterior approach.
-    // Once the genuine factory mesh is sectioned, the lens climbs ABOVE
-    // skid level to reveal the SILVER metal top next to BROWN composite.
+    // Real spatial transition: exterior rear follow -> descending skid view
+    // -> close overhead genuine silver forward-skid and composite surround.
     [0,[-7.90,.75,1.36],[-1.15,.43,0],57],
-    [.22,[-2.20,1.04,2.04],[.35,.45,0],56],
-    [.37,[2.20,1.22,1.66],[1.18,.15,0],45],
-    [.63,[2.05,1.10,1.38],[1.18,.095,0],42],
-    [1,[1.87,.92,1.25],[1.18,.085,0],42],
+    [.23,[-2.25,.96,2.15],[.25,.35,0],53],
+    [.42,[2.15,1.06,1.40],[1.18,.11,0],43],
+    [.65,[1.90,.82,1.12],[1.18,.086,0],42],
+    [1,[1.80,.76,1.02],[1.18,.08,0],44],
   ],
   'aero-load': [
     [0,[.20,1.72,12.3],[0,.57,0],55],
@@ -59,18 +59,19 @@ const KEYS: Readonly<Record<ShotId,readonly Key[]>> = {
     [1,[.13,1.47,12.4],[0,.51,0],55],
   ],
   'contact-macro': [
-    [0,[1.87,.92,1.25],[1.18,.085,0],42],
-    [.48,[1.79,.82,1.23],[1.18,.078,0],41],
-    [1,[1.72,.78,1.21],[1.18,.071,0],42],
+    [0,[1.80,.76,1.02],[1.18,.08,0],44],
+    [.48,[1.74,.66,.93],[1.18,.078,0],43],
+    [1,[1.69,.58,.85],[1.18,.071,0],42],
   ],
   'racing-payoff': [
-    // Distinct from hook: compact low rear follow, then elevated
-    // rear quarter with passing floodlights, never a repetitive side view.
-    [0,[-6.40,1.10,6.80],[.20,1.04,0],68],
-    [.38,[-5.90,1.28,7.00],[.04,1.04,0],68],
-    [.74,[-4.75,1.56,8.30],[.05,1.10,0],68],
-    [1,[-4.20,1.58,8.50],[.18,1.18,0],68],
+    // Starts intentionally close to the authentic sparkling metal trail,
+    // tracks rapidly out to a safe rear 3/4, then climbs to a controlled finish.
+    [0,[-3.85,.62,3.65],[-.72,.37,0],64],
+    [.20,[-4.70,.72,4.95],[-.42,.53,0],65],
+    [.55,[-5.90,1.08,6.70],[0,.55,0],68],
+    [1,[-5.70,1.35,8.30],[0,.62,0],66],
   ],
+
 };
 const clamp=(n:number,a=0,b=1)=>Math.max(a,Math.min(b,n));
 const smooth=(t:number)=>{const x=clamp(t);return x*x*(3-2*x);};
