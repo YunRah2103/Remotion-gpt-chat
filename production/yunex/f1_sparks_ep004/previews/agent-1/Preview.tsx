@@ -1,15 +1,16 @@
 import React, {useEffect, useMemo} from 'react';
+import {useThree} from '@react-three/fiber';
 import {ThreeCanvas} from '@remotion/three';
 import {AbsoluteFill,useCurrentFrame,useVideoConfig} from 'remotion';
 import * as T from 'three';
-import {createEnvironment,disposeObject} from '../../../../src/yunex/world-kit/index.ts';
+import {createEnvironment,disposeObject} from '../../../../../src/yunex/world-kit/index.ts';
 import {F1HeroVehicle,UnderfloorReveal} from '../../mechanics/index.ts';
 import {sampleAgent1Fixture} from './fixture.ts';
 
 function CameraFollow({position,yaw,tSec,technical}:{
  position:readonly[number,number,number],yaw:number,tSec:number,technical:boolean
 }) {
- const cameraRef=React.useRef<T.PerspectiveCamera|null>(null);
+ const {camera}=useThree();
  const ox=technical?-.30-.40*Math.sin(tSec*.54):-7.6;
  const oy=technical?.28:2.55;
  const oz=technical?2.28+.24*Math.cos(tSec*.44):4.95;
@@ -21,9 +22,9 @@ function CameraFollow({position,yaw,tSec,technical}:{
  const camPosition=new T.Vector3(position[0]+xx,position[1]+oy,position[2]+zz);
  const lookTarget=new T.Vector3(position[0]+tx,position[1]+(technical?.14:.66),position[2]+tz);
  // Camera property setting during frame evaluation is deterministic and seek safe.
- const cam=useMemo(()=>new T.PerspectiveCamera(technical?40:33,1080/1920,.02,500),[technical]);
- cam.position.copy(camPosition);cam.lookAt(lookTarget);
- return <primitive object={cam} ref={cameraRef} makeDefault={true}/>;
+ if(camera instanceof T.PerspectiveCamera){camera.fov=technical?40:33;camera.updateProjectionMatrix();}
+ camera.position.copy(camPosition);camera.lookAt(lookTarget);
+ return null;
 }
 const TechnicalStage:React.FC<{position:readonly[number,number,number];yaw:number}>=({position,yaw})=>{
  const matte=useMemo(()=>new T.MeshStandardMaterial({color:'#1e2832',metalness:.16,roughness:.82}),[]);
