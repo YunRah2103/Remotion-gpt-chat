@@ -74,3 +74,9 @@ node --experimental-strip-types production/yunex/f1_sparks_ep004/editor/render-n
 ```
 
 **Current outcome:** editor source and tests are committed; no original EP004 voice, accepted integrated live scene or native editor pair yet, so **no final editor MP4 verification or picture lock can honestly be declared.**
+
+## Editor-specific type-check (not covered by root tsconfig)
+```bash
+npx tsc -p production/yunex/f1_sparks_ep004/editor/tsconfig.json
+```
+Root `npm run check` checks `src/**` only and is **not** evidence this editor-local TypeScript was compiled. Agent 0 should add this command plus `tests/agent-6/*.test.mjs` to its editor acceptance gate after the two native deliverables are permitted.
