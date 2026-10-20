@@ -1,0 +1,202 @@
+/** Agent 8 exclusive standalone Remotion preview: never edits Agent 6's Root. */
+import React,{useEffect,useMemo} from 'react';
+import {AbsoluteFill,Composition,useCurrentFrame,useVideoConfig} from 'remotion';
+import {ThreeCanvas} from '@remotion/three';
+import * as T from 'three';
+import {createVehicle} from '../../../../src/yunex/world-kit/vehicles.ts';
+import {animateVehicle} from '../../../../src/yunex/world-kit/motion.ts';
+import {disposeObject} from '../../../../src/yunex/world-kit/geometry.ts';
+import {WorldLighting,CameraAim} from '../../../../src/yunex/world-kit/components.tsx';
+import {EP003_SCENE} from '../shared/contract.ts';
+import {sampleCrashOutcome} from './model.ts';
+import {CrashBarrierWorld,ImpactRailScars3D} from './Barrier.tsx';
+import {sampleCrashCamera,lensForCloseTime,lensForHydratedTime} from './Camera.ts';
+import type {CrashOutcomeFrame} from './model.ts';
+
+type V3=[number,number,number];
+const clamp=(v:number,a=0,b=1)=>Math.min(b,Math.max(a,v));
+function makeOriginalGrandTourer():T.Group{
+ const root=createVehicle({variant:'grand-tourer',color:EP003_SCENE.paint,
+  accent:'#C9A777',interior:true,lights:false});
+ // Match the approved A4 material recipe on the ORIGINAL kit model in preview;
+ // after branch integration use A4 finishGrandTourer() without a duplicate model.
+ const body=root.getObjectByName('arched-body');
+ if(body instanceof T.Mesh&&body.material instanceof T.MeshPhysicalMaterial){
+  body.material.color.set(EP003_SCENE.paint);
+  body.material.metalness=.43;body.material.roughness=.31;
+  body.material.clearcoat=.82;body.material.clearcoatRoughness=.19;
+ }
+ return root;
+}
+type DentTarget={mesh:T.Mesh;origin:Float32Array;position:T.BufferAttribute};
+function setupDent(root:T.Group):DentTarget|undefined{
+ const part=root.getObjectByName('arched-body');
+ if(!(part instanceof T.Mesh)||!(part.geometry instanceof T.BufferGeometry))return;
+ part.geometry=part.geometry.clone(); // never mutate the shared vehicle kit
+ const position=part.geometry.getAttribute('position') as T.BufferAttribute;
+ return {mesh:part,origin:new Float32Array(position.array as ArrayLike<number>),position};
+}
+function applyOriginalKitDamage(target:DentTarget|undefined,frame:CrashOutcomeFrame){
+ if(!target)return;
+ const {origin,position}=target;
+ for(let i=0;i<position.count;i++){
+  const ix=3*i,ox=origin[ix],oy=origin[ix+1],oz=origin[ix+2];
+  const nose=clamp((ox-1.42)/1.0),side=clamp((-oz-.30)/.72);
+  const blend=nose*nose*side*side;
+  position.setXYZ(i,ox-frame.bumperCrushM*blend,
+   oy+frame.fenderCrushM*.18*blend,
+   oz+frame.fenderCrushM*.72*blend);
+ }
+ position.needsUpdate=true;target.mesh.geometry.computeVertexNormals();
+}
+export const CrashCarRig:React.FC<{frame:CrashOutcomeFrame;
+ makeVehicle?:()=>T.Group;
+ afterPose?:(vehicle:T.Group,frame:CrashOutcomeFrame)=>void;
+}>=({frame,makeVehicle,afterPose})=>{
+ const original=useMemo(()=>makeVehicle?makeVehicle():makeOriginalGrandTourer(),[makeVehicle]);
+ const dent=useMemo(()=>setupDent(original),[original]);
+ const trim=useMemo(()=>{
+  const originalPositions=new Map<T.Object3D,[number,number,number]>();
+  original.traverse(o=>{
+   if(o.name==='lamp-lens'||o.name==='headlamp-housing'||
+      o.name==='lamp-reflector'||o.name==='front-lip'){
+    originalPositions.set(o,[o.position.x,o.position.y,o.position.z]);
+   }
+  });return originalPositions;
+ },[original]);
+ const damageFolds=useMemo(()=>{
+  // Thin, flush creased paint edges ON the original front-right metalwork.
+  // Earlier visual inspection found seven protruding blocks on the bonnet;
+  // those were NOT credible damage and have been removed. The underlying
+  // original arched-body mesh itself is still vertex-deformed above.
+  const root=new T.Group();
+  root.name='A8-front-right-metal-crease-edges';
+  const exposed=new T.MeshStandardMaterial({color:'#758d99',metalness:.68,roughness:.50,side:T.DoubleSide});
+  const shadow=new T.MeshStandardMaterial({color:'#1b3444',metalness:.46,roughness:.70,side:T.DoubleSide});
+  const lip=new T.Mesh(new T.BoxGeometry(.19,.016,.095),exposed);
+  lip.position.set(2.34,.776,-.895);lip.rotation.set(.06,.35,-.16);
+  root.add(lip);
+  const score=new T.Mesh(new T.BoxGeometry(.29,.012,.028),shadow);
+  score.position.set(2.25,.876,-.918);score.rotation.set(.12,.31,-.11);
+  root.add(score);
+  const fold=new T.Mesh(new T.BoxGeometry(.16,.015,.082),exposed);
+  fold.position.set(2.39,.696,-.890);fold.rotation.set(.02,.19,.19);
+  root.add(fold);
+  original.add(root);
+  return root;
+ },[original]);
+ useEffect(()=>()=>disposeObject(original),[original]);
+ // Original kit car body, cabin, wheels and interior are NEVER replaced with a box.
+ animateVehicle(original,frame.distanceTravelledM,frame.driverSteerRad);
+ original.position.set(...frame.scenePositionM);
+ original.rotation.set(frame.pitchRad,frame.headingRad,frame.rollRad,'YXZ');
+ applyOriginalKitDamage(dent,frame);
+ damageFolds.visible=frame.bumperCrushM>.012;
+ damageFolds.scale.setScalar(.45+frame.bumperCrushM*2.4);
+ trim.forEach((p,node)=>{
+  node.position.set(...p);
+  if(p[0]>1.7&&p[2]<-.12){
+   node.position.x-=frame.lampCrushM*.8;
+   node.position.z+=frame.lampCrushM*.35;
+   if(node.name==='lamp-lens')node.scale.set(1-frame.lampCrushM*.9,1,1);
+  }
+ });
+ // Same original failed front-right tyre/rim/brake hierarchy. This standalone
+ // kit fixture compresses rubber only; Agent 1's final rig slots in at merge.
+ if(!afterPose)original.traverse(o=>{
+  if(!o.name.startsWith('steer-')||!o.userData.steering)return;
+  const rightFront=o.position.x>0&&o.position.z<0;
+  if(!rightFront)return;
+  const wheelRoll=o.getObjectByName('wheel-roll');
+  if(wheelRoll)wheelRoll.rotation.z=frame.frontRightWheelSpinRad;
+  const tyre=o.getObjectByName('tyre');
+  if(tyre)tyre.scale.y=.84-.08*(1-frame.frontRightPressureRatio);
+ });
+ original.updateMatrixWorld(true);
+ afterPose?.(original,frame);
+ return <primitive object={original}/>;
+};
+/** Seek-safe debris from frozen first-contact point; no random renderer mutation. */
+export const CrashDebris:React.FC<{frame:CrashOutcomeFrame}>=({frame})=>{
+ if(!frame.contact.occurred||frame.contact.firstContactSec===null||
+    frame.contact.firstContactX===null||frame.contact.firstContactZ===null)return null;
+ const age=frame.relativeTimeSec-frame.contact.firstContactSec;
+ const impactX=frame.contact.firstContactX,railZ=frame.contact.firstContactZ;
+ return <group>
+  {Array.from({length:38},(_,i)=>{
+   const seed=(n:number)=>Math.abs(Math.sin((i+1)*n*17.151)*43758.5453)%1;
+   const phase=age, vx=2.4+seed(3)*8.5, vz=-1.5+seed(5)*3.0;
+   const vy=.9+seed(7)*2.3;
+   const x=impactX+vx*phase, y=Math.max(.055,.42+vy*phase-4.9*phase*phase);
+   const z=railZ+.10+vz*phase;
+   const isSpark=i<20;
+   const life=isSpark?.49:1.2;
+   if(age>life||phase<0)return null;
+   const opacity=clamp((life-age)/life)*.96;
+   const radius=isSpark?.032+seed(9)*.014:.027+seed(9)*.037;
+   return <mesh key={i} position={[x,y,z]} rotation={[phase*6,i*.7,phase*8]}>
+    <boxGeometry args={[radius*(isSpark?6:1),radius*.65,radius]}/>
+    <meshStandardMaterial color={isSpark?'#f5b568':(i%3===0?'#272a2a':'#647377')}
+      emissive={isSpark?'#f2852a':'#000000'} emissiveIntensity={isSpark?.75:0}
+      transparent opacity={opacity} roughness={.8}/>
+   </mesh>;
+  })}
+  {Array.from({length:6},(_,i)=>{
+   if(age>1.35)return null;
+   const seed=(i+1)/6;
+   const x=impactX+age*(2.1+seed*3.3),z=railZ+.14+seed*.35;
+   const radius=.31+age*.75;
+   return <mesh key={'dust'+i} position={[x,.22+age*.16,z]}
+    scale={[radius,radius*.5,radius]}>
+    <sphereGeometry args={[1,10,7]}/>
+    <meshStandardMaterial color="#9aa09b" roughness={1} transparent
+      opacity={.32*(1-clamp(age/1.35))} depthWrite={false}/>
+   </mesh>;
+  })}
+ </group>;
+};
+export const ImpactEffects3D:React.FC<{frame:CrashOutcomeFrame}>=({frame})=><>
+ <CrashDebris frame={frame}/>
+ <ImpactRailScars3D frame={frame}/>
+</>;
+export const CrashPreview:React.FC<{kind:'approach'|'close'}>=({kind})=>{
+ const videoFrame=useCurrentFrame(),{fps,width,height}=useVideoConfig();
+ const t=kind==='approach'?videoFrame/fps:1.10+videoFrame/fps;
+ const crash=sampleCrashOutcome(Math.min(4.5,t));
+ const lens=kind==='approach'?lensForHydratedTime(t):lensForCloseTime(t);
+ const camera=sampleCrashCamera(crash,lens);
+ return <AbsoluteFill style={{background:'#b7ced8'}}>
+  <ThreeCanvas width={width} height={height} shadows
+   camera={{position:camera.position,fov:camera.fov,near:.1,far:310}}>
+   <WorldLighting timeOfDay="day" focus={[crash.scenePositionM[0],0,crash.scenePositionM[2]]}/>
+   <CrashBarrierWorld frame={crash}/>
+   <CameraAim position={camera.position} target={camera.target} fov={camera.fov}/>
+   <CrashCarRig frame={crash}/>
+   <ImpactEffects3D frame={crash}/>
+  </ThreeCanvas>
+  <div style={{position:'absolute',top:'7%',left:'7%',right:'7%',
+   fontFamily:'Arial,sans-serif',fontWeight:800,letterSpacing:1.6,
+   color:'#ffffff',textShadow:'0 3px 10px #12252a',fontSize:27}}>
+   HYPOTHETICAL WRONG REACTION
+   <div style={{fontSize:16,fontWeight:500,marginTop:8,letterSpacing:.3}}>
+    ABRUPT STEERING + HARSH BRAKING — NOT INEVITABLE
+   </div>
+  </div>
+  <div style={{position:'absolute',bottom:'8%',left:'7%',right:'7%',
+   color:'#eef4f5',background:'rgba(11,25,32,.69)',padding:'14px 16px',
+   fontSize:16,letterSpacing:.6,fontFamily:'Arial,sans-serif'}}>
+   {crash.contact.occurred?'BARRIER CONTACT / VEHICLE DAMAGE':'FAILED FRONT-RIGHT TYRE / CAR VEERS'}
+   <div style={{fontSize:12,opacity:.8,marginTop:5}}>
+    ILLUSTRATIVE COUNTERFACTUAL · NOT CRASH TEST DATA
+   </div>
+  </div>
+ </AbsoluteFill>;
+};
+export const Agent8Compositions:React.FC=()=> <>
+ <Composition id="EP003Agent8CrashApproach" component={CrashPreview}
+  width={1080} height={1920} fps={30} durationInFrames={120}
+  defaultProps={{kind:'approach' as const}}/>
+ <Composition id="EP003Agent8ImpactClose" component={CrashPreview}
+  width={1080} height={1920} fps={30} durationInFrames={100}
+  defaultProps={{kind:'close' as const}}/>
+ </>;
