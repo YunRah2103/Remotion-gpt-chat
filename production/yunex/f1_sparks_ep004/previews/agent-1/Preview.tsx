@@ -11,18 +11,19 @@ function CameraFollow({position,yaw,tSec,technical}:{
  position:readonly[number,number,number],yaw:number,tSec:number,technical:boolean
 }) {
  const {camera}=useThree();
- const ox=technical?-.30-.40*Math.sin(tSec*.54):-7.6;
- const oy=technical?.032:2.55;
- const oz=technical?2.28+.24*Math.cos(tSec*.44):4.95;
+ const sweep=Math.max(0,Math.min(1,tSec/5.7));
+ const ox=technical?1.15-2.25*sweep:-10.8;
+ const oy=technical?.035:3.25;
+ const oz=technical?1.95+.08*Math.cos(tSec*.55):9.0;
  const localToWorld=(dx:number,dz:number)=>{
    return [Math.cos(yaw)*dx+Math.sin(yaw)*dz,-Math.sin(yaw)*dx+Math.cos(yaw)*dz] as const;
  };
  const [xx,zz]=localToWorld(ox,oz);
- const [tx,tz]=localToWorld(technical?-.28:1.04,0);
+ const [tx,tz]=localToWorld(technical?1.18-2.16*sweep:0,0);
  const camPosition=new T.Vector3(position[0]+xx,position[1]+oy,position[2]+zz);
- const lookTarget=new T.Vector3(position[0]+tx,position[1]+(technical?.14:.66),position[2]+tz);
+ const lookTarget=new T.Vector3(position[0]+tx,position[1]+(technical?.095:.55),position[2]+tz);
  // Camera property setting during frame evaluation is deterministic and seek safe.
- if(camera instanceof T.PerspectiveCamera){camera.fov=technical?40:33;camera.updateProjectionMatrix();}
+ if(camera instanceof T.PerspectiveCamera){camera.fov=technical?48:47;camera.updateProjectionMatrix();}
  camera.position.copy(camPosition);camera.lookAt(lookTarget);
  return null;
 }
@@ -51,7 +52,7 @@ export const MechanicsPreview:React.FC<{mode:'technical'|'context'}>=({mode})=>{
  const fade=technical?Math.min(1,Math.max(0,(tSec-.35)/1.35)):0;
  return <AbsoluteFill style={{backgroundColor:'#071320'}}>
   <ThreeCanvas width={1080} height={1920}
-    camera={{fov:technical?40:33,near:.02,far:500,position:[0,1.8,6]}}
+    camera={{fov:technical?48:47,near:.02,far:500,position:[0,1.8,6]}}
     gl={{antialias:true,preserveDrawingBuffer:true}}>
    <color attach="background" args={[technical?'#0d1720':'#0b1421']}/>
    <fog attach="fog" args={['#0b1421',technical?22:90,technical?90:220]}/>
