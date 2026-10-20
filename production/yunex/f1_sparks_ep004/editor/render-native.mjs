@@ -56,7 +56,7 @@ export function renderApprovedEditorPair(manifestPath) {
     const outPath=join(destination,output);
     writeFileSync(propsPath,JSON.stringify({plan,readiness:m.readiness,showCaptions})+'\n');
     run('npx',['remotion','render',entry,composition,outPath,'--props',propsPath,'--gl=swangle','--codec=h264','--pixel-format=yuv420p','--log=error']);
-    const evidence=verifyNativeMp4(outPath,plan.totalFrames,{audioRequired:true});
+    const evidence=verifyNativeMp4(outPath,plan.totalFrames,{audioRequired:true,cuts:plan.cuts});
     result.push({composition,output:outPath,evidence});
   }
   writeFileSync(join(destination,'EP004-editor-pair-audit.json'),JSON.stringify(result,null,2)+'\n');
