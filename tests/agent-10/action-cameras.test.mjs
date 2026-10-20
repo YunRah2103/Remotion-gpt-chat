@@ -46,18 +46,18 @@ test('camera geography: every stage is finite with viable portrait FOV',()=>{
 });
 test('first-contact camera reveals A8 front-right nose from above the rail',()=>{
  const d=fakeFrame(),p=sampleActionCamera(req('impact-side-profile',.6));
- assert.ok(p.position[0]>d.positionM[0]+8,
+ assert.ok(p.position[0]>d.positionM[0]+7.5,
    'front three-quarter lens looks toward the real crumple corner');
- assert.ok(p.position[2]<d.positionM[2]-5,
-   'lens is on failed front-right / right-rail side');
+ assert.ok(p.position[2]>d.positionM[2]+2,
+   'approved traffic-side view keeps the original right rail BEHIND damaged blue GT');
  assert.ok(p.position[1]>4.9,'lens clears steel rail');
  assert.ok(distance(p.position,p.target)>8.5,
    'portrait framing must show the whole car, not a cropped bumper');
  const scrape=sampleActionCamera(req('damage-scrape',.6));
  assert.ok(scrape.position[0]>d.positionM[0]+6,
    'aftermath must NOT show only the undamaged rear');
- assert.ok(scrape.position[2]<d.positionM[2]-4,
-   'damage is on failed right side');
+ assert.ok(scrape.position[2]>d.positionM[2]+.9,
+   'scrape closeup views approved right-front bonnet without steel occlusion');
 });
 test('safe-branch final recovery shot stays on visible carriageway side',()=>{
  const s=actionPreviewState(6.68,'recovery');
@@ -219,8 +219,10 @@ test('crash camera and rail share A8 world X rebasing and front-right side',()=>
    progress01:s.progress01,dynamics:s.dynamics,
    impactFrame:{actualBarrierContact:s.impact.contact.occurred,
      contact01:s.contact01}});
- assert.ok(actual.position[2]<s.dynamics.positionM[2]-4,
-   'camera must expose the A8 damaged right corner');
+ assert.ok(actual.position[2]>s.dynamics.positionM[2]+1,
+   'traffic-side camera must expose approved A8 damaged right corner without rail across it');
+ assert.ok(actual.position[1]>s.dynamics.positionM[1]+3,
+   'camera must clear steel guardrail while retaining original full car');
 });
 
 test('approved A8 bent right rail replaces static rail ONLY in crash branch',()=>{

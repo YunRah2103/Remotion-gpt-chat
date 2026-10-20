@@ -19,7 +19,7 @@ targets `production/yunex-ep003-base`. No Agent 6 editor/timeline/root edits.
 - A4 world: `a44f1b6c9c31105edd1a9b0d2de7f233d1223952`
 - A5 hands: `cd03c64f77705aa03ee5d5071e5cf18c669fa4ea`
 - A8 **user-approved original bent right rail and front-right body**: `8e703e70218e9c0b9e9b7768112f2d8388ae31c8`
-- A9 rewind: `6b767e381418f51ace0aea53fbb7bf3f071a5f8d`
+- A9 updated approved-A8 pin (same verified rewind source): `0b459955d7b7ac676275d7fb957fd8a12732e6ab`
 
 The dedicated workflow Git-restores each pinned source directory without touching their PR branches or adding their code to the Agent 10 PR. A final merge of all departments is Agent 0/6 responsibility.
 
@@ -56,3 +56,10 @@ const pose=sampleActionCamera({
 ## Verification
 
 Workflow `.github/workflows/yunex-ep003-agent10-action.yml` runs native Remotion, FFprobe frame and H264 codec checks, complete FFmpeg decode, sampled temporal-motion statistics and impact/rewind contact sheets. Green workflow and inspectable artifact are mandatory before claiming playable delivery; code commits alone do not satisfy that. Visual phone review is required before Agent 6 picture lock. No accepted final mixed MP4 is implied by these independent previews.
+
+## 20 October final combined-source checkpoint
+
+- The original approved Agent 8 geometry, 0.18m rail buckle and reversible rail-scars are preserved. A10 `PreviewFilm.tsx` uses exactly one `CrashBarrierWorld(frame,buildEpisodeHighway)` **instead of** the regular world road in the bad/reverse phase, and original A1 rubber via `CrashCarRig` + `Agent10DamagedOriginalCar` as one object.
+- A9 updated owner commit `0b459955d7b7ac676275d7fb957fd8a12732e6ab` pins the SAME approved A8 SHA, with `rewind/branchReplay.ts` and `rewind/agent8Integration.ts` unchanged from its already genuine H264 backward-time baseline. A10 uses this exact A9 snapshot without reauthoring A9-owned code.
+- Agent10 camera aims on the traffic (+Z) side of the damaged right-front blue GT to keep the approved bent -Z steel rail behind the nose. Tests are updated to protect this verified unobscured framing rather than the obsolete rail-side viewpoint.
+- The camera branch/pose exports, A2 moving safe-response, A5 hands, 800-frame master VO timing, and original GT geometry remain unchanged. Final rendering acceptance requires exact-head two-MP4 H264, full decode, frame count and direct 9:16 mobile inspection. DO NOT treat this document as actual video proof.
