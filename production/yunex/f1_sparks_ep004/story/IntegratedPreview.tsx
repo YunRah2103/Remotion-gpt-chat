@@ -15,6 +15,7 @@ import {WorldLighting} from '../../../../src/yunex/world-kit/components';
 import {F1HeroVehicle,getSkidDescriptors} from '../mechanics/index';
 import {StoryMechanicalCutaway} from './StoryMechanicalCutaway';
 import {SparkLensGlints} from './SparkLensGlints';
+import {projectedActualParts} from './project-actual-parts';
 import {contactCaption} from './scene-captions';
 import {sampleDynamics,sampleContactDrivenSparks,sampleSkidContacts,localToWorld} from '../physics/index';
 import {NightCircuitWorld} from '../look/NightCircuitWorld';
@@ -81,15 +82,15 @@ export function integratedStoryCamera(req:StoryRequest):CameraPose{
  const m=req.motion,p=clamp01(req.shotLocalSec/req.shotDurationSec);
  let pos:Vec3,target:Vec3,fovDeg:number;
  switch(req.shot){
-  case 'spark-hook':pos=[.9+p*.35,1.20,11.2-p*.9];target=[.10,.93,0];fovDeg=50;break;
+  case 'spark-hook':pos=[-4.7+p*.4,1.55,4.75];target=[.10,.84,0];fovDeg=62;break;
   case 'rear-mystery':pos=[-7.6+p*.6,1.55,5.2-p*.4];target=[-.40,.93,0];fovDeg=52;break;
   case 'underfloor-reveal':
    // Camera is below Agent 4's opaque road FOR THE CUTAWAY ONLY.
    // Look upward at the real silver skid and tan plank, not a ghost arrow.
-   pos=[.45+p*.42,-1.27,3.05+p*.14];target=[.70,.105,0];fovDeg=51;break;
+   pos=[.99+p*.08,-.28,1.32+p*.05];target=[1.00,.115,0];fovDeg=59;break;
   case 'aero-load':pos=[.24,1.44,12.25-p*.35];target=[0,.90,0];fovDeg=52;break;
-  case 'contact-macro':pos=[.7,.88,12.2+p*.1];target=[.50,.82,0];fovDeg=52;break;
-  default:pos=[-2.2+p*.75,1.73,12.15-p*.35];target=[.0,.88,0];fovDeg=52;break;
+  case 'contact-macro':pos=[-5.95+p*.4,1.68,4.65];target=[.15,.82,0];fovDeg=62;break;
+  default:pos=[-5.2+p*.75,1.83,4.62];target=[.2,.84,0];fovDeg=60;break;
  }
  const position=localWorld(m,pos),cameraTarget=localWorld(m,target);
  // Aero camera remains tied to road, NOT the heaving body: lowering is visible.
@@ -153,17 +154,27 @@ const RealSparkParticles:React.FC<{particles:readonly SparkParticle[]}>=({partic
 /** Restrained real-geometry legend during the physical underfloor cutaway. */
 const UnderfloorMaterialKey:React.FC<{request:StoryRequest;opacity:number}>=({request,opacity})=>{
  const p=clamp01(request.shotLocalSec/request.shotDurationSec);
- if(p<.10)return null;
- return <div style={{
-  position:'absolute',left:'8%',top:'18%',display:'flex',flexDirection:'column',
-  gap:9,opacity:opacity*.92,pointerEvents:'none',zIndex:3,
-  fontFamily:'Arial,sans-serif',fontSize:42,fontWeight:750,letterSpacing:1.8,
-  textShadow:'0 2px 9px #000',maxWidth:'50%'
- }}>
-  <div style={{color:'#e5edf0'}}>● SILVER METAL SKID</div>
-  <div style={{color:'#c5b69c'}}>● TAN COMPOSITE PLANK</div>
-  <div style={{color:'#83acbc'}}>● DARK CARBON FLOOR</div>
- </div>;
+ if(p<.06)return null;
+ const pose=integratedStoryCamera(request);
+ const points=projectedActualParts(request.motion,pose);
+ return <svg aria-label="Projected labels on the actual three-piece underfloor" style={{
+  position:'absolute',inset:0,width:'100%',height:'100%',pointerEvents:'none',
+  opacity:opacity*.97
+ }} viewBox="0 0 1080 1920">
+  <rect x="65" y="340" width="560" height="254" rx="16" fill="#0a141d" opacity=".82"/>
+  <text x="89" y="379" fill="#f8e0b5" fontFamily="Arial,sans-serif" fontSize="25" fontWeight="700" letterSpacing="3">UNDERFLOOR SECTION</text>
+  {points.map((pt,i)=>{
+    const y=428+i*64,labelX=87;
+    return <g key={pt.id}>
+      {pt.onScreen&&<path d={`M 610 ${y-11} L 684 ${y-11} L ${pt.x.toFixed(2)} ${pt.y.toFixed(2)}`}
+        fill="none" stroke={pt.color} strokeWidth="2.2" opacity=".89"/>}
+      {pt.onScreen&&<circle cx={pt.x} cy={pt.y} r="8" fill={pt.color} stroke="#09151d" strokeWidth="2"/>}
+      <circle cx={labelX+7} cy={y-13} r="6" fill={pt.color}/>
+      <text x={labelX+26} y={y} fill={pt.color} fontFamily="Arial,sans-serif" fontSize="30"
+        fontWeight="800" letterSpacing=".9">{pt.title}</text>
+     </g>;
+   })}
+ </svg>;
 };
 /** Real physics A/B clearance numbers, unchanged camera scale and race line. */
 const AeroHeightGuide:React.FC<{request:StoryRequest}>=({request})=>{
