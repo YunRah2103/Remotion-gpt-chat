@@ -23,7 +23,8 @@ test('actual impact and damage remain visible across deterministic perspective c
  assert.equal(lensForCloseTime(2.5),'damage');
  const afterLens=sampleCrashCamera(sample(2.5),after);
  assert.ok(afterLens.position[1]>1.8&&afterLens.position[1]<3);
- assert.ok(afterLens.position[2]<sample(2.5).scenePositionM[2]-2,'rail-side aftermath angle');
+ assert.ok(afterLens.position[2]>sample(2.5).contact.barrierZ+.5,'frontal shot stays inside physical right-hand guardrail');
+ assert.ok(Math.abs(afterLens.position[2]-sample(2.5).scenePositionM[2])<.7,'no obstructing rail between lens and damaged nose');
  const backward=sampleCrashCamera(sample(1.95),lensForHydratedTime(1.95));
  assert.deepEqual(backward,sampleCrashCamera(sample(1.95),lensForHydratedTime(1.95)));
 });
