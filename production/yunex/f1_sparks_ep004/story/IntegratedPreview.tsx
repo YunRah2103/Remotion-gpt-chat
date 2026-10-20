@@ -147,7 +147,7 @@ const UnderfloorMaterialKey:React.FC<{request:StoryRequest;opacity:number}>=({re
  return <div style={{
   position:'absolute',left:'8%',top:'18%',display:'flex',flexDirection:'column',
   gap:9,opacity:opacity*.92,pointerEvents:'none',zIndex:3,
-  fontFamily:'Arial,sans-serif',fontSize:24,fontWeight:750,letterSpacing:1.8,
+  fontFamily:'Arial,sans-serif',fontSize:42,fontWeight:750,letterSpacing:1.8,
   textShadow:'0 2px 9px #000',maxWidth:'50%'
  }}>
   <div style={{color:'#c5b69c'}}>● TAN COMPOSITE PLANK</div>
