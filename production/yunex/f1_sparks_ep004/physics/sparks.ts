@@ -1,6 +1,8 @@
 import type {SkidContact,SkidDescriptor,SkidId,SparkParticle,Vec3,VehicleMotionState} from '../shared/contract.ts';
 import {sampleSkidContacts} from './contacts.ts';
 import {sampleDynamics,worldToLocal} from './dynamics.ts';
+import {sampleTrackSurface} from '../shared/track.ts';
+import {EP004} from '../shared/contract.ts';
 import type {DynamicsParams} from './dynamics.ts';
 
 const clamp=(v:number,lo:number,hi:number)=>Math.max(lo,Math.min(hi,v));
@@ -34,8 +36,15 @@ export function sampleSparkParticles(
   const contactIds=new Set(contacts.map(c=>c.skidId));
   for(const s of skidArray)if(!contactIds.has(s.id))throw new Error('missing contact state for '+s.id);
   const startDistanceM=motion.routeDistanceM-motion.speedMps*motion.tSec;
+  // Reconstruct the parameters of the supplied chassis state when callers use
+  // the contract's 3-argument API. Optional explicit parameters take precedence.
+  const speedSquared=Math.pow(motion.speedMps/EP004.previewSpeedMps,2);
+  const inferredAero=speedSquared>1e-8?clamp(motion.downforceProxy01/speedSquared,0,1):1;
+  const bump01=clamp(sampleTrackSurface(motion.routeDistanceM).heightM/.019,0,1);
+  const inferredRideOffset=motion.heaveM+.042*motion.downforceProxy01+.032*bump01;
   const replay: DynamicsParams={startDistanceM,speedMps:motion.speedMps,
-    aeroLoad01:params.aeroLoad01,rideHeightOffsetM:params.rideHeightOffsetM};
+    aeroLoad01:params.aeroLoad01??inferredAero,
+    rideHeightOffsetM:params.rideHeightOffsetM??inferredRideOffset};
   const firstTick=Math.max(0,Math.ceil((tSec-MAX_LIFE)*HZ));
   const lastTick=Math.floor(tSec*HZ+1e-8);
   const result:SparkParticle[]=[];
