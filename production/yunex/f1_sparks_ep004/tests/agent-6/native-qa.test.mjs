@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
-import {validateVideoMetadata, uniqueDecodedFrameHashes} from '../../editor/native-qa.mjs';
+import {validateVideoMetadata, uniqueDecodedFrameHashes, VIDEO_HASH_STREAM_SELECTOR} from '../../editor/native-qa.mjs';
 const metadata = () => ({
   streams: [
     {codec_type:'video',width:1080,height:1920,avg_frame_rate:'30/1',nb_read_frames:'810'},
@@ -28,4 +28,8 @@ test('sampled pixel hashes identify temporal movement, not metadata alone',()=>{
   const samples='# FrameMD5\n0, 0, 0, 300, hashA\n0, 1, 1, 300, hashB\n0, 2, 2, 300, hashB\n';
   assert.equal(uniqueDecodedFrameHashes(samples),2);
   assert.equal(uniqueDecodedFrameHashes('# FrameMD5\n0, 0, 0, 300, hashA\n0, 1, 1, 300, hashA\n'),1);
+});
+
+test('moving-frame proof samples VIDEO only, never voice/audio packet hashes',()=>{
+  assert.equal(VIDEO_HASH_STREAM_SELECTOR,'0:v:0');
 });
