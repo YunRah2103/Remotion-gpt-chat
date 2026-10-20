@@ -1,0 +1,141 @@
+name: YUNEX EP003 Agent 10 — Native Cinematic Action Previews
+on:
+  push:
+    branches: [agent/ep003-10-action-cameras]
+    paths:
+      - '.github/workflows/yunex-ep003-agent10-action.yml'
+      - 'production/yunex/tyre_blowout_ep003/action/**'
+      - 'previews/agent-10/**'
+      - 'tests/agent-10/**'
+permissions:
+  contents: read
+concurrency:
+  group: ep003-agent10-native-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  motion-camera-native:
+    name: Real 3D Render, FFprobe, Decode and Motion QA
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install native render and proof requirements
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --quiet Pillow==11.3.0
+          npm ci --no-audit --no-fund
+          mkdir -p previews/agent-10/out
+      - name: Hydrate ORIGINAL approved A1–A5 with immutable commit identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          specs=(
+            'agent/ep003-01-mechanics mechanics 7d47746d2fc584e935b5a9766eb1150e5b3dac38'
+            'agent/ep003-02-dynamics dynamics e724786fc087b080e9de19e9e26bda6a815ce276'
+            'agent/ep003-03-cinema cinema 938628271f9b50d975ee55491881a8fd2d4807a5'
+            'agent/ep003-04-look look a44f1b6c9c31105edd1a9b0d2de7f233d1223952'
+            'agent/ep003-05-story story cd03c64f77705aa03ee5d5071e5cf18c669fa4ea'
+          )
+          : > previews/agent-10/out/provenance.txt
+          printf '%s\n' "Agent10 branch: ${GITHUB_SHA}" >> previews/agent-10/out/provenance.txt
+          for spec in "${specs[@]}"; do
+            read -r branch folder sha <<< "$spec"
+            git fetch --no-tags --depth=120 origin "refs/heads/$branch"
+            if ! git cat-file -e "${sha}^{commit}" 2>/dev/null; then
+              git fetch --no-tags --depth=1 origin "$sha"
+            fi
+            git cat-file -e "${sha}^{commit}"
+            git restore --source="$sha" --worktree -- "production/yunex/tyre_blowout_ep003/$folder/"
+            printf '%s %s %s\n' "$branch" "$folder" "$sha" | tee -a previews/agent-10/out/provenance.txt
+          done
+          test -f production/yunex/tyre_blowout_ep003/mechanics/tyreRig.ts
+          test -f production/yunex/tyre_blowout_ep003/dynamics/model.ts
+          test -f production/yunex/tyre_blowout_ep003/cinema/scene.tsx
+          test -f production/yunex/tyre_blowout_ep003/look/world.tsx
+          test -f production/yunex/tyre_blowout_ep003/story/SteadyHands3D.tsx
+          # Agent8 and Agent9 are separate owned branch sources, pinned by exact SHA.
+          integrations=(
+            'agent/ep003-08-crash-vfx impact 8e703e70218e9c0b9e9b7768112f2d8388ae31c8'
+            'agent/ep003-09-rewind-story rewind 6884664e265c680e314b3d44b81d33b6d6439977'
+          )
+          for spec in "${integrations[@]}"; do
+            read -r sourceBranch folder sha <<< "$spec"
+            git fetch --no-tags --depth=120 origin "refs/heads/$sourceBranch"
+            if ! git cat-file -e "${sha}^{commit}" 2>/dev/null; then
+              git fetch --no-tags --depth=1 origin "$sha"
+            fi
+            git cat-file -e "${sha}^{commit}"
+            git restore --source="$sha" --worktree -- "production/yunex/tyre_blowout_ep003/$folder/"
+            printf '%s %s %s\n' "$sourceBranch" "$folder" "$sha" | tee -a previews/agent-10/out/provenance.txt
+          done
+          test -f production/yunex/tyre_blowout_ep003/impact/model.ts
+          test -f production/yunex/tyre_blowout_ep003/impact/Preview.tsx
+          test -f production/yunex/tyre_blowout_ep003/impact/Barrier.tsx
+          test -f production/yunex/tyre_blowout_ep003/rewind/branchReplay.ts
+          test -f production/yunex/tyre_blowout_ep003/rewind/agent8Integration.ts
+          printf '%s\n' 'INTEGRATED: exact-pin A8 impact + A9 rewind, NO provisional crash fixture'             >> previews/agent-10/out/provenance.txt
+      - name: Check TS and original world/parts tests
+        run: |
+          set -euo pipefail
+          npm run check
+          npx --no-install tsc -p previews/agent-10/tsconfig.json
+          npm run worldkit:test
+          npm run partskit:test
+          node --experimental-strip-types --test tests/agent-10/*.test.mjs
+      - name: Render still frames before full movies
+        run: |
+          set -euo pipefail
+          mkdir -p previews/agent-10/out/early-frames
+          npx --no-install remotion still previews/agent-10/entry.tsx EP003Agent10CrashAction             previews/agent-10/out/early-frames/barrier-approach.png             --frame=88 --scale=0.5 --gl=swangle
+          npx --no-install remotion still previews/agent-10/entry.tsx EP003Agent10CrashAction \
+            previews/agent-10/out/early-frames/genuine-rewind.png \
+            --frame=143 --scale=0.5 --gl=swangle
+          # Agent8 true A2-seeded first contact ~t=1.95 incident, mapped by
+          # Agent9 compressed 12.83–14.22 edit to ~43f in this 180f review.
+          # Verify contact on a WIDE full-car shot; 79f is later scrape/freeze.
+          npx --no-install remotion still previews/agent-10/entry.tsx EP003Agent10CrashAction \
+            previews/agent-10/out/early-frames/actual-contact-wide.png \
+            --frame=43 --scale=0.5 --gl=swangle
+          npx --no-install remotion still previews/agent-10/entry.tsx EP003Agent10CrashAction \
+            previews/agent-10/out/early-frames/damaged-aftermath.png \
+            --frame=79 --scale=0.5 --gl=swangle
+          npx --no-install remotion still previews/agent-10/entry.tsx EP003Agent10RecoveryAction \
+            previews/agent-10/out/early-frames/recovery-unobstructed.png \
+            --frame=194 --scale=0.5 --gl=swangle
+          npx --no-install remotion still previews/agent-10/entry.tsx EP003Agent10RecoveryAction             previews/agent-10/out/early-frames/hands-driving.png             --frame=30 --scale=0.5 --gl=swangle
+      - name: Publish early frame proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: EP003-Agent10-FirstFrames-${{ github.run_id }}
+          path: |
+            previews/agent-10/out/early-frames
+            previews/agent-10/out/provenance.txt
+          retention-days: 21
+          if-no-files-found: warn
+      - name: Render two actual native 3D H264 portrait MP4 previews
+        run: |
+          set -euo pipefail
+          npx --no-install remotion render previews/agent-10/entry.tsx EP003Agent10CrashAction             previews/agent-10/out/crash-impact-rewind.mp4             --gl=swangle --scale=0.5 --codec=h264 --pixel-format=yuv420p --concurrency=1
+          npx --no-install remotion render previews/agent-10/entry.tsx EP003Agent10RecoveryAction             previews/agent-10/out/moving-recovery.mp4             --gl=swangle --scale=0.5 --codec=h264 --pixel-format=yuv420p --concurrency=1
+      - name: Count frames, fully decode, inspect moving frames and create contact sheets
+        run: |
+          set -euo pipefail
+          python previews/agent-10/verify_previews.py --dir previews/agent-10/out
+      - name: Upload independent MP4 preview and QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: EP003-Agent10-ACTION-MOVING-PREVIEWS-${{ github.run_id }}
+          path: previews/agent-10/out
+          retention-days: 21
+          if-no-files-found: warn
