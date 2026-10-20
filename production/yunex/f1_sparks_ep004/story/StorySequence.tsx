@@ -12,6 +12,8 @@ export type StorySequenceProps=Readonly<{
  timing?:StoryTiming;
  startAtSec?:number;
  captions?:readonly WordCaption[];
+ /** Source-gated contact captions override fixed sample labels only when provided. */
+ captionForRequest?:(request:StoryRequest)=>string|undefined;
  metalSkidScreenAnchor?:(request:StoryRequest)=>ScreenAnchor|undefined;
  showLabels?:boolean;
  showCaptions?:boolean;
@@ -19,7 +21,7 @@ export type StorySequenceProps=Readonly<{
 /** Same global time in all layers, so no car teleport. Captions live above the
  * shot blend so they don't ghost/double during camera match transitions. */
 export const StorySequence:React.FC<StorySequenceProps>=({
- requestAt,renderShot,timing=defaultTiming,startAtSec=0,captions=[],
+ requestAt,renderShot,timing=defaultTiming,startAtSec=0,captions=[],captionForRequest,
  metalSkidScreenAnchor,showLabels=true,showCaptions=true
 })=>{
  const frame=useCurrentFrame(),{fps,width,height}=useVideoConfig();
@@ -27,6 +29,8 @@ export const StorySequence:React.FC<StorySequenceProps>=({
  const layers=storyLayers(globalTimeSec,timing);
  const active=storyLocation(globalTimeSec,timing);
  const activeReq=requestAt(globalTimeSec,active.shot,active.shotLocalSec,active.shotDurationSec);
+ const physicsCaption=captionForRequest?.(activeReq);
+ const realCaptions=physicsCaption===undefined?captions:physicsCaption?[{text:physicsCaption,startSec:globalTimeSec-.001,endSec:globalTimeSec+.1}]:[];
  if(activeReq.shot!==active.shot||Math.abs(activeReq.tSec-globalTimeSec)>.001)
   throw new Error('StoryRequest must match editorial shot and global physics time');
  return <AbsoluteFill style={{background:'#081018',overflow:'hidden'}}>
@@ -39,7 +43,7 @@ export const StorySequence:React.FC<StorySequenceProps>=({
     </AbsoluteFill>;
   })}
   <StoryOverlay request={activeReq} globalTimeSec={globalTimeSec} width={width} height={height}
-    captions={captions} showLabels={showLabels} showCaptions={showCaptions}
+    captions={realCaptions} showLabels={showLabels} showCaptions={showCaptions}
     metalSkidScreenAnchor={metalSkidScreenAnchor?.(activeReq)}/>
  </AbsoluteFill>;
 };
