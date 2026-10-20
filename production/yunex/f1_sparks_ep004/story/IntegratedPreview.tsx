@@ -128,8 +128,10 @@ const RealSparkParticles:React.FC<{particles:readonly SparkParticle[]}>=({partic
   const p=usable[i],r=Math.max(.009,p.radiusM*(1.65+p.luminance01*.7));
   temp.position.set(...p.positionWorld);
   const speed=Math.hypot(...p.velocityWorld);
-  temp.scale.set(r*(1+Math.min(2,speed/30)),r,r);
-  temp.rotation.set(0,0,0);temp.updateMatrix();
+  temp.scale.set(r*(2+Math.min(4,speed/12)),r*.62,r*.62);
+  const direction=new THREE.Vector3(...p.velocityWorld);
+  temp.quaternion.setFromUnitVectors(new THREE.Vector3(1,0,0),direction.lengthSq()>1e-8?direction.normalize():new THREE.Vector3(1,0,0));
+  temp.updateMatrix();
   mesh.setMatrixAt(i,temp.matrix);
   color.setRGB(1,Math.min(1,.52+.45*p.luminance01),.24+.46*p.luminance01);
   mesh.setColorAt(i,color);
@@ -165,9 +167,9 @@ const RealShot:React.FC<{request:StoryRequest;cue:StoryVisualCue}>=({request,cue
    {mechanism
     ? <>
        <WorldLighting timeOfDay="night"/>
-       <pointLight position={[...localWorld(request.motion,[.2,-.25,1.5])]}
+       <pointLight position={[...localWorld(request.motion,[.2,-.25,1.5])] as [number,number,number]}
         color="#ffe0b5" intensity={16} distance={9}/>
-       <pointLight position={[...localWorld(request.motion,[.9,-.12,-1.8])]}
+       <pointLight position={[...localWorld(request.motion,[.9,-.12,-1.8])] as [number,number,number]}
         color="#d3eef8" intensity={10} distance={8}/>
       </>
     : <NightCircuitWorld motion={request.motion} particles={request.particles} exposure={.8}/>}
