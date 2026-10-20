@@ -125,11 +125,11 @@ export function buildDriveableAsphalt(): THREE.Mesh {
   const map = makeAsphaltTexture();
   const material = new THREE.MeshPhysicalMaterial({
     name: 'EP004 physically lit asphalt',
-    color: '#3b4249',
+    color: '#242f39',
     map,
     metalness: 0.045,
-    roughness: 0.83,
-    clearcoat: 0.075,
+    roughness: 0.79,
+    clearcoat: 0.12,
     clearcoatRoughness: 0.79,
     side: THREE.DoubleSide,
   });
