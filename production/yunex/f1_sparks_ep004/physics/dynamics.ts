@@ -46,7 +46,7 @@ export function sampleDynamics(tSec:number,params:DynamicsParams={}):VehicleMoti
   const angleDelta=Math.atan2(Math.sin(lookahead.yaw-route.yaw),Math.cos(lookahead.yaw-route.yaw));
   const rollRad=clamp(-angleDelta*downforceProxy01*.65,-.021,.021);
   const wheelCompressionM=clamp(.005*downforceProxy01+.017*bump01,0,.026);
-  const wheelCompression:Readonly<Record<WheelId,number>>={
+  const wheelCompressionM:Readonly<Record<WheelId,number>>={
     'front-left':clamp(wheelCompressionM+pitchRad*.09-rollRad*.08,0,.032),
     'front-right':clamp(wheelCompressionM+pitchRad*.09+rollRad*.08,0,.032),
     'rear-left':clamp(wheelCompressionM-pitchRad*.09-rollRad*.08,0,.032),
@@ -57,7 +57,7 @@ export function sampleDynamics(tSec:number,params:DynamicsParams={}):VehicleMoti
     worldPosition:[route.position[0],surface.heightM+heaveM,route.position[2]] as Vec3,
     yawRad:route.yaw,pitchRad,rollRad,
     wheelRotationRad:-speedMps*tSec/EP004.wheelRadiusM,
-    heaveM,wheelCompression,downforceProxy01,
+    heaveM,wheelCompressionM,downforceProxy01,
   };
 }
 
