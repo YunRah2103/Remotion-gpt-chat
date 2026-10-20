@@ -127,6 +127,13 @@ jobs:
           mkdir -p out/ep004-native
           npx remotion render "$ENTRY" "$A" out/ep004-native/technical.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --log=error
           npx remotion render "$ENTRY" "$B" out/ep004-native/context.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --log=error
+      - name: Install actual FFmpeg and FFprobe for native media QA
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          ffmpeg -version
+          ffprobe -version
       - name: Verify REAL time-evolving full MP4 video and capture screenshots
         shell: bash
         env:
@@ -148,7 +155,7 @@ jobs:
               subprocess.run(['ffmpeg','-v','error','-y','-i',path,'-vf',f'select=eq(n\\,{frame})','-vsync','vfr','-frames:v','1',out],check=True)
               assert os.path.getsize(out)>0,out
               screenshots.append(out)
-            frames=subprocess.check_output(['ffmpeg','-v','error','-i',path,'-vf','fps=1','-f','framemd5','-'])
+            frames=subprocess.check_output(['ffmpeg','-v','error','-i',path,'-map','0:v:0','-vf','fps=1','-f','framemd5','-'])
             hashes=set(line.split(',')[-1].strip() for line in frames.decode().splitlines() if line and not line.startswith('#'))
             assert len(hashes)>=2,f'{label}: video has no measured time-evolving frames'
             open(f'out/ep004-native/{label}-probe.json','w').write(json.dumps(meta,indent=2))
