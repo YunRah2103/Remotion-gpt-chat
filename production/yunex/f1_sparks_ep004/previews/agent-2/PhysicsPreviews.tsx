@@ -8,10 +8,14 @@ import {CameraAim,WorldLighting} from '../../../../../src/yunex/world-kit/compon
 import {sampleTrackSurface} from '../../shared/track.ts';
 import type {SkidDescriptor,SparkParticle,Vec3} from '../../shared/contract.ts';
 import {sampleDynamics,sampleContactDrivenSparks} from '../../physics/index.ts';
+import {localToWorld} from '../../physics/dynamics.ts';
 
-const PREVIEW_SKIDS:readonly SkidDescriptor[]=[{id:'forward',metal:true,localBottomPoint:[1.05,.065,0]}];
-// EXPLICIT VISUAL FIXTURE; replace with Agent 1 getSkidDescriptors() for approval.
+const PREVIEW_SKIDS:readonly SkidDescriptor[]=[{id:'forward',metal:true,localBottomPoint:[1.18,.065,0]},{id:'middle',metal:true,localBottomPoint:[.10,.065,0]},{id:'rear',metal:true,localBottomPoint:[-1.03,.065,0]}];
+// PROVISIONAL DIMENSIONS copied from Agent 1 handoff #217 (not an import until integration).
+// After Agent 0 merges PR #225 into the base, import mechanics/skids.ts:getSkidDescriptors
+// and mechanics/F1HeroVehicle; never release independently fitted geometry.
 const ORIGIN=69.0;
+const SPARK_STRETCH=new T.Vector3(0,0,1);
 const carForward=(yaw:number,x:number,z:number):[number,number] =>
   [Math.cos(yaw)*x+Math.sin(yaw)*z,-Math.sin(yaw)*x+Math.cos(yaw)*z];
 
@@ -48,18 +52,26 @@ const ParticleInstances:React.FC<{particles:readonly SparkParticle[]}>=({particl
  const position=useMemo(()=>new T.Vector3(),[]);
  const scale=useMemo(()=>new T.Vector3(),[]);
  const quat=useMemo(()=>new T.Quaternion(),[]);
+ const heading=useMemo(()=>new T.Vector3(),[]);
  useLayoutEffect(()=>{
   const inst=ref.current;if(!inst)return;
   inst.count=Math.min(particles.length,260);
   particles.slice(0,260).forEach((p,i)=>{
-   position.set(...p.positionWorld);scale.setScalar(p.radiusM*1.9);
+   position.set(...p.positionWorld);
+   heading.set(...p.velocityWorld).normalize();
+   quat.setFromUnitVectors(SPARK_STRETCH,heading);
+   // Spatial motion blur from each particle's own ballistic velocity.
+   // 1/30-second streak: not a flat 2D/glowing exhaust overlay.
+   const speed=Math.hypot(...p.velocityWorld);
+   scale.set(Math.max(.012,p.radiusM*1.6),Math.max(.012,p.radiusM*1.6),
+     Math.max(.07,Math.min(.42,speed/60)));
    matrix.compose(position,quat,scale);inst.setMatrixAt(i,matrix);
    const warm=new T.Color('#fff3bb').lerp(new T.Color('#ff8d3a'),Math.min(1,p.ageSec/p.lifetimeSec));
    inst.setColorAt(i,warm.multiplyScalar(Math.max(.05,p.luminance01)));
   });
   inst.instanceMatrix.needsUpdate=true;
   if(inst.instanceColor)inst.instanceColor.needsUpdate=true;
- },[particles,matrix,position,scale,quat]);
+ },[particles,matrix,position,scale,quat,heading]);
  return <instancedMesh ref={ref} args={[undefined,undefined,260]} frustumCulled={false}>
    <sphereGeometry args={[1,5,4]}/>
    <meshBasicMaterial color="#fff1b2" toneMapped={false} transparent opacity={.98}/>
@@ -70,34 +82,42 @@ export const Agent2PhysicsPreview:React.FC<{mode:'technical'|'portrait'}>=({mode
  const frame=useCurrentFrame(),t=frame/fps;
  const motion=sampleDynamics(t,{startDistanceM:ORIGIN});
  const {contacts,particles}=sampleContactDrivenSparks(t,motion,PREVIEW_SKIDS);
- const contact=contacts[0],active=contact.active;
+ const contact=contacts[0],active=contacts.some(c=>c.active);
+ const strongest=contacts.find(c=>c.active)??contact;
  const at=(forward:number,up:number,left:number):Vec3=>{
   const [x,z]=carForward(motion.yawRad,forward,left);
   return [motion.worldPosition[0]+x,motion.worldPosition[1]+up,motion.worldPosition[2]+z];
  };
  const technical=mode==='technical';
- const camera=technical?at(1.05,.67,2.85):at(-7.2,2.6,5.35);
- const target=technical?at(.8,.05,0):at(.55,.35,0);
+ const camera=technical?at(.50,.48,2.85):at(-9.5,3.20,6.4);
+ const target=technical?at(1.05,.08,0):at(-.62,.36,0);
  const world=sampleRoute('track',motion.routeDistanceM);
  return <AbsoluteFill style={{background:'#0a111c'}}>
-  <ThreeCanvas width={width} height={height} shadows camera={{position:camera,fov:technical?30:42,near:.045,far:230}}>
+  <ThreeCanvas width={width} height={height} shadows camera={{position:camera,fov:technical?36:40,near:.045,far:230}}>
    <WorldLighting timeOfDay="night" focus={world.position}/>
-   <CameraAim position={camera} target={target} fov={technical?30:42}/>
+   <CameraAim position={camera} target={target} fov={technical?36:40}/>
    <Ribbon/>
    <MovingCar distanceM={motion.routeDistanceM} worldPosition={motion.worldPosition} yaw={motion.yawRad} pitch={motion.pitchRad} roll={motion.rollRad}/>
-   {/* temporary labelled physical metal object; delete when Agent 1 supplies fitted mesh */}
-   <mesh position={at(1.05,.075,0)}><boxGeometry args={[.26,.018,.21]}/><meshStandardMaterial color="#dce6d9" metalness={.95} roughness={.24}/></mesh>
+   {/* Visible fixture skids follow exactly the SAME motion transforms as contact sampling.
+        Only Agent 1's fitted named meshes may replace these provisional markers. */}
+   {PREVIEW_SKIDS.map((skid)=> {
+     const worldSkid=localToWorld([skid.localBottomPoint[0],.075,skid.localBottomPoint[2]],motion);
+     return <mesh key={skid.id} position={worldSkid} rotation={[0,motion.yawRad,0]}>
+       <boxGeometry args={[skid.id==='forward'?.60:.46,.020,.32]}/>
+       <meshStandardMaterial color="#d9e6e1" metalness={.96} roughness={.24}/>
+     </mesh>;
+   })}
    <ParticleInstances particles={particles}/>
-   {active&&<pointLight position={[contact.pointWorld[0],contact.pointWorld[1]+.20,contact.pointWorld[2]]} color="#ffd78c" intensity={8+40*contact.contactIntensity01} distance={4}/>}
+   {active&&<pointLight position={[strongest.pointWorld[0],strongest.pointWorld[1]+.20,strongest.pointWorld[2]]} color="#ffda99" intensity={18+50*strongest.contactIntensity01} distance={5}/>}
    <hemisphereLight args={['#a6cad9','#212633',.45]}/>
   </ThreeCanvas>
   <div style={{position:'absolute',top:90,left:56,color:'#e7f8ff',fontFamily:'Arial,sans-serif',background:'#101823ca',padding:'20px 24px',borderLeft:'4px solid #46e8d0'}}>
    <div style={{fontSize:27,letterSpacing:3,fontWeight:800}}>{technical?'CONTACT PHYSICS / FIXTURE':'YUNEX EP004 / SPARK MOTION'}</div>
    <div style={{fontSize:22,marginTop:12,color:active?'#ffce78':'#9acbd5'}}>METAL SKID {active?'TOUCHING ASPHALT':'CLEAR OF ASPHALT'}</div>
-   <div style={{fontSize:21,marginTop:6}}>SIGNED GAP {contact.signedGapM>=0?'+':''}{(contact.signedGapM*1000).toFixed(1)} mm · {Math.round(motion.speedMps*3.6)} km/h</div>
+   <div style={{fontSize:21,marginTop:6}}>GAP {strongest.signedGapM>=0?'+':''}{(strongest.signedGapM*1000).toFixed(1)} mm · {Math.round(motion.speedMps*3.6)} km/h · {particles.length} GLINTS</div>
   </div>
   <div style={{position:'absolute',bottom:90,left:60,color:'#d6dce5',fontFamily:'Arial,sans-serif',fontSize:20,background:'#0c1325bb',padding:'12px 16px'}}>
-   ILLUSTRATIVE MODEL · TEMP SKID FIXTURE · NOT FIA TELEMETRY
+   ILLUSTRATIVE PHYSICS · AGENT 1 PROVISIONAL SKIDS · NO EXHAUST EMISSION
   </div>
  </AbsoluteFill>;
 };
