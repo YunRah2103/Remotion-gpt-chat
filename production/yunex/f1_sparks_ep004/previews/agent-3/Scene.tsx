@@ -12,6 +12,7 @@ import {NightCircuitWorld} from '../../look/index.ts';
 import type {ShotId,SparkParticle} from '../../shared/contract.ts';
 import {sampleRetimedShotCamera} from '../../cinema/cameras.ts';
 import {ApplyCameraPose} from '../../cinema/ShotCamera.tsx';
+import {CutawayHero} from './CutawayHero.tsx';
 
 const SKIDS=getSkidDescriptors();
 export const INTEGRATED_SOURCE='Agent 1 actual hero + Agent 2 signed-gap particles + Agent 4 real night road';
@@ -22,9 +23,9 @@ export type CameraBeat=Readonly<{
 }>;
 export const CAMERA_SEQUENCE:readonly CameraBeat[]=[
   {shot:'rear-mystery',fromSec:0,durationSec:2.25,startDistanceM:63.55,startTimeSec:.13,playRate:.21},
-  {shot:'underfloor-reveal',fromSec:2.25,durationSec:3.55,startDistanceM:128.20,startTimeSec:.105,playRate:.145},
-  {shot:'contact-macro',fromSec:5.80,durationSec:2.30,startDistanceM:128.10,startTimeSec:.11,playRate:.14},
-  {shot:'racing-payoff',fromSec:8.10,durationSec:2.90,startDistanceM:63.50,startTimeSec:.13,playRate:.31},
+  {shot:'underfloor-reveal',fromSec:2.25,durationSec:3.55,startDistanceM:132.30,startTimeSec:.055,playRate:.033},
+  {shot:'contact-macro',fromSec:5.80,durationSec:2.30,startDistanceM:134.00,startTimeSec:.04,playRate:.030},
+  {shot:'racing-payoff',fromSec:8.10,durationSec:2.90,startDistanceM:97.70,startTimeSec:.07,playRate:.20},
 ];
 export const OPENING_BEAT:CameraBeat={
   shot:'spark-hook',fromSec:0,durationSec:5,startDistanceM:63.65,startTimeSec:.12,playRate:.31,
@@ -67,14 +68,16 @@ export const Agent3Scene:React.FC<{hook:boolean}>=({hook})=>{
   });
   const {particles,contacts}=sampleContactDrivenSparks(physicsSec,motion,SKIDS);
   const camera=sampleRetimedShotCamera(beat.shot,localSec,beat.durationSec,motion);
-  const reveal=beat.shot==='underfloor-reveal'?
-    Math.min(.97,.62+localSec*.11):
-    beat.shot==='contact-macro'?.96:0;
+  // The real tyre and suspension obscure the 65 mm skid when viewed from outside.
+  // Switch to a labelled optical section AFTER showing the complete hero moving.
+  // The section removes visible shell/wheel meshes only; it does not move the skid.
+  const sectioned=beat.shot==='contact-macro'||(beat.shot==='underfloor-reveal'&&localSec>=1.12);
+  const reveal=beat.shot==='underfloor-reveal'?Math.min(.97,.44+localSec*.20):0;
   const contactActive=contacts.some(c=>c.active);
   return <AbsoluteFill style={{background:'#0a1420'}}>
     <ThreeCanvas width={width} height={height} shadows camera={{position:[0,3,10],fov:55,near:.025,far:350}}>
       <NightCircuitWorld motion={motion} particles={particles} exposure={.90}/>
-      <F1HeroVehicle motion={motion} reveal01={reveal}/>
+      {sectioned?<CutawayHero motion={motion}/>:<F1HeroVehicle motion={motion} reveal01={reveal}/>}
       <ContactSparkVisuals particles={particles}/>
       <ApplyCameraPose pose={camera} near={.025}/>
     </ThreeCanvas>
@@ -83,6 +86,7 @@ export const Agent3Scene:React.FC<{hook:boolean}>=({hook})=>{
     </div>
     <div style={{position:'absolute',bottom:'8.4%',left:'8%',right:'8%',...reportStyle,fontSize:24}}>
       {beat.shot.replaceAll('-',' ')}
+      {sectioned&&<div style={{fontSize:14,letterSpacing:1,marginTop:7,color:'#f3d7a1'}}>ACTUAL METAL SKID · COMPOSITE PLANK / OPTICAL CUTAWAY</div>}
       <div style={{fontSize:12,letterSpacing:1,fontWeight:400,opacity:.74,marginTop:7,textTransform:'none'}}>
         Metal skid contact: {contactActive?'YES':'clear'} · Authentic physics particles: {particles.length}
       </div>
