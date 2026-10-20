@@ -8,6 +8,8 @@ import {existsSync, mkdirSync, statSync, writeFileSync} from 'node:fs';
 import {resolve, dirname, join, basename} from 'node:path';
 import {pathToFileURL} from 'node:url';
 
+export const VIDEO_HASH_STREAM_SELECTOR = '0:v:0';
+
 const run = (command, args) => {
   try {
     return execFileSync(command, args, {encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe']});
@@ -56,7 +58,7 @@ export function verifyNativeMp4(filePath, expectedFrames, {audioRequired = true,
   const metadata = JSON.parse(run('ffprobe', ffprobeArgs));
   const video = validateVideoMetadata(metadata, expectedFrames, {audioRequired});
   run('ffmpeg', ['-hide_banner','-v','error','-xerror','-nostdin','-i',absolute,'-f','null','-']);
-  const hashes = uniqueDecodedFrameHashes(run('ffmpeg', ['-hide_banner','-v','error','-nostdin','-i',absolute,'-map','0:v:0','-vf','fps=1','-f','framemd5','-']));
+  const hashes = uniqueDecodedFrameHashes(run('ffmpeg', ['-hide_banner','-v','error','-nostdin','-i',absolute,'-map',VIDEO_HASH_STREAM_SELECTOR,'-vf','fps=1','-f','framemd5','-']));
   if (hashes < 2) throw new Error('EP004 native audit: no real time-evolving frames found by sampled decoded pixel hashes');
   const screenshots = [];
   for (const frame of [0, Math.floor(expectedFrames / 2), expectedFrames - 1]) {
