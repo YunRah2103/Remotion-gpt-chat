@@ -1,6 +1,6 @@
 import React, {useEffect, useMemo} from 'react';
 import * as T from 'three';
-import {animateVehicle, createVehicle, disposeObject} from '../../../src/yunex/world-kit/index.ts';
+import {animateVehicle, createVehicle, disposeObject} from '../../../../src/yunex/world-kit/index.ts';
 import type {VehicleMotionState, WheelId} from '../shared/contract.ts';
 import {EP004} from '../shared/contract.ts';
 import {
