@@ -90,12 +90,12 @@ export function integratedStoryCamera(req:StoryRequest):CameraPose{
   case 'contact-macro':pos=[1.0,.78,9.3+p*.3];target=[.8,.69,0];fovDeg=49;break;
   default:pos=[-1.9+p*1.1,1.70,10.2-p*.7];target=[-.30,.91,0];fovDeg=49;break;
  }
- const position=localWorld(m,pos),target=localWorld(m,target);
+ const position=localWorld(m,pos),cameraTarget=localWorld(m,target);
  // Aero camera remains tied to road, NOT the heaving body: lowering is visible.
  const positionWorld:Vec3=req.shot==='aero-load'
   ? [position[0],position[1]-m.heaveM,position[2]]:position;
  const targetWorld:Vec3=req.shot==='aero-load'
-  ? [target[0],target[1]-m.heaveM,target[2]]:target;
+  ? [cameraTarget[0],cameraTarget[1]-m.heaveM,cameraTarget[2]]:cameraTarget;
  return {positionWorld,targetWorld,fovDeg,rollRad:0};
 }
 export function projectRealSkid(req:StoryRequest):ScreenAnchor|undefined{
