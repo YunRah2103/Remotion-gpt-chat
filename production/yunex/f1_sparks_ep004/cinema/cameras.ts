@@ -33,9 +33,9 @@ const KEYS: Readonly<Record<ShotId,readonly Key[]>> = {
     // Intentional spark-origin tyre / metal rear detail for first 0.8 seconds:
     // show the hot chip physics at phone size, THEN pull back to the entire hero.
     // This is a cinematic close-up, not an unexplained accidental car crop.
-    [0,[-3.70,.35,2.70],[-1.30,.29,0],56],
-    [.15,[-4.05,.40,3.65],[-1.15,.37,0],59],
-    [.36,[-5.20,.54,6.50],[0,.54,0],64],
+    [0,[-4.55,.35,2.95],[-2.15,.25,0],62],
+    [.15,[-4.80,.40,3.80],[-1.85,.35,0],62],
+    [.36,[-5.45,.54,6.80],[0,.54,0],64],
     [.65,[-2.50,.64,8.25],[0,.56,0],66],
     [1,[4.35,.73,8.80],[0,.56,0],65],
   ],
@@ -59,17 +59,17 @@ const KEYS: Readonly<Record<ShotId,readonly Key[]>> = {
     [1,[.13,1.47,12.4],[0,.51,0],55],
   ],
   'contact-macro': [
-    [0,[1.64,.83,.83],[1.18,.08,0],44],
-    [.48,[1.55,.82,.78],[1.18,.078,0],43],
-    [1,[1.50,.82,.75],[1.18,.071,0],42],
+    [0,[1.12,.36,.72],[1.18,.075,0],44],
+    [.48,[1.10,.33,.70],[1.18,.075,0],43],
+    [1,[1.08,.31,.68],[1.18,.065,0],42],
   ],
   'racing-payoff': [
     // Starts intentionally close to the authentic sparkling metal trail,
     // tracks rapidly out to a safe rear 3/4, then climbs to a controlled finish.
     [0,[-3.85,.62,3.65],[-.72,.37,0],64],
     [.20,[-4.70,.72,4.95],[-.42,.53,0],65],
-    [.55,[-5.90,1.08,6.70],[0,.55,0],68],
-    [1,[-5.50,1.18,6.75],[0,.62,0],67],
+    [.55,[-6.30,.95,3.20],[0,.55,-.55],69],
+    [1,[-5.80,.65,1.90],[0,.50,-.70],67],
   ],
 
 };
