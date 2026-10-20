@@ -34,8 +34,8 @@ const KEYS: Readonly<Record<ShotId,readonly Key[]>> = {
     // the car. Dolly diagonally across its flank for real perspective change.
     [0,[-4.80,.57,8.20],[0,1.26,0],68],
     [.18,[-2.60,.51,8.35],[0,1.22,0],66],
-    [.43,[.45,.52,8.40],[0,1.18,0],65],
-    [.72,[3.25,.62,8.40],[0,1.17,0],65],
+    [.43,[.45,.52,9.40],[0,1.18,0],67],
+    [.72,[3.25,.62,8.50],[0,1.17,0],68],
     [1,[4.80,.78,8.15],[-.06,1.17,0],66],
   ],
   'rear-mystery': [
@@ -66,10 +66,10 @@ const KEYS: Readonly<Record<ShotId,readonly Key[]>> = {
   'racing-payoff': [
     // Distinct from hook: compact low rear follow, then elevated
     // rear quarter with passing floodlights, never a repetitive side view.
-    [0,[-6.40,1.10,6.45],[.20,1.04,0],66],
-    [.38,[-5.90,1.28,6.20],[.04,1.04,0],65],
-    [.74,[-4.75,1.56,6.55],[.05,1.10,0],64],
-    [1,[-4.20,1.58,6.75],[.18,1.18,0],64],
+    [0,[-6.40,1.10,6.80],[.20,1.04,0],68],
+    [.38,[-5.90,1.28,7.00],[.04,1.04,0],68],
+    [.74,[-4.75,1.56,8.30],[.05,1.10,0],68],
+    [1,[-4.20,1.58,8.50],[.18,1.18,0],68],
   ],
 };
 const clamp=(n:number,a=0,b=1)=>Math.max(a,Math.min(b,n));
