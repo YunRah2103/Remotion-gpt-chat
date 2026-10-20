@@ -1,24 +1,25 @@
-# YUNEX EP004 — Production status & evidence ledger
+# YUNEX EP004 — PRODUCTION STATUS (20 October 2026 ~19:20 UTC)
 
-**Updated:** 20 October 2026 — infrastructure setup. **No specialist ChatGPT sessions auto-started. No moving EP004 MP4 was produced or verified at setup.**
+**Master:** https://github.com/YunRah2103/Remotion-gpt-chat/issues/215
+**Production base:** `production/yunex-ep004-base`; shared CI `9e2dbee` explicitly installs FFprobe/FFmpeg and checks video-only motion. **No agent PR approved or merged into EP004 base; EP003 and main untouched.**
 
-**Master:** [#215](https://github.com/YunRah2103/Remotion-gpt-chat/issues/215); [contract](PRODUCTION_CONTRACT.md); [handoff](HANDOFF.md); [five full launch prompts](LAUNCH_PROMPTS.md).
+| Agent | Source PR | Latest evidence | Manager state | Review blocker / corrective action |
+|---|---|---|---|---|
+| 1 — mechanical F1 hero/plank/skids | [#225](https://github.com/YunRah2103/Remotion-gpt-chat/pull/225) | [revised native run 39481891565](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39481891565) with [artifact 12291643841](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39481891565/artifacts/12291643841); initial 180f/240f genuine native MP4s independently decoded | **WORKING** (prior preview reviewed with corrections) | Visually inspect revised underfloor visibility and portrait hero; previous native runs green render/red ffprobe due missing CLI |
+| 2 — deterministic skid-contact/sparks | [#222](https://github.com/YunRah2103/Remotion-gpt-chat/pull/222) | [validated initial full native motion artifact 12290753254](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39480434088/artifacts/12290753254) 150f/210f; latest revised slim-streak source renders underway | **WORKING** (prior PREVIEW EVIDENCE ready, no approval) | Inspect current effects from current commit; replace provisional skid coordinate duplicates with exact Agent 1 descriptors after integration; matched Agent 4 road |
+| 3 — camera rigs | [#226](https://github.com/YunRah2103/Remotion-gpt-chat/pull/226) | [native run 39478313482](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39478313482) uploaded [artifact 12292350218](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39478313482/artifacts/12292350218), downstream QA red | **WORKING** (native files exist, not independently reviewed) | Run actual ffprobe/full decode on 150f/330f, inspect framing at opening, reveals/end; real Agent 1/2/4 assets needed |
+| 4 — night track/look | [#227](https://github.com/YunRah2103/Remotion-gpt-chat/pull/227) | [validated earlier artifact 12290204384](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39478308801/artifacts/12290204384) 150f/210f; latest darker source [run 39481919666](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39481919666) in progress | **WORKING** (prior creative review asks correction) | Inspect latest night contrast, ground contact agreement, prevent pitch-black car/highlights; real spark illumination after integration |
+| 5 — story/transitions/caption safety | [#224](https://github.com/YunRah2103/Remotion-gpt-chat/pull/224) | [native run 39480610447](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39480610447) in progress, 165f/330f | **WORKING** | Verify two playable native film previews and safe text, replace placeholders with actual combined mechanics/physics/look |
+| 6 — picture editing & VO | [#223](https://github.com/YunRah2103/Remotion-gpt-chat/pull/223) / issue [#221](https://github.com/YunRah2103/Remotion-gpt-chat/issues/221) | Timing/caption/QA framework implemented, no original-VO EP004 picture MP4 | **BLOCKED** | Needs all 5 visual sources approved/integrated, original British male EP004 speech recording and true word timings |
+| 7 — final audio | not started | none | **BLOCKED** | Only after original narration picture lock |
 
-| Agent / ownership | Issue | Branch | State | Latest implementation commit / PR | Verified moving MP4s | Blockers / Next action |
-|---|---|---|---|---|---|---|
-| 1 — mechanics | [#216](https://github.com/YunRah2103/Remotion-gpt-chat/issues/216) | `agent/ep004-01-mechanics` | NOT STARTED | — / — | none | Separate agent session must begin; inspect kit, fit skid nodes |
-| 2 — dynamics/sparks | [#217](https://github.com/YunRah2103/Remotion-gpt-chat/issues/217) | `agent/ep004-02-physics` | NOT STARTED | — / — | none | Requires Agent 1 actual skid descriptor for sign-off |
-| 3 — cinema | [#218](https://github.com/YunRah2103/Remotion-gpt-chat/issues/218) | `agent/ep004-03-cinema` | NOT STARTED | — / — | none | May start fixture, later consume real motion/contact |
-| 4 — night look | [#219](https://github.com/YunRah2103/Remotion-gpt-chat/issues/219) | `agent/ep004-04-look` | NOT STARTED | — / — | none | Road mesh must match `shared/track.ts` |
-| 5 — story | [#220](https://github.com/YunRah2103/Remotion-gpt-chat/issues/220) | `agent/ep004-05-story` | NOT STARTED | — / — | none | Keep timing retimeable and labels safe |
+## Agent 0 corrective work
+- Identified missing `ffprobe` command on GitHub runner causing false-negative verification jobs after successful Remotion MP4 renders; **fixed manager-only workflow** in [`9e2dbee`](https://github.com/YunRah2103/Remotion-gpt-chat/commit/9e2dbee6c90aa4a61c649ef7c1ec5a707161aa49) with installed FFmpeg/FFprobe and proper `-map 0:v:0` frame-hash proof.
+- Posted tailored next actions in all five issues. Existing in-flight old-revision GitHub jobs are not retroactively repaired: agent must sync updated EP004 manager base into own branch without force-pushing and do one new PR-triggering push for corrected QA. Do not preempt still-rendering jobs.
+- Physically real sparks require **contact between metallic skid and moving track**; plank/floor/exhaust are not emitters. Agent 1 authoritative skid meshes; Agent 2 authoritative motion/contacts/particles; Agent 4 road surface agrees with `shared/track.ts`; A3/A5 consume these rather than independent fixtures. No integrated film approval yet.
+- Status sequence remains NOT STARTED → WORKING → PREVIEW READY → REVIEWED → APPROVED → INTEGRATED; current moving preview proof is partial and mixed-version, so no optimistic promotion.
 
-**Status sequence:** NOT STARTED → WORKING → PREVIEW READY → REVIEWED → APPROVED → INTEGRATED. Work status requires unique substantive agent commit/PR. Preview-ready requires actual media, a GitHub artifact link and validation evidence. Reviewed means Agent 0 inspected real frames; Approved needs Agent 0 decision; Integrated means source merged to isolated base and demonstrated compatible moving footage. Each issue receives follow-up corrections and next actions directly.
-
-## Foundation validation scope
-- Reusable asset source confirmed in open unmerged PR #145, reference `d31fbaa0f95abc468a3294ef2a1b2f6baa84bccb` (world kit: 35 generic cars including `formula-modern`, 20 environments including `track`; separate parts kit: 55 illustrative assemblies).
-- Manager-only shared TS contract and deterministic profile are preparatory code, **not a preview/render/simulation**.
-- 2026 FIA Technical Regulations Issue 21 C3.6 reviewed; forward metallic skid mandatory; mid/rear optional metal.
-- Agent 6 — editor: BLOCKED pending approved and integrated visual sources.
-- Agent 7 — audio: BLOCKED pending Agent 6 picture lock and original narration.
-
-**Next external action:** the owner starts independent Agent 1–5 ChatGPT conversations using the [five stored prompts](LAUNCH_PROMPTS.md) or [short reusable launch line](HANDOFF.md). Agent 0 handles future review, corrective GitHub issue directions and integration after work appears.
+## Next
+1. Finish and independently inspect latest current-head dual MP4s per agent; rerun shared job after syncing CI fix. Link exact artifacts/commits in agent issues.
+2. Source-integrate carefully only after real visual/technical review; do not change EP003 or merge PR #145 into main.
+3. Create real EP004 integrated six-scene episode, then original recorded/timed VO and two Agent 6 full picture masters; only picture lock permits Agent 7 soundtrack.
