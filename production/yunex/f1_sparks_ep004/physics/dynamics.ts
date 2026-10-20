@@ -45,12 +45,12 @@ export function sampleDynamics(tSec:number,params:DynamicsParams={}):VehicleMoti
   const lookahead=sampleRoute('track',routeDistanceM+.25);
   const angleDelta=Math.atan2(Math.sin(lookahead.yaw-route.yaw),Math.cos(lookahead.yaw-route.yaw));
   const rollRad=clamp(-angleDelta*downforceProxy01*.65,-.021,.021);
-  const wheelCompressionM=clamp(.005*downforceProxy01+.017*bump01,0,.026);
+  const wheelCompressionBaseM=clamp(.005*downforceProxy01+.017*bump01,0,.026);
   const wheelCompressionM:Readonly<Record<WheelId,number>>={
-    'front-left':clamp(wheelCompressionM+pitchRad*.09-rollRad*.08,0,.032),
-    'front-right':clamp(wheelCompressionM+pitchRad*.09+rollRad*.08,0,.032),
-    'rear-left':clamp(wheelCompressionM-pitchRad*.09-rollRad*.08,0,.032),
-    'rear-right':clamp(wheelCompressionM-pitchRad*.09+rollRad*.08,0,.032),
+    'front-left':clamp(wheelCompressionBaseM+pitchRad*.09-rollRad*.08,0,.032),
+    'front-right':clamp(wheelCompressionBaseM+pitchRad*.09+rollRad*.08,0,.032),
+    'rear-left':clamp(wheelCompressionBaseM-pitchRad*.09-rollRad*.08,0,.032),
+    'rear-right':clamp(wheelCompressionBaseM-pitchRad*.09+rollRad*.08,0,.032),
   };
   return {
     tSec,routeDistanceM,speedMps,
