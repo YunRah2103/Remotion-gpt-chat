@@ -72,6 +72,16 @@ jobs:
               "out/agent-8/Hydrated-impact-frame-$frame.png" --frame="$frame" \
               --gl=swangle --scale=0.35 --log=error
           done
+      - name: Upload EARLY visible contact stills for artistic QA
+        uses: actions/upload-artifact@v4
+        with:
+          name: EP003-agent8-impact-stills
+          path: |
+            out/agent-8/Hydrated-impact-frame-*.png
+            out/agent-8/integrated-physics-proof.json
+            out/agent-8/integration-pins.txt
+          retention-days: 30
+          if-no-files-found: error
       - name: Render authoritative A1 A2 A4 integrated crash FIRST
         run: |
           set -euxo pipefail
