@@ -15,6 +15,7 @@ import {disposeObject} from '../../../../src/yunex/world-kit/geometry.ts';
 import {sampleTrackSurface} from '../shared/track.ts';
 import type {SparkParticle, VehicleMotionState, Vec3} from '../shared/contract.ts';
 import {NightCircuitWorld} from './NightCircuitWorld.tsx';
+import {applyNightCircuitFinish} from './finishes.ts';
 import {sampleCircuitRoadPoint} from './road.ts';
 
 export type LookPreviewMode = 'trackside-pass' | 'race-follow';
@@ -36,14 +37,14 @@ const RacePreview3D: React.FC<{
   motion?: VehicleMotionState;
   particles: readonly SparkParticle[];
 }> = ({mode, tSec, motion, particles}) => {
-  const factoryCar = useMemo(() => createVehicle({
+  const factoryCar = useMemo(() => applyNightCircuitFinish(createVehicle({
     variant: 'formula-modern',
     color: '#127b82',
     accent: '#e9a65c',
     wheelColor: '#b2bac0',
     lights: true,
     interior: false,
-  }), []);
+  })), []);
   useEffect(() => () => disposeObject(factoryCar), [factoryCar]);
 
   // Moving reference, NOT a second source of skid dynamics: the final
