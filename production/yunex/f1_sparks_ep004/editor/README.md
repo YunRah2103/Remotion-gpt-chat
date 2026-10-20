@@ -20,7 +20,7 @@ Agent 0 must first accept real two-preview MP4s and merge all five module export
 3. Explicit semantic `WordLinkedCut` indices for all six beats, matched to transcript meaning (not arbitrary fixed times). If narration changes, rerun plan; do not manually stretch individual scenes without checking the spoken word sync.
 4. A real `IntegratedVisualShot` React component consuming `VisualShotProps` from `PictureEdit.tsx`, using Agent 2 authoritative absolute-time dynamics, Agent 1 hero/skids, Agent 3 cameras, Agent 4 circuit, Agent 5 semantic graphics.
 
-Use `buildPicturePlan({audioSrc, audioDurationSec, words, cuts})`, then register the result with `makeEP004PictureEdit(IntegratedVisualShot)` in an **EP004-only** composition entry. Its duration must equal `plan.totalFrames` and its dimensions/fps must be 1080×1920 @30. No `src/Root.tsx` modification needed.
+Use `buildPicturePlan({audioSrc, audioDurationSec, words, cuts})`, then register the result with `makeEP004PictureEdit(IntegratedVisualShot)` in an **EP004-only** composition entry. Its props **must include `readiness`** with the five approved agents, integrated SHA, six actual moving scenes, original VO and word timing all verified: the picture component itself throws if any prerequisite is missing. Pass an asset URL for `audioSrc` (e.g. Remotion `staticFile('ep004/original.wav')` when located under `public/`). Its duration must equal `plan.totalFrames` and its dimensions/fps must be 1080×1920 @30. No `src/Root.tsx` modification needed.
 
 ## Tests (after Node/npm workspace available)
 
