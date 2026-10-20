@@ -10,7 +10,7 @@ import {F1HeroVehicle,getSkidDescriptors} from '../../mechanics/index.ts';
 import {sampleDynamics,sampleContactDrivenSparks} from '../../physics/index.ts';
 import {NightCircuitWorld} from '../../look/index.ts';
 import type {ShotId,SparkParticle} from '../../shared/contract.ts';
-import {sampleRetimedShotCamera} from '../../cinema/cameras.ts';
+import {sampleRetimedShotCamera,cameraLocalToWorld} from '../../cinema/cameras.ts';
 import {ApplyCameraPose} from '../../cinema/ShotCamera.tsx';
 import {CutawayHero} from './CutawayHero.tsx';
 
@@ -25,10 +25,10 @@ export const CAMERA_SEQUENCE:readonly CameraBeat[]=[
   {shot:'rear-mystery',fromSec:0,durationSec:2.25,startDistanceM:63.55,startTimeSec:.13,playRate:.21},
   {shot:'underfloor-reveal',fromSec:2.25,durationSec:3.55,startDistanceM:132.30,startTimeSec:.055,playRate:.033},
   {shot:'contact-macro',fromSec:5.80,durationSec:2.30,startDistanceM:134.00,startTimeSec:.04,playRate:.030},
-  {shot:'racing-payoff',fromSec:8.10,durationSec:2.90,startDistanceM:97.70,startTimeSec:.07,playRate:.20},
+  {shot:'racing-payoff',fromSec:8.10,durationSec:2.90,startDistanceM:63.55,startTimeSec:.145,playRate:.22},
 ];
 export const OPENING_BEAT:CameraBeat={
-  shot:'spark-hook',fromSec:0,durationSec:5,startDistanceM:63.65,startTimeSec:.12,playRate:.31,
+  shot:'spark-hook',fromSec:0,durationSec:5,startDistanceM:63.65,startTimeSec:.21,playRate:.30,
 };
 export function previewBeat(screenSec:number,hook:boolean):{beat:CameraBeat;localSec:number;physicsSec:number}{
   if(!Number.isFinite(screenSec)||screenSec<0)throw new Error('invalid sequence time');
@@ -48,8 +48,8 @@ const ContactSparkVisuals:React.FC<{particles:readonly SparkParticle[]}>=({parti
       if(direction.lengthSq()<1e-9)direction.set(0,0,1);
       // Camera shutter integration of the particle's real instantaneous
       // velocity (~1/50 s), not a synthetic emitter or screen-space flare.
-      const size=.018+.024*p.luminance01;
-      const length=.14+.65*Math.min(1,direction.length()/47)*p.luminance01;
+      const size=.010+.013*p.luminance01;
+      const length=.065+.32*Math.min(1,direction.length()/47)*p.luminance01;
       const quat=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,0,1),direction.normalize());
       const whiteHot=p.luminance01>.67;
       return <group key={p.id} position={p.positionWorld} quaternion={quat}>
@@ -58,7 +58,7 @@ const ContactSparkVisuals:React.FC<{particles:readonly SparkParticle[]}>=({parti
           <meshBasicMaterial color={whiteHot?'#fffce5':'#ffc076'} toneMapped={false}/>
         </mesh>
         <mesh>
-          <sphereGeometry args={[.026+.029*p.luminance01,7,6]}/>
+          <sphereGeometry args={[.010+.012*p.luminance01,7,6]}/>
           <meshBasicMaterial color={whiteHot?'#fff8d4':'#ffad58'} toneMapped={false}/>
         </mesh>
       </group>;
@@ -80,12 +80,18 @@ export const Agent3Scene:React.FC<{hook:boolean}>=({hook})=>{
   // The real tyre and suspension obscure the 65 mm skid when viewed from outside.
   // Switch to a labelled optical section AFTER showing the complete hero moving.
   // The section removes visible shell/wheel meshes only; it does not move the skid.
-  const sectioned=beat.shot==='contact-macro'||(beat.shot==='underfloor-reveal'&&localSec>=1.12);
+  const sectioned=beat.shot==='contact-macro'||(beat.shot==='underfloor-reveal'&&localSec>=1.00);
   const reveal=beat.shot==='underfloor-reveal'?Math.min(.97,.44+localSec*.20):0;
   const contactActive=contacts.some(c=>c.active);
   return <AbsoluteFill style={{background:'#0a1420'}}>
     <ThreeCanvas width={width} height={height} shadows camera={{position:[0,3,10],fov:55,near:.025,far:350}}>
       <NightCircuitWorld motion={motion} particles={particles} exposure={.90}/>
+      {sectioned&&<>
+        {/* Neutral inspection lights show real titanium and plank surfaces;
+            no invented hero, skid, glowing contact, or source spark particles. */}
+        <pointLight position={cameraLocalToWorld([1.18,1.55,.72],motion)} intensity={6.0} distance={5} decay={2} color='#fff5dd'/>
+        <pointLight position={cameraLocalToWorld([.3,.65,-.55],motion)} intensity={2.4} distance={3.5} decay={2} color='#a7d9ec'/>
+      </>}
       {sectioned?<CutawayHero motion={motion}/>:<F1HeroVehicle motion={motion} reveal01={reveal}/>}
       <ContactSparkVisuals particles={particles}/>
       <ApplyCameraPose pose={camera} near={.025}/>
