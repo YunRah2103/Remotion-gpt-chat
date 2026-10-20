@@ -1,7 +1,7 @@
 /** Phone-first subtitles. Layout is dynamic, never crops real narrator words.
  * The editor supplies short (ideally 1–3 word) spoken phrases; this code
  * doesn't fabricate word timings or rewrite the script. */
-export const CAPTION_BOTTOM_SAFE_RATIO=0.155;
+export const CAPTION_BOTTOM_SAFE_RATIO=0.17;
 export const CAPTION_SIDE_SAFE_RATIO=0.09;
 export type CaptionSizing=Readonly<{
  bottomPx:number;
