@@ -64,7 +64,7 @@ jobs:
           test -f production/yunex/tyre_blowout_ep003/story/SteadyHands3D.tsx
           # Agent8 and Agent9 are separate owned branch sources, pinned by exact SHA.
           integrations=(
-            'agent/ep003-08-crash-vfx impact 9aa1a092591336e4b6a2b1944e3e817c71e99271'
+            'agent/ep003-08-crash-vfx impact 8e703e70218e9c0b9e9b7768112f2d8388ae31c8'
             'agent/ep003-09-rewind-story rewind 6b767e381418f51ace0aea53fbb7bf3f071a5f8d'
           )
           for spec in "${integrations[@]}"; do
@@ -79,6 +79,7 @@ jobs:
           done
           test -f production/yunex/tyre_blowout_ep003/impact/model.ts
           test -f production/yunex/tyre_blowout_ep003/impact/Preview.tsx
+          test -f production/yunex/tyre_blowout_ep003/impact/Barrier.tsx
           test -f production/yunex/tyre_blowout_ep003/rewind/branchReplay.ts
           test -f production/yunex/tyre_blowout_ep003/rewind/agent8Integration.ts
           printf '%s\n' 'INTEGRATED: exact-pin A8 impact + A9 rewind, NO provisional crash fixture'             >> previews/agent-10/out/provenance.txt

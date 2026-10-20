@@ -14,6 +14,7 @@ import {SteadyHands3D} from '../story/SteadyHands3D.tsx';
 import {sampleActionCamera} from './cameras.ts';
 import {Agent10DamagedOriginalCar} from './CrashCar.tsx';
 import {ImpactEffects3D} from '../impact/Preview.tsx';
+import {CrashBarrierWorld} from '../impact/Barrier.tsx';
 import {ChoiceOverlay,RewindVisualTransition} from '../rewind/RewindVisualTransition.tsx';
 import type {ActionCameraPose} from './cameras.ts';
 import {actionPreviewState} from './previewState.ts';
@@ -68,7 +69,9 @@ export const ActionPreviewFilm:React.FC<{mode:'crash-action'|'recovery'}>=({mode
       position:[...pose.position],near:pose.nearM,far:pose.farM,fov:pose.fovDeg
     }}>
       <EpisodeLight focus={state.dynamics.positionM}/>
-      <primitive object={highway}/>
+      {state.impact
+        ? <CrashBarrierWorld frame={state.impact} worldFactory={buildEpisodeHighway}/>
+        : <primitive object={highway}/>}
       <ContactOcclusion dynamics={state.dynamics}/>
       {state.impact
         ? <Agent10DamagedOriginalCar dynamics={state.dynamics}

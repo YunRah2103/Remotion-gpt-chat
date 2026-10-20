@@ -18,7 +18,7 @@ targets `production/yunex-ep003-base`. No Agent 6 editor/timeline/root edits.
 - A3 cinema: `938628271f9b50d975ee55491881a8fd2d4807a5`
 - A4 world: `a44f1b6c9c31105edd1a9b0d2de7f233d1223952`
 - A5 hands: `cd03c64f77705aa03ee5d5071e5cf18c669fa4ea`
-- A8 impact: `9aa1a092591336e4b6a2b1944e3e817c71e99271`
+- A8 **user-approved original bent right rail and front-right body**: `8e703e70218e9c0b9e9b7768112f2d8388ae31c8`
 - A9 rewind: `6b767e381418f51ace0aea53fbb7bf3f071a5f8d`
 
 The dedicated workflow Git-restores each pinned source directory without touching their PR branches or adding their code to the Agent 10 PR. A final merge of all departments is Agent 0/6 responsibility.
@@ -50,7 +50,8 @@ const pose=sampleActionCamera({
 - `sampleActionCamera` is deterministic, controls only camera pose/lens/shake and never changes physics or VO.
 - +X vehicle forward, -Z right rail, A4 upstream rail approx Z=-7.8.
 - All 4 hub X coordinates, car and A8 FX share the same cut rebase. Agent9's `rebaseDynamicsX` is used for the impact branch; independent A8 effect contact is already in scene world X.
-- True collision body/damage uses `Agent10DamagedOriginalCar`, which clones the original kit mesh before applying A8 bumper/fender/lamp state; A1 wheel remains the only failed wheel.
+- True collision body/damage uses `Agent10DamagedOriginalCar` as an adapter around Agent 8's approved `CrashCarRig` on the original A1 prepared blue GT: exact bumper/fender/lamp/crease geometry and the A1 rubber/hub phase on the same object. No second car.
+- The bad branch alone renders `CrashBarrierWorld({frame,worldFactory:buildEpisodeHighway})` instead of the static A4 highway instance, so there is ONE original right steel rail. `ImpactEffects3D` draws the same-source-time A8 rail scratches/dust/sparks; Agent9's reversed `CrashOutcomeFrame` unwinds rail buckle and damage. The correct branch keeps unchanged A4 highway and still-moving A2 recovery.
 
 ## Verification
 

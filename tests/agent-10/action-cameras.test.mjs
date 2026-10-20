@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {
   sampleActionCamera,actionVehicleToWorld,rebaseActionFrame,
   selectActionCut,ACTION_CRASH_CUTS,ACTION_RECOVERY_CUTS
@@ -220,4 +221,15 @@ test('crash camera and rail share A8 world X rebasing and front-right side',()=>
      contact01:s.contact01}});
  assert.ok(actual.position[2]<s.dynamics.positionM[2]-4,
    'camera must expose the A8 damaged right corner');
+});
+
+test('approved A8 bent right rail replaces static rail ONLY in crash branch',()=>{
+ const film=readFileSync(new URL('../../production/yunex/tyre_blowout_ep003/action/PreviewFilm.tsx',import.meta.url),'utf8');
+ const car=readFileSync(new URL('../../production/yunex/tyre_blowout_ep003/action/CrashCar.tsx',import.meta.url),'utf8');
+ const workflow=readFileSync(new URL('../../.github/workflows/yunex-ep003-agent10-action.yml',import.meta.url),'utf8');
+ assert.match(workflow,/agent\/ep003-08-crash-vfx impact 8e703e70218e9c0b9e9b7768112f2d8388ae31c8/);
+ assert.match(film,/state\.impact\s*\? <CrashBarrierWorld frame=\{state\.impact\} worldFactory=\{buildEpisodeHighway\}\/>\s*: <primitive object=\{highway\}\/>/);
+ assert.match(film,/<ImpactEffects3D frame=\{state\.impact\}\/>/);
+ assert.match(car,/<CrashCarRig frame=\{impact\} makeVehicle=\{makeVehicle\}/);
+ assert.match(car,/applyTyreFrame\(rig,tyre,\{dynamics,exposure:0\}\)/);
 });
