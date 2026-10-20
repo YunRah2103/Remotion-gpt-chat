@@ -65,9 +65,23 @@ export const MIDDLE_FIXTURE_TIMING:StoryTiming=[
  {shot:'underfloor-reveal',durationSec:2.9},{shot:'aero-load',durationSec:2.9},
  {shot:'contact-macro',durationSec:2.4},{shot:'racing-payoff',durationSec:2.4},
 ];
-const Fixture:React.FC<{timing:StoryTiming}>=({timing})=>
+/** Shot-intent placeholders ONLY: these are NOT scripted/recorded narration or actual
+ * metal-contact markers. Their only purpose is phone-safe subtitle layout proof. */
+export const FIXTURE_HOOK_CAPTIONS=[
+ {text:'MOTION STUDY',startSec:.12,endSec:1.45},
+ {text:'REAR PURSUIT',startSec:1.45,endSec:2.90},
+ {text:'UNDERBODY REVEAL',startSec:2.90,endSec:5.50}
+] as const;
+export const FIXTURE_MIDDLE_CAPTIONS=[
+ {text:'UNDERBODY REVEAL',startSec:.8,endSec:3.7},
+ {text:'RIDE HEIGHT',startSec:3.7,endSec:6.6},
+ {text:'CONTACT CLOSE-UP',startSec:6.6,endSec:9.0},
+ {text:'RACING PAYOFF',startSec:9.0,endSec:11.0}
+] as const;
+const Fixture:React.FC<{timing:StoryTiming;captions:readonly {text:string;startSec:number;endSec:number}[]}>=({timing,captions})=>
  <StorySequence requestAt={requestAt} renderShot={request=><FixtureShot request={request}/>}
-   timing={timing} showCaptions={false} showLabels={false}/>;
-/** Demonstrates actual moving shared-kit car and sequence timing; not Agent 1/2 signed-gap proof. */
-export const StoryFixtureHook:React.FC=()=> <Fixture timing={HOOK_FIXTURE_TIMING}/>;
-export const StoryFixtureMiddle:React.FC=()=> <Fixture timing={MIDDLE_FIXTURE_TIMING}/>;
+   timing={timing} captions={captions} showCaptions showLabels={false}/>;
+/** Moving kit-only car with phone-safe EDITORIAL placeholder captions.
+ * No actual metallic skid/contact data: labels/pointers and sparks stay OFF. */
+export const StoryFixtureHook:React.FC=()=> <Fixture timing={HOOK_FIXTURE_TIMING} captions={FIXTURE_HOOK_CAPTIONS}/>;
+export const StoryFixtureMiddle:React.FC=()=> <Fixture timing={MIDDLE_FIXTURE_TIMING} captions={FIXTURE_MIDDLE_CAPTIONS}/>;
