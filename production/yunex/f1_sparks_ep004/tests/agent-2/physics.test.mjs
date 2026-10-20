@@ -77,3 +77,38 @@ test('particle array is deterministic, bounded and has no non-metal emitters',()
  assert.ok(a.length<=260);
  assert.throws(()=>sampleSkidContacts(at,m,[{id:'forward',metal:false,localBottomPoint:[1,.065,0]}]));
 });
+
+import {getSkidDescriptors} from '../../mechanics/skids.ts';
+import {PREVIEW_SHOTS,samplePreviewShot} from '../../previews/agent-2/shot-plan.ts';
+
+test('V2 cinematic passes import actual metal descriptors, show dry road and real contact-born glints',()=>{
+ const skids=getSkidDescriptors();
+ assert.deepEqual(skids.map(s=>s.id),['forward','middle','rear']);
+ for(const [mode,frames] of [['technical',150],['portrait',210]]){
+  const events=new Map();
+  for(let frame=0;frame<frames;frame++){
+   const {shot,sourceTimeSec}=samplePreviewShot(mode,frame);
+   const data=events.get(shot.id)??{contact:0,clear:0,sparks:0,release:0};
+   const motion=sampleDynamics(sourceTimeSec,{startDistanceM:shot.startDistanceM});
+   const contacts=sampleSkidContacts(sourceTimeSec,motion,skids);
+   const particles=sampleSparkParticles(sourceTimeSec,motion,contacts,skids);
+   const active=contacts.some(c=>c.active);
+   if(active)data.contact++;else data.clear++;
+   if(particles.length)data.sparks++;
+   if(!active&&particles.length)data.release++;
+   for(const p of particles){
+    const atBirth=sampleSkidContacts(p.startSec,sampleDynamics(p.startSec,
+     {startDistanceM:shot.startDistanceM}),skids).find(c=>c.skidId===p.emitterSkidId);
+    assert.ok(atBirth?.active&&atBirth.signedGapM<=0,'Every particle must be born at a sliding METAL skid');
+   }
+   events.set(shot.id,data);
+  }
+  assert.equal(events.size,PREVIEW_SHOTS[mode].length);
+  for(const [id,stat] of events){
+   assert.ok(stat.contact>=1,mode+'/'+id+' must have genuine contact '+JSON.stringify(stat));
+   assert.ok(stat.clear>=1,mode+'/'+id+' must have clear road '+JSON.stringify(stat));
+   assert.ok(stat.sparks>=2,mode+'/'+id+' must have visible glints '+JSON.stringify(stat));
+   assert.ok(stat.release>=1,mode+'/'+id+' must retain airborne glints after release '+JSON.stringify(stat));
+  }
+ }
+});
