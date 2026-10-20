@@ -20,16 +20,25 @@ test('night asphalt matches exactly same profile used for contact',()=>{
   const point=sampleCircuitRoadPoint(72,0);
   assert.ok(Math.abs(point.y-sampleTrackSurface(72).heightM)<1e-9);
 });
-test('underfloor glide and contact macro lenses never occupy the wheel corridor',()=>{
+test('underfloor and macro lenses stay outside actual 3D tyre volumes, including safe overhead approach',()=>{
   for(const shot of ['underfloor-reveal','contact-macro']){
     const duration=CAMERA_SHOTS[shot].suggestedDurationSec;
-    for(let i=0;i<=20;i++){
-      const t=i/20*duration,motion=sampleDynamics(.12+t*.14,{startDistanceM:128.2,speedMps:62});
+    for(let i=0;i<=40;i++){
+      const t=i/40*duration,motion=sampleDynamics(.12+t*.14,{startDistanceM:128.2,speedMps:62});
       const pose=sampleShotCamera(shot,t,motion);
-      const c=Math.cos(motion.yawRad),s=Math.sin(motion.yawRad);
+      const c=Math.cos(motion.yawRad),ss=Math.sin(motion.yawRad);
       const dx=pose.positionWorld[0]-motion.worldPosition[0],dz=pose.positionWorld[2]-motion.worldPosition[2];
-      const lateral=dx*s+dz*c;
-      if(t>=.5||shot==='contact-macro')assert.ok(lateral>1.16,shot+' inside tyre envelope '+lateral);
+      const forward=dx*c-dz*ss,lateral=dx*ss+dz*c;
+      const height=pose.positionWorld[1]-motion.worldPosition[1];
+      for(const axle of [-1.71,1.71])for(const side of [-.83,.83]){
+        const tyreLateralClearance=Math.abs(lateral-side);
+        const tyreRadialClearance=Math.hypot(forward-axle,height-.36);
+        // Real car 0.36m radius + 0.06m lens safety, 0.32m tyre width
+        // + 0.07m longitudinal section clearance; a lens safely ABOVE the
+        // wheel is valid even when inside the tyre's lateral XZ corridor.
+        assert.ok(tyreLateralClearance>.23||tyreRadialClearance>.42,
+          shot+' intersects wheel at '+t+': lateral '+tyreLateralClearance+' radial '+tyreRadialClearance);
+      }
     }
   }
 });
