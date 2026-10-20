@@ -42,7 +42,7 @@ jobs:
           agent/ep003-03-cinema cinema 938628271f9b50d975ee55491881a8fd2d4807a5 3
           agent/ep003-04-look look a44f1b6c9c31105edd1a9b0d2de7f233d1223952 4
           agent/ep003-05-story story cd03c64f77705aa03ee5d5071e5cf18c669fa4ea 5
-          agent/ep003-08-crash-vfx impact 6d28e332d289e11ef7cacfc6682b35a43d41a332 8
+          agent/ep003-08-crash-vfx impact 8e703e70218e9c0b9e9b7768112f2d8388ae31c8 8
           PINS
           while read -r agent folder pin number; do
             git fetch --no-tags --depth=160 origin "refs/heads/$agent"
@@ -64,7 +64,7 @@ jobs:
             impact/Preview.tsx; do
               test -s "production/yunex/tyre_blowout_ep003/$file"
           done
-          echo "REAL INTEGRATION: Agent8 impact SHA 6d28e332d289e11ef7cacfc6682b35a43d41a332 + original A1-A5 source; explicit native QA pending." \
+          echo "REAL INTEGRATION: Agent8 impact SHA 8e703e70218e9c0b9e9b7768112f2d8388ae31c8 + original A1-A5 source; explicit native QA pending." \
             | tee previews/agent-9/out/approval-status.txt
       - name: TypeScript, A8 model, source restart/reverse mechanics tests
         shell: bash
