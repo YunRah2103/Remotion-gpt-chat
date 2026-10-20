@@ -59,6 +59,11 @@ jobs:
               git restore --source="$pin" --worktree -- "tests/agent-$number/"
             fi
             echo "$number $folder $pin" | tee -a out/agent6/sources.txt
+            # One Agent10 regression reads its own workflow metadata. Stage
+            # that immutable source workflow ONLY in ephemeral CI checkout.
+            if [[ "$number" == "10" ]]; then
+              git show "$pin:.github/workflows/yunex-ep003-agent10-action.yml" >.github/workflows/yunex-ep003-agent10-action.yml
+            fi
           done </tmp/ep003-pins
           echo "EDITOR $(git rev-parse HEAD)" >>out/agent6/sources.txt
           for p in mechanics/tyreRig.ts dynamics/model.ts cinema/scene.tsx look/world.tsx story/SteadyHands3D.tsx impact/model.ts rewind/branchReplay.ts action/cameras.ts; do
@@ -163,7 +168,7 @@ jobs:
           sha256sum "$f" > SHA256SUMS.txt
           cp ../../production/yunex/tyre_blowout_ep003/editor/VOICEOVER_PROVENANCE.json .
           cp ../segments/sources.txt ./SOURCES-V2.txt
-          echo "V2 FULL 1080p PICTURE ONLY, exact A8/A9/A10. Original Cedar 26.664s voice is muxed independently for user approval, not silently replaced." >README.txt
+          echo "V3 IMPROVED FULL 1080p PICTURE ONLY, exact A8/A9/A10. Original Cedar 26.664s voice is muxed independently for user approval, not silently replaced." >README.txt
       - uses: actions/upload-artifact@v4
         with:
           name: EP003-AGENT6-FULL-PICTURE-${{ github.run_id }}

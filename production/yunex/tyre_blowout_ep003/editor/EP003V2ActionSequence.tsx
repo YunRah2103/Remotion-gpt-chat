@@ -15,7 +15,7 @@ import type {VehicleDynamicsFrame,TyreFrame} from '../shared/contract.ts';
 import type {CrashOutcomeFrame} from '../impact/model.ts';
 import type {BranchReplaySample} from '../rewind/branchReplay.ts';
 import {EP003FinalPicture as ApprovedOriginalOpening} from './EP003FinalPicture.tsx';
-import {EP003_DURATION_FRAMES,EP003_FPS} from './timeline.ts';
+import {EP003_DURATION_FRAMES,EP003_FPS,VO_CUES} from './timeline.ts';
 import {prepareTyreRig,applyTyreFrame,disposeTyreRig} from '../mechanics/tyreRig.ts';
 import {buildEpisodeHighway,EpisodeLight,finishGrandTourer} from '../look/world.tsx';
 import {ContactOcclusion} from '../look/contact.tsx';
@@ -31,6 +31,7 @@ import {sampleControlledFrame} from '../rewind/agent8Integration.ts';
 import {sampleBranchReplay,DEFAULT_BRANCH_REPLAY} from '../rewind/branchReplay.ts';
 import {ChoiceOverlay,RewindVisualTransition} from '../rewind/RewindVisualTransition.tsx';
 import {sampleTyreFailure} from '../mechanics/sampleTyreFailure.ts';
+import {sampleCrashCamera} from '../impact/Camera.ts';
 
 const CHOICE=DEFAULT_BRANCH_REPLAY.choiceFilmSec; // 12.830
 const CORRECT=DEFAULT_BRANCH_REPLAY.correctFilmSec; // 16.015
@@ -41,14 +42,17 @@ const CRASH_REVIEW_SECONDS=6;
 export const V2_RECOVERY_CUTS:readonly {
   from:number;to:number;stage:ActionStage;sceneX:number
 }[]=[
- {from:16.015,to:17.15,stage:'steady-driver',sceneX:-55},
- {from:17.15,to:18.08,stage:'moving-recovery-hero',sceneX:-58},
- {from:18.08,to:19.31,stage:'steady-driver',sceneX:-55},
- {from:19.31,to:20.425,stage:'emergency-pull',sceneX:-58},
+ {from:16.015,to:16.93,stage:'steady-driver',sceneX:-55},
+ {from:16.93,to:17.76,stage:'moving-recovery-hero',sceneX:-58},
+ {from:17.76,to:18.08,stage:'emergency-pull',sceneX:-56},
+ {from:18.08,to:18.95,stage:'steady-driver',sceneX:-55},
+ {from:18.95,to:19.84,stage:'emergency-pull',sceneX:-58},
+ {from:19.84,to:20.425,stage:'moving-recovery-hero',sceneX:-51},
  {from:20.425,to:21.905,stage:'safe-slowdown-follow',sceneX:-52},
- {from:21.905,to:23.80,stage:'moving-recovery-hero',sceneX:-46},
- {from:23.80,to:24.96,stage:'emergency-pull',sceneX:-55},
- {from:24.96,to:END,stage:'safe-slowdown-follow',sceneX:34},
+ {from:21.905,to:23.30,stage:'moving-recovery-hero',sceneX:-46},
+ {from:23.30,to:24.12,stage:'emergency-pull',sceneX:-55},
+ {from:24.12,to:25.18,stage:'safe-slowdown-follow',sceneX:30},
+ {from:25.18,to:END,stage:'moving-recovery-hero',sceneX:-55},
 ] as const;
 
 type V2Frame={
@@ -125,12 +129,25 @@ const OriginalMovingActionScene:React.FC<{time:number}>=({time})=>{
  const {width,height}=useVideoConfig();
  const state=sampleEditorV2Frame(time);
  const {dynamics,tyre,impact,replay}=state;
- const pose=sampleActionCamera({
+ const basePose=sampleActionCamera({
   stage:state.stage,sourceTimeSec:state.sourceTimeSec,
   progress01:state.progress01,dynamics,
   impactFrame:{contact01:impact?.contact.occurred?
      clamp(impact.bumperCrushM/.24):0,actualBarrierContact:!!impact?.contact.occurred}
  });
+ // Director's V3 close coverage: exact Agent8 camera on the SAME
+ // approved impact frame. Do not increase dent, modify the physical car,
+ // or manufacture a new hit. Three hard cuts reveal approach/contact/metal.
+ const lens=impact ? (time<13.40?'establish'
+   :time<13.88?'contact'
+   :time<14.87?'damage'
+   :time<15.26?'contact'
+   :null) : null;
+ const crashLens=lens&&impact?sampleCrashCamera(impact,lens):null;
+ const pose:ActionCameraPose=crashLens
+   ? {...basePose,position:crashLens.position,target:crashLens.target,
+      fovDeg:crashLens.fov,nearM:.055,insideCabin:false}
+   : basePose;
  const world=useMemo(buildEpisodeHighway,[]);
  useEffect(()=>()=>disposeObject(world),[world]);
  return <AbsoluteFill style={{backgroundColor:'#b8cad5'}}>
@@ -168,13 +185,45 @@ const OriginalMovingActionScene:React.FC<{time:number}>=({time})=>{
  * In public GitHub CI we render EP003PictureOnly, then mux the exact original
  * file locally after full native picture and audio decode.
  */
+/** Phrase subtitles use the 16 REAL waveform-aligned Cedar cue boundaries. */
+const CaptionTrack:React.FC<{time:number}>=({time})=>{
+ const cue=VO_CUES.find(c=>time>=c.start&&time<c.end);
+ if(!cue)return null;
+ const fade=Math.min(1,(time-cue.start)/.13,(cue.end-time)/.15);
+ const emphasis=cue.id==='vo-08'||cue.id==='vo-09'?'#ffcc9b':'#ffffff';
+ return <AbsoluteFill style={{pointerEvents:'none'}}>
+  <div style={{position:'absolute',bottom:146,left:60,right:60,
+   display:'flex',justifyContent:'center',opacity:Math.max(0,fade)}}>
+   <span style={{display:'inline-block',maxWidth:'100%',textAlign:'center',
+    padding:'19px 26px',borderRadius:22,boxSizing:'border-box',
+    fontFamily:'Arial,sans-serif',fontSize:50,lineHeight:1.2,fontWeight:800,
+    color:emphasis,background:'rgba(7,20,32,.67)',
+    boxShadow:'0 5px 25px rgba(0,0,0,.14)',
+    textShadow:'0 2px 9px rgba(0,0,0,.70)'}}>
+    {cue.text}
+   </span>
+  </div>
+ </AbsoluteFill>;
+};
+
+/** V3 finishing is picture-only; Cedar is never regenerated or time-shifted. */
 export const EP003V2FinalPicture:React.FC<{includeVoice?:boolean}>=({includeVoice=true})=>{
  const frame=useCurrentFrame(),{fps}=useVideoConfig();
  const time=frame/fps;
- return <AbsoluteFill>
-  {time<CHOICE
-    ? <ApprovedOriginalOpening includeVoice={false}/>
-    : <OriginalMovingActionScene time={time}/>}
+ return <AbsoluteFill style={{background:'#a9bfcb'}}>
+  <AbsoluteFill style={{filter:'contrast(1.12) saturate(1.16)'}}>
+   {time<CHOICE
+     ? <ApprovedOriginalOpening includeVoice={false}/>
+     : <OriginalMovingActionScene time={time}/>}
+  </AbsoluteFill>
+  <AbsoluteFill style={{pointerEvents:'none',
+   background:'radial-gradient(ellipse at center, transparent 57%, rgba(9,22,32,.20) 100%)'}}/>
+  {time<1.2&&<div style={{position:'absolute',top:110,left:75,
+   fontFamily:'Arial,sans-serif',letterSpacing:7,fontWeight:900,
+   fontSize:34,color:'#f7fbfd',textShadow:'0 3px 14px #102633'}}>
+   70 MPH · MOTORWAY SPEED
+  </div>}
+  <CaptionTrack time={time}/>
   {includeVoice&&<Audio src={staticFile('ep003/vo_master.wav')} volume={1}/>}
  </AbsoluteFill>;
 };
