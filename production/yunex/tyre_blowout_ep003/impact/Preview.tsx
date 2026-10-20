@@ -10,6 +10,7 @@ import {WorldLighting,CameraAim} from '../../../../src/yunex/world-kit/component
 import {EP003_SCENE} from '../shared/contract.ts';
 import {sampleCrashOutcome} from './model.ts';
 import {CrashBarrierWorld,ImpactRailScars3D} from './Barrier.tsx';
+import {sampleCrashCamera,lensForCloseTime,lensForHydratedTime} from './Camera.ts';
 import type {CrashOutcomeFrame} from './model.ts';
 
 type V3=[number,number,number];
@@ -154,21 +155,12 @@ export const ImpactEffects3D:React.FC<{frame:CrashOutcomeFrame}>=({frame})=><>
  <CrashDebris frame={frame}/>
  <ImpactRailScars3D frame={frame}/>
 </>;
-const useCamera=(frame:CrashOutcomeFrame,kind:'approach'|'close')=>{
- const [x,,z]=frame.scenePositionM;
- // Visual QA: previous low camera put a median in the chase view and
- // blocked frontal damage behind the guardrail. Rise above its upper lip.
- const position:V3=kind==='approach'
-  ?[x-9.8,5.5,Math.min(-1.15,z+1.3)]
-  :[x+6.5,9.8,Math.min(-10.2,z-4.7)];
- const target:V3=kind==='approach'?[x+.6,.72,z-.55]:[x+1.05,.90,z-.30];
- return {position,target,fov:kind==='approach'?49:43};
-};
 export const CrashPreview:React.FC<{kind:'approach'|'close'}>=({kind})=>{
  const videoFrame=useCurrentFrame(),{fps,width,height}=useVideoConfig();
  const t=kind==='approach'?videoFrame/fps:1.10+videoFrame/fps;
  const crash=sampleCrashOutcome(Math.min(4.5,t));
- const camera=useCamera(crash,kind);
+ const lens=kind==='approach'?lensForHydratedTime(t):lensForCloseTime(t);
+ const camera=sampleCrashCamera(crash,lens);
  return <AbsoluteFill style={{background:'#b7ced8'}}>
   <ThreeCanvas width={width} height={height} shadows
    camera={{position:camera.position,fov:camera.fov,near:.1,far:310}}>
@@ -180,17 +172,17 @@ export const CrashPreview:React.FC<{kind:'approach'|'close'}>=({kind})=>{
   </ThreeCanvas>
   <div style={{position:'absolute',top:'7%',left:'7%',right:'7%',
    fontFamily:'Arial,sans-serif',fontWeight:800,letterSpacing:1.6,
-   color:'#ffffff',textShadow:'0 3px 10px #12252a',fontSize:32}}>
+   color:'#ffffff',textShadow:'0 3px 10px #12252a',fontSize:27}}>
    HYPOTHETICAL WRONG REACTION
-   <div style={{fontSize:18,fontWeight:500,marginTop:9,letterSpacing:.3}}>
+   <div style={{fontSize:16,fontWeight:500,marginTop:8,letterSpacing:.3}}>
     ABRUPT STEERING + HARSH BRAKING — NOT INEVITABLE
    </div>
   </div>
   <div style={{position:'absolute',bottom:'8%',left:'7%',right:'7%',
    color:'#eef4f5',background:'rgba(11,25,32,.69)',padding:'14px 16px',
-   fontSize:18,letterSpacing:1,fontFamily:'Arial,sans-serif'}}>
+   fontSize:16,letterSpacing:.6,fontFamily:'Arial,sans-serif'}}>
    {crash.contact.occurred?'BARRIER CONTACT / VEHICLE DAMAGE':'FAILED FRONT-RIGHT TYRE / CAR VEERS'}
-   <div style={{fontSize:14,opacity:.8,marginTop:6}}>
+   <div style={{fontSize:12,opacity:.8,marginTop:5}}>
     ILLUSTRATIVE COUNTERFACTUAL · NOT CRASH TEST DATA
    </div>
   </div>
