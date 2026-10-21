@@ -6,6 +6,7 @@
 import React from 'react';
 import {AbsoluteFill, Audio, useCurrentFrame, useVideoConfig} from 'remotion';
 import type {ShotId} from '../shared/contract.ts';
+import {captionSizing} from '../story/typography.ts';
 import {
   CAPTION_MAX_WIDTH_PX,
   CAPTION_SAFE_BOTTOM_PX,
@@ -53,6 +54,7 @@ export function makeEP004PictureEdit(IntegratedVisualShot: React.ComponentType<V
     }
     const cut = shotAtFrame(frame, plan.cuts);
     const caption = showCaptions ? captionAtFrame(frame, plan.captions) : null;
+    const phoneCaption = captionSizing(config.width,config.height,caption?.text??'');
     const captionEntrance01 = caption ? Math.min(1,(frame-caption.startFrame+1)/4) : 1;
     const activeTime = frame / config.fps;
     const wordIndex = caption?.wordIndices.find(i => {
@@ -75,11 +77,11 @@ export function makeEP004PictureEdit(IntegratedVisualShot: React.ComponentType<V
           <AbsoluteFill style={{pointerEvents: 'none'}}>
             <div style={{
               position: 'absolute',
-              bottom: CAPTION_SAFE_BOTTOM_PX,
+              bottom: Math.max(CAPTION_SAFE_BOTTOM_PX,phoneCaption.bottomPx),
               left: '50%',
               transform: `translate(-50%, ${Math.round((1-captionEntrance01)*8)}px)`,
               opacity: captionEntrance01,
-              width: CAPTION_MAX_WIDTH_PX,
+              width: Math.min(CAPTION_MAX_WIDTH_PX,config.width-phoneCaption.leftPx-phoneCaption.rightPx),
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
@@ -90,7 +92,7 @@ export function makeEP004PictureEdit(IntegratedVisualShot: React.ComponentType<V
               backgroundColor: 'rgba(7, 11, 17, 0.66)',
               textAlign: 'center',
               fontFamily: 'Inter, Arial, Helvetica, sans-serif',
-              fontSize: 54,
+              fontSize: phoneCaption.fontPx,
               lineHeight: 1.2,
               fontWeight: 800,
               letterSpacing: '-0.7px',
