@@ -7,8 +7,8 @@ import {createCinematicVehicle,animateCinematicVehicle,HERO_VEHICLES} from '../.
 import {disposeObject} from '../../src/yunex/world-kit/geometry.ts';
 if(!globalThis.FileReader)globalThis.FileReader=class {readAsArrayBuffer(b){b.arrayBuffer().then(result=>{this.result=result;this.onloadend?.();});}readAsDataURL(b){b.arrayBuffer().then(data=>{this.result=`data:${b.type};base64,${Buffer.from(data).toString('base64')}`;this.onloadend?.();});}};
 const out='out/modelling-kit-v2/glb';await mkdir(out,{recursive:true});const manifest=[];
-for(const variant of HERO_VEHICLES)for(const pose of ['intact','mechanical']){
- const g=createCinematicVehicle({variant,quality:'hero'});animateCinematicVehicle(g,{frame:40,fps:24,cutaway:pose==='mechanical'?.98:0,exploded:pose==='mechanical'?.4:0});
+for(const variant of HERO_VEHICLES)for(const pose of variant==='formula-modern'?['intact','mechanical']:['intact','mechanical','damaged']){
+ const g=createCinematicVehicle({variant,quality:'hero'});animateCinematicVehicle(g,{frame:pose==='damaged'?100:40,fps:30,tyreDamage:pose==='damaged'?1:0,cutaway:pose==='mechanical'?.98:0,exploded:pose==='mechanical'?.4:0});
  // Rest arrays are runtime data, not model metadata; exported pose is intentionally baked.
  g.traverse(o=>{for(const key of ['restVertices','restIndex','rimRest','lastDamage','lastRimDamage','lastBodyDamage','baseline','link','restPosition','rest','motion','explode'])delete o.userData[key];});
  const binary=await new GLTFExporter().parseAsync(g,{binary:true,onlyVisible:true}),bytes=Buffer.from(binary);assert.equal(bytes.toString('ascii',0,4),'glTF');

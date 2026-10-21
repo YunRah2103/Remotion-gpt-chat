@@ -32,7 +32,7 @@ export function createFragments(){
 export function animateFragments(g:T.Group,amount:number,seconds:number,origin:T.Vector3){
  g.visible=amount>.02;g.children.forEach((o,i)=>{const t=Math.max(0,seconds-i*.018),a=i*2.399,flight=origin.y+(1.2+i%5*.17)*t-4.905*t*t;
  o.position.set(origin.x-t*(2+i%7*.6),Math.max(.012,flight),origin.z+Math.sin(a)*Math.min(t,.65)*1.2);
- o.rotation.set(i+t*4,i+t*6,i+t*3);o.scale.setScalar(amount*(t>0?1:0));});
+ if(flight<.10)o.rotation.set(0,i+t*.5,0);else o.rotation.set(i+t*4,i+t*6,i+t*3);o.scale.setScalar(amount*(t>0?1:0));});
 }
 /** Open sector plus hanging ribbons/cords; all vertices remain in the rolling wheel rig. */
 export function createTornCarcass(roll:T.Object3D,r:number,w:number){
@@ -50,4 +50,16 @@ export function damageRim(rim:T.Mesh,amount:number){
  const a=rim.geometry.attributes.position,rest=rim.userData.rimRest;
  for(let i=0;i<a.count;i++){const x=rest[i*3],y=rest[i*3+1],z=rest[i*3+2],angle=Math.atan2(y,x),dent=amount*.035*Math.exp(-(((angle-.75)/.22)**2));a.setXYZ(i,x*(1-dent),y*(1-dent),z+dent*.6);}
  a.needsUpdate=true;rim.geometry.computeVertexNormals();rim.geometry.computeBoundingSphere();rim.userData.lastRimDamage=amount;
+}
+
+/** Clamp hanging material in vehicle-local road space after steering/roll/wobble transforms. */
+export function groundTornCords(root:T.Group,mounts:T.Group[]){
+ const rootInverse=root.matrixWorld.clone().invert(),relative=new T.Matrix4(),inverse=new T.Matrix4(),p=new T.Vector3();
+ for(const mount of mounts){const group=mount.getObjectByName('torn-cords');if(!group?.visible)continue;
+  group.traverse(o=>{if(!(o instanceof T.Mesh))return;const a=o.geometry.attributes.position;const rest=(o.userData.restVertices??=Array.from(a.array)) as number[];
+   relative.multiplyMatrices(rootInverse,o.matrixWorld);inverse.copy(relative).invert();
+   for(let i=0;i<a.count;i++){p.fromArray(rest,i*3).applyMatrix4(relative);p.y=Math.max(.003,p.y);p.applyMatrix4(inverse);a.setXYZ(i,p.x,p.y,p.z);}
+   a.needsUpdate=true;o.geometry.computeVertexNormals();o.geometry.computeBoundingSphere();
+  });
+ }
 }

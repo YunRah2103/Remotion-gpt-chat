@@ -7,6 +7,9 @@ on:
       - 'tests/modelling-kit/**'
       - 'scripts/modelling-kit/**'
       - '.github/workflows/yunex-modelling-kit-v2.yml'
+concurrency:
+  group: modelling-kit-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:

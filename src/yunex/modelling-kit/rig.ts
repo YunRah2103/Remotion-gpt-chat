@@ -9,7 +9,7 @@ import {animatePart} from '../parts-kit/motion.ts';
 import {batchVehicleDetails} from './optimize.ts';
 import {sculptShell,roadHeroDetails,formulaHeroDetails} from './premium.ts';
 import {tyreDetail,floorAssembly,suspensionLinks} from './details.ts';
-import {deformTyre,deformBody,createFragments,animateFragments,createTornCarcass,damageRim} from './damage.ts';
+import {deformTyre,deformBody,createFragments,animateFragments,createTornCarcass,damageRim,groundTornCords} from './damage.ts';
 
 export const HERO_VEHICLES=['hot-hatch','supercar','formula-modern'] as const satisfies readonly VehicleVariant[];
 export type CinematicOptions=VehicleOptions & {quality?:'lightweight'|'standard'|'hero';paintPreset?:'lacquer'|'satin';tyreType?:'road'|'slick';optimize?:boolean};
@@ -86,5 +86,5 @@ export function animateCinematicVehicle(root:T.Group,state:CinematicState){
  const contact=!!floor&&.050+shell.position.y<=0&&exploded===0;
  sparks.visible=contact;const dummy=new T.Object3D(),t=state.frame/state.fps;
  for(let i=0;i<sparks.count;i++){const age=(t*3+i*.61803398875)%1,side=Math.sin(i*12.9);dummy.position.set((i%2?.8:-.8)-age*4.5,.014+Math.sin(age*Math.PI)*(.035+(i%7)*.012),side*age*.95);dummy.scale.set(.8+age*3.5,.65,.65);dummy.rotation.z=-.2;dummy.updateMatrix();sparks.setMatrixAt(i,dummy.matrix);}sparks.instanceMatrix.needsUpdate=true;
- root.updateMatrixWorld(true);
+ root.updateMatrixWorld(true);groundTornCords(root,mounts);
 }
