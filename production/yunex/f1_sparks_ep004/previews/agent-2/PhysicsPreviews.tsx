@@ -1,124 +1,129 @@
-import React,{useEffect,useLayoutEffect,useMemo,useRef} from 'react';
+/** V2 native physics shot: real Agent 1 skid geometry, real Agent 4 asphalt.
+ * Editorial slow motion never triggers sparks; all glints come from historic metal contact.
+ */
+import React,{useLayoutEffect,useMemo,useRef} from 'react';
 import {AbsoluteFill,useCurrentFrame,useVideoConfig} from 'remotion';
 import {ThreeCanvas} from '@remotion/three';
 import * as T from 'three';
-import {createVehicle,animateVehicle} from '../../../../../src/yunex/world-kit/index.ts';
-import {routeLength,sampleRoute} from '../../../../../src/yunex/world-kit/environments.ts';
-import {CameraAim,WorldLighting} from '../../../../../src/yunex/world-kit/components.tsx';
-import {sampleTrackSurface} from '../../shared/track.ts';
-import type {SkidDescriptor,SparkParticle,Vec3} from '../../shared/contract.ts';
-import {sampleDynamics,sampleContactDrivenSparks} from '../../physics/index.ts';
-import {localToWorld} from '../../physics/dynamics.ts';
+import {CameraAim} from '../../../../../src/yunex/world-kit/components.tsx';
+import {F1HeroVehicle,getSkidDescriptors} from '../../mechanics/index.ts';
+import {NightCircuitWorld} from '../../look/index.ts';
+import {sampleDynamics,sampleContactDrivenSparks,localToWorld} from '../../physics/index.ts';
+import type {SparkParticle,SkidContact,Vec3,VehicleMotionState} from '../../shared/contract.ts';
+import {samplePreviewShot} from './shot-plan.ts';
+import type {PreviewMode,PreviewShot} from './shot-plan.ts';
 
-const PREVIEW_SKIDS:readonly SkidDescriptor[]=[{id:'forward',metal:true,localBottomPoint:[1.18,.065,0]},{id:'middle',metal:true,localBottomPoint:[.10,.065,0]},{id:'rear',metal:true,localBottomPoint:[-1.03,.065,0]}];
-// PROVISIONAL DIMENSIONS copied from Agent 1 handoff #217 (not an import until integration).
-// After Agent 0 merges PR #225 into the base, import mechanics/skids.ts:getSkidDescriptors
-// and mechanics/F1HeroVehicle; never release independently fitted geometry.
-const ORIGIN=69.0;
-const SPARK_STRETCH=new T.Vector3(0,1,0);
-const carForward=(yaw:number,x:number,z:number):[number,number] =>
-  [Math.cos(yaw)*x+Math.sin(yaw)*z,-Math.sin(yaw)*x+Math.cos(yaw)*z];
+const SKIDS=getSkidDescriptors();
+const MAX_PARTICLES=260;
+const UP=new T.Vector3(0,1,0);
+const clamp=(v:number,a:number,b:number)=>Math.max(a,Math.min(b,v));
+const at=(m:VehicleMotionState,x:number,y:number,z:number):Vec3=>localToWorld([x,y,z],m);
 
-function createExactTrackRibbon() {
-  const length=routeLength('track'),n=620,vertices:number[]=[],indices:number[]=[];
-  for(let i=0;i<=n;i++) {
-    const distance=length*i/n,route=sampleRoute('track',distance);
-    const surface=sampleTrackSurface(distance),yaw=route.yaw;
-    for(const side of [-1,1]) {
-      const [x,z]=carForward(yaw,0,side*6.0);
-      vertices.push(route.position[0]+x,surface.heightM,route.position[2]+z);
-    }
-    if(i<n){const o=i*2;indices.push(o,o+1,o+2,o+1,o+3,o+2);}
-  }
-  const geo=new T.BufferGeometry();
-  geo.setAttribute('position',new T.Float32BufferAttribute(vertices,3));geo.setIndex(indices);geo.computeVertexNormals();return geo;
-}
-const Ribbon:React.FC=()=>{
- const geometry=useMemo(()=>createExactTrackRibbon(),[]);
- useEffect(()=>()=>geometry.dispose(),[geometry]);
- return <mesh geometry={geometry} receiveShadow><meshStandardMaterial color="#2c303a" side={T.DoubleSide} roughness={.90} metalness={.08}/></mesh>;
-};
-const MovingCar:React.FC<{distanceM:number;worldPosition:Vec3;yaw:number;pitch:number;roll:number}>=({distanceM,worldPosition,yaw,pitch,roll})=>{
- const car=useMemo(()=>createVehicle({variant:'formula-modern',color:'#08bba9',accent:'#d3ad63',lights:true}),[]);
- useEffect(()=>()=>{car.traverse(o=>{if(o instanceof T.Mesh){o.geometry.dispose();}});},[car]);
- animateVehicle(car,distanceM);
- car.position.set(...worldPosition);
- car.rotation.set(0,yaw,0);car.rotateZ(pitch);car.rotateX(roll);
- return <primitive object={car}/>;
-};
-const ParticleInstances:React.FC<{particles:readonly SparkParticle[]}>=({particles})=>{
- const ref=useRef<T.InstancedMesh>(null);
- const matrix=useMemo(()=>new T.Matrix4(),[]);
- const position=useMemo(()=>new T.Vector3(),[]);
- const scale=useMemo(()=>new T.Vector3(),[]);
- const quat=useMemo(()=>new T.Quaternion(),[]);
- const heading=useMemo(()=>new T.Vector3(),[]);
+const ParticleStreaks:React.FC<{particles:readonly SparkParticle[]}>=({particles})=>{
+ const core=useRef<T.InstancedMesh>(null),halo=useRef<T.InstancedMesh>(null);
+ const obj=useMemo(()=>new T.Object3D(),[]);
+ const v=useMemo(()=>new T.Vector3(),[]);
+ const col=useMemo(()=>new T.Color(),[]);
+ const white=useMemo(()=>new T.Color('#fff6d1'),[]);
+ const orange=useMemo(()=>new T.Color('#ff9c45'),[]);
  useLayoutEffect(()=>{
-  const inst=ref.current;if(!inst)return;
-  inst.count=Math.min(particles.length,260);
-  particles.slice(0,260).forEach((p,i)=>{
-   position.set(...p.positionWorld);
-   heading.set(...p.velocityWorld).normalize();
-   quat.setFromUnitVectors(SPARK_STRETCH,heading);
-   // Spatial motion blur from each particle's own ballistic velocity.
-   // 1/30-second streak: not a flat 2D/glowing exhaust overlay.
-   const speed=Math.hypot(...p.velocityWorld);
-   const radius=Math.max(.004,p.radiusM*.50);
-   const streakLength=Math.max(.08,Math.min(.30,speed/100));
-   scale.set(radius,streakLength,radius);
-   matrix.compose(position,quat,scale);inst.setMatrixAt(i,matrix);
-   const warm=new T.Color('#fff3bb').lerp(new T.Color('#ff8d3a'),Math.min(1,p.ageSec/p.lifetimeSec));
-   inst.setColorAt(i,warm.multiplyScalar(Math.max(.05,p.luminance01)));
-  });
-  inst.instanceMatrix.needsUpdate=true;
-  if(inst.instanceColor)inst.instanceColor.needsUpdate=true;
- },[particles,matrix,position,scale,quat,heading]);
- return <instancedMesh ref={ref} args={[undefined,undefined,260]} frustumCulled={false}>
+  const a=core.current,h=halo.current;if(!a||!h)return;
+  const count=Math.min(particles.length,MAX_PARTICLES);a.count=count;h.count=count;
+  for(let i=0;i<count;i++){
+   const p=particles[i],age=p.ageSec/p.lifetimeSec;
+   v.set(...p.velocityWorld);
+   const speed=v.length();
+   if(speed>.0001)obj.quaternion.setFromUnitVectors(UP,v.divideScalar(speed));
+   else obj.quaternion.identity();
+   obj.position.set(...p.positionWorld);
+   const radius=clamp(p.radiusM*.50,.005,.013);
+   const length=clamp(speed/95,.07,.25);
+   obj.scale.set(radius,length,radius);obj.updateMatrix();a.setMatrixAt(i,obj.matrix);
+   obj.scale.set(radius*2.6,length*1.5,radius*2.6);obj.updateMatrix();h.setMatrixAt(i,obj.matrix);
+   col.copy(white).lerp(orange,clamp(age,0,1)*.82).multiplyScalar(.55+.45*p.luminance01);
+   a.setColorAt(i,col);
+   h.setColorAt(i,new T.Color('#f4ad62').multiplyScalar(.16*p.luminance01));
+  }
+  a.instanceMatrix.needsUpdate=true;h.instanceMatrix.needsUpdate=true;
+  if(a.instanceColor)a.instanceColor.needsUpdate=true;
+  if(h.instanceColor)h.instanceColor.needsUpdate=true;
+ },[particles,obj,v,col,white,orange]);
+ return <>
+  <instancedMesh ref={halo} args={[undefined,undefined,MAX_PARTICLES]} frustumCulled={false} renderOrder={5}>
+   <cylinderGeometry args={[1,1,1,5]}/>
+   <meshBasicMaterial color="#ffb060" toneMapped={false} blending={T.AdditiveBlending} transparent opacity={.19} depthWrite={false}/>
+  </instancedMesh>
+  <instancedMesh ref={core} args={[undefined,undefined,MAX_PARTICLES]} frustumCulled={false} renderOrder={6}>
    <cylinderGeometry args={[1,1,1,8]}/>
-   <meshBasicMaterial color="#fff1b2" toneMapped={false} transparent opacity={.98}/>
- </instancedMesh>;
+   <meshBasicMaterial color="#fff4d8" toneMapped={false} blending={T.AdditiveBlending} depthWrite={false}/>
+  </instancedMesh>
+ </>;
 };
-export const Agent2PhysicsPreview:React.FC<{mode:'technical'|'portrait'}>=({mode})=>{
- const {width,height,fps}=useVideoConfig();
- const frame=useCurrentFrame(),t=frame/fps;
- const motion=sampleDynamics(t,{startDistanceM:ORIGIN});
- const {contacts,particles}=sampleContactDrivenSparks(t,motion,PREVIEW_SKIDS);
- const contact=contacts[0],active=contacts.some(c=>c.active);
- const strongest=contacts.find(c=>c.active)??contact;
- const at=(forward:number,up:number,left:number):Vec3=>{
-  const [x,z]=carForward(motion.yawRad,forward,left);
-  return [motion.worldPosition[0]+x,motion.worldPosition[1]+up,motion.worldPosition[2]+z];
- };
- const technical=mode==='technical';
- const camera=technical?at(.50,.48,2.85):at(-9.5,3.20,6.4);
- const target=technical?at(1.05,.08,0):at(-.62,.36,0);
- const world=sampleRoute('track',motion.routeDistanceM);
- return <AbsoluteFill style={{background:'#0a111c'}}>
-  <ThreeCanvas width={width} height={height} shadows camera={{position:camera,fov:technical?36:40,near:.045,far:230}}>
-   <WorldLighting timeOfDay="night" focus={world.position}/>
-   <CameraAim position={camera} target={target} fov={technical?36:40}/>
-   <Ribbon/>
-   <MovingCar distanceM={motion.routeDistanceM} worldPosition={motion.worldPosition} yaw={motion.yawRad} pitch={motion.pitchRad} roll={motion.rollRad}/>
-   {/* Visible fixture skids follow exactly the SAME motion transforms as contact sampling.
-        Only Agent 1's fitted named meshes may replace these provisional markers. */}
-   {PREVIEW_SKIDS.map((skid)=> {
-     const worldSkid=localToWorld([skid.localBottomPoint[0],.075,skid.localBottomPoint[2]],motion);
-     return <mesh key={skid.id} position={worldSkid} rotation={[0,motion.yawRad,0]}>
-       <boxGeometry args={[skid.id==='forward'?.60:.46,.020,.32]}/>
-       <meshStandardMaterial color="#d9e6e1" metalness={.96} roughness={.24}/>
-     </mesh>;
-   })}
-   <ParticleInstances particles={particles}/>
-   {active&&<pointLight position={[strongest.pointWorld[0],strongest.pointWorld[1]+.20,strongest.pointWorld[2]]} color="#ffda99" intensity={18+50*strongest.contactIntensity01} distance={5}/>}
-   <hemisphereLight args={['#a6cad9','#212633',.45]}/>
+
+const SparkContact:React.FC<{contacts:readonly SkidContact[];technical:boolean}>=({contacts,technical})=>
+ <>{contacts.filter(c=>c.active).map(c=><group key={c.skidId}>
+  <pointLight position={[c.pointWorld[0],c.pointWorld[1]+.13,c.pointWorld[2]]} color="#ffc486"
+   intensity={9+20*c.contactIntensity01} distance={3.3} decay={2}/>
+  {technical&&<mesh position={[c.pointWorld[0],c.pointWorld[1]+.018,c.pointWorld[2]]}>
+    <sphereGeometry args={[.025,8,8]}/><meshBasicMaterial color="#ffe7ae" toneMapped={false}/>
+  </mesh>}
+ </group>)}</>;
+
+function cameraFor(motion:VehicleMotionState,shot:PreviewShot,tSec:number){
+ const presets={
+  'underfloor-front':{eye:[2.2,1.05,5.4],target:[.82,.15,0],fov:54},
+  'underfloor-rear':{eye:[-2.7,1.11,-5.2],target:[-.4,.14,0],fov:55},
+  'chase':{eye:[-7.0,2.6,5.9],target:[.2,.40,0],fov:56},
+  'approach':{eye:[5.8,1.8,5.6],target:[.4,.35,0],fov:57},
+  'payoff':{eye:[-7.8,2.4,-6.4],target:[.15,.37,0],fov:56},
+ } as const;
+ const d=presets[shot.angle],drift=Math.sin(tSec*.73)*.13;
+ return {eye:at(motion,d.eye[0],d.eye[1],d.eye[2]+drift),
+  target:at(motion,d.target[0],d.target[1],d.target[2]),fov:d.fov};
+}
+
+export const Agent2PhysicsPreview:React.FC<{mode:PreviewMode}>=({mode})=>{
+ const frame=useCurrentFrame(),{fps,width,height}=useVideoConfig();
+ const {shot,sourceTimeSec,localFrame}=samplePreviewShot(mode,frame,fps);
+ const motion=sampleDynamics(sourceTimeSec,{startDistanceM:shot.startDistanceM});
+ const {contacts,particles}=sampleContactDrivenSparks(sourceTimeSec,motion,SKIDS);
+ const {eye,target,fov}=cameraFor(motion,shot,sourceTimeSec);
+ const technical=mode==='technical',active=contacts.some(c=>c.active);
+ const nearest=[...contacts].sort((a,b)=>a.signedGapM-b.signedGapM)[0];
+ const sceneNumber=mode==='technical'?(frame<75?1:2):(frame<70?1:frame<140?2:3);
+ const headline=active?'METAL ON ASPHALT':particles.length?'SKID LIFTED · HOT CHIPS IN FLIGHT':'METAL SKID CLEAR';
+ return <AbsoluteFill style={{background:'#081320'}}>
+  <ThreeCanvas width={width} height={height} shadows camera={{position:eye,fov,near:.035,far:350}}
+   gl={{antialias:true,alpha:false,preserveDrawingBuffer:true}}>
+    <NightCircuitWorld motion={motion} particles={particles} exposure={1}/>
+    <F1HeroVehicle motion={motion} reveal01={technical?.66:0}/>
+    <ParticleStreaks particles={particles}/>
+    <SparkContact contacts={contacts} technical={technical}/>
+    <CameraAim position={eye} target={target} fov={fov}/>
   </ThreeCanvas>
-  <div style={{position:'absolute',top:90,left:56,color:'#e7f8ff',fontFamily:'Arial,sans-serif',background:'#101823ca',padding:'20px 24px',borderLeft:'4px solid #46e8d0'}}>
-   <div style={{fontSize:27,letterSpacing:3,fontWeight:800}}>{technical?'CONTACT PHYSICS / FIXTURE':'YUNEX EP004 / SPARK MOTION'}</div>
-   <div style={{fontSize:22,marginTop:12,color:active?'#ffce78':'#9acbd5'}}>METAL SKID {active?'TOUCHING ASPHALT':particles.length?'CLEAR — OLD GLINTS IN FLIGHT':'CLEAR OF ASPHALT'}</div>
-   <div style={{fontSize:21,marginTop:6}}>GAP {strongest.signedGapM>=0?'+':''}{(strongest.signedGapM*1000).toFixed(1)} mm · {Math.round(motion.speedMps*3.6)} km/h · {particles.length} GLINTS</div>
+  <div style={{position:'absolute',top:0,left:0,right:0,height:450,pointerEvents:'none',
+    background:'linear-gradient(to bottom,#081221ed,#08122177,transparent)'}}/>
+  <div style={{position:'absolute',bottom:0,left:0,right:0,height:370,pointerEvents:'none',
+    background:'linear-gradient(to top,#07101ce8,transparent)'}}/>
+  <div style={{position:'absolute',top:115,left:64,right:62,color:'#f5f9fc',fontFamily:'Arial,sans-serif'}}>
+   <div style={{fontSize:20,letterSpacing:4,color:'#72d9d1',fontWeight:800}}>
+    YUNEX / F1 SPARKS · PASS {String(sceneNumber).padStart(2,'0')}
+   </div>
+   <div style={{fontSize:51,fontWeight:900,lineHeight:1.05,marginTop:20,
+    textShadow:'0 3px 22px #081320'}}>{shot.title}</div>
+   <div style={{fontSize:22,color:'#b5d7df',marginTop:19,letterSpacing:2,fontWeight:700}}>
+    SLOW MOTION {shot.playbackRate.toFixed(2)}× · 223 KM/H SOURCE SPEED
+   </div>
   </div>
-  <div style={{position:'absolute',bottom:90,left:60,color:'#d6dce5',fontFamily:'Arial,sans-serif',fontSize:20,background:'#0c1325bb',padding:'12px 16px'}}>
-   ILLUSTRATIVE PHYSICS · AGENT 1 PROVISIONAL SKIDS · NO EXHAUST EMISSION
+  <div style={{position:'absolute',bottom:203,left:65,right:65,color:'#edf5f9',fontFamily:'Arial,sans-serif'}}>
+   <div style={{fontSize:24,letterSpacing:2,fontWeight:800,color:active?'#ffca7a':'#a9d5de'}}>{headline}</div>
+   <div style={{fontSize:21,marginTop:10}}>SKID GAP {nearest.signedGapM>=0?'+':''}{(nearest.signedGapM*1000).toFixed(1)} mm
+    {'  ·  '}{particles.length} METAL-BORN GLINTS</div>
+   <div style={{background:'#fff4',height:3,marginTop:21}}>
+    <div style={{height:'100%',background:'#ffbd70',width:String(100*localFrame/(shot.frames-1))+'%'}}/>
+   </div>
   </div>
+  <div style={{position:'absolute',bottom:87,left:65,color:'#b5c8d0',fontSize:17,letterSpacing:1.5,
+   fontFamily:'Arial,sans-serif'}}>REAL EP004 CAR + SKIDS + CIRCUIT · ILLUSTRATIVE PHYSICS</div>
  </AbsoluteFill>;
 };
