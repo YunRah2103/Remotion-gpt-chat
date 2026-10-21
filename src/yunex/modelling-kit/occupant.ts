@@ -47,9 +47,9 @@ export function createDriver(shell:T.Group,s:VehicleSpec,o:Partial<VehicleOption
   const target=new T.Object3D();target.name=`grip-target-${side}`;if(formula)target.position.set((side==='left'?-1:1)*.11,0,0);else target.position.set(0,0,(side==='left'?1:-1)*.17*l.k);wheel.add(target);
  }
  // Flat textile ribbons, with fixed vehicle anchors and a moving chest guide.
- for(const name of ['belt-diagonal','belt-lower','belt-lap'])add(mesh(root,new T.BoxGeometry(.008,.045,1),belt,[0,0,0],[0,0,0],name));
+ for(const name of ['belt-diagonal','belt-shoulder','belt-chest','belt-lower','belt-waist','belt-pelvis','belt-lap','belt-lap-outer','belt-lap-inner'])add(mesh(root,new T.BoxGeometry(.008,.045,1),belt,[0,0,0],[0,0,0],name));
  add(box(root,dark,[.045,.05,.065],[0,0,0],.008,'belt-latch'));
- const anchors=[hip.clone().add(v(-.18*k,.49*k,sign*.18*k)),hip.clone().add(v(.08*k,-.03*k,-sign*.16*k)),hip.clone().add(v(-.10*k,-.03*k,sign*.18*k))];
+ const anchors=[hip.clone().add(v(-.18*k,.49*k,sign*.22*k)),hip.clone().add(v(.08*k,-.03*k,-sign*.22*k)),hip.clone().add(v(-.10*k,-.03*k,sign*.22*k))];
  const radius=formula?.11:.17*l.k;rigs.set(root,{root,wheel,hip,k,radius,parts,anchors});animateDriver(root,0,0,0);return root;
 }
 export function animateDriver(root:T.Group,steer:number,braking:number,impact:number){
@@ -71,9 +71,16 @@ export function animateDriver(root:T.Group,steer:number,braking:number,impact:nu
   foot.x+=(side==='right'?braking*.012:0);
   const knee=elbow(h,foot,Math.max(.33*k,h.distanceTo(foot)*.505),v(0,1,0));parts.get(`knee-${side}`)!.position.copy(knee);connect(parts.get(`thigh-${side}`)!,h,knee);connect(parts.get(`shin-${side}`)!,knee,foot);parts.get(`foot-${side}`)!.position.copy(foot);
  }
- // Route the diagonal through the forward chest guide so it stays outside the torso.
- const guide=chest.clone().add(v(.113*k,.09*k,Math.sign(anchors[0].z-hip.z)*.10*k));
+ // Guides follow the posed chest's local front/shoulder surfaces; fixed anchors stay on the vehicle.
+ const side=Math.sign(anchors[0].z-hip.z);
+ const chestPoint=(x:number,y:number,z:number)=>v(x*k,y*k,z*k).applyEuler(thorax.rotation).add(chest);
+ const shoulderBack=chestPoint(-.16,.22,side*.25),shoulderFront=chestPoint(.15,.20,side*.25);
+ const chestUpper=chestPoint(.15,.10,side*.10),chestLower=chestPoint(.15,-.14,-side*.10);
+ const lowerExit=chestPoint(.15,-.20,-side*.10);
+ const outerHip=hip.clone().add(v(.15*k,-.03*k,side*.22*k)),innerHip=hip.clone().add(v(.15*k,-.03*k,-side*.22*k));
  const ribbon=(name:string,a:T.Vector3,b:T.Vector3)=>{const m=parts.get(name)!,d=b.clone().sub(a);m.position.copy(a).add(b).multiplyScalar(.5);m.quaternion.setFromUnitVectors(v(0,0,1),d.clone().normalize());m.scale.z=d.length();};
- ribbon('belt-diagonal',anchors[0],guide);ribbon('belt-lower',guide,anchors[1]);ribbon('belt-lap',anchors[2],anchors[1]);parts.get('belt-latch')!.position.copy(anchors[1]);
+ ribbon('belt-diagonal',anchors[0],shoulderBack);ribbon('belt-shoulder',shoulderBack,shoulderFront);ribbon('belt-chest',shoulderFront,chestUpper);
+ ribbon('belt-lower',chestUpper,chestLower);ribbon('belt-waist',chestLower,lowerExit);ribbon('belt-pelvis',lowerExit,innerHip);
+ ribbon('belt-lap-outer',anchors[2],outerHip);ribbon('belt-lap',outerHip,innerHip);ribbon('belt-lap-inner',innerHip,anchors[1]);parts.get('belt-latch')!.position.copy(anchors[1]);
  root.updateMatrixWorld(true);
 }
