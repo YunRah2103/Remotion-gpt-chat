@@ -43,7 +43,7 @@ jobs:
         shell: bash
         run: |
           node production/yunex/f1_sparks_ep004/editor/native-qa.mjs \
-            out/ep004-editor/EP004-six-shot-video-only.mp4 420
+            out/ep004-editor/EP004-six-shot-video-only.mp4 420 --video-only
           ffprobe -v error -show_entries stream=codec_type,nb_read_frames,width,height,avg_frame_rate -count_frames -of json \
             out/ep004-editor/EP004-six-shot-video-only.mp4 > out/ep004-editor/probe.json
           test "$(ffprobe -v error -select_streams a -show_entries stream=index -of csv=p=0 out/ep004-editor/EP004-six-shot-video-only.mp4 | wc -l)" = "0"
