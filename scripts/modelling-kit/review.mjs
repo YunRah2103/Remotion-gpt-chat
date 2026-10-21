@@ -19,6 +19,6 @@ try{
    const result={id,width:composition.width*scale,height:composition.height*scale,fps,duration,renderSeconds:(Date.now()-start)/1000};report.push(result);await writeFile(`${out}/timing-${id}.json`,JSON.stringify(result,null,2));
   }
  }
- if(process.argv.includes('--compare'))for(const baseline of [false,true]){const composition=await selectComposition({serveUrl,id:'KitA',puppeteerInstance:browser,inputProps:{demo:'A',baseline}});await renderStill({serveUrl,composition,frame:30,output:`${out}/${baseline?'before':'after'}.png`,scale,puppeteerInstance:browser,inputProps:{demo:'A',baseline}});}
+ if(process.argv.includes('--compare'))for(const baseline of [false,true]){const composition=await selectComposition({serveUrl,id:'KitA',puppeteerInstance:browser,inputProps:{demo:'A',baseline}});for(const [frame,suffix] of [[30,''],[120,'-supercar'],[210,'-formula-modern']])await renderStill({serveUrl,composition,frame,output:`${out}/${baseline?'before':'after'}${suffix}.png`,scale,puppeteerInstance:browser,inputProps:{demo:'A',baseline}});}
  await writeFile(`${out}/render-report${process.argv.includes('--portrait')?'-portrait':''}.json`,JSON.stringify(report,null,2));
 }finally{await browser.close({});}

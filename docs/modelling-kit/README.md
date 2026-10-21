@@ -138,3 +138,11 @@ fresh still against a later decoded frame and rejects a mean RGB error of 4 or m
 The previous `docs/modelling-kit/previews` files are archived **12 fps first-pass
 media**. Current native 1080p/30 fps outputs and diagnostics are in the latest
 YUNEX-MODELLING-KIT-V2-REVIEW workflow artifact; do not label the old files as 30 fps.
+
+## Recovery continuation (21 October 2026)
+
+See [recovery and verification boundary](RESUME-2026-10-21.md). Rubber strips now
+bounce twice, slow with friction and settle deterministically; their rotated
+geometry stays above the local road. `interior:false` skips hero seats/console as
+well as the original interior, retaining exterior lights. `--compare` captures
+matched stills for all three showcased vehicle presets.

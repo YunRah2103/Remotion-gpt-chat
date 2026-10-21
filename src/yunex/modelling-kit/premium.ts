@@ -33,7 +33,8 @@ export function roadHeroDetails(shell:T.Group,s:VehicleSpec){
   mesh(shell,new T.TubeGeometry(new T.CatmullRomCurve3(pts),18,.006,6,false),led,[0,0,0],[0,0,0],'led-signature');
 
   const innerZ=side*s.width*.235,interior=shell.getObjectByName('interior');
-  const oldSeat=interior?.getObjectByName(side>0?'front-seat-left':'front-seat-right');if(oldSeat)oldSeat.visible=false;
+  if(!interior)continue;
+  const oldSeat=interior.getObjectByName(side>0?'front-seat-left':'front-seat-right');if(oldSeat)oldSeat.visible=false;
   const seat=new T.Group();seat.name='bucket-seat-shell';seat.position.set(layout.frontSeat,layout.floor+.15,innerZ);seat.scale.y=layout.k;(interior??shell).add(seat);
   const back=box(seat,leather,[.12,.51,.39],[-.20,.28,0],.045,'seat-back');back.rotation.z=-.14;
   box(seat,leather,[.45,.09,.37],[0,.03,0],.035,'seat-cushion');
@@ -42,7 +43,7 @@ export function roadHeroDetails(shell:T.Group,s:VehicleSpec){
   box(seat,black,[.03,.06,.12],[-.13,.43,0],.012,'harness-aperture');
  }
  // Thin forged rim edge plus valve stems; original pivots/rotors remain the authority.
- box(shell,metal,[.04,.015,.22],[.16,.79,0],.005,'console-switch-bank');
+ if(shell.getObjectByName('interior'))box(shell,metal,[.04,.015,.22],[.16,.79,0],.005,'console-switch-bank');
 }
 function aerofoil(parent:T.Group,mat:T.Material,chord:number,span:number,pos:[number,number,number],name:string,angle=0){
  const sh=new T.Shape(),n=32;

@@ -29,11 +29,37 @@ export function createFragments(){
  const g=new T.Group();g.name='rubber-fragments';const mat=new T.MeshStandardMaterial({color:'#171d22',roughness:.94,side:T.DoubleSide});
  for(let i=0;i<24;i++){const p:number[]=[],idx:number[]=[];for(let j=0;j<=6;j++){const t=j/6;for(const side of [-1,1])p.push((t-.5)*(.10+i%4*.045),Math.sin(t*Math.PI)*.018,side*(.012+i%3*.008));if(j<6){const k=j*2;idx.push(k,k+1,k+2,k+1,k+3,k+2);}}const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(p,3));geo.setIndex(idx);geo.computeVertexNormals();const m=new T.Mesh(geo,mat);m.name=`rubber-${i}`;g.add(m);}return g;
 }
-/** Prescribed ballistic ejection with road bounce/slide; no looping particle respawn. */
+/** Absolute-time ejection, two damped bounces and frictional settling. No frame history. */
 export function animateFragments(g:T.Group,amount:number,seconds:number,origin:T.Vector3){
- g.visible=amount>.02;g.children.forEach((o,i)=>{const t=Math.max(0,seconds-i*.018),a=i*2.399,flight=origin.y+(1.2+i%5*.17)*t-4.905*t*t;
- o.position.set(origin.x-t*(2+i%7*.6),Math.max(.012,flight),origin.z+Math.sin(a)*Math.min(t,.65)*1.2);
- if(flight<.10)o.rotation.set(0,i+t*.5,0);else o.rotation.set(i+t*4,i+t*6,i+t*3);o.scale.setScalar(amount*(t>0?1:0));});
+ g.visible=amount>.02;
+ const gravity=9.81,clearance=.002;
+ const rotation=new T.Matrix4(),point=new T.Vector3();
+ g.children.forEach((o,i)=>{
+  const t=Math.max(0,seconds-i*.018),up=1.2+i%5*.17;
+  const height=Math.max(0,origin.y-clearance);
+  const impactSpeed=Math.sqrt(up*up+2*gravity*height),impact=(up+impactSpeed)/gravity;
+  const rebound=impactSpeed*(.27+i%3*.035),bounceDuration=2*rebound/gravity;
+  const second=rebound*.28,secondDuration=2*second/gravity,landed=impact+bounceDuration+secondDuration;
+  let y:number;
+  if(t<impact)y=height+up*t-.5*gravity*t*t;
+  else if(t<impact+bounceDuration){const b=t-impact;y=rebound*b-.5*gravity*b*b;}
+  else if(t<landed){const b=t-impact-bounceDuration;y=second*b-.5*gravity*b*b;}
+  else y=0;
+  // Horizontal travel loses speed after first contact, then reaches a finite rest position.
+  const speed=2+i%7*.6,friction=4.5,slide=Math.min(Math.max(0,t-impact),speed/friction);
+  const travel=speed*Math.min(t,impact)+speed*slide-.5*friction*slide*slide;
+  const settle=Math.min(1,Math.max(0,(t-impact)/Math.max(.001,landed-impact)));
+  const tumble=Math.min(t,landed),a=i*2.399;
+  o.position.set(origin.x-travel,clearance+Math.max(0,y),origin.z+Math.sin(a)*travel*.22);
+  o.rotation.set((i+tumble*4)*(1-settle),i+tumble*6,(i+tumble*3)*(1-settle));
+  o.scale.setScalar(amount*(t>0?1:0));
+  // Support the actual rotated ribbon, rather than just clamping its centre.
+  if(o instanceof T.Mesh&&o.scale.x>0){
+   rotation.makeRotationFromEuler(o.rotation);const vertices=o.geometry.attributes.position;let bottom=Infinity;
+   for(let j=0;j<vertices.count;j++){point.fromBufferAttribute(vertices,j).applyMatrix4(rotation);bottom=Math.min(bottom,point.y*o.scale.y);}
+   o.position.y-=bottom;
+  }
+ });
 }
 /** Open sector plus hanging ribbons/cords; all vertices remain in the rolling wheel rig. */
 export function createTornCarcass(roll:T.Object3D,r:number,w:number){
