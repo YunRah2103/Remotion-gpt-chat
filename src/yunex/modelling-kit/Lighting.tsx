@@ -1,6 +1,7 @@
 import React,{useLayoutEffect} from 'react';
 import {useThree} from '@react-three/fiber';
 import * as T from 'three';
+import type {V3} from '../world-kit/geometry.ts';
 import {RoomEnvironment} from 'three/examples/jsm/environments/RoomEnvironment.js';
 /** Initialise reflections before Remotion's first frame advance, not in a later passive effect. */
 const StableReflections:React.FC=()=>{
@@ -11,11 +12,14 @@ const StableReflections:React.FC=()=>{
   room.dispose();pmrem.dispose();return()=>{scene.environment=previous;scene.environmentIntensity=intensity;env.dispose();};
  },[gl,scene]);return null;
 };
-export const CinematicLighting:React.FC=()=> <>
+export const CinematicLighting:React.FC<{focus?:V3;timeOfDay?:'day'|'dusk'|'night'}>=({focus=[0,0,0],timeOfDay='day'})=> {
+ const target=React.useMemo(()=>new T.Object3D(),[]);target.position.set(...focus);const night=timeOfDay==='night';
+ return <>
  <color attach="background" args={['#14232d']}/><fog attach="fog" args={['#14232d',95,260]}/>
- <hemisphereLight args={['#b1cbdc','#17212b',.55]}/>
- <directionalLight position={[4,7,4]} color="#fff0dd" intensity={3.2} castShadow shadow-mapSize={[1536,1536]} shadow-camera-left={-10} shadow-camera-right={10} shadow-camera-top={10} shadow-camera-bottom={-10} shadow-camera-far={35} shadow-bias={-.0003} shadow-normalBias={.015}/>
- <directionalLight position={[-5,2,-4]} color="#93d9d6" intensity={1.5}/>
- <directionalLight position={[1,5,-6]} color="#d5eaff" intensity={1.2}/>
+ <hemisphereLight args={['#b1cbdc','#17212b',night?.25:.55]}/><primitive object={target}/>
+ <directionalLight target={target} position={[focus[0]+4,focus[1]+7,focus[2]+4]} color="#fff0dd" intensity={night?.6:3.2} castShadow shadow-mapSize={[1536,1536]} shadow-camera-left={-10} shadow-camera-right={10} shadow-camera-top={10} shadow-camera-bottom={-10} shadow-camera-far={35} shadow-bias={-.0003} shadow-normalBias={.015}/>
+ <directionalLight position={[-5,2,-4]} color="#93d9d6" intensity={night?.4:1.5}/>
+ <directionalLight position={[1,5,-6]} color="#d5eaff" intensity={night?.3:1.2}/>
  <StableReflections/>
  </>;
+};

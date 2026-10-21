@@ -1,12 +1,15 @@
+import {premiumWorldDetail} from './world-detail.ts';
 import * as T from 'three';
 import {createEnvironment} from '../world-kit/environments.ts';
 import type {EnvironmentOptions} from '../world-kit/environments.ts';
 
 /** A separate factory: existing 20 environment IDs and their route geometry remain unchanged. */
-export function createCinematicEnvironment(options:EnvironmentOptions & {wetness?:number}){
+export function createCinematicEnvironment(options:EnvironmentOptions & {wetness?:number;quality?:'lightweight'|'standard'|'hero'}){
  const wet=options.wetness??0;if(!Number.isFinite(wet)||wet<0||wet>1)throw new Error('wetness must be 0..1');
+ const quality=options.quality??'hero';if(!['lightweight','standard','hero'].includes(quality))throw new Error('Unknown environment quality');
  const g=createEnvironment(options),roads=new Set(['road','boulevard','circuit-asphalt','runway','parking-asphalt','bridge-deck','forecourt']);
  g.traverse(o=>{if(!(o instanceof T.Mesh)||!roads.has(o.name))return;const mat=o.material as T.MeshStandardMaterial;mat.roughness=.86-wet*.63;mat.metalness=.025+wet*.12;mat.envMapIntensity=1.1;if(mat.bumpMap)mat.bumpScale=.0025;});
+ if(quality!=='lightweight')premiumWorldDetail(g,options,quality==='hero');
  g.userData.surfaceUpgrade='V2 wetness; original world/route preserved';return g;
 }
 /** Small, repeatable aggregate/patch maps, suitable for software WebGL. */

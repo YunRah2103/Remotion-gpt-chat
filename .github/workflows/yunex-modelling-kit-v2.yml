@@ -42,7 +42,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        composition: [KitA, KitB, KitC, KitD, KitE, KitAPortrait, KitBPortrait, KitCPortrait, KitDPortrait, KitEPortrait, KitBefore]
+        composition: [KitA, KitB, KitC, KitD, KitE, KitAPortrait, KitBPortrait, KitCPortrait, KitDPortrait, KitEPortrait, KitBefore, KitF, KitFPortrait, KitG, KitGPortrait, KitH, KitHPortrait, KitI, KitIPortrait, KitWorldBefore]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

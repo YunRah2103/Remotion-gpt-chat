@@ -9,6 +9,7 @@ import {animatePart} from '../parts-kit/motion.ts';
 import {createDriver,animateDriver} from './occupant.ts';
 import {createMechanicalSystems,animateMechanicalSystems,mechanicalLayout} from './systems.ts';
 import {batchVehicleDetails} from './optimize.ts';
+import {premiumExterior} from './exterior.ts';
 import {sculptShell,roadHeroDetails,formulaHeroDetails} from './premium.ts';
 import {tyreDetail,floorAssembly,suspensionLinks} from './details.ts';
 import {deformTyre,deformBody,createFragments,animateFragments,createTornCarcass,damageRim,groundTornCords} from './damage.ts';
@@ -36,7 +37,7 @@ export function createCinematicVehicle(options:CinematicOptions):T.Group{
    if(quality==='hero'){const roll=mount.getObjectByName('wheel-roll')!;tyreDetail(roll,s.radius,s.family==='formula'?.32:s.family==='sports'?.28:.235,options.tyreType==='slick'||s.family==='formula');}
   }else shell.add(o);
  }
- if(quality==='hero'){roadHeroDetails(shell,s);sculptShell(shell,s);formulaHeroDetails(shell,mounts,s);}
+ if(quality==='hero'){roadHeroDetails(shell,s);premiumExterior(shell,s);sculptShell(shell,s);formulaHeroDetails(shell,mounts,s);}
  // Material clones isolate fades/highlights between components and between vehicles.
  const originals=new Set<T.Material>();
  for(const scope of [shell,...mounts]){const clones=new Map<T.Material,T.Material>();scope.traverse(o=>{if(o instanceof T.Mesh){const clone=(m:T.Material)=>{let c=clones.get(m);if(!c){c=m.clone();clones.set(m,c);originals.add(m);}return c;};o.material=Array.isArray(o.material)?o.material.map(clone):clone(o.material);}});}
