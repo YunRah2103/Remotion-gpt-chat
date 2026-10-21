@@ -46,7 +46,7 @@ export const KitDemo:React.FC<{demo:'A'|'B'|'C';baseline?:boolean;variant?:Vehic
    <directionalLight position={[-3,3,-4]} intensity={1.6} color="#54d4cf"/>
    <Stage distance={distance} track={demo!=='A'}/><CameraAim position={position} target={target} fov={fov}/>
    <group rotation={[0,demo==='B'?damage*.055:0,0]}>
-    {baseline?<Vehicle variant={selected} distance={distance}/>:<CinematicVehicle options={{variant:selected,quality:'hero',color:selected==='supercar'?'#ca3948':selected==='hot-hatch'?'#2368b6':'#10a99e',lights:true}} state={state}/>}
+    {baseline?<Vehicle variant={selected} distance={distance} color={selected==='supercar'?'#ca3948':selected==='hot-hatch'?'#2368b6':'#10a99e'} lights/>:<CinematicVehicle options={{variant:selected,quality:'hero',color:selected==='supercar'?'#ca3948':selected==='hot-hatch'?'#2368b6':'#10a99e',lights:true}} state={state}/>}
    </group>
   </ThreeCanvas>
   <div style={{position:'absolute',left:'6%',top:'6%',color:'#e2f3f5',fontFamily:'Arial',fontSize:width*(portrait?.032:.018),letterSpacing:2}}>YUNEX / MODELLING KIT V2</div>

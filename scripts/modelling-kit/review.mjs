@@ -6,7 +6,7 @@ const serveUrl=await bundle({entryPoint:'src/yunex/modelling-kit/entry.tsx'});
 const browser=await openBrowser('chrome',{chromiumOptions:{gl:'swangle'}}),report=[];
 try{
  const requested=process.argv.find(v=>v.startsWith('--id='))?.slice(5);
- const ids=requested?[requested]:process.argv.includes('--portrait')?['KitAPortrait','KitBPortrait','KitCPortrait']:['KitA','KitB','KitC'];
+ const ids=process.argv.includes('--compare-only')?[]:requested?[requested]:process.argv.includes('--portrait')?['KitAPortrait','KitBPortrait','KitCPortrait']:['KitA','KitB','KitC'];
  for(const id of ids){
   const composition=await selectComposition({serveUrl,id,browserInstance:browser}),duration=composition.durationInFrames/24;
   for(const second of id.startsWith('KitA')?[.5,3.5,6.5]:id.startsWith('KitB')?[.5,2.4,3.5,5]:[.5,1.8,3.5,5.5]){

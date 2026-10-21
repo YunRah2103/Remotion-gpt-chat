@@ -44,7 +44,7 @@ export function createCinematicVehicle(options:CinematicOptions):T.Group{
   shell.traverse(o=>{if(['floor','floor-diffuser','pushrod','lower-wishbone'].includes(o.name))o.visible=false;if(o instanceof T.Mesh&&o.name===''&&o.geometry instanceof T.CylinderGeometry&&o.geometry.parameters.radiusTop===.025&&Math.abs(o.position.x)>.7&&o.position.y<.65)o.visible=false;});floor=floorAssembly(shell,s);
  }
  const links=mounts.map(m=>suspensionLinks(root,m,s));
- const sparks=new T.InstancedMesh(new T.SphereGeometry(.009,5,3),new T.MeshBasicMaterial({color:'#ffbd4f',toneMapped:false}),100);sparks.name='contact-sparks';sparks.frustumCulled=false;root.add(sparks);
+ const sparks=new T.InstancedMesh(new T.BoxGeometry(.10,.012,.012),new T.MeshBasicMaterial({color:'#ffbd4f',toneMapped:false}),100);sparks.name='contact-sparks';sparks.frustumCulled=false;root.add(sparks);
  const fragments=createFragments();root.add(fragments);
  const body=shell.getObjectByName('arched-body') as T.Mesh|undefined;
  if(body){const original=body.geometry,geometry=original.clone();original.dispose();geometry.deleteAttribute('normal');body.geometry=mergeVertices(geometry,.00001);geometry.dispose();body.geometry.computeVertexNormals();body.userData.restVertices=Array.from(body.geometry.attributes.position.array);}
@@ -78,6 +78,6 @@ export function animateCinematicVehicle(root:T.Group,state:CinematicState){
  if(floor){fade(floor,0);const carbon=floor.getObjectByName('carbon-floor')!;carbon.scale.z=1-cutaway*.65;carbon.position.z=-cutaway*s.width*.22;floor.traverse(o=>{if(o instanceof T.Mesh&&o.name==='metal-skid'){const m=o.material as T.MeshStandardMaterial;m.emissive.setHex(highlight==='underfloor'?0xeeb84e:0);m.emissiveIntensity=highlight==='underfloor'?.45:0;}});}
  const contact=!!floor&&.050+shell.position.y<=0&&exploded===0;
  sparks.visible=contact;const dummy=new T.Object3D(),t=state.frame/state.fps;
- for(let i=0;i<sparks.count;i++){const age=(t*3+i*.61803398875)%1,side=Math.sin(i*12.9);dummy.position.set(.8-age*2.8,.014+Math.sin(age*Math.PI)*(.05+(i%7)*.015),side*age*.65);dummy.scale.set(.8+age*2,.45, .45);dummy.rotation.z=-.2;dummy.updateMatrix();sparks.setMatrixAt(i,dummy.matrix);}sparks.instanceMatrix.needsUpdate=true;
+ for(let i=0;i<sparks.count;i++){const age=(t*3+i*.61803398875)%1,side=Math.sin(i*12.9);dummy.position.set((i%2?.8:-.8)-age*4.5,.014+Math.sin(age*Math.PI)*(.035+(i%7)*.012),side*age*.95);dummy.scale.set(.8+age*3.5,.65,.65);dummy.rotation.z=-.2;dummy.updateMatrix();sparks.setMatrixAt(i,dummy.matrix);}sparks.instanceMatrix.needsUpdate=true;
  root.updateMatrixWorld(true);
 }
