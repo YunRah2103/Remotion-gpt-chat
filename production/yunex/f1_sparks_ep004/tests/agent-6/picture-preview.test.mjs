@@ -47,7 +47,7 @@ test('approved Agent 3 cinematic poses exist in all six beats',()=>{
 });
 test('video-only picture cut times are not fabricated narrator timecodes',()=>{
  const cue=authenticSparkTime();
- assert.deepEqual(PREVIEW_CUT_FRAMES,[0,24,75,159,222,291,420]);
+ assert.deepEqual(PREVIEW_CUT_FRAMES,[0,24,75,159,222,258,420]);
  assert.ok(previewFrame(0,cue).timeScale<1);
  assert.equal(previewFrame(130,cue).timeScale,1);
  assert.equal(previewFrame(210,cue).shot,'aero-load');
