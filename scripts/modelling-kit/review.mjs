@@ -23,5 +23,5 @@ try{
   }
  }
  if(process.argv.includes('--compare'))for(const baseline of [false,true]){const composition=await selectComposition({serveUrl,id:'KitA',puppeteerInstance:browser,inputProps:{demo:'A',baseline}});for(const [frame,suffix] of [[30,''],[120,'-supercar'],[210,'-formula-modern']])await renderStill({serveUrl,composition,frame,output:`${out}/${baseline?'before':'after'}${suffix}.png`,scale,puppeteerInstance:browser,inputProps:{demo:'A',baseline}});}
- await writeFile(`${out}/render-report${process.argv.includes('--portrait')?'-portrait':''}.json`,JSON.stringify(report,null,2));
+ await writeFile(`${out}/render-report${requested?`-${requested}`:process.argv.includes('--portrait')?'-portrait':''}.json`,JSON.stringify(report,null,2));
 }finally{await browser.close({});}

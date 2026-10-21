@@ -41,7 +41,7 @@ export function createDriver(shell:T.Group,s:VehicleSpec,o:Partial<VehicleOption
   for(let i=0;i<4;i++)box(hand,mark,[.045*k,.013*k,.012*k],[.025*k,-.026*k,(i-1.5)*.014*k],.004,'finger');
   add(box(root,dark,[.21*k,.075*k,.085*k],[0,0,0],.018,`foot-${side}`));
   const existingPedals=shell.getObjectByName('pedals')?.children.filter(p=>p.name==='pedal');
-  const pad=formula?box(shell,dark,[.08,.035,.06],[.40,.38,(side==='left'?1:-1)*.07],.008,'formula-pedal'):existingPedals?.[side==='left'?0:1];
+  const pad=formula?box(shell,dark,[.08,.035,.06],[.40,.38,(side==='left'?1:-1)*.07],.008,'formula-pedal'):existingPedals?.[side==='left'?1:0];
   if(!pad)throw new Error('Missing pedal hardpoint');
   const pedalTarget=new T.Object3D();pedalTarget.name=`pedal-target-${side}`;pedalTarget.position.set(-.04*k,.04*k,0);pad.add(pedalTarget);
   const target=new T.Object3D();target.name=`grip-target-${side}`;if(formula)target.position.set((side==='left'?-1:1)*.11,0,0);else target.position.set(0,0,(side==='left'?1:-1)*.17*l.k);wheel.add(target);

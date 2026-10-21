@@ -91,7 +91,7 @@ python scripts/modelling-kit/verify.py
 Native compositions and default exports are 1920×1080 / 1080×1920, 30 fps.
 `--quick` explicitly requests 960×540 / 540×960 at 12 fps. Demo A is 9 s;
 B/C are 6 s. No narration or audio is added. Use the composition directly for full
-resolution. The workflow saves six MP4s, stills, GLBs, timings and decode evidence.
+resolution. The workflow requires eleven native MP4s, plus stills, GLBs, timings and decode evidence.
 
 ## Scope still outstanding
 
