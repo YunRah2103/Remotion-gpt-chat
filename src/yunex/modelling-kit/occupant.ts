@@ -1,4 +1,5 @@
 import * as T from 'three';
+import {toCreasedNormals} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {box,mesh,surface} from '../world-kit/geometry.ts';
 import {interiorLayout} from '../world-kit/interiors.ts';
 import type {VehicleSpec,VehicleOptions} from '../world-kit/catalog.ts';
@@ -50,6 +51,7 @@ export function createDriver(shell:T.Group,s:VehicleSpec,o:Partial<VehicleOption
  for(const name of ['belt-diagonal','belt-shoulder','belt-chest','belt-lower','belt-waist','belt-pelvis','belt-lap','belt-lap-outer','belt-lap-inner'])add(mesh(root,new T.BoxGeometry(.008,.045,1),belt,[0,0,0],[0,0,0],name));
  add(box(root,dark,[.045,.05,.065],[0,0,0],.008,'belt-latch'));
  const anchors=[hip.clone().add(v(-.18*k,.49*k,sign*.22*k)),hip.clone().add(v(.08*k,-.03*k,-sign*.22*k)),hip.clone().add(v(-.10*k,-.03*k,sign*.22*k))];
+ root.traverse(o=>{if(o instanceof T.Mesh&&o.geometry.type==='ExtrudeGeometry'){const old=o.geometry;o.geometry=toCreasedNormals(old,Math.PI/3);old.dispose();}});
  const radius=formula?.11:.17*l.k;rigs.set(root,{root,wheel,hip,k,radius,parts,anchors});animateDriver(root,0,0,0);return root;
 }
 export function animateDriver(root:T.Group,steer:number,braking:number,impact:number){
