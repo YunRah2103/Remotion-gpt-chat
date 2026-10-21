@@ -1,0 +1,66 @@
+name: YUNEX EP004 Agent 6 silent native picture review
+on:
+  pull_request:
+    branches: [production/yunex-ep004-base]
+    paths:
+      - 'production/yunex/f1_sparks_ep004/editor/**'
+      - 'production/yunex/f1_sparks_ep004/tests/agent-6/**'
+      - '.github/workflows/yunex-ep004-editor-picture-review.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-picture:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.head_ref == 'agent/ep004-06-editor' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Ensure ffmpeg and ffprobe
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          ffmpeg -version
+          ffprobe -version
+      - name: Strict Agent 6 tests and TypeScript
+        run: |
+          npx tsc -p production/yunex/f1_sparks_ep004/editor/tsconfig.json
+          node --experimental-strip-types --test production/yunex/f1_sparks_ep004/tests/agent-6/*.test.mjs
+      - name: Native real six-shot SILENT preview (not final voice picture)
+        run: |
+          mkdir -p out/ep004-editor
+          npx remotion render \
+            production/yunex/f1_sparks_ep004/editor/preview-entry.tsx \
+            EP004Agent6VideoOnlyReview out/ep004-editor/EP004-six-shot-video-only.mp4 \
+            --gl=swangle --codec=h264 --pixel-format=yuv420p \
+            --concurrency=2 --log=error
+      - name: Verify original native moving MP4 full frames and frame evidence
+        shell: bash
+        run: |
+          node production/yunex/f1_sparks_ep004/editor/native-qa.mjs \
+            out/ep004-editor/EP004-six-shot-video-only.mp4 420
+          ffprobe -v error -show_entries stream=codec_type,nb_read_frames,width,height,avg_frame_rate -count_frames -of json \
+            out/ep004-editor/EP004-six-shot-video-only.mp4 > out/ep004-editor/probe.json
+          test "$(ffprobe -v error -select_streams a -show_entries stream=index -of csv=p=0 out/ep004-editor/EP004-six-shot-video-only.mp4 | wc -l)" = "0"
+          python3 - <<'PY'
+          import os,subprocess
+          movie='out/ep004-editor/EP004-six-shot-video-only.mp4'
+          for i,frame in enumerate([0,8,23,24,52,75,116,159,188,222,258,291,345,419]):
+              target=f'out/ep004-editor/story-beat-{i:02}-frame-{frame:03}.png'
+              subprocess.run(['ffmpeg','-hide_banner','-loglevel','error','-y','-i',movie,
+                '-vf',f'select=eq(n\\,{frame})','-frames:v','1',target],check=True)
+              assert os.path.getsize(target)>300
+          PY
+      - name: Upload genuine MP4 and inspection frames (even on QA failure)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EP004-Agent6-SILENT-six-shot-native-review
+          path: out/ep004-editor
+          retention-days: 30
+          if-no-files-found: warn
