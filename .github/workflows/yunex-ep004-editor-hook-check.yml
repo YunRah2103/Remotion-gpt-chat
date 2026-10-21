@@ -1,0 +1,43 @@
+name: YUNEX EP004 Agent 6 first-second real contact review
+on:
+  pull_request:
+    branches: [production/yunex-ep004-base]
+    paths:
+      - '.github/workflows/yunex-ep004-editor-hook-check.yml'
+permissions:
+  contents: read
+jobs:
+  opening-native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Render first 2 seconds of the ACTUAL Agent6 picture
+        run: |
+          mkdir -p out/ep004-hook
+          npx remotion render production/yunex/f1_sparks_ep004/editor/preview-entry.tsx \
+            EP004Agent6VideoOnlyReview out/ep004-hook/real-contact-hook.mp4 \
+            --frames=0-59 --gl=swangle --codec=h264 --pixel-format=yuv420p \
+            --concurrency=2 --log=error
+      - name: Verify motion + export exact opening frames
+        shell: bash
+        run: |
+          node production/yunex/f1_sparks_ep004/editor/native-qa.mjs \
+            out/ep004-hook/real-contact-hook.mp4 60 --video-only
+          for n in 0 3 8 14 20 23 29 40 59; do
+            ffmpeg -loglevel error -y -i out/ep004-hook/real-contact-hook.mp4 \
+              -vf "select=eq(n\\,$n)" -frames:v 1 out/ep004-hook/frame-$n.png
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EP004-Agent6-V2-authentic-spark-opening-native
+          path: out/ep004-hook
+          retention-days: 30
+          if-no-files-found: warn
