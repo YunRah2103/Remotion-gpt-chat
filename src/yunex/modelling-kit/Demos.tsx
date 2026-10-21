@@ -3,20 +3,12 @@ import {AbsoluteFill,useCurrentFrame,useVideoConfig} from 'remotion';
 import {ThreeCanvas} from '@remotion/three';
 import {CameraAim,WorldLighting,Vehicle} from '../world-kit/components';
 import {CinematicVehicle} from './components';
+import {CinematicStage} from './Stage';
 import {HERO_VEHICLES} from './rig.ts';
 import type {CinematicState} from './rig.ts';
 import type {V3} from '../world-kit/geometry.ts';
 import type {VehicleVariant} from '../world-kit/catalog.ts';
 const smooth=(a:number,b:number,t:number)=>{const u=Math.max(0,Math.min(1,(t-a)/(b-a)));return u*u*(3-2*u);};
-/** Shared local rendering look; no external textures, HDRIs or post-process grain. */
-const Stage:React.FC<{distance:number;track:boolean}>=({distance,track})=><>
- <mesh rotation={[-Math.PI/2,0,0]} position={[0,-.016,0]} receiveShadow><planeGeometry args={[240,240]}/><meshStandardMaterial color={track?'#252d36':'#26343a'} roughness={track?.77:.36} metalness={track?.05:.2}/></mesh>
- {track&&<group position={[-distance%8,0,0]}>{Array.from({length:26},(_,i)=><group key={i} position={[(i-13)*8,0,0]}>
-  <mesh rotation={[-Math.PI/2,0,0]} position={[0,-.012,-2.8]}><planeGeometry args={[3,.10]}/><meshStandardMaterial color="#dbe6e6" roughness={.7}/></mesh>
-  {[-1,1].map(side=><group key={side} position={[0,0,side*4]}><mesh position={[0,.30,0]} castShadow><boxGeometry args={[7.9,.60,.23]}/><meshStandardMaterial color="#596975" metalness={.6} roughness={.4}/></mesh><mesh position={[0,.025,-side*.25]}><boxGeometry args={[4,.05,.5]}/><meshStandardMaterial color={i%2?'#c24b40':'#c7c9c5'} roughness={.8}/></mesh></group>)}
- </group>)}</group>}
-
-</>;
 export const KitDemo:React.FC<{demo:'A'|'B'|'C';baseline?:boolean;variant?:VehicleVariant}>=({demo,baseline=false,variant})=>{
  const frame=useCurrentFrame(),{fps,width,height}=useVideoConfig(),t=frame/fps,portrait=height>width;
  const selected=variant??(demo==='A'?HERO_VEHICLES[Math.min(2,Math.floor(t/3))]:demo==='B'?'hot-hatch':'formula-modern');
@@ -44,7 +36,7 @@ export const KitDemo:React.FC<{demo:'A'|'B'|'C';baseline?:boolean;variant?:Vehic
    <WorldLighting timeOfDay="night"/>
    <directionalLight position={[4,6,3]} intensity={1.8} color="#e2f0ff"/>
    <directionalLight position={[-3,3,-4]} intensity={1.6} color="#54d4cf"/>
-   <Stage distance={distance} track={demo!=='A'}/><CameraAim position={position} target={target} fov={fov}/>
+   <CinematicStage distance={distance} track={demo!=='A'} wetness={demo==='A'?.35:.45}/><CameraAim position={position} target={target} fov={fov}/>
    <group rotation={[0,demo==='B'?damage*.055:0,0]}>
     {baseline?<Vehicle variant={selected} distance={distance} color={selected==='supercar'?'#ca3948':selected==='hot-hatch'?'#2368b6':'#10a99e'} lights/>:<CinematicVehicle options={{variant:selected,quality:'hero',color:selected==='supercar'?'#ca3948':selected==='hot-hatch'?'#2368b6':'#10a99e',lights:true}} state={state}/>}
    </group>

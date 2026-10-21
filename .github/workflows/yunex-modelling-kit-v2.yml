@@ -12,7 +12,7 @@ permissions:
 jobs:
   native-review:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -24,7 +24,7 @@ jobs:
       - run: node --experimental-strip-types --test tests/modelling-kit/*.test.mjs tests/world-kit/*.test.mjs tests/parts-kit/*.test.mjs
       - run: node --experimental-strip-types scripts/modelling-kit/export.mjs
       - run: node scripts/modelling-kit/review.mjs --compare
-      - run: node scripts/modelling-kit/review.mjs --portrait
+      - run: node scripts/modelling-kit/review.mjs --id=KitBefore
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - run: python -m pip install numpy
       - run: python scripts/modelling-kit/verify.py
@@ -32,5 +32,7 @@ jobs:
         if: always()
         with:
           name: YUNEX-MODELLING-KIT-V2-REVIEW
-          path: out/modelling-kit-v2
+          path: |
+            out/modelling-kit-v2-hd
+            out/modelling-kit-v2/glb
           retention-days: 30

@@ -10,7 +10,7 @@ const out='out/modelling-kit-v2/glb';await mkdir(out,{recursive:true});const man
 for(const variant of HERO_VEHICLES)for(const pose of ['intact','mechanical']){
  const g=createCinematicVehicle({variant,quality:'hero'});animateCinematicVehicle(g,{frame:40,fps:24,cutaway:pose==='mechanical'?.98:0,exploded:pose==='mechanical'?.4:0});
  // Rest arrays are runtime data, not model metadata; exported pose is intentionally baked.
- g.traverse(o=>{for(const key of ['restVertices','baseline','link','restPosition','rest','motion','explode'])delete o.userData[key];});
+ g.traverse(o=>{for(const key of ['restVertices','restIndex','rimRest','lastDamage','lastRimDamage','lastBodyDamage','baseline','link','restPosition','rest','motion','explode'])delete o.userData[key];});
  const binary=await new GLTFExporter().parseAsync(g,{binary:true,onlyVisible:true}),bytes=Buffer.from(binary);assert.equal(bytes.toString('ascii',0,4),'glTF');
  const loaded=await new GLTFLoader().parseAsync(binary,'');let wheels=0;loaded.scene.traverse(o=>{if(o.userData.wheel)wheels++;});assert.equal(wheels,4);assert.ok(new Box3().setFromObject(loaded.scene).max.y>0);
  await writeFile(`${out}/${variant}-${pose}.glb`,bytes);manifest.push({variant,pose,bytes:bytes.length,wheels,animation:'baked pose; recreate TS rig for damage/cutaway animation'});disposeObject(g);disposeObject(loaded.scene);

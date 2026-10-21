@@ -34,7 +34,9 @@ export function suspensionLinks(root:T.Group,mount:T.Group,s:VehicleSpec){
   const a:[number,number,number]=[x+dx,s.radius+h,side*s.width*.20],b:[number,number,number]=[x,s.radius+h*.3,mount.position.z-side*.07];
   const link=rod(g,carbon,a,b,.018);link.name='wishbone';link.userData.link={a,b};
  }
- const a:[number,number,number]=[x-.12,s.radius+.30,side*s.width*.25],b:[number,number,number]=[x,s.radius,mount.position.z-side*.09];
+ const formula=s.family==='formula';
+ const a:[number,number,number]=formula?[x*.62,s.radius+.26,side*.18]:[x-.12,s.radius+.30,side*s.width*.25],b:[number,number,number]=formula?[x*.62+.10,s.radius+.08,side*.18]:[x,s.radius,mount.position.z-side*.09];
+ if(formula){const p=rod(g,carbon,[x*.62,s.radius+.20,side*.22],[x,s.radius+.02,mount.position.z-side*.07],.012);p.name='inboard-pushrod';p.userData.link={a:[x*.62,s.radius+.20,side*.22],b:[x,s.radius+.02,mount.position.z-side*.07]};}
  const damper=rod(g,metal,a,b,.026);damper.name='damper';damper.userData.link={a,b};
  const curve=new T.CatmullRomCurve3(Array.from({length:97},(_,i)=>{const t=i/96;return new T.Vector3(Math.cos(t*Math.PI*14)*.05,t,Math.sin(t*Math.PI*14)*.05);}));
  const spring=mesh(g,new T.TubeGeometry(curve,96,.008,5,false),accent);spring.name='coil-spring';spring.userData.link={a,b,unit:true};

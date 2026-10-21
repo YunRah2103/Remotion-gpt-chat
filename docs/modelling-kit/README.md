@@ -1,4 +1,4 @@
-# YUNEX modelling kit V2 — first working slice
+# YUNEX modelling kit V2 — continuing upgrade
 
 An opt-in Three.js rig on top of the current 35 vehicles and 55 parts. Existing
 `createVehicle`, `animateVehicle`, `createPart`, `animatePart`, environments,
@@ -43,7 +43,10 @@ not manufacturer CAD. Do not describe these animations as validated simulations.
 | hero | Initial showcased presets: hot-hatch, supercar, formula-modern | Standard features, instanced rolling tread, sidewall moulding, lacquer/satin tuning |
 
 Hero is an inspection/detail tier, **not a claim of finished premium exterior modelling**.
-The existing silhouettes, lights, glazing, interiors and wings are retained. The
+Existing family identities and cabin hardpoints are retained. Hero road variants
+get coordinated nose/shoulder surface changes, LED signatures and mounted sport seats;
+the modern Formula hero gets shaped multi-element wings, venturi tubes, floor
+fences, inboard spring/pushrod detail and rolling aero wheel covers. The
 Formula preset adds a distinct carbon floor, tan composite plank and metallic skids.
 Cutaway progressively sections the carbon panel so plank and skid remain visible.
 Other variants accept hero detail but have not all received individual visual review.
@@ -85,19 +88,41 @@ node scripts/modelling-kit/review.mjs --portrait
 python scripts/modelling-kit/verify.py
 ```
 
-Native compositions are 1920×1080 / 1080×1920, 24 fps. CPU inspection exports are
-960×540 / 540×960, 12 fps (explicitly not full-resolution final films). Demo A is 9 s;
+Native compositions and default exports are 1920×1080 / 1080×1920, 30 fps.
+`--quick` explicitly requests 960×540 / 540×960 at 12 fps. Demo A is 9 s;
 B/C are 6 s. No narration or audio is added. Use the composition directly for full
 resolution. The workflow saves six MP4s, stills, GLBs, timings and decode evidence.
 
 ## Scope still outstanding
 
-Bespoke higher fidelity body shells, a redesigned Formula aero package, wheel-rim
-fracture, a shredded/open tyre mesh, connected turbo airflow, full vehicle drivetrain,
-impact impulses and a per-environment V2 refresh remain future work. Existing 20
-worlds are preserved; the demos add their own shared procedural track/studio stage.
+Complete bespoke exterior retopology, separated wheel-rim fracture pieces, connected
+turbo airflow, a full vehicle drivetrain and validated impact impulses remain future work. Existing 20
+worlds are preserved. `createCinematicEnvironment({...options, wetness:0.7})` adds
+optional road-material tuning; `CinematicStage` adds aggregate, wet sheen, kerbs,
+barriers, light poles and a procedural contact-shadow approximation.
 The demonstrations do not replace EP003/EP004. A nominal three-vehicle showcase is
 not evidence that all 35 vehicles are visually approved. See QA.md for actual evidence.
 
 For three-axle tractor units, the additional axle uses `rear-aux-left` /
 `rear-aux-right`; the two rear axles never share a damage selector.
+
+## Continued geometry and damage pass
+
+`failureFrame` optionally sets fragment ejection onset in Remotion frames. Torn
+sector topology, rim denting and hanging cords are reversible on seek. Ejected
+rubber strips follow a prescribed gravity/bounce path rather than respawning in a
+loop. These are visual demonstrations, not a tyre failure prediction model.
+
+`optimize:false` disables static-detail batching for debugging/comparisons. Default
+batching combines spokes, bolts, sidewall marks and grille details within their
+own parent/pivot and material; tyres, rims and articulated parts stay separate.
+Healthy tyre/body geometry updates are cached until damage changes. All existing
+35 variants still accept the standard/lightweight tiers; the strongest exterior
+changes are in the road families, and the Formula aero pass targets formula-modern.
+
+Full HD review outputs are in `out/modelling-kit-v2-hd`. Render the matched moving
+legacy baseline with `node scripts/modelling-kit/review.mjs --id=KitBefore` and
+verify with `python scripts/modelling-kit/verify.py out/modelling-kit-v2-hd`.
+The baseline shares camera, lighting, paint and environment with the first two
+seconds of the updated showcase. These are native 30 fps renders, without optical
+flow or repeated-frame interpolation.
