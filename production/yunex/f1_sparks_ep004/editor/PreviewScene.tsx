@@ -10,7 +10,7 @@ import {ThreeCanvas} from '@remotion/three';
 import type {SparkParticle,StoryRequest,CameraPose} from '../shared/contract.ts';
 import {F1HeroVehicle,getSkidDescriptors} from '../mechanics/index.ts';
 import {sampleDynamics,sampleContactDrivenSparks} from '../physics/index.ts';
-import {NightCircuitWorld} from '../look/index.ts';
+import {NightCircuitWorld} from '../look/NightCircuitWorld.tsx';
 import {sampleRetimedShotCamera} from '../cinema/cameras.ts';
 import {ApplyCameraPose} from '../cinema/ShotCamera.tsx';
 import {CutawayHero} from '../previews/agent-3/CutawayHero.tsx';
