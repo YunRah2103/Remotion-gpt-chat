@@ -110,3 +110,37 @@ node --experimental-strip-types --test production/yunex/f1_sparks_ep004/tests/ag
 ```
 
 **No new playable Agent 6 final MP4 or true narrator is supplied by these improvements.** All original-VO gate conditions still apply; do not merge the editor film as complete without accepted Agents 3+5, integrated `entry.tsx`, recorded EP004 voice, verified word timings and actual MP4/full-frame/audio/visual proofs.
+
+## 21 October — Agent 5 merged, Agent 3 six-shot handoff **prepared**
+
+Source synchronization: manager-accepted Agent 5 [PR #224](https://github.com/YunRah2103/Remotion-gpt-chat/pull/224) (merge `6215ff09`) is present in this branch, alongside the previously approved actual car, skid, physics and night road. Guarded, two-parent sync merge `55d21808` copied manager base with no EP003/main/Agent 3 changes.
+
+**Editorial orchestration rule:** Agent 6 `buildPicturePlan` (cuts derived from **measured original VO words**) controls global movie duration and shot boundaries. Do **not** insert Agent 5 `DEFAULT_BEATS`, `StorySequence` fixture timecodes, `HOOK_STORY_CAPTIONS`, `MIDDLE_STORY_CAPTIONS` or Agent 5's preview cinematography into the final VO film: those are artist/story guides, **not** the original recording. The adapter consumes the **approved** story semantics instead:
+
+- `editor/story-request.ts:buildRealStoryRequest(props)`: uses `sourceSec` to sample current approved Agent 1 skid descriptors + Agent 2 `sampleDynamics/sampleContactDrivenSparks` + Agent 4 matched asphalt and returns an actual `StoryRequest`. It never synthesizes an independent route or particle.
+- `editor/story-bridge.tsx:makeApprovedStoryVisualShot(renderApprovedCameraShot,projectApprovedMetalSkid?)`: renders real Agent 5 `getStoryVisualCue` and physics-grounded `StoryOverlay` labels around a **required, externally manager-approved Agent 3 camera renderer**. Only shows a METAL SKID label when the real plate has a valid projected screen anchor. It sends `showCaptions={false}` to Agent 5 to avoid duplicating actual burned-in word subtitles.
+- `editor/PictureEdit.tsx`: owns the **one authoritative** word-highlighted subtitle track and original audio at full level. Layout now consumes Agent 5's `captionSizing` (portrait minimum 326px bottom reserve, 9% width gutter), with existing extra max-width constraints retained.
+- `editor/camera-handoff.ts:deriveCameraHandoff(plan)`: declares exactly six cut positions, frame counts and voice/source second ranges **only after actual original word timestamps are verified**. It exposes per-cut `incomingCut` and `incomingBlendFrames`: ~0.18s handle maximum, further clamped to both adjacent shots; a spark-contact flash-forward into earlier physical story time has `incomingCut:'hard-time-jump'` and 0 blend. No arbitrary route restart or optical crossfade across incompatible physics instants. Each scene requires at least 18 actual frames (0.6 seconds) for full cinematic/motion QA.
+
+**Agent 3 final camera integration handoff (still awaiting #218 approval):**
+```tsx
+import {makeEP004PictureEdit} from './editor/PictureEdit';
+import {makeApprovedStoryVisualShot} from './editor/story-bridge';
+import {deriveCameraHandoff} from './editor/camera-handoff';
+
+// AFTER manager accepts Agent 3 and creates a genuine renderer:
+const IntegratedVisualShot=makeApprovedStoryVisualShot(
+  ({request,cue,voiceSec})=>/* real Agent 3 camera, A1 car, A4 road,
+    A2 contact-born particles, cue.sectionReveal01 and real perspective */,
+  (request)=>/* actual metal skid projected with approved camera pose, or undefined */
+);
+const PictureWithCaptions=makeEP004PictureEdit(IntegratedVisualShot);
+// Clean and captioned compositions use the identical component, original VO
+// and audio-derived frame count. Set showCaptions per actual render props.
+// deriveCameraHandoff(plan) gives the source/exact frame cut seam contract.
+```
+The snippets above are **interface descriptions, not usable fabricated footage**. Manager must supply actual Agent 3 approved camera exports and register real Remotion compositions. Preview rigs, static fallback meshes and a mock recording are forbidden.
+
+**Original audio requirement — NOT PRESENT:** a genuinely recorded EP004 British-male voice `.wav`/`.mp3` file, an addressable Remotion audio URL to that very same recording, `ffprobe`-measured duration, every spoken word's actual `startSec` / `endSec`, and six semantic source-word cut indices (opening index 0). No fallback to EP003 Cedar, arbitrary generated narrator, invented word timings, or Agent 5 preview sample text. Audio output in both finished MP4s is individually PCM envelope-compared to the original supplied recording, then listened to by a reviewer.
+
+**Source-handle limits:** camera/scene clips only borrow <= 0.18 seconds when corresponding physical source times are continuous across cuts and both shot intervals accommodate that handle; never take frames from negative time, after recorded VO end or across an unapproved camera time jump. Visual/temporal proof still requires 1080x1920/30fps full-decoded moving pixels in each six-shot interval of **both** real final MP4s. This plan is source-only preparation, NOT an approved picture render.
