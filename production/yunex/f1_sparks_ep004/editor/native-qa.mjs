@@ -125,6 +125,6 @@ export function verifyNativeMp4(filePath, expectedFrames, {audioRequired = true,
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const file = process.argv[2], frames = Number(process.argv[3]);
-  if (!file || !frames) throw new Error('Usage: node native-qa.mjs path-to-native.mp4 expected-frame-count');
-  process.stdout.write(JSON.stringify(verifyNativeMp4(file, frames), null, 2) + '\n');
+  if (!file || !frames || ![undefined,'--video-only'].includes(process.argv[4])) throw new Error('Usage: node native-qa.mjs path-to-native.mp4 expected-frame-count [--video-only]');
+  process.stdout.write(JSON.stringify(verifyNativeMp4(file, frames, {audioRequired:process.argv[4]!=='--video-only'}), null, 2) + '\n');
 }
