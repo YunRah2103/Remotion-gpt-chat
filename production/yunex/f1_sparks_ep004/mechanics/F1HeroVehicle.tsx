@@ -40,6 +40,30 @@ function link(parent:T.Group,name:string,a:readonly [number,number,number],
   m.castShadow=true;parent.add(m);
   return m;
 }
+/** Smooth longitudinal loft avoids a blocky nose without changing any kit pivot. */
+function aeroLoft(parent:T.Group,name:string,sections:readonly {
+ x:number;y:number;halfHeight:number;halfWidth:number
+}[],material:T.Material):T.Mesh {
+ const verts:number[]=[];const indices:number[]=[];const around=20;
+ for(const sec of sections)for(let k=0;k<around;k++){
+   const a=k*2*Math.PI/around;
+   verts.push(sec.x,sec.y+sec.halfHeight*Math.sin(a),sec.halfWidth*Math.cos(a));
+ }
+ for(let i=0;i<sections.length-1;i++)for(let k=0;k<around;k++){
+   const a=i*around+k,b=i*around+(k+1)%around;
+   indices.push(a,a+around,b,b,a+around,b+around);
+ }
+ for(let side=0;side<2;side++){
+   const i=side*(sections.length-1)*around;
+   for(let k=1;k<around-1;k++)indices.push(i,i+(side?k+1:k),i+(side?k:k+1));
+ }
+ const geometry=new T.BufferGeometry();
+ geometry.setAttribute('position',new T.Float32BufferAttribute(verts,3));
+ geometry.setIndex(indices);geometry.computeVertexNormals();
+ const m=new T.Mesh(geometry,material);m.name=name;m.castShadow=true;m.receiveShadow=true;
+ parent.add(m);return m;
+}
+
 const WHEEL_IDS: Readonly<Record<string, WheelId>>={
   '1.71,0.83':'front-left', '1.71,-0.83':'front-right',
   '-1.71,0.83':'rear-left', '-1.71,-0.83':'rear-right',
@@ -51,8 +75,8 @@ const WHEEL_IDS: Readonly<Record<string, WheelId>>={
  */
 export function buildF1HeroVehicle(): T.Group {
   const root=createVehicle({
-    variant:'formula-modern', color:'#12ada8', accent:'#dd9754',
-    wheelColor:'#b0c4d0', lights:true, interior:false,
+    variant:'formula-modern', color:'#0c8091', accent:'#ffb45e',
+    wheelColor:'#6e8592', lights:true, interior:false,
   });
   root.name='EP004-F1-HERO';
   const carbon=physical('#111b20',.32,.48);
@@ -61,7 +85,11 @@ export function buildF1HeroVehicle(): T.Group {
   const titaniumEdge=physical('#d9bfa4',.77,.32);
   const brass=physical('#b59158',.75,.35);
   const liner=physical('#352f2a',.04,.82);
-  const aeroPaint=physical('#0a908d',.52,.22,.9);
+  const aeroPaint=physical('#047d99',.62,.20,.95);
+  const sapphire=physical('#062f43',.58,.24,.95);
+  const highlight=physical('#24d5c4',.68,.19,.95);
+  const satin=physical('#59666e',.73,.28);
+  const tyreTrim=physical('#2f3840',.05,.84);
 
   // Structural carbon floor is immediately below, and physically mounted to, the kit floor.
   // No disembodied plank/slab: its longitudinal side ribs and bridge saddles mount to this floor.
@@ -145,6 +173,80 @@ export function buildF1HeroVehicle(): T.Group {
       }
     }
   }
+  // V2 aerodynamic refinement: continuous profiled nose, stepped wings,
+  // inset sidepod intake channels, rear diffuser and unbranded wheel graphics.
+  // All parts are mounted to the same vehicle root and preserve wheel factories.
+  aeroLoft(root,'EP004-V2-sculpted-nose',[
+    {x:.68,y:.48,halfHeight:.205,halfWidth:.27},
+    {x:1.12,y:.455,halfHeight:.16,halfWidth:.245},
+    {x:1.70,y:.37,halfHeight:.115,halfWidth:.152},
+    {x:2.22,y:.298,halfHeight:.083,halfWidth:.09},
+    {x:2.54,y:.272,halfHeight:.044,halfWidth:.058},
+  ],aeroPaint);
+  // Tapered engine-cowl dorsal ridge and clean paint/carbon separation.
+  aeroLoft(root,'EP004-V2-engine-spine',[
+    {x:-1.84,y:.67,halfHeight:.05,halfWidth:.095},
+    {x:-1.43,y:.78,halfHeight:.16,halfWidth:.145},
+    {x:-.96,y:.91,halfHeight:.13,halfWidth:.128},
+    {x:-.68,y:.83,halfHeight:.08,halfWidth:.118},
+  ],sapphire);
+  tube(root,'EP004-V2-engine-spine-accent',
+    [[-1.73,.716,0],[-1.34,.939,0],[-1.00,1.040,0],[-.76,.938,0]],.009,highlight);
+  for(const sign of [-1,1]){
+    // Front wing has stacked carbon main plane, two narrow flaps and endplate.
+    block(root,'EP004-V2-front-flap-inner',[.28,.021,.83],[2.34,.356,sign*.46],carbon);
+    block(root,'EP004-V2-front-flap-upper',[.24,.018,.73],[2.17,.422,sign*.52],aeroPaint);
+    block(root,'EP004-V2-wing-edge',[.055,.013,.77],[2.46,.337,sign*.50],highlight);
+    block(root,'EP004-V2-front-endplate',[.43,.24,.022],[2.33,.342,sign*.996],sapphire);
+    block(root,'EP004-V2-endplate-tip',[.25,.018,.027],[2.43,.468,sign*.999],highlight);
+    // Dark intake funnels read as open channels, not body-colour bricks.
+    block(root,'EP004-V2-sidepod-inlet',[.17,.16,.056],[-.07,.505,sign*.728],carbon);
+    block(root,'EP004-V2-sidepod-inlet-rim',[.018,.175,.061],[.015,.506,sign*.733],highlight);
+    for(let i=0;i<3;i++){
+      block(root,'EP004-V2-sidepod-vortex-vane',[.35,.015,.045],
+        [-.37-i*.22,.345+i*.015,sign*(.73+i*.014)],sapphire);
+    }
+    // Floor remains thin, with aerodynamic body-mounted edges away from skids.
+    block(root,'EP004-V2-floor-tunnel-fence',[2.58,.044,.018],
+      [-.43,.245,sign*.744],carbon);
+    block(root,'EP004-V2-floor-edge-highlight',[2.60,.011,.017],
+      [-.42,.267,sign*.744],highlight);
+    // Rear diffuser strakes grow out of the rear underfloor assembly.
+    for(let i=0;i<4;i++){
+      block(root,'EP004-V2-diffuser-strake',[.66,.12,.021],
+        [-1.80,.20,sign*(.15+i*.145)],carbon);
+    }
+    // Multi-element rear wing and braced swan-neck mounts.
+    block(root,'EP004-V2-rear-upper-flap',[.24,.031,.77],
+      [-2.19,1.145,sign*.44],sapphire);
+    block(root,'EP004-V2-rear-wing-highlight',[.031,.015,.72],
+      [-2.055,1.15,sign*.44],highlight);
+    block(root,'EP004-V2-rear-endplate',[.39,.29,.025],
+      [-2.20,1.035,sign*.85],carbon);
+    link(root,'EP004-V2-wing-support',[-1.69,.59,sign*.20],
+      [-2.13,1.055,sign*.23],.020,satin);
+    // No team marks or sponsored logos.
+    tube(root,'EP004-V2-halo-highlight',
+      [[-.69,.82,sign*.20],[-.59,1.03,sign*.18],[-.37,1.07,sign*.015]],
+      .009,highlight);
+  }
+  // Wheel styling follows the REAL wheel-roll node; steering/suspension pivot
+  // and wheel phase are still exclusively controlled by the kit.
+  root.traverse(o=>{
+    if(!(o instanceof T.Group)||o.name!=='wheel-roll')return;
+    for(const sign of [-1,1]){
+      const z=sign*.32*.50; // factory Formula tyre width is .32m
+      const trimRing=new T.Mesh(new T.TorusGeometry(.251,.008,8,64),tyreTrim);
+      trimRing.name='EP004-V2-tyre-sidewall-ring';trimRing.position.z=z;
+      o.add(trimRing);
+      const innerRing=new T.Mesh(new T.TorusGeometry(.215,.005,8,64),highlight);
+      innerRing.name='EP004-V2-rim-accent-ring';innerRing.position.z=sign*.169;
+      o.add(innerRing);
+      const hub=new T.Mesh(new T.CylinderGeometry(.055,.055,.01,32),sapphire);
+      hub.name='EP004-V2-wheel-hub-cap';hub.rotation.x=Math.PI/2;
+      hub.position.z=sign*.182;o.add(hub);
+    }
+  });
   // Give the kit's body a local, independently adjustable fade for reveal shots.
   root.traverse(o=>{
     if(!(o instanceof T.Mesh))return;
