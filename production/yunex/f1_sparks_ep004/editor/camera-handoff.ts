@@ -48,7 +48,11 @@ export function deriveCameraHandoff(plan:PicturePlan, desiredBlendSec=0.18):read
       throw new Error('EP004 camera handoff: bad real source-time anchor at shot '+index);
     const physicsEndSecExclusive=physicsStartSec+cut.durationFrames/EP004_FPS;
     const previous=output.at(-1);
-    const sourceContinuous=previous!==undefined
+    // Even when the selected real spark moment accidentally numerically aligns
+    // with the first VO cut, a declared flash-forward is a deliberate story jump.
+    // Never hide that jump with a false optical dissolve.
+    const intentionalHookFlashforward=index===1 && plan.cuts[0].sourceStartSec!==undefined;
+    const sourceContinuous=previous!==undefined && !intentionalHookFlashforward
       &&Math.abs(physicsStartSec-previous.physicsEndSecExclusive)<1/EP004_FPS+1e-7;
     const allowable=index===0?0:sourceContinuous
       ? Math.min(blended,Math.floor((cut.durationFrames-1)/3),Math.floor((previous!.frameCount-1)/3))
