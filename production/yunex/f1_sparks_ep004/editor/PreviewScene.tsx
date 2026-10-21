@@ -17,6 +17,7 @@ import {CutawayHero} from '../previews/agent-3/CutawayHero.tsx';
 import {getStoryVisualCue} from '../story/visual-cues.ts';
 import {projectedActualParts} from '../story/project-actual-parts.ts';
 import {CinematicSparkGlints} from './CinematicSparkGlints.tsx';
+import {contextualContactCamera} from './macro-camera.ts';
 import {PREVIEW_TOTAL_FRAMES,previewFrame,authenticSparkTime} from './preview-plan.ts';
 const skids=getSkidDescriptors();
 
@@ -94,8 +95,10 @@ export const EP004VideoOnlyReview:React.FC=()=>{
  // Editorial lens trim of the already approved Agent 3 rig, never a new car path.
  // Keep the full vehicle legible in the stable aero comparison and moving exit.
  const framing=part.shot==='aero-load'?.81:part.shot==='racing-payoff'?.92:1;
- const camera={...preset,positionWorld:preset.positionWorld.map((v,i)=>
-  preset.targetWorld[i]+(v-preset.targetWorld[i])*framing) as [number,number,number]};
+ const camera=part.shot==='contact-macro'
+  ?contextualContactCamera(preset)
+  :{...preset,positionWorld:preset.positionWorld.map((v,i)=>
+    preset.targetWorld[i]+(v-preset.targetWorld[i])*framing) as [number,number,number]};
  // No fixed caption or invented VO transcript; these are factual on-screen
  // material labels kept well above the lower 326px phone UI reserve.
  return <AbsoluteFill style={{background:'#060e16',overflow:'hidden'}}>
