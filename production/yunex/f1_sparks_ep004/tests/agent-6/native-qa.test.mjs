@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
-import {validateVideoMetadata, uniqueDecodedFrameHashes, VIDEO_HASH_STREAM_SELECTOR, beatMotionFrameNumbers, assertEachBeatChanges} from '../../editor/native-qa.mjs';
+import {validateVideoMetadata, uniqueDecodedFrameHashes, VIDEO_HASH_STREAM_SELECTOR, VIDEO_MOTION_HASH_FPS, beatMotionFrameNumbers, assertEachBeatChanges} from '../../editor/native-qa.mjs';
 const metadata = () => ({
   streams: [
     {codec_type:'video',width:1080,height:1920,avg_frame_rate:'30/1',nb_read_frames:'810'},
@@ -51,4 +51,9 @@ test('disallow noncontiguous, short or unfinished native editorial cuts',()=>{
   assert.throws(()=>beatMotionFrameNumbers(normal.slice(0,5),180),/six editorial cuts/);
   assert.throws(()=>beatMotionFrameNumbers([{...normal[0],endFrameExclusive:10},...normal.slice(1)],180),/invalid or too-short/);
   assert.throws(()=>beatMotionFrameNumbers(normal,181),/cover complete movie/);
+});
+
+test('short 1.2 second native clips get multiple VIDEO-only hash samples',()=>{
+  assert.ok(VIDEO_MOTION_HASH_FPS>=3);
+  assert.ok(Math.floor(1.2*VIDEO_MOTION_HASH_FPS)>=3);
 });
