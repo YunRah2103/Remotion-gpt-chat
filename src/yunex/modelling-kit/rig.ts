@@ -42,7 +42,7 @@ export function createCinematicVehicle(options:CinematicOptions):T.Group{
  materials(shell,m=>{if(m instanceof T.MeshPhysicalMaterial&&m.transparent){m.roughness=.075;m.envMapIntensity=.8;}else if(m instanceof T.MeshPhysicalMaterial&&m.clearcoat>0){m.clearcoat=1;m.roughness=options.paintPreset==='satin'?.43:.22;m.clearcoatRoughness=.13;m.envMapIntensity=1.1;}});
  let engine:T.Group|undefined,floor:T.Group|undefined;
  if(s.family!=='bike'&&s.id!=='box-truck'&&s.id!=='tractor-truck'){
-  engine=createPart({variant:s.family==='formula'?'v6':s.family==='sports'?'v8':'inline-4',cutaway:true});engine.name='engine';engine.scale.setScalar(1.15);engine.position.set(s.family==='sports'||s.family==='formula'?-.65:.75,.48,0);engine.userData.mount=engine.position.toArray();shell.add(engine);
+  engine=createPart({variant:s.family==='formula'?'v6':s.family==='sports'?'v8':'inline-4',cutaway:true});engine.name='engine';engine.scale.setScalar(1.15);engine.position.set(s.family==='sports'||s.family==='formula'?-.95:.75,.26,0);engine.userData.mount=engine.position.toArray();shell.add(engine);
  }
  if(s.family==='formula'){
   shell.traverse(o=>{if(['floor','floor-diffuser','pushrod','lower-wishbone'].includes(o.name))o.visible=false;if(o instanceof T.Mesh&&o.name===''&&o.geometry instanceof T.CylinderGeometry&&o.geometry.parameters.radiusTop===.025&&Math.abs(o.position.x)>.7&&o.position.y<.65)o.visible=false;});floor=floorAssembly(shell,s);
