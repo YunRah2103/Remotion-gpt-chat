@@ -61,7 +61,7 @@ export function formulaHeroDetails(shell:T.Group,mounts:T.Group[],s:VehicleSpec)
   box(shell,carbon,[.56,.24,.026],[s.length*.40,.29,side*s.width*.49],.018,'front-wing-endplate');
   box(shell,paint,[.45,.38,.027],[-s.length*.40,.91,side*s.width*.395],.025,'rear-wing-endplate');
   const path=new T.CatmullRomCurve3([new T.Vector3(-1.60,.14,side*.45),new T.Vector3(-.75,.10,side*.48),new T.Vector3(.4,.12,side*.48),new T.Vector3(.85,.17,side*.42)]);
-  const tunnel=mesh(shell,new T.TubeGeometry(path,28,.115,12,true),carbon,[0,0,0],[0,0,0],'venturi-tunnel');tunnel.scale.y=.55;
+  const tunnel=mesh(shell,new T.TubeGeometry(path,28,.115,12,true),carbon,[0,0,0],[0,0,0],'venturi-tunnel');tunnel.scale.y=.55;tunnel.position.y=.09;
   for(let i=0;i<5;i++)box(shell,carbon,[.30,.11,.016],[.9-i*.12,.19,side*(.39+i*.055)],.003,'floor-fence');
  }
  for(const mount of mounts){const roll=mount.getObjectByName('wheel-roll')!;for(const side of [-1,1]){
