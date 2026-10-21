@@ -31,3 +31,11 @@ This emits both H.264/yuv420p native MP4s, FFprobe frame counts, complete FFmpeg
 - **8.1–11s ending:** close rear wheel/mount to wider rear three-quarter chase at genuine contact bump, restrained real-lens motion with the Agent 4 circuit's own trackside parallax. Crop tests explicitly protect the complete-car portions while allowing close-up inserts.
 
 The **latest exact source run** must still provide actual 150-frame +330-frame artifacts, FFprobe, full video-only FFmpeg decode and sampled 0/middle/end/reveal first 20-frame visual proof. Until inspection, status is **WORKING — not Director-approved**.
+
+## 21 Oct targeted director corrections
+
+- Safety: preserve the strict full-car portrait frame/tyre guards and keep the payoff camera above 0.8m at the final 0.66/0.85/1.0 fractions; final local lens 0.96m, controlled high-speed closing dolly (no roll or frantic rotation).
+- Opening: start the 35cm-high camera on the actual forward metal-skid zone at x=1.18m; grow genuine short-lived Agent 2 velocity-oriented spark streaks only from their returned particles. No fake chip births and no moved skid geometry.
+- Cutaway: slightly wider coupled underfloor→macro lens to keep real inset metal and adjacent tan composite in the same frame; restore the intentionally faint—but actually perceptible—original car/carbon silhouette instead of an apparently detached tray. Carbon floor leader is projected from the existing floor mesh. All cuts/labels remain a preview for Agent 6 to time to the EP004 original narration.
+
+Source safe-checks alone are not cinema approval: review the exact new 150f + 330f native artifact and real frame motion before final handoff.

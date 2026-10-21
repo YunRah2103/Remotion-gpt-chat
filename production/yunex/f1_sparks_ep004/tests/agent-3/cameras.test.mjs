@@ -49,6 +49,11 @@ test('portrait spark-origin macro and readable full-car racing exit with control
   assert.ok(hook.positionWorld[1]>=.30&&hook.positionWorld[1]<.9,'true asphalt-skimming first-shot lens height');
   const finish=sampleShotCamera('racing-payoff',CAMERA_SHOTS['racing-payoff'].suggestedDurationSec,fixtures());
   assert.ok(finish.positionWorld[1]>0.8);
+  for(const progress of [.66,.85,1]){
+    const pose=sampleShotCamera('racing-payoff',progress*CAMERA_SHOTS['racing-payoff'].suggestedDurationSec,fixtures());
+    assert.ok(pose.positionWorld[1]>.8&&pose.positionWorld[1]<1.35,'safe elevated payoff lens at '+progress);
+  }
+  assert.ok(Math.abs(hook.targetWorld[0]-1.18)<.5,'opening close-up points at real forward metal skid');
 });
 test('retime, crossfade, finite guards and invalid duration',()=>{
   const m=fixtures();

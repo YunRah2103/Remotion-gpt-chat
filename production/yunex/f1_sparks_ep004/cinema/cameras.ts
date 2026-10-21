@@ -31,9 +31,9 @@ type Key = readonly [progress:number,position:Vec3,target:Vec3,fovDeg:number];
 const KEYS: Readonly<Record<ShotId,readonly Key[]>> = {
   'spark-hook': [
     // Intentional spark-origin tyre / metal rear detail for first 0.8 seconds:
-    // show the hot chip physics at phone size, THEN pull back to the entire hero.
+    // start on the REAL forward skid origin, THEN pull back to the hero.
     // This is a cinematic close-up, not an unexplained accidental car crop.
-    [0,[-4.55,.35,2.95],[-2.15,.25,0],62],
+    [0,[-1.05,.35,3.10],[.92,.14,0],62],
     [.15,[-4.80,.40,3.80],[-1.85,.35,0],62],
     [.36,[-5.45,.54,6.80],[0,.54,0],64],
     [.65,[-2.50,.64,8.25],[0,.56,0],66],
@@ -51,7 +51,7 @@ const KEYS: Readonly<Record<ShotId,readonly Key[]>> = {
     [.23,[-2.25,.96,2.15],[.25,.35,0],53],
     [.42,[2.15,1.06,1.40],[1.18,.11,0],43],
     [.65,[1.55,.86,1.30],[1.18,.086,0],42],
-    [1,[1.12,.36,.72],[1.18,.075,0],44],
+    [1,[1.12,.36,.72],[.98,.075,0],51],
   ],
   'aero-load': [
     [0,[.20,1.72,12.3],[0,.57,0],55],
@@ -59,17 +59,17 @@ const KEYS: Readonly<Record<ShotId,readonly Key[]>> = {
     [1,[.13,1.47,12.4],[0,.51,0],55],
   ],
   'contact-macro': [
-    [0,[1.12,.36,.72],[1.18,.075,0],44],
-    [.48,[1.10,.33,.70],[1.18,.075,0],43],
-    [1,[1.08,.31,.68],[1.18,.065,0],42],
+    [0,[1.12,.36,.72],[.98,.075,0],51],
+    [.48,[1.10,.33,.70],[1.00,.075,0],50],
+    [1,[1.08,.31,.68],[1.02,.065,0],49],
   ],
   'racing-payoff': [
     // Starts intentionally close to the authentic sparkling metal trail,
-    // tracks rapidly out to a safe rear 3/4, then climbs to a controlled finish.
+    // tracks out to a safe rear 3/4 and ends above 0.8m without a spin.
     [0,[-3.85,.62,3.65],[-.72,.37,0],64],
     [.20,[-4.70,.72,4.95],[-.42,.53,0],65],
     [.55,[-6.30,.95,3.20],[0,.55,-.55],68],
-    [1,[-5.80,.65,1.90],[0,.50,-.70],67],
+    [1,[-6.00,.96,2.10],[0,.56,-.65],67],
   ],
 
 };

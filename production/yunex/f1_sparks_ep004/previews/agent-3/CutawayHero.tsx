@@ -39,9 +39,9 @@ function opticalMaterial(name:string):THREE.Material{
  }
  // This is the unmodified APPROVED moving hero silhouette: the same actual
  // F1 chassis and tyres with a 3D X-ray presentation, not a loose tray.
- const opacity=name==='EP004-carbon-floor'?.20:.11;
+ const opacity=name==='EP004-carbon-floor'?.09:.11;
  return new THREE.MeshBasicMaterial({
-   color:'#325967',transparent:true,opacity:opacity*.20,depthWrite:false,
+   color:'#325967',transparent:true,opacity,depthWrite:false,
    side:THREE.DoubleSide,
  });
 }

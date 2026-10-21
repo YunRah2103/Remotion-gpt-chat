@@ -51,8 +51,8 @@ const ContactSparkVisuals:React.FC<{particles:readonly SparkParticle[]}>=({parti
       if(direction.lengthSq()<1e-9)direction.set(0,0,1);
       // Camera shutter integration of the particle's real instantaneous
       // velocity (~1/50 s), not a synthetic emitter or screen-space flare.
-      const size=.010+.013*p.luminance01;
-      const length=.065+.32*Math.min(1,direction.length()/47)*p.luminance01;
+      const size=.011+.014*p.luminance01;
+      const length=.065+.40*Math.min(1,direction.length()/47)*p.luminance01;
       const quat=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,0,1),direction.normalize());
       const whiteHot=p.luminance01>.67;
       return <group key={p.id} position={p.positionWorld} quaternion={quat}>
@@ -86,9 +86,11 @@ const SkidLeaderOverlay:React.FC<{pose:CameraPose;motion:VehicleMotionState;show
   if(!show)return null;
   const silver=anchorXY(pose,motion,[1.18,.091,-.005]);
   const plank=anchorXY(pose,motion,[.69,.095,-.14]);
+  const carbon=anchorXY(pose,motion,[.60,.162,.30]);
   const annotations=[
     {source:silver,title:'METAL SKID',subtitle:'Titanium contact insert',x:110,y:525,color:'#dbf5ff'},
     {source:plank,title:'COMPOSITE PLANK',subtitle:'Non-metallic wear strip',x:540,y:925,color:'#e9b97e'},
+    {source:carbon,title:'CARBON FLOOR',subtitle:'Structural shell, not the emitter',x:110,y:1170,color:'#9fb8bd'},
   ];
   return <svg viewBox="0 0 1080 1920" width="100%" height="100%"
     style={{position:'absolute',inset:0,pointerEvents:'none',overflow:'visible'}}>

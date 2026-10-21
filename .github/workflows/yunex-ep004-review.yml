@@ -45,6 +45,25 @@ jobs:
           test -s production/yunex/f1_sparks_ep004/HANDOFF.md
           test -s production/yunex/f1_sparks_ep004/LAUNCH_PROMPTS.md
 
+
+  editor-readiness:
+    name: EP004 editor-specific TypeScript and timing/native-QA unit tests
+    if: ${{ github.event_name == 'pull_request' && github.head_ref == 'agent/ep004-06-editor' }}
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Check exact EP004 editor-local TypeScript
+        run: npx tsc -p production/yunex/f1_sparks_ep004/editor/tsconfig.json
+      - name: Run original VO frame timing, captions, full video QA unit tests
+        run: node --experimental-strip-types --test production/yunex/f1_sparks_ep004/tests/agent-6/*.test.mjs
+
   specialist-native:
     name: Native EP004 specialist moving MP4s and frame proof
     if: ${{ github.event_name == 'pull_request' && (github.head_ref == 'agent/ep004-01-mechanics' || github.head_ref == 'agent/ep004-02-physics' || github.head_ref == 'agent/ep004-03-cinema' || github.head_ref == 'agent/ep004-04-look' || github.head_ref == 'agent/ep004-05-story') }}
