@@ -73,7 +73,7 @@ export const EP004VideoOnlyReview:React.FC=()=>{
  const frame=useCurrentFrame(),config=useVideoConfig();
  if(config.width!==1080||config.height!==1920||config.fps!==30||config.durationInFrames!==PREVIEW_TOTAL_FRAMES)
   throw new Error('EP004 picture review: invalid vertical real 420-frame composition');
- const sparkTime=authenticSparkTime();
+ const sparkTime=useMemo(authenticSparkTime,[]);
  const part=previewFrame(frame,sparkTime);
  // Small authentic slow-motion inserts at contact; all other driving uses
  // real Agent 2 motion time at normal velocity, including moving final car.
@@ -96,7 +96,7 @@ export const EP004VideoOnlyReview:React.FC=()=>{
  return <AbsoluteFill style={{background:'#060e16',overflow:'hidden'}}>
   <ThreeCanvas width={1080} height={1920} shadows
     camera={{position:[0,2,9],fov:50,near:.025,far:350}}>
-    <NightCircuitWorld motion={motion} particles={particles} exposure={.9}/>
+    <NightCircuitWorld motion={motion} particles={particles} exposure={.9} showEnvironment={!cutaway}/>
     {cutaway&&<>
       <pointLight position={camera.positionWorld} intensity={9} distance={10} color="#d8ecff"/>
       <ambientLight intensity={.35}/>
