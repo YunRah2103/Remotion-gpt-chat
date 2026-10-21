@@ -9,7 +9,7 @@ import {findAuthenticSparkMoment} from './contact-hook.ts';
 export const PREVIEW_FPS=30;
 export const PREVIEW_WIDTH=1080;
 export const PREVIEW_HEIGHT=1920;
-export const PREVIEW_CUT_FRAMES=[0,24,75,159,222,291,420] as const;
+export const PREVIEW_CUT_FRAMES=[0,24,75,159,222,258,420] as const;
 export const PREVIEW_TOTAL_FRAMES=420;
 export const PREVIEW_SHOTS:readonly ShotId[]=[
  'spark-hook','rear-mystery','underfloor-reveal','aero-load','contact-macro','racing-payoff'
@@ -43,7 +43,7 @@ export function previewFrame(frame:number,sparkTimeSec:number):PreviewFrame{
  // Mid-beats are a continuous high-speed race followed by an explicitly edited
  // contact replay and a new fast car chase. No fake route/particle generation.
  const sourceStarts=[sparkTimeSec,1.30,2.96,4.72,sparkTimeSec,6.35];
- const timeScale=i===0?.24:i===4?.24:1;
+ const timeScale=i===0?.24:i===4?.04:1;
  return {shot:PREVIEW_SHOTS[i],frame,localFrame,localSec,durationSec,
   sourceSec:sourceStarts[i]+localSec*timeScale,
   startFrame:start,endFrameExclusive:end,timeScale};
