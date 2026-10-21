@@ -53,3 +53,19 @@ test('video-only picture cut times are not fabricated narrator timecodes',()=>{
  assert.equal(previewFrame(210,cue).shot,'aero-load');
  assert.throws(()=>previewFrame(420,cue),/outside real six-shot/);
 });
+
+test('short V4 contact macro shows REAL luminous skid particles across the take',()=>{
+ const t=authenticSparkTime(),skids=getSkidDescriptors();
+ const frames=[222,226,233,243,255];
+ let visible=0;
+ for(const frame of frames){
+  const part=previewFrame(frame,t);
+  assert.equal(part.shot,'contact-macro');
+  const m=sampleDynamics(part.sourceSec,{aeroLoad01:1});
+  const {particles}=sampleContactDrivenSparks(part.sourceSec,m,skids,{aeroLoad01:1});
+  if(particles.some(p=>p.luminance01>.11&&p.ageSec>=0&&p.ageSec<p.lifetimeSec))visible++;
+ }
+ assert.ok(visible>=3,'must show real skid-born sparks beyond the first macro frame');
+ assert.equal(previewFrame(258,t).shot,'racing-payoff');
+ assert.equal(previewFrame(419,t).shot,'racing-payoff');
+});
