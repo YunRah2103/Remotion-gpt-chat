@@ -1,11 +1,12 @@
 import * as T from 'three';
+const tyreTopology=new WeakMap<T.Mesh,{closed:T.BufferAttribute;open?:T.BufferAttribute}>();
 /** Deform from immutable rest vertices in the wheel's current rolling frame. */
 export function deformTyre(tyre:T.Mesh,damage:number,angle:number,support:number){
  const a=tyre.geometry.attributes.position,rest=tyre.userData.restVertices as number[],c=Math.cos(angle),s=Math.sin(angle);
- if(!tyre.userData.restIndex)tyre.userData.restIndex=Array.from(tyre.geometry.index!.array);
- const restIndex=tyre.userData.restIndex as number[];
- if(damage===0){if(tyre.userData.lastDamage!==0){a.array.set(rest);a.needsUpdate=true;tyre.geometry.setIndex(restIndex);tyre.geometry.computeVertexNormals();tyre.geometry.computeBoundingSphere();tyre.geometry.computeBoundingBox();}tyre.userData.lastDamage=0;return;}
- if(damage>.55){const kept:number[]=[];for(let j=0;j<restIndex.length;j+=3){const ia=restIndex[j],ib=restIndex[j+1],ic=restIndex[j+2],cx=(rest[ia*3]+rest[ib*3]+rest[ic*3])/3,cy=(rest[ia*3+1]+rest[ib*3+1]+rest[ic*3+1])/3,angle=Math.atan2(cy,cx);if(angle<.32||angle>1.52)kept.push(ia,ib,ic);}tyre.geometry.setIndex(kept);}else tyre.geometry.setIndex(restIndex);
+ let topology=tyreTopology.get(tyre);if(!topology){topology={closed:tyre.geometry.index!};tyreTopology.set(tyre,topology);}
+ const restIndex=topology.closed.array;
+ if(damage===0){if(tyre.userData.lastDamage!==0){a.array.set(rest);a.needsUpdate=true;tyre.geometry.setIndex(topology.closed);tyre.geometry.computeVertexNormals();tyre.geometry.computeBoundingSphere();tyre.geometry.computeBoundingBox();}tyre.userData.lastDamage=0;return;}
+ if(damage>.55){if(!topology.open){const kept:number[]=[];for(let j=0;j<restIndex.length;j+=3){const ia=restIndex[j],ib=restIndex[j+1],ic=restIndex[j+2],cx=(rest[ia*3]+rest[ib*3]+rest[ic*3])/3,cy=(rest[ia*3+1]+rest[ib*3+1]+rest[ic*3+1])/3,angle=Math.atan2(cy,cx);if(angle<.32||angle>1.52)kept.push(ia,ib,ic);}topology.open=new T.Uint16BufferAttribute(kept,1);}if(tyre.geometry.index!==topology.open)tyre.geometry.setIndex(topology.open);}else if(tyre.geometry.index!==topology.closed)tyre.geometry.setIndex(topology.closed);
  tyre.userData.lastDamage=damage;
  for(let i=0;i<a.count;i++){
   const x=rest[i*3],y=rest[i*3+1],z=rest[i*3+2];
