@@ -16,7 +16,7 @@ import {ApplyCameraPose} from '../cinema/ShotCamera.tsx';
 import {CutawayHero} from '../previews/agent-3/CutawayHero.tsx';
 import {getStoryVisualCue} from '../story/visual-cues.ts';
 import {projectedActualParts} from '../story/project-actual-parts.ts';
-import {SparkLensGlints} from '../story/SparkLensGlints.tsx';
+import {CinematicSparkGlints} from './CinematicSparkGlints.tsx';
 import {PREVIEW_TOTAL_FRAMES,previewFrame,authenticSparkTime} from './preview-plan.ts';
 const skids=getSkidDescriptors();
 
@@ -86,11 +86,16 @@ export const EP004VideoOnlyReview:React.FC=()=>{
   shotDurationSec:part.durationSec,motion,contacts,particles
  };
  const cue=getStoryVisualCue(request);
- const cutaway=part.shot==='underfloor-reveal'||part.shot==='contact-macro';
+ const cutaway=part.shot==='underfloor-reveal';
  const lensSec=part.shot==='spark-hook'?part.localSec:part.localSec;
  // Preserve Agent3 retimeability but keep its hook view tight for first 0.8s.
- const camera=sampleRetimedShotCamera(part.shot,lensSec,
+ const preset=sampleRetimedShotCamera(part.shot,lensSec,
   part.shot==='spark-hook'?2.8:part.durationSec,motion);
+ // Editorial lens trim of the already approved Agent 3 rig, never a new car path.
+ // Keep the full vehicle legible in the stable aero comparison and moving exit.
+ const framing=part.shot==='aero-load'?.81:part.shot==='racing-payoff'?.92:1;
+ const camera={...preset,positionWorld:preset.positionWorld.map((v,i)=>
+  preset.targetWorld[i]+(v-preset.targetWorld[i])*framing) as [number,number,number]};
  // No fixed caption or invented VO transcript; these are factual on-screen
  // material labels kept well above the lower 326px phone UI reserve.
  return <AbsoluteFill style={{background:'#060e16',overflow:'hidden'}}>
@@ -101,11 +106,13 @@ export const EP004VideoOnlyReview:React.FC=()=>{
       <pointLight position={camera.positionWorld} intensity={9} distance={10} color="#d8ecff"/>
       <ambientLight intensity={.35}/>
     </>}
-    {cutaway?<CutawayHero motion={motion}/>:<F1HeroVehicle motion={motion}/>}
+    {cutaway?<CutawayHero motion={motion}/>:<F1HeroVehicle motion={motion}
+      reveal01={part.shot==='contact-macro'?.32:0}/>}
     <RealParticleStreaks particles={particles}/>
     <ApplyCameraPose pose={camera} near={.025}/>
   </ThreeCanvas>
-  <SparkLensGlints particles={particles} pose={camera}/>
+  <CinematicSparkGlints particles={particles} pose={camera}
+    strength={part.shot==='spark-hook'?1.85:part.shot==='contact-macro'?1.55:1.05}/>
   {part.shot==='underfloor-reveal'&&<UnderfloorCallouts request={request} pose={camera}/>}
   {part.shot==='aero-load'&&<div style={{...cardStyle,position:'absolute',
     top:290,left:92,right:92,fontSize:35}}>
@@ -118,9 +125,9 @@ export const EP004VideoOnlyReview:React.FC=()=>{
     position:'absolute',top:300,left:92,right:92,fontSize:33}}>
     METAL SKID SCRAPES ASPHALT
   </div>}
-  {part.shot==='spark-hook'&&particles.length>0&&<div style={{...cardStyle,
-    position:'absolute',top:260,left:92,right:92,fontSize:31}}>
-    REAL METAL CONTACT
+  {part.shot==='spark-hook'&&part.localSec>.33&&particles.length>0&&<div style={{...cardStyle,
+    position:'absolute',top:260,left:92,right:92,fontSize:29}}>
+    METAL MEETS THE TRACK
   </div>}
  </AbsoluteFill>;
 };
