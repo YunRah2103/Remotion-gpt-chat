@@ -8,7 +8,9 @@ import {CinematicStage} from './Stage';
 import {HERO_VEHICLES} from './rig.ts';
 import type {CinematicState} from './rig.ts';
 import type {V3} from '../world-kit/geometry.ts';
+import {vehicleSpec} from '../world-kit/catalog.ts';
 import type {VehicleVariant} from '../world-kit/catalog.ts';
+import {fitInspectionCamera} from './framing.ts';
 const smooth=(a:number,b:number,t:number)=>{const u=Math.max(0,Math.min(1,(t-a)/(b-a)));return u*u*(3-2*u);};
 export const KitDemo:React.FC<{demo:'A'|'B'|'C';baseline?:boolean;variant?:VehicleVariant}>=({demo,baseline=false,variant})=>{
  const frame=useCurrentFrame(),{fps,width,height}=useVideoConfig(),t=frame/fps,portrait=height>width;
@@ -20,7 +22,7 @@ export const KitDemo:React.FC<{demo:'A'|'B'|'C';baseline?:boolean;variant?:Vehic
  let position:V3,target:V3=[0,.60,0],fov=portrait?42:38;
  if(demo==='A'){
   const angle=.55+segment*.23,r=portrait?11.8:6.2;position=[Math.cos(angle)*r,2.05,Math.sin(angle)*r];
-  if(segment>1.8){const q=smooth(1.8,3,segment);position=[(1-q)*position[0]+q*3,(1-q)*position[1]+q*.9,(1-q)*position[2]+q*3.1];target=[q*.8,.55,q*.35];}
+  if(!portrait&&segment>1.8){const q=smooth(1.8,3,segment);position=[(1-q)*position[0]+q*3,(1-q)*position[1]+q*.9,(1-q)*position[2]+q*3.1];target=[q*.8,.55,q*.35];}
  }else if(demo==='B'){
   if(t<2.7)position=[portrait?7:5.5,1.7,portrait?6.2:4.8];
   else if(t<4.5){position=[3.1,.86,2.3];target=[1.25,.30,.8];fov=40;}
@@ -30,6 +32,7 @@ export const KitDemo:React.FC<{demo:'A'|'B'|'C';baseline?:boolean;variant?:Vehic
   else if(t<5){position=[portrait?6:2.5,portrait?3.4:2.0,portrait?8:3.5];target=[0,.12,0];}
   else {position=[portrait?-8:-5.2,portrait?1.7:1.05,portrait?10:4.5];target=[-.25,.5,0];}
  }
+ if(demo==='A'&&portrait){const s=vehicleSpec(selected);target=[0,s.height/2,0];position=fitInspectionCamera(position,target,[s.length+.5,s.height+.3,s.width+.4],width/height,fov);}
  const state:CinematicState={frame,fps,distance,compression,tyreDamage:damage,steer:demo==='B'?.035*damage:0,cutaway,highlight:cutaway>0?'underfloor':undefined,bodyDamage:0};
  const title=demo==='A'?`${selected.toUpperCase()} / HERO`:demo==='B'?(t<1.6?'01 / INTACT':t<2.7?'02 / PRESSURE LOSS':t<4.5?'03 / COLLAPSED CARCASS':'04 / SAME WHEEL, DAMAGED'):t<2.6?'01 / SKID CONTACT':t<5?'02 / CARBON · PLANK · METAL':'03 / SUSPENSION REBOUNDS';
  return <AbsoluteFill style={{background:'#15232d'}}>

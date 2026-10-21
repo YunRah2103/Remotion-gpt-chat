@@ -5,7 +5,7 @@ import {disposeObject} from '../world-kit/geometry.ts';
 import {asphaltMaps} from './environments.ts';
 /** Native geometry and lighting assets shared by kit previews and future agents. */
 export const CinematicStage:React.FC<{distance:number;track?:boolean;wetness?:number}>=({distance,track=true,wetness=.35})=>{
- const scenery=useMemo(()=>createInspectionScenery(),[]);useEffect(()=>()=>disposeObject(scenery),[scenery]);
+ const scenery=useMemo(()=>createInspectionScenery({farSideOnly:true}),[]);useEffect(()=>()=>disposeObject(scenery),[scenery]);
  const maps=useMemo(()=>asphaltMaps(),[]);useEffect(()=>()=>{maps.map.dispose();maps.roughnessMap.dispose();},[maps]);
  return <>
   <mesh rotation={[-Math.PI/2,0,0]} position={[-distance%5, -.018,0]} receiveShadow><planeGeometry args={[240,240]}/><meshStandardMaterial map={maps.map} roughnessMap={maps.roughnessMap} roughness={.85-wetness*.45} metalness={.08} envMapIntensity={.9}/></mesh>
