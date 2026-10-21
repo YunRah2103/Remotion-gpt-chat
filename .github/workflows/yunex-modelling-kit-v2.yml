@@ -1,0 +1,36 @@
+name: YUNEX modelling kit V2
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'src/yunex/modelling-kit/**'
+      - 'tests/modelling-kit/**'
+      - 'scripts/modelling-kit/**'
+      - '.github/workflows/yunex-modelling-kit-v2.yml'
+permissions:
+  contents: read
+jobs:
+  native-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: node --experimental-strip-types --test tests/modelling-kit/*.test.mjs tests/world-kit/*.test.mjs tests/parts-kit/*.test.mjs
+      - run: node --experimental-strip-types scripts/modelling-kit/export.mjs
+      - run: node scripts/modelling-kit/review.mjs --compare
+      - run: node scripts/modelling-kit/review.mjs --portrait
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: python -m pip install numpy
+      - run: python scripts/modelling-kit/verify.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-MODELLING-KIT-V2-REVIEW
+          path: out/modelling-kit-v2
+          retention-days: 30
