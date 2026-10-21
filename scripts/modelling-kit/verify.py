@@ -13,10 +13,15 @@ for path in sorted(root.glob('*.mp4')):
     expected=2 if path.stem=='KitBefore' else 9 if path.stem.startswith('KitA') else 6
     assert abs(duration-expected)<.05 and video['r_frame_rate']==f'{fps}/1'
     subprocess.run(['ffmpeg','-v','error','-i',str(path),'-f','null','-'],check=True)
+    assert int(video['nb_frames'])==round(expected*fps)
+    dense=subprocess.check_output(['ffmpeg','-v','error','-i',str(path),'-vf','crop=iw*.8:ih*.60:iw*.1:ih*.18,scale=96:54,format=gray','-f','rawvideo','-'])
+    dense_frames=np.frombuffer(dense,dtype=np.uint8).reshape(-1,54,96)
+    unique=len({frame.tobytes() for frame in dense_frames});assert unique>=len(dense_frames)*.98,(path,unique)
     data=subprocess.check_output(['ffmpeg','-v','error','-i',str(path),'-vf','fps=2,crop=iw*.8:ih*.60:iw*.1:ih*.18,scale=96:54,format=gray','-f','rawvideo','-'])
     frames=np.frombuffer(data,dtype=np.uint8).reshape(-1,54,96).astype(float)
     differences=np.abs(np.diff(frames,axis=0)).mean(axis=(1,2))
     assert np.count_nonzero(differences>.1)>=len(differences)*.8,(path,differences)
-    reports.append(dict(file=path.name,width=video['width'],height=video['height'],fps=fps,duration=duration,frames=int(video['nb_frames']),sha256=hashlib.sha256(path.read_bytes()).hexdigest(),sampleMeanAbsoluteDifferences=differences.tolist(),fullDecode=True))
+    reports.append(dict(file=path.name,width=video['width'],height=video['height'],fps=fps,duration=duration,frames=int(video['nb_frames']),uniqueDecodedFrames=unique,sha256=hashlib.sha256(path.read_bytes()).hexdigest(),sampleMeanAbsoluteDifferences=differences.tolist(),fullDecode=True))
 assert reports,'No MP4 files were found'
+if '--partial' not in sys.argv and '--quick' not in sys.argv:assert {'KitA.mp4','KitB.mp4','KitC.mp4','KitBefore.mp4'}.issubset({r['file'] for r in reports})
 (root/'video-qa.json').write_text(json.dumps(reports,indent=2));print(json.dumps(reports,indent=2))
