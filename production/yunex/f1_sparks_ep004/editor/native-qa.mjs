@@ -9,6 +9,9 @@ import {resolve, dirname, join, basename} from 'node:path';
 import {pathToFileURL} from 'node:url';
 
 export const VIDEO_HASH_STREAM_SELECTOR = '0:v:0';
+// 1fps provides only one sample in a 1.2s scientific macro; use 5fps for
+// both full and short clips so real movement is tested without false rejects.
+export const VIDEO_MOTION_HASH_FPS = 5;
 
 const run = (command, args) => {
   try {
@@ -89,7 +92,7 @@ export function verifyNativeMp4(filePath, expectedFrames, {audioRequired = true,
   const metadata = JSON.parse(run('ffprobe', ffprobeArgs));
   const video = validateVideoMetadata(metadata, expectedFrames, {audioRequired});
   run('ffmpeg', ['-hide_banner','-v','error','-xerror','-nostdin','-i',absolute,'-f','null','-']);
-  const hashes = uniqueDecodedFrameHashes(run('ffmpeg', ['-hide_banner','-v','error','-nostdin','-i',absolute,'-map',VIDEO_HASH_STREAM_SELECTOR,'-vf','fps=1','-f','framemd5','-']));
+  const hashes = uniqueDecodedFrameHashes(run('ffmpeg', ['-hide_banner','-v','error','-nostdin','-i',absolute,'-map',VIDEO_HASH_STREAM_SELECTOR,'-vf',`fps=${VIDEO_MOTION_HASH_FPS}`,'-f','framemd5','-']));
   if (hashes < 2) throw new Error('EP004 native audit: no real time-evolving frames found by sampled decoded pixel hashes');
   let sceneMotionProof = null;
   if (cuts !== null) {
