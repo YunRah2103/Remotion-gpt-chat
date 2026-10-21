@@ -153,7 +153,7 @@ Standard/hero four-wheel vehicles now share fitted chassis rails, crossmembers,
 transmission, differential, steering rack, radiator/coolant connection and driven
 half shafts. Family configuration is in `mechanicalLayout()`. Half shafts retain
 wheel endpoints through compression/exploded views. The compact EV uses a battery
-and motor rather than a combustion engine. Heavy trucks now receive an engine.
+and motor rather than a combustion engine. Heavy trucks now receive an engine, rear-drive prop shaft and tandem-axle connections where appropriate. The EV battery clears the existing cabin floor.
 These are generic assemblies, not exact manufacturer powertrains. The existing
 motorcycles retain their original frame, casing and fork assemblies in this stage.
 
@@ -190,3 +190,7 @@ manufacturer-specific cabin/powertrain fit, motorcycle rider, richer heavy-truck
 engine families, turbo airflow, validated rigid/soft body physics and fully modelled
 restraint dynamics. Catalogue bounds tests are not proof of clearance between every
 internal part. Inspect cutaways and moving footage for the intended production shot.
+
+The CI workflow validates once, renders each native composition in a separate job,
+and then combines all eleven videos for full decoding and colour verification.
+Per-composition artifacts allow early visual review without waiting for every clip.

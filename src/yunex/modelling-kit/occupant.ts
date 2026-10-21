@@ -23,8 +23,14 @@ export function createDriver(shell:T.Group,s:VehicleSpec,o:Partial<VehicleOption
  const hip=formula?v(-.36,.48,0):v(l.frontSeat,l.floor+.255*k,sign*s.width*.235);
  const gold=surface('#cda65f',.32,.42),dark=surface('#252c31',.25,.62),belt=surface('#153c45',0,.88),mark=surface('#f2d48c',.1,.55);
  if(formula){for(const name of ['racing-seat','racing-seat-back','cockpit']){const old=shell.getObjectByName(name);if(old)old.visible=false;}box(shell,dark,[.48,.065,.36],[-.36,.435,0],.035,'driver-seat-cushion');const back=box(shell,dark,[.08,.34,.34],[-.53,.60,0],.04,'driver-seat-back');back.rotation.z=-.28;}
+ shell.updateMatrixWorld(true);
+ const sportSeat=shell.getObjectsByProperty('name','bucket-seat-shell').find(seat=>Math.sign(seat.position.z)===sign);
+ const seat=formula?shell.getObjectByName('driver-seat-cushion'):sportSeat?.getObjectByName('seat-cushion')??shell.getObjectByName(sign>0?'front-seat-left':'front-seat-right')?.getObjectByName('seat-cushion');
+ if(!seat)throw new Error('Missing seat cushion hardpoint');
+ hip.y=new T.Box3().setFromObject(seat).max.y+.08*k+.005;
  const parts=new Map<string,T.Object3D>();const add=(x:T.Object3D)=>{parts.set(x.name,x);return x;};
- add(box(root,gold,[.21*k,.16*k,.30*k],hip.toArray(),.045,'pelvis'));
+ const pelvis=add(box(root,gold,[.21*k,.16*k,.30*k],hip.toArray(),.045,'pelvis'));
+ root.updateMatrixWorld(true);hip.y+=new T.Box3().setFromObject(seat).max.y+.005-new T.Box3().setFromObject(pelvis).min.y;pelvis.position.copy(hip);
  add(box(root,gold,[.20*k,.30*k,.32*k],[0,0,0],.06,'thorax'));
  add(mesh(root,new T.SphereGeometry(.105*k,24,16),gold,[0,0,0],[0,0,0],'head'));parts.get('head')!.scale.set(1,.128/.105,.88);
  add(segment(root,'neck',dark,.045*k));

@@ -13,9 +13,9 @@ concurrency:
 permissions:
   contents: read
 jobs:
-  native-review:
+  validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -27,10 +27,56 @@ jobs:
       - run: node --experimental-strip-types --test tests/modelling-kit/*.test.mjs tests/world-kit/*.test.mjs tests/parts-kit/*.test.mjs
       - run: node --experimental-strip-types scripts/modelling-kit/measure.mjs
       - run: node --experimental-strip-types scripts/modelling-kit/export.mjs
-      - run: node scripts/modelling-kit/review.mjs --compare
-      - run: node scripts/modelling-kit/review.mjs --portrait
-      - run: node scripts/modelling-kit/review.mjs --id=KitBefore
-      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-KIT-MODELS-AND-PERFORMANCE
+          path: |
+            out/modelling-kit-v2/glb
+            out/modelling-kit-v2/performance.json
+          retention-days: 30
+  render:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        composition: [KitA, KitB, KitC, KitD, KitE, KitAPortrait, KitBPortrait, KitCPortrait, KitDPortrait, KitEPortrait, KitBefore]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: node scripts/modelling-kit/review.mjs --id=${{ matrix.composition }}
+      - if: matrix.composition == 'KitA'
+        run: node scripts/modelling-kit/review.mjs --compare-only --compare
+      - run: python -m pip install numpy
+      - run: python scripts/modelling-kit/verify.py out/modelling-kit-v2-hd --partial
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-KIT-${{ matrix.composition }}
+          path: out/modelling-kit-v2-hd
+          retention-days: 30
+  native-review:
+    needs: [validate, render]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: YUNEX-KIT-Kit*
+          merge-multiple: true
+          path: out/modelling-kit-v2-hd
       - run: python -m pip install numpy
       - run: node scripts/modelling-kit/verify-colour.mjs
       - run: python scripts/modelling-kit/verify.py
@@ -38,8 +84,5 @@ jobs:
         if: always()
         with:
           name: YUNEX-MODELLING-KIT-V2-REVIEW
-          path: |
-            out/modelling-kit-v2-hd
-            out/modelling-kit-v2/glb
-            out/modelling-kit-v2/performance.json
+          path: out/modelling-kit-v2-hd
           retention-days: 30
