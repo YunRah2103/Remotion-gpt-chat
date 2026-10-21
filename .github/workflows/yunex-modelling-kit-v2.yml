@@ -30,6 +30,7 @@ jobs:
       - run: node scripts/modelling-kit/review.mjs --id=KitBefore
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - run: python -m pip install numpy
+      - run: node scripts/modelling-kit/verify-colour.mjs
       - run: python scripts/modelling-kit/verify.py
       - uses: actions/upload-artifact@v4
         if: always()

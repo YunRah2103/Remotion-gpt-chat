@@ -9,16 +9,16 @@ try{
  const requested=process.argv.find(v=>v.startsWith('--id='))?.slice(5);
  const ids=process.argv.includes('--compare-only')?[]:requested?[requested]:process.argv.includes('--portrait')?['KitAPortrait','KitBPortrait','KitCPortrait']:['KitA','KitB','KitC'];
  for(const id of ids){
-  const composition=await selectComposition({serveUrl,id,browserInstance:browser}),duration=composition.durationInFrames/composition.fps;
+  const composition=await selectComposition({serveUrl,id,puppeteerInstance:browser}),duration=composition.durationInFrames/composition.fps;
   if(!process.argv.includes('--video-only'))for(const second of id==='KitBefore'?[.5,1.5]:id.startsWith('KitA')?[.5,3.5,6.5]:id.startsWith('KitB')?[.5,2.4,3.5,5]:[.5,1.8,3.5,5.5]){
-   await renderStill({serveUrl,composition,frame:Math.min(composition.durationInFrames-1,Math.floor(second*composition.fps)),output:`${out}/${id}-${second}.png`,scale,browserInstance:browser});
+   await renderStill({serveUrl,composition,frame:Math.min(composition.durationInFrames-1,Math.floor(second*composition.fps)),output:`${out}/${id}-${second}.png`,scale,puppeteerInstance:browser});
   }
   if(!process.argv.includes('--stills')){
    const review={...composition,fps,durationInFrames:duration*fps},start=Date.now();
-   await renderMedia({serveUrl,composition:review,outputLocation:`${out}/${id}.mp4`,codec:'h264',pixelFormat:'yuv420p',colorSpace:'bt709',scale,crf:18,concurrency:2,browserInstance:browser,chromiumOptions:{gl:'swangle'},onProgress:p=>{if(p.renderedFrames%fps===0)console.log(id,p.renderedFrames,'/',review.durationInFrames);}});
+   await renderMedia({serveUrl,composition:review,outputLocation:`${out}/${id}.mp4`,imageFormat:'png',codec:'h264',pixelFormat:'yuv420p',colorSpace:'bt709',scale,crf:18,concurrency:2,puppeteerInstance:browser,chromiumOptions:{gl:'swangle'},onProgress:p=>{if(p.renderedFrames%fps===0)console.log(id,p.renderedFrames,'/',review.durationInFrames);}});
    const result={id,width:composition.width*scale,height:composition.height*scale,fps,duration,renderSeconds:(Date.now()-start)/1000};report.push(result);await writeFile(`${out}/timing-${id}.json`,JSON.stringify(result,null,2));
   }
  }
- if(process.argv.includes('--compare'))for(const baseline of [false,true]){const composition=await selectComposition({serveUrl,id:'KitA',browserInstance:browser,inputProps:{demo:'A',baseline}});await renderStill({serveUrl,composition,frame:30,output:`${out}/${baseline?'before':'after'}.png`,scale,browserInstance:browser,inputProps:{demo:'A',baseline}});}
+ if(process.argv.includes('--compare'))for(const baseline of [false,true]){const composition=await selectComposition({serveUrl,id:'KitA',puppeteerInstance:browser,inputProps:{demo:'A',baseline}});await renderStill({serveUrl,composition,frame:30,output:`${out}/${baseline?'before':'after'}.png`,scale,puppeteerInstance:browser,inputProps:{demo:'A',baseline}});}
  await writeFile(`${out}/render-report${process.argv.includes('--portrait')?'-portrait':''}.json`,JSON.stringify(report,null,2));
 }finally{await browser.close({});}

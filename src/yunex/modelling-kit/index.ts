@@ -5,3 +5,4 @@ export {createImpactBarrier,animateImpactBarrier} from './barrier.ts';
 
 export {createCinematicEnvironment} from './environments.ts';
 export {CinematicStage} from './Stage';
+export {CinematicLighting} from './Lighting';

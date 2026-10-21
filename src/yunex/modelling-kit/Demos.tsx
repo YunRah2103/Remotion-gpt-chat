@@ -1,8 +1,9 @@
 import React from 'react';
 import {AbsoluteFill,useCurrentFrame,useVideoConfig} from 'remotion';
 import {ThreeCanvas} from '@remotion/three';
-import {CameraAim,WorldLighting,Vehicle} from '../world-kit/components';
+import {CameraAim,Vehicle} from '../world-kit/components';
 import {CinematicVehicle} from './components';
+import {CinematicLighting} from './Lighting';
 import {CinematicStage} from './Stage';
 import {HERO_VEHICLES} from './rig.ts';
 import type {CinematicState} from './rig.ts';
@@ -33,9 +34,7 @@ export const KitDemo:React.FC<{demo:'A'|'B'|'C';baseline?:boolean;variant?:Vehic
  const title=demo==='A'?`${selected.toUpperCase()} / HERO`:demo==='B'?(t<1.6?'01 / INTACT':t<2.7?'02 / PRESSURE LOSS':t<4.5?'03 / COLLAPSED CARCASS':'04 / SAME WHEEL, DAMAGED'):t<2.6?'01 / SKID CONTACT':t<5?'02 / CARBON · PLANK · METAL':'03 / SUSPENSION REBOUNDS';
  return <AbsoluteFill style={{background:'#15232d'}}>
   <ThreeCanvas width={width} height={height} shadows camera={{fov,near:.05,far:300}} gl={{antialias:true}}>
-   <WorldLighting timeOfDay="night"/>
-   <directionalLight position={[4,6,3]} intensity={1.8} color="#e2f0ff"/>
-   <directionalLight position={[-3,3,-4]} intensity={1.6} color="#54d4cf"/>
+   <CinematicLighting/>
    <CinematicStage distance={distance} track={demo!=='A'} wetness={demo==='A'?.35:.45}/><CameraAim position={position} target={target} fov={fov}/>
    <group rotation={[0,demo==='B'?damage*.055:0,0]}>
     {baseline?<Vehicle variant={selected} distance={distance} color={selected==='supercar'?'#ca3948':selected==='hot-hatch'?'#2368b6':'#10a99e'} lights/>:<CinematicVehicle options={{variant:selected,quality:'hero',color:selected==='supercar'?'#ca3948':selected==='hot-hatch'?'#2368b6':'#10a99e',lights:true}} state={state}/>}

@@ -126,3 +126,15 @@ verify with `python scripts/modelling-kit/verify.py out/modelling-kit-v2-hd`.
 The baseline shares camera, lighting, paint and environment with the first two
 seconds of the updated showcase. These are native 30 fps renders, without optical
 flow or repeated-frame interpolation.
+
+Use `CinematicLighting` inside the canvas for new kit scenes. It prepares its
+reflection map in a layout effect before Remotion advances the first frame; the
+legacy episode lighting is left untouched. This prevents stills/first frames from
+using different reflection state than subsequent video frames. The review script
+uses Remotion's supported `puppeteerInstance` option to reuse one browser, and
+captures lossless PNG frames before H.264 encoding. `verify-colour.mjs` compares a
+fresh still against a later decoded frame and rejects a mean RGB error of 4 or more.
+
+The previous `docs/modelling-kit/previews` files are archived **12 fps first-pass
+media**. Current native 1080p/30 fps outputs and diagnostics are in the latest
+YUNEX-MODELLING-KIT-V2-REVIEW workflow artifact; do not label the old files as 30 fps.
