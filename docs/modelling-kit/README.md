@@ -146,3 +146,47 @@ bounce twice, slow with friction and settle deterministically; their rotated
 geometry stays above the local road. `interior:false` skips hero seats/console as
 well as the original interior, retaining exterior lights. `--compare` captures
 matched stills for all three showcased vehicle presets.
+
+## Fitted systems and articulated occupant (continuation)
+
+Standard/hero four-wheel vehicles now share fitted chassis rails, crossmembers,
+transmission, differential, steering rack, radiator/coolant connection and driven
+half shafts. Family configuration is in `mechanicalLayout()`. Half shafts retain
+wheel endpoints through compression/exploded views. The compact EV uses a battery
+and motor rather than a combustion engine. Heavy trucks now receive an engine.
+These are generic assemblies, not exact manufacturer powertrains. The existing
+motorcycles retain their original frame, casing and fork assemblies in this stage.
+
+```ts
+import {animationPreset} from './presets.ts';
+const car = createCinematicVehicle({variant:'hot-hatch',driver:true});
+animateCinematicVehicle(car, animationPreset('driver-reaction',frame,30));
+// Explicit controls can be combined with any compatible vehicle:
+animateCinematicVehicle(car,{frame,fps:30,steer:.08,braking:.7,impact:.2});
+```
+
+`driver:true` opts into a gold segmented mannequin with volumetric torso/pelvis,
+head/neck, articulated arms/legs, hands/fingers, feet, vehicle-anchored belt and
+pedal/wheel targets. It uses actual existing steering/pedal hardpoints; Formula
+gets a lowered shared seat and pedal box. Steering grip targets rotate with the
+wheel. Reactions are prescribed poses with two-link limb solving, not human injury
+or restraint dynamics. Limb reach adapts to the generic cabin: this is not a fixed
+anthropometric skeleton. A rider rig is not yet provided for motorcycles.
+`interior:false` cannot provide the hardpoints required by the driver.
+
+Seven six-second frame-controlled presets: `tyre-failure`, `emergency-braking`,
+`collision-rewind`, `floor-sparks`, `engine-cutaway`, `suspension`, `driver-reaction`.
+A preset returns a `CinematicState`; floor sparks require a Formula vehicle.
+Collision/rewind controls existing visual damage and pose, not collision detection.
+Engine-cutaway exposes the existing engine; connected turbo airflow is still absent.
+
+`KitD` / `KitDPortrait` show braking, impact reaction and restored seating;
+`KitE` / `KitEPortrait` show the three hero internal assemblies. Existing A/B/C
+remain the exterior, tyre and Formula demonstrations. All native exports are 30fps.
+Driver GLB exports contain a baked articulated pose; runtime solvers are TS-only.
+
+Outstanding: individual premium exterior modelling/approval of all 35 variants,
+manufacturer-specific cabin/powertrain fit, motorcycle rider, richer heavy-truck
+engine families, turbo airflow, validated rigid/soft body physics and fully modelled
+restraint dynamics. Catalogue bounds tests are not proof of clearance between every
+internal part. Inspect cutaways and moving footage for the intended production shot.

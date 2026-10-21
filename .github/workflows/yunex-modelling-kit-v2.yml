@@ -25,8 +25,10 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: node --experimental-strip-types --test tests/modelling-kit/*.test.mjs tests/world-kit/*.test.mjs tests/parts-kit/*.test.mjs
+      - run: node --experimental-strip-types scripts/modelling-kit/measure.mjs
       - run: node --experimental-strip-types scripts/modelling-kit/export.mjs
       - run: node scripts/modelling-kit/review.mjs --compare
+      - run: node scripts/modelling-kit/review.mjs --portrait
       - run: node scripts/modelling-kit/review.mjs --id=KitBefore
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - run: python -m pip install numpy
@@ -39,4 +41,5 @@ jobs:
           path: |
             out/modelling-kit-v2-hd
             out/modelling-kit-v2/glb
+            out/modelling-kit-v2/performance.json
           retention-days: 30

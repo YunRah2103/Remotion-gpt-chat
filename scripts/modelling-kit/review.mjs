@@ -3,12 +3,15 @@ import {openBrowser,selectComposition,renderStill,renderMedia} from '@remotion/r
 import {mkdir,writeFile} from 'node:fs/promises';
 const quick=process.argv.includes('--quick'),scale=quick?.5:1,fps=quick?12:30;
 const out=quick?'out/modelling-kit-v2':'out/modelling-kit-v2-hd';await mkdir(out,{recursive:true});
+console.log('Bundling kit review');
 const serveUrl=await bundle({entryPoint:'src/yunex/modelling-kit/entry.tsx'});
+console.log('Opening software WebGL browser');
 const browser=await openBrowser('chrome',{chromiumOptions:{gl:'swangle'}}),report=[];
 try{
  const requested=process.argv.find(v=>v.startsWith('--id='))?.slice(5);
- const ids=process.argv.includes('--compare-only')?[]:requested?[requested]:process.argv.includes('--portrait')?['KitAPortrait','KitBPortrait','KitCPortrait']:['KitA','KitB','KitC'];
+ const ids=process.argv.includes('--compare-only')?[]:requested?[requested]:process.argv.includes('--portrait')?['KitAPortrait','KitBPortrait','KitCPortrait','KitDPortrait','KitEPortrait']:['KitA','KitB','KitC','KitD','KitE'];
  for(const id of ids){
+  console.log('Reviewing',id);
   const composition=await selectComposition({serveUrl,id,puppeteerInstance:browser}),duration=composition.durationInFrames/composition.fps;
   if(!process.argv.includes('--video-only'))for(const second of id==='KitBefore'?[.5,1.5]:id.startsWith('KitA')?[.5,3.5,6.5]:id.startsWith('KitB')?[.5,2.4,3.5,5]:[.5,1.8,3.5,5.5]){
    await renderStill({serveUrl,composition,frame:Math.min(composition.durationInFrames-1,Math.floor(second*composition.fps)),output:`${out}/${id}-${second}.png`,scale,puppeteerInstance:browser});
