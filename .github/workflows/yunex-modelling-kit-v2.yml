@@ -50,6 +50,7 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - run: node scripts/modelling-kit/review.mjs --id=${{ matrix.composition }}
       - if: matrix.composition == 'KitA'
         run: node scripts/modelling-kit/review.mjs --compare-only --compare
@@ -78,6 +79,7 @@ jobs:
           merge-multiple: true
           path: out/modelling-kit-v2-hd
       - run: python -m pip install numpy
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - run: node scripts/modelling-kit/verify-colour.mjs
       - run: python scripts/modelling-kit/verify.py
       - uses: actions/upload-artifact@v4
