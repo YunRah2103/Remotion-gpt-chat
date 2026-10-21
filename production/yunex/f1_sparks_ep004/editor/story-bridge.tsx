@@ -11,40 +11,14 @@
  */
 import React from 'react';
 import {AbsoluteFill} from 'remotion';
-import type {StoryRequest,ShotId} from '../shared/contract.ts';
-import {getSkidDescriptors} from '../mechanics/skids.ts';
-import {sampleDynamics,sampleContactDrivenSparks} from '../physics/index.ts';
+import type {StoryRequest} from '../shared/contract.ts';
+import {buildRealStoryRequest} from './story-request.ts';
 import {getStoryVisualCue,type StoryVisualCue} from '../story/visual-cues.ts';
 import {StoryOverlay,type ScreenAnchor} from '../story/StoryOverlay.tsx';
 import {chooseLabel} from '../story/StoryOverlay.tsx';
-import {SHOT_ORDER} from './timing.ts';
 import type {VisualShotProps} from './PictureEdit.tsx';
 
-const SKIDS = getSkidDescriptors();
-
-/** Narration is NOT part of the scene clock; only real physics source time is. */
-export function buildRealStoryRequest(props: VisualShotProps): StoryRequest {
-  if (!SHOT_ORDER.includes(props.shot as (typeof SHOT_ORDER)[number])) {
-    throw new Error('EP004 editor bridge: unrecognised canonical story shot');
-  }
-  if (!Number.isFinite(props.globalSec) || !Number.isFinite(props.sourceSec)
-      || !Number.isFinite(props.shotLocalSec) || !Number.isFinite(props.shotDurationSec)
-      || props.globalSec < 0 || props.sourceSec < 0 || props.shotLocalSec < 0
-      || props.shotDurationSec <= 0 || props.shotLocalSec >= props.shotDurationSec + .0001) {
-    throw new Error('EP004 editor bridge: invalid VO/source-time split or shot handle');
-  }
-  const motion=sampleDynamics(props.sourceSec);
-  const {contacts,particles}=sampleContactDrivenSparks(props.sourceSec,motion,SKIDS);
-  // These are authoritative geometry-linked Agent 1+2 particles. No independent
-  // decorative spark birth, route, motion, or source-time guess is allowed.
-  return {
-    shot:props.shot,
-    tSec:props.sourceSec,
-    shotLocalSec:props.shotLocalSec,
-    shotDurationSec:props.shotDurationSec,
-    motion,contacts,particles,
-  };
-}
+export {buildRealStoryRequest} from './story-request.ts';
 
 export type ApprovedCameraShotRenderer = (input: Readonly<{
   request:StoryRequest;
