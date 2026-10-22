@@ -65,3 +65,9 @@ test('picture subtitles cannot appear without both original audio and verified t
  assert.match(overlay,/SILENT PICTURE REVIEW \/ NOT FINAL/);
  assert.match(overlay,/top:1578,height:207/);
 });
+
+test('costly independent live exhaust-port projection runs ONLY in its named beat',()=>{
+ assert.match(template,/const needsPort=sample.shot.id==='exhaust'/);
+ assert.match(template,/needsPort\?createEp005Hero\(\):null/);
+ assert.match(template,/if\(!anchorHero\)return null/);
+});
