@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "sourceStatus": "PRELIMINARY_EDITING_NOT_RECORDED_OR_APPROVED",
+  "fps": 30,
+  "totalFrames": 750,
+  "narration": {
+    "approved": false,
+    "source": null,
+    "recordingSHA256": null,
+    "verifiedTimingsAvailable": false,
+    "targetIntegratedLUFS": -16,
+    "maxTruePeakDBFS": -1.5,
+    "sourceMustRemainUnchanged": true
+  },
+  "guidance": "Audio is a proposal, not recorded narration; source stems remain null and may only be used after approval, license verification, hashes and actual listening.",
+  "cues": [
+    {
+      "id": "hook",
+      "start": 0,
+      "end": 45,
+      "priority": "exhaust-afterfire",
+      "sound": "Immediate brief exhaust fire pulse with rolling engine underneath; no loud buzz or sustained flames",
+      "proposedStem": null,
+      "approved": false
+    },
+    {
+      "id": "tracking",
+      "start": 45,
+      "end": 165,
+      "priority": "car-under-load",
+      "sound": "Convincing accelerating engine/exhaust and travelling road ambience, tonal gear transition; narration remains in front",
+      "proposedStem": null,
+      "approved": false
+    },
+    {
+      "id": "science-engine",
+      "start": 165,
+      "end": 285,
+      "priority": "mechanical",
+      "sound": "Subtle ignition/exhaust pulse synced to rendered cylinder and flow; remove harsh high-frequency whine",
+      "proposedStem": null,
+      "approved": false
+    },
+    {
+      "id": "science-flow",
+      "start": 285,
+      "end": 420,
+      "priority": "airflow",
+      "sound": "Quiet exhaust gas flow, light transients aligned with animated pipe packets; not a generic sci-fi sweeping whoosh",
+      "proposedStem": null,
+      "approved": false
+    },
+    {
+      "id": "afterfire-reveal",
+      "start": 420,
+      "end": 555,
+      "priority": "exhaust-ignition",
+      "sound": "Short natural ignition crackle/roar ONLY at visible tailpipe pulse; no universal static flame",
+      "proposedStem": null,
+      "approved": false
+    },
+    {
+      "id": "myth-correction",
+      "start": 555,
+      "end": 675,
+      "priority": "racing-drive",
+      "sound": "Subdued dynamic engine rise, tire texture and road ambience; narrator science caveat clear",
+      "proposedStem": null,
+      "approved": false
+    },
+    {
+      "id": "finale",
+      "start": 675,
+      "end": 750,
+      "priority": "payoff",
+      "sound": "High-speed rear tracking, gear lift and dual brief flame bursts; powerful but NOT loud enough to mask final line",
+      "proposedStem": null,
+      "approved": false
+    }
+  ],
+  "mastering": {
+    "outputChannels": 2,
+    "sampleRateHz": 48000,
+    "aacBitrate": "192k",
+    "targetIntegratedLUFS": -16,
+    "maxTruePeakDBFS": -1.5,
+    "preferredLRA": 9,
+    "manualListeningMandatory": true
+  },
+  "ethics": {
+    "noInventedCedar": true,
+    "noVoiceCloning": true,
+    "noUnlicensedSfx": true,
+    "noUnapprovedA1ToA5Samples": true
+  }
+}
