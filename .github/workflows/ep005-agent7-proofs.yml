@@ -48,6 +48,18 @@ jobs:
           sha256sum out/ep005/agent7/*.mp4 > out/ep005/agent7/SHA256SUMS
           ffmpeg -y -i out/ep005/agent7/flame-fixture.mp4 -vf "fps=1,scale=270:480,tile=3x1" -frames:v 1 out/ep005/agent7/flame-contact.png
           ffmpeg -y -i out/ep005/agent7/science.mp4 -vf "fps=1,scale=270:480,tile=5x1" -frames:v 1 out/ep005/agent7/science-contact.png
+      - name: Publish contact thumbnails to logs for visual inspection
+        run: |
+          ffmpeg -y -i out/ep005/agent7/flame-contact.png -q:v 8 out/ep005/agent7/flame-contact.jpg
+          ffmpeg -y -i out/ep005/agent7/science-contact.png -q:v 8 out/ep005/agent7/science-contact.jpg
+          python3 - <<'PY'
+          from base64 import b64encode
+          from pathlib import Path
+          for which in ('flame','science'):
+              data=b64encode(Path(f'out/ep005/agent7/{which}-contact.jpg').read_bytes()).decode()
+              for i in range(0,len(data),1500):
+                  print(f'YUNEX_CONTACT_{which.upper()}={data[i:i+1500]}')
+          PY
       - name: Upload unapproved R&D proofs
         uses: actions/upload-artifact@v4
         if: always()
