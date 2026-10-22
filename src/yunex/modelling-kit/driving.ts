@@ -12,8 +12,8 @@ export function drivingState(action:DrivingAction,frame:number,fps:number):Cinem
  const t=Math.max(0,frame/fps),base={frame:Math.max(0,frame),fps};
  switch(action){
   case 'cruise':return {...base,speed:12,distance:t*12};
-  case 'acceleration':{const a=3.5,u=Math.min(t,5),speed=3+a*u;return {...base,speed,distance:3*u+.5*a*u*u+Math.max(0,t-5)*speed,compression:.008};}
-  case 'braking':{const u=T.MathUtils.clamp(t-1,0,3),speed=t<1?18:18-6*u;return {...base,speed,distance:Math.min(t,1)*18+18*u-3*u*u,braking:t>=1&&t<4?Math.sin(u/3*Math.PI)*.65+.25:0,heat:t>=1?.75*Math.exp(-Math.max(0,t-4)*.4):0,compression:t>=1&&t<4?.035:0};}
+  case 'acceleration':{const a=3.5,u=Math.min(t,5),speed=3+a*u;return {...base,speed,distance:3*u+.5*a*u*u+Math.max(0,t-5)*speed,acceleration:t<5?3.5:0,compression:0};}
+  case 'braking':{const u=T.MathUtils.clamp(t-1,0,3),speed=t<1?18:18-6*u;return {...base,speed,distance:Math.min(t,1)*18+18*u-3*u*u,acceleration:t>=1&&t<4?-6:0,braking:t>=1&&t<4?Math.sin(u/3*Math.PI)*.65+.25:0,heat:t>=1?.75*Math.exp(-Math.max(0,t-4)*.4):0,compression:t>=1&&t<4?.035:0};}
   case 'cornering':return {...base,speed:12,distance:t*12,steer:.13*Math.sin(t*.8),compression:.022};
   default:throw new Error(`Unknown driving action: ${action}`);
  }

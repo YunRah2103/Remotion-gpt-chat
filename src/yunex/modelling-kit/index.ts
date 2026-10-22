@@ -27,3 +27,6 @@ export {ComponentRegistry} from './registry.ts';
 export type {RegisteredComponent} from './registry.ts';
 
 export {animateEnergyFlow} from './systems.ts';
+
+export {sampleDynamics,dynamicsProfile,roadHeight} from './dynamics.ts';
+export type {DynamicsInput} from './dynamics.ts';

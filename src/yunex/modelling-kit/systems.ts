@@ -30,10 +30,10 @@ export function createMechanicalSystems(s:VehicleSpec,mounts:T.Group[]){
  // Springs and wishbones already live on the cinematic rig. This adds their shared frame.
  return g;
 }
-export function animateMechanicalSystems(g:T.Group,root:T.Group,bodyY:number){
- g.position.y=bodyY;
+export function animateMechanicalSystems(g:T.Group,root:T.Group,bodyY:number,bodyRotation?:T.Euler){
+ g.position.y=bodyY;g.rotation.copy(bodyRotation??new T.Euler());g.updateMatrixWorld(true);
  g.children.forEach(o=>{if(!o.userData.wheelEndpoint)return;const mount=root.getObjectByName(o.userData.wheelEndpoint)!;
- const a=new T.Vector3(...o.userData.inboard),b=mount.position.clone();b.y-=bodyY;const d=b.clone().sub(a);o.position.copy(a).add(b).multiplyScalar(.5);o.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.clone().normalize());o.scale.y=d.length();});
+ const a=new T.Vector3(...o.userData.inboard),b=g.worldToLocal(mount.getWorldPosition(new T.Vector3()));const d=b.clone().sub(a);o.position.copy(a).add(b).multiplyScalar(.5);o.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.clone().normalize());o.scale.y=d.length();});
 }
 
 /** Illustrative electrical energy direction, not a battery/torque simulation. Actual component centres anchor the route. */

@@ -49,9 +49,9 @@ export const StudioEpisode:React.FC<{recipe:EpisodeRecipe}>=({recipe})=>{
   camera=partInspectionCamera(model,width/height,shot.orbit?{azimuth:shot.orbit.azimuth+(shot.orbit.sweep??0)*sample.localFrame/(shot.duration*fps),elevation:shot.orbit.elevation}:undefined);
  }else{
   const ahead=parked?pose:sampleRoute(recipe.world.kind,distance+.4),delta=Math.atan2(Math.sin(ahead.yaw-pose.yaw),Math.cos(ahead.yaw-pose.yaw));
-  animateCinematicVehicle(model,{...state,distance:parked?0:state.distance,steer:parked?state.steer:T.MathUtils.clamp(-delta/.4*s.wheelbase,-.4,.4)});
+  animateCinematicVehicle(model,{...state,distance:parked?0:state.distance,speed:parked?0:state.speed,acceleration:parked?0:state.acceleration,curvature:parked?0:-delta/.4,steer:parked?state.steer:T.MathUtils.clamp(-delta/.4*s.wheelbase,-.4,.4)});
   animateComponents(model,sample.joints);
-  model.position.fromArray(pose.position);model.rotation.y=pose.yaw;model.updateMatrixWorld(true);
+  model.position.fromArray(pose.position);model.rotation.set(0,pose.yaw,parked?0:Math.atan2(ahead.position[1]-pose.position[1],.4));model.updateMatrixWorld(true);
   const head=model.getObjectByName('head');if(head)head.visible=shot.camera!=='onboard';
   if(shot.camera==='onboard')camera=driverPovCamera(model);
   else if(['tracking','chase','reveal','overhead'].includes(shot.camera))camera=fitModelCamera(model,camera,width/height);
