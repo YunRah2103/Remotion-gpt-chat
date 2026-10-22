@@ -7,17 +7,17 @@ import {PARTS} from '../../src/yunex/parts-kit/catalog.ts';
 import {STUDIO_RECIPES} from '../../src/yunex/modelling-kit/studio-recipes.ts';
 import {compileRecipe} from '../../src/yunex/modelling-kit/recipe.ts';
 export function createProject(root,name,template='braking'){
- if(!/^[a-z][a-z0-9-]{1,60}$/.test(name)||/ep00[34]/i.test(name))throw Error('Use a new lowercase slug; EP003/EP004 are protected');
+ if(typeof name!=='string'||!/^[a-z][a-z0-9-]{1,60}$/.test(name)||/ep00[34]/i.test(name))throw Error('Use a new lowercase slug; EP003/EP004 are protected');
  if(!STUDIO_RECIPES[template])throw Error(`Templates: ${Object.keys(STUDIO_RECIPES).join(', ')}`);
  const folder=resolve(root,'src/yunex/studio-projects',name);if(existsSync(folder))throw Error('Project already exists; refusing to overwrite');
  const recipe=structuredClone(STUDIO_RECIPES[template]);recipe.id=name;compileRecipe(recipe);
- mkdirSync(folder,{recursive:true});writeFileSync(resolve(folder,'recipe.json'),JSON.stringify(recipe,null,2)+'\n');
+ mkdirSync(dirname(folder),{recursive:true});mkdirSync(folder);writeFileSync(resolve(folder,'recipe.json'),JSON.stringify(recipe,null,2)+'\n');
  writeFileSync(resolve(folder,'entry.tsx'),`import React from 'react';\nimport {Composition,registerRoot} from 'remotion';\nimport input from './recipe.json';\nimport {StudioEpisode} from '../../modelling-kit/StudioEpisode';\nimport {compileRecipe} from '../../modelling-kit/recipe';\nimport type {EpisodeRecipe} from '../../modelling-kit/recipe';\nconst recipe=input as EpisodeRecipe;\nconst compiled=compileRecipe(recipe);\nconst Root=()=> <Composition id="StudioEpisode" component={StudioEpisode} width={1080} height={1920} fps={30} durationInFrames={compiled.durationInFrames} defaultProps={{recipe}}/>;\nregisterRoot(Root);\n`);
  writeFileSync(resolve(folder,'README.md'),`# ${name}\n\nEdit recipe.json. Keep durations in seconds and use kit:catalog for valid assets.\n\nRun from repository root:\n\n\`npm run kit:validate -- ${name}\`\n\n\`npm run kit:render -- ${name}\`\n\nNarration/music are optional public-relative audio paths; supply original audio yourself. Review every cut and caption before handoff.\n`);
  return folder;
 }
 export function validateProject(root,name){
- if(!/^[a-z][a-z0-9-]{1,60}$/.test(name))throw Error('Invalid project slug');
+ if(typeof name!=='string'||!/^[a-z][a-z0-9-]{1,60}$/.test(name))throw Error('Invalid project slug');
  const folder=resolve(root,'src/yunex/studio-projects',name),recipe=JSON.parse(readFileSync(resolve(folder,'recipe.json'),'utf8')),compiled=compileRecipe(recipe);
  for(const asset of [recipe.audio?.narration,recipe.audio?.music])if(asset&&!existsSync(resolve(root,'public',asset)))throw Error(`Missing public audio: ${asset}`);
  return {folder,compiled};

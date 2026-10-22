@@ -27,7 +27,7 @@ export function drivingCamera(name:CameraPreset,pose:RoutePose,s:VehicleSpec,asp
   case 'tracking':p=[l*1.10,h*1.50,(options.side??-1)*w*1.2];overview=true;break;
   case 'chase':p=[-l*1.3,h*1.25,w*1.3];overview=true;break;
   case 'wheel':p=[s.wheelbase*.65,s.radius*1.55,w*.94];target=[s.wheelbase/2,s.radius,w*.45];fov=46;break;
-  case 'interior':p=[l*.10,h*.86,-w*.72];target=[0,h*.55,0];fov=48;break;
+  case 'interior':p=[l*.10+.08*Math.sin(time*.45),h*.86+.015*Math.sin(time*.35),-w*.72+.035*Math.cos(time*.45)];target=[0,h*.55,0];fov=48;break;
   case 'onboard':p=[-l*.10,h*.88,0];target=[l*1.5,h*.40,0];fov=65;break;
   case 'overhead':p=[.01,l*2,0];target=[0,0,0];overview=true;fov=46;break;
   case 'reveal':{const a=.38+Math.sin(time*.28)*.45;p=[Math.cos(a)*l*1.35,h*1.15,Math.sin(a)*l*1.35];overview=true;break;}

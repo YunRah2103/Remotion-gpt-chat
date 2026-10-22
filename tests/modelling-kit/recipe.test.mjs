@@ -22,3 +22,4 @@ test('cutaway envelopes and tracked annotations stay finite and recipe output is
  for(const f of [0,30,89,90,179]){const s=recipe.sampleRecipe(c,f);assert.ok(Number.isFinite(s.state.frame));assert.ok((s.state.cutaway??0)>=0&&(s.state.cutaway??0)<=1);}
  assert.throws(()=>recipe.sampleRecipe(c,NaN));
 });
+test('parked cabin cameras retain a gentle absolute-time dolly between gear movements',async()=>{const {drivingCamera}=await import('../../src/yunex/modelling-kit/driving.ts');const {vehicleSpec}=await import('../../src/yunex/world-kit/catalog.ts');const s=vehicleSpec('supercar'),pose={position:[0,0,0],yaw:0};const a=drivingCamera('interior',pose,s,1080/1920,13),b=drivingCamera('interior',pose,s,1080/1920,13+1/30);assert.notDeepEqual(a.position,b.position);assert.deepEqual(a,drivingCamera('interior',pose,s,1080/1920,13));assert.ok(Math.hypot(...a.position.map((n,i)=>n-b.position[i]))<.01);});
