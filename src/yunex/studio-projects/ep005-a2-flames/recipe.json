@@ -1,0 +1,44 @@
+{
+  "id": "ep005-a2-flames",
+  "title": "A1 REAL EXHAUST / TURBULENT AFTERFIRE / SILENT",
+  "vehicle": {
+    "variant": "supercar",
+    "driver": true,
+    "color": "#15585f"
+  },
+  "world": {
+    "kind": "track",
+    "timeOfDay": "night",
+    "wetness": 0.13
+  },
+  "shots": [
+    {
+      "id": "hook",
+      "duration": 1.2,
+      "camera": "chase",
+      "action": "acceleration",
+      "caption": "UNBURNT FUEL. HOT EXHAUST. FLAME."
+    },
+    {
+      "id": "tailpipe",
+      "duration": 2,
+      "camera": "chase",
+      "action": "acceleration",
+      "caption": "A brief afterfire burst — not a constant torch."
+    },
+    {
+      "id": "mechanism",
+      "duration": 2.8,
+      "camera": "reveal",
+      "action": "cruise",
+      "caption": "ENGINE → HOT EXHAUST → TAILPIPES"
+    },
+    {
+      "id": "wide",
+      "duration": 2,
+      "camera": "chase",
+      "action": "acceleration",
+      "caption": "Not all supercars do this."
+    }
+  ]
+}

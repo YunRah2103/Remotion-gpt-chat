@@ -1,0 +1,83 @@
+name: EP005 Agent 2 — V3 Afterfire Native Review
+on:
+  push:
+    branches:
+      - agent/ep005-02-v3-flames
+      - agent/ep005-02-v3-afterfire-premium-r2
+    paths:
+      - 'production/yunex/supercar_flames_ep005/flames/**'
+      - 'src/yunex/studio-projects/ep005-a2-flames/**'
+      - 'tests/ep005/**'
+      - '.github/workflows/ep005-agent2-afterfire.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - run: npm run check
+      - run: node --experimental-strip-types --test tests/ep005/*.test.mjs
+      - run: npm run kit:validate -- ep005-a2-flames
+      - run: npm run kit:plan -- ep005-a2-flames
+      - run: npm run kit:inspect -- ep005-a2-flames
+      - run: npm run kit:render -- ep005-a2-flames
+      - run: npm run kit:handoff -- ep005-a2-flames
+      - name: Prove native dimensions, full decode and motion
+        run: |
+          mkdir -p out/studio/ep005-a2-flames/qa
+          ffprobe -v error -show_entries stream=width,height,r_frame_rate,nb_frames -select_streams v:0 -of json out/studio/ep005-a2-flames.mp4 | tee out/studio/ep005-a2-flames/qa/ffprobe.json
+          ffmpeg -v error -i out/studio/ep005-a2-flames.mp4 -f null -
+          sha256sum out/studio/ep005-a2-flames.mp4 > out/studio/ep005-a2-flames/qa/sha256.txt
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          j=json.loads(Path('out/studio/ep005-a2-flames/qa/ffprobe.json').read_text())
+          v=j['streams'][0]
+          assert (int(v['width']),int(v['height']))==(1080,1920),v
+          assert v['r_frame_rate']=='30/1',v
+          assert int(v['nb_frames'])==240,v
+          PY
+          ffmpeg -y -v error -i out/studio/ep005-a2-flames.mp4 -vf "select='eq(n,0)+eq(n,5)+eq(n,15)+eq(n,35)+eq(n,60)+eq(n,90)+eq(n,135)+eq(n,175)+eq(n,230)',scale=270:480,tile=3x3" -vsync vfr -frames:v 1 out/studio/ep005-a2-flames/qa/contact-sheet.jpg
+          ffmpeg -v error -i out/studio/ep005-a2-flames.mp4 -vf "fps=2,scale=120:213" -f framemd5 out/studio/ep005-a2-flames/qa/motion.framemd5
+          python - <<'PY'
+          from pathlib import Path
+          lines=[l for l in Path('out/studio/ep005-a2-flames/qa/motion.framemd5').read_text().splitlines() if not l.startswith('#')]
+          assert len(lines)>=12
+          assert len({l.split(',')[-1].strip() for l in lines})>=10,'Film has insufficient distinct moving frames'
+          PY
+      - name: Enforce a visible 3D mechanical subject at f135
+        run: |
+          ffmpeg -v error -i out/studio/ep005-a2-flames.mp4 -vf "select='eq(n,135)',scale=180:320" -frames:v 1 -pix_fmt rgb24 -f rawvideo out/studio/ep005-a2-flames/qa/mechanism.rgb
+          python - <<'PY'
+          from pathlib import Path
+          raw=Path('out/studio/ep005-a2-flames/qa/mechanism.rgb').read_bytes()
+          w,h=180,320
+          assert len(raw)==w*h*3, 'exact mechanic frame missing'
+          bright=0
+          for y in range(117,216):
+              for x in range(17,163):
+                  k=(y*w+x)*3
+                  r,g,b=raw[k:k+3]
+                  if max(r,g,b)>105 and (r+g+b)>225:
+                      bright+=1
+          print('central mechanic object pixels:',bright)
+          assert bright>260, 'MECHANICAL SHOT EMPTY OR CROPPED: reject render'
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EP005-A2-AFTERFIRE-SILENT-NATIVE-1080x1920-30
+          path: |
+            out/studio/ep005-a2-flames.mp4
+            out/studio/ep005-a2-flames/
+          retention-days: 30
