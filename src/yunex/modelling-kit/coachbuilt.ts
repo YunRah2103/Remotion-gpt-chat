@@ -19,8 +19,8 @@ export function coachbuiltField(p:T.Vector3,s:VehicleSpec){
  p.y-=free*nose*.055*side**2*(1-roof);
  p.y+=roof*.026*(1-Math.min(1,side**2));
  // Shape the actual bonnet and bumper together. The former shallow die left a
- // horizontal slab between the headlamps; this gives the prow a broad plan-view
- // sweep and a bonnet valley between independently crowned fender shoulders.
+ // horizontal slab between the headlamps; retain bonnet volume between
+ // independently crowned fender shoulders instead of pressing a deep valley.
  // Release only above the tyre envelope, never move the wheel/arch contact edge.
  const athletic=sport&&s.bodyStyle!=='muscle';
  const strength=athletic?1:s.family==='normal'?.38:s.family==='suv'?.24:0;
@@ -30,9 +30,17 @@ export function coachbuiltField(p:T.Vector3,s:VehicleSpec){
  const centre=Math.exp(-((zRatio(p.z,s.width)/.64)**4));
  const fender=Math.exp(-(((Math.abs(p.z)/(s.width/2)-.78)/.22)**2));
  const axleCrown=Math.exp(-(((x-s.wheelbase/2)/.63)**2));
- p.y+=strength*upper*bonnet*(-.125*centre+.075*fender*axleCrown);
+ p.y+=strength*upper*bonnet*(.018*centre+.075*fender*axleCrown);
  const prow=T.MathUtils.smoothstep(x,half*.30,half);
  p.x-=strength*.12*prow*Math.min(1.25,side)**2*(1-roof)*free;
+ // A cabin is a distinct volume above the belt, not an almost horizontal glass
+ // lid. Keep the sill and controls fixed while opening the upper canopy. The
+ // same transform acts on pillars, seals, roof and glazing, so they stay joined.
+ const canopy=T.MathUtils.smoothstep(y,l.belt+.025,l.roof);
+ const cabinLift=athletic?(s.id==='supercar'?.17:.10):s.family==='normal'?.045:s.family==='suv'?.035:0;
+ const crown=Math.max(0,1-(p.z/(s.width*.43))**2);
+ p.y+=canopy*(cabinLift+.045*strength*crown);
+ p.z*=1-canopy*(athletic?.085:.025);
  return p;
 }
 function zRatio(z:number,width:number){return z/(width/2);}
@@ -70,6 +78,16 @@ export function coachbuiltFinish(shell:T.Group,mounts:T.Group[],s:VehicleSpec){
   }
   next.computeBoundingBox();next.computeBoundingSphere();o.geometry.dispose();o.geometry=next;
  });
+ // Controls keep their original hardpoints, but the ceiling must follow the
+ // actual new canopy. Reuse its curved surface at a measured inward inset.
+ const roofMesh=shell.getObjectByName('roof') as T.Mesh|undefined;
+ const liner=shell.getObjectByName('roof-liner') as T.Mesh|undefined;
+ if(roofMesh&&liner){
+  shell.updateMatrixWorld(true);const next=roofMesh.geometry.clone(),toLiner=liner.matrixWorld.clone().invert(),p=next.attributes.position;
+  for(let i=0;i<p.count;i++){const q=new T.Vector3().fromBufferAttribute(p,i).applyMatrix4(roofMesh.matrixWorld);q.y-=.028;q.applyMatrix4(toLiner);p.setXYZ(i,q.x,q.y,q.z);}
+  const index=next.index;if(index)for(let i=0;i<index.count;i+=3){const b=index.getX(i+1);index.setX(i+1,index.getX(i+2));index.setX(i+2,b);}
+  next.computeVertexNormals();next.computeBoundingBox();next.computeBoundingSphere();liner.geometry.dispose();liner.geometry=next;
+ }
  // Valve stems and machined hub centres live on rolling pivots, never on the brake caliper.
  for(const mount of mounts){const roll=mount.getObjectByName('wheel-roll')!;for(const side of [-1,1])mesh(roll,new T.CylinderGeometry(.006,.006,.025,8),optical,[s.radius*.47,s.radius*.47,side*.126],[Math.PI/2,0,0],'machined-valve-stem');}
  shell.userData.coachbuilt=true;
