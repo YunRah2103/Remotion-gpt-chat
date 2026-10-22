@@ -111,7 +111,7 @@ function plan() {
     requireGate(voice.approved && b.approved === true && safeLocal(b.path) && isSha(b.sha256) &&
       isCommit(b.sourceCommit) && hasApprovedSourceRef(b.approvalRef) &&
       Number.isInteger(b.artifactRunId) && b.artifactRunId > 0 &&
-      typeof b.artifactName === 'string' && /^[\\w.-]+$/.test(b.artifactName) &&
+      typeof b.artifactName === 'string' && /^[\w.-]+$/.test(b.artifactName) &&
       typeof b.provenance === 'string' && b.provenance.trim().length >= 8 &&
       int(b.startFrame) && b.startFrame >= 0 && b.startFrame < 750 &&
       Number.isFinite(b.gainDb) && b.gainDb >= -48 && b.gainDb <= -10,
