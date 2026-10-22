@@ -44,5 +44,19 @@
       "outerRadius": 0.105
     }
   ],
-  "notes": "Read Object3D mount world matrix every absolute frame after animateCinematicVehicle and vehicle route transform; flame exits along car-local -X. Not a calibrated OEM exhaust."
+  "notes": "Keep flame at mount's full world transform after animation; userData.direction=[-1,0,0] in mount-local frame and userData.radius=0.085 are set on both real nozzle-port objects in hero.ts. Body +X forward and +Z left; non-OEM illustrative geometry.",
+  "nozzleConstruction": {
+    "feedPipeRadius": 0.054,
+    "feedPipeEndsAtLocalX": -2.31,
+    "transition": {
+      "rearRadius": 0.054,
+      "exitRadius": 0.085,
+      "centreX": -2.335,
+      "length": 0.16,
+      "openEnded": true
+    },
+    "rolledLipLocalX": -2.465,
+    "clearOpenLip": true,
+    "description": "Smaller routed feed terminates recessed behind the larger open-ended transition and hollow 85 mm bore; actual emission mount remains at outer lip on the physical pipe node."
+  }
 }
