@@ -3,6 +3,13 @@ on:
   push:
     branches:
       - agent/ep005-07-v4-afterfire-science
+  pull_request:
+    branches:
+      - production/yunex-ep005-v3-base
+    paths:
+      - 'src/yunex/ep005/agent7/**'
+      - 'tests/ep005-agent7.test.mjs'
+      - '.github/workflows/ep005-agent7-proofs.yml'
   workflow_dispatch:
 jobs:
   visual-proof:
