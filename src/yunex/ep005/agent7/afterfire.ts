@@ -38,25 +38,25 @@ const fragment = /* glsl */ `
     float n = .56*noise(vec2(x*13.-flow+uSeed,uv.y*8.))
              +.30*noise(vec2(x*34.-flow*2.1,uv.y*19.+uSeed))
              +.14*noise(vec2(x*72.-flow*4.,uv.y*31.));
-    float finger=1.-smoothstep(.54,1.01,x + (.5-n)*.27);
-    float edge=1.-smoothstep(.30+.27*n,.95,r + (1.-n)*.13);
+    float finger=1.-smoothstep(.53,.92,x + (.5-n)*.43);
+    float edge=1.-smoothstep(.20+.43*n,.82,r + (1.-n)*.22);
     float body=edge*finger*smoothstep(0.,.033,x+.016);
     body*=mix(1.,.62, smoothstep(.2,.93,x));
     float hot=exp(-pow(r/(.13+.35*x),2.));
     float base=1.-smoothstep(.035,.23,x);
     vec3 blue=vec3(.20,.64,1.0);
-    vec3 white=vec3(1.0,.94,.75);
+    vec3 white=vec3(.95,.90,.75);
     vec3 gold=vec3(1.,.43,.075);
     vec3 red=vec3(.90,.105,.016);
     vec3 col=mix(blue,white,smoothstep(.035,.18,x));
     col=mix(col,gold,smoothstep(.15,.50,x+.10*r));
     col=mix(col,red,smoothstep(.38,.97,x+.13*r));
     col=mix(col,vec3(.67,.82,1.),base*.34);
-    float layerWeight=uLayer<.5 ? 1.0 : (uLayer<1.5 ? .55 : .24);
+    float layerWeight=uLayer<.5 ? .20 : (uLayer<1.5 ? .105 : .070);
     float alpha=body*layerWeight*(.32+.68*hot)*uPower;
     alpha*=.80+.20*noise(vec2(x*49.+flow,uv.y*41.));
     if(alpha<.008)discard;
-    gl_FragColor=vec4(col*(1.3+1.45*base),min(.92,alpha));
+    gl_FragColor=vec4(col*(1.02+.27*base),min(.38,alpha));
   }
 `;
 function ribbon():T.BufferGeometry {
@@ -79,7 +79,7 @@ export function createAfterfireRig():AfterfireRig{
   for(const side of ['left','right'] as const){
     const group=new T.Group();group.name='afterfire-from-'+side;root.add(group);
     const sheets:T.Mesh[]=[];
-    for(let layer=0;layer<3;layer++)for(let k=0;k<7;k++){
+    for(let layer=0;layer<3;layer++)for(let k=0;k<6;k++){
       const uniforms={
         uTime:{value:0},uLength:{value:.1},uWidth:{value:.05},
         uLayer:{value:layer},uPower:{value:0},
@@ -94,10 +94,10 @@ export function createAfterfireRig():AfterfireRig{
       });
       const sheet=new T.Mesh(geometry,mat);
       sheet.name='luminous-turbulent-tongue';
-      sheet.rotation.x=k*Math.PI/7+layer*.11;
+      sheet.rotation.x=k*Math.PI/6+layer*.11;
       sheet.frustumCulled=false;group.add(sheet);sheets.push(sheet);
     }
-    const spill=new T.PointLight('#ff8440',0,2.1,2);
+    const spill=new T.PointLight('#ff9963',0,.95,2);
     spill.position.x=.08;group.add(spill);
     jets[side]={root:group,sheets,spill};
   }
@@ -126,8 +126,8 @@ export function animateAfterfire(
     jet.root.position.copy(port.origin);
     jet.root.quaternion.setFromUnitVectors(new T.Vector3(1,0,0),port.outward);
     jet.root.visible=env>.012;
-    const width=port.innerRadiusM*(2.8+1.75*env);
-    const length=(.20+1.58*env)*(1+.11*Math.sin(time*37+ (port.id==='left'?0:2)));
+    const width=port.innerRadiusM*(2.0+.85*env);
+    const length=(.16+1.10*env)*(1+.17*Math.sin(time*37+ (port.id==='left'?0:2)));
     const wind=worldVelocity ? -worldVelocity.dot(new T.Vector3(0,1,0))*0.002 : 0;
     jet.sheets.forEach(mesh=>{
       const m=mesh.material as T.ShaderMaterial;
@@ -137,6 +137,6 @@ export function animateAfterfire(
       m.uniforms.uWind.value=wind;
       m.uniforms.uPower.value=env;
     });
-    jet.spill.intensity=Math.min(10,8*env);
+    jet.spill.intensity=Math.min(2,1.65*env);
   }
 }
