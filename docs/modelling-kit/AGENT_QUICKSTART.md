@@ -1,5 +1,9 @@
 # Production-agent quick start
 
+For the new world/driving/camera APIs and verified native previews, read the
+[Premium Studio guide](PREMIUM-STUDIO-UPGRADE.md) and
+[22 October QA handoff](STUDIO-QA-2026-10-22.md).
+
 Use the existing V2 branch/PR while it remains draft. Do not copy these files into
 an episode-specific replacement kit. Preserve the legacy world/parts factories.
 Metres, +X forward, +Y up, +Z left; local road plane Y=0.
