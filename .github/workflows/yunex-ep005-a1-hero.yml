@@ -1,0 +1,73 @@
+name: YUNEX EP005 Agent 1 native hero QA
+on:
+  push:
+    branches:
+      - agent/ep005-01-v3-hero
+    paths:
+      - src/yunex/studio-projects/ep005-a1-hero/**
+      - production/yunex/supercar_flames_ep005/vehicle/**
+      - .github/workflows/yunex-ep005-a1-hero.yml
+  pull_request:
+    branches:
+      - production/yunex-ep005-v3-base
+    paths:
+      - src/yunex/studio-projects/ep005-a1-hero/**
+      - production/yunex/supercar_flames_ep005/vehicle/**
+      - .github/workflows/yunex-ep005-a1-hero.yml
+permissions:
+  contents: read
+concurrency:
+  group: ep005-agent1-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  native-hero:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - run: npm run check
+      - run: node --test production/yunex/supercar_flames_ep005/vehicle/hero-contract.test.mjs
+      - run: npm run kit:validate -- ep005-a1-hero
+      - run: npm run kit:plan -- ep005-a1-hero
+      - run: npm run kit:inspect -- ep005-a1-hero
+      - run: npm run kit:preview -- ep005-a1-hero
+      - run: npm run kit:render -- ep005-a1-hero
+      - name: Full decode + native format verification, motion stats and contact sheet
+        run: |
+          set -eu
+          OUT=out/studio/ep005-a1-hero.mp4
+          PACK=out/studio/ep005-a1-hero
+          mkdir -p "$PACK"
+          ffprobe -v error -show_entries stream=width,height,r_frame_rate,nb_frames,codec_name -show_entries format=duration,size -of json "$OUT" > "$PACK/native-media.json"
+          python3 - <<'PY'
+          import json
+          x=json.load(open('out/studio/ep005-a1-hero/native-media.json'))
+          s=next(a for a in x['streams'] if a.get('width'))
+          assert (s['width'],s['height'],s['r_frame_rate'],int(s['nb_frames'])) == (1080,1920,'30/1',300),s
+          assert abs(float(x['format']['duration'])-10)<.1,x
+          print('Native portrait 1080x1920, 30fps, 300f / 10 seconds verified.')
+          PY
+          ffmpeg -hide_banner -loglevel error -i "$OUT" -f null -
+          ffmpeg -hide_banner -loglevel error -i "$OUT" -vf "fps=1,scale=270:480,tile=5x2" -frames:v 1 "$PACK/10s-contact.jpg"
+          sha256sum "$OUT" > "$PACK/native-mp4.sha256"
+          ls -lh "$OUT" "$PACK/10s-contact.jpg"
+      - name: Upload actual native moving proof + QA
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EP005-Agent1-Hero-Native-Portrait-1080p30
+          path: |
+            out/studio/ep005-a1-hero.mp4
+            out/studio/ep005-a1-hero/native-media.json
+            out/studio/ep005-a1-hero/native-mp4.sha256
+            out/studio/ep005-a1-hero/10s-contact.jpg
+            out/studio/ep005-a1-hero/previews/
+            out/studio/ep005-a1-hero/model-report.json
+            out/studio/ep005-a1-hero/plan.json
+          retention-days: 30

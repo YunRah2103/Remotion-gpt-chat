@@ -1,0 +1,39 @@
+{
+  "id": "ep005-a6-polish",
+  "title": "EP005 Agent 6 premium hero and motion comparison / silent",
+  "vehicle": {
+    "variant": "supercar",
+    "color": "#17384f",
+    "driver": true,
+    "interior": true
+  },
+  "world": {
+    "kind": "track",
+    "seed": 21,
+    "timeOfDay": "dusk",
+    "wetness": 0.1
+  },
+  "shots": [
+    {
+      "id": "rear-review",
+      "duration": 2,
+      "camera": "chase",
+      "action": "acceleration",
+      "caption": "Rear exhaust fit and road contact"
+    },
+    {
+      "id": "profile-review",
+      "duration": 2,
+      "camera": "tracking",
+      "action": "cornering",
+      "caption": "Steering, wheels and stance"
+    },
+    {
+      "id": "payoff-review",
+      "duration": 2,
+      "camera": "chase",
+      "action": "acceleration",
+      "caption": "Cinematic follow and body movement"
+    }
+  ]
+}

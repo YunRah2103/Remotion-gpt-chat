@@ -1,0 +1,65 @@
+name: EP005 Agent 6 — Hero + Planted Motion Native Comparison
+on:
+  push:
+    branches:
+      - agent/ep005-06-v3-hero-motion-polish
+    paths:
+      - 'production/yunex/supercar_flames_ep005/polish/**'
+      - 'src/yunex/studio-projects/ep005-a6-polish/**'
+      - '.github/workflows/ep005-agent6-polish.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  review-mp4:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - run: npm run check
+      - run: node --experimental-strip-types --test production/yunex/supercar_flames_ep005/polish/dynamics.test.mjs
+      - run: npm run kit:validate -- ep005-a6-polish
+      - name: Render actual native matched before + after video
+        run: |
+          mkdir -p out/studio/ep005-a6-polish
+          npx remotion render src/yunex/studio-projects/ep005-a6-polish/entry.tsx EP005Before out/studio/ep005-a6-polish/before.mp4 --gl=swangle --concurrency=2
+          npx remotion render src/yunex/studio-projects/ep005-a6-polish/entry.tsx EP005After out/studio/ep005-a6-polish/after.mp4 --gl=swangle --concurrency=2
+      - name: Verify native media, full decode, frame motion and SHA256
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd out/studio/ep005-a6-polish
+          for kind in before after; do
+            ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,width,height,r_frame_rate,nb_frames -show_entries format=duration,size -of json "$kind.mp4" > "$kind.probe.json"
+            ffmpeg -hide_banner -loglevel error -i "$kind.mp4" -f null -
+            sha256sum "$kind.mp4" > "$kind.sha256"
+            ffmpeg -hide_banner -loglevel error -i "$kind.mp4" -vf "fps=1,scale=270:480,tile=3x2" -frames:v 1 -y "$kind-contact.jpg"
+            ffmpeg -hide_banner -loglevel error -i "$kind.mp4" -vf "select='eq(n,0)+eq(n,30)+eq(n,90)+eq(n,150)+eq(n,179)',scale=270:480" -vsync 0 -y "$kind-%03d.jpg"
+          done
+          python3 - <<'PY'
+          import json,hashlib,pathlib
+          p=pathlib.Path('.')
+          for kind in ('before','after'):
+              j=json.loads((p/f'{kind}.probe.json').read_text())
+              v=j['streams'][0]
+              assert (v['codec_name'],int(v['width']),int(v['height']),v['r_frame_rate'],int(v['nb_frames']))==('h264',1080,1920,'30/1',180),v
+              assert abs(float(j['format']['duration'])-6)<.10,j
+              hashes=[hashlib.sha256(x.read_bytes()).hexdigest() for x in sorted(p.glob(f'{kind}-*.jpg')) if not x.name.endswith('-contact.jpg')]
+              assert len(hashes)==5 and len(set(hashes))>=4,(kind,hashes)
+              print(f'{kind}: 1080x1920/30 180 frames, complete decode, at least 4 distinct sampled images')
+          assert hashlib.sha256((p/'before.mp4').read_bytes()).digest()!=hashlib.sha256((p/'after.mp4').read_bytes()).digest()
+          print('Before/after differ. Visual judgement still requires actual MP4 inspection.')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EP005-A6-Before-After-Native-1080p30
+          path: |
+            out/studio/ep005-a6-polish/
+          retention-days: 30
