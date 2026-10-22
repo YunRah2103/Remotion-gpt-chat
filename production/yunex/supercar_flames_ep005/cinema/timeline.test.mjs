@@ -77,3 +77,58 @@ test('portrait hero centre and three whole-car views stay in-frame across cuts',
   }
  }
 });
+
+test('planted vehicle load cues are finite, smooth and independent of shot cuts',()=>{
+ let prev=sampleCinema(0),activeCorners=0;
+ for(let f=1;f<750;f++){
+  const now=sampleCinema(f);
+  for(const key of ['longitudinalAcceleration','lateralAcceleration','curvature',
+   'bodyPitch','bodyRoll','suspensionCompression']){
+   assert.ok(Number.isFinite(now[key]),`frame ${f}: ${key} must be finite`);
+  }
+  assert.ok(Math.abs(now.bodyRoll)<=.044001,'body roll must stay planted');
+  assert.ok(Math.abs(now.bodyPitch)<=.013001,'body pitch must stay planted');
+  assert.ok(now.suspensionCompression>=.003&&now.suspensionCompression<=.022001,
+   'tyre travel must not cause visibly floating vehicle');
+  assert.ok(Math.abs(now.bodyRoll-prev.bodyRoll)<.025,'avoid per-frame sway snaps');
+  assert.ok(Math.abs(now.suspensionCompression-prev.suspensionCompression)<.01,
+   'avoid per-frame suspension jumps');
+  assert.ok(now.distanceMeters>prev.distanceMeters,'rolling distance is monotonic');
+  if(Math.abs(now.curvature)>.001)activeCorners++;
+  if(now.shot.id!==prev.shot.id){
+   assert.ok(Math.abs(now.bodyRoll-prev.bodyRoll)<.025,'camera cut cannot reset chassis state');
+  }
+  prev=now;
+ }
+ assert.ok(activeCorners>60,'driving route must contain visible corners');
+});
+test('cinematic camera dollies are genuine, deliberate and portrait-safe',()=>{
+ const spec=vehicleSpec('supercar');
+ let totalMotion=0;
+ for(const shot of CINEMA_SHOTS){
+  const a=sampleCinema(shot.start),b=sampleCinema(shot.end-1);
+  // Camera position relative to the road/car must advance within shots, not be
+  // glued to a frozen hero while scenery scrolls past.
+  const relative=sample=>new T.Vector3(...sample.camera.position)
+   .sub(new T.Vector3(...sample.pose.position))
+   .applyAxisAngle(new T.Vector3(0,1,0),-sample.pose.yaw);
+  const move=relative(a).distanceTo(relative(b));totalMotion+=move;
+  assert.ok(move>.25,`${shot.id} is a frozen rigid chase camera`);
+  for(const f of [shot.start,Math.floor((shot.start+shot.end-1)/2),shot.end-1]){
+   const sample=sampleCinema(f);
+   const cam=new T.PerspectiveCamera(sample.camera.fov,9/16,.025,600);
+   cam.position.fromArray(sample.camera.position);
+   cam.lookAt(new T.Vector3(...sample.camera.target));cam.updateMatrixWorld(true);
+   const origin=new T.Vector3(...sample.pose.position)
+    .add(new T.Vector3(0,spec.height/2,0)).project(cam);
+   assert.ok(Math.abs(origin.x)<.55&&Math.abs(origin.y)<.55,
+    `${shot.id} loses the actual driving supercar`);
+   assert.ok(sample.camera.position[1]>sample.pose.position[1]+.9,
+    `${shot.id} camera hit the tarmac`);
+  }
+ }
+ assert.ok(totalMotion>5,'shots need significant cinematic movement');
+ const first=sampleCinema(0),last=sampleCinema(749);
+ assert.ok(first.afterfireDemand>.7,'hook must command the real exhaust effect at f0');
+ assert.ok(last.speedMps>first.speedMps,'final payoff must be genuine accelerating motion');
+});
