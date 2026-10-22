@@ -69,7 +69,7 @@ export function applyEp005HeroPolish(hero:THREE.Group):THREE.Group{
  for(const side of ['front-left','front-right','rear-left','rear-right']){
   const pivot=hero.getObjectByName('mount-'+side);
   const wheel=pivot?.getObjectByName('wheel-roll');
-  if(!wheel)throw Error('Original V3 rolling wheel absent: '+side);
+  if(!pivot||!wheel)throw Error('Original V3 rolling wheel absent: '+side);
   const sign=side.endsWith('left')?1:-1,z=sign*.152,r=spec.radius;
   add(wheel,'rotor-microgroove-'+side,new THREE.TorusGeometry(r*.49,.0035,6,64),
    brakeMetal,[0,0,z],[0,0,0]);
