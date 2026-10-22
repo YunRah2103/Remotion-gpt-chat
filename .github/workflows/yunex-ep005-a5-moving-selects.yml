@@ -1,0 +1,113 @@
+name: EP005 Agent 5 editorial moving-selects visual QA
+on:
+  pull_request:
+    paths:
+      - 'src/yunex/studio-projects/ep005-a5-premium/**'
+      - 'production/yunex/supercar_flames_ep005/editor-premium/**'
+      - '.github/workflows/yunex-ep005-a5-moving-selects.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ep005-a5-moving-selects-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  short-moving-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install dependencies and media tools
+        run: |
+          npm ci --no-audit --no-fund
+          bash scripts/modelling-kit/install-native-media.sh
+      - name: Authoring QA before native rendering
+        run: |
+          npm run check
+          node --test production/yunex/supercar_flames_ep005/editor-premium/picture-contract.test.mjs
+      - name: Stage real four-agent review sources WITHOUT MERGING
+        shell: bash
+        run: |
+          set -euo pipefail
+          a1=23eda32c1796fd9af546ea80c3d6e5117e8e6ba8
+          a2=e8a8f5e415e4abb03b0fa8a2c0959df5eaceab32
+          a3=2a452439603aa21a0e7a050a98892d15b087a803
+          a4=92f28465b83183815605fcb3f13291bba87b2714
+          git fetch --no-tags origin "$a1" "$a2" "$a3" "$a4"
+          pull_file() { mkdir -p "$(dirname "$2")"; git show "$1:$2" > "$2"; }
+          pull_file "$a3" production/yunex/supercar_flames_ep005/cinema/DrivingFilm.tsx
+          pull_file "$a3" production/yunex/supercar_flames_ep005/cinema/timeline.ts
+          pull_file "$a1" production/yunex/supercar_flames_ep005/vehicle/hero.ts
+          pull_file "$a1" production/yunex/supercar_flames_ep005/vehicle/premium-details.ts
+          pull_file "$a1" production/yunex/supercar_flames_ep005/vehicle/exhaust-contract.json
+          pull_file "$a1" src/yunex/studio-projects/ep005-a1-hero/recipe.json
+          pull_file "$a2" production/yunex/supercar_flames_ep005/flames/afterfire.ts
+          pull_file "$a2" production/yunex/supercar_flames_ep005/flames/exhaust-rig.ts
+          pull_file "$a4" production/yunex/supercar_flames_ep005/look/route.ts
+          pull_file "$a4" production/yunex/supercar_flames_ep005/look/NightCircuit.ts
+          pull_file "$a4" production/yunex/supercar_flames_ep005/look/PracticalLighting.tsx
+          cp production/yunex/supercar_flames_ep005/editor-premium/review-entry.template.txt src/yunex/studio-projects/ep005-a5-premium/entry.tsx
+          npm run check
+      - name: Render NATIVE MP4 f0-44 opening, f285-419 explanation, f674-749 ending
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/studio/ep005-a5-moving-selects
+          entry=src/yunex/studio-projects/ep005-a5-premium/entry.tsx
+          out=out/studio/ep005-a5-moving-selects
+          npx remotion render "$entry" StudioEpisode "$out/hook-f0-44.mp4" --frames=0-44 --gl=swangle --codec=h264 --pixel-format=yuv420p
+          npx remotion render "$entry" StudioEpisode "$out/science-f285-419.mp4" --frames=285-419 --gl=swangle --codec=h264 --pixel-format=yuv420p
+          npx remotion render "$entry" StudioEpisode "$out/ending-f674-749.mp4" --frames=674-749 --gl=swangle --codec=h264 --pixel-format=yuv420p
+      - name: Validate native MP4 streams, full decode and motion
+        shell: bash
+        run: |
+          set -euo pipefail
+          out=out/studio/ep005-a5-moving-selects
+          for item in "hook-f0-44:45" "science-f285-419:135" "ending-f674-749:76"; do
+            name="${item%%:*}"
+            count="${item##*:}"
+            film="$out/$name.mp4"
+            test -s "$film"
+            ffprobe -v error -show_entries stream=width,height,avg_frame_rate,nb_frames -show_entries format=duration -of json "$film" > "$out/$name.ffprobe.json"
+            python - "$out/$name.ffprobe.json" "$count" <<'PY'
+import json,sys
+d=json.load(open(sys.argv[1]))
+v=next(x for x in d['streams'] if 'width' in x)
+assert (v['width'],v['height'])==(1080,1920),v
+assert v['avg_frame_rate']=='30/1',v
+assert int(v['nb_frames'])==int(sys.argv[2]),v
+assert abs(float(d['format']['duration'])-int(sys.argv[2])/30)<0.04,d
+PY
+            ffmpeg -hide_banner -loglevel error -xerror -i "$film" -f null -
+            ffmpeg -y -hide_banner -loglevel error -i "$film" -vf "fps=3,scale=270:480,tile=4x5" -frames:v 1 "$out/$name-contact.jpg"
+            sha256sum "$film" | tee "$out/$name.sha256"
+          done
+          python - <<'PY'
+import cv2
+from pathlib import Path
+r=Path('out/studio/ep005-a5-moving-selects')
+for f in r.glob('*.mp4'):
+ cap=cv2.VideoCapture(str(f))
+ readings=[]
+ while True:
+  ok,im=cap.read()
+  if not ok:break
+  readings.append(cv2.resize(cv2.cvtColor(im,cv2.COLOR_BGR2GRAY),(80,140)))
+ cap.release()
+ assert len(readings)>20,(f,len(readings))
+ import numpy as np
+ differences=[float(np.abs(readings[i].astype(float)-readings[i-1].astype(float)).mean()) for i in range(1,len(readings))]
+ assert sum(x>.2 for x in differences)>=len(differences)*.8,(f,min(differences))
+ print(f.name,'moving pairs',sum(x>.2 for x in differences),'/',len(differences))
+PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EP005-A5-PREMIUM-REAL-MOVING-SELECTS-SILENT-NOT-APPROVED
+          path: out/studio/ep005-a5-moving-selects/
+          retention-days: 30
+          if-no-files-found: warn
