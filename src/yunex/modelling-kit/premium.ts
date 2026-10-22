@@ -18,8 +18,15 @@ export function sculptShell(shell:T.Group,s:VehicleSpec){
   return p;
  };
  shell.traverse(o=>{if(!(o instanceof T.Mesh))return;let ancestor:T.Object3D|null=o;while(ancestor&&ancestor!==shell){if(ancestor.name==='interior')return;ancestor=ancestor.parent;}
-  const old=o.geometry,g=old.clone(),a=g.attributes.position;inverse.copy(o.matrixWorld).invert();
-  for(let i=0;i<a.count;i++){world.fromBufferAttribute(a,i).applyMatrix4(o.matrixWorld);local.copy(warp(world)).applyMatrix4(inverse);a.setXYZ(i,local.x,local.y,local.z);}g.computeVertexNormals();g.computeBoundingSphere();o.geometry=g;old.dispose();
+  const old=o.geometry,g=old.clone(),a=g.attributes.position,norm=g.attributes.normal;inverse.copy(o.matrixWorld).invert();
+  const toWorld=new T.Matrix3().getNormalMatrix(o.matrixWorld),toLocal=new T.Matrix3().getNormalMatrix(inverse),j=new T.Matrix3(),e=.0001,normal=new T.Vector3();
+  for(let i=0;i<a.count;i++){
+   world.fromBufferAttribute(a,i).applyMatrix4(o.matrixWorld);const p=world.clone(),mapped=warp(p.clone());
+   // Preserve interpolated normals across clipped T-junctions. Recomputing them from
+   // the clipped triangles produces bright ripples in clearcoat on an intact bonnet.
+   if(norm){const dx=warp(p.clone().add(new T.Vector3(e,0,0))).sub(mapped).divideScalar(e),dy=warp(p.clone().add(new T.Vector3(0,e,0))).sub(mapped).divideScalar(e),dz=warp(p.clone().add(new T.Vector3(0,0,e))).sub(mapped).divideScalar(e);j.set(dx.x,dy.x,dz.x,dx.y,dy.y,dz.y,dx.z,dy.z,dz.z).invert().transpose();normal.fromBufferAttribute(norm,i).applyMatrix3(toWorld).applyMatrix3(j).applyMatrix3(toLocal).normalize();norm.setXYZ(i,normal.x,normal.y,normal.z);}
+   local.copy(mapped).applyMatrix4(inverse);a.setXYZ(i,local.x,local.y,local.z);
+  }g.computeBoundingSphere();o.geometry=g;old.dispose();
  });
 }
 export function roadHeroDetails(shell:T.Group,s:VehicleSpec){

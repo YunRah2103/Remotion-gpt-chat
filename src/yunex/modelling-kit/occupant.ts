@@ -4,7 +4,7 @@ import {box,mesh,surface} from '../world-kit/geometry.ts';
 import {interiorLayout} from '../world-kit/interiors.ts';
 import type {VehicleSpec,VehicleOptions} from '../world-kit/catalog.ts';
 
-type OccupantRig={root:T.Group;wheel:T.Object3D;hip:T.Vector3;k:number;radius:number;parts:Map<string,T.Object3D>;anchors:T.Vector3[]};
+type OccupantRig={root:T.Group;wheel:T.Object3D;hip:T.Vector3;k:number;radius:number;parts:Map<string,T.Object3D>;anchors:T.Vector3[];gear?:T.Object3D;shiftHand:string};
 const rigs=new WeakMap<T.Object3D,OccupantRig>();
 const v=(x:number,y:number,z:number)=>new T.Vector3(x,y,z);
 function segment(parent:T.Group,name:string,material:T.Material,radius:number){
@@ -52,9 +52,11 @@ export function createDriver(shell:T.Group,s:VehicleSpec,o:Partial<VehicleOption
  add(box(root,dark,[.045,.05,.065],[0,0,0],.008,'belt-latch'));
  const anchors=[hip.clone().add(v(-.18*k,.49*k,sign*.22*k)),hip.clone().add(v(.08*k,-.03*k,-sign*.22*k)),hip.clone().add(v(-.10*k,-.03*k,sign*.22*k))];
  root.traverse(o=>{if(o instanceof T.Mesh&&o.geometry.type==='ExtrudeGeometry'){const old=o.geometry;o.geometry=toCreasedNormals(old,Math.PI/3);old.dispose();}});
- const radius=formula?.11:.17*l.k;rigs.set(root,{root,wheel,hip,k,radius,parts,anchors});animateDriver(root,0,0,0);return root;
+ let gear:T.Object3D|undefined;
+ if(!formula){shell.getObjectByName('interior')?.traverse(o=>{if(o instanceof T.Mesh&&o.geometry instanceof T.SphereGeometry&&Math.abs(o.geometry.parameters.radius-.035)<1e-6){gear=o;o.name='gear-knob';}});}
+ const radius=formula?.11:.17*l.k;rigs.set(root,{root,wheel,hip,k,radius,parts,anchors,gear,shiftHand:sign>0?'right':'left'});animateDriver(root,0,0,0);return root;
 }
-export function animateDriver(root:T.Group,steer:number,braking:number,impact:number){
+export function animateDriver(root:T.Group,steer:number,braking:number,impact:number,gearChange=0){
  const rig=rigs.get(root);if(!rig)return;const {hip,k,parts,wheel,anchors}=rig;
  // Wheel pose is shared by driver grips and the visible steering mesh.
  if(wheel.name==='racing-steering-wheel')wheel.rotation.x=-steer*2.5;
@@ -66,6 +68,7 @@ export function animateDriver(root:T.Group,steer:number,braking:number,impact:nu
  for(const side of ['left','right']){
   const sign=side==='left'?1:-1,shoulder=chest.clone().add(v(0,.09*k,sign*.17*k));
   const hand=wheel.getObjectByName(`grip-target-${side}`)!.getWorldPosition(new T.Vector3()).applyMatrix4(inverse);
+  if(rig.gear&&side===rig.shiftHand&&gearChange>0)hand.lerp(rig.gear.getWorldPosition(new T.Vector3()).applyMatrix4(inverse),gearChange*gearChange*(3-2*gearChange));
   const joint=elbow(shoulder,hand,Math.max(.25*k,shoulder.distanceTo(hand)*.505),v(-.3,-1,sign*.5));
   parts.get(`shoulder-${side}`)!.position.copy(shoulder);parts.get(`elbow-${side}`)!.position.copy(joint);
   connect(parts.get(`upper-arm-${side}`)!,shoulder,joint);connect(parts.get(`forearm-${side}`)!,joint,hand);parts.get(`hand-${side}`)!.position.copy(hand);

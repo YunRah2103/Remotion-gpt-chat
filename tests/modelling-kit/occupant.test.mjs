@@ -33,3 +33,15 @@ test('all restraint webbing stays outside actual posed pelvis and chest triangle
 });
 test('chest webbing remains close to the posed front surface',()=>{for(const variant of ['hot-hatch','supercar','formula-modern']){const g=createCinematicVehicle({variant,driver:true});for(const [braking,impact] of [[0,0],[1,0],[1,1]]){animateCinematicVehicle(g,{frame:90,fps:30,braking,impact});const chest=g.getObjectByName('thorax'),belt=g.getObjectByName('belt-lower'),p=belt.getWorldPosition(new T.Vector3()),normal=new T.Vector3(-1,0,0).transformDirection(chest.matrixWorld),hits=new T.Raycaster(p,normal,0,1).intersectObject(chest,false);assert.ok(hits.length&&hits[0].distance<.04,`${variant}: loose front strap ${hits[0]?.distance}`);}disposeObject(g);}});
 test('driver cutaways preserve opaque seating and steering hardware',()=>{const g=createCinematicVehicle({variant:'hot-hatch',driver:true}),interior=g.getObjectByName('interior'),seat=interior.getObjectByName('bucket-seat-shell').getObjectByName('seat-cushion'),wheel=interior.getObjectByName('steering-wheel');let rim;wheel.traverse(o=>{if(o.isMesh&&o.geometry.type==='TorusGeometry')rim=o;});animateCinematicVehicle(g,{frame:90,fps:30,cutaway:.97,braking:1,impact:.8});assert.equal(seat.material.opacity,1);assert.equal(rim.material.opacity,1);assert.equal(interior.getObjectByName('door-panel-right').visible,false);animateCinematicVehicle(g,{frame:0,fps:30});assert.equal(interior.getObjectByName('door-panel-right').visible,true);animateCinematicVehicle(g,{frame:90,fps:30,cutaway:.97});assert.ok(g.getObjectByName('arched-body').material.opacity<.1);disposeObject(g);});
+
+test('gear change reaches the actual console knob with the correct hand and seeks back to steering',()=>{
+ for(const steeringSide of ['left','right']){
+  const g=createCinematicVehicle({variant:'hot-hatch',driver:true,steeringSide}),side=steeringSide==='left'?'right':'left';
+  animateCinematicVehicle(g,{frame:60,fps:30,gearChange:1,steer:.2});
+  const hand=g.getObjectByName(`hand-${side}`).getWorldPosition(new T.Vector3()),knob=g.getObjectByName('gear-knob');assert.ok(knob,'use existing console hardware');
+  assert.ok(hand.distanceTo(knob.getWorldPosition(new T.Vector3()))<.01);
+  animateCinematicVehicle(g,{frame:0,fps:30});
+  assert.ok(g.getObjectByName(`hand-${side}`).getWorldPosition(new T.Vector3()).distanceTo(g.getObjectByName(`grip-target-${side}`).getWorldPosition(new T.Vector3()))<1e-5);
+  assert.throws(()=>animateCinematicVehicle(g,{frame:1,fps:30,gearChange:2}));disposeObject(g);
+ }
+});

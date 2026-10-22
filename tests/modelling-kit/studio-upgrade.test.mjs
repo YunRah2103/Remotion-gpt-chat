@@ -38,3 +38,19 @@ test('new world batching is deterministic and keeps motorway furniture clear of 
  const m=new T.Matrix4();for(let i=0;i<x.count;i++){x.getMatrixAt(i,m);assert.ok(Math.abs(m.elements[14])>8);}
  disposeObject(a);disposeObject(b);
 });
+
+test('intact shell preserves authored surface normals and restores them after a dent',()=>{
+ const g=createCinematicVehicle({variant:'hot-hatch'}),body=g.getObjectByName('arched-body');
+ assert.ok(body.userData.restNormals,'authored normals must survive cutout tessellation');
+ const normals=Array.from(body.geometry.attributes.normal.array);
+ animateCinematicVehicle(g,{frame:90,fps:30,bodyDamage:1});
+ animateCinematicVehicle(g,{frame:0,fps:30});assert.deepEqual(Array.from(body.geometry.attributes.normal.array),normals);
+ disposeObject(g);
+});
+
+test('premium grille cells sit ahead of their backing rather than behind the legacy solid grille',()=>{
+ const g=createCinematicVehicle({variant:'hot-hatch',optimize:false});
+ assert.equal(g.getObjectByName('grille').visible,false);
+ const cells=new T.Box3().setFromObject(g.getObjectByName('recessed-grille')),back=new T.Box3().setFromObject(g.getObjectByName('grille-backing'));
+ assert.ok(cells.min.x>back.max.x);disposeObject(g);
+});

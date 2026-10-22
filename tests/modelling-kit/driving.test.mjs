@@ -35,3 +35,11 @@ test('all reusable shots seek deterministically and reject invalid parameters',(
  }
  assert.throws(()=>studio.drivingCamera('tracking',pose,spec,0,0));
 });
+
+test('motorway tracking view stays on the carriageway side of the median',()=>{
+ const pose=sampleRoute('highway',-20),spec=vehicleSpec('hot-hatch');
+ for(const aspect of [16/9,9/16]){
+  const shot=studio.drivingCamera('tracking',pose,spec,aspect,0);
+  assert.ok(shot.position[2]<0&&shot.target[2]<0,'Median must not lie between camera and car');
+ }
+});

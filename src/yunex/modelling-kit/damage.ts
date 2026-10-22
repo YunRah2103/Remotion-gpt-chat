@@ -23,7 +23,7 @@ export function deformBody(body:T.Mesh,damage:number,width:number){
   const x=rest[i*3],y=rest[i*3+1],z=rest[i*3+2],dent=damage*.18*Math.exp(-((x-1.3)**2/.23+(y-.55)**2/.10));
   a.setXYZ(i,x-dent*.4,y+dent*.14,z-Math.sign(z)*dent*T.MathUtils.smoothstep(Math.abs(z),width*.3,width*.48));
  }
- a.needsUpdate=true;body.geometry.computeVertexNormals();body.geometry.computeBoundingSphere();body.geometry.computeBoundingBox();
+ a.needsUpdate=true;if(damage===0&&body.userData.restNormals){body.geometry.attributes.normal.array.set(body.userData.restNormals);body.geometry.attributes.normal.needsUpdate=true;}else body.geometry.computeVertexNormals();body.geometry.computeBoundingSphere();body.geometry.computeBoundingBox();
 }
 export function createFragments(){
  const g=new T.Group();g.name='rubber-fragments';const mat=new T.MeshStandardMaterial({color:'#171d22',roughness:.94,side:T.DoubleSide});

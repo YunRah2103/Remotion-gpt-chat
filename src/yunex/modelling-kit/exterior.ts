@@ -16,8 +16,11 @@ export function premiumExterior(shell:T.Group,s:VehicleSpec){
  const black=surface('#10191e',.22,.34),metal=surface('#6e808b',.82,.25);
  if(['normal','sports','suv'].includes(s.family)){
   const l=interiorLayout(s),front=s.length/2,back=-front,wide=s.width*.51,h=.15,y=l.belt-.34;
+  if(s.family==='normal')shell.traverse(o=>{if(o.name==='side-intake')o.visible=false;});
   // Match the existing real grille aperture; replace its coarse straight slats.
-  shell.traverse(o=>{if(o.name==='grille-slat')o.visible=false;});
+  if(s.bodyStyle!=='ev'){
+  shell.traverse(o=>{if(['grille','grille-slat'].includes(o.name))o.visible=false;});
+  box(shell,black,[.010,.14,wide*.95],[front-.095,y,0],.002,'grille-backing');
   intake(shell,front-.025,y,0,wide,h,black,'sculpted-intake-surround');
   const cells:T.BufferGeometry[]=[];
   for(let row=0;row<3;row++)for(let col=0;col<17;col++){
@@ -28,6 +31,7 @@ export function premiumExterior(shell:T.Group,s:VehicleSpec){
   const positions:number[]=[],normals:number[]=[];
   for(const geo of cells){const g=geo.toNonIndexed();positions.push(...g.attributes.position.array);normals.push(...g.attributes.normal.array);geo.dispose();g.dispose();}
   const grid=new T.BufferGeometry();grid.setAttribute('position',new T.Float32BufferAttribute(positions,3));grid.setAttribute('normal',new T.Float32BufferAttribute(normals,3));mesh(shell,grid,metal,[0,0,0],[0,0,0],'recessed-grille');
+  }
   for(const side of [-1,1]){
    const z=side*s.width*.36;
    // Rear channels follow the bumper, clear of the tyre and central exhaust bore.
@@ -40,6 +44,7 @@ export function premiumExterior(shell:T.Group,s:VehicleSpec){
   }
  }
  if(s.id==='formula-modern'){
+  shell.traverse(o=>{if(o.name==='sidepod')o.visible=false;});
   const source=shell.getObjectByName('single-seater-body') as T.Mesh<T.BufferGeometry,T.MeshStandardMaterial>;
   const paint=new T.MeshPhysicalMaterial({color:source.material.color,metalness:.42,roughness:.23,clearcoat:1,clearcoatRoughness:.12});
   // Continuous lofted shoulders and undercut sides rather than rectangular sidepods.
