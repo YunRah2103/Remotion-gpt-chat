@@ -24,7 +24,7 @@ export function drivingCamera(name:CameraPreset,pose:RoutePose,s:VehicleSpec,asp
  if(options.side!==undefined&&options.side!==-1&&options.side!==1)throw new Error('Camera side must be -1 or 1');
  const l=s.length,h=s.height,w=s.width;let p:V3,target:V3=[0,h*.48,0],fov=42,overview=false;
  switch(name){
-  case 'tracking':p=[l*.80,h*1.50,(options.side??-1)*w*2.1];overview=true;break;
+  case 'tracking':p=[l*1.10,h*1.50,(options.side??-1)*w*1.2];overview=true;break;
   case 'chase':p=[-l*1.3,h*1.25,w*1.3];overview=true;break;
   case 'wheel':p=[s.wheelbase*.65,s.radius*1.55,w*.94];target=[s.wheelbase/2,s.radius,w*.45];fov=46;break;
   case 'interior':p=[l*.10,h*.86,-w*.72];target=[0,h*.55,0];fov=48;break;

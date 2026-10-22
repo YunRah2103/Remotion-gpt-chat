@@ -44,14 +44,14 @@ test('motorway tracking view stays on the carriageway side of the median',()=>{
  }
 });
 
-test('city camera can choose the open road side without intersecting new shop awnings',async()=>{
+test('city tracking sweep keeps the car centre clear of all world geometry',async()=>{
  const {createCinematicEnvironment}=await import('../../src/yunex/modelling-kit/environments.ts');
  const {disposeObject}=await import('../../src/yunex/world-kit/geometry.ts');
  const world=createCinematicEnvironment({kind:'city',timeOfDay:'night'});world.updateMatrixWorld(true);
- for(const aspect of [16/9,9/16])for(const time of [.5,1.8,3.5,5.5]){
+ for(const aspect of [16/9,9/16])for(const time of Array.from({length:60},(_,i)=>i/10)){
   const pose=sampleRoute('city',time*12-40),shot=studio.drivingCamera('tracking',pose,vehicleSpec('supercar'),aspect,time,{side:1});
   assert.ok(shot.position[2]>pose.position[2]);
-  const a=new T.Vector3(...shot.position),b=new T.Vector3(...shot.target),delta=b.clone().sub(a),hits=new T.Raycaster(a,delta.clone().normalize(),0,delta.length()-.1).intersectObject(world.getObjectByName('shopfront-awnings'));
+  const a=new T.Vector3(...shot.position),b=new T.Vector3(...shot.target),delta=b.clone().sub(a),hits=new T.Raycaster(a,delta.clone().normalize(),0,delta.length()-.1).intersectObject(world,true);
   assert.equal(hits.length,0);
  }
  disposeObject(world);
