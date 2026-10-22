@@ -9,6 +9,7 @@ import {IntegratedBeat} from './IntegratedBeat.tsx';
 import {QualitySubtitleOverlay} from './staging/graphics/QualitySubtitleOverlay.tsx';
 import {locateOriginalContactHook} from './hook.ts';
 import {PHYSICAL_BEATS} from './staging/cinema/shot-plan.ts';
+import {editorialStartDistance} from './payoff-source.ts';
 import {captionAtFrame,shotAtFrame,missingPicturePrerequisites,
  type PicturePlan,type ReadinessInput} from './timing.ts';
 
@@ -46,7 +47,7 @@ export const EP004OriginalCedarPicture:React.FC<VoiceEditProps>=({
  const aeroLoad01=cut.shot==='aero-load'
   ?.5+.5*Math.max(0,Math.min(1,(localSec/durationSec-.17)/.68)):1;
  const beat={shot:cut.shot,localSec,durationSec,sourceSec,
-  startDistanceM:physical.startDistanceM,aeroLoad01};
+  startDistanceM:editorialStartDistance(physical.shot,physical.startDistanceM),aeroLoad01};
  const cue=captionAtFrame(frame,plan.captions);
  return <AbsoluteFill style={{background:'#061019',overflow:'hidden'}}>
   <IntegratedBeat beat={beat}/>
