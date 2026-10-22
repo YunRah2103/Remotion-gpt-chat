@@ -1,0 +1,99 @@
+name: EP005 Agent 5 premium source-pinned picture review
+on:
+  pull_request:
+    paths:
+      - 'production/yunex/supercar_flames_ep005/editor-premium/**'
+      - 'src/yunex/studio-projects/ep005-a5-premium/**'
+      - '.github/workflows/yunex-ep005-a5-premium.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  a5-picture-review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Native dependencies and FFprobe
+        run: |
+          npm ci --no-audit --no-fund
+          bash scripts/modelling-kit/install-native-media.sh
+      - name: A5 owned contract tests and V3 project validation
+        run: |
+          npm run check
+          node --test production/yunex/supercar_flames_ep005/editor-premium/picture-contract.test.mjs
+          npm run kit:validate -- ep005-a5-premium
+          npm run kit:plan -- ep005-a5-premium
+          npm run kit:inspect -- ep005-a5-premium
+      - name: Stage exact A1–A4 visual-source SHAs in ephemeral CI working tree ONLY
+        shell: bash
+        run: |
+          set -euo pipefail
+          a1=23eda32c1796fd9af546ea80c3d6e5117e8e6ba8
+          a2=e8a8f5e415e4abb03b0fa8a2c0959df5eaceab32
+          a3=2a452439603aa21a0e7a050a98892d15b087a803
+          a4=92f28465b83183815605fcb3f13291bba87b2714
+          git fetch --no-tags origin "$a1" "$a2" "$a3" "$a4"
+          pull_file() {
+            mkdir -p "$(dirname "$2")"
+            git show "$1:$2" > "$2"
+          }
+          pull_file "$a3" production/yunex/supercar_flames_ep005/cinema/DrivingFilm.tsx
+          pull_file "$a3" production/yunex/supercar_flames_ep005/cinema/timeline.ts
+          pull_file "$a1" production/yunex/supercar_flames_ep005/vehicle/hero.ts
+          pull_file "$a1" production/yunex/supercar_flames_ep005/vehicle/premium-details.ts
+          pull_file "$a1" production/yunex/supercar_flames_ep005/vehicle/exhaust-contract.json
+          pull_file "$a1" src/yunex/studio-projects/ep005-a1-hero/recipe.json
+          pull_file "$a2" production/yunex/supercar_flames_ep005/flames/afterfire.ts
+          pull_file "$a2" production/yunex/supercar_flames_ep005/flames/exhaust-rig.ts
+          pull_file "$a4" production/yunex/supercar_flames_ep005/look/route.ts
+          pull_file "$a4" production/yunex/supercar_flames_ep005/look/NightCircuit.ts
+          pull_file "$a4" production/yunex/supercar_flames_ep005/look/PracticalLighting.tsx
+          cp production/yunex/supercar_flames_ep005/editor-premium/review-entry.template.txt src/yunex/studio-projects/ep005-a5-premium/entry.tsx
+          mkdir -p out/studio/ep005-a5-premium
+          cp production/yunex/supercar_flames_ep005/editor-premium/review-sources.json out/studio/ep005-a5-premium/
+          npm run check
+      - name: Render actual animated A1/A2/A3/A4 picture with A5 editorial graphics
+        run: npm run kit:render -- ep005-a5-premium
+      - name: Full native 750-frame video decode, cut and motion QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          film=out/studio/ep005-a5-premium.mp4
+          out=out/studio/ep005-a5-premium
+          mkdir -p "$out/frames"
+          ffprobe -v error -show_entries stream=codec_name,width,height,avg_frame_rate,nb_frames -show_entries format=duration -of json "$film" | tee "$out/ffprobe.json"
+          python - <<'PY'
+          import json
+          d=json.load(open('out/studio/ep005-a5-premium/ffprobe.json'))
+          v=next(s for s in d['streams'] if s.get('codec_name')=='h264')
+          assert (v['width'],v['height'])==(1080,1920),v
+          assert v['avg_frame_rate']=='30/1',v
+          assert int(v['nb_frames'])==750,v
+          assert abs(float(d['format']['duration'])-25)<.04,d
+          print('Full 25s/750f/1080x1920/30 verified')
+          PY
+          ffmpeg -hide_banner -loglevel error -xerror -i "$film" -f null -
+          sha256sum "$film" | tee "$out/sha256.txt"
+          ffmpeg -y -hide_banner -loglevel error -i "$film" -vf "select='eq(n,0)+eq(n,10)+eq(n,12)+eq(n,23)+eq(n,29)+eq(n,44)+eq(n,45)+eq(n,164)+eq(n,165)+eq(n,284)+eq(n,285)+eq(n,419)+eq(n,420)+eq(n,554)+eq(n,555)+eq(n,674)+eq(n,709)+eq(n,748)+eq(n,749)'" -fps_mode vfr "$out/frames/cut-%02d.png"
+          test "$(find "$out/frames" -name 'cut-*.png' | wc -l)" -eq 19
+          ffmpeg -y -hide_banner -loglevel error -i "$film" -vf "fps=1,scale=270:480,tile=5x5" -frames:v 1 "$out/contact-sheet.jpg"
+          python - <<'PY'
+          import hashlib,pathlib
+          p=sorted(pathlib.Path('out/studio/ep005-a5-premium/frames').glob('cut-*.png'))
+          assert len(p)==19
+          assert len({hashlib.sha256(f.read_bytes()).hexdigest() for f in p})>=16, 'Static frames detected'
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EP005-A5-PREMIUM-750f-SILENT-PICTURE-REVIEW-UNAPPROVED
+          path: |
+            out/studio/ep005-a5-premium.mp4
+            out/studio/ep005-a5-premium/
+          retention-days: 30
+          if-no-files-found: warn
