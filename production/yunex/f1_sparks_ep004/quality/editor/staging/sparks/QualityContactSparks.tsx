@@ -6,7 +6,7 @@
 import React,{useLayoutEffect,useMemo,useRef} from 'react';
 import * as THREE from 'three';
 import type {SkidContact,SparkParticle} from '../../../../shared/contract.ts';
-import {deriveQualityContactGlows,sampleQualitySparkInstances} from 'appearance.ts';
+import {deriveQualityContactGlows,sampleQualitySparkInstances} from './appearance.ts';
 
 export type QualityContactSparksProps=Readonly<{
  particles:readonly SparkParticle[];
