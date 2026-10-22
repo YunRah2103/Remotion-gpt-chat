@@ -40,7 +40,7 @@ export function sampleAfterfire(frame:number,fps:number,engineState:EngineState,
   const jitter=.78+.22*hash(beat*19+(engineState.seed??17)*31+i*37);
   const intensity=mode==='off'?0:clamp(attack*decay*jitter*fuel*hot*(engineState.afterfireDemand??1)*(mode==='anti-lag'?1:.93));
   return {name:p.name,position:[...p.position] as Vec3,direction:[...p.direction] as Vec3,radius:p.radius,intensity,
-   length:intensity*(.44+.43*hash(beat*7+i*23+11))/.78,phase,mode};
+   length:intensity*(.77+.57*hash(beat*7+i*23+11))/.78,phase,mode};
  });
  return {frame,fps,mode,ports,illustrative:true};
 }
