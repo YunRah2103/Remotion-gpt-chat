@@ -2,21 +2,13 @@ import * as T from 'three';
 import {box,mesh,rod,surface} from '../world-kit/geometry.ts';
 import type {VehicleSpec} from '../world-kit/catalog.ts';
 import {interiorLayout} from '../world-kit/interiors.ts';
+import {coachworkField} from './coachwork.ts';
 
 /** Continuous styling field applied to shell parts together, keeping trim on its skin. */
 export function sculptShell(shell:T.Group,s:VehicleSpec){
- if(!['normal','sports','suv'].includes(s.family))return;
+ if(!shell.getObjectByName('arched-body'))return;
  shell.updateMatrixWorld(true);const world=new T.Vector3(),local=new T.Vector3(),inverse=new T.Matrix4();
- const warp=(p:T.Vector3)=>{
-  const half=s.length/2,z=p.z,roof=T.MathUtils.smoothstep(p.y,s.height*.64,s.height),nose=T.MathUtils.smoothstep(p.x,half*.55,half),tail=1-T.MathUtils.smoothstep(p.x,-half,-half*.68);
-  // Preserve the arch ring and wheel clearance; sculpt beyond the axle envelope.
-  const nearArch=Math.max(...[-1,1].map(sign=>Math.exp(-(((p.x-sign*s.wheelbase/2)/(s.radius*1.3))**6)))),lower=1-T.MathUtils.smoothstep(p.y,s.radius*1.9,s.radius*2.4);
-  const free=1-nearArch*lower,side=Math.min(1.2,Math.abs(z)/(s.width/2));
-  p.x-=nose*.16*Math.pow(side,3)*free; p.x+=tail*.12*Math.pow(side,3)*free;
-  p.y-=nose*.065*free*(1-roof);p.y+=.025*Math.cos(p.x/half*Math.PI*.5)*Math.pow(side,2)*(1-roof);
-  p.z*=1-(nose*.065+tail*.055)*free;
-  return p;
- };
+ const warp=(p:T.Vector3)=>coachworkField(p,s);
  shell.traverse(o=>{if(!(o instanceof T.Mesh))return;let ancestor:T.Object3D|null=o;while(ancestor&&ancestor!==shell){if(ancestor.name==='interior')return;ancestor=ancestor.parent;}
   const old=o.geometry,g=old.clone(),a=g.attributes.position,norm=g.attributes.normal;inverse.copy(o.matrixWorld).invert();
   const toWorld=new T.Matrix3().getNormalMatrix(o.matrixWorld),toLocal=new T.Matrix3().getNormalMatrix(inverse),j=new T.Matrix3(),e=.0001,normal=new T.Vector3();
@@ -32,11 +24,12 @@ export function sculptShell(shell:T.Group,s:VehicleSpec){
 export function roadHeroDetails(shell:T.Group,s:VehicleSpec){
  if(!['normal','sports','suv'].includes(s.family))return;
  const layout=interiorLayout(s),belt=layout.belt,front=s.length/2,black=surface('#0b1219',.2,.28),metal=surface('#667b86',.85,.24),leather=surface('#18242b',.05,.78),stitch=surface('#879c9d',.1,.7);
- const led=new T.MeshStandardMaterial({color:'#e0f4ff',emissive:'#bcdfff',emissiveIntensity:4,toneMapped:false});
+ const source=shell.getObjectByName('projector-light') as T.Mesh<T.BufferGeometry,T.MeshStandardMaterial>|undefined;
+ const led=new T.MeshStandardMaterial({color:'#e0f4ff',emissive:'#bcdfff',emissiveIntensity:source?.material.emissiveIntensity??.15});
  // Retain original recessed light buckets, add a sharp three-dimensional DRL signature.
  for(const side of [-1,1]){
-  const z=side*s.width*.31,y=belt-.165;
-  const pts=[new T.Vector3(front+.002,y,z-side*.18),new T.Vector3(front-.014,y+.022,z+side*.10),new T.Vector3(front-.045,y-.025,z+side*.18)];
+  const z=side*s.width*.31,y=belt-(s.family==='sports'?.135:.15); const lampWidth=s.width*.20;
+  const pts=[new T.Vector3(front-.008,y-.017,z-side*lampWidth*.42),new T.Vector3(front-.008,y-.017,z+side*lampWidth*.28),new T.Vector3(front-.012,y+.012,z+side*lampWidth*.42)];
   mesh(shell,new T.TubeGeometry(new T.CatmullRomCurve3(pts),18,.006,6,false),led,[0,0,0],[0,0,0],'led-signature');
 
   const innerZ=side*s.width*.235,interior=shell.getObjectByName('interior');

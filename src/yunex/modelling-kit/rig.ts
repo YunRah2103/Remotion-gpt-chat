@@ -9,6 +9,8 @@ import {animatePart} from '../parts-kit/motion.ts';
 import {createDriver,animateDriver} from './occupant.ts';
 import {createMechanicalSystems,animateMechanicalSystems,mechanicalLayout} from './systems.ts';
 import {batchVehicleDetails} from './optimize.ts';
+import {enhanceCabin} from './cabin-depth.ts';
+import {engineConfiguration} from './powertrain.ts';
 import {premiumExterior} from './exterior.ts';
 import {sculptShell,roadHeroDetails,formulaHeroDetails} from './premium.ts';
 import {tyreDetail,floorAssembly,suspensionLinks} from './details.ts';
@@ -37,16 +39,15 @@ export function createCinematicVehicle(options:CinematicOptions):T.Group{
    if(quality==='hero'){const roll=mount.getObjectByName('wheel-roll')!;tyreDetail(roll,s.radius,s.family==='formula'?.32:s.family==='sports'?.28:.235,options.tyreType==='slick'||s.family==='formula');}
   }else shell.add(o);
  }
- if(quality==='hero'){roadHeroDetails(shell,s);premiumExterior(shell,s);sculptShell(shell,s);formulaHeroDetails(shell,mounts,s);}
+ if(quality==='hero'){roadHeroDetails(shell,s);premiumExterior(shell,s);sculptShell(shell,s);formulaHeroDetails(shell,mounts,s);enhanceCabin(shell,s,options);}
  // Material clones isolate fades/highlights between components and between vehicles.
  const originals=new Set<T.Material>();
  for(const scope of [shell,...mounts]){const clones=new Map<T.Material,T.Material>();scope.traverse(o=>{if(o instanceof T.Mesh){const clone=(m:T.Material)=>{let c=clones.get(m);if(!c){c=m.clone();clones.set(m,c);originals.add(m);}return c;};o.material=Array.isArray(o.material)?o.material.map(clone):clone(o.material);}});}
  originals.forEach(m=>m.dispose());
  materials(shell,m=>{if(m instanceof T.MeshPhysicalMaterial&&m.transparent){m.roughness=.075;m.envMapIntensity=.8;}else if(m instanceof T.MeshPhysicalMaterial&&m.clearcoat>0){m.clearcoat=1;m.roughness=options.paintPreset==='satin'?.43:.22;m.clearcoatRoughness=.13;m.envMapIntensity=1.1;}});
  let engine:T.Group|undefined,floor:T.Group|undefined;
- if(s.family!=='bike'&&s.bodyStyle!=='ev'){
-  engine=createPart({variant:s.family==='formula'?'v6':s.family==='sports'?'v8':'inline-4',cutaway:true});engine.name='engine';engine.scale.setScalar(1.15);engine.position.set(mechanicalLayout(s).engineX,.26,0);engine.userData.mount=engine.position.toArray();shell.add(engine);
- }
+ const engineConfig=engineConfiguration(s);
+ if(engineConfig){engine=createPart({variant:engineConfig.variant,cutaway:true});engine.name='engine';engine.scale.setScalar(engineConfig.scale);engine.position.fromArray(engineConfig.position);engine.userData.mount=engine.position.toArray();shell.add(engine);}
  if(s.family==='formula'){
   shell.traverse(o=>{if(['floor','floor-diffuser','pushrod','lower-wishbone'].includes(o.name))o.visible=false;if(o instanceof T.Mesh&&o.name===''&&o.geometry instanceof T.CylinderGeometry&&o.geometry.parameters.radiusTop===.025&&Math.abs(o.position.x)>.7&&o.position.y<.65)o.visible=false;});floor=floorAssembly(shell,s);
  }

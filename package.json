@@ -18,7 +18,11 @@
     "partskit:export": "node --experimental-strip-types scripts/parts-kit/export.mjs",
     "partskit:review": "node --experimental-strip-types scripts/parts-kit/review.mjs",
     "worldkit:review-quality": "node --experimental-strip-types scripts/world-kit/render-quality.mjs",
-    "worldkit:review-worlds": "node --experimental-strip-types scripts/world-kit/render-world-quality.mjs"
+    "worldkit:review-worlds": "node --experimental-strip-types scripts/world-kit/render-world-quality.mjs",
+    "kit:catalog": "node --experimental-strip-types scripts/modelling-kit/studio.mjs catalog",
+    "kit:create": "node --experimental-strip-types scripts/modelling-kit/studio.mjs create",
+    "kit:validate": "node --experimental-strip-types scripts/modelling-kit/studio.mjs validate",
+    "kit:render": "node --experimental-strip-types scripts/modelling-kit/studio.mjs render"
   },
   "dependencies": {
     "@remotion/captions": "4.0.533",

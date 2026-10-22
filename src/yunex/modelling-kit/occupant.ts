@@ -39,12 +39,17 @@ export function createDriver(shell:T.Group,s:VehicleSpec,o:Partial<VehicleOption
   for(const name of ['upper-arm','forearm','thigh','shin'])add(segment(root,`${name}-${side}`,gold,(name==='thigh'?.067:name==='shin'?.047:.038)*k));
   for(const name of ['shoulder','elbow','knee'])add(mesh(root,new T.SphereGeometry((name==='knee'?.048:.04)*k,12,8),dark,[0,0,0],[0,0,0],`${name}-${side}`));
   const hand=add(box(root,gold,[.095*k,.07*k,.065*k],[0,0,0],.018,`hand-${side}`));
-  for(let i=0;i<4;i++)box(hand,mark,[.045*k,.013*k,.012*k],[.025*k,-.026*k,(i-1.5)*.014*k],.004,'finger');
-  add(box(root,dark,[.21*k,.075*k,.085*k],[0,0,0],.018,`foot-${side}`));
+  for(let i=0;i<4;i++){
+   const finger=box(hand,mark,[.038*k,.013*k,.012*k],[.025*k,-.026*k,(i-1.5)*.014*k],.004,'finger');
+   const tip=box(finger,gold,[.018*k,.026*k,.012*k],[.018*k,.009*k,0],.004,'finger-tip');tip.rotation.z=-.35;
+  }
+  const thumb=box(hand,gold,[.033*k,.016*k,.018*k],[-.018*k,-.009*k,(side==='left'?-1:1)*.039*k],.005,'thumb');thumb.rotation.y=side==='left'?-.55:.55;
+  const shoe=add(box(root,dark,[.21*k,.075*k,.085*k],[0,0,0],.018,`foot-${side}`)) as T.Mesh;
   const existingPedals=shell.getObjectByName('pedals')?.children.filter(p=>p.name==='pedal');
   const pad=formula?box(shell,dark,[.08,.035,.06],[.40,.38,(side==='left'?1:-1)*.07],.008,'formula-pedal'):existingPedals?.[side==='left'?1:0];
   if(!pad)throw new Error('Missing pedal hardpoint');
-  const pedalTarget=new T.Object3D();pedalTarget.name=`pedal-target-${side}`;pedalTarget.position.set(-.04*k,.04*k,0);pad.add(pedalTarget);
+  const padMesh=pad as T.Mesh;padMesh.geometry.computeBoundingBox();shoe.geometry.computeBoundingBox();
+  const pedalTarget=new T.Object3D();pedalTarget.name=`pedal-target-${side}`;pedalTarget.position.set(-.04*k,padMesh.geometry.boundingBox!.max.y-shoe.geometry.boundingBox!.min.y+.002,0);pad.add(pedalTarget);
   const target=new T.Object3D();target.name=`grip-target-${side}`;if(formula)target.position.set((side==='left'?-1:1)*.11,0,0);else target.position.set(0,0,(side==='left'?1:-1)*.17*l.k);wheel.add(target);
  }
  // Flat textile ribbons, with fixed vehicle anchors and a moving chest guide.
@@ -72,8 +77,11 @@ export function animateDriver(root:T.Group,steer:number,braking:number,impact:nu
   const joint=elbow(shoulder,hand,Math.max(.25*k,shoulder.distanceTo(hand)*.505),v(-.3,-1,sign*.5));
   parts.get(`shoulder-${side}`)!.position.copy(shoulder);parts.get(`elbow-${side}`)!.position.copy(joint);
   connect(parts.get(`upper-arm-${side}`)!,shoulder,joint);connect(parts.get(`forearm-${side}`)!,joint,hand);parts.get(`hand-${side}`)!.position.copy(hand);
+  const palm=parts.get(`hand-${side}`)!;
+  palm.quaternion.copy(root.getWorldQuaternion(new T.Quaternion()).invert()).multiply(wheel.getWorldQuaternion(new T.Quaternion()));
+  if(rig.gear&&side===rig.shiftHand&&gearChange>0){const shiftQ=root.getWorldQuaternion(new T.Quaternion()).invert().multiply(rig.gear.getWorldQuaternion(new T.Quaternion()));palm.quaternion.slerp(shiftQ,gearChange*gearChange*(3-2*gearChange));}
   const h=hip.clone().add(v(0,0,sign*.095*k)),foot=root.parent!.getObjectByName(`pedal-target-${side}`)!.getWorldPosition(new T.Vector3()).applyMatrix4(inverse);
-  foot.x+=(side==='right'?braking*.012:0);
+  // Soles retain their pedal contact through the illustrative braking pose.
   const knee=elbow(h,foot,Math.max(.33*k,h.distanceTo(foot)*.505),v(0,1,0));parts.get(`knee-${side}`)!.position.copy(knee);connect(parts.get(`thigh-${side}`)!,h,knee);connect(parts.get(`shin-${side}`)!,knee,foot);parts.get(`foot-${side}`)!.position.copy(foot);
  }
  // Guides follow the posed chest's local front/shoulder surfaces; fixed anchors stay on the vehicle.

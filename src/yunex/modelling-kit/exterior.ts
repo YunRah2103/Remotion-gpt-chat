@@ -3,6 +3,7 @@ import {box,mesh,rod,surface} from '../world-kit/geometry.ts';
 import type {V3} from '../world-kit/geometry.ts';
 import type {VehicleSpec} from '../world-kit/catalog.ts';
 import {interiorLayout} from '../world-kit/interiors.ts';
+import {bodyHalfWidth,bodyTop} from '../world-kit/vehicle-body.ts';
 /** Bevelled, open intake rim: the centre remains an actual aperture. +X is outward. */
 function intake(parent:T.Group,x:number,y:number,z:number,w:number,h:number,mat:T.Material,name:string){
  const shape=new T.Shape();shape.moveTo(-w/2,-h/2);shape.lineTo(w/2,-h/2);shape.lineTo(w*.45,h/2);shape.lineTo(-w*.45,h/2);shape.closePath();
@@ -14,8 +15,23 @@ function intake(parent:T.Group,x:number,y:number,z:number,w:number,h:number,mat:
 /** Extra geometry is inside the shell pivot, so cutaways and suspension preserve attachment. */
 export function premiumExterior(shell:T.Group,s:VehicleSpec){
  const black=surface('#10191e',.22,.34),metal=surface('#6e808b',.82,.25);
- if(['normal','sports','suv'].includes(s.family)){
+ if(shell.getObjectByName('arched-body')){
   const l=interiorLayout(s),front=s.length/2,back=-front,wide=s.width*.51,h=.15,y=l.belt-.34;
+  // Close the bonnet seam across the front rather than drawing a decorative stripe.
+  // Its samples use the same original skin, then sculptShell moves skin and seam together.
+  const seam=surface('#243038',.15,.64),hoodEnd=front-.23;
+  if(hoodEnd>l.frontBase+.19){
+   const points:T.Vector3[]=[];
+   for(let i=0;i<=40;i++){const z=T.MathUtils.lerp(-s.width*.29,s.width*.29,i/40),x=hoodEnd-.025*(1-(z/(s.width*.29))**2),top=bodyTop(s,x),w=bodyHalfWidth(s,x,top);points.push(new T.Vector3(x,top+.040*Math.sin(Math.PI*(.5+z/(2*w)))+.003,z));}
+   mesh(shell,new T.TubeGeometry(new T.CatmullRomCurve3(points),40,.0025,5,false),seam,[0,0,0],[0,0,0],'bonnet-shutline');
+  }
+  const redSource=shell.getObjectByName('tail-light-strip') as T.Mesh<T.BufferGeometry,T.MeshStandardMaterial>|undefined;
+  const red=new T.MeshStandardMaterial({color:'#e54149',emissive:'#ed2534',emissiveIntensity:redSource?.material.emissiveIntensity??.15});
+  for(const side of [-1,1]){
+   const z=side*s.width*.31,cy=l.belt-.11,w=s.width*.20;
+   const points=[new T.Vector3(back+.009,cy-.018,z-side*w*.42),new T.Vector3(back+.007,cy-.018,z+side*w*.32),new T.Vector3(back+.012,cy+.020,z+side*w*.42)];
+   mesh(shell,new T.TubeGeometry(new T.CatmullRomCurve3(points),24,.0055,6,false),red,[0,0,0],[0,0,0],'rear-light-guide');
+  }
   if(s.family==='normal')shell.traverse(o=>{if(o.name==='side-intake')o.visible=false;});
   // Match the existing real grille aperture; replace its coarse straight slats.
   if(s.bodyStyle!=='ev'){

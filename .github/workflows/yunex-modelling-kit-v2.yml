@@ -42,7 +42,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        composition: [KitA, KitB, KitC, KitD, KitE, KitAPortrait, KitBPortrait, KitCPortrait, KitDPortrait, KitEPortrait, KitBefore, KitF, KitFPortrait, KitG, KitGPortrait, KitH, KitHPortrait, KitI, KitIPortrait, KitWorldBefore]
+        composition: [KitA, KitB, KitC, KitD, KitE, KitAPortrait, KitBPortrait, KitCPortrait, KitDPortrait, KitEPortrait, KitBefore, KitF, KitFPortrait, KitG, KitGPortrait, KitH, KitHPortrait, KitI, KitIPortrait, KitWorldBefore, StudioRoadPortrait, StudioMechanicsPortrait]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -75,7 +75,7 @@ jobs:
       - run: npm ci
       - uses: actions/download-artifact@v4
         with:
-          pattern: YUNEX-KIT-Kit*
+          pattern: YUNEX-KIT-*
           merge-multiple: true
           path: out/modelling-kit-v2-hd
       - run: python -m pip install numpy

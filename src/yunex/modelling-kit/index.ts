@@ -9,3 +9,9 @@ export {CinematicLighting} from './Lighting';
 
 export {drivingCamera,drivingState} from './driving.ts';
 export type {CameraPreset,DrivingAction} from './driving.ts';
+
+export {StudioEpisode} from './StudioEpisode';
+export {compileRecipe,sampleRecipe} from './recipe.ts';
+export type {EpisodeRecipe,StudioShot} from './recipe.ts';
+export {STUDIO_RECIPES} from './studio-recipes.ts';
+export {createWeather,animateWeather} from './weather.ts';

@@ -13,7 +13,7 @@ try{
  for(const id of ids){
   console.log('Reviewing',id);
   const composition=await selectComposition({serveUrl,id,puppeteerInstance:browser}),duration=composition.durationInFrames/composition.fps;
-  if(!process.argv.includes('--video-only'))for(const second of id==='KitBefore'?[.5,1.5]:id.startsWith('KitA')?[.5,3.5,6.5]:id.startsWith('KitB')?[.5,2.4,3.5,5]:[.5,1.8,3.5,5.5]){
+  if(!process.argv.includes('--video-only'))for(const second of id.startsWith('Studio')?[.5,3.5,6.5,9.5,12.5,15.5]:id==='KitBefore'?[.5,1.5]:id.startsWith('KitA')?[.5,3.5,6.5]:id.startsWith('KitB')?[.5,2.4,3.5,5]:[.5,1.8,3.5,5.5]){
    await renderStill({serveUrl,composition,frame:Math.min(composition.durationInFrames-1,Math.floor(second*composition.fps)),output:`${out}/${id}-${second}.png`,scale,puppeteerInstance:browser});
   }
   if(!process.argv.includes('--stills')){
