@@ -6,6 +6,7 @@
  */
 import type {ShotId} from '../../shared/contract.ts';
 import {PHYSICAL_BEATS} from './staging/cinema/shot-plan.ts';
+import {editorialStartDistance} from './payoff-source.ts';
 
 export const REVIEW_FPS=30;
 export const REVIEW_TOTAL_FRAMES=758;
@@ -41,6 +42,6 @@ export function reviewBeat(frame:number,sparkHookSec:number):ReviewBeat {
  const aeroLoad01=i===3?.50+.50*smooth((localSec/durationSec-.17)/.68):1;
  return {shot:REVIEW_SHOTS[i],frame,localFrame,localSec,durationSec,
   sourceSec:sourceIn+localSec*sourceRate,
-  startDistanceM:physical.startDistanceM,
+  startDistanceM:editorialStartDistance(physical.shot,physical.startDistanceM),
   aeroLoad01,sourceRate,startFrame,endFrameExclusive};
 }
