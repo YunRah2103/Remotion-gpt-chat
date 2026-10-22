@@ -103,7 +103,6 @@ export function animateAfterfireRig(rig:AfterfireRig,sample:AfterfireSample):voi
 function mount(root:T.Group,name:string,x:number,dir:Vec3){
  const m=new T.Object3D();m.name='mount:'+name;m.position.set(x,0,0);m.userData={mount:true,mountName:name,direction:dir};root.add(m);
 }
-const muted=metal();
 /** Fresh built component with actual metal shell, inlet/outlet sockets and baffled internals. */
 function segment(kind:'collector'|'catalyst'|'muffler'|'tailpipe'):T.Group{
  const root=new T.Group();root.name='ep005-'+kind;
@@ -119,7 +118,7 @@ function segment(kind:'collector'|'catalyst'|'muffler'|'tailpipe'):T.Group{
   root.add(cylinderBetween(new T.Vector3(length*.28,y,z),new T.Vector3(-length*.36,0,0),.036,'ep005-header-'+k,metal()));
  }
  if(kind==='catalyst')for(let y=-2;y<=2;y++)for(let z=-2;z<=2;z++)if(y*y+z*z<=5){
-  root.add(cylinderBetween(new T.Vector3(-length*.36,y*.034,z*.034),new T.Vector3(length*.36,y*.034,z*.034),.013,'ep005-substrate-channel-'+y+'-'+z,muted));
+  root.add(cylinderBetween(new T.Vector3(-length*.36,y*.034,z*.034),new T.Vector3(length*.36,y*.034,z*.034),.013,'ep005-substrate-channel-'+y+'-'+z,metal()));
  }
  if(kind==='muffler')for(let k=0;k<3;k++){
   const plate=new T.Mesh(new T.CylinderGeometry(rad*.94,rad*.94,.025,24),new T.MeshStandardMaterial({color:'#758390',metalness:.76,roughness:.39}));
