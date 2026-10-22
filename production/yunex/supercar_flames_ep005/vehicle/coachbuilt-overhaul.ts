@@ -160,7 +160,7 @@ function runningGear(hero:T.Group,m:Finish){
  for(const position of ['front-left','front-right','rear-left','rear-right']){
   const pivot=hero.getObjectByName('mount-'+position);
   const roll=pivot?.getObjectByName('wheel-roll');
-  if(!roll)throw new Error('V3 wheel roll missing: '+position);
+  if(!pivot||!roll)throw new Error('V3 wheel mount/roll missing: '+position);
   const side=position.endsWith('left')?1:-1;
   const face=side*.167,r=s.radius;
   add(roll,'overhaul-rolled-barrel-'+position,
