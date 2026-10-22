@@ -1,7 +1,7 @@
 /**
  * EP005 proportion die, v2. Physically changes the model's arched-body
  * vertex positions, replaces the shallow stock glass/roof shell with a
- * continuous elevated curved greenhouse, and adds nonplanar bonnet and
+ * continuous raised short-cabin greenhouse, and adds nonplanar bonnet and
  * rear-haunch skins. This is NOT a camera/scale/trim workaround.
  * The V3 wheels, steering, animated body shell, cabin, driver, V8 and
  * actual A2 exhaust Object3D nodes are NOT rebuilt or reparented.
@@ -13,7 +13,7 @@ import {bodyTop,bodyHalfWidth} from '../../../../src/yunex/world-kit/vehicle-bod
 type V3=[number,number,number];
 export const EP005_ENVELOPE={
  length:4.70,width:2.01,designRoofHeight:1.235,
- windowBelt:0.79,frontRoofX:0.27,rearRoofX:-1.02,
+ windowBelt:0.79,frontRoofX:0.20,rearRoofX:-0.88,
  screenBaseX:0.92,screenBaseY:0.79,rearGlassBaseX:-1.62,
  rearArchX:-1.39,frontArchX:1.39,wheelRadius:.36
 } as const;
@@ -66,8 +66,8 @@ export function sculptEp005BodyVertices(shell:T.Object3D){
   const rear=gauss(x,-1.36,.61),front=gauss(x,1.34,.60);
   const door=gauss(x,.0,.77),shoulder=gauss(y,.765,.155),waist=gauss(y,.48,.19);
   // Pronounced horizontal shoulder, grown rear fender and concave mid-door.
-  const dz=side*flank*(.081*rear*shoulder+.037*front*shoulder-.070*door*waist);
-  const dy=.042*rear*shoulder+.027*front*shoulder+.024*door*shoulder
+  const dz=side*flank*(.145*rear*shoulder+.080*front*shoulder-.115*door*waist);
+  const dy=.065*rear*shoulder+.050*front*shoulder+.030*door*shoulder
    -.025*ease((x-1.78)/.54)*ease((y-.52)/.30);
   if(Math.abs(dz)+Math.abs(dy)>1e-6)moved++;
   attr.setXYZ(i,x,y+dy,z+dz);
@@ -110,14 +110,14 @@ function canopy(shell:T.Object3D){
  const roof=grid('ep005-formed-roof-canopy',36,24,roofPoint,paint);shell.add(roof);
  const windshield=(u:number,v:number):V3=>{
   // u bottom -> top; v left -> right. Real 3D bulge, not planar quadrilateral.
-  const t=ease(u),x=.920+(.275-.920)*t+.024*Math.sin(Math.PI*t);
+  const t=ease(u),x=.920+(.205-.920)*t+.024*Math.sin(Math.PI*t);
   const y=.793+.333*t+.012*Math.sin(Math.PI*v)*Math.sin(Math.PI*t);
   const width=.900+(.642-.900)*t;
   return [x,y,(2*v-1)*width];
  };
  shell.add(grid('ep005-curved-windscreen',22,26,windshield,glass));
  const rearScreen=(u:number,v:number):V3=>{
-  const t=ease(u),x=-1.615+(.005-1.020+1.615)*t;
+  const t=ease(u),x=-1.615+(.005-.880+1.615)*t;
   const y=.805+.323*t+.012*Math.sin(Math.PI*v)*Math.sin(Math.PI*t);
   const width=.845+(.655-.845)*t;
   return [x,y,(2*v-1)*width];
@@ -125,7 +125,7 @@ function canopy(shell:T.Object3D){
  shell.add(grid('ep005-curved-rear-glazing',20,24,rearScreen,glass));
  for(const sign of [-1,1]){
   const sideGlass=(u:number,v:number):V3=>{
-   const lowerX=-1.60+2.51*u,topX=-1.018+1.287*u;
+   const lowerX=-1.60+2.51*u,topX=-.878+1.078*u;
    const x=lowerX+(topX-lowerX)*ease(v);
    const roof=.1*Math.sin(Math.PI*u)+1.118;
    const y=.79+(roof-.79)*ease(v)+.008*Math.sin(Math.PI*u)*Math.sin(Math.PI*v);
@@ -157,8 +157,8 @@ function bonnet(shell:T.Object3D){
   const x=.86+1.47*u;
   const breadth=.70+.12*Math.sin(Math.PI*u);
   const z=(2*v-1)*breadth;
-  const dome=.063*Math.sin(Math.PI*u)*(1-sq(2*v-1));
-  const fender=.025*Math.exp(-sq((Math.abs(z)-.68)/.24));
+  const dome=.095*Math.sin(Math.PI*u)*(1-sq(2*v-1));
+  const fender=.045*Math.exp(-sq((Math.abs(z)-.68)/.24));
   const y=bodyTop(s,x)+.026+dome+fender-.022*ease((x-1.88)/.46);
   return [x,y,z];
  },m));
@@ -172,7 +172,7 @@ function rearQuarter(shell:T.Object3D){
    const u=i/nx,v=j/ny,x=-2.24+1.66*u;
    const y=.59+.296*v+.033*Math.sin(Math.PI*u)*v;
    const contour=bodyHalfWidth(s,x,y);
-   const haunch=.102*gauss(x,-1.38,.53)*Math.sin(Math.PI*(.17+.83*v));
+   const haunch=.185*gauss(x,-1.38,.53)*Math.sin(Math.PI*(.17+.83*v));
    positions.push(x,y,sign*(contour+.014+haunch));
   }
   for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){
