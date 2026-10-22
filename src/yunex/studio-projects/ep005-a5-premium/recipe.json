@@ -1,0 +1,58 @@
+{
+  "id": "ep005-a5-premium",
+  "title": "EP005 PINNED REAL-FOOTAGE REVIEW — SILENT / NOT APPROVED",
+  "vehicle": {
+    "variant": "supercar",
+    "driver": true,
+    "color": "#19374c"
+  },
+  "world": {
+    "kind": "track",
+    "timeOfDay": "night",
+    "wetness": 0.18
+  },
+  "shots": [
+    {
+      "id": "hook",
+      "duration": 1.5,
+      "camera": "chase",
+      "action": "acceleration",
+      "caption": ""
+    },
+    {
+      "id": "launch",
+      "duration": 4,
+      "camera": "tracking",
+      "action": "acceleration",
+      "caption": ""
+    },
+    {
+      "id": "engine-reveal",
+      "duration": 4,
+      "camera": "reveal",
+      "action": "cruise",
+      "caption": ""
+    },
+    {
+      "id": "mechanism",
+      "duration": 4.5,
+      "camera": "overhead",
+      "action": "cruise",
+      "caption": ""
+    },
+    {
+      "id": "exhaust",
+      "duration": 4.5,
+      "camera": "chase",
+      "action": "acceleration",
+      "caption": ""
+    },
+    {
+      "id": "payoff",
+      "duration": 6.5,
+      "camera": "chase",
+      "action": "acceleration",
+      "caption": ""
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+import React,{useEffect,useMemo} from 'react';
+import {AbsoluteFill,Composition,registerRoot,useCurrentFrame} from 'remotion';
+import * as T from 'three';
+import {EP005DrivingFilm} from '../../../../production/yunex/supercar_flames_ep005/cinema/DrivingFilm';
+import type {CinemaIntegration} from '../../../../production/yunex/supercar_flames_ep005/cinema/DrivingFilm';
+import {sampleCinema,CINEMA_FRAMES,CINEMA_FPS} from '../../../../production/yunex/supercar_flames_ep005/cinema/timeline';
+import type {CinemaSample} from '../../../../production/yunex/supercar_flames_ep005/cinema/timeline';
+import {createEp005Hero,resolveEp005ExhaustPorts} from '../../../../production/yunex/supercar_flames_ep005/vehicle/hero';
+import {createAfterfireRig,readExhaustMounts,animateAfterfireRig} from '../../../../production/yunex/supercar_flames_ep005/flames/exhaust-rig';
+import {sampleAfterfire,stateFromCinemaDemand} from '../../../../production/yunex/supercar_flames_ep005/flames/afterfire';
+import {createEP005NightCircuit} from '../../../../production/yunex/supercar_flames_ep005/look/NightCircuit';
+import {sampleEP005Route} from '../../../../production/yunex/supercar_flames_ep005/look/route';
+import {EP005PracticalLighting,EP005NightAtmosphere} from '../../../../production/yunex/supercar_flames_ep005/look/PracticalLighting';
+import {animateCinematicVehicle} from '../../modelling-kit/rig';
+import {disposeObject} from '../../world-kit/geometry';
+import {PremiumOverlay} from './PremiumOverlay';
+import type {ScreenTarget} from './PremiumOverlay';
+import {PORTRAIT} from './picture-contract';
+const radii={'exhaust-tip-left':.085,'exhaust-tip-right':.085};
+/** Isolated native moving review. These assets are SHA-pinned but NOT visually approved by Agent 0. */
+const integration:CinemaIntegration={
+ createHero:createEp005Hero,
+ createWorld:()=>createEP005NightCircuit({premium:true}),
+ routeSampler:sampleEP005Route,
+ practicalLight:sample=><><EP005NightAtmosphere premium/><EP005PracticalLighting pose={sample.pose} flameIntensity={sample.afterfireDemand}/></>,
+ attachAfterfire:hero=>{
+  const rig=createAfterfireRig(hero,{radii,requireAuthoritative:true});
+  return (sample:CinemaSample)=>{
+   const mounts=readExhaustMounts(hero,radii);
+   const state=stateFromCinemaDemand(sample.afterfireDemand,sample.throttle);
+   const fx=sampleAfterfire(sample.frame,sample.fps,state,mounts);
+   animateAfterfireRig(rig,fx);
+  };
+ }
+};
+/** Duplicate rig is evaluated at the exact same ABSOLUTE frame as picture to
+ * project actual moving A1 named tailpipe ports; no world-fixed arrow guesses. */
+const useTailpipeProjection=(sample:CinemaSample):ScreenTarget|null=>{
+ // Only the exhaust beat needs an independent live-rig world-space mount
+ // projection. Avoid rebuilding a second high-poly hero in all 615 other frames.
+ const needsPort=sample.shot.id==='exhaust';
+ const anchorHero=useMemo(()=>needsPort?createEp005Hero():null,[needsPort]);
+ useEffect(()=>()=>{if(anchorHero)disposeObject(anchorHero);},[anchorHero]);
+ if(!anchorHero)return null;
+ animateCinematicVehicle(anchorHero,{
+  frame:sample.frame,fps:sample.fps,distance:sample.distanceMeters,
+  steer:sample.steerRadians,cutaway:0,compression:.008,
+  heat:sample.afterfireDemand*.25,gearChange:sample.gearChange
+ });
+ anchorHero.position.fromArray(sample.pose.position);
+ anchorHero.rotation.y=sample.pose.yaw;
+ anchorHero.updateMatrixWorld(true);
+ const port=resolveEp005ExhaustPorts(anchorHero).find(p=>p.name==='exhaust-tip-left');
+ if(!port)return null;
+ const cam=new T.PerspectiveCamera(sample.camera.fov,PORTRAIT.width/PORTRAIT.height,.025,600);
+ cam.position.fromArray(sample.camera.position);
+ cam.lookAt(new T.Vector3(...sample.camera.target));
+ cam.updateMatrixWorld(true);
+ const direction=new T.Vector3();
+ cam.getWorldDirection(direction);
+ if(port.position.clone().sub(cam.position).dot(direction)<=.025)return null;
+ const ndc=port.position.clone().project(cam);
+ return {x:(ndc.x+1)*PORTRAIT.width/2,y:(1-ndc.y)*PORTRAIT.height/2,
+  visible:Number.isFinite(ndc.x)&&Number.isFinite(ndc.y)&&Math.abs(ndc.x)<1&&Math.abs(ndc.y)<1,
+  source:'mount:exhaust-tip-left'};
+};
+const Picture:React.FC=()=>{
+ const frame=useCurrentFrame(),sample=sampleCinema(frame,CINEMA_FPS,sampleEP005Route);
+ const port=useTailpipeProjection(sample);
+ return <AbsoluteFill>
+  <EP005DrivingFilm integration={integration}/>
+  <PremiumOverlay exhaustTarget={port} originalAudioVerified={false}/>
+ </AbsoluteFill>;
+};
+if(CINEMA_FRAMES!==PORTRAIT.frames||CINEMA_FPS!==PORTRAIT.fps)
+ throw new Error('Agent 3 cut/afterfire timeline drift from Agent 5 editor');
+registerRoot(()=> <Composition id="StudioEpisode" component={Picture}
+  width={PORTRAIT.width} height={PORTRAIT.height} fps={CINEMA_FPS}
+  durationInFrames={CINEMA_FRAMES}/>);
+

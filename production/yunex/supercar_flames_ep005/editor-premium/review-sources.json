@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "kind": "SILENT_PINNED_VISUAL_REVIEW_ONLY",
+  "verifiedV3Base": "ce7316b364f96721b39100841eb386724ccf2d52",
+  "route": "track",
+  "fps": 30,
+  "frames": 750,
+  "editor": "agent/ep005-05-premium-editor-rebuild",
+  "sources": {
+    "agent1": {
+      "sha": "23eda32c1796fd9af546ea80c3d6e5117e8e6ba8",
+      "approved": false
+    },
+    "agent2": {
+      "sha": "e8a8f5e415e4abb03b0fa8a2c0959df5eaceab32",
+      "approved": false
+    },
+    "agent3": {
+      "sha": "2a452439603aa21a0e7a050a98892d15b087a803",
+      "approved": false
+    },
+    "agent4": {
+      "sha": "92f28465b83183815605fcb3f13291bba87b2714",
+      "approved": false
+    }
+  },
+  "masterAudio": {
+    "provided": false,
+    "timingVerified": false,
+    "sourcePath": null
+  },
+  "beats": [
+    [
+      "hook",
+      0,
+      45
+    ],
+    [
+      "launch",
+      45,
+      165
+    ],
+    [
+      "engine-reveal",
+      165,
+      285
+    ],
+    [
+      "mechanism",
+      285,
+      420
+    ],
+    [
+      "exhaust",
+      420,
+      555
+    ],
+    [
+      "payoff",
+      555,
+      750
+    ]
+  ],
+  "afterfireWindows": [
+    [
+      0,
+      30
+    ],
+    [
+      430,
+      490
+    ],
+    [
+      674,
+      710
+    ]
+  ],
+  "requiresExplicitAgent0Approval": true
+}
