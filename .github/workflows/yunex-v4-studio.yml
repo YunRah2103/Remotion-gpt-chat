@@ -74,6 +74,7 @@ jobs:
           path: out/studio/${{ matrix.project }}
           merge-multiple: true
       - run: node --experimental-strip-types scripts/modelling-kit/v4-native.mjs --kind=${{ matrix.kind }} --assemble
+      - run: python -m pip install --disable-pip-version-check Pillow==11.3.0
       - name: Verify source, native media and perceptual diagnostics
         env:
           PROOF_PROJECT: ${{ matrix.project }}
@@ -113,6 +114,7 @@ jobs:
           out/v4-models/${{ matrix.variant }}-${{ matrix.body }}-${{ matrix.time }}.mp4
           --props='{"variant":"${{ matrix.variant }}","bodyDetail":"${{ matrix.body }}","timeOfDay":"${{ matrix.time }}"}'
           --gl=swangle --codec=h264 --pixel-format=yuv420p --color-space=bt709 --crf=18 --concurrency=2
+      - run: python -m pip install --disable-pip-version-check Pillow==11.3.0
       - name: Verify native model orbit
         run: >-
           python scripts/modelling-kit/v4-media-qc.py

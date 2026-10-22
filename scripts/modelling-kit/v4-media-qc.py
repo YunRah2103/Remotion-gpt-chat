@@ -13,7 +13,6 @@ import math
 import pathlib
 import subprocess
 import sys
-from PIL import Image, ImageChops, ImageDraw, ImageStat
 
 
 def read_json(path):
@@ -53,6 +52,7 @@ def review_state(review, sha, frames):
 
 
 def main():
+    from PIL import Image, ImageChops, ImageDraw, ImageStat
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('video', type=pathlib.Path)
     parser.add_argument('--out', required=True, type=pathlib.Path)
