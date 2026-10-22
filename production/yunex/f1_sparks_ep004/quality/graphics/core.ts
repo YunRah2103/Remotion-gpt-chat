@@ -6,7 +6,7 @@ import {projectedActualParts} from '../../story/project-actual-parts.ts';
 import {validateAeroPair} from '../../story/visual-cues.ts';
 export const SCREEN={width:1080,height:1920,left:84,right:186,top:225,captionBottom:326,captionMaxWidth:754,scienceBottom:1360} as const;
 export type NarratorWord=Readonly<{text:string;startSec:number;endSec:number}>;
-export type SubtitleCue=Readonly<{startFrame:number;endFrame:number;wordIndices:readonly number[]}>;
+export type SubtitleCue=Readonly<{startFrame:number;endFrameExclusive:number;wordIndices:readonly number[]}>;
 export type TimingStatus='verified-original-ep004'|'provisional-test-fixture';
 const clamp=(x:number,lo:number,hi:number)=>Math.max(lo,Math.min(hi,x));
 export const ease=(v:number)=>{const x=clamp(v,0,1);return x*x*(3-2*x);};
@@ -27,8 +27,8 @@ export function validateNarratorWords(words:readonly NarratorWord[],status:Timin
 export function activeSubtitle(frame:number,fps:number,words:readonly NarratorWord[],cue:SubtitleCue|null,
  status:TimingStatus,allowFixture=false){
  validateNarratorWords(words,status,allowFixture);
- if(!cue||frame<cue.startFrame||frame>=cue.endFrame)return null;
- if(!(fps>0)||!Number.isFinite(frame)||cue.startFrame<0||cue.endFrame<=cue.startFrame)
+ if(!cue||frame<cue.startFrame||frame>=cue.endFrameExclusive)return null;
+ if(!(fps>0)||!Number.isFinite(frame)||cue.startFrame<0||cue.endFrameExclusive<=cue.startFrame)
   throw new Error('Invalid caption frame bounds');
  const indices=[...cue.wordIndices];
  if(!indices.length||indices.length>5||new Set(indices).size!==indices.length||
@@ -36,7 +36,7 @@ export function activeSubtitle(frame:number,fps:number,words:readonly NarratorWo
     indices.some((x,i)=>i>0&&x<=indices[i-1]))
    throw new Error('Caption groups must reference 1–5 ordered real narrator words');
  const highlighted=indices.find(i=>frame/fps>=words[i].startSec&&frame/fps<words[i].endSec);
- return {indices,highlighted,fade:ease((frame-cue.startFrame+1)/4)*ease((cue.endFrame-frame)/4)};
+ return {indices,highlighted,fade:ease((frame-cue.startFrame+1)/4)*ease((cue.endFrameExclusive-frame)/4)};
 }
 export function subtitleSize(words:readonly string[],width=SCREEN.width) {
  const visible=Math.min(SCREEN.captionMaxWidth,width-SCREEN.left-SCREEN.right);
