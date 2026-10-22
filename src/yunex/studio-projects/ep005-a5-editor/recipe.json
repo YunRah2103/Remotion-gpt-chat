@@ -7,28 +7,28 @@
     "color": "#1c3439"
   },
   "world": {
-    "kind": "city",
+    "kind": "track",
     "timeOfDay": "dusk",
-    "wetness": 0.25
+    "wetness": 0.1
   },
   "shots": [
     {
       "id": "flame-hook",
-      "duration": 1.2,
-      "camera": "tracking",
-      "action": "acceleration",
-      "caption": ""
-    },
-    {
-      "id": "moving-reveal",
-      "duration": 4.3,
+      "duration": 1.5,
       "camera": "chase",
       "action": "acceleration",
       "caption": ""
     },
     {
+      "id": "moving-reveal",
+      "duration": 4,
+      "camera": "tracking",
+      "action": "acceleration",
+      "caption": ""
+    },
+    {
       "id": "engine-reveal",
-      "duration": 5.2,
+      "duration": 4,
       "camera": "reveal",
       "action": "cruise",
       "cutaway": 0.94,
@@ -41,8 +41,8 @@
     },
     {
       "id": "fuel-path",
-      "duration": 5.3,
-      "camera": "reveal",
+      "duration": 4.5,
+      "camera": "overhead",
       "action": "cruise",
       "part": "v8",
       "annotation": {
@@ -58,14 +58,14 @@
     },
     {
       "id": "afterfire-exit",
-      "duration": 5,
-      "camera": "tracking",
+      "duration": 4.5,
+      "camera": "chase",
       "action": "acceleration",
       "caption": ""
     },
     {
       "id": "driving-payoff",
-      "duration": 5,
+      "duration": 6.5,
       "camera": "chase",
       "action": "acceleration",
       "caption": ""
