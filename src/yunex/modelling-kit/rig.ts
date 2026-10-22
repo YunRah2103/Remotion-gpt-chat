@@ -93,6 +93,6 @@ export function animateCinematicVehicle(root:T.Group,state:CinematicState){
  sparks.visible=contact;const dummy=new T.Object3D(),t=state.frame/state.fps;
  for(let i=0;i<sparks.count;i++){const age=(t*3+i*.61803398875)%1,side=Math.sin(i*12.9);dummy.position.set((i%2?.8:-.8)-age*4.5,.014+Math.sin(age*Math.PI)*(.035+(i%7)*.012),side*age*.95);dummy.scale.set(.8+age*3.5,.65,.65);dummy.rotation.z=-.2;dummy.updateMatrix();sparks.setMatrixAt(i,dummy.matrix);}sparks.instanceMatrix.needsUpdate=true;
  if(systems)animateMechanicalSystems(systems,root,shell.position.y);
- if(driver){const cabin=shell.getObjectByName('interior');if(cabin){fade(cabin,0);for(const name of ['door-panel-left','door-panel-right']){const panel=cabin.getObjectByName(name);if(panel)panel.visible=cutaway<.5;}}animateDriver(driver,steer,state.braking??0,state.impact??0,state.gearChange??0);fade(driver,0);}
+ if(driver){const cabin=shell.getObjectByName('interior');if(cabin){fade(cabin,0);for(const name of ['door-panel-left','door-panel-right','roof-liner']){const panel=cabin.getObjectByName(name);if(panel)panel.visible=cutaway<.5;}}animateDriver(driver,steer,state.braking??0,state.impact??0,state.gearChange??0);fade(driver,0);}
  root.updateMatrixWorld(true);groundTornCords(root,mounts);
 }

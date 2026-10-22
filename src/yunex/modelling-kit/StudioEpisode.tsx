@@ -27,7 +27,7 @@ export const StudioEpisode:React.FC<{recipe:EpisodeRecipe}>=({recipe})=>{
  const model=useMemo(()=>{
   if(shot.part)return createPart({variant:shot.part,cutaway:true});
   const vehicle=createCinematicVehicle({...recipe.vehicle,quality:'hero',lights:true});
-  if(recipe.world.timeOfDay==='night')for(const side of [-1,1]){const target=new T.Object3D();target.position.set(s.length/2+24,.05,side*s.width*.32);const light=new T.SpotLight('#e2edff',75,45,.24,.7,2);light.position.set(s.length*.46,s.height*.42,side*s.width*.32);light.target=target;vehicle.add(target,light);}
+  if(recipe.world.timeOfDay==='night')for(const side of [-1,1]){const target=new T.Object3D();target.position.set(s.length/2+24,.05,side*s.width*.32);const light=new T.SpotLight('#e2edff',450,55,.24,.7,2);light.position.set(s.length*.46,s.height*.42,side*s.width*.32);light.target=target;vehicle.add(target,light);}
   return vehicle;
  },[shot.part,recipe.vehicle,recipe.world.timeOfDay,s]);
  const weather=useMemo(()=>createWeather({kind:'rain',quality:'standard',seed:17}),[]);

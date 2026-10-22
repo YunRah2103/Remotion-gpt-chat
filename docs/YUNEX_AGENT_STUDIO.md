@@ -6,12 +6,13 @@ From the repository root, with dependencies installed:
 npm run kit:catalog
 npm run kit:create -- braking-explained braking
 npm run kit:validate -- braking-explained
+npm run kit:preview -- braking-explained
 npm run kit:render -- braking-explained
 ```
 
 The finished native 1080×1920 / 30 fps MP4 is `out/studio/braking-explained.mp4`. To preview interactively: `npx remotion studio src/yunex/studio-projects/braking-explained/entry.tsx`.
 
-Before a full MP4, inspect a cheap preview:
+`kit:preview` renders a half-resolution still at the midpoint of **every compiled shot**, including edited durations, into `out/studio/<slug>/previews/` with `shots.json`. Use `--dry-run` to inspect its commands. Inspect these images before a full MP4. For one specific frame:
 
 ```sh
 npx remotion still src/yunex/studio-projects/braking-explained/entry.tsx StudioEpisode out/studio/braking-preview.png --frame=45 --scale=.5 --gl=swangle
@@ -44,7 +45,7 @@ Four complete 18 second starters ship: `braking`, `powertrain`, `f1-downforce` a
 | audio.narration / music | Existing files beneath public/, e.g. audio/my-narration.mp3 |
 | audio.musicVolume | 0–1; defaults to 0.15 |
 
-Distance is continuous across shot boundaries; all motion uses absolute frame samples. Cuts are intentional hard cuts. Garage/showroom/parking car shots are parked; engine parts still animate. For road sequences, the wheels steer along the actual route tangent. Part shots fit the camera to real component bounds. Onboard views use seated eye positions, hiding the dummy head for that view. Interior and overhead shots have gentle deterministic camera motion. Night close-ups have local fill.
+Distance is continuous across shot boundaries; all motion uses absolute frame samples. Cuts are intentional hard cuts. Garage/showroom/parking car shots are parked; engine parts still animate. For road sequences, the wheels steer along the actual route tangent. Part shots fit the camera to real component bounds. Onboard views use fitted windscreen or Formula T-camera mounts, hiding the dummy head for that view. Interior and overhead shots have gentle deterministic camera motion. Night cabin/wheel close-ups have restrained local fill; vehicle-mounted headlights illuminate onboard road views.
 
 CI distributes each 18-second starter across six absolute-frame ranges, then joins the verified chunks into a complete native film. The review pack includes a 72-second silent showcase and matching-frame body/camera comparisons.
 
