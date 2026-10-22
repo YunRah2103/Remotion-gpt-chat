@@ -1,0 +1,44 @@
+name: EP005 Agent7 Flame and Science Previews
+on:
+  push:
+    branches:
+      - agent/ep005-07-v4-afterfire-science
+  workflow_dispatch:
+jobs:
+  visual-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: TypeScript validation
+        run: npm run check
+      - name: System ffmpeg
+        run: ffmpeg -version | head -n 1
+      - name: Render genuine native 3s moving fixture preview
+        run: |
+          mkdir -p out/ep005/agent7
+          npx remotion render src/yunex/ep005/agent7/entry.tsx Agent7FlameFixture out/ep005/agent7/flame-fixture.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+      - name: Render genuine native 5s moving engine cutaway
+        run: npx remotion render src/yunex/ep005/agent7/entry.tsx Agent7Science out/ep005/agent7/science.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+      - name: Full decode, stream checks and reproducible hashes
+        run: |
+          set -euxo pipefail
+          for f in out/ep005/agent7/*.mp4; do
+            ffprobe -v error -select_streams v:0 -show_entries stream=width,height,r_frame_rate,nb_frames -of default=noprint_wrappers=1 "$f"
+            ffmpeg -v error -xerror -i "$f" -f null -
+          done
+          sha256sum out/ep005/agent7/*.mp4 > out/ep005/agent7/SHA256SUMS
+          ffmpeg -y -i out/ep005/agent7/flame-fixture.mp4 -vf "fps=1,scale=270:480,tile=3x1" -frames:v 1 out/ep005/agent7/flame-contact.png
+          ffmpeg -y -i out/ep005/agent7/science.mp4 -vf "fps=1,scale=270:480,tile=5x1" -frames:v 1 out/ep005/agent7/science-contact.png
+      - name: Upload unapproved R&D proofs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ep005-agent7-unapproved-motion-proofs
+          path: out/ep005/agent7/
+          retention-days: 14
