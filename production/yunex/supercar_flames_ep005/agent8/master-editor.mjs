@@ -270,12 +270,26 @@ const sampleFrames=[...samples].sort((a,b)=>a-b);
 const expr=sampleFrames.map(n=>'eq(n\\,'+n+')').join('+');
 run('ffmpeg',['-hide_banner','-loglevel','error','-i',output,'-vf','select='+expr,
   '-vsync','0',path.join(outDir,'review-%03d.png')]);
+// Export EVERY opening frame and EVERY final 75-frame payoff frame for real
+// moving-image visual review, instead of claiming that a few stills prove quality.
+run('ffmpeg',['-hide_banner','-loglevel','error','-i',output,
+  '-vf','select=lte(n\\,29)+gte(n\\,675),scale=270:-2',
+  '-vsync','0','-q:v','4',path.join(outDir,'mandatory-visual-%03d.jpg')]);
+const visualFiles=(await fsp.readdir(outDir)).filter(x=>/^mandatory-visual-\d+\.jpg$/.test(x)).sort();
+if(visualFiles.length!==105) throw new Error('MANDATORY QA FAIL: expected exactly first 30 + last 75 review frames');
+const visualHashes=[];
+for(const f of visualFiles) visualHashes.push(await sha256(path.join(outDir,f)));
+const openingUnique=new Set(visualHashes.slice(0,30)).size;
+const endingUnique=new Set(visualHashes.slice(30)).size;
+if(openingUnique<5 || endingUnique<12)
+  throw new Error('MANDATORY QA FAIL: opening or ending looks frame-static; inspect replacement source');
 const report={
   episode:'EP005',candidate:true,humanVisualApproval:'PENDING',
   mode:status.mode,frameCount:750,width:1080,height:1920,fps:30,
   sha256:await sha256(output),videoPath:output,
   audioStreamCount:aud.length,sourceCommitHashes:manifest.beats.map(b=>({id:b.id,commit:b.media.sourceCommit,sha256:b.media.sha256,approval:b.media.approvalRef})),
-  sampleFrames,fullDecode:'PASS',note:'Inspect full-speed film, each cut and all extracted first/last samples before calling picture lock.'
+  sampleFrames,mandatoryVisualFrames:105,openingUniqueFrames:openingUnique,endingUniqueFrames:endingUnique,
+  fullDecode:'PASS',note:'Inspect full-speed film, each cut and all extracted first/last samples before calling picture lock.'
 };
 await fsp.writeFile(path.join(outDir,'render-proof.json'),JSON.stringify(report,null,2)+'\n');
 console.log(JSON.stringify(report,null,2));
