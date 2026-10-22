@@ -686,7 +686,7 @@
     ]
   },
   "world": {
-    "kind": "highway",
+    "kind": "mountain",
     "timeOfDay": "dusk"
   },
   "shots": [
