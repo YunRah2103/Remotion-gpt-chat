@@ -1,0 +1,44 @@
+{
+  "id": "ep005-a2-flames",
+  "title": "Afterfire / PORTS PROVISIONAL / SILENT",
+  "vehicle": {
+    "variant": "supercar",
+    "driver": true,
+    "color": "#15585f"
+  },
+  "world": {
+    "kind": "mountain",
+    "timeOfDay": "dusk",
+    "wetness": 0.06
+  },
+  "shots": [
+    {
+      "id": "hook",
+      "duration": 1.2,
+      "camera": "chase",
+      "action": "acceleration",
+      "caption": "The tailpipes flash as the driver lifts."
+    },
+    {
+      "id": "tailpipe",
+      "duration": 2,
+      "camera": "chase",
+      "action": "acceleration",
+      "caption": "Fuel can ignite in a sufficiently hot exhaust."
+    },
+    {
+      "id": "mechanism",
+      "duration": 2.8,
+      "camera": "reveal",
+      "action": "cruise",
+      "caption": "Illustration: exhaust flows from engine to tailpipe."
+    },
+    {
+      "id": "wide",
+      "duration": 2,
+      "camera": "chase",
+      "action": "acceleration",
+      "caption": "Not every supercar does this. Conditions matter."
+    }
+  ]
+}

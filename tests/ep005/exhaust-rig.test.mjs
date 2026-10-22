@@ -1,0 +1,30 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import * as T from 'three';
+import {createCinematicVehicle} from '../../src/yunex/modelling-kit/rig.ts';
+import {validateModel} from '../../src/yunex/modelling-kit/authoring.ts';
+import {addProvisionalPreviewExhaust,readExhaustMounts,createAfterfireRig,animateAfterfireRig,createAfterfireCutaway} from '../../production/yunex/supercar_flames_ep005/flames/exhaust-rig.ts';
+import {sampleAfterfire} from '../../production/yunex/supercar_flames_ep005/flames/afterfire.ts';
+test('flame path refuses missing mounts and requires explicit preview opt-in',()=>{
+ const car=new T.Group();
+ assert.throws(()=>readExhaustMounts(car),/Agent 1/);
+ const car2=createCinematicVehicle({variant:'supercar',quality:'hero',optimize:false});
+ addProvisionalPreviewExhaust(car2);
+ assert.throws(()=>createAfterfireRig(car2),/provisional/);
+ const fx=createAfterfireRig(car2,{requireAuthoritative:false});
+ assert.equal(fx.elements.length,2);
+ const hot={throttle:.1,unburntFuel:1,exhaustTemperatureC:800,overrun:true};
+ animateAfterfireRig(fx,sampleAfterfire(0,30,hot,readExhaustMounts(car2)));
+ assert.ok(fx.elements.some(e=>e.root.visible));
+ const p=fx.elements[0].socket.getWorldPosition(new T.Vector3());
+ car2.position.set(9,0,4);car2.rotation.y=.65;car2.updateMatrixWorld(true);
+ const moved=fx.elements[0].socket.getWorldPosition(new T.Vector3());
+ assert.ok(moved.distanceTo(p)>4);
+ assert.ok(fx.elements[0].root.parent===fx.elements[0].socket);
+});
+test('exhaust cutaway uses V3 genuine port-connected assembly',()=>{
+ const g=createAfterfireCutaway(),r=validateModel(g);
+ assert.ok(g.userData.assembly);assert.ok(g.getObjectByName('ep005-muffler-baffle-0'));
+ assert.equal(r.errors.length,0,JSON.stringify(r.errors));
+ assert.ok(g.getObjectByName('connection-0'));
+});
