@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - agent/ep005-02-v3-flames
+      - agent/ep005-02-v3-afterfire-premium-r2
     paths:
       - 'production/yunex/supercar_flames_ep005/flames/**'
       - 'src/yunex/studio-projects/ep005-a2-flames/**'
@@ -53,6 +54,25 @@ jobs:
           assert len(lines)>=12
           assert len({l.split(',')[-1].strip() for l in lines})>=10,'Film has insufficient distinct moving frames'
           PY
+      - name: Enforce a visible 3D mechanical subject at f135
+        run: |
+          ffmpeg -v error -i out/studio/ep005-a2-flames.mp4 -vf "select='eq(n,135)',scale=180:320" -frames:v 1 -pix_fmt rgb24 -f rawvideo out/studio/ep005-a2-flames/qa/mechanism.rgb
+          python - <<'PY'
+          from pathlib import Path
+          raw=Path('out/studio/ep005-a2-flames/qa/mechanism.rgb').read_bytes()
+          w,h=180,320
+          assert len(raw)==w*h*3, 'exact mechanic frame missing'
+          bright=0
+          for y in range(117,216):
+              for x in range(17,163):
+                  k=(y*w+x)*3
+                  r,g,b=raw[k:k+3]
+                  if max(r,g,b)>105 and (r+g+b)>225:
+                      bright+=1
+          print('central mechanic object pixels:',bright)
+          assert bright>260, 'MECHANICAL SHOT EMPTY OR CROPPED: reject render'
+          PY
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
