@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "episode": "EP005",
+  "agent": 5,
+  "approvalAuthority": "Agent 0 / issue #247",
+  "status": "awaiting-manager-approved-footage",
+  "sourceLock": "ce7316b364f96721b39100841eb386724ccf2d52",
+  "agents": {
+    "1": {"issue": 248, "approved": false, "headSha": null, "artifactSha256": null},
+    "2": {"issue": 249, "approved": false, "headSha": null, "artifactSha256": null},
+    "3": {"issue": 250, "approved": false, "headSha": null, "artifactSha256": null},
+    "4": {"issue": 251, "approved": false, "headSha": null, "artifactSha256": null}
+  },
+  "originalNarration": {"supplied": false, "verifiedWordTimings": false, "path": null}
+}
