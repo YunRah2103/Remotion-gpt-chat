@@ -6,9 +6,10 @@ No original narration has been provided or reproduced.
 ## Critical mount contract with Agent 1
 - Exactly two unique named Object3D instances under V3 vehicle:
   `mount:exhaust-tip-left`, `mount:exhaust-tip-right`.
-- Each has `userData.direction: [x,y,z]` as a *unit vector in the mount's own local axes*, pointing **out of the tailpipe**, and `userData.radius` in metres. The mount's physical position is the true tip lip; transform inherited from body-shell.
+- Each has `userData.direction: [x,y,z]` as a *unit vector in the mount's own local axes*, pointing **out of the tailpipe**. Pin radius explicitly via Agent 1's JSON contract when the V3 component builder does not place `userData.radius` on the node. The mount's physical position is the true tip lip; transform inherited from body-shell.
 - `readExhaustMounts(vehicle)` converts to vehicle-local port pose after the full absolute-frame vehicle update; `createAfterfireRig(vehicle)` attaches real 3D flame under each named mount. It throws on missing/provisional ports.
-- Agent 1 must publish exact tip origin, orientation, radius, transforms, and clearance verification. No guess accepted as a final interface.
+- Agent 1 draft contract #247: left `[-2.465,.420,+.570]`, right `[-2.465,.420,-.570]`, exit `[-1,0,0]`, inner radius `.085 m` each. Example: `createAfterfireRig(hero,{radii:{'exhaust-tip-left':.085,'exhaust-tip-right':.085}})`. Confirm actual hero component QA before manager integration; this JSON-derived radius is not guessed.
+- Agent 1 must publish exact tip origin, orientation, radius, transforms, and clearance verification. Draft recipe currently uses `.054 m` exhaust pipe tube radius versus `.085 m` declared nozzle inner radius: verify physically modelled flare/sleeve and exit clearance. No guess accepted as a final interface.
 - Only this test preview calls `addProvisionalPreviewExhaust`; production integrations must not.
 
 ## API
