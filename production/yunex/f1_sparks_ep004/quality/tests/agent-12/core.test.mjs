@@ -15,7 +15,7 @@ const sample=(sec,shot='contact-macro')=>{
 const fixture=[{text:'Under',startSec:0,endSec:.3},{text:'the',startSec:.3,endSec:.5},
  {text:'car',startSec:.5,endSec:.9},{text:'sparks',startSec:.9,endSec:1.2}];
 test('original narrator verification is REQUIRED in film mode; preview explicitly provisional',()=>{
- const cue={startFrame:0,endFrame:37,wordIndices:[0,1,2,3]};
+ const cue={startFrame:0,endFrameExclusive:37,wordIndices:[0,1,2,3]};
  assert.throws(()=>activeSubtitle(4,30,fixture,cue,'provisional-test-fixture'),/blocked/);
  assert.equal(activeSubtitle(4,30,fixture,cue,'provisional-test-fixture',true).highlighted,0);
  assert.equal(activeSubtitle(14,30,fixture,cue,'provisional-test-fixture',true).highlighted,1);
