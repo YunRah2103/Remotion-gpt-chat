@@ -24,7 +24,7 @@
       "approved": false
     },
     {
-      "id": "tracking",
+      "id": "drive",
       "start": 45,
       "end": 165,
       "priority": "car-under-load",
@@ -33,7 +33,7 @@
       "approved": false
     },
     {
-      "id": "science-engine",
+      "id": "engine",
       "start": 165,
       "end": 285,
       "priority": "mechanical",
@@ -42,7 +42,7 @@
       "approved": false
     },
     {
-      "id": "science-flow",
+      "id": "flow",
       "start": 285,
       "end": 420,
       "priority": "airflow",
@@ -51,7 +51,7 @@
       "approved": false
     },
     {
-      "id": "afterfire-reveal",
+      "id": "ignition",
       "start": 420,
       "end": 555,
       "priority": "exhaust-ignition",
@@ -60,7 +60,7 @@
       "approved": false
     },
     {
-      "id": "myth-correction",
+      "id": "context",
       "start": 555,
       "end": 675,
       "priority": "racing-drive",
@@ -69,7 +69,7 @@
       "approved": false
     },
     {
-      "id": "finale",
+      "id": "payoff",
       "start": 675,
       "end": 750,
       "priority": "payoff",
