@@ -14,7 +14,7 @@ import {compileRecipe,sampleRecipe} from '../../../../src/yunex/modelling-kit/re
 import {animateCinematicVehicle} from '../../../../src/yunex/modelling-kit/rig.ts';
 import {animateComponents} from '../../../../src/yunex/modelling-kit/authoring.ts';
 import type {EpisodeRecipe} from '../../../../src/yunex/modelling-kit/recipe.ts';
-import {createEp005Hero} from './hero.ts';
+import {createEp005Hero,resolveEp005ExhaustPorts} from './hero.ts';
 
 /**
  * Uses the same validated V3 route and animator as StudioEpisode, with an
@@ -39,22 +39,45 @@ export const HeroEpisode:React.FC<{recipe:EpisodeRecipe}>=({recipe})=>{
  vehicle.position.fromArray(pose.position);
  vehicle.rotation.set(0,pose.yaw,0);
  vehicle.updateMatrixWorld(true);
+ // Port proof samples ACTUAL world-space mounts after V3 wheel/shell updates,
+ // not stale recipe coordinates. This is checked at every rendered frame.
+ const ports=resolveEp005ExhaustPorts(vehicle);
+ if(ports.length!==2||ports.some(p=>!Number.isFinite(p.position.x)||!Number.isFinite(p.direction.x)))
+  throw new Error('Invalid animated EP005 exhaust mount transform');
  const head=vehicle.getObjectByName('head');if(head)head.visible=shot.camera!=='onboard';
  let camera=drivingCamera(shot.camera,pose,s,width/height,frame/fps,{side:-1});
  // Orbit is a moving-reveal shot on a moving route. The camera does not freeze
  // the car or substitute a static showroom rotation for real pavement contact.
  if(shot.id==='moving-orbit'){
   const a=-2.35+sample.localFrame/Math.max(1,shot.duration*fps-1)*1.38;
-  const local=new T.Vector3(Math.cos(a)*s.length*1.8,s.height*1.65,Math.sin(a)*s.length*1.8);
+  const local=new T.Vector3(Math.cos(a)*s.length*1.48,s.height*1.52,Math.sin(a)*s.length*1.48);
   const pivot=new T.Vector3(...pose.position);
   const p=local.applyAxisAngle(new T.Vector3(0,1,0),pose.yaw).add(pivot);
-  camera={position:p.toArray() as [number,number,number],target:new T.Vector3(0,s.height*.46,0).applyAxisAngle(new T.Vector3(0,1,0),pose.yaw).add(pivot).toArray() as [number,number,number],fov:39};
+  camera={position:p.toArray() as [number,number,number],target:new T.Vector3(0,s.height*.46,0).applyAxisAngle(new T.Vector3(0,1,0),pose.yaw).add(pivot).toArray() as [number,number,number],fov:44};
  }
+ // Consistent route-local art direction. Each shot follows the same vehicle
+ // motion; only the framing changes, never a second fake parked model.
+ const framed=(offset:[number,number,number],aim:[number,number,number],fov:number)=>{
+  const yaw=pose.yaw,cs=Math.cos(yaw),sn=Math.sin(yaw);
+  const toWorld=(v:[number,number,number]):[number,number,number]=>[
+   pose.position[0]+cs*v[0]+sn*v[2],
+   pose.position[1]+v[1],
+   pose.position[2]-sn*v[0]+cs*v[2]
+  ];
+  return {position:toWorld(offset),target:toWorld(aim),fov};
+ };
+ if(shot.id==='rear-hook')camera=framed([-7.55,1.66,3.1],[-.65,.55,0],40);
+ if(shot.id==='road-payoff')camera=framed([-7.9,1.63,-2.5],[-.95,.52,0],42);
+ if(shot.id==='engine-reveal')camera=framed([-3.25,1.58,2.45],[-.93,.48,0],41);
+ const fillA=framed([1.5,3.7,-3.5],[0,0,0],42).position;
+ const fillB=framed([-2.3,2.5,3.8],[0,0,0],42).position;
  const drawCaption=sample.caption;
  return <AbsoluteFill style={{backgroundColor:'#14232d'}}>
   <ThreeCanvas width={width} height={height} shadows gl={{antialias:true}} camera={{fov:camera.fov,near:.025,far:500}}>
    <CinematicLighting focus={pose.position} timeOfDay={recipe.world.timeOfDay??'day'}/>
    <primitive object={world}/><primitive object={vehicle}/><CameraAim {...camera}/>
+   <pointLight position={fillA} intensity={22} distance={16} decay={2} color="#b9ddef"/>
+   <pointLight position={fillB} intensity={18} distance={14} decay={2} color="#ffe5c3"/>
    {shot.camera==='interior'?<pointLight position={camera.position} intensity={1.2} distance={5} color="#daebf2"/>:null}
   </ThreeCanvas>
   <div style={{position:'absolute',top:'6%',left:'7%',fontFamily:'Arial,sans-serif',fontSize:23,fontWeight:800,letterSpacing:3,color:'#e5f2f4',textShadow:'0 2px 8px #00131d'}}>YUNEX / HERO DEVELOPMENT</div>
