@@ -32,7 +32,7 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: bash scripts/modelling-kit/install-native-media.sh
       - run: npm run check
-      - run: node --test production/yunex/supercar_flames_ep005/vehicle/hero-contract.test.mjs production/yunex/supercar_flames_ep005/vehicle/coachbuilt-overhaul.test.mjs
+      - run: node --test production/yunex/supercar_flames_ep005/vehicle/hero-contract.test.mjs production/yunex/supercar_flames_ep005/vehicle/coachbuilt-overhaul.test.mjs production/yunex/supercar_flames_ep005/vehicle/rear-finish.test.mjs
       - run: npm run kit:validate -- ep005-a1-hero
       - run: npm run kit:plan -- ep005-a1-hero
       - run: npm run kit:inspect -- ep005-a1-hero

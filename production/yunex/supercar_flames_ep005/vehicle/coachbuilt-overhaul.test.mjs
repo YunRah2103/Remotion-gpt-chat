@@ -45,3 +45,14 @@ test('render studies true rolling road motion under night-circuit cinematography
  assert.match(episode,/animateCinematicVehicle\(/);
  assert.match(episode,/applyEp005CoachbuiltOverhaul|createEp005Hero/);
 });
+
+test('continuous, integrated rear lenses replace assembled light bars without breaking nozzle ABI',()=>{
+ const core=read('./hero.ts'),src=read('./rear-finish.ts');
+ assert.match(core,/refineEp005RearFinish\(hero\)/);
+ assert.match(src,/ep005-continuous-smoked-tail-lens-/);
+ assert.match(src,/ep005-flush-diffused-led-/);
+ assert.match(src,/o\.visible=false/);
+ assert.match(src,/mount:exhaust-tip-left/);
+ assert.match(src,/mount:exhaust-tip-right/);
+ assert.doesNotMatch(src,/TorusGeometry/);
+});

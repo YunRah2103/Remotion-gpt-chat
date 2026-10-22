@@ -8,6 +8,7 @@ import contract from './exhaust-contract.json';
 import {applyEp005PremiumDetails} from './premium-details.ts';
 import {applyEp005CoachbuiltOverhaul} from './coachbuilt-overhaul.ts';
 import {resculptEp005Supercar} from './body-proportions.ts';
+import {refineEp005RearFinish} from './rear-finish.ts';
 
 export const HERO_RECIPE=input as unknown as EpisodeRecipe;
 export const EP005_EXHAUST_MOUNTS=['exhaust-tip-left','exhaust-tip-right'] as const;
@@ -89,6 +90,8 @@ export function createEp005Hero():T.Group{
  applyEp005PremiumDetails(hero);
  applyEp005CoachbuiltOverhaul(hero);
  resculptEp005Supercar(hero);
+ // One coherent curved lamp pair, no layered rectangular/boomerang aftermarket units.
+ refineEp005RearFinish(hero);
  // V3 remembers shader material fade baselines *before* episode components
  // are authored. Register fresh episode materials so engine cutaways reveal
  // genuine internals rather than leaving opaque aftermarket geometry.
