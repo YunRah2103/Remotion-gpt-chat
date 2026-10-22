@@ -38,6 +38,9 @@ jobs:
       - run: npm run kit:inspect -- ep005-a1-hero
       - run: npm run kit:preview -- ep005-a1-hero
       - run: npm run kit:render -- ep005-a1-hero
+      - run: npm run kit:scene -- ep005-a1-hero --shot=rear-hook
+      - run: npm run kit:scene -- ep005-a1-hero --shot=engine-reveal
+      - run: npm run kit:handoff -- ep005-a1-hero
       - name: Full decode + native format verification, motion stats and contact sheet
         run: |
           set -eu
@@ -55,8 +58,24 @@ jobs:
           PY
           ffmpeg -hide_banner -loglevel error -i "$OUT" -f null -
           ffmpeg -hide_banner -loglevel error -i "$OUT" -vf "fps=1,scale=270:480,tile=5x2" -frames:v 1 "$PACK/10s-contact.jpg"
-          sha256sum "$OUT" > "$PACK/native-mp4.sha256"
-          ls -lh "$OUT" "$PACK/10s-contact.jpg"
+          # Genuine native focused clips for first-second nozzle and engine review.
+          for clip in "$PACK/render-shot-0.mp4" "$PACK/render-shot-3.mp4"; do
+            test -s "$clip"
+            ffprobe -v error -select_streams v:0 -show_entries stream=width,height,nb_frames -of csv=p=0 "$clip"
+            ffmpeg -hide_banner -loglevel error -i "$clip" -f null -
+          done
+          sha256sum "$OUT" "$PACK/render-shot-0.mp4" "$PACK/render-shot-3.mp4" > "$PACK/native-mp4.sha256"
+          # Sample front/rear/engine motion, not only identical stills.
+          ffmpeg -hide_banner -loglevel error -i "$OUT" -vf "select='eq(n,0)+eq(n,6)+eq(n,15)+eq(n,29)+eq(n,65)+eq(n,95)+eq(n,150)+eq(n,187)+eq(n,225)+eq(n,265)+eq(n,299)',scale=540:960,tile=4x3" -vsync vfr -frames:v 1 "$PACK/11-frame-quality.jpg"
+          ffmpeg -hide_banner -loglevel error -i "$OUT" -vf "select='eq(n,0)+eq(n,6)+eq(n,15)+eq(n,29)'" -vsync vfr -f framemd5 "$PACK/hook-motion.framemd5"
+          python3 - <<'PY'
+          from pathlib import Path
+          hashes=[line.rsplit(',',1)[-1].strip() for line in Path('out/studio/ep005-a1-hero/hook-motion.framemd5').read_text().splitlines() if line and not line.startswith('#')]
+          assert len(hashes)==4,hashes
+          assert len(set(hashes))>=3,'First-second frames not visibly changing'
+          print('First-second motion frames unique:',len(set(hashes)),'/',len(hashes))
+          PY
+          ls -lh "$OUT" "$PACK/"*.mp4 "$PACK/"*.jpg
       - name: Upload actual native moving proof + QA
         uses: actions/upload-artifact@v4
         if: always()
@@ -67,6 +86,11 @@ jobs:
             out/studio/ep005-a1-hero/native-media.json
             out/studio/ep005-a1-hero/native-mp4.sha256
             out/studio/ep005-a1-hero/10s-contact.jpg
+            out/studio/ep005-a1-hero/11-frame-quality.jpg
+            out/studio/ep005-a1-hero/hook-motion.framemd5
+            out/studio/ep005-a1-hero/render-shot-*.mp4
+            out/studio/ep005-a1-hero/render-shot-*.mp4.json
+            out/studio/ep005-a1-hero/handoff.json
             out/studio/ep005-a1-hero/previews/
             out/studio/ep005-a1-hero/model-report.json
             out/studio/ep005-a1-hero/plan.json
