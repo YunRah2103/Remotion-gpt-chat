@@ -71,6 +71,11 @@ for(const video of videos) {
     meta.width!==1080||meta.height!==1920||meta.avg_frame_rate!=='30/1'||
     Number(meta.nb_read_frames)!==video.frames)
     throw new Error('Native video spec mismatch '+video.id+': '+JSON.stringify(meta));
+  const durationSec=Number(meta.duration);
+  if (!Number.isFinite(durationSec) ||
+      Math.abs(durationSec - video.frames/30) > 0.06) {
+    throw new Error('Duration does not match declared frames: '+JSON.stringify(meta));
+  }
   run('ffmpeg',['-v','error','-xerror','-i',path,'-f','null','-']);
   const motion=motionCheck(path,video.frames/30);
   const frameEvidence=[];
