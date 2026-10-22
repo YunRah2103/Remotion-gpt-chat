@@ -92,7 +92,7 @@ function canopy(shell:T.Group,s:VehicleSpec,paint:T.Material,trim:T.Material,gla
  const roofX=(t:number)=>t<.24?T.MathUtils.lerp(c.rearBase,c.rearRoof,t/.24):t>.77?T.MathUtils.lerp(c.frontRoof,c.frontBase,(t-.77)/.23):T.MathUtils.lerp(c.rearRoof,c.frontRoof,(t-.24)/.53);
  const topY=(t:number)=>t<.24?T.MathUtils.lerp(c.belt,c.roof-.055,t/.24):t>.77?T.MathUtils.lerp(c.roof-.055,c.belt,(t-.77)/.23):c.roof-.055+.012*Math.sin(Math.PI*(t-.24)/.53);
  for(const side of [-1,1]){
-  pane('side-glass',(u,v)=>{const t=.04+u*.92,x=roofX(t),y=topY(t),edge=1-v;return new T.Vector3(x,T.MathUtils.lerp(c.belt+.018,y-.018,v),side*T.MathUtils.lerp(c.baseWidth,c.roofWidth,(y-c.belt)/(c.roof-c.belt)*v)-side*.009*Math.sin(Math.PI*u)*Math.sin(Math.PI*v));},glass,side<0);
+  pane('side-glass',(u,v)=>{const t=.04+u*.92,x=roofX(t),y=topY(t),edge=1-v;return new T.Vector3(x,T.MathUtils.lerp(c.belt+.009,y-.005,v),side*T.MathUtils.lerp(c.baseWidth,c.roofWidth,(y-c.belt)/(c.roof-c.belt)*v)-side*.009*Math.sin(Math.PI*u)*Math.sin(Math.PI*v));},glass,side<0);
   const upper:V3[]=[],lower:V3[]=[];for(let i=0;i<=64;i++){const t=i/64,y=topY(t);upper.push([roofX(t),y,side*T.MathUtils.lerp(c.baseWidth,c.roofWidth,(y-c.belt)/(c.roof-c.belt))]);lower.push([T.MathUtils.lerp(c.rearBase,c.frontBase,t),c.belt,side*c.baseWidth]);}
   formedRail(shell,paint,upper,.040,.020,'window-frame');curve(shell,trim,lower,.012,'window-seal');
   if(s.id==='rally-hatch'){const t=.48,x=roofX(t);rod(shell,trim,[x,c.belt,side*c.baseWidth],[x,c.roof-.055,side*c.roofWidth],.026).name='b-pillar';}
