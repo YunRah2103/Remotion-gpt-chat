@@ -26,7 +26,7 @@ const REJECTED_VIDEO_SHA = new Set([
   'b409370aab6cc68b4641abc4dc53b6c05c32f052c25411cb5dc0bea5d934e860',
 ]);
 const hasApprovedSourceRef = (s) => typeof s === 'string' &&
-  /^https:\/\/github\.com\/YunRah2103\/Remotion-gpt-chat\/(issues|pull)\/(247|265|266|267|268|269|270)(?:#issuecomment-\d+)?$/.test(s);
+  /^https:\/\/github\.com\/YunRah2103\/Remotion-gpt-chat\/(issues|pull)\/(247|265|266|267|268|269|270)(?:#issuecomment-\d+)$/.test(s);
 const isRejectedCandidate = (m) => [m.sourceCommit,m.agent6Commit].some(s => s === REJECTED_AG6_CANDIDATE_A) ||
   REJECTED_VIDEO_SHA.has(m.sha256);
 const int = (n) => Number.isInteger(n);
