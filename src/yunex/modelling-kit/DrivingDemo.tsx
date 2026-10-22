@@ -35,7 +35,7 @@ export const DrivingDemo:React.FC<{scene?:'highway'|'city'|'mountain'|'track';ba
  const distance=(state.distance??0)+(scene==='highway'?-30:scene==='track'?35:-40),pose=sampleRoute(scene,distance);
  // Numerical route curvature steers the wheels according to the actual road, including loop wrapping.
  const ahead=sampleRoute(scene,distance+.4),delta=Math.atan2(Math.sin(ahead.yaw-pose.yaw),Math.cos(ahead.yaw-pose.yaw)),steer=T.MathUtils.clamp(-delta/.4*s.wheelbase,-.4,.4);
- const shot=drivingCamera(scene==='track'?'chase':'tracking',pose,s,width/height,t);
+ const shot=drivingCamera(scene==='track'?'chase':'tracking',pose,s,width/height,t,{side:scene==='city'?1:-1});
  return <AbsoluteFill style={{background:'#14232d'}}><ThreeCanvas width={width} height={height} shadows camera={{fov:shot.fov,near:.05,far:500}} gl={{antialias:true}}>
  <CinematicLighting focus={pose.position} timeOfDay={timeOfDay}/><World kind={scene} timeOfDay={timeOfDay} baseline={baseline}/>
  <CameraAim {...shot}/>

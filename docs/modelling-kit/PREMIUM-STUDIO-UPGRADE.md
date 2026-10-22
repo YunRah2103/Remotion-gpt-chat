@@ -13,8 +13,8 @@ is changed. Units and axes remain metres, +X forward, +Y up, +Z left.
 - Modern Formula: lofted sidepod shoulders/undercuts, inlet lips and connected
   rear-wing supports. Replaced coarse pods are hidden, not overlaid.
 - Preserved authored normals through the shell deformation Jacobian and restored
-  them exactly after body damage. This avoids clearcoat ripples from clipped
-  triangle T-junctions.
+  them exactly after body damage. This retains interpolated shading across clipped
+  triangle T-junctions; the original body surface still needs a finer sculpting pass.
 - Motorway: overpass with clear-lane piers, acoustic panels, uprights and fasteners.
 - City: street-level glazing, awnings, mullions and traffic signals.
 - Circuit: tyre stacks, pit-shutter seams and canopies.
@@ -56,7 +56,9 @@ as the driving review does. These are kinematics, not a vehicle dynamics solver.
 Cameras: `tracking`, `chase`, `wheel`, `interior`, `onboard`, `overhead`, `reveal`.
 Overview cameras fit padded vehicle bounds for the supplied aspect ratio. Detail
 cameras intentionally crop. Tracking views default to the negative-Z carriageway
-side; callers still need to inspect scenery occlusion for their chosen route.
+side. Pass `{side:1}` as the seventh argument for the opposite tracking side;
+the city review uses this to avoid roadside awnings. Callers still need to inspect
+scenery occlusion for their chosen route.
 
 `gearChange:0..1` blends the inboard hand from its wheel grip to the existing
 console knob. Use a smooth rise/hold/fall envelope. It is supported for seated
