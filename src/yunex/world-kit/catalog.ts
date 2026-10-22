@@ -1,6 +1,6 @@
 /** Original generic silhouettes. Units: metres; +X forward, +Y up, +Z left. */
 export type VehicleFamily='normal'|'sports'|'suv'|'formula'|'bike'|'truck'|'van';
-export type VehicleSpec={id:string;label:string;family:VehicleFamily;length:number;width:number;height:number;wheelbase:number;radius:number;axles:number;roof?:'saloon'|'hatch'|'estate'|'open';bodyStyle?:'retro'|'muscle'|'targa'|'track'|'ev';seats?:number;color:string};
+export type VehicleSpec={id:string;label:string;family:VehicleFamily;length:number;width:number;height:number;wheelbase:number;radius:number;axles:number;roof?:'saloon'|'hatch'|'estate'|'open';bodyStyle?:'retro'|'muscle'|'targa'|'track'|'ev'|'rally';seats?:number;color:string};
 export const VEHICLES=[
  {id:'saloon',label:'Everyday saloon',family:'normal',length:4.55,width:1.82,height:1.46,wheelbase:2.72,radius:.33,axles:2,roof:'saloon',color:'#426d8c'},
  {id:'hatchback',label:'City hatchback',family:'normal',length:4.05,width:1.76,height:1.50,wheelbase:2.52,radius:.32,axles:2,roof:'hatch',color:'#d9b54b'},
@@ -38,6 +38,7 @@ export const VEHICLES=[
  {id:'panel-van',label:'Cargo panel van',family:'van',length:5.42,width:2.03,height:2.48,wheelbase:3.39,radius:.38,axles:2,roof:'estate',seats:2,color:'#c9d0c9'},
  {id:'minivan',label:'Family minivan',family:'van',length:4.93,width:1.96,height:1.88,wheelbase:3.02,radius:.35,axles:2,roof:'estate',seats:7,color:'#668b9c'},
  {id:'camper-van',label:'Compact camper van',family:'van',length:5.65,width:2.10,height:2.66,wheelbase:3.48,radius:.39,axles:2,roof:'estate',seats:2,color:'#c2aa7a'},
+ {id:'rally-hatch',label:'Widebody rally hatch',family:'normal',length:4.25,width:1.94,height:1.52,wheelbase:2.62,radius:.36,axles:2,roof:'hatch',bodyStyle:'rally',seats:2,color:'#e7e9e4'},
 ] as const satisfies readonly VehicleSpec[];
 export type VehicleVariant=typeof VEHICLES[number]['id'];
 export type VehicleOptions={variant:VehicleVariant;color?:string;accent?:string;wheelColor?:string;lights?:boolean;interior?:boolean;cutaway?:boolean;glassOpacity?:number;interiorColor?:string;steeringSide?:'left'|'right'};

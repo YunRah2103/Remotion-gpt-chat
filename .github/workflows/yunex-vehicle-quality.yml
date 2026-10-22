@@ -1,0 +1,65 @@
+name: YUNEX coachbuilt and rally model proofs
+on:
+  pull_request:
+    paths:
+      - 'src/yunex/modelling-kit/coachbuilt.ts'
+      - 'src/yunex/modelling-kit/rally.ts'
+      - 'src/yunex/modelling-kit/vehicle-quality.ts'
+      - 'src/yunex/world-kit/catalog.ts'
+      - 'scripts/modelling-kit/vehicle-quality.mjs'
+      - 'tests/modelling-kit/coachbuilt-models.test.mjs'
+      - '.github/workflows/yunex-vehicle-quality.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: yunex-vehicle-quality-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  geometry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
+      - run: node --experimental-strip-types --test tests/modelling-kit/coachbuilt-models.test.mjs tests/modelling-kit/coachwork-depth.test.mjs tests/modelling-kit/studio-cameras.test.mjs tests/modelling-kit/occupant.test.mjs tests/world-kit/models.test.mjs tests/world-kit/interiors.test.mjs
+  model:
+    needs: geometry
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {vehicle: city-ev, style: legacy, suffix: ''}
+          - {vehicle: city-ev, style: coachbuilt, suffix: ''}
+          - {vehicle: supercar, style: legacy, suffix: ''}
+          - {vehicle: supercar, style: coachbuilt, suffix: ''}
+          - {vehicle: crossover, style: legacy, suffix: ''}
+          - {vehicle: crossover, style: coachbuilt, suffix: ''}
+          - {vehicle: formula-modern, style: legacy, suffix: ''}
+          - {vehicle: formula-modern, style: coachbuilt, suffix: ''}
+          - {vehicle: rally-hatch, style: coachbuilt, suffix: ''}
+          - {vehicle: rally-hatch, style: coachbuilt, suffix: '-cabin'}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - run: python -m pip install pillow
+      - run: node --experimental-strip-types scripts/modelling-kit/vehicle-quality.mjs --vehicle=${{ matrix.vehicle }} --style=${{ matrix.style }} ${{ matrix.suffix == '-cabin' && '--cabin' || '' }}
+      - run: python scripts/modelling-kit/v3-verify.py out/studio/quality-${{ matrix.vehicle }}-${{ matrix.style }}${{ matrix.suffix }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-model-${{ matrix.vehicle }}-${{ matrix.style }}${{ matrix.suffix }}
+          path: out/studio/quality-${{ matrix.vehicle }}-${{ matrix.style }}${{ matrix.suffix }}
+          retention-days: 30
