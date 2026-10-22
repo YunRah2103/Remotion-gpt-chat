@@ -44,3 +44,24 @@ test('safe caption lane, conditional tracked port arrow and first 12 bare frames
  assert.match(overlay,/exhaustTarget\?\.visible/);
 });
 
+
+test('editorial hook and final burst remain visually open',()=>{
+ assert.match(overlay,/introSafe=frame<12/);
+ assert.match(overlay,/flameMoment=payoff&&frame>=674&&frame<=710/);
+ assert.match(overlay,/!introSafe&&!flameMoment/);
+ assert.match(overlay,/finale=payoff&&frame>=711/);
+ assert.match(overlay,/THAT IS AFTERFIRE/);
+});
+test('mechanical schematic is expressly illustrative, not fake 3D tracking',()=>{
+ assert.match(overlay,/UNBURNT FUEL/);
+ assert.match(overlay,/HOT EXHAUST/);
+ assert.match(overlay,/POSSIBLE IGNITION/);
+ assert.match(overlay,/ILLUSTRATIVE PATH — NOT TO SCALE/);
+ assert.match(overlay,/showMount&&exhaustTarget/);
+ assert.match(overlay,/labelX\+55/);
+});
+test('picture subtitles cannot appear without both original audio and verified text',()=>{
+ assert.match(overlay,/originalAudioVerified&&verifiedCaptions.length>0/);
+ assert.match(overlay,/SILENT PICTURE REVIEW \/ NOT FINAL/);
+ assert.match(overlay,/top:1578,height:207/);
+});
