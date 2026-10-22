@@ -1,0 +1,54 @@
+name: YUNEX V3 authoring proofs
+on:
+  pull_request:
+    paths:
+      - 'src/yunex/modelling-kit/**'
+      - 'scripts/modelling-kit/**'
+      - 'tests/modelling-kit/**'
+      - '.github/workflows/yunex-studio-v3.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: yunex-v3-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
+      - run: node --experimental-strip-types --test tests/modelling-kit/*.test.mjs tests/world-kit/*.test.mjs tests/parts-kit/*.test.mjs
+      - run: python -m unittest discover -s tests/modelling-kit -p 'test_*.py'
+  proof:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        id: [turbo, sports, formula, environment]
+        orientation: [portrait, landscape]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: python -m pip install pillow
+      - run: node --experimental-strip-types scripts/modelling-kit/v3-proof.mjs --id=${{ matrix.id }} ${{ matrix.orientation == 'landscape' && '--landscape' || '' }}
+      - run: python scripts/modelling-kit/v3-verify.py out/v3/${{ matrix.id }}${{ matrix.orientation == 'landscape' && '-landscape' || '' }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-V3-${{ matrix.id }}-${{ matrix.orientation }}
+          path: out/v3
+          retention-days: 30

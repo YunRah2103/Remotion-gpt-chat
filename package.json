@@ -23,7 +23,13 @@
     "kit:create": "node --experimental-strip-types scripts/modelling-kit/studio.mjs create",
     "kit:validate": "node --experimental-strip-types scripts/modelling-kit/studio.mjs validate",
     "kit:render": "node --experimental-strip-types scripts/modelling-kit/studio.mjs render",
-    "kit:preview": "node --experimental-strip-types scripts/modelling-kit/studio.mjs preview"
+    "kit:preview": "node --experimental-strip-types scripts/modelling-kit/studio.mjs preview",
+    "kit:brief": "node --experimental-strip-types scripts/modelling-kit/studio-v3.mjs brief",
+    "kit:plan": "node --experimental-strip-types scripts/modelling-kit/studio-v3.mjs plan",
+    "kit:inspect": "node --experimental-strip-types scripts/modelling-kit/studio-v3.mjs inspect",
+    "kit:handoff": "node --experimental-strip-types scripts/modelling-kit/studio-v3.mjs handoff",
+    "kit:scene": "node --experimental-strip-types scripts/modelling-kit/studio-v3.mjs render",
+    "kit:review": "node --experimental-strip-types scripts/modelling-kit/studio-v3.mjs preview"
   },
   "dependencies": {
     "@remotion/captions": "4.0.533",

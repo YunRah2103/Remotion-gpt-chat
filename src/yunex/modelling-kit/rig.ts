@@ -1,3 +1,5 @@
+import {createAssembly,animateAssembly} from './authoring.ts';
+import type {AssemblySpec} from './authoring.ts';
 import * as T from 'three';
 import {mergeVertices} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {createVehicle} from '../world-kit/vehicles.ts';
@@ -17,7 +19,7 @@ import {tyreDetail,floorAssembly,suspensionLinks} from './details.ts';
 import {deformTyre,deformBody,createFragments,animateFragments,createTornCarcass,damageRim,groundTornCords} from './damage.ts';
 
 export const HERO_VEHICLES=['hot-hatch','supercar','formula-modern'] as const satisfies readonly VehicleVariant[];
-export type CinematicOptions=VehicleOptions & {quality?:'lightweight'|'standard'|'hero';paintPreset?:'lacquer'|'satin';tyreType?:'road'|'slick';optimize?:boolean;driver?:boolean};
+export type CinematicOptions=VehicleOptions & {quality?:'lightweight'|'standard'|'hero';paintPreset?:'lacquer'|'satin';tyreType?:'road'|'slick';optimize?:boolean;driver?:boolean;powertrain?:AssemblySpec};
 export type WheelCorner='front-left'|'front-right'|'rear-left'|'rear-right'|'rear-aux-left'|'rear-aux-right';
 export type CinematicState={frame:number;fps:number;distance?:number;steer?:number;compression?:number;tyreDamage?:number;damagedWheel?:WheelCorner;bodyDamage?:number;cutaway?:number;exploded?:number;highlight?:'engine'|'underfloor'|'wheels';heat?:number;failureFrame?:number;braking?:number;impact?:number;gearChange?:number};
 type Rig={driver?:T.Group;systems?:T.Group;shell:T.Group;mounts:T.Group[];engine?:T.Group;floor?:T.Group;links:T.Group[];sparks:T.InstancedMesh;fragments:T.Group;body?:T.Mesh};
@@ -47,7 +49,7 @@ export function createCinematicVehicle(options:CinematicOptions):T.Group{
  materials(shell,m=>{if(m instanceof T.MeshPhysicalMaterial&&m.transparent){m.roughness=.075;m.envMapIntensity=.8;}else if(m instanceof T.MeshPhysicalMaterial&&m.clearcoat>0){m.clearcoat=1;m.roughness=options.paintPreset==='satin'?.43:.22;m.clearcoatRoughness=.13;m.envMapIntensity=1.1;}});
  let engine:T.Group|undefined,floor:T.Group|undefined;
  const engineConfig=engineConfiguration(s);
- if(engineConfig){engine=createPart({variant:engineConfig.variant,cutaway:true});engine.name='engine';engine.scale.setScalar(engineConfig.scale);engine.position.fromArray(engineConfig.position);engine.userData.mount=engine.position.toArray();shell.add(engine);}
+ if(engineConfig){engine=options.powertrain?createAssembly(options.powertrain):createPart({variant:engineConfig.variant,cutaway:true});engine.name='engine';if(options.powertrain){const bounds=new T.Box3().setFromObject(engine).getSize(new T.Vector3());engine.scale.setScalar(Math.min(.9/Math.max(bounds.x,.001),.65/Math.max(bounds.y,.001),s.width*.7/Math.max(bounds.z,.001)));}else engine.scale.setScalar(engineConfig.scale);engine.position.fromArray(engineConfig.position);engine.userData.mount=engine.position.toArray();shell.add(engine);}
  if(s.family==='formula'){
   shell.traverse(o=>{if(['floor','floor-diffuser','pushrod','lower-wishbone'].includes(o.name))o.visible=false;if(o instanceof T.Mesh&&o.name===''&&o.geometry instanceof T.CylinderGeometry&&o.geometry.parameters.radiusTop===.025&&Math.abs(o.position.x)>.7&&o.position.y<.65)o.visible=false;});floor=floorAssembly(shell,s);
  }
@@ -87,7 +89,7 @@ export function animateCinematicVehicle(root:T.Group,state:CinematicState){
   links[i].children.forEach(o=>{const link=o.userData.link;if(!link)return;const a=new T.Vector3(...link.a),b=new T.Vector3(...link.b);a.y+=shell.position.y;a.z+=Math.sign(a.z)*exploded*.10;b.y+=m.position.y-rest[1];b.z+=m.position.z-rest[2];const delta=b.clone().sub(a);o.position.copy(a.add(b).multiplyScalar(.5));o.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),delta.clone().normalize());if(link.unit){o.position.copy(a.addScaledVector(delta,-.5));o.scale.y=delta.length();}else o.scale.y=delta.length()/new T.Vector3(...link.a).distanceTo(new T.Vector3(...link.b));});
  });
  animateFragments(fragments,tyreDamage,Math.max(0,(state.frame-(state.failureFrame??state.fps*1.6))/state.fps),damagedOrigin);
- if(engine){engine.position.fromArray(engine.userData.mount);engine.position.y+=exploded*.35;animatePart(engine,{shaftAngle:state.frame/state.fps*12,explode:exploded*.25});fade(engine,0,highlight==='engine');}
+ if(engine){engine.position.fromArray(engine.userData.mount);engine.position.y+=exploded*.35;if(engine.userData.assembly)animateAssembly(engine,state.frame,state.fps);else animatePart(engine,{shaftAngle:state.frame/state.fps*12,explode:exploded*.25});fade(engine,0,highlight==='engine');}
  if(floor){fade(floor,0);const carbon=floor.getObjectByName('carbon-floor')!;carbon.scale.z=1-cutaway*.65;carbon.position.z=-cutaway*s.width*.22;floor.traverse(o=>{if(o instanceof T.Mesh&&o.name==='metal-skid'){const m=o.material as T.MeshStandardMaterial;m.emissive.setHex(highlight==='underfloor'?0xeeb84e:0);m.emissiveIntensity=highlight==='underfloor'?.45:0;}});}
  const contact=!!floor&&.050+shell.position.y<=0&&exploded===0;
  sparks.visible=contact;const dummy=new T.Object3D(),t=state.frame/state.fps;
