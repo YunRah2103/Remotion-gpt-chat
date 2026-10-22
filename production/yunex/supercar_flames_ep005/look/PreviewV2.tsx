@@ -33,7 +33,12 @@ export const EP005CinematicLookEpisode:React.FC<{recipe:EpisodeRecipe;premium?:b
  animateCinematicVehicle(vehicle,{...absoluteState,distance,
   steer:T.MathUtils.clamp(-delta*spec.wheelbase/.25,-.4,.4)});
  vehicle.position.set(...pose.position);vehicle.rotation.y=pose.yaw;vehicle.updateMatrixWorld(true);
- const camera=drivingCamera(shot.camera,pose,spec,width/height,frame/fps,{side:1});
+ // The old look study left the car tiny in portrait. Tighten without altering route,
+ // and apply the same lens/position to BOTH comparison compositions.
+ const lens=drivingCamera(shot.camera,pose,spec,width/height,frame/fps,{side:1});
+ const eye=new T.Vector3(...lens.position).lerp(new T.Vector3(...lens.target),.18);
+ const camera={...lens,position:[eye.x,eye.y,eye.z] as [number,number,number],
+  fov:Math.max(37,lens.fov*.87)};
  return <AbsoluteFill style={{background:"#071320"}}>
   <ThreeCanvas width={width} height={height} shadows
    camera={{fov:camera.fov,near:.035,far:350}} gl={{antialias:true}}>
