@@ -1,0 +1,52 @@
+{
+  "format": "yunex.agent6.exhaust.v1",
+  "source": "Spectral GT RS @ 34499c501908818a2b08e589a7aecf963343cee7",
+  "modelUnits": "m",
+  "sceneAxes": {
+    "forward": "+Z",
+    "up": "+Y",
+    "left": "-X"
+  },
+  "mountFrame": "vehicle-local AFTER -pi/2 Y-axis glTF orientation correction and before root driving transforms",
+  "mounts": [
+    {
+      "id": "exhaust-left",
+      "center_m": [
+        -0.56,
+        0.57,
+        -2.515
+      ],
+      "outward_unit": [
+        0,
+        0,
+        -1
+      ],
+      "innerRadius_m": 0.041,
+      "visibleOuterDiameter_m": 0.114,
+      "recessDepth_m": 0.012
+    },
+    {
+      "id": "exhaust-right",
+      "center_m": [
+        0.56,
+        0.57,
+        -2.515
+      ],
+      "outward_unit": [
+        0,
+        0,
+        -1
+      ],
+      "innerRadius_m": 0.041,
+      "visibleOuterDiameter_m": 0.114,
+      "recessDepth_m": 0.012
+    }
+  ],
+  "temporal": {
+    "fps": 30,
+    "previewFrames": 120,
+    "previewCarStatic": true,
+    "worldSpaceEvaluation": "Every frame: apply current model-to-world transform to local center and direction; include suspension/body pose."
+  },
+  "remarks": "Candidate not approved; no driving or flames until explicit visual approval."
+}
