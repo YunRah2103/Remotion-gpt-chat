@@ -30,3 +30,6 @@ export {animateEnergyFlow} from './systems.ts';
 
 export {sampleDynamics,dynamicsProfile,roadHeight} from './dynamics.ts';
 export type {DynamicsInput} from './dynamics.ts';
+
+export {doorRegions} from './body-panels.ts';
+export {glazingVolume} from './glazing.ts';

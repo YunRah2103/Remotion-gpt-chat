@@ -1,6 +1,6 @@
 import type {VehicleVariant} from '../world-kit/catalog.ts';
 import type {EpisodeRecipe} from './recipe.ts';
-export const QUALITY_VEHICLES=['city-ev','supercar','crossover','formula-modern','rally-hatch'] as const;
+export const QUALITY_VEHICLES=['city-ev','supercar','crossover','formula-modern','rally-hatch','coupe','hot-hatch','box-truck'] as const;
 /** Matching trajectories and cameras isolate the modelling change; use ordinary editable studio projects. */
 export function vehicleQualityRecipe(variant:VehicleVariant,bodyDetail:'legacy'|'coachbuilt'='coachbuilt',cabin=false):EpisodeRecipe{
  if(!QUALITY_VEHICLES.includes(variant as typeof QUALITY_VEHICLES[number]))throw Error('Unknown quality demonstration');

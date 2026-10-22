@@ -3,12 +3,12 @@ import {resolve} from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {SHOWCASES} from '../../src/yunex/modelling-kit/showcases.ts';
-import {createProject} from './studio.mjs';
+import {prepareProofProject} from './proof-project.mjs';
 import {main} from './studio-v3.mjs';
 import {sourceFingerprint,renderInputFingerprint} from './assemble.mjs';
 const id=process.argv.find(a=>a.startsWith('--demo='))?.slice(7)??'B';
 const recipe=SHOWCASES[id];if(!recipe)throw Error('Choose --demo=A through F');
-const folder=createProject(process.cwd(),recipe.id,'braking');writeFileSync(resolve(folder,'recipe.json'),JSON.stringify(recipe,null,2)+'\n');
+const folder=prepareProofProject(process.cwd(),recipe);
 await main(['plan',recipe.id]);await main(['inspect',recipe.id]);
 if(process.argv.includes('--render')){
  const source=sourceFingerprint(process.cwd(),folder),inputs=renderInputFingerprint(process.cwd(),folder);

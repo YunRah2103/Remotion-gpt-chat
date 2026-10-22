@@ -146,3 +146,11 @@ npm run kit:scene -- showcase-b-rally
 Use A–F for supercar, rally, Formula, mechanics, city/night and complete silent 25-second film respectively. Add `--render` on initial creation to produce the complete native proof pack. Creation refuses duplicate projects: after creation use the normal plan/inspect/review/scene/handoff commands. Native workflow `yunex-studio-overhaul.yml` packages all six editable projects and verifies full decode, dimensions, 30fps, frames, duration, hashes and per-shot moving scene content. Source existence is not render success or visual approval.
 
 `kit:scene` now prints frame progress and rejects source changes detected during rendering before issuing reusable contracts. `kit:handoff` includes exact Git revision, shared source fingerprint and explicitly separate QA placeholders. Agents/editors must attach real test, render and visual evidence. No handoff command grants visual approval.
+
+## Real body panels and glazing
+
+Default hero `bodyDetail:'coachbuilt'` now exposes `coachbuilt-door-front-left` / `coachbuilt-door-front-right` on suitable road and heavy-cab models. These are curved closed20mm skins occupying actual openings in the source body, with inward returns and panel gaps. Target these names through existing model edits/components to replace or shape a door without reconstructing the whole body. `userData.editablePanel`, `thickness`, `sourceSurface` and `region` identify them in TypeScript. Existing wheel/steering/cabin anchors and reversible body-damage sampling remain supported. Retro silhouettes and lightweight models retain their existing design.
+
+Windscreen/side/rear glazing retains existing object names but has real5–6mm thickness. `glazingVolume(geometry, thickness)` is exported for convex automotive pane silhouettes; it does not promise arbitrary concave-solid offsetting. Keep the JSON/TS source and validate actual clearances after substantial private edits.
+
+The native proof wrappers can rerun an unchanged canonical recipe, including the tracked supercar example, without rewriting project source. They refuse a modified recipe; use an isolated new id or the ordinary scene command for your private edit. `kit:create` remains atomic and refuses existing project folders.

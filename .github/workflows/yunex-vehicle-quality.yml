@@ -4,6 +4,8 @@ on:
     paths:
       - 'src/yunex/modelling-kit/coachbuilt.ts'
       - 'src/yunex/modelling-kit/fascia.ts'
+      - 'src/yunex/modelling-kit/body-panels.ts'
+      - 'src/yunex/modelling-kit/glazing.ts'
       - 'src/yunex/modelling-kit/model-framing.ts'
       - 'src/yunex/modelling-kit/rally.ts'
       - 'src/yunex/modelling-kit/vehicle-quality.ts'
@@ -29,7 +31,7 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: npm run check
-      - run: node --experimental-strip-types --test tests/modelling-kit/coachbuilt-models.test.mjs tests/modelling-kit/model-framing.test.mjs tests/modelling-kit/coachwork-depth.test.mjs tests/modelling-kit/studio-cameras.test.mjs tests/modelling-kit/occupant.test.mjs tests/world-kit/models.test.mjs tests/world-kit/interiors.test.mjs
+      - run: node --experimental-strip-types --test tests/modelling-kit/panel-engineering.test.mjs tests/modelling-kit/glazing-volume.test.mjs tests/modelling-kit/proof-project.test.mjs tests/modelling-kit/coachbuilt-models.test.mjs tests/modelling-kit/model-framing.test.mjs tests/modelling-kit/coachwork-depth.test.mjs tests/modelling-kit/studio-cameras.test.mjs tests/modelling-kit/occupant.test.mjs tests/world-kit/models.test.mjs tests/world-kit/interiors.test.mjs
   model:
     needs: geometry
     runs-on: ubuntu-latest
@@ -48,6 +50,12 @@ jobs:
           - {vehicle: formula-modern, style: coachbuilt, suffix: ''}
           - {vehicle: rally-hatch, style: coachbuilt, suffix: ''}
           - {vehicle: rally-hatch, style: coachbuilt, suffix: '-cabin'}
+          - {vehicle: coupe, style: legacy, suffix: ''}
+          - {vehicle: coupe, style: coachbuilt, suffix: ''}
+          - {vehicle: hot-hatch, style: legacy, suffix: ''}
+          - {vehicle: hot-hatch, style: coachbuilt, suffix: ''}
+          - {vehicle: box-truck, style: legacy, suffix: ''}
+          - {vehicle: box-truck, style: coachbuilt, suffix: ''}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
