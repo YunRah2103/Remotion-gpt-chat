@@ -75,9 +75,12 @@ export function animateCinematicVehicle(root:T.Group,state:CinematicState){
  for(const k of ['tyreDamage','bodyDamage','cutaway','exploded','heat','braking','impact','gearChange'] as const)if(state[k]!==undefined&&(state[k]!<0||state[k]!>1))throw new Error(`${k} must be 0..1`);
  if(state.compression!==undefined&&(state.compression<0||state.compression>.12))throw new Error('compression must be 0..0.12 metres');
  const {distance=0,steer=0,compression=0,tyreDamage=0,bodyDamage=0,cutaway=0,exploded=0,highlight,heat=0}=state;
+ const roadKeys=['roadFrontLeft','roadFrontRight','roadRearLeft','roadRearRight'] as const;
+ if(roadKeys.some(k=>state[k]!==undefined)&&!roadKeys.every(k=>state[k]!==undefined))throw Error('Supply all four road heights together');
+ const s=vehicleSpec(root.userData.variant);const dynamics=sampleDynamics(s,{speed:state.speed??0,distance,curvature:state.curvature??Math.tan(steer)/s.wheelbase,acceleration:state.acceleration??0,roughness:state.roughness??0,roadHeights:state.roadFrontLeft===undefined?undefined:[state.roadFrontLeft,state.roadFrontRight!,state.roadRearLeft!,state.roadRearRight!]});
  animateVehicle(root,distance,steer);const rig=rigs.get(root);if(!rig)return;
- const {driver,systems,shell,mounts,engine,floor,links,sparks,fragments,body}=rig,s=vehicleSpec(root.userData.variant);
- shell.position.set(0,(s.bodyStyle==='rally'?.045:0)-Math.min(compression,floor?.05:.12)-tyreDamage*.025+exploded*.65,0);const dynamics=sampleDynamics(s,{speed:state.speed??0,distance,curvature:state.curvature??Math.tan(steer)/s.wheelbase,acceleration:state.acceleration??0,roughness:state.roughness??0,roadHeights:state.roadFrontLeft===undefined?undefined:[state.roadFrontLeft,state.roadFrontRight!,state.roadRearLeft!,state.roadRearRight!]});
+ const {driver,systems,shell,mounts,engine,floor,links,sparks,fragments,body}=rig;
+ shell.position.set(0,(s.bodyStyle==='rally'?.045:0)-Math.min(compression,floor?.05:.12)-tyreDamage*.025+exploded*.65,0);
  shell.position.y+=dynamics.heave; shell.rotation.set(dynamics.roll,0,dynamics.pitch-tyreDamage*.012);
  fade(shell,cutaway);if(body)deformBody(body,bodyDamage,s.width);
  let damagedOrigin=new T.Vector3();

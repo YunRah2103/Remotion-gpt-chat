@@ -39,3 +39,9 @@ test('mechanical shafts stay attached after simultaneous body roll and pitch',()
  animateCinematicVehicle(car,{frame:90,fps:30,distance:30,speed:15,acceleration:3,curvature:.025});car.updateMatrixWorld(true);
  car.traverse(o=>{if(!o.userData.wheelEndpoint)return;const end=o.localToWorld(new (o.position.constructor)(0,.5,0)),wheel=car.getObjectByName(o.userData.wheelEndpoint).getWorldPosition(new (o.position.constructor)());assert.ok(end.distanceTo(wheel)<1e-6);});disposeObject(car);
 });
+test('invalid dynamics reject atomically and require a complete wheel-height quartet',()=>{
+ const car=createCinematicVehicle({variant:'supercar',quality:'standard'}),snapshot=()=>{const a=[];car.traverse(o=>a.push([...o.position,...o.quaternion,...o.scale]));return JSON.stringify(a);};
+ animateCinematicVehicle(car,{frame:20,fps:30,distance:10,compression:.04});const before=snapshot();
+ for(const input of [{speed:-1},{roughness:2},{roadFrontLeft:.02},{roadFrontRight:.02}]){assert.throws(()=>animateCinematicVehicle(car,{frame:60,fps:30,distance:20,...input}));assert.equal(snapshot(),before);}
+ disposeObject(car);
+});

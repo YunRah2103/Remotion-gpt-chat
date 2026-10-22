@@ -36,3 +36,16 @@ Native showcase workflow uses 1080x1920/30fps, six actual editable projects, ful
 - Render and inspect all six final native demonstrations and matched before/after MP4s, attach exact source and technical reports, update PR progress. No unverified visual approval.
 
 Cabin follow-up: `cabinInspectionCamera` now fits actual driver/steering/pedal bounds with explicit portrait safe margins. Default cutaway cabin shots use it; existing onboard mounts remain unchanged. Focused test checks complete occupant framing rather than accepting head-only views.
+
+## Independent review corrections
+
+Reviewer found and reproduced three issues; all corrected in a separate skip-CI checkpoint so the existing native render batch is not cancelled:
+- Render input stability now hashes recipe bytes as well as shared source, preventing changed editable recipes from being packaged with old footage. Shared shot-cache identity remains unchanged.
+- Dynamics validation precedes every scene mutation; invalid speed/roughness and incomplete four-height input leave wheel/body transforms untouched.
+- Rough rally contact rejects motorcycles and six-wheel layouts during recipe validation with an actionable four-wheel requirement. All existing IDs still work on default flat worlds.
+
+Exact-source 1e849c7 broad Node suite completed 201/201 pass, zero skipped. Review-correction focused suite 12/12 pass; reviewer independently reran dynamics/road/assembly 10/10 pass and found no remaining important issue in the corrections. TypeScript passed.
+
+Native proof D: workflow39832849080 artifact12448574476, 1080x1920/30fps,180frames/6s silent, full decode,180 moving scene frames. PR checkout merge revision286b3eafa82e6e2ccf490727a6beb1e91832ed2d, PR head1e849c7; source fingerprint b4a9e63f8ae0997f34c8521fddc4e9c640e9f4fb918c0f8af96ce78394b4dc2f matches local checkpoint render. MP4 SHA256 0d5f40d5e0fdb213dbdd5d3c25b21a792f4f07396dc45b110b133d22dff6017c. Downloaded and independently decoded/inspected timeline; remains a technical mechanical demonstration, not final premium-engine geometry approval.
+
+Focused native rally cabin proof: 90frames/3s silent, source1e849c7, same source fingerprint, SHA256 9bbfb6048ed8f56e8e4aa4ef2b7e43d6ae7b22bdd8c9f778978cf6dd0aed3079. Render stability guard passed before later correction edits. Moving frames show the whole driver/controls/cage instead of the old tight head crop. This is a focused shot, not the complete12s rally showcase. Full A/B/C/E/F films remain subject to native completion and moving review.

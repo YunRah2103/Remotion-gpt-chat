@@ -19,6 +19,7 @@ export function compileRecipe(input:EpisodeRecipe,fps=30):CompiledRecipe{
  if(!ENVIRONMENTS.some(v=>v===r.world?.kind))fail('Unknown world');
  if(r.world.timeOfDay!==undefined&&!['day','dusk','night'].includes(r.world.timeOfDay))fail('Unknown time of day');
  if(r.world.roughness!==undefined&&(!Number.isFinite(r.world.roughness)||r.world.roughness<0||r.world.roughness>1||r.world.roughness>0&&r.world.kind!=='rally'))fail('Roughness requires a rally world and 0..1');
+ if((r.world.roughness??0)>0&&(vehicle!.family==='bike'||vehicle!.axles!==2))fail('Rough rally contact currently requires a four-wheel vehicle; set roughness to 0 for motorcycles or six-wheel vehicles');
  if(!Array.isArray(r.shots)||!r.shots.length)fail('At least one shot required');
  for(const model of [r.vehicle.model,r.world.model])if(model&&(model.version!==1||!model.id||!Array.isArray(model.edits)))fail('Invalid model variation');
  let cursor=0,distance=0;const ids=new Set<string>();

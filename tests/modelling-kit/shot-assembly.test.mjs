@@ -1,5 +1,6 @@
+import {createProject} from '../../scripts/modelling-kit/studio.mjs';
 import {test} from 'node:test';import assert from 'node:assert/strict';
-import {mkdtempSync,writeFileSync,mkdirSync,symlinkSync,rmSync} from 'node:fs';
+import {mkdtempSync,readFileSync,writeFileSync,mkdirSync,symlinkSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';import {resolve} from 'node:path';import {execFileSync} from 'node:child_process';
 import {shotContract,verifyShot,assemble} from '../../scripts/modelling-kit/assemble.mjs';
 test('real native shot assembly verifies hashes, source, frame counts and rejects stale recipe',()=>{
@@ -19,4 +20,8 @@ test('real native shot assembly verifies hashes, source, frame counts and reject
   writeFileSync(resolve(folder,'custom-model.ts'),'export const size=2');assert.throws(()=>verifyShot(root,recipe,0,resolve(out,'render-shot-0.mp4'),dimensions),/Stale.*source/);rmSync(resolve(folder,'custom-model.ts'));
   recipe.shots[0].caption='Changed';assert.throws(()=>verifyShot(root,recipe,0,resolve(out,'render-shot-0.mp4'),dimensions),/Stale.*renderHash/);
  }finally{rmSync(root,{recursive:true,force:true});}
+});
+test('render stability includes recipe edits without invalidating shared renderer cache identity',async()=>{
+ const {renderInputFingerprint,sourceFingerprint}=await import('../../scripts/modelling-kit/assemble.mjs');assert.equal(typeof renderInputFingerprint,'function');
+ const root=mkdtempSync(resolve(tmpdir(),'yunex-input-'));try{const folder=createProject(root,'input-proof');const original=renderInputFingerprint(root,folder),shared=sourceFingerprint(root,folder),file=resolve(folder,'recipe.json');const recipe=JSON.parse(readFileSync(file,'utf8'));recipe.title+=' changed';writeFileSync(file,JSON.stringify(recipe));assert.notEqual(renderInputFingerprint(root,folder),original);assert.equal(sourceFingerprint(root,folder),shared);}finally{rmSync(root,{recursive:true,force:true});}
 });

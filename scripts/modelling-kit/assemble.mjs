@@ -18,6 +18,8 @@ export function sourceFingerprint(root,projectFolder){
  for(const file of ['package.json','package-lock.json','tsconfig.json'])if(existsSync(resolve(root,file)))hash.update(file).update(readFileSync(resolve(root,file)));
  return hash.digest('hex');
 }
+/** Full render inputs include recipe bytes; shared source identity deliberately does not. */
+export function renderInputFingerprint(root,projectFolder){return digest(sourceFingerprint(root,projectFolder)+'\n'+readFileSync(resolve(projectFolder,'recipe.json'),'utf8'));}
 export function shotContract(root,recipe,shotIndex,file,dimensions,entry=resolve(root,'src/yunex/studio-projects',recipe.id,'entry.tsx')){const plan=productionPlan(recipe),shot=plan.shots[shotIndex],{shots,...global}=compileRecipe(recipe);return {schema:2,source:sourceFingerprint(root,dirname(entry)),renderHash:digest(JSON.stringify({global,shot:shots[shotIndex]})),entry:digest(readFileSync(entry)),shot:shot.id,shotHash:shot.hash,range:shot.range,dimensions,fps:30,sha256:digest(readFileSync(file)),file:relative(root,file)};}
 export function verifyShot(root,recipe,index,file,dimensions,entry){
  const expected=shotContract(root,recipe,index,file,dimensions,entry),actual=JSON.parse(readFileSync(file+'.json','utf8'));
