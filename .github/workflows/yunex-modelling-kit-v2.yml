@@ -39,6 +39,38 @@ jobs:
             out/modelling-kit-v2/glb
             out/modelling-kit-v2/performance.json
           retention-days: 30
+  agent-preview:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run kit:create -- ci-agent-preview powertrain
+      - run: npm run kit:preview -- ci-agent-preview
+      - run: |
+          python - <<'PY'
+          import json,pathlib,struct
+          manifest=pathlib.Path('out/studio/ci-agent-preview/previews/shots.json')
+          shots=json.loads(manifest.read_text())
+          assert len(shots)==6
+          assert [s['frame'] for s in shots]==[45,135,225,315,405,495]
+          for shot in shots:
+              data=pathlib.Path(shot['file']).read_bytes()
+              assert data[:8]==bytes([137,80,78,71,13,10,26,10])
+              assert struct.unpack('>II',data[16:24])==(540,960)
+          print('Six generated-project preview PNGs and shot manifest verified')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-AGENT-PREVIEW
+          path: out/studio/ci-agent-preview
+          retention-days: 30
   render_plan:
     needs: validate
     runs-on: ubuntu-latest
@@ -79,7 +111,7 @@ jobs:
           path: out/modelling-kit-v2-hd
           retention-days: 30
   native-review:
-    needs: [validate, render]
+    needs: [validate, render, agent-preview]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:

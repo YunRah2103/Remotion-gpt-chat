@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import {vehicleSpec} from '../../src/yunex/world-kit/catalog.ts';
+import {vehicleSpec,VEHICLES} from '../../src/yunex/world-kit/catalog.ts';
 import {bodyTop,bodyHalfWidth} from '../../src/yunex/world-kit/vehicle-body.ts';
 import {interiorLayout} from '../../src/yunex/world-kit/interiors.ts';
 import {coachworkField} from '../../src/yunex/modelling-kit/coachwork.ts';
@@ -46,9 +46,9 @@ test('paint flank normals follow the continuous skin through densely sampled whe
  }
 });
 
-test('coachwork preserves positive skin orientation through arch-release transitions',()=>{
- for(const variant of ['hot-hatch','supercar','crossover','panel-van','pickup']){
-  const s=vehicleSpec(variant),eps=.0001;
+test('coachwork preserves positive skin orientation across every compatible catalogue body',()=>{
+ for(const s of VEHICLES.filter(v=>['normal','sports','suv','van'].includes(v.family))){
+  const variant=s.id,eps=.0001;
   for(let i=0;i<=60;i++)for(let j=0;j<=12;j++)for(const side of [-1,1]){
    const x=-s.length/2+i*s.length/60,y=s.radius*.7+j*(s.height-s.radius*.7)/12,p=new T.Vector3(x,y,side*bodyHalfWidth(s,x,y)),f=coachworkField(p.clone(),s);
    const dx=coachworkField(p.clone().add(new T.Vector3(eps,0,0)),s).sub(f).divideScalar(eps),dy=coachworkField(p.clone().add(new T.Vector3(0,eps,0)),s).sub(f).divideScalar(eps),dz=coachworkField(p.clone().add(new T.Vector3(0,0,eps)),s).sub(f).divideScalar(eps);
