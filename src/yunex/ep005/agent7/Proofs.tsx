@@ -15,7 +15,7 @@ function fixture(){
   const bumper=new T.Mesh(new T.BoxGeometry(.32,.35,1.38),dark);
   bumper.position.set(.06,.28,0);root.add(bumper);
   for(const side of [-1,1]){
-    const tube=new T.Mesh(new T.CylinderGeometry(.064,.064,.24,48,1,true),chrome);
+    const tube=new T.Mesh(new T.CylinderGeometry(.059,.059,.24,48,1,true),chrome);
     tube.rotation.z=Math.PI/2;tube.position.set(-.24,.24,side*.38);root.add(tube);
     const bore=new T.Mesh(new T.CircleGeometry(.050,48),
        new T.MeshBasicMaterial({color:'#0b1018',side:T.DoubleSide}));
@@ -45,7 +45,7 @@ export const FlameFixtureProof:React.FC=()=>{
     id:i===0?'right':'left',
     origin:new T.Vector3(-.365,.24,side*.38),
     outward:new T.Vector3(-1,0,0),
-    innerRadiusM:.050,outerDiameterM:.128,frame,fps
+    innerRadiusM:.049,outerDiameterM:.118,frame,fps
   }));
   animateAfterfire(rig,ports,t,[{at:-.055,duration:.68,strength:1},
     {at:1.43,duration:.53,strength:.92},
