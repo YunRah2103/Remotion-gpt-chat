@@ -44,5 +44,5 @@ export function sampleRecipe(recipe:CompiledRecipe,frame:number){
  const f=Math.max(0,Math.min(recipe.durationInFrames-1,Math.floor(frame)));
  const shot=recipe.shots.find(s=>f<s.endFrame)!;const localFrame=f-shot.startFrame;
  const state=drivingState(shot.action,localFrame,recipe.fps);
- return {shot,localFrame,frame:f,state:{...state,frame:f,distance:shot.distanceOffset+(state.distance??0),cutaway:shot.cutaway??0,exploded:shot.exploded??0,highlight:shot.highlight,gearChange:shot.action==='acceleration'?Math.max(0,Math.sin(localFrame/recipe.fps*5))**12:0},caption:recipe.captions?.find(c=>f/recipe.fps>=c.start&&f/recipe.fps<c.end)?.text??(recipe.captions? '':shot.caption)};
+ return {shot,localFrame,frame:f,state:{...state,frame:f,distance:shot.distanceOffset+(state.distance??0),cutaway:shot.cutaway??0,exploded:shot.exploded??0,highlight:shot.highlight,gearChange:shot.action==='acceleration'?Math.max(0,Math.sin(localFrame/recipe.fps*5))**12:0},caption:recipe.words?(recipe.words.find(w=>f/recipe.fps>=w.start&&f/recipe.fps<w.end)?.text??''):recipe.captions?.find(c=>f/recipe.fps>=c.start&&f/recipe.fps<c.end)?.text??(recipe.captions? '':shot.caption)};
 }
