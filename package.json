@@ -29,7 +29,8 @@
     "kit:inspect": "node --experimental-strip-types scripts/modelling-kit/studio-v3.mjs inspect",
     "kit:handoff": "node --experimental-strip-types scripts/modelling-kit/studio-v3.mjs handoff",
     "kit:scene": "node --experimental-strip-types scripts/modelling-kit/studio-v3.mjs render",
-    "kit:review": "node --experimental-strip-types scripts/modelling-kit/studio-v3.mjs preview"
+    "kit:review": "node --experimental-strip-types scripts/modelling-kit/studio-v3.mjs preview",
+    "kit:assemble": "node --experimental-strip-types scripts/modelling-kit/assemble.mjs"
   },
   "dependencies": {
     "@remotion/captions": "4.0.533",

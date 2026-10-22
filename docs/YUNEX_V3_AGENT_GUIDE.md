@@ -75,3 +75,30 @@ Supply original public-relative narration/music files in `audio`. Optional `word
 ### Project component registry
 
 `new ComponentRegistry()` exposes all 55 shared parts through `search(query)`, `describe(id)` (actual bounds and ports) and `create(id, family)`. Add independent factories with `register({id,version,families,source,factory})`; duplicate IDs are rejected. A factory must return a fresh Group. Use `createAssembly(spec, id => registry.create(id,'sports'))` to combine new agent-built geometry with existing parts and port plumbing. This resolver is a TypeScript extension; recipe JSON resolves the built-in catalogue. Retain animation callbacks in your source when creating nonstandard rigs.
+
+## Recovered V3: animated editing and complete films
+
+`jointTracks` extends each shot's fixed `joints` with ordered `{time,value}` keys in **shot-local seconds**. Values are 0..1, interpolated linearly, and sampled from absolute frames without accumulated state. Example: `"jointTracks":{"v3-rear-wing":[{"time":0,"value":0},{"time":1,"value":1}]}`. Works on custom vehicle or assembly components. Unkeyed joints retain the fixed pose.
+
+Mechanical shots accept `orbit:{azimuth:0.8,elevation:0.3,sweep:0.4}` in radians. The camera fits the actual component bounds throughout its move; this does not bypass safe-area framing. Assembly connections optionally accept `flow:{speed:0.32,count:7}` for illustrative moving markers along the **same actual tube curve**, orange for exhaust connections and teal for compressor connections. These markers show direction and are not a fluid or combustion simulation.
+
+`fitDiagnostics(parent,part,{min,max})` measures visible mesh vertices in the parent installation space, including rotated parents. It returns per-axis clearance and named overflowing faces, without silently resizing the part. `kit:inspect` now includes `installationFit` for custom powertrains against the existing generic installation envelope. Treat broad-phase fit as a review aid, not physical compatibility certification.
+
+### Complete silent twin-turbo demonstration
+
+```sh
+node --experimental-strip-types scripts/modelling-kit/complete-demo.mjs
+npm run kit:plan -- twin-turbo-complete
+npm run kit:inspect -- twin-turbo-complete
+npm run kit:review -- twin-turbo-complete --moving --shot=exhaust
+npm run kit:scene -- twin-turbo-complete --shot=hook
+# Repeat kit:scene for exhaust, shaft, charge, combustion, installed, payoff.
+npm run kit:assemble -- twin-turbo-complete
+npm run kit:handoff -- twin-turbo-complete
+```
+
+The complete recipe is editable source in `twin-turbo-demo.ts`, installed through the ordinary atomic project creator. Seven original shots total **25 seconds / 750 frames**, native portrait 1080x1920/30fps. No narration has been invented. Use a different slug for independent variants, or edit the existing generated project rather than running creation again.
+
+`kit:scene --shot` writes an MP4 plus a SHA256/source/shot contract. `kit:assemble -- <slug> [downloaded-shot-folder]` verifies those contracts, native dimensions, frame counts and full decode for **every shot**, then concatenates without interpolation or re-encoding. It rejects modified files, changed shot recipes and changed renderer source. Render only invalid shots again; unchanged artifacts can be reused while their source and shot contracts match. Script and shared renderer edits invalidate cached clips conservatively. Keep sidecar `.mp4.json` files with their MP4s.
+
+Assembly currently accepts silent portrait clips only; use the full `kit:scene` render for supplied narration/music so original audio spans the complete timeline. An assembled file and technical report still require actual moving-footage review. The V3 native workflow retains all eight short modelling proofs and separately renders/assembles the seven demo shots, with an editable project, timeline sheet and complete decode report.

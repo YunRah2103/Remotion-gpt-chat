@@ -42,7 +42,8 @@ export const StudioEpisode:React.FC<{recipe:EpisodeRecipe}>=({recipe})=>{
  if(shot.part||shot.assembly){
   if(shot.assembly)animateAssembly(model,frame,fps);else animatePart(model,{shaftAngle:frame/fps*8,explode:shot.exploded??0,heat:state.heat});
   model.position.set(0,.8,0);model.updateMatrixWorld(true);
-  camera=partInspectionCamera(model,width/height);
+  camera=partInspectionCamera(model,width/height,shot.orbit?{azimuth:shot.orbit.azimuth+(shot.orbit.sweep??0)*sample.localFrame/(shot.duration*fps),elevation:shot.orbit.elevation}:undefined);
+  animateComponents(model,sample.joints);
  }else{
   const ahead=parked?pose:sampleRoute(recipe.world.kind,distance+.4),delta=Math.atan2(Math.sin(ahead.yaw-pose.yaw),Math.cos(ahead.yaw-pose.yaw));
   animateCinematicVehicle(model,{...state,distance:parked?0:state.distance,steer:parked?state.steer:T.MathUtils.clamp(-delta/.4*s.wheelbase,-.4,.4)});

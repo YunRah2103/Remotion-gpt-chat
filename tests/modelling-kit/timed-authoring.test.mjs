@@ -15,3 +15,12 @@ test('joint tracks reject duplicate times, values outside joint limits, and keys
  const r=recipe();r.shots[0].jointTracks={'v3-rear-wing':track};assert.throws(()=>compileRecipe(r),/joint track/i);
  }
 });
+import {partInspectionCamera} from '../../src/yunex/modelling-kit/studio-camera.ts';
+import * as T from 'three';
+test('component orbit changes angle while retaining portrait fit and fixed target',()=>{
+ const model=new T.Mesh(new T.BoxGeometry(2,1,3));
+ const a=partInspectionCamera(model,9/16,{azimuth:0,elevation:.3});
+ const b=partInspectionCamera(model,9/16,{azimuth:1,elevation:.3});
+ assert.notDeepEqual(a.position,b.position);assert.deepEqual(a.target,b.target);
+ for(const c of [a,b]){const camera=new T.PerspectiveCamera(c.fov,9/16,.025,500);camera.position.fromArray(c.position);camera.lookAt(new T.Vector3(...c.target));camera.updateMatrixWorld(true);for(const x of [-1,1])for(const y of [-.5,.5])for(const z of [-1.5,1.5]){const p=new T.Vector3(x,y,z).project(camera);assert.ok(Math.abs(p.x)<=.87&&Math.abs(p.y)<=.87);}}
+});

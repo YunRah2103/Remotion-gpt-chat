@@ -4,10 +4,10 @@ import {interiorLayout} from '../world-kit/interiors.ts';
 import {vehicleSpec} from '../world-kit/catalog.ts';
 import {fitInspectionCamera} from './framing.ts';
 /** Fit the actual component's world bounds, with the same safe area as vehicle reveals. */
-export function partInspectionCamera(model:T.Object3D,aspect:number){
+export function partInspectionCamera(model:T.Object3D,aspect:number,orbit?:{azimuth:number;elevation:number}){
  model.updateMatrixWorld(true);const bounds=new T.Box3().setFromObject(model),center=bounds.getCenter(new T.Vector3()),size=bounds.getSize(new T.Vector3());
  if(bounds.isEmpty())throw new Error('Part camera needs visible geometry');
- const target=center.toArray() as V3,initial=center.clone().add(new T.Vector3(.7,.4,1).normalize().multiplyScalar(.1)).toArray() as V3;
+ const target=center.toArray() as V3,initial=center.clone().add((orbit?new T.Vector3(Math.sin(orbit.azimuth)*Math.cos(orbit.elevation),Math.sin(orbit.elevation),Math.cos(orbit.azimuth)*Math.cos(orbit.elevation)):new T.Vector3(.7,.4,1)).normalize().multiplyScalar(.1)).toArray() as V3;
  return {position:fitInspectionCamera(initial,target,size.toArray() as V3,aspect,36),target,fov:36};
 }
 /** Fitted onboard mounts: a windscreen camera for road cars and a raised T-camera for Formula.
