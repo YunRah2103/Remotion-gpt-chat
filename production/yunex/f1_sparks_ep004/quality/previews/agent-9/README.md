@@ -14,6 +14,7 @@ The cinematic 8s review renders `createCinematicVehicle({variant:'formula-modern
 ```bash
 npm ci
 npm run check
+npx tsc -p production/yunex/f1_sparks_ep004/quality/previews/agent-9/tsconfig.json
 node --experimental-strip-types --test production/yunex/f1_sparks_ep004/quality/tests/agent-9/*.test.mjs
 node production/yunex/f1_sparks_ep004/quality/previews/agent-9/render-native.mjs
 ```
