@@ -20,7 +20,7 @@ def plan(base,candidate,changed):
     if any(p.startswith(("src/TurboDocumentary","src/turbo/")) for p in paths):add("TurboDocumentary")
     if "src/ProductionCaptions.tsx" in paths:
         selected.update(k for k in b if k.endswith("Captioned"))
-    # The four manual kit commands do not alter renderer inputs. Unknown/malformed manifests
+    # The manual kit commands do not alter renderer inputs. Unknown/malformed manifests
     # remain conservative; lockfile and any non-script package changes review all.
     package_runtime_changed=False
     if "package.json" in paths:
@@ -31,7 +31,7 @@ def plan(base,candidate,changed):
             for manifest in (old,new):
                 scripts=manifest.get("scripts",{})
                 if not isinstance(scripts,dict):raise ValueError("Scripts must be an object")
-                manifest["scripts"]={k:v for k,v in scripts.items() if k not in {"kit:catalog","kit:create","kit:validate","kit:render"}}
+                manifest["scripts"]={k:v for k,v in scripts.items() if k not in {"kit:catalog","kit:create","kit:validate","kit:render","kit:preview"}}
             package_runtime_changed=old!=new
         except (OSError,ValueError,AttributeError):package_runtime_changed=True
     if package_runtime_changed or any(p in {"src/Root.tsx","package-lock.json"} or p.startswith("src/mechanics/") for p in paths):
