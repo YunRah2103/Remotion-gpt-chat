@@ -126,7 +126,10 @@ function exterior(shell:T.Object3D,m:Finish){
    spline(shell,'overhaul-arch-lip-'+side+'-'+xAxle,arc,.0045,m.blueShadow);
   }
  }
- // A rear aero blade with an actual curved wing element and full-width highlight.
+ // One real articulated aero blade: replace the active jointed wing mesh
+ // instead of stacking a static show-wing on top of the real movable wing.
+ const activeWing=shell.getObjectByName('ep005-active-rear-wing');
+ if(!(activeWing instanceof T.Mesh))throw new Error('Missing jointed EP005 rear aero wing');
  const wing=new T.Shape();
  wing.moveTo(-.14,-.70);wing.quadraticCurveTo(.03,-.76,.15,-.64);
  wing.quadraticCurveTo(.20,0,.15,.64);
@@ -134,10 +137,15 @@ function exterior(shell:T.Object3D,m:Finish){
  wing.quadraticCurveTo(-.03,0,-.14,-.70);
  const wingGeo=new T.ExtrudeGeometry(wing,{depth:.025,bevelEnabled:true,bevelSegments:3,steps:1,bevelThickness:.006,bevelSize:.007});
  wingGeo.rotateX(-Math.PI/2);
- add(shell,'overhaul-curved-carbon-wing',wingGeo,m.carbon,[-1.76,1.022,0]);
- spline(shell,'overhaul-wing-trailing-highlight',[
-  [-1.61,1.046,-.66],[-1.57,1.045,0],[-1.61,1.046,.66]
+ wingGeo.translate(0,.032,0);
+ const oldWingGeo=activeWing.geometry;
+ activeWing.geometry=wingGeo;
+ activeWing.material=m.carbon;
+ oldWingGeo.dispose();
+ spline(activeWing,'overhaul-wing-trailing-highlight',[
+  [.15,.055,-.66],[.19,.055,0],[.15,.055,.66]
  ],.006,m.polished);
+ // Geometry remains in the original jointed node; V3 active-aero tracks still work.
  // Fine flush vents reveal form; don't cover radiator apertures with giant boxes.
  for(const side of [-1,1])for(let i=0;i<5;i++){
   const x=.88+i*.095,y=bodyTop(s,x)+.044;
