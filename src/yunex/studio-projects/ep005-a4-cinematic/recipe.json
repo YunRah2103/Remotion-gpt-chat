@@ -1,0 +1,37 @@
+{
+  "id": "ep005-a4-cinematic",
+  "title": "YUNEX EP005 / Cinematic Night Circuit V2",
+  "vehicle": {
+    "variant": "supercar",
+    "driver": true,
+    "color": "#bc2435"
+  },
+  "world": {
+    "kind": "track",
+    "timeOfDay": "night",
+    "wetness": 0.1
+  },
+  "shots": [
+    {
+      "id": "flame-hook-corridor",
+      "duration": 2,
+      "camera": "chase",
+      "action": "cruise",
+      "caption": "Night track / actual attached flames require Agent 2"
+    },
+    {
+      "id": "pbr-night-road",
+      "duration": 2,
+      "camera": "tracking",
+      "action": "cruise",
+      "caption": "Continuous native track / realistic road contact"
+    },
+    {
+      "id": "night-racing-payoff",
+      "duration": 2,
+      "camera": "chase",
+      "action": "cruise",
+      "caption": "Motivated practicals / genuine supercar driving"
+    }
+  ]
+}
