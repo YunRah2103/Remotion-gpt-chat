@@ -5,7 +5,7 @@ export function batchVehicleDetails(root:T.Object3D){
  const names=new Set(['alloy-spoke','split-spoke','wheel-bolt','sidewall-mark','grille-slat','intake-vane']);let saved=0;
  const parents:T.Object3D[]=[];root.traverse(o=>{if(o.children.length)parents.push(o);});
  for(const parent of parents){const groups=new Map<string,T.Mesh[]>();for(const o of [...parent.children]){
-  if(!(o instanceof T.Mesh)||o instanceof T.InstancedMesh||!names.has(o.name)||Array.isArray(o.material))continue;
+  if(!o.visible||!(o instanceof T.Mesh)||o instanceof T.InstancedMesh||!names.has(o.name)||Array.isArray(o.material))continue;
   const key=`${o.name}:${o.material.uuid}`;const list=groups.get(key)??[];list.push(o);groups.set(key,list);
  }
  for(const list of groups.values())if(list.length>1){const geos=list.map(m=>{m.updateMatrix();return m.geometry.clone().applyMatrix4(m.matrix);}),merged=mergeGeometries(geos,false);geos.forEach(g=>g.dispose());if(!merged)continue;

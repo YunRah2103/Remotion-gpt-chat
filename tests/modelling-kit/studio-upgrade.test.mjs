@@ -54,3 +54,8 @@ test('premium grille cells sit ahead of their backing rather than behind the leg
  const cells=new T.Box3().setFromObject(g.getObjectByName('recessed-grille')),back=new T.Box3().setFromObject(g.getObjectByName('grille-backing'));
  assert.ok(cells.min.x>back.max.x);disposeObject(g);
 });
+
+test('default detail batching never resurrects hidden legacy grille slats',()=>{
+ const g=createCinematicVehicle({variant:'hot-hatch'}),visible=[];
+ g.traverse(o=>{if(o.name==='grille-slat'&&o.visible)visible.push(o);});assert.equal(visible.length,0);disposeObject(g);
+});
