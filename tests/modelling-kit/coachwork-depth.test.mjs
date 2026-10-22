@@ -31,3 +31,17 @@ test('hero lamps retain recessed apertures and new coachwork remains reversible 
   for(const v of n)assert.ok(Number.isFinite(v));disposeObject(g);
  }
 });
+
+test('paint flank normals follow the continuous skin through densely sampled wheel arches',async()=>{
+ const {createVehicle}=await import('../../src/yunex/world-kit/vehicles.ts');const {sculptShell}=await import('../../src/yunex/modelling-kit/premium.ts');
+ for(const variant of ['hot-hatch','supercar']){
+  const s=vehicleSpec(variant),g=createVehicle({variant}),body=g.getObjectByName('arched-body'),rest=body.geometry.attributes.position.array.slice();sculptShell(g,s);
+  const normals=body.geometry.attributes.normal;let samples=0;const e=.0001;
+  const skin=(x,y,side)=>coachworkField(new T.Vector3(x,y,side*bodyHalfWidth(s,x,y)),s);
+  for(let i=0;i<normals.count;i++){const x=rest[i*3],y=rest[i*3+1],z=rest[i*3+2],side=Math.sign(z);
+   if(Math.abs(x)>=s.length/2-.02||y>=bodyTop(s,x)-.045||Math.abs(Math.abs(z)-bodyHalfWidth(s,x,y))>=.00001)continue;
+   const tx=skin(x+e,y,side).sub(skin(x-e,y,side)),ty=skin(x,y+e,side).sub(skin(x,y-e,side)),expected=tx.cross(ty).multiplyScalar(side).normalize(),actual=new T.Vector3().fromBufferAttribute(normals,i);
+   assert.ok(actual.dot(expected)>.995,variant+' reflected skin continuity');samples++;
+  }assert.ok(samples>100,variant+' actual flank coverage');disposeObject(g);
+ }
+});

@@ -2,6 +2,7 @@ import * as T from 'three';
 import {box,mesh,rod,surface} from '../world-kit/geometry.ts';
 import type {VehicleSpec} from '../world-kit/catalog.ts';
 import {interiorLayout} from '../world-kit/interiors.ts';
+import {bodyTop,bodyHalfWidth} from '../world-kit/vehicle-body.ts';
 import {coachworkField} from './coachwork.ts';
 
 /** Continuous styling field applied to shell parts together, keeping trim on its skin. */
@@ -16,7 +17,13 @@ export function sculptShell(shell:T.Group,s:VehicleSpec){
    world.fromBufferAttribute(a,i).applyMatrix4(o.matrixWorld);const p=world.clone(),mapped=warp(p.clone());
    // Preserve interpolated normals across clipped T-junctions. Recomputing them from
    // the clipped triangles produces bright ripples in clearcoat on an intact bonnet.
-   if(norm){const dx=warp(p.clone().add(new T.Vector3(e,0,0))).sub(mapped).divideScalar(e),dy=warp(p.clone().add(new T.Vector3(0,e,0))).sub(mapped).divideScalar(e),dz=warp(p.clone().add(new T.Vector3(0,0,e))).sub(mapped).divideScalar(e);j.set(dx.x,dy.x,dz.x,dx.y,dy.y,dz.y,dx.z,dy.z,dz.z).invert().transpose();normal.fromBufferAttribute(norm,i).applyMatrix3(toWorld).applyMatrix3(j).applyMatrix3(toLocal).normalize();norm.setXYZ(i,normal.x,normal.y,normal.z);}
+   if(norm){const dx=warp(p.clone().add(new T.Vector3(e,0,0))).sub(mapped).divideScalar(e),dy=warp(p.clone().add(new T.Vector3(0,e,0))).sub(mapped).divideScalar(e),dz=warp(p.clone().add(new T.Vector3(0,0,e))).sub(mapped).divideScalar(e);j.set(dx.x,dy.x,dz.x,dx.y,dy.y,dz.y,dx.z,dy.z,dz.z).invert().transpose();// On the body flank, ring spacing collapses at wheel arches and clipped lamp
+   // apertures. Area-weighted triangle normals then pinch an otherwise smooth skin.
+   // Use the actual surface derivatives, independent of tessellation density.
+   const flank=o.name==='arched-body'&&Math.abs(p.x)<s.length/2-.02&&p.y<bodyTop(s,p.x)-.045&&Math.abs(Math.abs(p.z)-bodyHalfWidth(s,p.x,p.y))<.002;
+   if(flank){const dx=(bodyHalfWidth(s,p.x+e,p.y)-bodyHalfWidth(s,p.x-e,p.y))/(2*e),dy=(bodyHalfWidth(s,p.x,p.y+e)-bodyHalfWidth(s,p.x,p.y-e))/(2*e);normal.set(-dx,-dy,Math.sign(p.z)).normalize();}
+   else normal.fromBufferAttribute(norm,i).applyMatrix3(toWorld);
+   normal.applyMatrix3(j).applyMatrix3(toLocal).normalize();norm.setXYZ(i,normal.x,normal.y,normal.z);}
    local.copy(mapped).applyMatrix4(inverse);a.setXYZ(i,local.x,local.y,local.z);
   }g.computeBoundingSphere();o.geometry=g;old.dispose();
  });
