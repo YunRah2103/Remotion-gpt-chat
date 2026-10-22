@@ -1,0 +1,37 @@
+{
+  "id": "ep005-a4-environment",
+  "title": "YUNEX EP005 / Premium Midnight Circuit",
+  "vehicle": {
+    "variant": "supercar",
+    "driver": true,
+    "color": "#a62935"
+  },
+  "world": {
+    "kind": "track",
+    "timeOfDay": "night",
+    "wetness": 0.1
+  },
+  "shots": [
+    {
+      "id": "rear-moving-hook",
+      "duration": 2,
+      "camera": "chase",
+      "action": "cruise",
+      "caption": "Night circuit / actual moving supercar"
+    },
+    {
+      "id": "circuit-lighting",
+      "duration": 2,
+      "camera": "tracking",
+      "action": "cruise",
+      "caption": "Subtle asphalt reflections / real tyre contact"
+    },
+    {
+      "id": "paddock-payoff",
+      "duration": 2,
+      "camera": "chase",
+      "action": "cruise",
+      "caption": "Trackside lights / continuous V3 driving"
+    }
+  ]
+}
