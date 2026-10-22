@@ -33,13 +33,15 @@ const TAG:React.CSSProperties={position:'absolute',top:115,left:84,right:84,colo
  letterSpacing:2,textTransform:'uppercase'};
 export const Agent10Scene:React.FC<{comparison?:boolean}>=({comparison=false})=>{
  const frame=useCurrentFrame(),{width,height}=useVideoConfig();
- const data=comparison?sampleCameraComparison(frame):sampleQualitySource(frame);
+ const compared=comparison?sampleCameraComparison(frame):null;
+ const source=comparison?null:sampleQualitySource(frame);
+ const data=(compared??source)!;
  const motion=sampleDynamics(data.sourceSec,{startDistanceM:data.startDistanceM,speedMps:62,aeroLoad01:1});
  const {particles,contacts}=sampleContactDrivenSparks(data.sourceSec,motion,SKIDS);
- const pose=comparison&&data.baseline
-   ?sampleRetimedShotCamera(data.shot,data.localSec,data.durationSec,motion)
-   :sampleRetimedQualityCamera(data.shot,data.localSec,
-      comparison?data.durationSec:data.shotDurationSec,motion);
+ const durationSec=compared?.durationSec??source!.shotDurationSec;
+ const pose=compared?.baseline
+   ?sampleRetimedShotCamera(data.shot,data.localSec,durationSec,motion)
+   :sampleRetimedQualityCamera(data.shot,data.localSec,durationSec,motion);
  const sectioned=!comparison&&(data.shot==='underfloor-reveal'||data.shot==='contact-macro');
  const cutaway=sectioned?(data.shot==='contact-macro'?.84:Math.min(.78,.36+data.localSec*.26)):0;
  const active=contacts.some(c=>c.active);
@@ -56,7 +58,7 @@ export const Agent10Scene:React.FC<{comparison?:boolean}>=({comparison=false})=>
      <ApplyCameraPose pose={pose} near={.025}/>
    </ThreeCanvas>
    <div style={TAG}>YUNEX / EP004 <span style={{color:'#ffd7ae'}}>{comparison
-     ?(data.baseline?'A3 / BEFORE':'A10 / QUALITY')
+     ?(compared?.baseline?'A3 / BEFORE':'A10 / QUALITY')
      :'A10 / V2 CAMERA ACTION'}</span></div>
    <div style={{...TAG,top:175,fontSize:20,opacity:.8,letterSpacing:1.2}}>
      {data.shot.replaceAll('-',' ')}{sectioned?' · OPTICAL CAR CUTAWAY':''}
