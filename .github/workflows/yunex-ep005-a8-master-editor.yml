@@ -1,0 +1,72 @@
+name: EP005 NEW Agent 8 - approved master film delivery
+
+on:
+  push:
+    branches:
+      - agent/ep005-08-master-editor
+  pull_request:
+    paths:
+      - 'production/yunex/supercar_flames_ep005/agent8/**'
+      - '.github/workflows/yunex-ep005-a8-master-editor.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  editorial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Verify source compilation, editor and science QA
+        run: |
+          npm run check
+          node --check production/yunex/supercar_flames_ep005/agent8/master-editor.mjs
+          node --check production/yunex/supercar_flames_ep005/agent8/download-media.mjs
+          node --test production/yunex/supercar_flames_ep005/agent8/master-editor.test.mjs
+      - name: Determine whether owner approved footage exists
+        id: gate
+        shell: bash
+        run: |
+          node production/yunex/supercar_flames_ep005/agent8/master-editor.mjs --check > ep005-a8-gate.json
+          cat ep005-a8-gate.json
+          if node -e "process.exit(JSON.parse(require('fs').readFileSync('ep005-a8-gate.json')).ready ? 0 : 1)"; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "SOURCE ONLY / NATIVE FILM BLOCKED — do not imply picture lock."
+          fi
+      - name: Install FFmpeg and subtitle fonts
+        if: steps.gate.outputs.ready == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+          ffmpeg -hide_banner -filters | grep -E ' ass ' | head -1
+      - name: Retrieve source-version-pinned video and approved narration
+        if: steps.gate.outputs.ready == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node production/yunex/supercar_flames_ep005/agent8/download-media.mjs
+      - name: Render and fully decode exact 750-frame native H264 film
+        if: steps.gate.outputs.ready == 'true'
+        run: node production/yunex/supercar_flames_ep005/agent8/master-editor.mjs --render
+      - name: Preserve blocker report, proof, native video, cut and flame review stills
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ep005-a8-editorial-${{ github.run_id }}
+          path: |
+            ep005-a8-gate.json
+            out/ep005-agent8/EP005-*.mp4
+            out/ep005-agent8/render-proof.json
+            out/ep005-agent8/review-*.png
+            out/ep005-agent8/approved-caption-overlay.ass
+          if-no-files-found: warn
+          retention-days: 30
