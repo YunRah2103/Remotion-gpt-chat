@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "episode": "YUNEX EP005 — Why Do Supercars Shoot Flames?",
+  "state": "WAITING_FOR_APPROVED_NEW_AGENTS",
+  "settings": {
+    "fps": 30,
+    "width": 1080,
+    "height": 1920,
+    "totalFrames": 750,
+    "codec": "libx264",
+    "crf": 18
+  },
+  "voice": {
+    "approved": false,
+    "path": null,
+    "sha256": null,
+    "sourceCommit": null,
+    "approvalRef": null,
+    "captionsVerified": false
+  },
+  "captions": [],
+  "beats": [
+    {
+      "id": "hook",
+      "start": 0,
+      "end": 45,
+      "role": "integrated",
+      "visual": "Moving approved Agent 6 hero; Agent 7 afterfire attached to actual exhaust ports. Flame visible at f0-f14.",
+      "title": null,
+      "media": {
+        "approved": false,
+        "path": null,
+        "sha256": null,
+        "sourceCommit": null,
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": null,
+        "artifactName": null,
+        "assetProvenance": null,
+        "agent6Commit": null,
+        "agent7Commit": null,
+        "portManifestSha256": null
+      }
+    },
+    {
+      "id": "drive",
+      "start": 45,
+      "end": 165,
+      "role": "vehicle",
+      "visual": "Purposeful fast side/front supercar tracking; authentic rotating wheels, road speed and parallax.",
+      "title": {
+        "text": "WHAT CAUSES THE FLAMES?",
+        "start": 77,
+        "end": 147
+      },
+      "media": {
+        "approved": false,
+        "path": null,
+        "sha256": null,
+        "sourceCommit": null,
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": null,
+        "artifactName": null,
+        "assetProvenance": null,
+        "agent6Commit": null,
+        "agent7Commit": null,
+        "portManifestSha256": null
+      }
+    },
+    {
+      "id": "engine",
+      "start": 165,
+      "end": 285,
+      "role": "science",
+      "visual": "Realistic engine combustion with rich/modified overrun condition; no floating fake boxes.",
+      "title": {
+        "text": "UNBURNED FUEL",
+        "start": 186,
+        "end": 272
+      },
+      "media": {
+        "approved": false,
+        "path": null,
+        "sha256": null,
+        "sourceCommit": null,
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": null,
+        "artifactName": null,
+        "assetProvenance": null,
+        "agent6Commit": null,
+        "agent7Commit": null,
+        "portManifestSha256": null
+      }
+    },
+    {
+      "id": "flow",
+      "start": 285,
+      "end": 420,
+      "role": "science",
+      "visual": "3D exhaust manifolds and correctly connected pipes, hot gas flow and oxygen; no simulated-CFD claim.",
+      "title": {
+        "text": "HOT EXHAUST + OXYGEN",
+        "start": 307,
+        "end": 402
+      },
+      "media": {
+        "approved": false,
+        "path": null,
+        "sha256": null,
+        "sourceCommit": null,
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": null,
+        "artifactName": null,
+        "assetProvenance": null,
+        "agent6Commit": null,
+        "agent7Commit": null,
+        "portManifestSha256": null
+      }
+    },
+    {
+      "id": "ignition",
+      "start": 420,
+      "end": 555,
+      "role": "integrated",
+      "visual": "Brief ignition traced from real recessed tip; science not constant flamethrower.",
+      "title": {
+        "text": "BRIEF AFTERFIRE",
+        "start": 462,
+        "end": 522
+      },
+      "media": {
+        "approved": false,
+        "path": null,
+        "sha256": null,
+        "sourceCommit": null,
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": null,
+        "artifactName": null,
+        "assetProvenance": null,
+        "agent6Commit": null,
+        "agent7Commit": null,
+        "portManifestSha256": null
+      }
+    },
+    {
+      "id": "context",
+      "start": 555,
+      "end": 675,
+      "role": "vehicle",
+      "visual": "Fast moving premium car footage; mention tuned/condition-specific behaviour, not universal.",
+      "title": {
+        "text": "NOT EVERY SUPERCAR",
+        "start": 586,
+        "end": 646
+      },
+      "media": {
+        "approved": false,
+        "path": null,
+        "sha256": null,
+        "sourceCommit": null,
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": null,
+        "artifactName": null,
+        "assetProvenance": null,
+        "agent6Commit": null,
+        "agent7Commit": null,
+        "portManifestSha256": null
+      }
+    },
+    {
+      "id": "payoff",
+      "start": 675,
+      "end": 750,
+      "role": "integrated",
+      "visual": "Moving rear/side car with striking transient twin exhaust flames on authentic ports; clean cinematic exit.",
+      "title": null,
+      "media": {
+        "approved": false,
+        "path": null,
+        "sha256": null,
+        "sourceCommit": null,
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": null,
+        "artifactName": null,
+        "assetProvenance": null,
+        "agent6Commit": null,
+        "agent7Commit": null,
+        "portManifestSha256": null
+      }
+    }
+  ],
+  "optionalAudioBeds": []
+}
