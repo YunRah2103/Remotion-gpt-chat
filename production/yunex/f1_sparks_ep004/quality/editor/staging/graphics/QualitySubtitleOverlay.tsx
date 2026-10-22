@@ -1,6 +1,6 @@
 import React from 'react';
 import {AbsoluteFill} from 'remotion';
-import {SCREEN,activeSubtitle,subtitleSize,type NarratorWord,type SubtitleCue,type TimingStatus} from 'core.ts';
+import {SCREEN,activeSubtitle,subtitleSize,type NarratorWord,type SubtitleCue,type TimingStatus} from './core.ts';
 /** One optional drop-in substitution for Agent 6 captions. Editor MUST disable its built-in caption lane. */
 export type QualitySubtitleProps=Readonly<{
  words:readonly NarratorWord[]; caption:SubtitleCue|null;
