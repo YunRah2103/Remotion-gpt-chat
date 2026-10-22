@@ -132,3 +132,24 @@ test('cinematic camera dollies are genuine, deliberate and portrait-safe',()=>{
  assert.ok(first.afterfireDemand>.7,'hook must command the real exhaust effect at f0');
  assert.ok(last.speedMps>first.speedMps,'final payoff must be genuine accelerating motion');
 });
+
+test('hook prioritises actual exhaust and closing shot crosses behind the moving car',()=>{
+ const hook=sampleCinema(0),hookEnd=sampleCinema(44);
+ const closingStart=sampleCinema(555),closingEnd=sampleCinema(749);
+ // Compare inverse-rotated camera displacement in vehicle coordinates:
+ // f0 is a lower, tighter tailpipe inspection than earlier A3 baseline.
+ const local=(v)=>new T.Vector3(...v.camera.position)
+  .sub(new T.Vector3(...v.pose.position))
+  .applyAxisAngle(new T.Vector3(0,1,0),-v.pose.yaw);
+ const a=local(hook),b=local(hookEnd),c=local(closingStart),d=local(closingEnd);
+ assert.ok(a.x< -6&&a.y<2.05&&a.z>3.2,'first frame should expose rear exhaust');
+ assert.ok(b.x< -6.5&&b.z>2,'hero rear should remain clear through f44');
+ assert.ok(c.z>3&&d.z< -2,'payoff camera must cross to opposite rear quarter');
+ assert.ok(c.x< -6&&d.x< -6,'moving finale jib must never cut through the car');
+ for(let i=556;i<750;i++){
+  const cur=sampleCinema(i),prior=sampleCinema(i-1);
+  const p=local(cur),q=local(prior);
+  assert.ok(p.distanceTo(q)<.12,'final jib should be a smooth camera track, not a teleport');
+  assert.ok(cur.speedMps>0,'car continues to physically travel through finale');
+ }
+});
