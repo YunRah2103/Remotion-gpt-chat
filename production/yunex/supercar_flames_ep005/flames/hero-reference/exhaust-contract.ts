@@ -1,0 +1,49 @@
+/** A1 SHA 8ba7a9624fc56973fa52658ef8d2600368dfc17a — generated from pinned A1 JSON (not independent car geometry). */
+export default {
+  "id": "ep005-a1-exhaust-ports",
+  "version": 1,
+  "units": "metres",
+  "coordinateSystem": "+X forward, +Y up, +Z vehicle left",
+  "parent": "body-shell",
+  "vehicleVariant": "supercar",
+  "bodyLength": 4.7,
+  "bodyWidth": 2.01,
+  "frame": "local to hero vehicle, before route transform",
+  "ports": [
+    {
+      "id": "exhaust-tip-left",
+      "node": "mount:exhaust-tip-left",
+      "component": "ep005-left-exhaust-tube",
+      "position": [
+        -2.465,
+        0.42,
+        0.57
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "innerRadius": 0.085,
+      "outerRadius": 0.105
+    },
+    {
+      "id": "exhaust-tip-right",
+      "node": "mount:exhaust-tip-right",
+      "component": "ep005-right-exhaust-tube",
+      "position": [
+        -2.465,
+        0.42,
+        -0.57
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "innerRadius": 0.085,
+      "outerRadius": 0.105
+    }
+  ],
+  "notes": "Read Object3D mount world matrix every absolute frame after animateCinematicVehicle and vehicle route transform; flame exits along car-local -X. Not a calibrated OEM exhaust."
+} as const;

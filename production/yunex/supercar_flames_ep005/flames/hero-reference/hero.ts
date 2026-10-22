@@ -7,8 +7,8 @@ import * as T from 'three';
 import {createCinematicVehicle} from '../../../../../src/yunex/modelling-kit/rig.ts';
 import {applyEdits,buildComponents} from '../../../../../src/yunex/modelling-kit/authoring.ts';
 import type {EpisodeRecipe} from '../../../../../src/yunex/modelling-kit/recipe.ts';
-import input from './hero-recipe.json';
-import contract from './exhaust-contract.json';
+import input from './hero-recipe.ts';
+import contract from './exhaust-contract.ts';
 
 export const HERO_RECIPE=input as unknown as EpisodeRecipe;
 export const EP005_EXHAUST_MOUNTS=['exhaust-tip-left','exhaust-tip-right'] as const;

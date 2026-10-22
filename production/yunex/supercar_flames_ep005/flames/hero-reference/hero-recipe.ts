@@ -1,0 +1,752 @@
+/** A1 SHA 8ba7a9624fc56973fa52658ef8d2600368dfc17a — generated from pinned A1 JSON (not independent car geometry). */
+export default {
+  "id": "ep005-a1-hero",
+  "title": "Supercar hero asset tests / SILENT",
+  "vehicle": {
+    "variant": "supercar",
+    "color": "#126378",
+    "driver": true,
+    "powertrain": {
+      "id": "ep005-parallel-twin-turbo-v8",
+      "version": 1,
+      "nodes": [
+        {
+          "id": "engine",
+          "part": "v8",
+          "components": [
+            {
+              "id": "ep005-right-bank-header",
+              "shape": {
+                "kind": "pipe",
+                "points": [
+                  [
+                    -0.22,
+                    0.18,
+                    -0.24
+                  ],
+                  [
+                    0,
+                    0.12,
+                    -0.34
+                  ],
+                  [
+                    0.22,
+                    0.18,
+                    -0.24
+                  ]
+                ],
+                "radius": 0.025
+              },
+              "color": "#b37a55",
+              "mounts": [
+                {
+                  "name": "bank-right-exhaust",
+                  "position": [
+                    0,
+                    0.12,
+                    -0.34
+                  ],
+                  "direction": [
+                    0,
+                    0,
+                    -1
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "turbo-left",
+          "part": "turbo-small",
+          "position": [
+            -0.1,
+            0.25,
+            0.55
+          ],
+          "scale": [
+            0.65,
+            0.65,
+            0.65
+          ]
+        },
+        {
+          "id": "turbo-right",
+          "part": "turbo-small",
+          "position": [
+            -0.1,
+            0.25,
+            -0.55
+          ],
+          "scale": [
+            0.65,
+            0.65,
+            0.65
+          ]
+        }
+      ],
+      "connections": [
+        {
+          "from": "engine:exhaust",
+          "to": "turbo-left:exhaust-in",
+          "radius": 0.027,
+          "via": [
+            [
+              0.02,
+              0.12,
+              0.42
+            ]
+          ]
+        },
+        {
+          "from": "engine:bank-right-exhaust",
+          "to": "turbo-right:exhaust-in",
+          "radius": 0.027,
+          "via": [
+            [
+              0.02,
+              0.12,
+              -0.45
+            ]
+          ]
+        },
+        {
+          "from": "turbo-left:outlet",
+          "to": "engine:intake",
+          "radius": 0.025,
+          "via": [
+            [
+              0.28,
+              0.35,
+              0.55
+            ],
+            [
+              0.3,
+              0.52,
+              0.05
+            ],
+            [
+              0.16,
+              0.45,
+              -0.32
+            ]
+          ]
+        },
+        {
+          "from": "turbo-right:outlet",
+          "to": "engine:intake",
+          "radius": 0.025,
+          "via": [
+            [
+              0.22,
+              0.35,
+              -0.48
+            ],
+            [
+              0.12,
+              0.4,
+              -0.38
+            ]
+          ]
+        }
+      ]
+    },
+    "model": {
+      "id": "ep005-hero-paintwork",
+      "version": 1,
+      "edits": [
+        {
+          "target": "arched-body",
+          "deform": {
+            "axis": "z",
+            "along": "x",
+            "amount": 0.022
+          }
+        },
+        {
+          "target": "side-intake-sculpture",
+          "scale": [
+            1.08,
+            1.07,
+            1
+          ]
+        },
+        {
+          "target": "dashboard-trim",
+          "scale": [
+            1,
+            1.025,
+            1
+          ]
+        }
+      ]
+    },
+    "components": [
+      {
+        "id": "ep005-nose-splitter",
+        "parent": "body-shell",
+        "shape": {
+          "kind": "loft",
+          "sections": [
+            {
+              "x": 1.9,
+              "y": 0.195,
+              "halfWidth": 0.79,
+              "height": 0.025
+            },
+            {
+              "x": 2.23,
+              "y": 0.215,
+              "halfWidth": 0.97,
+              "height": 0.03
+            },
+            {
+              "x": 2.36,
+              "y": 0.22,
+              "halfWidth": 0.84,
+              "height": 0.018
+            }
+          ]
+        },
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "color": "#0a151b"
+      },
+      {
+        "id": "ep005-active-rear-wing",
+        "parent": "body-shell",
+        "shape": {
+          "kind": "loft",
+          "sections": [
+            {
+              "x": -0.19,
+              "y": -0.025,
+              "halfWidth": 0.74,
+              "height": 0.045
+            },
+            {
+              "x": 0.15,
+              "y": 0.035,
+              "halfWidth": 0.84,
+              "height": 0.05
+            }
+          ]
+        },
+        "position": [
+          -1.76,
+          0.99,
+          0
+        ],
+        "color": "#144b55",
+        "replace": "rear-spoiler",
+        "joint": {
+          "axis": "z",
+          "min": -0.015,
+          "max": 0.105
+        }
+      },
+      {
+        "id": "ep005-wing-upright-right",
+        "parent": "body-shell",
+        "shape": {
+          "kind": "box",
+          "size": [
+            0.075,
+            0.29,
+            0.085
+          ]
+        },
+        "position": [
+          -1.75,
+          0.82,
+          -0.56
+        ],
+        "color": "#122028"
+      },
+      {
+        "id": "ep005-rocker-right",
+        "parent": "body-shell",
+        "shape": {
+          "kind": "box",
+          "size": [
+            2.15,
+            0.08,
+            0.1
+          ]
+        },
+        "position": [
+          0.05,
+          0.235,
+          -0.945
+        ],
+        "color": "#11191d"
+      },
+      {
+        "id": "ep005-rear-diffuser-fin-right",
+        "parent": "body-shell",
+        "shape": {
+          "kind": "box",
+          "size": [
+            0.72,
+            0.115,
+            0.028
+          ]
+        },
+        "position": [
+          -1.99,
+          0.2,
+          -0.51
+        ],
+        "color": "#111920"
+      },
+      {
+        "id": "ep005-aft-cooling-intake-right",
+        "parent": "body-shell",
+        "shape": {
+          "kind": "box",
+          "size": [
+            0.32,
+            0.19,
+            0.035
+          ]
+        },
+        "position": [
+          -1.09,
+          0.52,
+          -0.955
+        ],
+        "color": "#09171d"
+      },
+      {
+        "id": "ep005-side-signature-right",
+        "parent": "body-shell",
+        "shape": {
+          "kind": "box",
+          "size": [
+            0.39,
+            0.022,
+            0.035
+          ]
+        },
+        "position": [
+          0.28,
+          0.61,
+          -0.992
+        ],
+        "color": "#44a39f"
+      },
+      {
+        "id": "ep005-right-exhaust-tube",
+        "parent": "body-shell",
+        "shape": {
+          "kind": "pipe",
+          "points": [
+            [
+              -0.84,
+              0.5,
+              -0.37
+            ],
+            [
+              -1.15,
+              0.43,
+              -0.45
+            ],
+            [
+              -1.51,
+              0.41,
+              -0.57
+            ],
+            [
+              -1.86,
+              0.42,
+              -0.57
+            ],
+            [
+              -2.22,
+              0.42,
+              -0.57
+            ],
+            [
+              -2.465,
+              0.42,
+              -0.57
+            ]
+          ],
+          "radius": 0.054
+        },
+        "color": "#797b7b",
+        "mounts": [
+          {
+            "name": "exhaust-tip-right",
+            "position": [
+              -2.465,
+              0.42,
+              -0.57
+            ],
+            "direction": [
+              -1,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ep005-tail-light-right",
+        "parent": "body-shell",
+        "shape": {
+          "kind": "box",
+          "size": [
+            0.04,
+            0.055,
+            0.34
+          ]
+        },
+        "position": [
+          -2.34,
+          0.655,
+          -0.74
+        ],
+        "color": "#d42b29"
+      },
+      {
+        "id": "ep005-brake-cooling-right",
+        "parent": "body-shell",
+        "shape": {
+          "kind": "box",
+          "size": [
+            0.15,
+            0.115,
+            0.09
+          ]
+        },
+        "position": [
+          -1.18,
+          0.35,
+          -0.91
+        ],
+        "color": "#263d45"
+      },
+      {
+        "id": "ep005-wing-upright-left",
+        "parent": "body-shell",
+        "shape": {
+          "kind": "box",
+          "size": [
+            0.075,
+            0.29,
+            0.085
+          ]
+        },
+        "position": [
+          -1.75,
+          0.82,
+          0.56
+        ],
+        "color": "#122028"
+      },
+      {
+        "id": "ep005-rocker-left",
+        "parent": "body-shell",
+        "shape": {
+          "kind": "box",
+          "size": [
+            2.15,
+            0.08,
+            0.1
+          ]
+        },
+        "position": [
+          0.05,
+          0.235,
+          0.945
+        ],
+        "color": "#11191d"
+      },
+      {
+        "id": "ep005-rear-diffuser-fin-left",
+        "parent": "body-shell",
+        "shape": {
+          "kind": "box",
+          "size": [
+            0.72,
+            0.115,
+            0.028
+          ]
+        },
+        "position": [
+          -1.99,
+          0.2,
+          0.51
+        ],
+        "color": "#111920"
+      },
+      {
+        "id": "ep005-aft-cooling-intake-left",
+        "parent": "body-shell",
+        "shape": {
+          "kind": "box",
+          "size": [
+            0.32,
+            0.19,
+            0.035
+          ]
+        },
+        "position": [
+          -1.09,
+          0.52,
+          0.955
+        ],
+        "color": "#09171d"
+      },
+      {
+        "id": "ep005-side-signature-left",
+        "parent": "body-shell",
+        "shape": {
+          "kind": "box",
+          "size": [
+            0.39,
+            0.022,
+            0.035
+          ]
+        },
+        "position": [
+          0.28,
+          0.61,
+          0.992
+        ],
+        "color": "#44a39f"
+      },
+      {
+        "id": "ep005-left-exhaust-tube",
+        "parent": "body-shell",
+        "shape": {
+          "kind": "pipe",
+          "points": [
+            [
+              -0.84,
+              0.5,
+              0.37
+            ],
+            [
+              -1.15,
+              0.43,
+              0.45
+            ],
+            [
+              -1.51,
+              0.41,
+              0.57
+            ],
+            [
+              -1.86,
+              0.42,
+              0.57
+            ],
+            [
+              -2.22,
+              0.42,
+              0.57
+            ],
+            [
+              -2.465,
+              0.42,
+              0.57
+            ]
+          ],
+          "radius": 0.054
+        },
+        "color": "#797b7b",
+        "mounts": [
+          {
+            "name": "exhaust-tip-left",
+            "position": [
+              -2.465,
+              0.42,
+              0.57
+            ],
+            "direction": [
+              -1,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ep005-tail-light-left",
+        "parent": "body-shell",
+        "shape": {
+          "kind": "box",
+          "size": [
+            0.04,
+            0.055,
+            0.34
+          ]
+        },
+        "position": [
+          -2.34,
+          0.655,
+          0.74
+        ],
+        "color": "#d42b29"
+      },
+      {
+        "id": "ep005-brake-cooling-left",
+        "parent": "body-shell",
+        "shape": {
+          "kind": "box",
+          "size": [
+            0.15,
+            0.115,
+            0.09
+          ]
+        },
+        "position": [
+          -1.18,
+          0.35,
+          0.91
+        ],
+        "color": "#263d45"
+      },
+      {
+        "id": "ep005-rear-diffuser-deck",
+        "parent": "body-shell",
+        "shape": {
+          "kind": "box",
+          "size": [
+            0.74,
+            0.04,
+            1.64
+          ]
+        },
+        "position": [
+          -2.06,
+          0.195,
+          0
+        ],
+        "color": "#0e1519"
+      },
+      {
+        "id": "ep005-engine-heat-shield",
+        "parent": "body-shell",
+        "shape": {
+          "kind": "box",
+          "size": [
+            0.43,
+            0.018,
+            1.12
+          ]
+        },
+        "position": [
+          -1.43,
+          0.67,
+          0
+        ],
+        "color": "#40464b"
+      },
+      {
+        "id": "ep005-cabin-display",
+        "parent": "dashboard",
+        "shape": {
+          "kind": "box",
+          "size": [
+            0.022,
+            0.125,
+            0.26
+          ]
+        },
+        "position": [
+          0.015,
+          0.055,
+          0
+        ],
+        "color": "#15888f"
+      },
+      {
+        "id": "ep005-driver-console",
+        "parent": "interior",
+        "shape": {
+          "kind": "box",
+          "size": [
+            0.24,
+            0.06,
+            0.2
+          ]
+        },
+        "position": [
+          -0.18,
+          0.5,
+          0
+        ],
+        "color": "#1d2d36"
+      }
+    ]
+  },
+  "world": {
+    "kind": "highway",
+    "timeOfDay": "dusk"
+  },
+  "shots": [
+    {
+      "id": "rear-hook",
+      "duration": 2,
+      "camera": "chase",
+      "action": "acceleration",
+      "caption": "DUAL EXHAUST / MODEL REVEAL",
+      "joints": {
+        "ep005-active-rear-wing": 0.2
+      }
+    },
+    {
+      "id": "moving-orbit",
+      "duration": 2,
+      "camera": "reveal",
+      "action": "acceleration",
+      "caption": "CAR BODY / ACTIVE AERO",
+      "jointTracks": {
+        "ep005-active-rear-wing": [
+          {
+            "time": 0,
+            "value": 0.15
+          },
+          {
+            "time": 1.3,
+            "value": 0.75
+          },
+          {
+            "time": 2,
+            "value": 0.75
+          }
+        ]
+      }
+    },
+    {
+      "id": "driver-cabin",
+      "duration": 2,
+      "camera": "interior",
+      "action": "cornering",
+      "cutaway": 0.82,
+      "caption": "REAL CABIN / WORKING DRIVER RIG"
+    },
+    {
+      "id": "engine-reveal",
+      "duration": 2,
+      "camera": "tracking",
+      "action": "cruise",
+      "cutaway": 0.93,
+      "highlight": "engine",
+      "caption": "FITTED TWIN-TURBO V8"
+    },
+    {
+      "id": "road-payoff",
+      "duration": 2,
+      "camera": "chase",
+      "action": "acceleration",
+      "caption": "REAL WHEEL MOTION / EXHAUST MOUNTS"
+    }
+  ]
+} as const;

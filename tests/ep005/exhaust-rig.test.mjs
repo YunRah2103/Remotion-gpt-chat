@@ -6,7 +6,7 @@ import {validateModel} from '../../src/yunex/modelling-kit/authoring.ts';
 import {addProvisionalPreviewExhaust,readExhaustMounts,createAfterfireRig,animateAfterfireRig,createAfterfireCutaway} from '../../production/yunex/supercar_flames_ep005/flames/exhaust-rig.ts';
 import {sampleAfterfire} from '../../production/yunex/supercar_flames_ep005/flames/afterfire.ts';
 import {createEp005Hero} from '../../production/yunex/supercar_flames_ep005/flames/hero-reference/hero.ts';
-import exhaustContract from '../../production/yunex/supercar_flames_ep005/flames/hero-reference/exhaust-contract.json' with {type:'json'};
+import exhaustContract from '../../production/yunex/supercar_flames_ep005/flames/hero-reference/exhaust-contract.ts';
 test('flame path refuses missing mounts and requires explicit preview opt-in',()=>{
  const car=new T.Group();
  assert.throws(()=>readExhaustMounts(car),/Agent 1/);
