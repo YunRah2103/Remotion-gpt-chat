@@ -78,6 +78,7 @@ jobs:
             out/ep005-agent8/render-proof.json
             out/ep005-agent8/audio-qc-report.json
             out/ep005-agent8/review-*.png
+            out/ep005-agent8/mandatory-visual-*.jpg
             out/ep005-agent8/approved-caption-overlay.ass
           if-no-files-found: warn
           retention-days: 30
