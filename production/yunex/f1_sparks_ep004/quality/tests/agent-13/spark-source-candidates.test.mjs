@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {getSkidDescriptors} from '../../mechanics/skids.ts';
-import {sampleDynamics,sampleContactDrivenSparks} from '../../physics/index.ts';
+import {getSkidDescriptors} from '../../../mechanics/skids.ts';
+import {sampleDynamics,sampleContactDrivenSparks} from '../../../physics/index.ts';
 
 // Exposes real A2 particle brightness and contact coverage as facts, not
 // guesswork, to choose strong first/last editorial camera source intervals.
