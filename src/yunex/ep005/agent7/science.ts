@@ -10,7 +10,7 @@ type MovingPiston={head:T.Mesh;rod:T.Mesh;bank:T.Group;phase:number};
 type GasMark={mesh:T.Mesh;curve:T.CatmullRomCurve3;phase:number};
 export interface ScienceAssembly {
   root:T.Group; crank:T.Group; pistons:MovingPiston[];
-  gas:GasMark[]; flameRoot:T.Group; flame:T.Mesh[];
+  gas:GasMark[]; flameRoot:T.Group; flame:T.Mesh[]; ignitions:T.Mesh[];
 }
 const aluminium=new T.MeshPhysicalMaterial({color:'#a0a9b3',metalness:.83,roughness:.23,clearcoat:.24});
 const machined=new T.MeshStandardMaterial({color:'#535e68',metalness:.92,roughness:.27});
@@ -55,6 +55,7 @@ export function buildScienceEngine():ScienceAssembly {
   }
   const pistons:MovingPiston[]=[];
   const gas:GasMark[]=[];
+  const ignitions:T.Mesh[]=[];
   const routes:T.CatmullRomCurve3[]=[];
   for(const side of [-1,1]){
     const bank=new T.Group();bank.position.set(0,.31,side*.25);
@@ -73,6 +74,10 @@ export function buildScienceEngine():ScienceAssembly {
       cylinder(bank,'spark plug',.028,.10,aluminium,new T.Vector3(x,.602,0));
       const nose=cylinder(bank,'ignition electrode',.018,.035,combustion,new T.Vector3(x,.548,0));
       nose.visible=false;
+      const ignition=cylinder(bank,'combustion flash inside cylinder',.122,.020,
+        new T.MeshBasicMaterial({color:'#ffc975',transparent:true,opacity:0,
+          depthWrite:false,blending:T.AdditiveBlending}),new T.Vector3(x,.504,0));
+      ignition.castShadow=false;ignitions.push(ignition);
       const valve=cylinder(bank,'exhaust valve cap',.055,.07,titanium,new T.Vector3(x,.585,.12));
       valve.rotation.x=.3;
       if(i===0||i===3)box(bank,'cast rocker support',[.07,.13,.26],machined,[x,.66,0]);
@@ -89,6 +94,11 @@ export function buildScienceEngine():ScienceAssembly {
       const path=pipe(root,[start,new T.Vector3(x-.17,.48,side*.57),
         new T.Vector3(x-.40,.26,side*.79),end],.027,titanium,'individual tubular exhaust runner');
       ends.push(end);routes.push(path);
+      for(let n=0;n<3;n++){
+        const segment=new T.Mesh(new T.CylinderGeometry(.014,.014,.055,8),gasMaterial.clone());
+        segment.name='flow inside individual exhaust header';root.add(segment);
+        gas.push({mesh:segment,curve:path,phase:n/3+i*.11});
+      }
     }
     const trunk=pipe(root,[new T.Vector3(-1.05,.10,side*.77),
       new T.Vector3(-1.5,.02,side*.67),new T.Vector3(-1.95,-.02,side*.64),
@@ -102,7 +112,7 @@ export function buildScienceEngine():ScienceAssembly {
       new T.Vector3(-2.555,-.06,side*.71));
     inner.rotation.z=Math.PI/2;
     for(let j=0;j<14;j++){
-      const segment=new T.Mesh(new T.CylinderGeometry(.011,.011,.062,6),gasMaterial.clone());
+      const segment=new T.Mesh(new T.CylinderGeometry(.017,.017,.073,7),gasMaterial.clone());
       segment.name='hot exhaust packet inside connected tube';
       root.add(segment);gas.push({mesh:segment,curve:trunk,phase:j/14+(side===1?.13:0)});
     }
@@ -129,7 +139,7 @@ export function buildScienceEngine():ScienceAssembly {
     tongue.position.set(-.17,0,side*.71);tongue.rotation.z=-Math.PI/2;
     flameRoot.add(tongue);flame.push(tongue);
   }
-  return {root,crank,pistons,gas,flameRoot,flame};
+  return {root,crank,pistons,gas,flameRoot,flame,ignitions};
 }
 /**
  * phase 0: combustion in cylinders; 1: unburned mixture reaches hot exhaust;
@@ -145,6 +155,10 @@ export function animateScienceEngine(a:ScienceAssembly,t:number,phase:0|1|2):voi
       new T.Vector3(item.head.position.x,item.head.position.y-.045,0),
       new T.Vector3(item.head.position.x,.055,.06*Math.cos(t*11+item.phase)));
   }
+  a.ignitions.forEach((m,i)=>{
+    const mat=m.material as T.MeshBasicMaterial;
+    mat.opacity=phase===0 ? .18+.63*Math.pow(Math.max(0,Math.sin(t*11+i*1.31)),8) : .035;
+  });
   a.gas.forEach(g=>{
     const progress=(t*.38+g.phase)%1;
     const p=g.curve.getPoint(progress),tan=g.curve.getTangent(progress);
