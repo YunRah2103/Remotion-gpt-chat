@@ -369,19 +369,19 @@
               -0.57
             ],
             [
-              -2.31,
+              -2.255,
               0.42,
               -0.57
             ]
           ],
-          "radius": 0.054
+          "radius": 0.034
         },
         "color": "#777b80",
         "mounts": [
           {
             "name": "exhaust-tip-right",
             "position": [
-              -2.465,
+              -2.38,
               0.42,
               -0.57
             ],
@@ -551,19 +551,19 @@
               0.57
             ],
             [
-              -2.31,
+              -2.255,
               0.42,
               0.57
             ]
           ],
-          "radius": 0.054
+          "radius": 0.034
         },
         "color": "#777b80",
         "mounts": [
           {
             "name": "exhaust-tip-left",
             "position": [
-              -2.465,
+              -2.38,
               0.42,
               0.57
             ],
@@ -693,7 +693,7 @@
   "shots": [
     {
       "id": "rear-hook",
-      "duration": 2,
+      "duration": 1.6,
       "camera": "chase",
       "action": "acceleration",
       "caption": "Monocoque silhouette · twin real exhaust exits",
@@ -703,7 +703,7 @@
     },
     {
       "id": "moving-orbit",
-      "duration": 2,
+      "duration": 1.8,
       "camera": "reveal",
       "action": "acceleration",
       "caption": "Entire sculpted silhouette · forged wheels",
@@ -725,8 +725,15 @@
       }
     },
     {
+      "id": "front-reveal",
+      "duration": 1.2,
+      "camera": "tracking",
+      "action": "acceleration",
+      "caption": "Curved nose · true raised glass canopy"
+    },
+    {
       "id": "driver-cabin",
-      "duration": 2,
+      "duration": 1.5,
       "camera": "interior",
       "action": "cornering",
       "cutaway": 0.12,
@@ -742,7 +749,7 @@
     },
     {
       "id": "road-payoff",
-      "duration": 2,
+      "duration": 1.9,
       "camera": "chase",
       "action": "acceleration",
       "caption": "Rear diffuser · full-motion payoff"

@@ -26,10 +26,10 @@ test('wheel details parent to wheel-roll while driver remains articulated',()=>{
 test('actual exhaust ports and A2 radii unchanged',()=>{
  assert.equal(mounts.length,2);
  for(const p of mounts){
-  assert.equal(p.innerRadius,.085);
-  assert.equal(p.outerRadius,.105);
+  assert.equal(p.innerRadius,.044);
+  assert.equal(p.outerRadius,.058);
   assert.deepEqual(p.direction,[-1,0,0]);
-  assert.equal(p.position[0],-2.465);
+  assert.equal(p.position[0],-2.380);
  }
  assert.match(quality,/NEVER modify, mask or reparent mount:exhaust-tip-left\/right/);
  assert.match(core,/resolveEp005ExhaustPorts/);

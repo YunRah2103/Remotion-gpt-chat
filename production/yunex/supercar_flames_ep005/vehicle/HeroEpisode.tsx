@@ -67,8 +67,9 @@ export const HeroEpisode:React.FC<{recipe:EpisodeRecipe}>=({recipe})=>{
   ];
   return {position:toWorld(offset),target:toWorld(aim),fov};
  };
- if(shot.id==='rear-hook')camera=framed([-6.1,1.50,2.2],[-1.65,.56,0],36);
- if(shot.id==='road-payoff')camera=framed([-6.9,1.55,-2.6],[-1.25,.54,0],38);
+ if(shot.id==='rear-hook')camera=framed([-10.4,2.05,5.3],[-.48,.62,0],42);
+ if(shot.id==='front-reveal')camera=framed([9.4,1.87,4.4],[.52,.65,0],43);
+ if(shot.id==='road-payoff')camera=framed([-10.5,1.82,-4.9],[-.22,.59,0],42);
  // Capture dashboard, gloved hands and proper wheel from inside the passenger side.
  // The previous exterior X-ray angle rendered a huge featureless mannequin.
  if(shot.id==='driver-cabin')camera=framed([.35,1.09,.16],[-.37,.76,-.38],51);

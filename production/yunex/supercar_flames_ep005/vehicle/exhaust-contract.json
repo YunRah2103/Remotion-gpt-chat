@@ -1,6 +1,6 @@
 {
   "id": "ep005-a1-exhaust-ports",
-  "version": 1,
+  "version": 2,
   "units": "metres",
   "coordinateSystem": "+X forward, +Y up, +Z vehicle left",
   "parent": "body-shell",
@@ -14,7 +14,7 @@
       "node": "mount:exhaust-tip-left",
       "component": "ep005-left-exhaust-tube",
       "position": [
-        -2.465,
+        -2.38,
         0.42,
         0.57
       ],
@@ -23,15 +23,15 @@
         0,
         0
       ],
-      "innerRadius": 0.085,
-      "outerRadius": 0.105
+      "innerRadius": 0.044,
+      "outerRadius": 0.058
     },
     {
       "id": "exhaust-tip-right",
       "node": "mount:exhaust-tip-right",
       "component": "ep005-right-exhaust-tube",
       "position": [
-        -2.465,
+        -2.38,
         0.42,
         -0.57
       ],
@@ -40,23 +40,24 @@
         0,
         0
       ],
-      "innerRadius": 0.085,
-      "outerRadius": 0.105
+      "innerRadius": 0.044,
+      "outerRadius": 0.058
     }
   ],
-  "notes": "Keep flame at mount's full world transform after animation; userData.direction=[-1,0,0] in mount-local frame and userData.radius=0.085 are set on both real nozzle-port objects in hero.ts. Body +X forward and +Z left; non-OEM illustrative geometry.",
+  "notes": "EP005 port contract v2: small 88mm bore/116mm outer tip (0.044/0.058 metres); mount lips at x=-2.380, body Y=.420, Z=±.570, direction [-1,0,0]. Flame callers must get bore dynamically; fixed .085 legacy radii are invalid.",
   "nozzleConstruction": {
-    "feedPipeRadius": 0.054,
-    "feedPipeEndsAtLocalX": -2.31,
+    "feedPipeRadius": 0.034,
+    "feedPipeEndsAtLocalX": -2.255,
     "transition": {
-      "rearRadius": 0.054,
-      "exitRadius": 0.085,
-      "centreX": -2.335,
-      "length": 0.16,
+      "rearRadius": 0.034,
+      "exitRadius": 0.044,
+      "centreX": -2.3175,
+      "length": 0.125,
       "openEnded": true
     },
-    "rolledLipLocalX": -2.465,
+    "rolledLipLocalX": -2.38,
     "clearOpenLip": true,
-    "description": "Smaller routed feed terminates recessed behind the larger open-ended transition and hollow 85 mm bore; actual emission mount remains at outer lip on the physical pipe node."
+    "surroundOuterRadius": 0.065,
+    "description": "Small recessed twin stainless outlets; no oversized retaining bolt collar."
   }
 }

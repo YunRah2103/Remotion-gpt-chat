@@ -7,6 +7,7 @@ import input from '../../../../src/yunex/studio-projects/ep005-a1-hero/recipe.js
 import contract from './exhaust-contract.json';
 import {applyEp005PremiumDetails} from './premium-details.ts';
 import {applyEp005CoachbuiltOverhaul} from './coachbuilt-overhaul.ts';
+import {resculptEp005Supercar} from './body-proportions.ts';
 
 export const HERO_RECIPE=input as unknown as EpisodeRecipe;
 export const EP005_EXHAUST_MOUNTS=['exhaust-tip-left','exhaust-tip-right'] as const;
@@ -41,36 +42,29 @@ export function createEp005Hero():T.Group{
  const alloy=paint('#b8c7cc',.94,.21),red=paint('#e52c2b',.08,.33,'#df1215');
  const cyan=paint('#31d1ce',.08,.32,'#0c8086');
 
- // Hollow OUTLET barrels, internal recesses, heat-shield lips and retainer bolts.
- // The real named emission anchor is fixed to each tube; it is not an independent
- // point floating in world space or parented to the chassis rather than body shell.
+ // Modelled recessed twin 116mm tips, replacing former 210mm megaphones.
+ // Named emission nodes continue following real tube meshes on the V3 body.
+ hero.traverse(o=>{if(o.name==='exhaust-tip'||o.name==='exhaust-bore')o.visible=false;});
  for(const sign of [1,-1] as const){
   const side=sign>0?'left':'right',z=sign*.57;
-  // The thin 54mm feed ends RECESSED inside the shroud. This open-ended
-  // conical transition provides a genuinely unblocked 85mm flame bore.
-  add(shell,`ep005-${side}-tapered-nozzle-transition`,
-   new T.CylinderGeometry(.085,.054,.16,48,3,true),alloy,[-2.335,.42,z],[0,0,Math.PI/2]);
-  const barrel=add(shell,`ep005-${side}-nozzle-barrel`,
-   new T.CylinderGeometry(.105,.105,.22,48,2,true),alloy,[-2.355,.42,z],[0,0,Math.PI/2]);
-  barrel.userData.role='open-ended stainless exhaust shroud';
-  add(shell,`ep005-${side}-nozzle-interior`,
-   new T.CylinderGeometry(.085,.085,.222,48,1,true),dark,[-2.357,.42,z],[0,0,Math.PI/2]);
-  add(shell,`ep005-${side}-rolled-lip`,
-   new T.TorusGeometry(.099,.009,10,52),alloy,[-2.465,.42,z],[0,-Math.PI/2,0]);
-  add(shell,`ep005-${side}-heat-shield`,
-   new T.TorusGeometry(.124,.007,8,48),forged,[-2.30,.42,z],[0,-Math.PI/2,0]);
-  for(let i=0;i<6;i++){const a=i*Math.PI/3;
-   add(shell,`ep005-${side}-nozzle-retainer-${i}`,
-    new T.SphereGeometry(.007,8,6),forged,[-2.46,.42+Math.sin(a)*.119,z+Math.cos(a)*.119]);
-  }
-  // Twin recessed light blades, instead of a broad illuminated rectangle.
-  for(let n=0;n<2;n++)add(shell,`ep005-${side}-lightblade-${n}`,
+  // A 68mm feed transitions into the 88mm clear opening without solid plug.
+  add(shell,'ep005-'+side+'-tapered-nozzle-transition',
+   new T.CylinderGeometry(.044,.034,.125,48,3,true),dark,[-2.3175,.42,z],[0,0,Math.PI/2]);
+  const barrel=add(shell,'ep005-'+side+'-nozzle-barrel',
+   new T.CylinderGeometry(.058,.058,.120,48,2,true),alloy,[-2.320,.42,z],[0,0,Math.PI/2]);
+  barrel.userData.role='116mm outside stainless tip, close to bumper';
+  add(shell,'ep005-'+side+'-nozzle-interior',
+   new T.CylinderGeometry(.044,.044,.084,48,1,true),dark,[-2.338,.42,z],[0,0,Math.PI/2]);
+  add(shell,'ep005-'+side+'-rolled-lip',
+   new T.TorusGeometry(.055,.0025,9,48),alloy,[-2.380,.42,z],[0,-Math.PI/2,0]);
+  add(shell,'ep005-'+side+'-bumper-recess-surround',
+   new T.RingGeometry(.060,.065,48),forged,[-2.348,.42,z],[0,-Math.PI/2,0]);
+  for(let n=0;n<2;n++)add(shell,'ep005-'+side+'-lightblade-'+n,
    new T.BoxGeometry(.018,.012,.275),red,[-2.375,.678+n*.036,sign*.75]);
-  // A visible open mesh grille occupies body-adjacent space, not the pipe exit.
-  for(let n=0;n<5;n++)add(shell,`ep005-${side}-rear-grille-${n}`,
+  for(let n=0;n<5;n++)add(shell,'ep005-'+side+'-rear-grille-'+n,
    new T.BoxGeometry(.018,.011,.24),dark,[-2.373,.73+n*.035,sign*.31]);
  }
- for(let i=0;i<4;i++)add(shell,`ep005-diffuser-strake-${i}`,
+ for(let i=0;i<4;i++)add(shell,'ep005-diffuser-strake-'+i,
   new T.BoxGeometry(.51,.12,.013),forged,[-2.11,.21,(i-1.5)*.31]);
  // Wing profiles and dashboard are already component-driven (jointTracks work).
  // Fine cabin details retain original steering, pedals, seats and dummy hardpoints.
@@ -98,6 +92,7 @@ export function createEp005Hero():T.Group{
  }
  applyEp005PremiumDetails(hero);
  applyEp005CoachbuiltOverhaul(hero);
+ resculptEp005Supercar(hero);
  // V3 remembers shader material fade baselines *before* episode components
  // are authored. Register fresh episode materials so engine cutaways reveal
  // genuine internals rather than leaving opaque aftermarket geometry.
