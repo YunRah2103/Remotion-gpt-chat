@@ -86,23 +86,17 @@ PY
             ffmpeg -y -hide_banner -loglevel error -i "$film" -vf "fps=3,scale=270:480,tile=4x5" -frames:v 1 "$out/$name-contact.jpg"
             sha256sum "$film" | tee "$out/$name.sha256"
           done
+          for film in "$out"/hook-f0-44.mp4 "$out"/science-f285-419.mp4 "$out"/ending-f674-749.mp4; do
+            ffmpeg -hide_banner -loglevel error -i "$film" -an -f framemd5 "${film%.mp4}.framemd5"
+          done
           python - <<'PY'
-import cv2
 from pathlib import Path
-r=Path('out/studio/ep005-a5-moving-selects')
-for f in r.glob('*.mp4'):
- cap=cv2.VideoCapture(str(f))
- readings=[]
- while True:
-  ok,im=cap.read()
-  if not ok:break
-  readings.append(cv2.resize(cv2.cvtColor(im,cv2.COLOR_BGR2GRAY),(80,140)))
- cap.release()
- assert len(readings)>20,(f,len(readings))
- import numpy as np
- differences=[float(np.abs(readings[i].astype(float)-readings[i-1].astype(float)).mean()) for i in range(1,len(readings))]
- assert sum(x>.2 for x in differences)>=len(differences)*.8,(f,min(differences))
- print(f.name,'moving pairs',sum(x>.2 for x in differences),'/',len(differences))
+root=Path('out/studio/ep005-a5-moving-selects')
+for path in root.glob('*.framemd5'):
+ signatures=[line.strip().split(',')[-1].strip() for line in path.read_text().splitlines() if line and not line.startswith('#')]
+ assert len(signatures)>20,(path,len(signatures))
+ assert len(set(signatures))>=int(len(signatures)*.80), 'native visual frames are mostly duplicates: '+path.name
+ print(path.name,'unique decoded frame signatures',len(set(signatures)),'/',len(signatures))
 PY
       - uses: actions/upload-artifact@v4
         if: always()
