@@ -31,7 +31,7 @@ def plan(base,candidate,changed):
             for manifest in (old,new):
                 scripts=manifest.get("scripts",{})
                 if not isinstance(scripts,dict):raise ValueError("Scripts must be an object")
-                manifest["scripts"]={k:v for k,v in scripts.items() if k not in {"kit:catalog","kit:create","kit:validate","kit:render","kit:preview"}}
+                manifest["scripts"]={k:v for k,v in scripts.items() if k not in {"kit:catalog","kit:create","kit:validate","kit:render","kit:preview","kit:brief","kit:plan","kit:inspect","kit:review","kit:scene","kit:handoff"}}
             package_runtime_changed=old!=new
         except (OSError,ValueError,AttributeError):package_runtime_changed=True
     if package_runtime_changed or any(p in {"src/Root.tsx","package-lock.json"} or p.startswith("src/mechanics/") for p in paths):

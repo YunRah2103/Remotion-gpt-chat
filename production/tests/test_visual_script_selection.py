@@ -9,7 +9,9 @@ class ScriptSelection(unittest.TestCase):
    for root in [base,candidate]:
     (root/'src').mkdir(parents=True);(root/'src/Root.tsx').write_text('<Composition id="GpuDriveFilm" durationInFrames={100}/>\n<Composition id="MissingFootageFilm" durationInFrames={200}/>')
     (root/'package.json').write_text(json.dumps({'dependencies':{'remotion':'4.0.533'},'scripts':{'check':'tsc'}}))
-   package=json.loads((candidate/'package.json').read_text());package['scripts']['kit:render']='node studio.mjs';package['scripts']['kit:preview']='node studio.mjs preview';(candidate/'package.json').write_text(json.dumps(package))
+   package=json.loads((candidate/'package.json').read_text());package['scripts']['kit:render']='node studio.mjs';package['scripts']['kit:preview']='node studio.mjs preview';
+   for name in ['brief','plan','inspect','review','scene','handoff']:package['scripts']['kit:'+name]='node studio-v3.mjs '+name
+   (candidate/'package.json').write_text(json.dumps(package))
    self.assertEqual([v['composition'] for v in module.plan(base,candidate,['package.json'])['targets']],['GpuDriveFilm'])
    package['dependencies']['remotion']='5.0.0';(candidate/'package.json').write_text(json.dumps(package))
    self.assertEqual(len(module.plan(base,candidate,['package.json'])['targets']),2)

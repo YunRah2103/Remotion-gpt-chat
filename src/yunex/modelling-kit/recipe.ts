@@ -5,7 +5,7 @@ import {PARTS} from '../parts-kit/catalog.ts';
 import type {PartVariant} from '../parts-kit/catalog.ts';
 import {drivingState} from './driving.ts';
 import type {DrivingAction,CameraPreset} from './driving.ts';
-export type StudioShot={id:string;duration:number;camera:CameraPreset;action:DrivingAction;caption:string;joints?:Record<string,number>;part?:PartVariant;assembly?:AssemblySpec;cutaway?:number;exploded?:number;highlight?:'engine'|'underfloor'|'wheels';annotation?:{anchor:'engine'|'front-wheel'|'driver'|'underfloor'|'part';text:string}};
+export type StudioShot={id:string;duration:number;camera:CameraPreset;action:DrivingAction;caption:string;joints?:Record<string,number>;jointTracks?:Record<string,{time:number;value:number}[]>;part?:PartVariant;assembly?:AssemblySpec;cutaway?:number;exploded?:number;highlight?:'engine'|'underfloor'|'wheels';annotation?:{anchor:'engine'|'front-wheel'|'driver'|'underfloor'|'part';text:string}};
 export type EpisodeRecipe={id:string;title:string;vehicle:{variant:VehicleVariant;driver?:boolean;color?:string;powertrain?:AssemblySpec;model?:ModelVariation;components?:ComponentSpec[]};world:{kind:EnvironmentKind;wetness?:number;timeOfDay?:'day'|'dusk'|'night';model?:ModelVariation;components?:ComponentSpec[]};shots:StudioShot[];words?:{text:string;start:number;end:number}[];captions?:{start:number;end:number;text:string}[];audio?:{narration?:string;music?:string;musicVolume?:number}};
 export type CompiledRecipe=Omit<EpisodeRecipe,'shots'> & {fps:number;durationInFrames:number;shots:(StudioShot & {startFrame:number;endFrame:number;distanceOffset:number})[]};
 const fail=(message:string):never=>{throw new Error(message);};
@@ -30,6 +30,8 @@ export function compileRecipe(input:EpisodeRecipe,fps=30):CompiledRecipe{
   for(const value of [s.cutaway,s.exploded,r.world.wetness,r.audio?.musicVolume])if(value!==undefined&&(typeof value!=='number'||!Number.isFinite(value)||value<0||value>1))fail('Controls must be 0..1');
   if(s.annotation&&(typeof s.annotation.text!=='string'||!s.annotation.text||s.annotation.text.length>48))fail('Annotation text must contain 1–48 characters');
   if(s.annotation&&!['engine','front-wheel','driver','underfloor','part'].includes(s.annotation.anchor))fail('Unknown annotation anchor');
+  for(const value of Object.values(s.joints??{}))if(!Number.isFinite(value)||value<0||value>1)fail('Invalid joint pose');
+  for(const keys of Object.values(s.jointTracks??{})){let last=-1;if(!Array.isArray(keys)||!keys.length)fail('Invalid joint track');for(const key of keys){if(!Number.isFinite(key.time)||key.time<0||key.time<=last||key.time>s.duration||!Number.isFinite(key.value)||key.value<0||key.value>1)fail('Invalid joint track');last=key.time;}}
   const startFrame=cursor;cursor+=Math.round(s.duration*fps);const distanceOffset=distance;
   distance+=drivingState(s.action,cursor-startFrame,fps).distance??0;
   return {...s,startFrame,endFrame:cursor,distanceOffset};
@@ -44,5 +46,6 @@ export function sampleRecipe(recipe:CompiledRecipe,frame:number){
  const f=Math.max(0,Math.min(recipe.durationInFrames-1,Math.floor(frame)));
  const shot=recipe.shots.find(s=>f<s.endFrame)!;const localFrame=f-shot.startFrame;
  const state=drivingState(shot.action,localFrame,recipe.fps);
- return {shot,localFrame,frame:f,state:{...state,frame:f,distance:shot.distanceOffset+(state.distance??0),cutaway:shot.cutaway??0,exploded:shot.exploded??0,highlight:shot.highlight,gearChange:shot.action==='acceleration'?Math.max(0,Math.sin(localFrame/recipe.fps*5))**12:0},caption:recipe.words?(recipe.words.find(w=>f/recipe.fps>=w.start&&f/recipe.fps<w.end)?.text??''):recipe.captions?.find(c=>f/recipe.fps>=c.start&&f/recipe.fps<c.end)?.text??(recipe.captions? '':shot.caption)};
+ const joints={...shot.joints};for(const [name,keys] of Object.entries(shot.jointTracks??{})){const t=localFrame/recipe.fps;let value=keys[0].value;for(let i=1;i<keys.length;i++){const a=keys[i-1],b=keys[i];if(t>=b.time)value=b.value;else if(t>=a.time){value=a.value+(b.value-a.value)*(t-a.time)/(b.time-a.time);break;}}joints[name]=value;}
+ return {shot,localFrame,frame:f,joints,state:{...state,frame:f,distance:shot.distanceOffset+(state.distance??0),cutaway:shot.cutaway??0,exploded:shot.exploded??0,highlight:shot.highlight,gearChange:shot.action==='acceleration'?Math.max(0,Math.sin(localFrame/recipe.fps*5))**12:0},caption:recipe.words?(recipe.words.find(w=>f/recipe.fps>=w.start&&f/recipe.fps<w.end)?.text??''):recipe.captions?.find(c=>f/recipe.fps>=c.start&&f/recipe.fps<c.end)?.text??(recipe.captions? '':shot.caption)};
 }
