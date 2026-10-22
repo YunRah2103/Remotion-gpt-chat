@@ -1,4 +1,4 @@
-name: EP005 Agent 3 native cinema review
+name: EP005 Agent 3 quality driving cinematic review
 on:
   pull_request:
     paths:
@@ -35,7 +35,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          hero=23eda32c1796fd9af546ea80c3d6e5117e8e6ba8
+          hero=5224e0736760be244a51383c21d5ee09e4b3cf67
           flames=e8a8f5e415e4abb03b0fa8a2c0959df5eaceab32
           look=92f28465b83183815605fcb3f13291bba87b2714
           git fetch --no-tags origin "$hero" "$flames" "$look"
@@ -57,7 +57,7 @@ jobs:
           {"hero":"$hero","afterfire":"$flames","environment":"$look","approval":"INTEGRATION REVIEW ONLY - NOT MANAGER-APPROVED MASTER","audio":"silent"}
           JSON
           npm run check
-      - name: Native 750-frame moving QA with real A1 ports, A2 flames and A4 matched circuit
+      - name: Native 750-frame cinematic pass with real A1 ports, A2 tongues and A4 midnight circuit
         run: npm run kit:render -- ep005-a3-driving
       - name: Frame, decode, media and checksum verification
         shell: bash
@@ -77,6 +77,18 @@ jobs:
           assert abs(float(info['format']['duration'])-25)<.04,info
           PY
           ffmpeg -hide_banner -loglevel error -i "$film" -f null -
+          # Verify temporal movement in every shot, not merely valid container metadata.
+          ffmpeg -y -hide_banner -loglevel error -i "$film" -vf scale=270:480 -f framemd5 "$out/moving-frame-hashes.txt"
+          python - <<'PY'
+          import re
+          path='out/studio/ep005-a3-driving/moving-frame-hashes.txt'
+          rows=[line.strip().split(',')[-1].strip() for line in open(path)
+                if line.strip() and not line.startswith('#')]
+          assert len(rows)==750, ('decoded frames',len(rows))
+          duplicate=sum(a==b for a,b in zip(rows,rows[1:]))
+          assert duplicate==0, ('duplicate adjacent frames',duplicate)
+          print('Full timeline QA:',len(rows),'decoded frame hashes; zero identical adjacent frames')
+          PY
           sha256sum "$film" | tee "$out/sha256.txt"
           ffmpeg -y -hide_banner -loglevel error -i "$film" -vf "select='eq(n,0)+eq(n,10)+eq(n,23)+eq(n,29)+eq(n,44)+eq(n,45)+eq(n,164)+eq(n,165)+eq(n,284)+eq(n,285)+eq(n,419)+eq(n,420)+eq(n,554)+eq(n,555)+eq(n,674)+eq(n,709)+eq(n,749)'" -vsync vfr "$out/frame-qa/frame-%02d.png"
           test "$(find "$out/frame-qa" -name 'frame-*.png' | wc -l)" -eq 17
