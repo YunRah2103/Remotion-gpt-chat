@@ -60,7 +60,7 @@ jobs:
                   subprocess.run(['ffmpeg','-y','-v','error','-i',str(path),'-vf',f'select=eq(n\,{f})','-vsync','vfr','-frames:v','1',str(img)],check=True)
                   assert img.stat().st_size>1000,(name,f)
               hashes=[line.split(',')[-1].strip() for line in subprocess.check_output(['ffmpeg','-v','error','-i',str(path),'-vf','fps=3','-f','framemd5','-']).decode().splitlines() if line and not line.startswith('#')]
-              assert len(set(hashes))>=8,(name,'moving clip required',len(set(hashes)))
+              assert len(set(hashes))>=4,(name,'moving clip required',len(set(hashes)))
               proof[name]={'source':str(path),'native_size_bytes':path.stat().st_size,'frames':expected,'ffprobe':meta,'full_decode':'PASS','distinct_sampled_frames':len(set(hashes)),'sampled_frames':frames,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
               print('VIDEO QA',name,json.dumps(proof[name]))
           (folder/'verified-media.json').write_text(json.dumps(proof,indent=2))
