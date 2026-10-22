@@ -7,6 +7,7 @@ import React,{useEffect,useMemo} from 'react';
 import * as T from 'three';
 import {createCinematicVehicle,animateCinematicVehicle} from '../../../../../src/yunex/modelling-kit/rig.ts';
 import {disposeObject} from '../../../../../src/yunex/world-kit/geometry.ts';
+import {sampleRoute} from '../../../../../src/yunex/world-kit/environments.ts';
 import {getSkidDescriptors,SKID_LAYOUT,SKID_BOTTOM_Y_M,SKID_THICKNESS_M,SKID_WIDTH_M,PLANK_HALF_LENGTH_M,PLANK_HALF_WIDTH_M} from '../../mechanics/skids.ts';
 import {EP004} from '../../shared/contract.ts';
 import type {SkidDescriptor,VehicleMotionState,WheelId} from '../../shared/contract.ts';
@@ -47,8 +48,11 @@ function addPhysicsFloor(root:T.Group):void {
   for(const side of [-1,1]){
     piece(floor,'EP004-quality-carbon-floor-edge',[3.90,.075,.13],[-.05,.175,side*.47],edgeMaterial);
     piece(floor,'EP004-quality-plank-side-rail',[2*PLANK_HALF_LENGTH_M,.035,.055],[0,.0875,side*(PLANK_HALF_WIDTH_M-.0275)],plankMaterial);
-    for(const x of [-1.54,-.54,.46,1.50])
-      piece(floor,'EP004-quality-plank-fastener',[.07,.012,.045],[x,.110,side*.16],edgeMaterial);
+    for(const x of [-1.54,-.54,.46,1.50]){
+      // Structural spacers bridge nonmetal plank's top (.105) to carbon bottom (.133).
+      piece(floor,'EP004-quality-plank-standoff',[.085,.038,.060],[x,.120,side*.16],edgeMaterial);
+      piece(floor,'EP004-quality-plank-fastener',[.045,.008,.030],[x,.103,side*.16],skidMaterial);
+    }
   }
   // Nonmetal plank is continuous except at the three exact EP004 metal inserts.
   const sorted=[...SKID_LAYOUT].sort((a,b)=>a.xM-b.xM);
@@ -132,9 +136,14 @@ export function assertQualitySkidGeometry(root:T.Group,motion?:VehicleMotionStat
 export function applyQualityF1Motion(root:T.Group,motion:VehicleMotionState,reveal01=0):void {
   if(!Number.isFinite(motion.tSec)||motion.tSec<0)throw new Error('Invalid EP004 absolute time');
   const dist=-motion.wheelRotationRad*EP004.wheelRadiusM;
+  // Steering is a modest VISUAL derivative of the accepted track tangent.
+  // The authoritative A2 world pose still determines the actual trajectory.
+  const nextYaw=sampleRoute('track',motion.routeDistanceM+1.2).yaw;
+  const yawDelta=Math.atan2(Math.sin(nextYaw-motion.yawRad),Math.cos(nextYaw-motion.yawRad));
+  const visualSteer=Math.max(-.18,Math.min(.18,yawDelta*.85));
   animateCinematicVehicle(root,{
     frame:Math.round(motion.tSec*EP004.fps),fps:EP004.fps,
-    distance:dist,steer:0,compression:0,
+    distance:dist,steer:visualSteer,compression:0,
     cutaway:Math.max(0,Math.min(.55,reveal01*.55)),
   });
   // Kit rig has a separate suspension-mount group for each of these four wheels.
@@ -144,7 +153,7 @@ export function applyQualityF1Motion(root:T.Group,motion:VehicleMotionState,reve
       throw new Error(`Missing genuine V2 suspension mount ${id}`);
     const rest=m.userData.restPosition as number[];
     m.position.y=rest[1]+Math.max(0,motion.wheelCompressionM[id]??0);
-    if(id.startsWith('front'))m.rotation.y=0; // authoritative route yaw applied once at chassis root
+    // Kit steering yaw remains on its original front-wheel pivot; chassis yaw is root-only.
   }
   root.rotation.order='YZX'; // Yaw(Y) * Pitch(Z) * Roll(X), matching A2 localToWorld
   root.rotation.set(motion.rollRad,motion.yawRad,motion.pitchRad);
