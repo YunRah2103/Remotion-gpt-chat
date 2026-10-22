@@ -1,7 +1,7 @@
 import * as T from 'three';
-import {vehicleSpec} from '../../../src/yunex/world-kit/catalog.ts';
-import {createAssembly} from '../../../src/yunex/modelling-kit/authoring.ts';
-import {ComponentRegistry} from '../../../src/yunex/modelling-kit/registry.ts';
+import {vehicleSpec} from '../../../../src/yunex/world-kit/catalog.ts';
+import {createAssembly} from '../../../../src/yunex/modelling-kit/authoring.ts';
+import {ComponentRegistry} from '../../../../src/yunex/modelling-kit/registry.ts';
 import type {ExhaustPort,Vec3,AfterfireSample} from './afterfire.ts';
 import {validateExhaustMounts} from './afterfire.ts';
 /**
@@ -16,7 +16,7 @@ export function readExhaustMounts(vehicle:T.Object3D):ExhaustPort[]{
   const node=vehicle.getObjectByName('mount:'+name);
   if(!node)throw Error('Agent 1 exhaust interface missing: mount:'+name);
   if(!Array.isArray(node.userData.direction)||!Number.isFinite(node.userData.radius))throw Error('Missing direction/radius on '+name);
-  const direction=new T.Vector3(...node.userData.direction).transformDirection(node.matrixWorld);
+  const direction=new T.Vector3(...(node.userData.direction as Vec3)).transformDirection(node.matrixWorld);
   const relative=vehicle.getWorldQuaternion(new T.Quaternion()).invert();
   direction.applyQuaternion(relative).normalize();
   const position=vehicle.worldToLocal(node.getWorldPosition(new T.Vector3())).toArray() as Vec3;
@@ -57,7 +57,7 @@ export function createAfterfireRig(vehicle:T.Object3D,{requireAuthoritative=true
   const socket=vehicle.getObjectByName('mount:'+port.name)!;
   if(requireAuthoritative&&socket.userData.provisional)throw Error('Production flame cannot attach to a provisional exhaust port');
   const root=new T.Group();root.name='ep005-afterfire-'+port.name;
-  root.quaternion.setFromUnitVectors(new T.Vector3(1,0,0),new T.Vector3(...socket.userData.direction).normalize());
+  root.quaternion.setFromUnitVectors(new T.Vector3(1,0,0),new T.Vector3(...(socket.userData.direction as Vec3)).normalize());
   socket.add(root);
   const lobes:T.Mesh[]=[],cores:T.Mesh[]=[];
   for(let i=0;i<8;i++){
