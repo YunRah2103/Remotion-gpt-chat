@@ -36,7 +36,7 @@ export const QualityLighting: React.FC<{
 }> = ({focus = [0, 0, 0], diagnosticDay = false}) => {
   // V2 kit lighting and PMREM reflections, deterministic from current motion.
   // Existing A4 night fixtures remain world-anchored and do not strobe.
-  return <CinematicLighting timeOfDay={diagnosticDay ? 'day' : 'night'} focus={focus}/>;
+  return <CinematicLighting timeOfDay={diagnosticDay ? 'day' : 'night'} focus={[...focus] as [number, number, number]}/>;
 };
 
 export const QualityNightCircuit: React.FC<QualityNightCircuitProps> = ({
