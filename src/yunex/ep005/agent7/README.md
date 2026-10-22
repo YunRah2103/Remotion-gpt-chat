@@ -8,6 +8,17 @@
 - `science.ts`: original illustrative 3D V8 scene with actual cylinders, movable pistons/rods and crank, intake manifold, eight individual connected headers, two collectors, flow along true connected exhaust tubes. No hovering block flowchart.
 - `Proofs.tsx` and `entry.tsx`: 1080x1920 30fps, independent `Agent7FlameFixture` (3s) and `Agent7Science` (5s). **Fixture plate is NOT the Agent 6 car.** Final hero shot is blocked by the missing Agent 6 manifest and explicit owner hero-car approval.
 
+
+## Agent 6 real interface now found (PR #270 — STILL UNAPPROVED)
+Agent 6 branch `agent/ep005-06-hero-car-proof-cc0` introduced `src/yunex/ep005/agent6/exhaust-ports.v1.json`, which specifies 0.114m metal outlet OD and 0.041m bore radius on each side, and an exported `sampleExhaustWorld(car, frame)` in their proof source. The manifest's **corrected vehicle-local** axes and the helper's **pre-correction GLTF-local** sample call are not interchangeable. To prevent double-applying the correction, consume exactly the *already-transformed* live world samples:
+```ts
+// Inside a future approval-gated Agent 6 integration scene:
+const measuredWorld = sampleExhaustWorld(actualAgent6Car, frame);
+const ports = adaptAgent6WorldPorts(measuredWorld, frame, 30);
+animateAfterfire(afterfireRig, ports, frame/30, pulses, currentVelocity);
+```
+Both `sampleExhaustWorld` and the actual car instance MUST be provided by Agent 6's published approved shot integration, not imported from its Remotion `entry.tsx` registration module. This adapter is in `ports.ts` and deliberately copies world transforms WITHOUT applying a second model transform. Its 105–120mm OD safeguard matches the agreed aesthetic gate. The local named-node adapter remains available for a future verified v1 named-mount carrier.
+
 ## Mandatory integration — Agent 6
 Publish an exact `ExhaustMountManifest` (`ports.ts`):
 ```ts
