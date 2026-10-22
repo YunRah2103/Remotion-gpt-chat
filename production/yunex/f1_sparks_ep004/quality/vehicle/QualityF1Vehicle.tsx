@@ -152,7 +152,27 @@ export function applyQualityF1Motion(root:T.Group,motion:VehicleMotionState,reve
     if(!(m instanceof T.Group)||!m.userData.restPosition)
       throw new Error(`Missing genuine V2 suspension mount ${id}`);
     const rest=m.userData.restPosition as number[];
-    m.position.y=rest[1]+Math.max(0,motion.wheelCompressionM[id]??0);
+    const travel=Math.max(0,motion.wheelCompressionM[id]??0);
+    m.position.y=rest[1]+travel;
+    // The kit's wishbones and inboard pushrods are separate THREE objects.
+    // Updating only the wheel pivot would make the suspension detach in close-ups.
+    const links=root.getObjectByName(`links-mount-${id}`);
+    if(!(links instanceof T.Group))throw new Error(`Missing V2 suspension links for ${id}`);
+    for(const linkObj of links.children){
+      const link=linkObj.userData.link as
+        {a:[number,number,number];b:[number,number,number];unit?:boolean}|undefined;
+      if(!link)continue;
+      const a=new T.Vector3(...link.a),b=new T.Vector3(...link.b);
+      b.y+=travel;
+      const delta=b.clone().sub(a),length=delta.length();
+      if(length<=0)throw new Error(`Invalid suspension link on ${id}`);
+      linkObj.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),delta.clone().normalize());
+      if(link.unit){linkObj.position.copy(a);linkObj.scale.y=length;}
+      else{
+        linkObj.position.copy(a).add(b).multiplyScalar(.5);
+        linkObj.scale.y=length/new T.Vector3(...link.a).distanceTo(new T.Vector3(...link.b));
+      }
+    }
     // Kit steering yaw remains on its original front-wheel pivot; chassis yaw is root-only.
   }
   root.rotation.order='YZX'; // Yaw(Y) * Pitch(Z) * Roll(X), matching A2 localToWorld
