@@ -17,7 +17,7 @@ export function readExhaustMounts(vehicle:T.Object3D,radii:PortRadii={}):Exhaust
  const ports=names.map(name=>{
   const node=vehicle.getObjectByName('mount:'+name);
   if(!node)throw Error('Agent 1 exhaust interface missing: mount:'+name);
-  const radius=node.userData.radius??radii[name];
+  const radius=node.userData.nozzleInnerRadius??node.userData.radius??radii[name];
   if(!Array.isArray(node.userData.direction)||!Number.isFinite(radius))throw Error('Missing direction/radius on '+name+'; pass radius from the Agent 1 exhaust contract');
   const direction=new T.Vector3(...(node.userData.direction as Vec3)).transformDirection(node.matrixWorld);
   const relative=vehicle.getWorldQuaternion(new T.Quaternion()).invert();
@@ -50,54 +50,109 @@ export function addProvisionalPreviewExhaust(vehicle:T.Object3D):void{
  }
  vehicle.userData.ep005ProvisionalPorts=true;
 }
-type FlameObjects={socket:T.Object3D;root:T.Group;lobes:T.Mesh[];cores:T.Mesh[];light:T.PointLight;rim:T.Mesh};
+/**
+ * 3D procedural flame tongues: ZERO glowing spheres/discs. Multiple tapering,
+ * animated non-axisymmetric turbulent envelopes share the REAL nozzle transform.
+ * Vertex alpha feathers edges; deterministic absolute-frame deformation prevents
+ * playback-order artefacts. Editorial illustration, not a combustion solver.
+ */
+type FlameObjects={socket:T.Object3D;root:T.Group;envelopes:T.Mesh[];cores:T.Mesh[];light:T.PointLight};
 export type AfterfireRig={vehicle:T.Object3D;elements:FlameObjects[];provisional:boolean;radii:PortRadii};
-const cloud=(color:string,opacity:number)=>new T.MeshBasicMaterial({color,transparent:true,opacity,depthWrite:false,blending:T.AdditiveBlending,side:T.DoubleSide,toneMapped:false});
-/** Geometry extends along local +X after orienting to actual mount direction. */
+const RINGS=25,SIDES=14;
+const burnerColors={
+ outer:[new T.Color('#f4a552'),new T.Color('#f06c23'),new T.Color('#b9391a'),new T.Color('#3b3537')],
+ core:[new T.Color('#ffe2a8'),new T.Color('#f5ac55'),new T.Color('#ef641f'),new T.Color('#a73a22')]
+};
+const layerMaterial=()=>new T.ShaderMaterial({
+ uniforms:{opacity:{value:0}},
+ vertexShader:`attribute float aAlpha;
+ attribute vec3 color;
+ varying vec3 vColor;varying float vAlpha;
+ void main(){vColor=color;vAlpha=aAlpha;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+ fragmentShader:`uniform float opacity;
+ varying vec3 vColor;varying float vAlpha;
+ void main(){float a=clamp(vAlpha*opacity,0.0,0.65);if(a<0.006)discard;
+ gl_FragColor=vec4(vColor,a);}`,
+ transparent:true,depthWrite:false,depthTest:true,side:T.DoubleSide,
+ blending:T.NormalBlending
+});
+function newFlameLayer(kind:'outer'|'core',index:number):T.Mesh{
+ const geo=new T.BufferGeometry(),verts=(RINGS+1)*(SIDES+1),positions=new Float32Array(verts*3),colors=new Float32Array(verts*3),alpha=new Float32Array(verts),indices:number[]=[];
+ geo.setAttribute('position',new T.BufferAttribute(positions,3).setUsage(T.DynamicDrawUsage));
+ geo.setAttribute('color',new T.BufferAttribute(colors,3).setUsage(T.DynamicDrawUsage));
+ geo.setAttribute('aAlpha',new T.BufferAttribute(alpha,1).setUsage(T.DynamicDrawUsage));
+ for(let i=0;i<RINGS;i++)for(let j=0;j<SIDES;j++){const a=i*(SIDES+1)+j,b=a+SIDES+1;indices.push(a,b,a+1,b,b+1,a+1);}
+ geo.setIndex(indices);
+ const flame=new T.Mesh(geo,layerMaterial());flame.name=`ep005-${kind}-flame-tongue-${index}`;
+ flame.frustumCulled=false;flame.renderOrder=kind==='core'?7:6;
+ flame.userData.flameKind=kind;flame.userData.layerIndex=index;
+ return flame;
+}
+function palette(u:number,kind:'outer'|'core'):T.Color{
+ const stops=burnerColors[kind],v=Math.min(2.999,Math.max(0,u*3)),i=Math.floor(v);
+ return stops[i].clone().lerp(stops[i+1],v-i);
+}
+function shapeLayer(mesh:T.Mesh,port:ExhaustPort,burst:AfterfireSample['ports'][number],frame:number,fps:number,side:number){
+ const g=mesh.geometry,positions=g.getAttribute('position') as T.BufferAttribute,colors=g.getAttribute('color') as T.BufferAttribute,alphas=g.getAttribute('aAlpha') as T.BufferAttribute;
+ const kind=mesh.userData.flameKind as 'outer'|'core',idx=mesh.userData.layerIndex as number,t=frame/fps;
+ const core=kind==='core',seed=idx*2.27+side*.83;
+ const len=burst.length*(core?.70:.92+idx*.068);
+ const baseR=port.radius*(core?.37:.60+idx*.11);
+ for(let i=0;i<=RINGS;i++){
+  const u=i/RINGS,fade=Math.pow(1-u,core?1.3:.80);
+  const tongueWave=Math.sin(u*13-t*37+seed)*.075+Math.sin(u*24+t*26+seed*1.9)*.045+Math.sin(u*39-t*19+seed)*.018;
+  const x=.009+len*(u+u*u*tongueWave);
+  const sideways=u*u*(core?.009:.043)*Math.sin(t*19+seed+u*7);
+  const vertical=u*u*(core?.006:.036)*Math.cos(t*15+seed*1.8+u*11);
+  const swell=(.80+.67*Math.sin(Math.PI*u))*fade;
+  const taper=baseR*Math.max(.002,swell);
+  const ink=palette(u,kind);
+  for(let j=0;j<=SIDES;j++){
+   const v=j/SIDES,theta=2*Math.PI*v+u*(1.15+idx*.20)+t*(core?8.1:11.6);
+   const rough=1+.16*Math.sin(theta*3+u*15-t*23+seed)+.09*Math.sin(theta*7-u*32+t*29+seed*2);
+   const r=taper*Math.max(.50,rough);
+   const k=i*(SIDES+1)+j;
+   positions.setXYZ(k,x,sideways+Math.cos(theta)*r,vertical+Math.sin(theta)*r*(core?.9:1.2));
+   const c=ink.clone().multiplyScalar(1-.10*u);
+   colors.setXYZ(k,c.r,c.g,c.b);
+   const entry=Math.min(1,u*15),falloff=Math.pow(1-u,core?1.9:1.45);
+   const edge=.64+.22*Math.cos(theta*3+u*6+t*9);
+   alphas.setX(k,entry*falloff*edge*(core?.95:.71));
+  }
+ }
+ positions.needsUpdate=true;colors.needsUpdate=true;alphas.needsUpdate=true;
+ g.computeBoundingSphere();
+ (mesh.material as T.ShaderMaterial).uniforms.opacity.value=burst.intensity;
+}
 export function createAfterfireRig(vehicle:T.Object3D,{requireAuthoritative=true,radii={}}:{requireAuthoritative?:boolean;radii?:PortRadii}={}):AfterfireRig{
  const ports=readExhaustMounts(vehicle,radii);
  const elements=ports.map(port=>{
   const socket=vehicle.getObjectByName('mount:'+port.name)!;
-  if(requireAuthoritative&&socket.userData.provisional)throw Error('Production flame cannot attach to a provisional exhaust port');
+  if(requireAuthoritative&&(socket.userData.provisional||vehicle.userData.ep005ProvisionalPorts))throw Error('Production flame cannot attach to a provisional exhaust port');
+  if(requireAuthoritative&&(!socket.parent||!socket.parent.name.includes('exhaust-tube')))throw Error('Flame requires real modelled exhaust-tube parent');
   const root=new T.Group();root.name='ep005-afterfire-'+port.name;
   root.quaternion.setFromUnitVectors(new T.Vector3(1,0,0),new T.Vector3(...(socket.userData.direction as Vec3)).normalize());
   socket.add(root);
-  const lobes:T.Mesh[]=[],cores:T.Mesh[]=[];
-  for(let i=0;i<8;i++){
-   const envelope=new T.Mesh(new T.SphereGeometry(1,12,9),cloud(i%2?'#fa540c':'#ff8d16',.18));
-   envelope.name='ep005-turbulent-envelope-'+i;envelope.renderOrder=7;root.add(envelope);lobes.push(envelope);
-   const core=new T.Mesh(new T.SphereGeometry(1,12,9),cloud(i%2?'#ffe8ac':'#fff7db',.35));
-   core.name='ep005-hot-core-'+i;core.renderOrder=8;root.add(core);cores.push(core);
-  }
-  const rim=new T.Mesh(new T.SphereGeometry(1,14,10),cloud('#ffc35b',.55));rim.name='ep005-exhaust-glow';rim.renderOrder=9;root.add(rim);
-  const light=new T.PointLight('#ff8129',0,2.7,2);light.position.set(.14,0,0);root.add(light);
+  const envelopes=Array.from({length:4},(_,i)=>{const m=newFlameLayer('outer',i);root.add(m);return m;});
+  const cores=Array.from({length:2},(_,i)=>{const m=newFlameLayer('core',i);root.add(m);return m;});
+  // Restrained warm bounce onto actual metal bodywork. Never a floating yellow disc.
+  const light=new T.PointLight('#fa6427',0,1.7,2);light.position.set(.05,.035,0);root.add(light);
   root.visible=false;
-  return {socket,root,lobes,cores,light,rim};
+  return {socket,root,envelopes,cores,light};
  });
  return {vehicle,elements,provisional:!!vehicle.userData.ep005ProvisionalPorts,radii};
 }
-/** Stateless frame update. Port nodes move with suspension/body/route transform. */
+/** Stateless absolute-frame geometry update, attached to A1's physical moving nozzles. */
 export function animateAfterfireRig(rig:AfterfireRig,sample:AfterfireSample):void{
  if(sample.ports.length!==rig.elements.length)throw Error('Port count mismatch');
  const ports=readExhaustMounts(rig.vehicle,rig.radii);
  for(let i=0;i<rig.elements.length;i++){
-  const e=rig.elements[i],p=sample.ports.find(v=>v.name===names[i])!;
+  const e=rig.elements[i],p=sample.ports.find(v=>v.name===names[i]);
   if(!p||p.name!==ports[i].name)throw Error('Mount identity mismatch');
-  const a=p.intensity;e.root.visible=a>.012;e.light.intensity=a*1.9;
-  e.light.distance=1.2+a*1.2;
-  const radius=ports[i].radius,time=sample.frame/sample.fps;
-  e.rim.visible=a>.03;e.rim.position.set(.018,0,0);e.rim.scale.set(.025,2*radius,2*radius);
-  for(let j=0;j<e.lobes.length;j++){
-   const u=(j+.5)/e.lobes.length,shear=Math.sin(j*2.9+time*33+i*7),flicker=.86+.13*Math.sin(j*6.7+time*45);
-   const x=.025+(u*.9)*p.length;
-   const r=(.38+.62*Math.sin(Math.PI*u))*radius*(1+.24*u)*(1+.35*a);
-   const mesh=e.lobes[j];mesh.position.set(x,shear*r*.3,Math.cos(j*5.5+time*28)*r*.36);
-   mesh.scale.set(Math.max(.02,p.length*.12*flicker),r,r*.9);
-   (mesh.material as T.MeshBasicMaterial).opacity=a*(.12+(1-u)*.14);
-   const core=e.cores[j];core.position.set(x*.76,shear*r*.18,0);
-   core.scale.set(Math.max(.01,p.length*.095*flicker),r*.41,r*.43);
-   (core.material as T.MeshBasicMaterial).opacity=a*(.45-u*.27);
-  }
+  const a=p.intensity;e.root.visible=a>.012;
+  e.light.intensity=a*.72;e.light.distance=.68+a*.72;
+  if(!e.root.visible)continue;
+  for(const layer of [...e.envelopes,...e.cores])shapeLayer(layer,ports[i],p,sample.frame,sample.fps,i);
  }
 }
 function mount(root:T.Group,name:string,x:number,dir:Vec3){
