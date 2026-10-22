@@ -1,3 +1,6 @@
+/** Actual Agent 1 hero is SHA-pinned as isolated review input.
+ * This is an FX acceptance film, not an approved A1 master or final EP005 edit.
+ */
 import React,{useEffect,useMemo} from 'react';
 import {AbsoluteFill,useCurrentFrame,useVideoConfig} from 'remotion';
 import {ThreeCanvas} from '@remotion/three';
@@ -7,72 +10,81 @@ import {sampleRoute} from '../../world-kit/environments.ts';
 import {vehicleSpec} from '../../world-kit/catalog.ts';
 import {disposeObject} from '../../world-kit/geometry.ts';
 import type {V3} from '../../world-kit/geometry.ts';
-import {createCinematicVehicle,animateCinematicVehicle} from '../../modelling-kit/rig.ts';
+import {animateCinematicVehicle} from '../../modelling-kit/rig.ts';
 import {createCinematicEnvironment} from '../../modelling-kit/environments.ts';
 import {CinematicLighting} from '../../modelling-kit/Lighting';
-import {partInspectionCamera} from '../../modelling-kit/studio-camera.ts';
 import {drivingCamera} from '../../modelling-kit/driving.ts';
 import {compileRecipe,sampleRecipe} from '../../modelling-kit/recipe.ts';
 import type {EpisodeRecipe} from '../../modelling-kit/recipe.ts';
-import {animateAssembly} from '../../modelling-kit/authoring.ts';
+import {animateAssembly,animateComponents} from '../../modelling-kit/authoring.ts';
+import {createEp005Hero} from '../../../../production/yunex/supercar_flames_ep005/flames/hero-reference/hero.ts';
 import {sampleAfterfire,ep005PreviewEngineState} from '../../../../production/yunex/supercar_flames_ep005/flames/afterfire.ts';
-import {addProvisionalPreviewExhaust,readExhaustMounts,createAfterfireRig,animateAfterfireRig,createAfterfireCutaway} from '../../../../production/yunex/supercar_flames_ep005/flames/exhaust-rig.ts';
+import {readExhaustMounts,createAfterfireRig,animateAfterfireRig,createAfterfireCutaway} from '../../../../production/yunex/supercar_flames_ep005/flames/exhaust-rig.ts';
 
-/** Isolated silent engineering test film, NOT an Agent 1 hero-geometry approval. */
 export const AfterfireEpisode:React.FC<{recipe:EpisodeRecipe}>=({recipe})=>{
  const frame=useCurrentFrame(),{fps,width,height}=useVideoConfig();
  const compiled=useMemo(()=>compileRecipe(recipe,fps),[recipe,fps]);
  const sample=sampleRecipe(compiled,frame),{shot,state}=sample;
- const spec=vehicleSpec(recipe.vehicle.variant);
+ const s=vehicleSpec(recipe.vehicle.variant),mechanic=shot.id==='mechanism';
  const world=useMemo(()=>createCinematicEnvironment({...recipe.world,quality:'hero'}),[recipe.world]);
- const vehicle=useMemo(()=>{
-  const g=createCinematicVehicle({...recipe.vehicle,quality:'hero',lights:true,optimize:false});
-  addProvisionalPreviewExhaust(g);return g;
- },[recipe.vehicle]);
- const effects=useMemo(()=>createAfterfireRig(vehicle,{requireAuthoritative:false}),[vehicle]);
- const mechanics=useMemo(()=>{const g=createAfterfireCutaway();g.position.y=1.7;return g;},[]);
- useEffect(()=>()=>disposeObject(world),[world]);
- useEffect(()=>()=>disposeObject(vehicle),[vehicle]);
- useEffect(()=>()=>disposeObject(mechanics),[mechanics]);
- const distance=(state.distance??0)-30;
- const pose=sampleRoute(recipe.world.kind,distance);
- const ahead=sampleRoute(recipe.world.kind,distance+.4);
- const steering=T.MathUtils.clamp(-Math.atan2(Math.sin(ahead.yaw-pose.yaw),Math.cos(ahead.yaw-pose.yaw))/.4*spec.wheelbase,-.4,.4);
+ // The exact A1 source build (including physically hollow .085 m inner bore),
+ // not a generic V3 car with guessed stand-in tailpipe sockets.
+ const vehicle=useMemo(()=>createEp005Hero(),[]);
+ const effects=useMemo(()=>createAfterfireRig(vehicle),[vehicle]);
+ const mechanics=useMemo(()=>{const g=createAfterfireCutaway();g.position.set(0,1.65,0);return g;},[]);
+ useEffect(()=>()=>{disposeObject(world);disposeObject(vehicle);disposeObject(mechanics);},[world,vehicle,mechanics]);
+ const pose=sampleRoute(recipe.world.kind,(state.distance??0)+55);
+ const ahead=sampleRoute(recipe.world.kind,(state.distance??0)+55.45);
+ const dYaw=Math.atan2(Math.sin(ahead.yaw-pose.yaw),Math.cos(ahead.yaw-pose.yaw));
+ const steering=T.MathUtils.clamp(-dYaw/.45*s.wheelbase,-.38,.38);
  animateCinematicVehicle(vehicle,{...state,steer:steering});
+ animateComponents(vehicle,sample.joints);
  vehicle.position.fromArray(pose.position);vehicle.rotation.y=pose.yaw;vehicle.updateMatrixWorld(true);
+ const ports=readExhaustMounts(vehicle);
  const kind=shot.id as 'hook'|'tailpipe'|'mechanism'|'wide';
- const afterfire=sampleAfterfire(frame,fps,ep005PreviewEngineState(kind,sample.localFrame/fps),readExhaustMounts(vehicle));
- animateAfterfireRig(effects,afterfire);
+ const combustion=sampleAfterfire(frame,fps,ep005PreviewEngineState(kind,sample.localFrame/fps),ports);
+ animateAfterfireRig(effects,combustion);
  animateAssembly(mechanics,frame,fps);
- const mechanic=shot.id==='mechanism';
- const carCamera=drivingCamera(shot.camera,pose,spec,width/height,frame/fps,{side:1});
+ const carCamera=drivingCamera(shot.camera,pose,s,width/height,frame/fps,{side:1});
  let camera=carCamera;
  if(!mechanic&&shot.id!=='wide'){
-  const cameraLocal=new T.Vector3(-spec.length*(shot.id==='hook'?1.35:.93),spec.height*(shot.id==='hook'?1.05:.72),spec.width*(shot.id==='hook'?1.0:.73));
-  const targetLocal=new T.Vector3(-spec.length*.40,spec.height*.37,0);
+  // No anonymous isolated flame closeups: car remains recognisable.
+  const close=shot.id==='tailpipe';
+  const cam=new T.Vector3(close?-5.65:-8.1,close?1.38:2.2,close?2.55:4.5);
+  const focus=new T.Vector3(close?-2.43:-1.25,close?.51:.66,0);
   const transform=(v:T.Vector3)=>v.applyAxisAngle(new T.Vector3(0,1,0),pose.yaw).add(new T.Vector3(...pose.position)).toArray() as V3;
-  camera={position:transform(cameraLocal),target:transform(targetLocal),fov:shot.id==='hook'?46:43};
+  camera={position:transform(cam),target:transform(focus),fov:close?40:43};
  }
- if(mechanic)camera=partInspectionCamera(mechanics,width/height,{azimuth:-1.10+sample.localFrame/(shot.duration*fps)*.42,elevation:.23});
- const caption=sample.caption;
- return <AbsoluteFill style={{backgroundColor:'#15202a'}}>
-  <ThreeCanvas width={width} height={height} shadows camera={{fov:46,near:.025,far:500}} gl={{antialias:true}}>
-   <CinematicLighting focus={mechanic?[0,1.7,0]:pose.position} timeOfDay={recipe.world.timeOfDay??'dusk'}/>
-   <primitive object={world}/>
+ if(mechanic){
+  // Engine + manifold + catalyst + muffler + physical tip fit simultaneously
+  // inside the portrait width. World hidden to prevent opaque road occlusion.
+  camera={position:[0.12,3.35,18],target:[0,1.76,0],fov:34};
+ }
+ return <AbsoluteFill style={{background:'#0c1821'}}>
+  <ThreeCanvas width={width} height={height} shadows camera={{fov:camera.fov,near:.025,far:500}} gl={{antialias:true}}>
+   <CinematicLighting focus={mechanic?[0,1.65,0]:pose.position} timeOfDay={mechanic?'dusk':'night'}/>
+   {mechanic?<color attach="background" args={['#0e1b26']}/>:<primitive object={world}/>}
    {mechanic?<primitive object={mechanics}/>:<primitive object={vehicle}/>}
    <CameraAim {...camera}/>
+   {!mechanic?<pointLight position={[pose.position[0]-2.6,.85,pose.position[2]]} color="#e96634" intensity={.25} distance={2.6}/>:null}
   </ThreeCanvas>
-  <div style={{position:'absolute',top:'7%',left:'7%',right:'7%',font:'700 21px Arial',color:'#f5dfc9',letterSpacing:1.5}}>
-   YUNEX / EP005 / AFTERFIRE ENGINEERING PREVIEW
+  <div style={{position:'absolute',top:'7%',left:'7%',right:'7%',fontFamily:'Arial',fontSize:21,fontWeight:700,letterSpacing:2.1,color:'#eaf3f5',textShadow:'0 2px 7px #001219'}}>
+   YUNEX / EP005 / EXHAUST AFTERFIRE
   </div>
-  <div style={{position:'absolute',top:'11%',left:'7%',right:'7%',font:'600 22px Arial',color:'#ffb679',lineHeight:1.25}}>
-   {mechanic?'SCHEMATIC EXHAUST / FLOW MARKERS ARE ILLUSTRATIVE':'PROVISIONAL EXHAUST MOUNTS — AWAIT AGENT 1'}
+  {mechanic?
+   <div style={{position:'absolute',top:'18%',left:'7%',right:'7%',padding:'18px 21px',background:'rgba(8,22,32,.75)',borderLeft:'4px solid #f98a47',fontFamily:'Arial',fontSize:24,color:'#ffd1ac',fontWeight:700,lineHeight:1.4}}>
+    ILLUSTRATED EXHAUST FLOW
+    <div style={{fontSize:25,color:'#f7f8f7',marginTop:10}}>V8 ENGINE → MANIFOLD → CATALYST → MUFFLER → TAILPIPE</div>
+    <div style={{fontSize:21,color:'#b3ced9',marginTop:9}}>Flow markers follow the modelled piping. Not CFD.</div>
+   </div>
+  :<div style={{position:'absolute',top:'11%',left:'7%',right:'7%',fontFamily:'Arial',fontSize:22,fontWeight:600,color:'#ffb98c'}}>
+    REAL A1 MOUNTS / TRANSIENT BURSTS / SILENT REVIEW
+   </div>}
+  <div style={{position:'absolute',bottom:'12%',left:'7%',right:'7%',padding:'12px 14px',background:'rgba(6,19,29,.72)',borderLeft:'5px solid #fc8b43',fontFamily:'Arial',fontSize:41,fontWeight:800,color:'#fff',lineHeight:1.19}}>
+   {sample.caption}
   </div>
-  <div style={{position:'absolute',bottom:'12%',left:'7%',right:'7%',font:'700 41px Arial',lineHeight:1.2,color:'#fff',textShadow:'0 2px 12px #000'}}>
-   {caption}
-  </div>
-  <div style={{position:'absolute',bottom:'7%',left:'7%',right:'7%',font:'500 20px Arial',color:'#bed1d7'}}>
-   SILENT PROOF / NOT FINAL FILM / NO CALIBRATED COMBUSTION CLAIM
+  <div style={{position:'absolute',bottom:'7%',left:'7%',right:'7%',fontFamily:'Arial',fontSize:20,color:'#c2d2d8'}}>
+   SILENT A1/A2 REVIEW / VISUAL COMBUSTION ILLUSTRATION
   </div>
  </AbsoluteFill>;
 };
