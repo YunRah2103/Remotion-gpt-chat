@@ -1,0 +1,88 @@
+name: YUNEX EP005 Agent 4 - V3 Cinematic Night V2 Native Film Review
+on:
+  pull_request:
+    branches:
+      - production/yunex-ep005-v3-base
+    paths:
+      - 'production/yunex/supercar_flames_ep005/look/**'
+      - 'src/yunex/studio-projects/ep005-a4-cinematic/**'
+      - '.github/workflows/ep005-a4-cinematic-review.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ep005-a4-v2-native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Install native media (ffmpeg and ffprobe)
+        run: bash scripts/modelling-kit/install-native-media.sh
+      - name: V3 checks and original plus replacement track contract tests
+        run: |
+          npm run check
+          node --experimental-strip-types --test production/yunex/supercar_flames_ep005/look/*.test.mjs
+      - name: Authoring and exact-source validation
+        run: |
+          npm run kit:catalog > /dev/null
+          npm run kit:validate -- ep005-a4-cinematic
+          npm run kit:plan -- ep005-a4-cinematic
+          npm run kit:inspect -- ep005-a4-cinematic
+          npm run kit:handoff -- ep005-a4-cinematic
+      - name: Genuine 180-frame 1080x1920 30fps MP4 - premium V2
+        run: npm run kit:render -- ep005-a4-cinematic
+      - name: Same camera/road/time baseline - original premium A4
+        run: |
+          mkdir -p out/ep005-a4-v2
+          npx remotion render production/yunex/supercar_flames_ep005/look/preview-v2-entry.tsx EP005A4Previous out/ep005-a4-v2/previous-look.mp4 --frames=0-59 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2 --log=error
+      - name: Full MP4 decode, FFprobe, contact-frame differences, SHA256
+        run: |
+          python3 - <<'PY'
+          import json,subprocess,hashlib,pathlib
+          folder=pathlib.Path('out/ep005-a4-v2')
+          cases=[('v2',pathlib.Path('out/studio/ep005-a4-cinematic.mp4'),180),
+                 ('previous',folder/'previous-look.mp4',60)]
+          proof={}
+          for name,path,expected in cases:
+              meta=json.loads(subprocess.check_output(['ffprobe','-v','error','-select_streams','v:0','-count_frames','-show_entries','stream=codec_name,width,height,avg_frame_rate,nb_read_frames','-of','json',str(path)]))['streams'][0]
+              assert (int(meta['width']),int(meta['height']))==(1080,1920),(name,meta)
+              assert meta['avg_frame_rate']=='30/1',(name,meta)
+              assert int(meta['nb_read_frames'])==expected,(name,meta)
+              subprocess.run(['ffmpeg','-v','error','-xerror','-i',str(path),'-f','null','-'],check=True)
+              frames=[0,5,10,23,29,44,59] if name=='previous' else [0,5,10,23,29,44,59,60,89,119,120,149,179]
+              for f in frames:
+                  img=folder/(name+'-frame-'+str(f)+'.jpg')
+                  subprocess.run(['ffmpeg','-y','-v','error','-i',str(path),'-vf',f'select=eq(n\,{f})','-vsync','vfr','-frames:v','1',str(img)],check=True)
+                  assert img.stat().st_size>1000,(name,f)
+              hashes=[line.split(',')[-1].strip() for line in subprocess.check_output(['ffmpeg','-v','error','-i',str(path),'-vf','fps=3','-f','framemd5','-']).decode().splitlines() if line and not line.startswith('#')]
+              assert len(set(hashes))>=8,(name,'moving clip required',len(set(hashes)))
+              proof[name]={'source':str(path),'native_size_bytes':path.stat().st_size,'frames':expected,'ffprobe':meta,'full_decode':'PASS','distinct_sampled_frames':len(set(hashes)),'sampled_frames':frames,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+              print('VIDEO QA',name,json.dumps(proof[name]))
+          (folder/'verified-media.json').write_text(json.dumps(proof,indent=2))
+          PY
+      - name: Real moving frames and before/after contact sheets
+        run: |
+          ffmpeg -y -v error -i out/studio/ep005-a4-cinematic.mp4 -vf "select='eq(n,0)+eq(n,10)+eq(n,23)+eq(n,29)+eq(n,89)+eq(n,179)',scale=180:320:flags=lanczos,tile=3x2:padding=3:margin=3" -vsync vfr -frames:v 1 out/ep005-a4-v2/v2-contact.jpg
+          ffmpeg -y -v error -i out/ep005-a4-v2/previous-look.mp4 -vf "select='eq(n,0)+eq(n,23)+eq(n,29)',scale=180:320:flags=lanczos,tile=3x1:padding=3:margin=3" -vsync vfr -frames:v 1 out/ep005-a4-v2/previous-contact.jpg
+          test -s out/ep005-a4-v2/v2-contact.jpg
+          test -s out/ep005-a4-v2/previous-contact.jpg
+          echo YUNEX_A4_V2_CONTACT_BEGIN
+          base64 -w0 out/ep005-a4-v2/v2-contact.jpg
+          echo
+          echo YUNEX_A4_V2_CONTACT_END
+      - name: Upload complete moving MP4s, decode report and visual QA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-EP005-A4-V2-PREMIUM-NIGHT-MOVING
+          path: |
+            out/studio/ep005-a4-cinematic.mp4
+            out/studio/ep005-a4-cinematic/
+            out/ep005-a4-v2/
+          retention-days: 30
+          if-no-files-found: warn
