@@ -26,8 +26,12 @@ jobs:
         run: npm run check
       - name: Deterministic port and engine unit tests
         run: node --experimental-strip-types --test tests/ep005-agent7.test.mjs
-      - name: System ffmpeg
-        run: ffmpeg -version | head -n 1
+      - name: Install verification tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          ffmpeg -version | head -n 1
+          ffprobe -version | head -n 1
       - name: Render genuine native 3s moving fixture preview
         run: |
           mkdir -p out/ep005/agent7
