@@ -35,6 +35,27 @@ const Frame:React.FC<{tag:string;title:string;subtitle:string;footer:string}>=({
       borderTop:'1px solid rgba(190,209,220,.4)',paddingTop:22,
       color:'#d1dfe7',fontSize:22,letterSpacing:1}}>{footer}</div>
   </div>;
+
+type VectorTuple=[number,number,number];
+/** Shot-sized optical compositions rather than one tiny wide orthographic diagram. */
+function scienceCamera(t:number):{position:VectorTuple;target:VectorTuple}{
+  const k:{t:number;position:VectorTuple;target:VectorTuple}[]=[
+    {t:0,position:[.2,1.7,3.3],target:[.15,.45,0]},
+    {t:1.35,position:[.48,1.85,3.35],target:[-.10,.47,0]},
+    {t:1.90,position:[-1.4,3.8,11.3],target:[-.50,.35,0]},
+    {t:2.83,position:[-1.2,3.6,11.1],target:[-.90,.28,0]},
+    {t:3.50,position:[-5.5,1.55,3.25],target:[-2.48,-.02,0]},
+    {t:5,position:[-5.2,1.30,3.1],target:[-2.48,-.02,0]},
+  ];
+  let i=0;while(i<k.length-2&&t>k[i+1].t)i++;
+  const a=k[i],b=k[i+1],u=Math.max(0,Math.min(1,(t-a.t)/(b.t-a.t)));
+  const s=u*u*(3-2*u);
+  const mix=(v:VectorTuple,w:VectorTuple):VectorTuple=>[
+    v[0]+(w[0]-v[0])*s,v[1]+(w[1]-v[1])*s,v[2]+(w[2]-v[2])*s
+  ];
+  return {position:mix(a.position,b.position),target:mix(a.target,b.target)};
+}
+
 export const FlameFixtureProof:React.FC=()=>{
   const frame=useCurrentFrame(),{fps,width,height}=useVideoConfig(),t=frame/fps;
   const metal=useMemo(()=>fixture(),[]);
@@ -51,19 +72,19 @@ export const FlameFixtureProof:React.FC=()=>{
     {at:1.43,duration:.53,strength:.92},
     {at:2.33,duration:.35,strength:.72}]);
   return <AbsoluteFill style={{background:backdrop}}>
-    <ThreeCanvas width={width} height={height} camera={{fov:41,near:.025,far:60}}
+    <ThreeCanvas width={width} height={height} camera={{fov:37,near:.025,far:60}}
         gl={{antialias:true,alpha:false}}>
       <color attach="background" args={[backdrop]}/>
       <ambientLight intensity={.55} color="#c5d6e5"/>
       <directionalLight position={[2,6,3]} intensity={2.8} color="#fff4e6"/>
       <directionalLight position={[-3,2,-5]} intensity={2} color="#92ccfe"/>
-      <pointLight position={[-1.1,1.5,1]} intensity={6} distance={5} color="#ffc195"/>
+      <pointLight position={[-1.1,1.5,1]} intensity={.75} distance={2.4} color="#ffc195"/>
       <mesh rotation={[-Math.PI/2,0,0]} position={[0,-.18,0]} receiveShadow>
         <planeGeometry args={[70,70]}/>
         <meshStandardMaterial color="#2d323a" metalness={.35} roughness={.46}/>
       </mesh>
       <primitive object={metal}/><primitive object={rig.root}/>
-      <CameraAim position={[-5.5+.22*t,1.45,5.6-.18*t]} target={[-.84,.29,0]} fov={41}/>
+      <CameraAim position={[-3.95+.09*t,1.24,4.12-.09*t]} target={[-.85,.29,0]} fov={37}/>
     </ThreeCanvas>
     <Frame tag="YUNEX / AGENT 7 / FLAME R&D"
        title="TRANSIENT AFTERFIRE"
@@ -75,8 +96,7 @@ export const MechanicalScienceProof:React.FC=()=>{
   const frame=useCurrentFrame(),{fps,width,height}=useVideoConfig(),t=frame/fps;
   const a=useMemo(()=>buildScienceEngine(),[]);
   const phase:0|1|2=t<1.6?0:t<3.3?1:2;
-  const smooth=(x:number)=>{const a=Math.max(0,Math.min(1,x));return a*a*(3-2*a);};
-  const reveal=smooth(t/1.90),tail=smooth((t-2.75)/2.0);
+  const camera=scienceCamera(t);
   animateScienceEngine(a,t,phase);
   const story=[
     {h:'INSIDE THE ENGINE',sub:'Fuel normally burns inside the cylinders.',tag:'01 / CONTROLLED COMBUSTION'},
@@ -86,20 +106,25 @@ export const MechanicalScienceProof:React.FC=()=>{
   return <AbsoluteFill style={{background:backdrop}}>
     <ThreeCanvas width={width} height={height} camera={{fov:38,near:.025,far:90}} gl={{antialias:true}}>
       <color attach="background" args={[backdrop]}/>
-      <ambientLight intensity={.65} color="#bfd8e8"/>
-      <directionalLight position={[4,8,6]} intensity={3.4} color="#fff5e2"/>
+      <ambientLight intensity={1.35} color="#bfd8e8"/>
+      <directionalLight position={[4,8,6]} intensity={4.1} color="#fff5e2"/>
       <directionalLight position={[-5,4,-4]} intensity={2.3} color="#8db8dc"/>
-      <pointLight position={[-2,1,2]} intensity={3} distance={7} color="#f4aa75"/>
+      <pointLight position={[-2,1,2]} intensity={5.5} distance={8} color="#f4aa75"/>
       <mesh position={[-.50,-.52,0]} receiveShadow>
         <boxGeometry args={[5.25,.18,2.7]}/>
-        <meshStandardMaterial color="#293642" metalness={.62} roughness={.39}/>
+        <meshStandardMaterial color="#394954" metalness={.26} roughness={.53}/>
       </mesh>
       <primitive object={a.root}/>
-      <CameraAim position={[.40-1.9*reveal-1.4*tail,3.4+.8*reveal-1.1*tail,9.4+4.0*reveal-3.0*tail]}
-         target={[.10-.62*reveal-.8*tail,.55-.23*reveal-.10*tail,0]} fov={38}/>
+      <CameraAim position={camera.position} target={camera.target} fov={38}/>
     </ThreeCanvas>
     <Frame tag={'YUNEX / ' + story.tag} title={story.h}
       subtitle={story.sub}
       footer="Illustrative V8/exhaust anatomy • Catalysts can suppress visible flames"/>
+    <div style={{position:'absolute',bottom:'25%',left:'9%',right:'9%',
+      fontFamily:'Arial',fontSize:31,letterSpacing:1.2,fontWeight:700,
+      color:'#f2ecdf',textAlign:'center',padding:'16px 22px',
+      background:'rgba(9,20,29,.72)',borderTop:'2px solid #e89a64'}}>
+      {phase===0?'PISTONS • CYLINDER IGNITION':phase===1?'HOT GAS THROUGH CONNECTED HEADERS':'BRIEF AFTERFIRE — ONLY IN SOME CONDITIONS'}
+    </div>
   </AbsoluteFill>;
 };
