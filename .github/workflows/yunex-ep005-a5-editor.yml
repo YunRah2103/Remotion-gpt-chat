@@ -1,0 +1,82 @@
+name: EP005 Agent 5 native silent editor blockout QA
+on:
+  pull_request:
+    paths:
+      - 'src/yunex/studio-projects/ep005-a5-editor/**'
+      - 'production/yunex/supercar_flames_ep005/editor/**'
+      - '.github/workflows/yunex-ep005-a5-editor.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ep005-a5-native-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  editor:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Dependencies and native media tools
+        run: |
+          npm ci --no-audit --no-fund
+          bash scripts/modelling-kit/install-native-media.sh
+          ffprobe -version | head -n 1
+      - name: Native source tests and V3 validation
+        run: |
+          npm run check
+          node --test production/yunex/supercar_flames_ep005/editor/verify-editor.test.mjs
+          node production/yunex/supercar_flames_ep005/editor/verify-editor.mjs
+          npm run kit:validate -- ep005-a5-editor
+          npm run kit:plan -- ep005-a5-editor
+          npm run kit:inspect -- ep005-a5-editor
+          npm run kit:handoff -- ep005-a5-editor
+      - name: Render complete 750-frame native portrait editorial blockout
+        run: |
+          npm run kit:render -- ep005-a5-editor
+      - name: Verify full MP4 decode, motion, timings, cuts and checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          vid=out/studio/ep005-a5-editor.mp4
+          out=out/studio/ep005-a5-editor
+          mkdir -p "$out/cut-qa"
+          test -s "$vid"
+          ffprobe -v error -show_entries stream=codec_name,width,height,avg_frame_rate,nb_frames,pix_fmt -show_entries format=duration -of json "$vid" > "$out/ffprobe.json"
+          python - <<'PY'
+          import json
+          a=json.load(open('out/studio/ep005-a5-editor/ffprobe.json'))
+          v=next(s for s in a['streams'] if s.get('codec_name')=='h264')
+          assert (v['width'],v['height'])==(1080,1920),v
+          assert v['avg_frame_rate']=='30/1',v
+          assert int(v['nb_frames'])==750,v
+          assert abs(float(a['format']['duration'])-25)<.04,a
+          print('A5 native 750f / 1080x1920 / 30fps PASS')
+          PY
+          ffmpeg -hide_banner -loglevel error -xerror -i "$vid" -f null -
+          sha256sum "$vid" | tee "$out/sha256.txt"
+          ffmpeg -y -hide_banner -loglevel error -i "$vid" -vf "select='eq(n,0)+eq(n,5)+eq(n,12)+eq(n,29)+eq(n,44)+eq(n,45)+eq(n,164)+eq(n,165)+eq(n,284)+eq(n,285)+eq(n,419)+eq(n,420)+eq(n,554)+eq(n,555)+eq(n,674)+eq(n,709)+eq(n,748)+eq(n,749)'" -fps_mode vfr "$out/cut-qa/f-%02d.png"
+          test "$(find "$out/cut-qa" -name 'f-*.png' | wc -l)" -eq 18
+          ffmpeg -y -hide_banner -loglevel error -i "$vid" -vf "fps=1,scale=270:480,tile=5x5" -frames:v 1 "$out/25s-timeline.jpg"
+          # Distinct sampled frames show native motion rather than duplicated still.
+          python - <<'PY'
+          import hashlib,pathlib
+          p=sorted(pathlib.Path('out/studio/ep005-a5-editor/cut-qa').glob('f-*.png'))
+          sig=[hashlib.sha256(x.read_bytes()).hexdigest() for x in p]
+          assert len(sig)==18
+          assert len(set(sig))>=14, 'Motion sample too static: '+str(len(set(sig)))
+          print('Distinct-cut-frame QA:',len(set(sig)),'of',len(sig))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EP005-A5-750f-SILENT-EDITOR-BLOCKOUT-NOT-APPROVED
+          path: |
+            out/studio/ep005-a5-editor.mp4
+            out/studio/ep005-a5-editor/
+          retention-days: 30
+          if-no-files-found: warn
