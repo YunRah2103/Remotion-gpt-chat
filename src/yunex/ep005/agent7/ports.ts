@@ -62,3 +62,43 @@ export function sampleActualPorts(
       outerDiameterM:m.outerDiameterM, frame, fps};
   });
 }
+
+/**
+ * Direct adapter for NEW Agent 6 PR #270's sampleExhaustWorld(car,frame).
+ * It intentionally accepts their already-transformed WORLD vectors. The
+ * candidate GLB and its correction transform remain owned by Agent 6.
+ * NEVER apply the local vehicle transform a second time.
+ */
+export interface Agent6SampledWorldPort {
+  frame: number;
+  name: 'exhaust-left' | 'exhaust-right';
+  worldOrigin: V3;
+  worldOutward: V3;
+  innerRadiusM: number;
+  visibleOuterDiameterM: number;
+}
+export function adaptAgent6WorldPorts(
+  raw: readonly Agent6SampledWorldPort[], frame: number, fps = 30,
+): WorldExhaustPort[] {
+  if (raw.length !== 2 || !(fps > 0) || !Number.isInteger(frame) || frame < 0)
+    throw Error('Agent 6 sampled left/right moving world ports required');
+  const ids = new Set<string>();
+  return raw.map(p => {
+    if (p.frame !== frame || !['exhaust-left','exhaust-right'].includes(p.name)
+      || ids.has(p.name) || p.worldOrigin.length !== 3 || p.worldOutward.length !== 3)
+      throw Error('Missing, repeated or out-of-time Agent 6 exhaust sample');
+    ids.add(p.name);
+    const origin = new THREE.Vector3(...p.worldOrigin);
+    const outward = new THREE.Vector3(...p.worldOutward);
+    if (![...origin.toArray(),...outward.toArray()].every(Number.isFinite)
+       || outward.length() < .99 || outward.length() > 1.01
+       || !(p.visibleOuterDiameterM >= .105 && p.visibleOuterDiameterM <= .120)
+       || !(p.innerRadiusM >= .025 && p.innerRadiusM < p.visibleOuterDiameterM*.5))
+      throw Error('Malformed or oversized Agent 6 live exhaust sample');
+    return {
+      id: p.name==='exhaust-left'?'left':'right', origin,
+      outward:outward.normalize(),frame,fps,innerRadiusM:p.innerRadiusM,
+      outerDiameterM:p.visibleOuterDiameterM,
+    };
+  });
+}
