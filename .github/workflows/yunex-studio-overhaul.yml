@@ -1,0 +1,56 @@
+name: YUNEX automotive studio overhaul showcases
+on:
+  pull_request:
+    paths:
+      - 'src/yunex/modelling-kit/**'
+      - 'scripts/modelling-kit/showcase*'
+      - '.github/workflows/yunex-studio-overhaul.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: yunex-studio-overhaul-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
+      - run: node --experimental-strip-types --test tests/modelling-kit/dynamics.test.mjs tests/modelling-kit/rough-road.test.mjs tests/modelling-kit/rally-engineering.test.mjs tests/modelling-kit/showcase.test.mjs tests/modelling-kit/occupant.test.mjs
+  showcase:
+    needs: focused
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {demo: A, project: showcase-a-supercar}
+          - {demo: B, project: showcase-b-rally}
+          - {demo: C, project: showcase-c-formula}
+          - {demo: D, project: showcase-d-engineering}
+          - {demo: E, project: showcase-e-environment}
+          - {demo: F, project: showcase-f-complete-film}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - run: node --experimental-strip-types scripts/modelling-kit/showcase.mjs --demo=${{ matrix.demo }} --render
+      - run: python scripts/modelling-kit/showcase-verify.py out/studio/${{ matrix.project }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-overhaul-${{ matrix.demo }}
+          path: out/studio/${{ matrix.project }}
+          retention-days: 30

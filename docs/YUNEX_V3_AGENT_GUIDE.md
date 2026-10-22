@@ -126,3 +126,23 @@ For a matching-camera baseline set `vehicle.bodyDetail:'legacy'`; the default is
 Use `vehicle.variant:'rally-hatch'` with the usual studio workflow, or `createCinematicVehicle({variant:'rally-hatch',driver:true,quality:'hero'})`. The original rally model includes four widened arch shells, raised ride height, white multi-spoke rolling wheels, gravel tread, supported four-light bar, roof scoop, mud flaps, rear wing, fitted roll cage and geometric livery. These are editable named meshes; no shared model source is overwritten by private variants. Select `world.kind:'rally'`, `'forest'`, `'snow'` or any existing environment.
 
 Run `node --experimental-strip-types scripts/modelling-kit/vehicle-quality.mjs --vehicle=rally-hatch --style=coachbuilt` for an ordinary editable six-second driving project. Add `--cabin` for a separate cage/interior/onboard proof. For matching-camera before/after tests use `city-ev`, `supercar`, `crossover` or `formula-modern` with `--style=legacy` and `--style=coachbuilt`. Native videos still require decode and actual visual inspection; geometry tests alone cannot certify a significant aesthetic improvement.
+
+## Automotive studio overhaul checkpoints
+
+`sampleDynamics(spec,{speed,distance,curvature,acceleration,roughness})` is a reusable absolute-sample visual controller. Speed is m/s, acceleration m/s², curvature inverse metres; positive curvature steers right in the +X-forward/+Z-left convention. It returns class-specific bounded pitch/roll, Ackermann steering and four road heights. `animateCinematicVehicle` accepts these optional inputs; old callers remain compatible. Wheel spin still comes from absolute travel distance. This is illustrative quasi-static compliance, not a calibrated tyre/load/damper simulation.
+
+A rally recipe can set `world.roughness:0.8`. The world then builds a subdivided real road from `rallySurfaceHeight(x,z,roughness)`; the studio samples that same field at the actual wheel hardpoints. Existing worlds default to flat geometry. Roughness is rejected on unsupported worlds. Direct low-level callers may supply `roadFrontLeft`, `roadFrontRight`, `roadRearLeft`, `roadRearRight` in vehicle-local vertical metres to match custom terrain. Supply all four together. Do not add time-only random wheel shaking.
+
+Rally and Formula occupants retain the shared articulated grip/pedal rig and gain motorsport clothing and curved helmet geometry. Rally adds genuine bonnet apertures/recessed blades, formed aluminium sump protection and routed exhaust/tip geometry. These preserve original names/mounts; they do not imply certified clearance under arbitrary custom edits.
+
+Six source-owned showcase projects are in `showcases.ts`:
+
+```sh
+node --experimental-strip-types scripts/modelling-kit/showcase.mjs --demo=B
+npm run kit:review -- showcase-b-rally --shot=travel --moving
+npm run kit:scene -- showcase-b-rally
+```
+
+Use A–F for supercar, rally, Formula, mechanics, city/night and complete silent 25-second film respectively. Add `--render` on initial creation to produce the complete native proof pack. Creation refuses duplicate projects: after creation use the normal plan/inspect/review/scene/handoff commands. Native workflow `yunex-studio-overhaul.yml` packages all six editable projects and verifies full decode, dimensions, 30fps, frames, duration, hashes and per-shot moving scene content. Source existence is not render success or visual approval.
+
+`kit:scene` now prints frame progress and rejects source changes detected during rendering before issuing reusable contracts. `kit:handoff` includes exact Git revision, shared source fingerprint and explicitly separate QA placeholders. Agents/editors must attach real test, render and visual evidence. No handoff command grants visual approval.

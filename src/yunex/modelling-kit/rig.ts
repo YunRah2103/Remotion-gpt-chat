@@ -25,7 +25,7 @@ import {deformTyre,deformBody,createFragments,animateFragments,createTornCarcass
 export const HERO_VEHICLES=['hot-hatch','supercar','formula-modern'] as const satisfies readonly VehicleVariant[];
 export type CinematicOptions=VehicleOptions & {quality?:'lightweight'|'standard'|'hero';paintPreset?:'lacquer'|'satin';bodyDetail?:'legacy'|'coachbuilt';tyreType?:'road'|'slick';optimize?:boolean;driver?:boolean;powertrain?:AssemblySpec};
 export type WheelCorner='front-left'|'front-right'|'rear-left'|'rear-right'|'rear-aux-left'|'rear-aux-right';
-export type CinematicState={frame:number;fps:number;distance?:number;speed?:number;acceleration?:number;curvature?:number;roughness?:number;steer?:number;compression?:number;tyreDamage?:number;damagedWheel?:WheelCorner;bodyDamage?:number;cutaway?:number;exploded?:number;highlight?:'engine'|'underfloor'|'wheels';heat?:number;failureFrame?:number;braking?:number;impact?:number;gearChange?:number};
+export type CinematicState={frame:number;fps:number;distance?:number;speed?:number;acceleration?:number;curvature?:number;roughness?:number;roadFrontLeft?:number;roadFrontRight?:number;roadRearLeft?:number;roadRearRight?:number;steer?:number;compression?:number;tyreDamage?:number;damagedWheel?:WheelCorner;bodyDamage?:number;cutaway?:number;exploded?:number;highlight?:'engine'|'underfloor'|'wheels';heat?:number;failureFrame?:number;braking?:number;impact?:number;gearChange?:number};
 type Rig={driver?:T.Group;systems?:T.Group;shell:T.Group;mounts:T.Group[];engine?:T.Group;floor?:T.Group;links:T.Group[];sparks:T.InstancedMesh;fragments:T.Group;body?:T.Mesh};
 const rigs=new WeakMap<T.Object3D,Rig>();
 function materials(root:T.Object3D,fn:(m:T.MeshStandardMaterial)=>void){root.traverse(o=>{if(o instanceof T.Mesh)for(const m of Array.isArray(o.material)?o.material:[o.material])if(m instanceof T.MeshStandardMaterial)fn(m);});}
@@ -77,7 +77,7 @@ export function animateCinematicVehicle(root:T.Group,state:CinematicState){
  const {distance=0,steer=0,compression=0,tyreDamage=0,bodyDamage=0,cutaway=0,exploded=0,highlight,heat=0}=state;
  animateVehicle(root,distance,steer);const rig=rigs.get(root);if(!rig)return;
  const {driver,systems,shell,mounts,engine,floor,links,sparks,fragments,body}=rig,s=vehicleSpec(root.userData.variant);
- shell.position.set(0,(s.bodyStyle==='rally'?.045:0)-Math.min(compression,floor?.05:.12)-tyreDamage*.025+exploded*.65,0);const dynamics=sampleDynamics(s,{speed:state.speed??0,distance,curvature:state.curvature??Math.tan(steer)/s.wheelbase,acceleration:state.acceleration??0,roughness:state.roughness??0});
+ shell.position.set(0,(s.bodyStyle==='rally'?.045:0)-Math.min(compression,floor?.05:.12)-tyreDamage*.025+exploded*.65,0);const dynamics=sampleDynamics(s,{speed:state.speed??0,distance,curvature:state.curvature??Math.tan(steer)/s.wheelbase,acceleration:state.acceleration??0,roughness:state.roughness??0,roadHeights:state.roadFrontLeft===undefined?undefined:[state.roadFrontLeft,state.roadFrontRight!,state.roadRearLeft!,state.roadRearRight!]});
  shell.position.y+=dynamics.heave; shell.rotation.set(dynamics.roll,0,dynamics.pitch-tyreDamage*.012);
  fade(shell,cutaway);if(body)deformBody(body,bodyDamage,s.width);
  let damagedOrigin=new T.Vector3();

@@ -6,7 +6,7 @@ import type {PartVariant} from '../parts-kit/catalog.ts';
 import {drivingState} from './driving.ts';
 import type {DrivingAction,CameraPreset} from './driving.ts';
 export type StudioShot={context?:'world'|'inspection';energyFlow?:'drive'|'regenerate';id:string;duration:number;camera:CameraPreset;action:DrivingAction;caption:string;orbit?:{azimuth:number;elevation:number;sweep?:number};joints?:Record<string,number>;jointTracks?:Record<string,{time:number;value:number}[]>;part?:PartVariant;assembly?:AssemblySpec;cutaway?:number;exploded?:number;highlight?:'engine'|'underfloor'|'wheels';annotation?:{anchor:'engine'|'front-wheel'|'driver'|'underfloor'|'part';text:string}};
-export type EpisodeRecipe={id:string;title:string;vehicle:{bodyDetail?:'legacy'|'coachbuilt';variant:VehicleVariant;driver?:boolean;color?:string;powertrain?:AssemblySpec;model?:ModelVariation;components?:ComponentSpec[]};world:{kind:EnvironmentKind;wetness?:number;timeOfDay?:'day'|'dusk'|'night';model?:ModelVariation;components?:ComponentSpec[]};shots:StudioShot[];words?:{text:string;start:number;end:number}[];captions?:{start:number;end:number;text:string}[];audio?:{narration?:string;music?:string;musicVolume?:number}};
+export type EpisodeRecipe={id:string;title:string;vehicle:{bodyDetail?:'legacy'|'coachbuilt';variant:VehicleVariant;driver?:boolean;color?:string;powertrain?:AssemblySpec;model?:ModelVariation;components?:ComponentSpec[]};world:{kind:EnvironmentKind;roughness?:number;wetness?:number;timeOfDay?:'day'|'dusk'|'night';model?:ModelVariation;components?:ComponentSpec[]};shots:StudioShot[];words?:{text:string;start:number;end:number}[];captions?:{start:number;end:number;text:string}[];audio?:{narration?:string;music?:string;musicVolume?:number}};
 export type CompiledRecipe=Omit<EpisodeRecipe,'shots'> & {fps:number;durationInFrames:number;shots:(StudioShot & {startFrame:number;endFrame:number;distanceOffset:number})[]};
 const fail=(message:string):never=>{throw new Error(message);};
 export function compileRecipe(input:EpisodeRecipe,fps=30):CompiledRecipe{
@@ -18,6 +18,7 @@ export function compileRecipe(input:EpisodeRecipe,fps=30):CompiledRecipe{
  if(r.vehicle.driver&&vehicle!.family==='bike')fail('Motorcycle driver is not supported');
  if(!ENVIRONMENTS.some(v=>v===r.world?.kind))fail('Unknown world');
  if(r.world.timeOfDay!==undefined&&!['day','dusk','night'].includes(r.world.timeOfDay))fail('Unknown time of day');
+ if(r.world.roughness!==undefined&&(!Number.isFinite(r.world.roughness)||r.world.roughness<0||r.world.roughness>1||r.world.roughness>0&&r.world.kind!=='rally'))fail('Roughness requires a rally world and 0..1');
  if(!Array.isArray(r.shots)||!r.shots.length)fail('At least one shot required');
  for(const model of [r.vehicle.model,r.world.model])if(model&&(model.version!==1||!model.id||!Array.isArray(model.edits)))fail('Invalid model variation');
  let cursor=0,distance=0;const ids=new Set<string>();

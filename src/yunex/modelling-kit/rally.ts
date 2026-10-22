@@ -6,6 +6,7 @@ import type {V3} from '../world-kit/geometry.ts';
 import {interiorLayout} from '../world-kit/interiors.ts';
 import {bodyHalfWidth} from '../world-kit/vehicle-body.ts';
 import {coachworkField} from './coachwork.ts';
+import {cutOpening} from '../world-kit/cavity.ts';
 import {coachbuiltField} from './coachbuilt.ts';
 export function rallyDetails(shell:T.Group,mounts:T.Group[],s:VehicleSpec,refined=true){
  if(s.bodyStyle!=='rally')return;
@@ -30,5 +31,25 @@ export function rallyDetails(shell:T.Group,mounts:T.Group[],s:VehicleSpec,refine
   const spokeShape=new T.Shape();spokeShape.moveTo(s.radius*.13,-.012);spokeShape.lineTo(s.radius*.70,-.009);spokeShape.lineTo(s.radius*.70,.009);spokeShape.lineTo(s.radius*.13,.012);spokeShape.closePath();const spokeGeo=new T.ExtrudeGeometry(spokeShape,{depth:.020,bevelEnabled:true,bevelSize:.002,bevelThickness:.002,bevelSegments:2});spokeGeo.translate(0,0,-.01);
   const wheelPaint=new T.MeshPhysicalMaterial({color:'#e7e9df',metalness:.35,roughness:.27,clearcoat:.6}),spokes=new T.InstancedMesh(spokeGeo,wheelPaint,24);spokes.name='rally-multi-spoke-wheel';const spokePose=new T.Object3D();for(let i=0;i<24;i++){const side=i<12?1:-1;spokePose.position.set(0,0,side*.116);spokePose.rotation.set(0,side<0?Math.PI:0,(i%12)/12*Math.PI*2);spokePose.updateMatrix();spokes.setMatrixAt(i,spokePose.matrix);}spokes.instanceMatrix.needsUpdate=true;roll.add(spokes);
   const treads=new T.InstancedMesh(new T.BoxGeometry(.035,.012,.072),carbon,48);treads.name='rally-tread';const dummy=new T.Object3D();for(let i=0;i<48;i++){const a=Math.floor(i/2)/24*Math.PI*2;dummy.position.set(Math.cos(a)*(s.radius-.005),Math.sin(a)*(s.radius-.005),i%2?.068:-.068);dummy.rotation.set(0,0,a-Math.PI/2);dummy.updateMatrix();treads.setMatrixAt(i,dummy.matrix);}treads.instanceMatrix.needsUpdate=true;roll.add(treads);}
+ // Recess the real bonnet surface; every blade is below a thin paint surround.
+ shell.updateMatrixWorld(true);
+ for(const side of [-1,1]){
+  const x=l.frontBase+.35,z=side*s.width*.19;
+  const hit=new T.Raycaster(new T.Vector3(x,3,z),new T.Vector3(0,-1,0)).intersectObject(source)[0];
+  if(hit){const y=hit.point.y;source.geometry=cutOpening(source.geometry,[x-.17,y-.035,z-.12],[x+.17,y+.08,z+.12]);
+   box(shell,carbon,[.36,.025,.26],[x,y-.035,z],.014,'rally-bonnet-vent-well');
+   for(let i=0;i<6;i++){const blade=box(shell,carbon,[.038,.012,.23],[x-.14+i*.056,y-.012,z],.003,'rally-bonnet-vent-blade');blade.rotation.z=-.24;}
+   for(const edge of [-1,1])box(shell,paint,[.38,.014,.015],[x,y+.004,z+edge*.135],.005,'rally-vent-surround');
+  }
+ }
+ // Formed aluminium sump protection turns up at the leading edge.
+ const plate=new T.Shape();plate.moveTo(-.55,0);plate.lineTo(.46,0);plate.lineTo(.62,.13);plate.lineTo(.60,.15);plate.lineTo(.44,.024);plate.lineTo(-.55,.024);plate.closePath();
+ const pg=new T.ExtrudeGeometry(plate,{depth:s.width*.56,bevelEnabled:true,bevelSize:.003,bevelThickness:.003,bevelSegments:2});pg.translate(0,0,-s.width*.28);
+ const aluminium=surface('#9aa8ae',.8,.43);mesh(shell,pg,aluminium,[s.wheelbase*.32,.13,0],[0,0,0],'rally-sump-guard');
+ for(const dx of [-.3,.3])for(const side of [-1,1])mesh(shell,new T.CylinderGeometry(.009,.009,.008,6),carbon,[s.wheelbase*.32+dx,.159,side*s.width*.23],[0,0,0],'sump-guard-fastener');
+ const points=[new T.Vector3(s.wheelbase*.30,.43,.15),new T.Vector3(s.wheelbase*.20,.25,.20),new T.Vector3(-s.wheelbase*.25,.25,.20),new T.Vector3(-s.length*.43,.27,.29),new T.Vector3(-s.length*.49,.27,.29)];
+ const pipe=mesh(shell,new T.TubeGeometry(new T.CatmullRomCurve3(points),64,.028,12,false),aluminium,[0,0,0],[0,0,0],'rally-exhaust-route');pipe.userData.endpoint=points.at(-1)!.toArray();
+ const tip=mesh(shell,new T.CylinderGeometry(.045,.038,.14,32,1,true),aluminium,points.at(-1)!.toArray(),[0,0,Math.PI/2],'rally-exhaust-tip');tip.userData.direction=[-1,0,0];
+ box(shell,carbon,[.30,.10,.20],[-s.length*.36,.28,.29],.035,'rally-rear-silencer');
  shell.userData.rally=true;
 }

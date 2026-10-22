@@ -18,3 +18,10 @@ test('onboard central and upper sightlines clear opaque roof and halo geometry',
 });
 
 test('cabin cutaway removes opaque headliner and restores it after reverse seeks',()=>{const g=createCinematicVehicle({variant:'supercar',driver:true}),liner=g.getObjectByName('roof-liner');assert.ok(liner);animateCinematicVehicle(g,{frame:400,fps:30,cutaway:.92});assert.equal(liner.visible,false);assert.equal(g.getObjectByName('head').visible,true);animateCinematicVehicle(g,{frame:20,fps:30,cutaway:0});assert.equal(liner.visible,true);animateCinematicVehicle(g,{frame:400,fps:30,cutaway:.92});assert.equal(liner.visible,false);disposeObject(g);});
+test('cabin inspection frames the complete driver and controls inside portrait safe margins',async()=>{
+ const {cabinInspectionCamera}=await import('../../src/yunex/modelling-kit/studio-camera.ts');assert.equal(typeof cabinInspectionCamera,'function');
+ const g=createCinematicVehicle({variant:'rally-hatch',driver:true});animateCinematicVehicle(g,{frame:60,fps:30,speed:12,curvature:.03});
+ const view=cabinInspectionCamera(g,9/16),camera=new T.PerspectiveCamera(view.fov,9/16,.025,500);camera.position.fromArray(view.position);camera.lookAt(...view.target);camera.updateMatrixWorld(true);
+ const b=new T.Box3().setFromObject(g.getObjectByName('driver-rig'));for(const x of [b.min.x,b.max.x])for(const y of [b.min.y,b.max.y])for(const z of [b.min.z,b.max.z]){const p=new T.Vector3(x,y,z).project(camera);assert.ok(Math.abs(p.x)<.87&&Math.abs(p.y)<.87);}
+ disposeObject(g);
+});
