@@ -1,7 +1,7 @@
 import React from 'react';
 import {AbsoluteFill} from 'remotion';
 import type {CameraPose,StoryRequest,VehicleMotionState} from '../../../../shared/contract.ts';
-import {SCREEN,aeroPin,contactPin,ease,materialPins} from 'core.ts';
+import {SCREEN,aeroPin,contactPin,ease,materialPins} from './core.ts';
 export type QualityScienceProps=Readonly<{
  request:StoryRequest;cameraPose:CameraPose;unloadedMotion?:VehicleMotionState;
  /** If true, editor has not yet validated original word timing. Graphics remain semantic only. */
