@@ -3,7 +3,7 @@ export const STUDIO_RECIPES:Record<string,EpisodeRecipe>={
  braking:{id:'braking',title:'Where speed becomes heat',vehicle:{variant:'hot-hatch',driver:true},world:{kind:'highway'},shots:[
  {id:'approach',duration:3,camera:'tracking',action:'cruise',caption:'Speed carries energy.'},
  {id:'pedal',duration:3,camera:'interior',action:'braking',caption:'The driver applies the brake.'},
- {id:'disc',duration:3,camera:'wheel',action:'braking',caption:'Friction slows the rotating disc.',highlight:'wheels'},
+ {id:'disc',duration:3,camera:'wheel',action:'braking',caption:'Friction slows the rotating disc.'},
  {id:'mechanism',duration:3,camera:'reveal',action:'braking',part:'brake-drilled',annotation:{anchor:'part',text:'Caliper and disc'},caption:'The caliper clamps the pads.'},
  {id:'systems',duration:3,camera:'tracking',action:'braking',cutaway:.94,caption:'Braking loads the front suspension.'},
  {id:'finish',duration:3,camera:'reveal',action:'acceleration',caption:'Controlled braking keeps the car balanced.'}]},

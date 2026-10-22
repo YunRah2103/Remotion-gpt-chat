@@ -15,6 +15,10 @@ class ScriptSelection(unittest.TestCase):
    self.assertEqual(len(module.plan(base,candidate,['package.json'])['targets']),2)
    self.assertEqual(len(module.plan(base,candidate,['package-lock.json'])['targets']),2)
 
+   package['dependencies']['remotion']='4.0.533'
+   package['scripts']['postinstall']='node regenerate-assets.mjs'
+   (candidate/'package.json').write_text(json.dumps(package))
+   self.assertEqual(len(module.plan(base,candidate,['package.json'])['targets']),2)
    for malformed in ['[]','null','{invalid']:
     (candidate/'package.json').write_text(malformed)
     self.assertEqual(len(module.plan(base,candidate,['package.json'])['targets']),2)

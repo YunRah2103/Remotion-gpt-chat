@@ -12,6 +12,7 @@ import {animatePart} from '../parts-kit/motion.ts';
 import {createCinematicVehicle,animateCinematicVehicle} from './rig.ts';
 import {createCinematicEnvironment} from './environments.ts';
 import {CinematicLighting} from './Lighting';
+import {partInspectionCamera,driverPovCamera} from './studio-camera.ts';
 import {drivingCamera} from './driving.ts';
 import {compileRecipe,sampleRecipe} from './recipe.ts';
 import type {EpisodeRecipe} from './recipe.ts';
@@ -37,13 +38,13 @@ export const StudioEpisode:React.FC<{recipe:EpisodeRecipe}>=({recipe})=>{
  if(shot.part){
   animatePart(model,{shaftAngle:frame/fps*8,explode:shot.exploded??0,heat:state.heat});
   model.position.set(0,.8,0);model.updateMatrixWorld(true);
-  const bounds=new T.Box3().setFromObject(model),center=bounds.getCenter(new T.Vector3()),size=bounds.getSize(new T.Vector3());
-  const radius=Math.max(size.x,size.y,size.z,.3),distance=radius/(2*Math.tan(36*Math.PI/360))*Math.max(1,height/width)*1.4;
-  camera={position:[center.x+distance*.7,center.y+distance*.4,center.z+distance],target:center.toArray(),fov:36};
+  camera=partInspectionCamera(model,width/height);
  }else{
   const ahead=parked?pose:sampleRoute(recipe.world.kind,distance+.4),delta=Math.atan2(Math.sin(ahead.yaw-pose.yaw),Math.cos(ahead.yaw-pose.yaw));
   animateCinematicVehicle(model,{...state,distance:parked?0:state.distance,steer:parked?state.steer:T.MathUtils.clamp(-delta/.4*s.wheelbase,-.4,.4)});
-  model.position.fromArray(pose.position);model.rotation.y=pose.yaw;
+  model.position.fromArray(pose.position);model.rotation.y=pose.yaw;model.updateMatrixWorld(true);
+  const head=model.getObjectByName('head');if(head)head.visible=shot.camera!=='onboard';
+  if(shot.camera==='onboard')camera=driverPovCamera(model);
  }
  animateWeather(weather,{frame,fps,speed:state.speed,focus:pose.position});
  const wet=recipe.world.wetness??0;
@@ -59,8 +60,8 @@ export const StudioEpisode:React.FC<{recipe:EpisodeRecipe}>=({recipe})=>{
  }
 
  return <AbsoluteFill style={{background:'#14232d'}}><ThreeCanvas width={width} height={height} shadows camera={{fov:camera.fov,near:.025,far:500}} gl={{antialias:true}}>
- <CinematicLighting focus={shot.part?[0,.8,0]:pose.position} timeOfDay={recipe.world.timeOfDay??'day'}/><primitive object={world}/><primitive object={model}/><CameraAim {...camera}/>{wet>.4?<primitive object={weather}/>:null}
- </ThreeCanvas>{marker&&annotation?<svg width={width} height={height} style={{position:'absolute',inset:0,pointerEvents:'none'}}><circle cx={marker.x} cy={marker.y} r={7} fill="#3ee4ce"/><line x1={marker.x} y1={marker.y} x2={width*.15} y2={height*.27} stroke="#3ee4ce" strokeWidth={3}/><rect x={width*.08} y={height*.20} width={width*.62} height={height*.06} rx={8} fill="#10232d"/><text x={width*.11} y={height*.24} fill="white" fontFamily="Arial" fontSize={width*.032}>{annotation.text}</text></svg>:null}<div style={{position:'absolute',top:'6%',left:'6%',right:'6%',color:'#dce9ed',fontFamily:'Arial',fontSize:width*.025,letterSpacing:2}}>YUNEX / {recipe.title.toUpperCase()}</div>
+ <CinematicLighting focus={shot.part?[0,.8,0]:pose.position} timeOfDay={recipe.world.timeOfDay??'day'}/><primitive object={world}/><primitive object={model}/><CameraAim {...camera}/>{recipe.world.timeOfDay==='night'&&['interior','onboard','wheel'].includes(shot.camera)?<pointLight position={camera.position} intensity={6} distance={5} decay={2} color="#d9e7f2"/>:null}{wet>.4?<primitive object={weather}/>:null}
+ </ThreeCanvas>{marker&&annotation?<svg width={width} height={height} style={{position:'absolute',inset:0,pointerEvents:'none'}}><circle cx={marker.x} cy={marker.y} r={7} fill="#3ee4ce"/><line x1={marker.x} y1={marker.y} x2={width*.15} y2={height*.27} stroke="#3ee4ce" strokeWidth={3}/><rect x={width*.08} y={height*.20} width={width*.62} height={height*.06} rx={8} fill="#10232d"/><text x={width*.11} y={height*.24} fill="white" fontFamily="Arial" fontSize={width*.032}>{annotation.text}</text></svg>:null}<div style={{position:'absolute',top:'6%',left:'6%',right:'6%',padding:'14px 20px',background:'rgba(7,17,23,.78)',borderRadius:4,color:'#dce9ed',fontFamily:'Arial',fontSize:width*.025,letterSpacing:2}}>YUNEX / {recipe.title.toUpperCase()}</div>
  {sample.caption?<div style={{position:'absolute',bottom:'12%',left:'7%',right:'7%',padding:'20px 24px',borderLeft:'4px solid #28c7ba',background:'rgba(7,17,23,.83)',color:'#f0f7f6',fontFamily:'Arial',fontSize:width*(height>width?.043:.025),lineHeight:1.22,fontWeight:700}}>{sample.caption}</div>:null}
  {recipe.audio?.narration?<Audio src={staticFile(recipe.audio.narration)}/>:null}{recipe.audio?.music?<Audio src={staticFile(recipe.audio.music)} volume={recipe.audio.musicVolume??.15}/>:null}
  </AbsoluteFill>;
