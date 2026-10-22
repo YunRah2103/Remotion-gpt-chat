@@ -60,8 +60,8 @@ type FlameObjects={socket:T.Object3D;root:T.Group;envelopes:T.Mesh[];cores:T.Mes
 export type AfterfireRig={vehicle:T.Object3D;elements:FlameObjects[];provisional:boolean;radii:PortRadii};
 const RINGS=25,SIDES=14;
 const burnerColors={
- outer:[new T.Color('#f4a552'),new T.Color('#f06c23'),new T.Color('#b9391a'),new T.Color('#3b3537')],
- core:[new T.Color('#ffe2a8'),new T.Color('#f5ac55'),new T.Color('#ef641f'),new T.Color('#a73a22')]
+ outer:[new T.Color('#b99cfa'),new T.Color('#ffc979'),new T.Color('#fa6e2a'),new T.Color('#5c201a')],
+ core:[new T.Color('#c9d9ff'),new T.Color('#fff0b3'),new T.Color('#ffc163'),new T.Color('#f05b29')]
 };
 const layerMaterial=()=>new T.ShaderMaterial({
  uniforms:{opacity:{value:0}},
@@ -71,7 +71,7 @@ const layerMaterial=()=>new T.ShaderMaterial({
  void main(){vColor=color;vAlpha=aAlpha;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
  fragmentShader:`uniform float opacity;
  varying vec3 vColor;varying float vAlpha;
- void main(){float a=clamp(vAlpha*opacity,0.0,0.65);if(a<0.006)discard;
+ void main(){float a=clamp(vAlpha*opacity,0.0,0.75);if(a<0.008)discard;
  gl_FragColor=vec4(vColor,a);}`,
  transparent:true,depthWrite:false,depthTest:true,side:T.DoubleSide,
  blending:T.NormalBlending
@@ -96,28 +96,31 @@ function shapeLayer(mesh:T.Mesh,port:ExhaustPort,burst:AfterfireSample['ports'][
  const g=mesh.geometry,positions=g.getAttribute('position') as T.BufferAttribute,colors=g.getAttribute('color') as T.BufferAttribute,alphas=g.getAttribute('aAlpha') as T.BufferAttribute;
  const kind=mesh.userData.flameKind as 'outer'|'core',idx=mesh.userData.layerIndex as number,t=frame/fps;
  const core=kind==='core',seed=idx*2.27+side*.83;
- const len=burst.length*(core?.70:.92+idx*.068);
- const baseR=port.radius*(core?.37:.60+idx*.11);
+ const len=burst.length*(core?.63+idx*.12:.74+idx*.15);
+ const baseR=port.radius*(core?.27+idx*.12:.47+idx*.11);
  for(let i=0;i<=RINGS;i++){
   const u=i/RINGS,fade=Math.pow(1-u,core?1.3:.80);
-  const tongueWave=Math.sin(u*13-t*37+seed)*.075+Math.sin(u*24+t*26+seed*1.9)*.045+Math.sin(u*39-t*19+seed)*.018;
-  const x=.009+len*(u+u*u*tongueWave);
-  const sideways=u*u*(core?.009:.043)*Math.sin(t*19+seed+u*7);
-  const vertical=u*u*(core?.006:.036)*Math.cos(t*15+seed*1.8+u*11);
-  const swell=(.80+.67*Math.sin(Math.PI*u))*fade;
+  const tongueWave=Math.sin(u*12-t*27+seed)*.087+Math.sin(u*26+t*33+seed*1.9)*.057+Math.sin(u*41-t*21+seed)*.029;
+  const x=.013+len*(u+u*u*tongueWave);
+  // Each plume is a separate wandering ribbon with a shared metal nozzle base.
+  const fan=seed+idx*1.618;
+  const sideways=u*u*(core?.024:.104)*Math.sin(t*16+fan+u*9)+u*idx*.009*Math.cos(fan);
+  const vertical=u*u*(core?.020:.091)*Math.cos(t*14+fan*1.8+u*8)+u*idx*.008*Math.sin(fan);
+  const swell=(.80+.88*Math.sin(Math.PI*u))*fade;
   const taper=baseR*Math.max(.002,swell);
   const ink=palette(u,kind);
   for(let j=0;j<=SIDES;j++){
    const v=j/SIDES,theta=2*Math.PI*v+u*(1.15+idx*.20)+t*(core?8.1:11.6);
-   const rough=1+.16*Math.sin(theta*3+u*15-t*23+seed)+.09*Math.sin(theta*7-u*32+t*29+seed*2);
+   const rough=1+.21*Math.sin(theta*3+u*17-t*24+seed)+.115*Math.sin(theta*7-u*38+t*31+seed*2)+.06*Math.cos(theta*11+u*55-t*41);
    const r=taper*Math.max(.50,rough);
    const k=i*(SIDES+1)+j;
    positions.setXYZ(k,x,sideways+Math.cos(theta)*r,vertical+Math.sin(theta)*r*(core?.9:1.2));
    const c=ink.clone().multiplyScalar(1-.10*u);
    colors.setXYZ(k,c.r,c.g,c.b);
-   const entry=Math.min(1,u*15),falloff=Math.pow(1-u,core?1.9:1.45);
-   const edge=.64+.22*Math.cos(theta*3+u*6+t*9);
-   alphas.setX(k,entry*falloff*edge*(core?.95:.71));
+   const entry=Math.min(1,u*18),falloff=Math.pow(1-u,core?1.7:1.25);
+   const ragged=.48+.38*Math.cos(theta*3+u*9+t*12+seed)+.13*Math.sin(theta*9-u*28+t*19);
+   const flicker=.82+.18*Math.sin(t*51-u*19+seed);
+   alphas.setX(k,entry*falloff*Math.max(.06,ragged)*flicker*(core?.93:.72));
   }
  }
  positions.needsUpdate=true;colors.needsUpdate=true;alphas.needsUpdate=true;
@@ -136,7 +139,7 @@ export function createAfterfireRig(vehicle:T.Object3D,{requireAuthoritative=true
   const envelopes=Array.from({length:4},(_,i)=>{const m=newFlameLayer('outer',i);root.add(m);return m;});
   const cores=Array.from({length:2},(_,i)=>{const m=newFlameLayer('core',i);root.add(m);return m;});
   // Restrained warm bounce onto actual metal bodywork. Never a floating yellow disc.
-  const light=new T.PointLight('#fa6427',0,1.7,2);light.position.set(.05,.035,0);root.add(light);
+  const light=new T.PointLight('#ff8e47',0,1.65,2);light.position.set(.08,.03,0);root.add(light);
   root.visible=false;
   return {socket,root,envelopes,cores,light};
  });
@@ -150,7 +153,7 @@ export function animateAfterfireRig(rig:AfterfireRig,sample:AfterfireSample):voi
   const e=rig.elements[i],p=sample.ports.find(v=>v.name===names[i]);
   if(!p||p.name!==ports[i].name)throw Error('Mount identity mismatch');
   const a=p.intensity;e.root.visible=a>.012;
-  e.light.intensity=a*.72;e.light.distance=.68+a*.72;
+  e.light.intensity=a*2.1;e.light.distance=.7+a*.88;
   if(!e.root.visible)continue;
   for(const layer of [...e.envelopes,...e.cores])shapeLayer(layer,ports[i],p,sample.frame,sample.fps,i);
  }
