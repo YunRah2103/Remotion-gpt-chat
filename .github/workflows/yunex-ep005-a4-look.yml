@@ -66,6 +66,20 @@ jobs:
               print(name,report[name])
           (target/'media-proof.json').write_text(json.dumps(report,indent=2))
           PY
+      - name: Make true-source visual contact sheets (premium and baseline)
+        run: |
+          ffmpeg -y -v error -i out/studio/ep005-a4-environment.mp4 -vf "select='eq(n,0)+eq(n,23)+eq(n,29)+eq(n,89)+eq(n,149)+eq(n,179)',scale=160:284:flags=lanczos,tile=3x2:padding=2:margin=2" -vsync vfr -frames:v 1 -q:v 8 out/ep005-a4/premium-contact.jpg
+          ffmpeg -y -v error -i out/ep005-a4/baseline.mp4 -vf "select='eq(n,0)+eq(n,23)+eq(n,29)',scale=160:284:flags=lanczos,tile=3x1:padding=2:margin=2" -vsync vfr -frames:v 1 -q:v 8 out/ep005-a4/baseline-contact.jpg
+          test -s out/ep005-a4/premium-contact.jpg
+          test -s out/ep005-a4/baseline-contact.jpg
+          echo YUNEX_A4_PREMIUM_CONTACT_JPEG_BEGIN
+          base64 -w0 out/ep005-a4/premium-contact.jpg
+          echo
+          echo YUNEX_A4_PREMIUM_CONTACT_JPEG_END
+          echo YUNEX_A4_BASELINE_CONTACT_JPEG_BEGIN
+          base64 -w0 out/ep005-a4/baseline-contact.jpg
+          echo
+          echo YUNEX_A4_BASELINE_CONTACT_JPEG_END
       - name: Bundle edited source and native MP4 artifacts
         if: always()
         uses: actions/upload-artifact@v4

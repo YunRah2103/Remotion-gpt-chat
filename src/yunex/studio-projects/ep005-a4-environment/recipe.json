@@ -1,14 +1,14 @@
 {
   "id": "ep005-a4-environment",
-  "title": "YUNEX EP005 / Dusk Circuit Environment Study",
+  "title": "YUNEX EP005 / Premium Midnight Circuit",
   "vehicle": {
     "variant": "supercar",
     "driver": true,
-    "color": "#114655"
+    "color": "#a62935"
   },
   "world": {
     "kind": "track",
-    "timeOfDay": "dusk",
+    "timeOfDay": "night",
     "wetness": 0.1
   },
   "shots": [
@@ -17,21 +17,21 @@
       "duration": 2,
       "camera": "chase",
       "action": "cruise",
-      "caption": "Moving supercar / genuine track tangent"
+      "caption": "Night circuit / actual moving supercar"
     },
     {
       "id": "circuit-lighting",
       "duration": 2,
       "camera": "tracking",
       "action": "cruise",
-      "caption": "Real wheel spin / dusk highlights"
+      "caption": "Subtle asphalt reflections / real tyre contact"
     },
     {
       "id": "paddock-payoff",
       "duration": 2,
       "camera": "chase",
       "action": "cruise",
-      "caption": "Continuous route / architectural trackside payoff"
+      "caption": "Trackside lights / continuous V3 driving"
     }
   ]
 }

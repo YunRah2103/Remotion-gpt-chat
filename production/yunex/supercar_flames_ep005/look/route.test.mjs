@@ -15,7 +15,7 @@ test("A3/A4 canonical V3 closed-loop track has continuous position/yaw and absol
  }
  const a=sampleEP005Route(len-.01),b=sampleEP005Route(len+.01);
  assert.ok(new T.Vector3(...a.position).distanceTo(new T.Vector3(...b.position))<.1,"lap seam motion continuous");
- assert.equal(previewDistance(0),18);assert.equal(previewDistance(180),90);
+ assert.equal(previewDistance(0),55);assert.equal(previewDistance(180),127);
  assert.throws(()=>sampleEP005Route(Infinity),/finite/);
 });
 test("Night circuit uses existing V3 track and off-road instanced fixtures",()=>{
@@ -24,6 +24,10 @@ test("Night circuit uses existing V3 track and off-road instanced fixtures",()=>
   const road=b.getObjectByName("circuit-asphalt"),roadAfter=p.getObjectByName("circuit-asphalt");
   assert.ok(road&&roadAfter,"V3 track road remains present");
   assert.equal(road.geometry.attributes.position.count,roadAfter.geometry.attributes.position.count);
+  assert.ok(roadAfter.material.map && roadAfter.material.roughnessMap && roadAfter.material.bumpMap,"PBR asphalt maps must exist");
+  assert.ok(roadAfter.geometry.getAttribute("uv"),"road world-projective UVs must exist");
+  assert.ok(roadAfter.material.roughness>.75,"no wet mirror tarmac");
+  assert.equal(roadAfter.userData.ep005Asphalt.preservesRoute,true);
   for(const id of ["ep005-premium-environment","ep005-track-lamp-masts","ep005-paddock-canopy-roofs","ep005-barrier-retroreflectors"])
    assert.ok(p.getObjectByName(id),id);
   assert.equal(p.userData.ep005.route.kind,"track");

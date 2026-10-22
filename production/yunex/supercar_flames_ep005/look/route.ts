@@ -2,7 +2,7 @@ import {sampleRoute,routeLength} from "../../../../src/yunex/world-kit/environme
 import type {RoutePose} from "../../../../src/yunex/world-kit/environments.ts";
 export const EP005_ROUTE = Object.freeze({
  kind:"track" as const,seed:12,timeOfDay:"dusk" as const,wetness:.10,roadY:0,
- lapMetres:routeLength("track"),startDistance:18,previewSpeedMps:12,
+ lapMetres:routeLength("track"),startDistance:55,previewSpeedMps:12,
  roadHalfWidth:6,curbOffset:6.4,existingBarrierOffset:11.7,
  cameraClearanceNormalOffset:12,tallFixtureMinNormalOffset:19.2,
  canonicalSampler:"src/yunex/world-kit/environments.ts::sampleRoute('track',d)" as const
