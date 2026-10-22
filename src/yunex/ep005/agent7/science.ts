@@ -12,11 +12,11 @@ export interface ScienceAssembly {
   root:T.Group; crank:T.Group; pistons:MovingPiston[];
   gas:GasMark[]; flameRoot:T.Group; flame:T.Mesh[]; ignitions:T.Mesh[];
 }
-const aluminium=new T.MeshPhysicalMaterial({color:'#a0a9b3',metalness:.83,roughness:.23,clearcoat:.24});
-const machined=new T.MeshStandardMaterial({color:'#535e68',metalness:.92,roughness:.27});
-const steel=new T.MeshStandardMaterial({color:'#88949f',metalness:.89,roughness:.24});
-const titanium=new T.MeshStandardMaterial({color:'#9c7b67',metalness:.78,roughness:.29});
-const shadow=new T.MeshStandardMaterial({color:'#202c36',metalness:.7,roughness:.32});
+const aluminium=new T.MeshPhysicalMaterial({color:'#a0a9b3',metalness:.51,roughness:.27,clearcoat:.24});
+const machined=new T.MeshStandardMaterial({color:'#535e68',metalness:.56,roughness:.28});
+const steel=new T.MeshStandardMaterial({color:'#88949f',metalness:.52,roughness:.27});
+const titanium=new T.MeshStandardMaterial({color:'#9c7b67',metalness:.60,roughness:.26});
+const shadow=new T.MeshStandardMaterial({color:'#202c36',metalness:.41,roughness:.34});
 const combustion=new T.MeshBasicMaterial({color:'#ffb448',transparent:true,opacity:.7,depthWrite:false,blending:T.AdditiveBlending});
 const gasMaterial=new T.MeshBasicMaterial({color:'#ffb26c',transparent:true,opacity:.83,depthWrite:false});
 function cylinder(parent:T.Object3D,name:string,r:number,h:number,mat:T.Material,p:T.Vector3,segments=32):T.Mesh{
@@ -148,6 +148,10 @@ export function buildScienceEngine():ScienceAssembly {
  */
 export function animateScienceEngine(a:ScienceAssembly,t:number,phase:0|1|2):void {
   a.crank.rotation.set(t*11,0,0);
+  a.root.traverse(o=>{
+    if(o.name==='continuous valve cover'||o.name==='cast alloy intake plenum')
+      o.visible=phase!==0;
+  });
   for(const item of a.pistons){
     const s=Math.sin(t*11+item.phase);
     item.head.position.y=.27+.086*s;
