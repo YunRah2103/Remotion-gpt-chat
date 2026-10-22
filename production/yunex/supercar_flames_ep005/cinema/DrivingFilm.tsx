@@ -37,11 +37,21 @@ export const EP005DrivingFilm:React.FC<{integration?:CinemaIntegration}>=({integ
  useEffect(()=>()=>{disposeObject(hero);disposeObject(world);},[hero,world]);
  if(flames&&!flames.parent)hero.add(flames);
  const cutaway=shot.id==='mechanism'?.72:shot.id==='engine-reveal'?.30:0;
+ // V3 wheel rolls are distance/radius, so they remain mechanically consistent
+ // through each camera cut and when seeking the timeline in arbitrary order.
  animateCinematicVehicle(hero,{
   frame:sample.frame,fps,distance:sample.distanceMeters,steer:sample.steerRadians,
-  cutaway,highlight:cutaway?'engine':undefined,compression:.008,
+  cutaway,highlight:cutaway?'engine':undefined,
+  compression:sample.suspensionCompression,braking:afterfireDemand*.12,
   heat:afterfireDemand*.25,gearChange:sample.gearChange
  });
+ // Small sprung-body pitch/roll follow longitudinal/lateral acceleration.
+ // Move only the body-shell, NEVER the wheel-rolls or their grounded contacts.
+ const body=hero.getObjectByName('body-shell');
+ if(body){
+  body.rotation.x=sample.bodyRoll;
+  body.rotation.z=sample.bodyPitch;
+ }
  hero.position.fromArray(pose.position);
  hero.rotation.y=pose.yaw;
  hero.updateMatrixWorld(true);
@@ -49,7 +59,7 @@ export const EP005DrivingFilm:React.FC<{integration?:CinemaIntegration}>=({integ
  // Exhaust socket positions are resolved AFTER the real V3 animated body is placed.
  updateAfterfire?.(sample);
  return <AbsoluteFill style={{background:'#111c25'}}>
-  <AbsoluteFill style={{filter:'brightness(.9) contrast(1.10) saturate(1.12)'}}>
+  <AbsoluteFill style={{filter:'brightness(.98) contrast(1.08) saturate(1.10)'}}>
    <ThreeCanvas width={width} height={height} shadows camera={{fov:sample.camera.fov,near:.025,far:600}} gl={{antialias:true}}>
     <CinematicLighting focus={pose.position} timeOfDay={integration?.practicalLight?'night':'dusk'}/>
     {integration?.practicalLight?.(sample)}
