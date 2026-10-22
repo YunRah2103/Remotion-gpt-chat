@@ -24,5 +24,13 @@ test('enumerate genuine EP004 metal-road spark contact sources for cinematic pay
  }
  observations.sort((a,b)=>b.meanParticles-a.meanParticles);
  console.log('A13_A2_CONTACT_SOURCE_CANDIDATES='+JSON.stringify(observations));
+ const finishSec=.145+((757-580)/30)*.43;
+ const finishMotion=sampleDynamics(finishSec,{startDistanceM:-92.8,speedMps:62,aeroLoad01:1});
+ const finish=sampleContactDrivenSparks(finishSec,finishMotion,skids);
+ const visibleFinish=finish.particles.filter(p=>p.ageSec>=0&&p.ageSec<p.lifetimeSec&&p.luminance01>.13).length;
+ console.log('A13_REAL_RACING_PAYOFF_FINISH='+JSON.stringify({finishSec,routeDistanceM:finishMotion.routeDistanceM,
+  contacts:finish.contacts.filter(c=>c.active).length,visibleFinish}));
+ assert.ok(finishMotion.routeDistanceM>71&&finishMotion.routeDistanceM<75,'payoff ends on real 72m contact crest');
+ assert.ok(visibleFinish>=6,'racing payoff MUST visibly end on real physics-born sparks, not empty asphalt');
  assert.ok(observations.some(o=>o.peak>=6),'An authentic A2 spark event must exist in physics');
 });
