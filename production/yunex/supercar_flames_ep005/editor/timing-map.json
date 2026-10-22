@@ -1,0 +1,122 @@
+{
+  "schema": 2,
+  "status": "REVERSIBLE-SILENT-PICTURE-CONTRACT-NOT-APPROVAL",
+  "fps": 30,
+  "source": {
+    "agent": 5,
+    "head": "0f9cc1622476035b6ceb022393544a028d26b7ca",
+    "frames": 780,
+    "seconds": 26,
+    "rangeConvention": "[start,end)"
+  },
+  "target": {
+    "authority": "Agent 3 shot boundaries, manager #247",
+    "frames": 750,
+    "seconds": 25,
+    "sourceHead": "cf5140b1c1fef3f516ba3b19b31feeadaa1ce0ab",
+    "rangeConvention": "[start,end)",
+    "route": "track"
+  },
+  "beats": [
+    {
+      "editorBeat": "flame-hook",
+      "agent3Shot": "hook",
+      "from": [
+        0,
+        36
+      ],
+      "to": [
+        0,
+        45
+      ],
+      "narrative": "car visible + both tailpipes, 3D flame 0–29 only when approved"
+    },
+    {
+      "editorBeat": "moving-reveal",
+      "agent3Shot": "launch",
+      "from": [
+        36,
+        165
+      ],
+      "to": [
+        45,
+        165
+      ],
+      "narrative": "continuous moving hero, no fire claim"
+    },
+    {
+      "editorBeat": "engine-reveal",
+      "agent3Shot": "engine-reveal",
+      "from": [
+        165,
+        321
+      ],
+      "to": [
+        165,
+        285
+      ],
+      "narrative": "engine internals/cutaway, no false combustions"
+    },
+    {
+      "editorBeat": "fuel-path",
+      "agent3Shot": "mechanism",
+      "from": [
+        321,
+        480
+      ],
+      "to": [
+        285,
+        420
+      ],
+      "narrative": "fuel into exhaust is illustrative conditional mechanics"
+    },
+    {
+      "editorBeat": "afterfire-exit",
+      "agent3Shot": "exhaust",
+      "from": [
+        480,
+        630
+      ],
+      "to": [
+        420,
+        555
+      ],
+      "narrative": "physical tailpipe ignition, attach to named exhaust mounts"
+    },
+    {
+      "editorBeat": "driving-payoff",
+      "agent3Shot": "payoff",
+      "from": [
+        630,
+        780
+      ],
+      "to": [
+        555,
+        750
+      ],
+      "narrative": "car genuinely driving to ending, brief afterfire only if conditions met"
+    }
+  ],
+  "afterfireDemand": [
+    [
+      0,
+      30
+    ],
+    [
+      430,
+      490
+    ],
+    [
+      674,
+      710
+    ]
+  ],
+  "captionLane": {
+    "leftPercent": 8,
+    "rightPercent": 8,
+    "topPercent": 82,
+    "bottomPercent": 94,
+    "policy": "reserved for one verified original narration subtitle lane; editorial cards not allowed there"
+  },
+  "approvalRule": "Do not import any of the four visual PR heads just because they have a render. Each visual agent source must be explicitly approved by Agent 0, hash pinned and decoded/visually reviewed. Native preview from stock V3 remains a blockout and never proves integrated film."
+}

@@ -1,0 +1,74 @@
+{
+  "id": "ep005-a5-editor",
+  "title": "EP005 EDITOR BLOCKOUT - NOT FINAL",
+  "vehicle": {
+    "variant": "supercar",
+    "driver": true,
+    "color": "#1c3439"
+  },
+  "world": {
+    "kind": "track",
+    "timeOfDay": "dusk",
+    "wetness": 0.1
+  },
+  "shots": [
+    {
+      "id": "flame-hook",
+      "duration": 1.5,
+      "camera": "chase",
+      "action": "acceleration",
+      "caption": ""
+    },
+    {
+      "id": "moving-reveal",
+      "duration": 4,
+      "camera": "tracking",
+      "action": "acceleration",
+      "caption": ""
+    },
+    {
+      "id": "engine-reveal",
+      "duration": 4,
+      "camera": "reveal",
+      "action": "cruise",
+      "cutaway": 0.94,
+      "highlight": "engine",
+      "annotation": {
+        "anchor": "engine",
+        "text": "Engine"
+      },
+      "caption": ""
+    },
+    {
+      "id": "fuel-path",
+      "duration": 4.5,
+      "camera": "overhead",
+      "action": "cruise",
+      "part": "v8",
+      "annotation": {
+        "anchor": "part",
+        "text": "V8 engine"
+      },
+      "orbit": {
+        "azimuth": 0.7,
+        "elevation": 0.32,
+        "sweep": 0.4
+      },
+      "caption": ""
+    },
+    {
+      "id": "afterfire-exit",
+      "duration": 4.5,
+      "camera": "chase",
+      "action": "acceleration",
+      "caption": ""
+    },
+    {
+      "id": "driving-payoff",
+      "duration": 6.5,
+      "camera": "chase",
+      "action": "acceleration",
+      "caption": ""
+    }
+  ]
+}
