@@ -1,15 +1,15 @@
 {
   "id": "ep005-a4-environment",
-  "title": "Midnight Boulevard / Supercar Flames Lighting Study",
+  "title": "YUNEX EP005 / Dusk Circuit Environment Study",
   "vehicle": {
     "variant": "supercar",
     "driver": true,
-    "color": "#123e4b"
+    "color": "#114655"
   },
   "world": {
-    "kind": "city",
-    "timeOfDay": "night",
-    "wetness": 0.16
+    "kind": "track",
+    "timeOfDay": "dusk",
+    "wetness": 0.1
   },
   "shots": [
     {
@@ -17,21 +17,21 @@
       "duration": 2,
       "camera": "chase",
       "action": "cruise",
-      "caption": "Night boulevard / moving rear three-quarter"
+      "caption": "Moving supercar / genuine track tangent"
     },
     {
-      "id": "wet-asphalt-reflection",
+      "id": "circuit-lighting",
       "duration": 2,
       "camera": "tracking",
       "action": "cruise",
-      "caption": "Real tyre contact / premium streetlight pools"
+      "caption": "Real wheel spin / dusk highlights"
     },
     {
-      "id": "tunnel-threshold",
+      "id": "paddock-payoff",
       "duration": 2,
       "camera": "chase",
       "action": "cruise",
-      "caption": "Architectural tunnel approach / restrained atmosphere"
+      "caption": "Continuous route / architectural trackside payoff"
     }
   ]
 }

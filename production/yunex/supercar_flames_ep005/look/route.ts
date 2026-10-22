@@ -1,36 +1,28 @@
-import {sampleRoute} from "../../../../src/yunex/world-kit/environments.ts";
+import {sampleRoute,routeLength} from "../../../../src/yunex/world-kit/environments.ts";
 import type {RoutePose} from "../../../../src/yunex/world-kit/environments.ts";
-
-/** EP005 A3/A4 shared proposal: one *existing* V3 route, not a second road. */
 export const EP005_ROUTE = Object.freeze({
-  kind: "city" as const,
-  seed: 12,
-  timeOfDay: "night" as const,
-  wetness: 0.16,
-  roadY: 0,
-  travelAxis: "+X",
-  laneZ: -1.85,
-  startDistance: -48,
-  endDistance: 66,
-  previewSpeedMps: 12,
-  sceneClearanceHalfWidth: 6.15,
-  postMinimumAbsZ: 7.75,
-  portalHeadroom: 6.9,
-  canonicalSampler: "sampleRoute('city', metres)" as const,
+ kind:"track" as const,seed:12,timeOfDay:"dusk" as const,wetness:.10,roadY:0,
+ lapMetres:routeLength("track"),startDistance:18,previewSpeedMps:12,
+ roadHalfWidth:6,curbOffset:6.4,existingBarrierOffset:11.7,
+ cameraClearanceNormalOffset:12,tallFixtureMinNormalOffset:19.2,
+ canonicalSampler:"src/yunex/world-kit/environments.ts::sampleRoute('track',d)" as const
 });
-export function sampleEP005Route(distanceMetres: number): RoutePose {
-  if (!Number.isFinite(distanceMetres) || distanceMetres < -80 || distanceMetres > 78)
-    throw Error("EP005 city road distance outside reviewed -80..78 m segment (no wrap allowed)");
-  return sampleRoute(EP005_ROUTE.kind, distanceMetres);
+export function sampleEP005Route(distanceMetres:number):RoutePose{
+ if(!Number.isFinite(distanceMetres))throw Error("EP005 closed-loop distance must be finite");
+ return sampleRoute(EP005_ROUTE.kind,distanceMetres);
 }
-export function previewDistance(frame: number, fps = 30): number {
-  if (!Number.isFinite(frame) || !Number.isFinite(fps) || fps <= 0 || frame < 0)
-    throw Error("Expected nonnegative finite frame and positive fps");
-  return EP005_ROUTE.startDistance + (12 * frame) / fps;
+export function previewDistance(frame:number,fps=30):number {
+ if(!Number.isFinite(frame)||frame<0||!Number.isFinite(fps)||fps<=0)
+  throw Error("Finite nonnegative frame and positive fps required");
+ return EP005_ROUTE.startDistance+EP005_ROUTE.previewSpeedMps*frame/fps;
 }
-export const EP005_CAMERA_CLEARANCE = Object.freeze({
-  road: {zMin: -6.15, zMax: 6.15, yMin: 0, yMax: 5.5},
-  headroomMetres: 6.9,
-  fixtureMinAbsZ: 7.75,
-  note: "Hard scenic fixtures outside +/-7.75m Z; moving vehicle in Z=-1.85m lane. Existing V3 city geometry retained.",
+export function trackPoint(distanceMetres:number,normalOffset=0,height=0){
+ const pose=sampleEP005Route(distanceMetres);
+ return {position:[pose.position[0]+Math.sin(pose.yaw)*normalOffset,height,
+   pose.position[2]+Math.cos(pose.yaw)*normalOffset] as [number,number,number],yaw:pose.yaw};
+}
+export const EP005_CAMERA_CLEARANCE=Object.freeze({
+ roadTopY:0,laneCentre:"V3 track centreline",
+ rearAndSideCameraNormalCorridor:12,tallFixturesBeginBeyondNormalOffset:19.2,
+ note:"Original V3 track asphalt, curb and +/-11.7m barriers unchanged. No parallel road."
 });
