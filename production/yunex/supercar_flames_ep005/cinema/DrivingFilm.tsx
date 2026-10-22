@@ -17,6 +17,10 @@ export type CinemaIntegration={
  createWorld?:()=>T.Group;
  routeSampler?:RouteSampler;
  flames?:{create:(hero:T.Group)=>T.Group;animate:(group:T.Group,sample:CinemaSample)=>void};
+ /** Optional Agent-2 named-port rig, instantiated only with an Agent-1 approved hero. */
+ attachAfterfire?:(hero:T.Group)=>(sample:CinemaSample)=>void;
+ /** Agent-4 practical track lights, tied to the same route pose and actual ignition envelope. */
+ practicalLight?:(sample:CinemaSample)=>React.ReactNode;
 };
 export const EP005DrivingFilm:React.FC<{integration?:CinemaIntegration}>=({integration})=>{
  const frame=useCurrentFrame(),{fps,width,height}=useVideoConfig();
@@ -29,6 +33,7 @@ export const EP005DrivingFilm:React.FC<{integration?:CinemaIntegration}>=({integ
   kind:'track',seed:21,timeOfDay:'dusk',wetness:.1,quality:'hero'
  }),[integration]);
  const flames=useMemo(()=>integration?.flames?.create(hero),[integration,hero]);
+ const updateAfterfire=useMemo(()=>integration?.attachAfterfire?.(hero),[integration,hero]);
  useEffect(()=>()=>{disposeObject(hero);disposeObject(world);},[hero,world]);
  if(flames&&!flames.parent)hero.add(flames);
  const cutaway=shot.id==='mechanism'?.72:shot.id==='engine-reveal'?.30:0;
@@ -41,12 +46,17 @@ export const EP005DrivingFilm:React.FC<{integration?:CinemaIntegration}>=({integ
  hero.rotation.y=pose.yaw;
  hero.updateMatrixWorld(true);
  if(flames)integration?.flames?.animate(flames,sample);
+ // Exhaust socket positions are resolved AFTER the real V3 animated body is placed.
+ updateAfterfire?.(sample);
  return <AbsoluteFill style={{background:'#111c25'}}>
-  <ThreeCanvas width={width} height={height} shadows camera={{fov:sample.camera.fov,near:.025,far:600}} gl={{antialias:true}}>
-   <CinematicLighting focus={pose.position} timeOfDay="dusk"/>
-   <primitive object={world}/>
-   <primitive object={hero}/>
-   <CameraAim {...sample.camera}/>
-  </ThreeCanvas>
+  <AbsoluteFill style={{filter:'brightness(.9) contrast(1.10) saturate(1.12)'}}>
+   <ThreeCanvas width={width} height={height} shadows camera={{fov:sample.camera.fov,near:.025,far:600}} gl={{antialias:true}}>
+    <CinematicLighting focus={pose.position} timeOfDay={integration?.practicalLight?'night':'dusk'}/>
+    {integration?.practicalLight?.(sample)}
+    <primitive object={world}/>
+    <primitive object={hero}/>
+    <CameraAim {...sample.camera}/>
+   </ThreeCanvas>
+  </AbsoluteFill>
  </AbsoluteFill>;
 };

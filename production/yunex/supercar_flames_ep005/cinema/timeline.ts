@@ -56,17 +56,17 @@ const rotateY=(v:V3,yaw:number):V3=>[
 ];
 const add=(a:V3,b:V3):V3=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]];
 const cameraLocal:Record<CinemaShotId,{p:V3;target:V3;fov:number}>={
- hook:{p:[-10.5,2.65,5.5],target:[-.8,.68,0],fov:47},
+ hook:{p:[-9.7,2.45,5.15],target:[-.8,.68,0],fov:47},
  launch:{p:[.55,2.9,12.0],target:[0,.66,0],fov:51},
  'engine-reveal':{p:[10.3,3.45,6.9],target:[.2,.76,0],fov:49},
  mechanism:{p:[4.9,7.3,9.9],target:[0,.67,0],fov:50},
  exhaust:{p:[-9.0,2.1,5.15],target:[-1.8,.57,0],fov:47},
- payoff:{p:[-12.5,3.15,6.6],target:[0,.79,0],fov:49}
+ payoff:{p:[-10.1,2.6,5.5],target:[0,.79,0],fov:47}
 };
 export function cameraAt(shot:CinemaShot,pose:RoutePose,localFrame:number):CameraView{
  const spec=cameraLocal[shot.id],u=clamp(localFrame/Math.max(1,shot.end-shot.start-1),0,1);
  const eased=smoothstep(u),p:V3=[
-  spec.p[0]+(eased-.5)*.42,
+  spec.p[0]+(eased-.5)*.42+(shot.id==='payoff'?eased*.45:0),
   spec.p[1]+(eased-.5)*.12,
   spec.p[2]+(shot.id==='payoff'?(eased-.5)*-.92:(eased-.5)*.24)
  ];

@@ -19,6 +19,8 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci --no-audit --no-fund
+      - name: Install full native FFmpeg and FFprobe verification tools
+        run: bash scripts/modelling-kit/install-native-media.sh
       - name: V3 typecheck and continuous-motion camera tests
         run: |
           npm run check
@@ -29,7 +31,32 @@ jobs:
           npm run kit:plan -- ep005-a3-driving
           npm run kit:inspect -- ep005-a3-driving
           npm run kit:handoff -- ep005-a3-driving
-      - name: Native full 25-second 1080x1920/30fps silent MP4
+      - name: Stage cross-agent SHA-pinned sources for INTEGRATION REVIEW ONLY
+        shell: bash
+        run: |
+          set -euo pipefail
+          hero=8ba7a9624fc56973fa52658ef8d2600368dfc17a
+          flames=dc734d7061c17daa43116e4f7c91d63010ea1709
+          look=72e0be1028062bf38fdf84f76cfcf51139a0b400
+          git fetch --no-tags origin "$hero" "$flames" "$look"
+          pull_file() {
+            mkdir -p "$(dirname "$2")"
+            git show "$1:$2" > "$2"
+          }
+          pull_file "$hero" production/yunex/supercar_flames_ep005/vehicle/hero.ts
+          pull_file "$hero" production/yunex/supercar_flames_ep005/vehicle/exhaust-contract.json
+          pull_file "$hero" src/yunex/studio-projects/ep005-a1-hero/recipe.json
+          pull_file "$flames" production/yunex/supercar_flames_ep005/flames/afterfire.ts
+          pull_file "$flames" production/yunex/supercar_flames_ep005/flames/exhaust-rig.ts
+          pull_file "$look" production/yunex/supercar_flames_ep005/look/route.ts
+          pull_file "$look" production/yunex/supercar_flames_ep005/look/NightCircuit.ts
+          pull_file "$look" production/yunex/supercar_flames_ep005/look/PracticalLighting.tsx
+          cp production/yunex/supercar_flames_ep005/cinema/integration-entry.template.txt src/yunex/studio-projects/ep005-a3-driving/entry.tsx
+          cat > out/studio/ep005-a3-driving/integration-review-sources.json <<JSON
+          {"hero":"$hero","afterfire":"$flames","environment":"$look","approval":"INTEGRATION REVIEW ONLY - NOT MANAGER-APPROVED MASTER","audio":"silent"}
+          JSON
+          npm run check
+      - name: Native 750-frame moving QA with real A1 ports, A2 flames and A4 matched circuit
         run: npm run kit:render -- ep005-a3-driving
       - name: Frame, decode, media and checksum verification
         shell: bash
@@ -56,7 +83,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: EP005-A3-SILENT-CINEMA-MOVING-1080x1920-30fps
+          name: EP005-A3-SILENT-SHA-PINNED-INTEGRATION-REVIEW-1080x1920-30fps
           path: |
             out/studio/ep005-a3-driving.mp4
             out/studio/ep005-a3-driving/
