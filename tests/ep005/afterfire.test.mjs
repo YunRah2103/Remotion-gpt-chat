@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {sampleAfterfire,validateExhaustMounts,ep005PreviewEngineState} from '../../production/yunex/supercar_flames_ep005/flames/afterfire.ts';
+import {sampleAfterfire,validateExhaustMounts,ep005PreviewEngineState,stateFromCinemaDemand} from '../../production/yunex/supercar_flames_ep005/flames/afterfire.ts';
 const ports=[{name:'exhaust-tip-left',position:[-2,.38,.6],direction:[-1,0,0],radius:.07},{name:'exhaust-tip-right',position:[-2,.38,-.6],direction:[-1,0,0],radius:.07}];
 const hot={throttle:.07,unburntFuel:1,exhaustTemperatureC:850,overrun:true};
 test('first-second visual hook actually ignites both tips',()=>{
@@ -35,4 +35,20 @@ test('port validation fails closed on missing, corrupt or duplicate mounts',()=>
 test('defined preview control is a short condition-specific overrun, never continuous normal idle',()=>{
  assert.equal(ep005PreviewEngineState('hook',.1).overrun,true);
  assert.equal(ep005PreviewEngineState('mechanism',1).overrun,false);
+});
+
+test('Agent 3 afterfireDemand gates all emissions and preserves exact off frames',()=>{
+ const off=stateFromCinemaDemand(0,.56),on=stateFromCinemaDemand(1,.08);
+ assert.equal(off.afterfireDemand,0);assert.equal(on.overrun,true);
+ assert.equal(sampleAfterfire(0,30,off,ports).mode,'off');
+ assert.ok(sampleAfterfire(0,30,on,ports).ports.some(p=>p.intensity>.20));
+ assert.ok(sampleAfterfire(0,30,stateFromCinemaDemand(.35,.08),ports).ports[0].intensity
+  <sampleAfterfire(0,30,on,ports).ports[0].intensity);
+ assert.throws(()=>stateFromCinemaDemand(1.1,.08));
+});
+test('preview storyboard shows finite flash bursts instead of indefinite jet at wide view',()=>{
+ assert.equal(ep005PreviewEngineState('wide',0).overrun,false);
+ assert.equal(ep005PreviewEngineState('wide',.45).overrun,true);
+ assert.equal(ep005PreviewEngineState('wide',1.2).overrun,false);
+ assert.equal(ep005PreviewEngineState('tailpipe',.8).overrun,false);
 });
