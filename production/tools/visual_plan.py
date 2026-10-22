@@ -20,7 +20,17 @@ def plan(base,candidate,changed):
     if any(p.startswith(("src/TurboDocumentary","src/turbo/")) for p in paths):add("TurboDocumentary")
     if "src/ProductionCaptions.tsx" in paths:
         selected.update(k for k in b if k.endswith("Captioned"))
-    if any(p in {"src/Root.tsx","package.json","package-lock.json"} or p.startswith("src/mechanics/") for p in paths):
+    # New agent commands do not alter renderer inputs. Unknown/malformed manifests
+    # remain conservative; lockfile and any non-script package changes review all.
+    package_runtime_changed=False
+    if "package.json" in paths:
+        try:
+            old=json.loads((Path(base)/"package.json").read_text())
+            new=json.loads((Path(candidate)/"package.json").read_text())
+            old.pop("scripts",None);new.pop("scripts",None)
+            package_runtime_changed=old!=new
+        except (OSError,ValueError,AttributeError):package_runtime_changed=True
+    if package_runtime_changed or any(p in {"src/Root.tsx","package-lock.json"} or p.startswith("src/mechanics/") for p in paths):
         selected.update(b.keys())
     for p in paths:
         m=re.fullmatch(r"production/videos/([^/]+)/.*",p)

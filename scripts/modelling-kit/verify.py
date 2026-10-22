@@ -23,5 +23,5 @@ for path in sorted(root.glob('*.mp4')):
     assert np.count_nonzero(differences>.1)>=len(differences)*.8,(path,differences)
     reports.append(dict(file=path.name,width=video['width'],height=video['height'],fps=fps,duration=duration,frames=int(video['nb_frames']),uniqueDecodedFrames=unique,sha256=hashlib.sha256(path.read_bytes()).hexdigest(),sampleMeanAbsoluteDifferences=differences.tolist(),fullDecode=True))
 assert reports,'No MP4 files were found'
-if '--partial' not in sys.argv and '--quick' not in sys.argv:assert {f'Kit{demo}{orientation}.mp4' for demo in 'ABCDEFGHI' for orientation in ['', 'Portrait']}|{'KitBefore.mp4','KitWorldBefore.mp4','StudioRoadPortrait.mp4','StudioMechanicsPortrait.mp4'} <= {r['file'] for r in reports},'Missing required native landscape/portrait proof'
+if '--partial' not in sys.argv and '--quick' not in sys.argv:assert {f'Kit{demo}{orientation}.mp4' for demo in 'ABCDEFGHI' for orientation in ['', 'Portrait']}|{'KitBefore.mp4','KitWorldBefore.mp4','StudioRoadPortrait.mp4','StudioMechanicsPortrait.mp4','StudioF1Portrait.mp4','StudioRainPortrait.mp4'} <= {r['file'] for r in reports},'Missing required native landscape/portrait proof'
 (root/'video-qa.json').write_text(json.dumps(reports,indent=2));print(json.dumps(reports,indent=2))

@@ -1,5 +1,7 @@
 # Production-agent quick start
 
+Start with the [one-file recipe studio](../YUNEX_AGENT_STUDIO.md) to create complete videos with `kit:create`, `kit:validate` and `kit:render`. Four editable 18-second starters cover braking, powertrains, F1 and rainy night driving.
+
 For the new world/driving/camera APIs and verified native previews, read the
 [Premium Studio guide](PREMIUM-STUDIO-UPGRADE.md) and
 [22 October QA handoff](STUDIO-QA-2026-10-22.md).
