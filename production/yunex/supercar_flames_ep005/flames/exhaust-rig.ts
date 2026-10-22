@@ -163,7 +163,7 @@ function segment(kind:'collector'|'catalyst'|'muffler'|'tailpipe'):T.Group{
  const root=new T.Group();root.name='ep005-'+kind;
  const length={collector:.60,catalyst:.66,muffler:.90,tailpipe:.44}[kind];
  const rad={collector:.13,catalyst:.23,muffler:.30,tailpipe:.095}[kind];
- const shell=new T.Mesh(new T.CylinderGeometry(rad,rad,length,28,1,true),new T.MeshPhysicalMaterial({color:kind==='muffler'?'#5a636e':'#a2aab1',metalness:.84,roughness:.3,transparent:kind==='catalyst',opacity:kind==='catalyst'?.48:1,side:T.DoubleSide}));
+ const shell=new T.Mesh(new T.CylinderGeometry(rad,rad,length,28,1,true),new T.MeshPhysicalMaterial({color:kind==='muffler'?'#5a636e':'#a2aab1',metalness:.84,roughness:.3,transparent:kind==='catalyst'||kind==='muffler',opacity:kind==='catalyst'?.27:kind==='muffler'?.37:1,side:T.DoubleSide}));
  shell.rotation.z=Math.PI/2;shell.name=kind+'-steel-housing';root.add(shell);
  const rimA=new T.Mesh(new T.TorusGeometry(rad,.014,9,28),metal()),rimB=rimA.clone();rimA.rotation.y=rimB.rotation.y=Math.PI/2;rimA.position.x=-length/2;rimB.position.x=length/2;root.add(rimA,rimB);
  const flowTube=cylinderBetween(new T.Vector3(-length*.50,0,0),new T.Vector3(length*.50,0,0),Math.min(rad*.52,.074),'ep005-flow-core',new T.MeshStandardMaterial({color:'#bf6844',metalness:.70,roughness:.38}));
