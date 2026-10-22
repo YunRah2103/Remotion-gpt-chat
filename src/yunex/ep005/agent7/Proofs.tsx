@@ -51,7 +51,7 @@ export const FlameFixtureProof:React.FC=()=>{
     {at:1.43,duration:.53,strength:.92},
     {at:2.33,duration:.35,strength:.72}]);
   return <AbsoluteFill style={{background:backdrop}}>
-    <ThreeCanvas width={width} height={height} camera={{fov:30,near:.025,far:60}}
+    <ThreeCanvas width={width} height={height} camera={{fov:41,near:.025,far:60}}
         gl={{antialias:true,alpha:false}}>
       <color attach="background" args={[backdrop]}/>
       <ambientLight intensity={.55} color="#c5d6e5"/>
@@ -63,7 +63,7 @@ export const FlameFixtureProof:React.FC=()=>{
         <meshStandardMaterial color="#2d323a" metalness={.35} roughness={.46}/>
       </mesh>
       <primitive object={metal}/><primitive object={rig.root}/>
-      <CameraAim position={[-3.8+.18*t,1.20,3.9-.18*t]} target={[-.82,.32,0]} fov={30}/>
+      <CameraAim position={[-5.5+.22*t,1.45,5.6-.18*t]} target={[-.84,.29,0]} fov={41}/>
     </ThreeCanvas>
     <Frame tag="YUNEX / AGENT 7 / FLAME R&D"
        title="TRANSIENT AFTERFIRE"
@@ -82,15 +82,19 @@ export const MechanicalScienceProof:React.FC=()=>{
     {h:'A BRIEF IGNITION',sub:'Fuel, oxygen and enough heat can create afterfire.',tag:'03 / CONDITIONAL AFTERFIRE'},
   ][phase];
   return <AbsoluteFill style={{background:backdrop}}>
-    <ThreeCanvas width={width} height={height} camera={{fov:32,near:.025,far:90}} gl={{antialias:true}}>
+    <ThreeCanvas width={width} height={height} camera={{fov:38,near:.025,far:90}} gl={{antialias:true}}>
       <color attach="background" args={[backdrop]}/>
       <ambientLight intensity={.65} color="#bfd8e8"/>
       <directionalLight position={[4,8,6]} intensity={3.4} color="#fff5e2"/>
       <directionalLight position={[-5,4,-4]} intensity={2.3} color="#8db8dc"/>
       <pointLight position={[-2,1,2]} intensity={3} distance={7} color="#f4aa75"/>
+      <mesh position={[-.50,-.52,0]} receiveShadow>
+        <boxGeometry args={[5.25,.18,2.7]}/>
+        <meshStandardMaterial color="#293642" metalness={.62} roughness={.39}/>
+      </mesh>
       <primitive object={a.root}/>
-      <CameraAim position={[-3.7+.24*Math.sin(t*.45),3.0,5.5]}
-         target={[-.55,.43,0]} fov={32}/>
+      <CameraAim position={[-1.45+.55*Math.sin(t*.35),4.2,13.4-.55*Math.sin(t*.30)]}
+         target={[-.52+.14*Math.sin(t*.32),.32,0]} fov={38}/>
     </ThreeCanvas>
     <Frame tag={'YUNEX / ' + story.tag} title={story.h}
       subtitle={story.sub}
