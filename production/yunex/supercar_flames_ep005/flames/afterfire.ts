@@ -7,7 +7,7 @@ export type Vec3=[number,number,number];
 export type ExhaustPort={name:'exhaust-tip-left'|'exhaust-tip-right';position:Vec3;direction:Vec3;radius:number};
 export type EngineState={
   throttle:number;unburntFuel:number;exhaustTemperatureC:number;
-  overrun?:boolean;antiLag?:boolean;ignitionCut?:boolean;seed?:number;
+  overrun?:boolean;antiLag?:boolean;ignitionCut?:boolean;seed?:number;afterfireDemand?:number;
 };
 export type FlameBurst={name:ExhaustPort['name'];position:Vec3;direction:Vec3;radius:number;intensity:number;length:number;phase:number;mode:'overrun'|'anti-lag'|'ignition-cut'|'off'};
 export type AfterfireSample={frame:number;fps:number;mode:FlameBurst['mode'];ports:FlameBurst[];illustrative:true};
@@ -25,7 +25,7 @@ export function validateExhaustMounts(ports:ExhaustPort[]):void{
 export function sampleAfterfire(frame:number,fps:number,engineState:EngineState,exhaustMounts:ExhaustPort[]):AfterfireSample{
  if(!Number.isFinite(frame)||!Number.isInteger(frame)||!Number.isFinite(fps)||fps<=0)throw Error('Finite integer frame and positive fps required');
  if(!finite([engineState.throttle,engineState.unburntFuel,engineState.exhaustTemperatureC,engineState.seed??0])||
- engineState.throttle<0||engineState.throttle>1||engineState.unburntFuel<0||engineState.unburntFuel>1)throw Error('Invalid engine state');
+ engineState.throttle<0||engineState.throttle>1||engineState.unburntFuel<0||engineState.unburntFuel>1||!Number.isFinite(engineState.afterfireDemand??1)||(engineState.afterfireDemand??1)<0||(engineState.afterfireDemand??1)>1)throw Error('Invalid engine state');
  validateExhaustMounts(exhaustMounts);
  // A temperature threshold is solely a visual-story gate: ignition depends on
  // gas composition, residence time and ignition source, not a universal temperature.
@@ -38,14 +38,21 @@ export function sampleAfterfire(frame:number,fps:number,engineState:EngineState,
   const local=t+.115-(i*.032),beat=Math.floor(local/period),phase=(local/period)-beat;
   const attack=smooth(phase/.15),decay=1-smooth((phase-.20)/.49);
   const jitter=.78+.22*hash(beat*19+(engineState.seed??17)*31+i*37);
-  const intensity=mode==='off'?0:clamp(attack*decay*jitter*fuel*hot*(mode==='anti-lag'?1:.93));
+  const intensity=mode==='off'?0:clamp(attack*decay*jitter*fuel*hot*(engineState.afterfireDemand??1)*(mode==='anti-lag'?1:.93));
   return {name:p.name,position:[...p.position] as Vec3,direction:[...p.direction] as Vec3,radius:p.radius,intensity,
    length:intensity*(.44+.43*hash(beat*7+i*23+11))/.78,phase,mode};
  });
  return {frame,fps,mode,ports,illustrative:true};
 }
+/** Consume A3 sampleCinema.afterfireDemand, not arbitrary acceleration. */
+export function stateFromCinemaDemand(demand:number,throttle:number,kind:'overrun'|'anti-lag'|'ignition-cut'='overrun'):EngineState{
+ if(!Number.isFinite(demand)||demand<0||demand>1||!Number.isFinite(throttle)||throttle<0||throttle>1)throw Error('Invalid cinematic afterfire command');
+ return {throttle,unburntFuel:demand>.001?.98:.01,exhaustTemperatureC:770,
+ overrun:kind==='overrun',antiLag:kind==='anti-lag',ignitionCut:kind==='ignition-cut',
+ afterfireDemand:demand,seed:5};
+}
 /** Storyboard engine control; never infer afterfire merely from acceleration. */
 export function ep005PreviewEngineState(shot:'hook'|'tailpipe'|'mechanism'|'wide',localSeconds:number):EngineState{
- const active=shot==='hook'||shot==='tailpipe'||shot==='wide';
- return {throttle:active?.08:.52,unburntFuel:active?.95:.02,exhaustTemperatureC:active?790:590,overrun:active,antiLag:false,ignitionCut:false,seed:5};
+ const active=shot==='hook'?localSeconds<.90:shot==='tailpipe'?(localSeconds<.65||(localSeconds>1.27&&localSeconds<1.70)):shot==='wide'?(localSeconds>.25&&localSeconds<.96):false;
+ return {throttle:active?.08:.52,unburntFuel:active?.98:.01,exhaustTemperatureC:active?790:590,overrun:active,antiLag:false,ignitionCut:false,afterfireDemand:active?1:0,seed:5};
 }
