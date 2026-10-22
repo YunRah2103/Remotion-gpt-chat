@@ -1,0 +1,11 @@
+{
+  "extends": "../../../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": [
+    "look/**/*.ts",
+    "look/**/*.tsx",
+    "previews/agent-11/**/*.tsx"
+  ]
+}
