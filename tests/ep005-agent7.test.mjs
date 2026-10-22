@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import {sampleActualPorts} from '../src/yunex/ep005/agent7/ports.ts';
+import {sampleActualPorts,adaptAgent6WorldPorts} from '../src/yunex/ep005/agent7/ports.ts';
 import {createAfterfireRig,animateAfterfire,pulseEnvelope} from '../src/yunex/ep005/agent7/afterfire.ts';
 import {buildScienceEngine,animateScienceEngine} from '../src/yunex/ep005/agent7/science.ts';
 
@@ -54,4 +54,17 @@ test('science cutaway contains connected geometry and deterministic mechanical m
   animateScienceEngine(assembly,.32,2);
   assert.notEqual(assembly.pistons[0].head.position.y,a);
   assert.ok(assembly.gas.some(g=>g.mesh.visible));
+});
+
+test('NEW Agent 6 actual sampled world transforms have no duplicate transform and enforce port ABI',()=>{
+  const raw=[
+    {frame:10,name:'exhaust-left',worldOrigin:[-2,.61,-2.53],worldOutward:[0,0,-1],innerRadiusM:.041,visibleOuterDiameterM:.114},
+    {frame:10,name:'exhaust-right',worldOrigin:[2,.61,-2.53],worldOutward:[0,0,-1],innerRadiusM:.041,visibleOuterDiameterM:.114},
+  ];
+  const ports=adaptAgent6WorldPorts(raw,10,30);
+  assert.deepEqual(ports[0].origin.toArray(),[-2,.61,-2.53]);
+  assert.deepEqual(ports[0].outward.toArray(),[0,0,-1]);
+  assert.throws(()=>adaptAgent6WorldPorts(raw,9,30));
+  assert.throws(()=>adaptAgent6WorldPorts([raw[0],raw[0]],10,30));
+  assert.throws(()=>adaptAgent6WorldPorts(raw.map(p=>({...p,visibleOuterDiameterM:.2})),10,30));
 });
