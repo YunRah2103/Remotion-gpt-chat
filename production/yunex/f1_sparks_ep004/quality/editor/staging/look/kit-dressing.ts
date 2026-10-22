@@ -36,7 +36,7 @@ function illuminatedPitDetail(target: T.Group): void {
   }
 }
 
-export function createQualityKitDressing(wetness = QUALITY_NIGHT.kitWetness): T.Group {
+export function createQualityKitDressing(wetness: number = QUALITY_NIGHT.kitWetness): T.Group {
   qualityWetness(wetness);
   // EXACT V2 factory required by Issue #238. It is never added to the film.
   const temporaryKitWorld = createCinematicEnvironment({
