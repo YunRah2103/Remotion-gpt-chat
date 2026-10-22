@@ -72,7 +72,7 @@ export const HeroEpisode:React.FC<{recipe:EpisodeRecipe}>=({recipe})=>{
  if(shot.id==='road-payoff')camera=framed([-10.5,1.82,-4.9],[-.22,.59,0],42);
  // Capture dashboard, gloved hands and proper wheel from inside the passenger side.
  // The previous exterior X-ray angle rendered a huge featureless mannequin.
- if(shot.id==='driver-cabin')camera=framed([.35,1.09,.16],[-.37,.76,-.38],51);
+ if(shot.id==='driver-cabin')camera=framed([-.10,.89,.22],[.76,.66,-.22],58);
  // Maintain the complete engine/hood opening rather than clipping the wheel and giant highlighted tubes.
  if(shot.id==='engine-reveal')camera=framed([-2.20,2.34,4.05],[-.72,.61,0],45);
  const fillA=framed([1.5,3.7,-3.5],[0,0,0],42).position;
