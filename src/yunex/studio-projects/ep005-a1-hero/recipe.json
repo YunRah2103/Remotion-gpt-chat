@@ -706,7 +706,7 @@
       "duration": 2,
       "camera": "reveal",
       "action": "acceleration",
-      "caption": "Sculpted flanks · forged rotating wheels",
+      "caption": "Entire sculpted silhouette · forged wheels",
       "jointTracks": {
         "ep005-active-rear-wing": [
           {
@@ -729,17 +729,16 @@
       "duration": 2,
       "camera": "interior",
       "action": "cornering",
-      "cutaway": 0.82,
-      "caption": "Articulated driver · finished cockpit"
+      "cutaway": 0.12,
+      "caption": "From inside · steering and cockpit"
     },
     {
       "id": "engine-reveal",
       "duration": 2,
       "camera": "tracking",
       "action": "cruise",
-      "cutaway": 0.93,
-      "highlight": "engine",
-      "caption": "Twin-turbo V8 · visible routed systems"
+      "cutaway": 0.83,
+      "caption": "V8 + twin turbos · genuine mechanical routes"
     },
     {
       "id": "road-payoff",

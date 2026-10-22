@@ -49,11 +49,12 @@ export const HeroEpisode:React.FC<{recipe:EpisodeRecipe}>=({recipe})=>{
  // Orbit is a moving-reveal shot on a moving route. The camera does not freeze
  // the car or substitute a static showroom rotation for real pavement contact.
  if(shot.id==='moving-orbit'){
-  const a=-2.35+sample.localFrame/Math.max(1,shot.duration*fps-1)*1.38;
-  const local=new T.Vector3(Math.cos(a)*s.length*1.48,s.height*1.52,Math.sin(a)*s.length*1.48);
+  const a=-2.38+sample.localFrame/Math.max(1,shot.duration*fps-1)*.95;
+  // Portrait crop protection: 13.2m orbital radius gives the 4.7m entire side room inside a 9:16 frame.
+  const local=new T.Vector3(Math.cos(a)*s.length*2.82,s.height*1.53,Math.sin(a)*s.length*2.82);
   const pivot=new T.Vector3(...pose.position);
   const p=local.applyAxisAngle(new T.Vector3(0,1,0),pose.yaw).add(pivot);
-  camera={position:p.toArray() as [number,number,number],target:new T.Vector3(0,s.height*.45,0).applyAxisAngle(new T.Vector3(0,1,0),pose.yaw).add(pivot).toArray() as [number,number,number],fov:40};
+  camera={position:p.toArray() as [number,number,number],target:new T.Vector3(0,s.height*.45,0).applyAxisAngle(new T.Vector3(0,1,0),pose.yaw).add(pivot).toArray() as [number,number,number],fov:43};
  }
  // Consistent route-local art direction. Each shot follows the same vehicle
  // motion; only the framing changes, never a second fake parked model.
@@ -68,17 +69,24 @@ export const HeroEpisode:React.FC<{recipe:EpisodeRecipe}>=({recipe})=>{
  };
  if(shot.id==='rear-hook')camera=framed([-6.1,1.50,2.2],[-1.65,.56,0],36);
  if(shot.id==='road-payoff')camera=framed([-6.9,1.55,-2.6],[-1.25,.54,0],38);
- if(shot.id==='engine-reveal')camera=framed([-2.9,1.32,2.15],[-.90,.52,0],36);
+ // Capture dashboard, gloved hands and proper wheel from inside the passenger side.
+ // The previous exterior X-ray angle rendered a huge featureless mannequin.
+ if(shot.id==='driver-cabin')camera=framed([.35,1.09,.16],[-.37,.76,-.38],51);
+ // Maintain the complete engine/hood opening rather than clipping the wheel and giant highlighted tubes.
+ if(shot.id==='engine-reveal')camera=framed([-2.20,2.34,4.05],[-.72,.61,0],45);
  const fillA=framed([1.5,3.7,-3.5],[0,0,0],42).position;
+ const engineKey=framed([-.85,2.25,.42],[0,0,0],44).position;
  const fillB=framed([-2.3,2.5,3.8],[0,0,0],42).position;
  const drawCaption=sample.caption;
  return <AbsoluteFill style={{backgroundColor:'#14232d'}}>
   <ThreeCanvas width={width} height={height} shadows gl={{antialias:true}} camera={{fov:camera.fov,near:.025,far:500}}>
    <CinematicLighting focus={pose.position} timeOfDay={recipe.world.timeOfDay??'day'}/>
    <primitive object={world}/><primitive object={vehicle}/><CameraAim {...camera}/>
-   <pointLight position={fillA} intensity={13} distance={18} decay={2} color="#b9ddef"/>
-   <pointLight position={fillB} intensity={10} distance={17} decay={2} color="#ffe5c3"/>
-   {shot.camera==='interior'?<pointLight position={camera.position} intensity={1.2} distance={5} color="#daebf2"/>:null}
+   <hemisphereLight args={['#d9f1ff','#111b23',1.05]}/>
+   <pointLight position={fillA} intensity={26} distance={19} decay={2} color="#bfdff5"/>
+   <pointLight position={fillB} intensity={20} distance={19} decay={2} color="#ffe1be"/>
+   {shot.id==='driver-cabin'?<pointLight position={camera.position} intensity={3.8} distance={5} color="#dbeefe"/>:null}
+   {shot.id==='engine-reveal'?<pointLight position={engineKey} intensity={32} distance={7} decay={2} color="#ffe0b8"/>:null}
   </ThreeCanvas>
   <div style={{position:'absolute',top:'6%',left:'7%',fontFamily:'Arial,sans-serif',fontSize:23,fontWeight:800,letterSpacing:3,color:'#e5f2f4',textShadow:'0 2px 8px #00131d'}}>YUNEX / V3 COACHBUILT STUDY</div>
   {drawCaption?<div style={{position:'absolute',bottom:'10%',left:'7%',right:'7%',padding:'12px 16px',fontFamily:'Arial,sans-serif',fontSize:29,fontWeight:700,lineHeight:1.15,color:'#fff',background:'rgba(8,21,28,.44)',borderLeft:'5px solid #44d1c4'}}>{drawCaption}</div>:null}

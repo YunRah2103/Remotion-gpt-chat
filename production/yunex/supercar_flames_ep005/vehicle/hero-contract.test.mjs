@@ -50,8 +50,8 @@ test('five distinct fully animated review shots / accurate portrait frame count'
  assert.ok(recipe.shots.every(s=>s.duration>0));
  assert.equal(recipe.shots.reduce((n,s)=>n+Math.round(s.duration*30),0),300);
  assert.deepEqual(recipe.shots.map(s=>s.camera),['chase','reveal','interior','tracking','chase']);
- assert.ok(recipe.shots.some(s=>s.cutaway>.8&&s.highlight==='engine'));
- assert.ok(recipe.shots.some(s=>s.camera==='interior'&&s.cutaway>.5));
+ assert.ok(recipe.shots.some(s=>s.id==='engine-reveal'&&s.cutaway>.7&&!s.highlight), 'do not neon-highlight engine');
+ assert.ok(recipe.shots.some(s=>s.camera==='interior'&&s.cutaway<.25), 'in-cabin camera, no X-ray mannequin');
  assert.ok(recipe.shots.some(s=>s.jointTracks?.['ep005-active-rear-wing']));
  assert.equal(recipe.audio,undefined,'silent preview: do not invent narration');
 });
@@ -69,4 +69,12 @@ test('premium V3 hero factory includes rig-safe material, moving wheel and real 
  assert.match(detail,/getObjectByName\('driver-rig'\)/);
  assert.match(detail,/function enhanceEngine/);
  assert.match(detail,/bodyHalfWidth\(/);
+});
+
+test('full-width portrait hero framing and readable mechanical closeups',()=>{
+ const scene=readFileSync(new URL('./HeroEpisode.tsx',import.meta.url),'utf8');
+ assert.match(scene,/s\.length\*2\.82/);
+ assert.match(scene,/shot\.id==='driver-cabin'\)camera=framed/);
+ assert.match(scene,/shot\.id==='engine-reveal'\)camera=framed/);
+ assert.equal(recipe.shots.find(s=>s.id==='engine-reveal').highlight,undefined);
 });
