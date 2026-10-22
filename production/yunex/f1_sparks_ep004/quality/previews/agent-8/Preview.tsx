@@ -3,8 +3,8 @@ import {useThree} from '@react-three/fiber';
 import {ThreeCanvas} from '@remotion/three';
 import {AbsoluteFill,useCurrentFrame,useVideoConfig} from 'remotion';
 import * as T from 'three';
-import {sampleDynamics} from '../../physics/dynamics.ts';
-import type {VehicleMotionState} from '../../shared/contract.ts';
+import {sampleDynamics} from '../../../physics/dynamics.ts';
+import type {VehicleMotionState} from '../../../shared/contract.ts';
 import {QualityF1Vehicle} from '../../vehicle/QualityF1Vehicle.tsx';
 import {NightCircuitWorld} from '../../../look/NightCircuitWorld.tsx';
 
