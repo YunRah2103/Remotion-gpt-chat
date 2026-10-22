@@ -39,7 +39,7 @@ test('render studies true rolling road motion under night-circuit cinematography
  assert.equal(recipe.vehicle.driver,true);
  assert.equal(recipe.world.kind,'track');
  assert.equal(recipe.world.timeOfDay,'night');
- assert.equal(recipe.shots.length,5);
+ assert.equal(recipe.shots.length,6);
  assert.equal(recipe.shots.reduce((n,s)=>n+Math.round(s.duration*30),0),300);
  assert.match(episode,/sampleRoute\(/);
  assert.match(episode,/animateCinematicVehicle\(/);

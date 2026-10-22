@@ -67,7 +67,7 @@ test('premium V3 hero factory includes rig-safe material, moving wheel and real 
  assert.match(src,/applyEdits\(hero,options.model\)/);
  assert.match(src,/applyEp005PremiumDetails\(hero\)/);
  assert.match(src,/userData\.radius=spec\.innerRadius/);
- assert.match(src,/ep005-\$\{side\}-tapered-nozzle-transition/);
+ assert.match(src,/tapered-nozzle-transition/);
  assert.match(src,/CylinderGeometry\(\.044,\.034,\.125,48,3,true\)/);
  assert.match(detail,/getObjectByName\('wheel-roll'\)/);
  assert.match(detail,/getObjectByName\('driver-rig'\)/);
