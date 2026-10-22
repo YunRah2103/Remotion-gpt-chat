@@ -10,17 +10,20 @@ import {validateExhaustMounts} from './afterfire.ts';
  * Orientation is mount-local userData.direction and radius is metres.
  */
 const names=['exhaust-tip-left','exhaust-tip-right'] as const;
-export function readExhaustMounts(vehicle:T.Object3D):ExhaustPort[]{
+export type PortRadii=Partial<Record<'exhaust-tip-left'|'exhaust-tip-right',number>>;
+/** Pin explicitly to Agent 1's reviewed port contract when its JSON-created mounts lack radius metadata. */
+export function readExhaustMounts(vehicle:T.Object3D,radii:PortRadii={}):ExhaustPort[]{
  vehicle.updateWorldMatrix(true,true);
  const ports=names.map(name=>{
   const node=vehicle.getObjectByName('mount:'+name);
   if(!node)throw Error('Agent 1 exhaust interface missing: mount:'+name);
-  if(!Array.isArray(node.userData.direction)||!Number.isFinite(node.userData.radius))throw Error('Missing direction/radius on '+name);
+  const radius=node.userData.radius??radii[name];
+  if(!Array.isArray(node.userData.direction)||!Number.isFinite(radius))throw Error('Missing direction/radius on '+name+'; pass radius from the Agent 1 exhaust contract');
   const direction=new T.Vector3(...(node.userData.direction as Vec3)).transformDirection(node.matrixWorld);
   const relative=vehicle.getWorldQuaternion(new T.Quaternion()).invert();
   direction.applyQuaternion(relative).normalize();
   const position=vehicle.worldToLocal(node.getWorldPosition(new T.Vector3())).toArray() as Vec3;
-  return {name,position,direction:direction.toArray() as Vec3,radius:node.userData.radius} as ExhaustPort;
+  return {name,position,direction:direction.toArray() as Vec3,radius} as ExhaustPort;
  });
  validateExhaustMounts(ports);return ports;
 }
@@ -48,11 +51,11 @@ export function addProvisionalPreviewExhaust(vehicle:T.Object3D):void{
  vehicle.userData.ep005ProvisionalPorts=true;
 }
 type FlameObjects={socket:T.Object3D;root:T.Group;lobes:T.Mesh[];cores:T.Mesh[];light:T.PointLight;rim:T.Mesh};
-export type AfterfireRig={vehicle:T.Object3D;elements:FlameObjects[];provisional:boolean};
+export type AfterfireRig={vehicle:T.Object3D;elements:FlameObjects[];provisional:boolean;radii:PortRadii};
 const cloud=(color:string,opacity:number)=>new T.MeshBasicMaterial({color,transparent:true,opacity,depthWrite:false,blending:T.AdditiveBlending,side:T.DoubleSide,toneMapped:false});
 /** Geometry extends along local +X after orienting to actual mount direction. */
-export function createAfterfireRig(vehicle:T.Object3D,{requireAuthoritative=true}:{requireAuthoritative?:boolean}={}):AfterfireRig{
- const ports=readExhaustMounts(vehicle);
+export function createAfterfireRig(vehicle:T.Object3D,{requireAuthoritative=true,radii={}}:{requireAuthoritative?:boolean;radii?:PortRadii}={}):AfterfireRig{
+ const ports=readExhaustMounts(vehicle,radii);
  const elements=ports.map(port=>{
   const socket=vehicle.getObjectByName('mount:'+port.name)!;
   if(requireAuthoritative&&socket.userData.provisional)throw Error('Production flame cannot attach to a provisional exhaust port');
@@ -71,12 +74,12 @@ export function createAfterfireRig(vehicle:T.Object3D,{requireAuthoritative=true
   root.visible=false;
   return {socket,root,lobes,cores,light,rim};
  });
- return {vehicle,elements,provisional:!!vehicle.userData.ep005ProvisionalPorts};
+ return {vehicle,elements,provisional:!!vehicle.userData.ep005ProvisionalPorts,radii};
 }
 /** Stateless frame update. Port nodes move with suspension/body/route transform. */
 export function animateAfterfireRig(rig:AfterfireRig,sample:AfterfireSample):void{
  if(sample.ports.length!==rig.elements.length)throw Error('Port count mismatch');
- const ports=readExhaustMounts(rig.vehicle);
+ const ports=readExhaustMounts(rig.vehicle,rig.radii);
  for(let i=0;i<rig.elements.length;i++){
   const e=rig.elements[i],p=sample.ports.find(v=>v.name===names[i])!;
   if(!p||p.name!==ports[i].name)throw Error('Mount identity mismatch');
