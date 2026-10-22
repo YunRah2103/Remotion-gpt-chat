@@ -12,6 +12,7 @@ concurrency:
   cancel-in-progress: true
 permissions:
   contents: read
+  actions: read
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -25,6 +26,9 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: npm run check
       - run: node --experimental-strip-types --test tests/modelling-kit/*.test.mjs tests/world-kit/*.test.mjs tests/parts-kit/*.test.mjs
+      - run: python -m unittest discover -s tests/modelling-kit -p 'test_*.py'
+      - run: python -m py_compile scripts/modelling-kit/*.py
+      - run: node --check scripts/modelling-kit/review.mjs
       - run: node --experimental-strip-types scripts/modelling-kit/measure.mjs
       - run: node --experimental-strip-types scripts/modelling-kit/export.mjs
       - uses: actions/upload-artifact@v4
@@ -35,14 +39,22 @@ jobs:
             out/modelling-kit-v2/glb
             out/modelling-kit-v2/performance.json
           retention-days: 30
-  render:
+  render_plan:
     needs: validate
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: plan
+        run: python scripts/modelling-kit/render-plan.py >> "$GITHUB_OUTPUT"
+  render:
+    needs: [validate, render_plan]
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
     strategy:
       fail-fast: false
-      matrix:
-        composition: [KitA, KitB, KitC, KitD, KitE, KitAPortrait, KitBPortrait, KitCPortrait, KitDPortrait, KitEPortrait, KitBefore, KitF, KitFPortrait, KitG, KitGPortrait, KitH, KitHPortrait, KitI, KitIPortrait, KitWorldBefore, StudioRoadPortrait, StudioMechanicsPortrait, StudioF1Portrait, StudioRainPortrait]
+      matrix: ${{ fromJSON(needs.render_plan.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -51,21 +63,25 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg
-      - run: node scripts/modelling-kit/review.mjs --id=${{ matrix.composition }}
+      - run: node scripts/modelling-kit/review.mjs --id=${{ matrix.composition }} ${{ matrix.range && format('--frames={0}', matrix.range) || '' }}
       - if: matrix.composition == 'KitA'
         run: node scripts/modelling-kit/review.mjs --compare-only --compare
-      - run: python -m pip install numpy
-      - run: python scripts/modelling-kit/verify.py out/modelling-kit-v2-hd --partial
+      - run: python -m pip install numpy pillow
+      - if: matrix.range == ''
+        run: python scripts/modelling-kit/verify.py out/modelling-kit-v2-hd --partial
+      - if: matrix.range != ''
+        run: python scripts/modelling-kit/shards.py verify out/modelling-kit-v2-hd --id=${{ matrix.composition }} --range=${{ matrix.range }}
+      - run: python scripts/modelling-kit/visual-handoff.py out/modelling-kit-v2-hd --id=${{ matrix.composition }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: YUNEX-KIT-${{ matrix.composition }}
+          name: YUNEX-KIT-${{ matrix.composition }}${{ matrix.suffix }}
           path: out/modelling-kit-v2-hd
           retention-days: 30
   native-review:
     needs: [validate, render]
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -78,13 +94,36 @@ jobs:
           pattern: YUNEX-KIT-*
           merge-multiple: true
           path: out/modelling-kit-v2-hd
-      - run: python -m pip install numpy
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 39711449059
+          pattern: YUNEX-KIT-Studio*
+          merge-multiple: true
+          path: out/previous-studio
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 39700360543
+          name: YUNEX-KIT-KitAPortrait
+          path: out/previous-hero
+      - run: python -m pip install numpy pillow
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: python scripts/modelling-kit/shards.py assemble out/modelling-kit-v2-hd
       - run: node scripts/modelling-kit/verify-colour.mjs
       - run: python scripts/modelling-kit/verify.py
+      - run: python scripts/modelling-kit/visual-handoff.py out/modelling-kit-v2-hd --before out/previous-studio --body-before out/previous-hero --showcase
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: YUNEX-MODELLING-KIT-V2-REVIEW
           path: out/modelling-kit-v2-hd
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-STUDIO-SHOWCASE
+          path: |
+            out/modelling-kit-v2-hd/handoff
+            out/modelling-kit-v2-hd/native-camera-comparison.jpg
+            out/modelling-kit-v2-hd/native-body-comparison.jpg
           retention-days: 30
