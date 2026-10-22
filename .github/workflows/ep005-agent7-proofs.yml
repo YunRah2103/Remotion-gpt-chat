@@ -24,6 +24,8 @@ jobs:
       - run: npm ci
       - name: TypeScript validation
         run: npm run check
+      - name: Deterministic port and engine unit tests
+        run: node --experimental-strip-types --test tests/ep005-agent7.test.mjs
       - name: System ffmpeg
         run: ffmpeg -version | head -n 1
       - name: Render genuine native 3s moving fixture preview
