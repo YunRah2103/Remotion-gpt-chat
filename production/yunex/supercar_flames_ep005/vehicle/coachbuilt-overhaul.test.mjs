@@ -21,7 +21,7 @@ test('wheel details parent to wheel-roll while driver remains articulated',()=>{
  assert.match(quality,/add\(roll,'overhaul-forged-spoke-/);
  assert.match(quality,/add\(roll,'overhaul-ventilated-rotor-/);
  assert.match(quality,/getObjectByName\('driver-rig'\)/);
- assert.match(quality,/getObjectByName\('bucket-seat-shell'\)/);
+ assert.match(quality,/o.name==='bucket-seat-shell'/);
 });
 test('actual exhaust ports and A2 radii unchanged',()=>{
  assert.equal(mounts.length,2);
