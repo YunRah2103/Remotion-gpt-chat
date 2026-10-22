@@ -104,7 +104,7 @@ const CameraMoving: React.FC<{motion: VehicleMotionState; secondShot: boolean}> 
     motion.worldPosition[0], motion.worldPosition[1] + 0.48, motion.worldPosition[2],
   ];
   return <CameraAim position={eye.toArray() as [number, number, number]}
-                    target={target} fov={secondShot ? 47 : 43}/>;
+                    target={[...target] as [number, number, number]} fov={secondShot ? 47 : 43}/>;
 };
 
 const ProofFrame: React.FC<{mode: Mode}> = ({mode}) => {
