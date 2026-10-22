@@ -102,3 +102,27 @@ The complete recipe is editable source in `twin-turbo-demo.ts`, installed throug
 `kit:scene --shot` writes an MP4 plus a SHA256/source/shot contract. `kit:assemble -- <slug> [downloaded-shot-folder]` verifies those contracts, native dimensions, frame counts and full decode for **every shot**, then concatenates without interpolation or re-encoding. It rejects modified files, changed shot recipes and changed renderer source. Render only invalid shots again; unchanged artifacts can be reused while their source and shot contracts match. Script and shared renderer edits invalidate cached clips conservatively. Keep sidecar `.mp4.json` files with their MP4s.
 
 Assembly currently accepts silent portrait clips only; use the full `kit:scene` render for supplied narration/music so original audio spans the complete timeline. An assembled file and technical report still require actual moving-footage review. The V3 native workflow retains all eight short modelling proofs and separately renders/assembles the seven demo shots, with an editable project, timeline sheet and complete decode report.
+
+## Recovery additions: precise edits and independent films
+
+`npm run kit:catalog -- electric` searches all vehicle/part labels and metadata. Omit the query to retain the complete catalogue.
+
+`kit:inspect` includes a `path` for each named node. Copy that exact path into a model edit's `target` to select one repeated rim or intake. Paths contain sibling indices and belong to the source revision inspected. Plain-name edits preserve legacy first-match behaviour, with ambiguity diagnostics; set `match:'unique'` for strict selection. `selectModelObject(root,target)` is strict. Private variants retain canonical JSON/TS source; shared originals are never rewritten.
+
+Custom mounts may declare `kind:'engine'` or `accepts:['engine']`. `attachAt` rejects incompatible typed plugs before changing parentage; legacy untyped mounts have no compatibility certification. `fitDiagnostics` now returns a proposed parent-space uniform scale and translation. These are suggestions only: review actual geometry, update mount alignment and rerun diagnostics before applying them.
+
+Structured briefs also accept full `vehicle` and `environment` objects, plus original `audio`, `words` and `captions`. This preserves private geometry variants, supplied exact timestamps, music and night/wet settings through the same compiler. Nothing estimates speech timings.
+
+For isolated part or assembly shots set `context:'inspection'` to use a clean grounded studio view. Keep ordinary driving shots in default world context. For EV cutaways `energyFlow:'regenerate'` shows illustrative energy travelling from the actual motor centre towards the battery; `'drive'` reverses it. Markers respect depth and do not represent a calibrated power simulation.
+
+Independent reusable example: `node --experimental-strip-types scripts/modelling-kit/regeneration-demo.mjs`, then the same `kit:plan`, `kit:inspect`, `kit:review`, `kit:scene` and `kit:assemble` commands with `ev-regeneration-proof`. This creates a new editable 12-second, 360-frame silent proof using the existing EV/mountain assets. Creation is non-destructive and refuses duplicate slugs. See YUNEX_V3_RECOVERY_HANDOFF.md for verification status; source existence is not MP4 acceptance.
+
+## Coachbuilt bodies and rally hatch
+
+The catalogue now contains **36 vehicles**: every original 35 ID remains, plus `rally-hatch`. All 20 environments remain compatible. Standard hero vehicles use a new source-based body finish: stronger compound door/bonnet/rear-quarter curvature, tapered cabin, denser glazed surfaces, rounded mirror housings with fitted glass, optical headlamp lenses and rolling valve detail. Modern Formula adds a genuinely tapered engine cover, curved halo and cooling gills. Existing wheel/driver/mechanical anchors remain canonical.
+
+For a matching-camera baseline set `vehicle.bodyDetail:'legacy'`; the default is `'coachbuilt'`. This is a visual model option, not a replacement animation rig. Retro and intentionally boxy utility silhouettes retain their design. Lightweight assets remain unchanged.
+
+Use `vehicle.variant:'rally-hatch'` with the usual studio workflow, or `createCinematicVehicle({variant:'rally-hatch',driver:true,quality:'hero'})`. The original rally model includes four widened arch shells, raised ride height, white multi-spoke rolling wheels, gravel tread, supported four-light bar, roof scoop, mud flaps, rear wing, fitted roll cage and geometric livery. These are editable named meshes; no shared model source is overwritten by private variants. Select `world.kind:'rally'`, `'forest'`, `'snow'` or any existing environment.
+
+Run `node --experimental-strip-types scripts/modelling-kit/vehicle-quality.mjs --vehicle=rally-hatch --style=coachbuilt` for an ordinary editable six-second driving project. Add `--cabin` for a separate cage/interior/onboard proof. For matching-camera before/after tests use `city-ev`, `supercar`, `crossover` or `formula-modern` with `--style=legacy` and `--style=coachbuilt`. Native videos still require decode and actual visual inspection; geometry tests alone cannot certify a significant aesthetic improvement.

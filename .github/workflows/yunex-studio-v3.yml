@@ -61,7 +61,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shot: [hook, exhaust, shaft, charge, combustion, installed, payoff]
+        include:
+          - {project: twin-turbo-complete, script: complete-demo, shot: hook}
+          - {project: twin-turbo-complete, script: complete-demo, shot: exhaust}
+          - {project: twin-turbo-complete, script: complete-demo, shot: shaft}
+          - {project: twin-turbo-complete, script: complete-demo, shot: charge}
+          - {project: twin-turbo-complete, script: complete-demo, shot: combustion}
+          - {project: twin-turbo-complete, script: complete-demo, shot: installed}
+          - {project: twin-turbo-complete, script: complete-demo, shot: payoff}
+          - {project: ev-regeneration-proof, script: regeneration-demo, shot: decelerate}
+          - {project: ev-regeneration-proof, script: regeneration-demo, shot: recover}
+          - {project: ev-regeneration-proof, script: regeneration-demo, shot: generator}
+          - {project: ev-regeneration-proof, script: regeneration-demo, shot: continue}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -69,18 +80,24 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci --no-audit --no-fund
-      - run: node --experimental-strip-types scripts/modelling-kit/complete-demo.mjs
-      - run: npm run kit:inspect -- twin-turbo-complete
-      - run: npm run kit:scene -- twin-turbo-complete --shot=${{ matrix.shot }}
+      - run: node --experimental-strip-types scripts/modelling-kit/${{ matrix.script }}.mjs
+      - run: npm run kit:inspect -- ${{ matrix.project }}
+      - run: npm run kit:scene -- ${{ matrix.project }} --shot=${{ matrix.shot }}
       - uses: actions/upload-artifact@v4
         with:
-          name: YUNEX-V3-complete-shot-${{ matrix.shot }}
-          path: out/studio/twin-turbo-complete/
+          name: YUNEX-V3-${{ matrix.project }}-shot-${{ matrix.shot }}
+          path: out/studio/${{ matrix.project }}/
           retention-days: 30
   complete-demo:
     needs: demo-shot
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {project: twin-turbo-complete, script: complete-demo}
+          - {project: ev-regeneration-proof, script: regeneration-demo}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -89,19 +106,19 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: bash scripts/modelling-kit/install-native-media.sh
-      - run: node --experimental-strip-types scripts/modelling-kit/complete-demo.mjs
+      - run: node --experimental-strip-types scripts/modelling-kit/${{ matrix.script }}.mjs
       - uses: actions/download-artifact@v4
         with:
-          pattern: YUNEX-V3-complete-shot-*
-          path: out/studio/twin-turbo-complete
+          pattern: YUNEX-V3-${{ matrix.project }}-shot-*
+          path: out/studio/${{ matrix.project }}
           merge-multiple: true
-      - run: npm run kit:assemble -- twin-turbo-complete
-      - run: npm run kit:handoff -- twin-turbo-complete
+      - run: npm run kit:assemble -- ${{ matrix.project }}
+      - run: npm run kit:handoff -- ${{ matrix.project }}
       - run: |
-          cp -r src/yunex/studio-projects/twin-turbo-complete out/studio/twin-turbo-complete/editable-project
-          ffmpeg -v error -i out/studio/twin-turbo-complete/complete-silent.mp4 -vf "fps=2,scale=270:480,tile=5x10" -frames:v 1 out/studio/twin-turbo-complete/timeline.jpg
+          cp -r src/yunex/studio-projects/${{ matrix.project }} out/studio/${{ matrix.project }}/editable-project
+          ffmpeg -v error -i out/studio/${{ matrix.project }}/complete-silent.mp4 -vf "fps=2,scale=270:480,tile=5x10" -frames:v 1 out/studio/${{ matrix.project }}/timeline.jpg
       - uses: actions/upload-artifact@v4
         with:
-          name: YUNEX-V3-TWIN-TURBO-COMPLETE-SILENT-1080p30
-          path: out/studio/twin-turbo-complete
+          name: YUNEX-V3-${{ matrix.project }}-SILENT-1080p30
+          path: out/studio/${{ matrix.project }}
           retention-days: 30

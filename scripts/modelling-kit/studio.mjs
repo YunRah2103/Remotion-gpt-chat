@@ -30,7 +30,7 @@ export function previewArguments(root,name){
 }
 export function main(args=process.argv.slice(2),root=process.cwd()){
  const [command,name,template]=args;
- if(command==='catalog')return console.log(JSON.stringify({vehicles:VEHICLES.map(v=>({...v,driverSupported:v.family!=='bike'})),environments:ENVIRONMENTS,parts:PARTS,templates:Object.keys(STUDIO_RECIPES)},null,2));
+ if(command==='catalog'){const query=args.slice(1).join(' ').trim().toLowerCase(),matches=v=>!query||JSON.stringify(v).toLowerCase().includes(query);return console.log(JSON.stringify({vehicles:VEHICLES.filter(matches).map(v=>({...v,driverSupported:v.family!=='bike'})),environments:ENVIRONMENTS.filter(matches),parts:PARTS.filter(matches),templates:Object.keys(STUDIO_RECIPES).filter(matches)},null,2));}
  if(command==='create')return console.log(createProject(root,name,template));
  if(command==='validate'){const {compiled}=validateProject(root,name);return console.log(JSON.stringify({id:compiled.id,fps:30,width:1080,height:1920,frames:compiled.durationInFrames,shots:compiled.shots.map(s=>({id:s.id,start:s.startFrame,end:s.endFrame,part:s.part,camera:s.camera}))},null,2));}
  if(command==='preview'){const plan=previewArguments(root,name);if(args.includes('--dry-run'))return console.log(JSON.stringify(plan,null,2));const output=resolve(root,'out/studio',name,'previews');mkdirSync(output,{recursive:true});for(const shot of plan){const result=spawnSync('npx',shot.args,{cwd:root,stdio:'inherit'});if(result.error)throw result.error;if(result.status!==0){process.exitCode=result.status??1;return;}}writeFileSync(resolve(output,'shots.json'),JSON.stringify(plan.map(({shot,frame,args})=>({shot,frame,file:args[4]})),null,2)+'\n');return console.log(output);}

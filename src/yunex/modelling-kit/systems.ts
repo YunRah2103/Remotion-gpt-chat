@@ -35,3 +35,16 @@ export function animateMechanicalSystems(g:T.Group,root:T.Group,bodyY:number){
  g.children.forEach(o=>{if(!o.userData.wheelEndpoint)return;const mount=root.getObjectByName(o.userData.wheelEndpoint)!;
  const a=new T.Vector3(...o.userData.inboard),b=mount.position.clone();b.y-=bodyY;const d=b.clone().sub(a);o.position.copy(a).add(b).multiplyScalar(.5);o.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.clone().normalize());o.scale.y=d.length();});
 }
+
+/** Illustrative electrical energy direction, not a battery/torque simulation. Actual component centres anchor the route. */
+export function animateEnergyFlow(root:T.Group,direction:'drive'|'regenerate'|undefined,time:number){
+ if(!Number.isFinite(time))throw Error('Invalid energy-flow time');
+ let flow=root.getObjectByName('energy-flow') as T.Group|undefined;
+ const motor=root.getObjectByName('traction-motor'),battery=root.getObjectByName('traction-battery');
+ if(!direction||!motor||!battery){if(flow)flow.visible=false;return;}
+ if(!flow){flow=new T.Group();flow.name='energy-flow';const material=new T.MeshBasicMaterial({color:'#5effca',depthTest:true});for(let i=0;i<7;i++){const dot=new T.Mesh(new T.SphereGeometry(.035,10,8),material);dot.name=`energy-packet-${i}`;flow.add(dot);}root.add(flow);}
+ flow.visible=true;root.updateMatrixWorld(true);
+ const a=root.worldToLocal(motor.getWorldPosition(new T.Vector3())),b=root.worldToLocal(battery.getWorldPosition(new T.Vector3()));
+ flow.userData.endpoints=[a.toArray(),b.toArray()];
+ for(let i=0;i<flow.children.length;i++){const phase=((time*.45+i/flow.children.length)%1+1)%1;flow.children[i].position.lerpVectors(a,b,direction==='regenerate'?phase:1-phase);}
+}

@@ -1,3 +1,6 @@
+import {sculptedFascia} from './fascia.ts';
+import {coachbuiltFinish} from './coachbuilt.ts';
+import {rallyDetails} from './rally.ts';
 import {createAssembly,animateAssembly} from './authoring.ts';
 import type {AssemblySpec} from './authoring.ts';
 import * as T from 'three';
@@ -19,7 +22,7 @@ import {tyreDetail,floorAssembly,suspensionLinks} from './details.ts';
 import {deformTyre,deformBody,createFragments,animateFragments,createTornCarcass,damageRim,groundTornCords} from './damage.ts';
 
 export const HERO_VEHICLES=['hot-hatch','supercar','formula-modern'] as const satisfies readonly VehicleVariant[];
-export type CinematicOptions=VehicleOptions & {quality?:'lightweight'|'standard'|'hero';paintPreset?:'lacquer'|'satin';tyreType?:'road'|'slick';optimize?:boolean;driver?:boolean;powertrain?:AssemblySpec};
+export type CinematicOptions=VehicleOptions & {quality?:'lightweight'|'standard'|'hero';paintPreset?:'lacquer'|'satin';bodyDetail?:'legacy'|'coachbuilt';tyreType?:'road'|'slick';optimize?:boolean;driver?:boolean;powertrain?:AssemblySpec};
 export type WheelCorner='front-left'|'front-right'|'rear-left'|'rear-right'|'rear-aux-left'|'rear-aux-right';
 export type CinematicState={frame:number;fps:number;distance?:number;steer?:number;compression?:number;tyreDamage?:number;damagedWheel?:WheelCorner;bodyDamage?:number;cutaway?:number;exploded?:number;highlight?:'engine'|'underfloor'|'wheels';heat?:number;failureFrame?:number;braking?:number;impact?:number;gearChange?:number};
 type Rig={driver?:T.Group;systems?:T.Group;shell:T.Group;mounts:T.Group[];engine?:T.Group;floor?:T.Group;links:T.Group[];sparks:T.InstancedMesh;fragments:T.Group;body?:T.Mesh};
@@ -28,6 +31,7 @@ function materials(root:T.Object3D,fn:(m:T.MeshStandardMaterial)=>void){root.tra
 function rememberMaterials(root:T.Object3D){materials(root,m=>{m.userData.shaderTransparent=m.transparent;m.userData.baseline={opacity:m.opacity,transparent:m.transparent,depthWrite:m.depthWrite,emissive:m.emissive.getHex(),intensity:m.emissiveIntensity};});}
 function fade(root:T.Object3D,value:number,highlight=false){materials(root,m=>{const b=m.userData.baseline;if(!b)return;m.opacity=b.opacity*(1-value*.94);m.transparent=value>0||b.transparent;m.depthWrite=value>0?false:b.depthWrite;m.emissive.setHex(highlight?0x15c7bd:b.emissive);m.emissiveIntensity=highlight?.65:b.intensity;});}
 export function createCinematicVehicle(options:CinematicOptions):T.Group{
+ if(options.bodyDetail!==undefined&&!['legacy','coachbuilt'].includes(options.bodyDetail))throw Error('Unknown body detail');
  const quality=options.quality??'hero';if(!['lightweight','standard','hero'].includes(quality))throw new Error('Unknown quality');
  const root=createVehicle(options),s=vehicleSpec(options.variant);root.userData.quality=quality;root.userData.accuracy='Illustrative kinematic rig; not validated engineering simulation';
  if(quality==='lightweight')return root;
@@ -41,7 +45,7 @@ export function createCinematicVehicle(options:CinematicOptions):T.Group{
    if(quality==='hero'){const roll=mount.getObjectByName('wheel-roll')!;tyreDetail(roll,s.radius,s.family==='formula'?.32:s.family==='sports'?.28:.235,options.tyreType==='slick'||s.family==='formula');}
   }else shell.add(o);
  }
- if(quality==='hero'){roadHeroDetails(shell,s);premiumExterior(shell,s);sculptShell(shell,s);formulaHeroDetails(shell,mounts,s);enhanceCabin(shell,s,options);}
+ if(quality==='hero'){roadHeroDetails(shell,s);premiumExterior(shell,s);if(options.bodyDetail!=='legacy')sculptedFascia(shell,s);sculptShell(shell,s);formulaHeroDetails(shell,mounts,s);enhanceCabin(shell,s,options);if(options.bodyDetail!=='legacy')coachbuiltFinish(shell,mounts,s);rallyDetails(shell,mounts,s,options.bodyDetail!=='legacy');}
  // Material clones isolate fades/highlights between components and between vehicles.
  const originals=new Set<T.Material>();
  for(const scope of [shell,...mounts]){const clones=new Map<T.Material,T.Material>();scope.traverse(o=>{if(o instanceof T.Mesh){const clone=(m:T.Material)=>{let c=clones.get(m);if(!c){c=m.clone();clones.set(m,c);originals.add(m);}return c;};o.material=Array.isArray(o.material)?o.material.map(clone):clone(o.material);}});}
@@ -72,7 +76,7 @@ export function animateCinematicVehicle(root:T.Group,state:CinematicState){
  const {distance=0,steer=0,compression=0,tyreDamage=0,bodyDamage=0,cutaway=0,exploded=0,highlight,heat=0}=state;
  animateVehicle(root,distance,steer);const rig=rigs.get(root);if(!rig)return;
  const {driver,systems,shell,mounts,engine,floor,links,sparks,fragments,body}=rig,s=vehicleSpec(root.userData.variant);
- shell.position.set(0,-Math.min(compression,floor?.05:.12)-tyreDamage*.025+exploded*.65,0);shell.rotation.z=-tyreDamage*.012;
+ shell.position.set(0,(s.bodyStyle==='rally'?.045:0)-Math.min(compression,floor?.05:.12)-tyreDamage*.025+exploded*.65,0);shell.rotation.z=-tyreDamage*.012;
  fade(shell,cutaway);if(body)deformBody(body,bodyDamage,s.width);
  let damagedOrigin=new T.Vector3();
  mounts.forEach((m,i)=>{
@@ -80,7 +84,7 @@ export function animateCinematicVehicle(root:T.Group,state:CinematicState){
   m.position.set(rest[0],rest[1]-d*Math.min(.08,s.radius*.22),rest[2]+Math.sign(rest[2])*exploded*.65);
   const roll=m.getObjectByName('wheel-roll')!,tyre=m.getObjectByName('tyre') as T.Mesh;deformTyre(tyre,d,roll.rotation.z,m.position.y);
   // Detailed rolling marks are hidden on a failed carcass to avoid rigid floating tread.
-  roll.traverse(o=>{if(['hero-tread','sidewall-mould-ring','sidewall-mark','tyre-groove','sidewall-bead'].includes(o.name))o.visible=d<.1;});
+  roll.traverse(o=>{if(['hero-tread','sidewall-mould-ring','sidewall-mark','tyre-groove','sidewall-bead','rally-tread'].includes(o.name))o.visible=d<.1;});
   const torn=roll.getObjectByName('torn-cords')!;torn.visible=d>.55;torn.scale.setScalar(Math.max(0,(d-.55)/.45));
   roll.traverse(o=>{if(o instanceof T.Mesh&&['rim-lip','rim-barrel'].includes(o.name))damageRim(o,Math.max(0,(d-.65)/.35));});
   roll.rotation.x=d*.055*Math.sin(state.frame/state.fps*19);

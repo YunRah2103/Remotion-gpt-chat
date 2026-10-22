@@ -5,8 +5,8 @@ import {PARTS} from '../parts-kit/catalog.ts';
 import type {PartVariant} from '../parts-kit/catalog.ts';
 import {drivingState} from './driving.ts';
 import type {DrivingAction,CameraPreset} from './driving.ts';
-export type StudioShot={id:string;duration:number;camera:CameraPreset;action:DrivingAction;caption:string;orbit?:{azimuth:number;elevation:number;sweep?:number};joints?:Record<string,number>;jointTracks?:Record<string,{time:number;value:number}[]>;part?:PartVariant;assembly?:AssemblySpec;cutaway?:number;exploded?:number;highlight?:'engine'|'underfloor'|'wheels';annotation?:{anchor:'engine'|'front-wheel'|'driver'|'underfloor'|'part';text:string}};
-export type EpisodeRecipe={id:string;title:string;vehicle:{variant:VehicleVariant;driver?:boolean;color?:string;powertrain?:AssemblySpec;model?:ModelVariation;components?:ComponentSpec[]};world:{kind:EnvironmentKind;wetness?:number;timeOfDay?:'day'|'dusk'|'night';model?:ModelVariation;components?:ComponentSpec[]};shots:StudioShot[];words?:{text:string;start:number;end:number}[];captions?:{start:number;end:number;text:string}[];audio?:{narration?:string;music?:string;musicVolume?:number}};
+export type StudioShot={context?:'world'|'inspection';energyFlow?:'drive'|'regenerate';id:string;duration:number;camera:CameraPreset;action:DrivingAction;caption:string;orbit?:{azimuth:number;elevation:number;sweep?:number};joints?:Record<string,number>;jointTracks?:Record<string,{time:number;value:number}[]>;part?:PartVariant;assembly?:AssemblySpec;cutaway?:number;exploded?:number;highlight?:'engine'|'underfloor'|'wheels';annotation?:{anchor:'engine'|'front-wheel'|'driver'|'underfloor'|'part';text:string}};
+export type EpisodeRecipe={id:string;title:string;vehicle:{bodyDetail?:'legacy'|'coachbuilt';variant:VehicleVariant;driver?:boolean;color?:string;powertrain?:AssemblySpec;model?:ModelVariation;components?:ComponentSpec[]};world:{kind:EnvironmentKind;wetness?:number;timeOfDay?:'day'|'dusk'|'night';model?:ModelVariation;components?:ComponentSpec[]};shots:StudioShot[];words?:{text:string;start:number;end:number}[];captions?:{start:number;end:number;text:string}[];audio?:{narration?:string;music?:string;musicVolume?:number}};
 export type CompiledRecipe=Omit<EpisodeRecipe,'shots'> & {fps:number;durationInFrames:number;shots:(StudioShot & {startFrame:number;endFrame:number;distanceOffset:number})[]};
 const fail=(message:string):never=>{throw new Error(message);};
 export function compileRecipe(input:EpisodeRecipe,fps=30):CompiledRecipe{
@@ -14,6 +14,7 @@ export function compileRecipe(input:EpisodeRecipe,fps=30):CompiledRecipe{
  const r=JSON.parse(JSON.stringify(input)) as EpisodeRecipe;
  if(typeof r.id!=='string'||typeof r.title!=='string'||!r.id||!r.title)fail('Recipe requires id and title');
  const vehicle=VEHICLES.find(v=>v.id===r.vehicle?.variant);if(!vehicle)fail('Unknown vehicle');
+ if(r.vehicle.bodyDetail!==undefined&&!['legacy','coachbuilt'].includes(r.vehicle.bodyDetail))fail('Unknown body detail');
  if(r.vehicle.driver&&vehicle!.family==='bike')fail('Motorcycle driver is not supported');
  if(!ENVIRONMENTS.some(v=>v===r.world?.kind))fail('Unknown world');
  if(r.world.timeOfDay!==undefined&&!['day','dusk','night'].includes(r.world.timeOfDay))fail('Unknown time of day');
@@ -21,6 +22,8 @@ export function compileRecipe(input:EpisodeRecipe,fps=30):CompiledRecipe{
  for(const model of [r.vehicle.model,r.world.model])if(model&&(model.version!==1||!model.id||!Array.isArray(model.edits)))fail('Invalid model variation');
  let cursor=0,distance=0;const ids=new Set<string>();
  const shots=r.shots.map(s=>{
+  if(s.context!==undefined&&!['world','inspection'].includes(s.context))fail('Unknown shot context');
+  if(s.energyFlow!==undefined&&!['drive','regenerate'].includes(s.energyFlow))fail('Unknown energy flow');
   if(typeof s.caption!=='string')fail('Shot caption must be text');
   if(typeof s.id!=='string'||!s.id||ids.has(s.id))fail('Shot ids must be unique');ids.add(s.id);
   if(!Number.isFinite(s.duration)||Math.round(s.duration*fps)<1)fail('Shot duration must contain at least one frame');
