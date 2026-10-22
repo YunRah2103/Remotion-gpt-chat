@@ -1,5 +1,5 @@
-# EP004 QUALITY V2 — Four New Agent Launch Prompts
-**These are four separate ChatGPT sessions. They have NOT been started automatically.** Paste the matching single paragraph into each new session. No manual copying of the full handoff is necessary; the GitHub issue owns it.
+# EP004 QUALITY V2 — Five New Agent Launch Prompts
+**These are five separate ChatGPT sessions. They have NOT been started automatically.** Paste the matching single paragraph into each new session. No manual copying of the full handoff is necessary; the GitHub issue owns it.
 
 ## Agent 8 — V2 Formula car / skid adapter
 ```
@@ -21,7 +21,12 @@ YUNEX EP004 — AGENT 10: CINEMATIC CAMERA/ACTION RESCUE. Repo YunRah2103/Remoti
 YUNEX EP004 — AGENT 11: NIGHT CIRCUIT LOOKDEV. Repo YunRah2103/Remotion-gpt-chat. Read complete Issue #238 and master #234. Use existing agent/ep004-11-night-world branch and actual pre-made kit V2 cinematic environment/lighting while preserving original Agent4 physics-profile road. Avoid double asphalt, toy materials, flat grey light, washed-out/grain/dark car. Make stunning illuminated driving shots and spark reflections from actual Agent2 data, verify two genuine moving portrait 1080x1920/30 MP4s, tests and before/after, submit PR into production/yunex-ep004-quality-v2 and issue handoff #238. Never touch EP003/main/kit PR #233/editor or merge.
 ```
 
-## Return to Agent 0 once all four PRs exist
+## Return to Agent 0 once all five PRs exist
 ```
-YUNEX EP004 — AGENT 0: Review quality rescue master Issue #234, four specialist Issues #235–#238, exact kit V2 source PR #233, all new native previews, and existing Agent 6 PR #223. Verify actual frames and science; give each specialist targeted corrections in THEIR issue. Merge only approved source into isolated production/yunex-ep004-quality-v2. Prepare a safe real-VO editorial handoff to existing Agent 6, keeping original 25.248-second EP004 Cedar narration and genuine word timings. Do not merge into main or touch EP003.
+YUNEX EP004 — AGENT 0: Review quality rescue master Issue #234, five specialist Issues #235–#239, exact kit V2 source PR #233, all new native previews, and existing Agent 6 PR #223. Verify actual frames and science; give each specialist targeted corrections in THEIR issue. Merge only approved source including Agent 12 captions into isolated production/yunex-ep004-quality-v2. Prepare a safe real-VO editorial handoff to existing Agent 6, keeping original 25.248-second EP004 Cedar narration and genuine word timings. Do not merge into main or touch EP003.
+```
+
+## Agent 12 — subtitles, cinematic UI and explaining the science
+```
+YUNEX EP004 — Agent 12: CINEMATIC UI & SUBTITLES. Repo YunRah2103/Remotion-gpt-chat. Read your entire GitHub Issue #239 and quality dashboard #234. Work on assigned branch agent/ep004-12-motion-graphics using the PREMADE modelling kit V2 and the actual EP004 A1–A5 scene. Create beautiful readable phone-safe 9:16 highlighted subtitles and subtle camera-tracked visual callouts explaining real metal skid vs plank vs carbon, aero loading and true contact sparks. Do not crowd the moving car, create another narration or invent verified word timings. Integrate as optional overlays for existing Agent6 editor; don't edit Agent6, EP003 or main. Implement, test, render and inspect genuine moving MP4s, open PR only into production/yunex-ep004-quality-v2, and post GitHub handoff to Issue #239. Do not merge.
 ```
