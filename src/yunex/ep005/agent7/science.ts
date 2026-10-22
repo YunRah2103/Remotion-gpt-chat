@@ -92,13 +92,13 @@ export function buildScienceEngine():ScienceAssembly {
     }
     const trunk=pipe(root,[new T.Vector3(-1.05,.10,side*.77),
       new T.Vector3(-1.5,.02,side*.67),new T.Vector3(-1.95,-.02,side*.64),
-      new T.Vector3(-2.5,-.06,side*.71)],.075,titanium,'collector to rear exhaust');
+      new T.Vector3(-2.5,-.06,side*.71)],.051,titanium,'collector to rear exhaust');
     routes.push(trunk);
     // Real collector/terminal tube, NOT fake oversized decorative pipes.
-    const tip=cylinder(root,'illustrative downstream exhaust outlet',.078,.105,machined,
+    const tip=cylinder(root,'illustrative downstream exhaust outlet',.059,.105,machined,
       new T.Vector3(-2.50,-.06,side*.71));
     tip.rotation.z=Math.PI/2;
-    const inner=cylinder(root,'open exhaust bore',.053,.108,shadow,
+    const inner=cylinder(root,'open exhaust bore',.044,.108,shadow,
       new T.Vector3(-2.555,-.06,side*.71));
     inner.rotation.z=Math.PI/2;
     for(let j=0;j<14;j++){
@@ -137,7 +137,7 @@ export function buildScienceEngine():ScienceAssembly {
  * The illustration is NOT a calibrated combustion/gas simulation.
  */
 export function animateScienceEngine(a:ScienceAssembly,t:number,phase:0|1|2):void {
-  a.crank.rotation.x=0;a.crank.rotation.z=t*11;
+  a.crank.rotation.set(t*11,0,0);
   for(const item of a.pistons){
     const s=Math.sin(t*11+item.phase);
     item.head.position.y=.27+.086*s;
