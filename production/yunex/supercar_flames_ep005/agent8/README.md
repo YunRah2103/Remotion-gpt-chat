@@ -67,3 +67,21 @@ Pipeline downloads only pinned named GitHub workflow artifacts, verifies each MP
 4. Therefore no genuine complete EP005 candidate MP4 exists yet. Branch is an editorial source and native render workflow, not a finished film.
 
 No changes to EP003, EP004, kit PR #233 or rejected EP005 production branches.
+
+
+## Continuation checkpoint — new car / flame gates and audio mastering
+
+**Agent 6 #265 / PR #270:** The first Spectral GT RS candidate A was rejected after genuine portrait/landscape frame inspection. Its source `bc0185ece668d6ebb1f0f58adbc62edec0ce2cb4`, genuine rejected video hashes, and `exhaust-ports.v1.json` are BLACKLISTED. New Khronos CarConcept candidate B needed a proper KTX2 loader/transcoding repair before native visual acceptance. Do not use candidate A's mount geometry or assume candidate B's compatibility from old port coordinates.
+
+**Agent 7 #266 / PR #268:** Native fixture and V8 science proofs exist but are not integrated shots. Previous visuals were judged too distant and fire too weak; agent continues improvements. Await *new approved* hero world-port interface before f0 and f675 composite. Do not extract fixture flame to paste onto an approximate screen position.
+
+**Agent 8 new audio build:**
+- Edit-to-beat silent source sheet is `audio-cue-sheet.json`; all proposed stems remain NULL and explicitly unapproved.
+- `voice.approved=true` requires original audio SHA256, specific issue-comment approval, GitHub run+artifact, source SHA, actual independently measured `verifiedDurationSeconds` at/below 25.005s. The renderer blocks mismatched source duration and prevents cropping of longer narrator audio. Final voice timing has priority over provisional picture cuts.
+- Subtitles must be exact verified captions in 30fps frame units, ordered without overlaps and never extending beyond the actual narration length. No generated fake Cedar timestamps or implied recording.
+- Each approved engine/road/afterfire/music stem must have an authenticated source commit, explicit owner/manager approval, native SHA256, workflow artifact identity, license/provenance and -48 to -10dB pre-mix gain. Stems are dynamically sidechain-ducked against the unchanged narration. Mix targets -16 LUFS / -1.5dBTP, AAC stereo 48k / 192k.
+- `audio-filter-smoke.mjs` tests the real production filter chain with *synthetic one-second tone only* and produces NO user-facing film. This prevents claiming that synthetic diagnostic audio is an EP005 soundtrack.
+- After actual native MP4 render, `audio-qc.mjs` checks real audio-stream count, AAC stereo 48k, 25s duration, integrated loudness, true peak and generates `audio-qc-report.json`. No-audio picture review must have exactly zero audio streams.
+- In addition to cut and opening/ending sample frames, the renderer exports ALL f0–29 and f675–749 frames (105 compact thumbnails) and rejects an essentially static hook or ending. This is automated motion QA, NOT a replacement for watching the entire genuine MP4 and separately approving car geometry/fire/science.
+
+**Next authorized edit step:** Agent 6 supplies owner-accepted car B-or-later moving video and new exhaust port ABI; Agent 7 supplies matching port-anchored transient flame and science clips, both source/media hashes plus approval comments; editor pins only those exact files. If no approved voice exists, produce only genuine SILENT PICTURE REVIEW; no dummy narrator or undeserved final-audio claim. No merge.
