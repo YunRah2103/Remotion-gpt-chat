@@ -1,0 +1,37 @@
+{
+  "id": "ep005-a4-environment",
+  "title": "Midnight Boulevard / Supercar Flames Lighting Study",
+  "vehicle": {
+    "variant": "supercar",
+    "driver": true,
+    "color": "#123e4b"
+  },
+  "world": {
+    "kind": "city",
+    "timeOfDay": "night",
+    "wetness": 0.16
+  },
+  "shots": [
+    {
+      "id": "rear-moving-hook",
+      "duration": 2,
+      "camera": "chase",
+      "action": "cruise",
+      "caption": "Night boulevard / moving rear three-quarter"
+    },
+    {
+      "id": "wet-asphalt-reflection",
+      "duration": 2,
+      "camera": "tracking",
+      "action": "cruise",
+      "caption": "Real tyre contact / premium streetlight pools"
+    },
+    {
+      "id": "tunnel-threshold",
+      "duration": 2,
+      "camera": "chase",
+      "action": "cruise",
+      "caption": "Architectural tunnel approach / restrained atmosphere"
+    }
+  ]
+}

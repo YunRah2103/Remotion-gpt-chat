@@ -1,0 +1,79 @@
+name: YUNEX EP005 Agent 4 - Native Premium Road/Lighting Review
+on:
+  pull_request:
+    branches:
+      - production/yunex-ep005-v3-base
+    paths:
+      - 'production/yunex/supercar_flames_ep005/look/**'
+      - 'src/yunex/studio-projects/ep005-a4-environment/**'
+      - '.github/workflows/yunex-ep005-a4-look.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  agent4-native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Native renderer setup
+        run: bash scripts/modelling-kit/install-native-media.sh
+      - name: V3 TypeScript and A4 route/fixture tests
+        run: |
+          npm run check
+          node --experimental-strip-types --test production/yunex/supercar_flames_ep005/look/*.test.mjs
+      - name: V3 authoring gates
+        run: |
+          npm run kit:catalog > /dev/null
+          npm run kit:validate -- ep005-a4-environment
+          npm run kit:plan -- ep005-a4-environment
+          npm run kit:inspect -- ep005-a4-environment
+          npm run kit:handoff -- ep005-a4-environment
+      - name: Real moving 1080x1920 / 30fps native premium scene
+        run: npm run kit:render -- ep005-a4-environment
+      - name: Matched baseline scene for look comparison
+        run: |
+          mkdir -p out/ep005-a4
+          npx remotion render production/yunex/supercar_flames_ep005/look/preview-entry.tsx EP005A4Baseline out/ep005-a4/baseline.mp4 --frames=0-59 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2 --log=error
+      - name: Full native media QA plus frames at cuts
+        run: |
+          python3 - <<'PY'
+          import subprocess,json,hashlib,pathlib
+          target=pathlib.Path('out/ep005-a4');target.mkdir(parents=True,exist_ok=True)
+          clips=[(pathlib.Path('out/studio/ep005-a4-environment.mp4'),'premium',180),(target/'baseline.mp4','baseline',60)]
+          report={}
+          for path,name,expected in clips:
+              info=json.loads(subprocess.check_output(['ffprobe','-v','error','-select_streams','v:0','-count_frames','-show_entries','stream=codec_name,width,height,avg_frame_rate,nb_read_frames','-of','json',str(path)]))['streams'][0]
+              assert (info['width'],info['height'])==(1080,1920),(name,info)
+              assert info['avg_frame_rate']=='30/1',(name,info)
+              assert int(info['nb_read_frames'])==expected,(name,info)
+              subprocess.run(['ffmpeg','-v','error','-xerror','-i',str(path),'-f','null','-'],check=True)
+              stamps=[0,10,23,29,59] if name=='baseline' else [0,10,23,29,59,60,89,119,120,149,179]
+              for frame in stamps:
+                  dest=target/(name+'-f'+str(frame)+'.jpg')
+                  subprocess.run(['ffmpeg','-y','-v','error','-i',str(path),'-vf','select=eq(n\\,'+str(frame)+')','-vsync','vfr','-frames:v','1',str(dest)],check=True)
+                  assert dest.exists() and dest.stat().st_size>1000,(name,frame)
+              data=subprocess.check_output(['ffmpeg','-v','error','-i',str(path),'-vf','fps=2','-f','framemd5','-'])
+              hashes={l.split(',')[-1].strip() for l in data.decode().splitlines() if l and not l.startswith('#')}
+              assert len(hashes)>=4,(name,'static video',hashes)
+              sha=hashlib.sha256(path.read_bytes()).hexdigest()
+              report[name]={'file':str(path),'sha256':sha,'frames':expected,'ffprobe':info,'unique_2fps_sampled_frames':len(hashes),'full_decode':'PASS','frames_inspected':stamps}
+              print(name,report[name])
+          (target/'media-proof.json').write_text(json.dumps(report,indent=2))
+          PY
+      - name: Bundle edited source and native MP4 artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-EP005-A4-NATIVE-MOVING-1080P30
+          path: |
+            out/studio/ep005-a4-environment.mp4
+            out/studio/ep005-a4-environment/
+            out/ep005-a4/
+          retention-days: 30
+          if-no-files-found: warn
