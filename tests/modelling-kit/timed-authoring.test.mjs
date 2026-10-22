@@ -24,3 +24,18 @@ test('component orbit changes angle while retaining portrait fit and fixed targe
  assert.notDeepEqual(a.position,b.position);assert.deepEqual(a.target,b.target);
  for(const c of [a,b]){const camera=new T.PerspectiveCamera(c.fov,9/16,.025,500);camera.position.fromArray(c.position);camera.lookAt(new T.Vector3(...c.target));camera.updateMatrixWorld(true);for(const x of [-1,1])for(const y of [-.5,.5])for(const z of [-1.5,1.5]){const p=new T.Vector3(x,y,z).project(camera);assert.ok(Math.abs(p.x)<=.87&&Math.abs(p.y)<=.87);}}
 });
+import {drivingCamera} from '../../src/yunex/modelling-kit/driving.ts';
+import {vehicleSpec} from '../../src/yunex/world-kit/catalog.ts';
+test('chase camera stays on the selected carriageway side after route rotation',()=>{
+ const pose={position:[4,0,-10],yaw:.8};const car=vehicleSpec('supercar');
+ const local=c=>new T.Vector3(...c.position).sub(new T.Vector3(...pose.position)).applyAxisAngle(new T.Vector3(0,1,0),-pose.yaw);
+ assert.ok(local(drivingCamera('chase',pose,car,9/16,23,{side:-1})).z<0);
+ assert.ok(local(drivingCamera('chase',pose,car,9/16,23,{side:1})).z>0);
+});
+import {createCinematicVehicle,animateCinematicVehicle} from '../../src/yunex/modelling-kit/rig.ts';
+test('cutaway opacity mode changes invalidate the compiled material in both seek directions',()=>{
+ const car=createCinematicVehicle({variant:'supercar',quality:'hero',driver:true});const material=car.getObjectByName('arched-body').material;
+ const a=material.version;animateCinematicVehicle(car,{frame:75,fps:30,cutaway:.92});assert.ok(material.version>a);
+ const b=material.version;animateCinematicVehicle(car,{frame:76,fps:30,cutaway:.92});assert.equal(material.version,b);
+ animateCinematicVehicle(car,{frame:15,fps:30,cutaway:0});assert.ok(material.version>b);assert.equal(material.transparent,false);
+});

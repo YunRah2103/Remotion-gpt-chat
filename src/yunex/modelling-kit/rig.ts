@@ -25,7 +25,7 @@ export type CinematicState={frame:number;fps:number;distance?:number;steer?:numb
 type Rig={driver?:T.Group;systems?:T.Group;shell:T.Group;mounts:T.Group[];engine?:T.Group;floor?:T.Group;links:T.Group[];sparks:T.InstancedMesh;fragments:T.Group;body?:T.Mesh};
 const rigs=new WeakMap<T.Object3D,Rig>();
 function materials(root:T.Object3D,fn:(m:T.MeshStandardMaterial)=>void){root.traverse(o=>{if(o instanceof T.Mesh)for(const m of Array.isArray(o.material)?o.material:[o.material])if(m instanceof T.MeshStandardMaterial)fn(m);});}
-function rememberMaterials(root:T.Object3D){materials(root,m=>{m.userData.baseline={opacity:m.opacity,transparent:m.transparent,depthWrite:m.depthWrite,emissive:m.emissive.getHex(),intensity:m.emissiveIntensity};});}
+function rememberMaterials(root:T.Object3D){materials(root,m=>{m.userData.shaderTransparent=m.transparent;m.userData.baseline={opacity:m.opacity,transparent:m.transparent,depthWrite:m.depthWrite,emissive:m.emissive.getHex(),intensity:m.emissiveIntensity};});}
 function fade(root:T.Object3D,value:number,highlight=false){materials(root,m=>{const b=m.userData.baseline;if(!b)return;m.opacity=b.opacity*(1-value*.94);m.transparent=value>0||b.transparent;m.depthWrite=value>0?false:b.depthWrite;m.emissive.setHex(highlight?0x15c7bd:b.emissive);m.emissiveIntensity=highlight?.65:b.intensity;});}
 export function createCinematicVehicle(options:CinematicOptions):T.Group{
  const quality=options.quality??'hero';if(!['lightweight','standard','hero'].includes(quality))throw new Error('Unknown quality');
@@ -96,5 +96,6 @@ export function animateCinematicVehicle(root:T.Group,state:CinematicState){
  for(let i=0;i<sparks.count;i++){const age=(t*3+i*.61803398875)%1,side=Math.sin(i*12.9);dummy.position.set((i%2?.8:-.8)-age*4.5,.014+Math.sin(age*Math.PI)*(.035+(i%7)*.012),side*age*.95);dummy.scale.set(.8+age*3.5,.65,.65);dummy.rotation.z=-.2;dummy.updateMatrix();sparks.setMatrixAt(i,dummy.matrix);}sparks.instanceMatrix.needsUpdate=true;
  if(systems)animateMechanicalSystems(systems,root,shell.position.y);
  if(driver){const cabin=shell.getObjectByName('interior');if(cabin){fade(cabin,0);for(const name of ['door-panel-left','door-panel-right','roof-liner']){const panel=cabin.getObjectByName(name);if(panel)panel.visible=cutaway<.5;}}animateDriver(driver,steer,state.braking??0,state.impact??0,state.gearChange??0);fade(driver,0);}
+ materials(root,m=>{if(m.userData.shaderTransparent!==m.transparent){m.needsUpdate=true;m.userData.shaderTransparent=m.transparent;}});
  root.updateMatrixWorld(true);groundTornCords(root,mounts);
 }
