@@ -57,3 +57,7 @@ CI distributes each 18-second starter across six absolute-frame ranges, then joi
 5. Handoff the recipe, source entry, audio sources and MP4 together. State limitations. Never modify EP003 or EP004 to make a new episode.
 
 Use low-level factories from `src/yunex/modelling-kit/index.ts` for bespoke effects. Existing general driving, collision, cutaway, airflow and tyre failure systems remain available. The recipe director currently exposes the common driving/mechanical subset; it is not a collision or airflow scripting language.
+
+
+### Camera mounts and starter visibility
+The `onboard` preset uses a fitted windscreen mount on road cars and a raised T-camera on Formula cars. These are camera mounting positions, rather than anatomical eye measurements. Both follow the actual body-shell transform; the roof and halo remain modelled. Starter `interior` shots use a .92 body cutaway so controls, hands and restraint geometry can be inspected. Set the shot's `cutaway` explicitly when composing your own cabin view. Wheel cameras honour the selected roadside before route rotation and portrait fitting. Historical before/after artifacts are optional after expiration; current renders and full native-motion checks are mandatory.

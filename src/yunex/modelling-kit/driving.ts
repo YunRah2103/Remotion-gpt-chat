@@ -26,7 +26,7 @@ export function drivingCamera(name:CameraPreset,pose:RoutePose,s:VehicleSpec,asp
  switch(name){
   case 'tracking':p=[l*1.10,h*1.50,(options.side??-1)*w*1.2];overview=true;break;
   case 'chase':p=[-l*1.3,h*1.25,w*1.3];overview=true;break;
-  case 'wheel':p=[s.wheelbase*.65,s.radius*1.55,w*.94];target=[s.wheelbase/2,s.radius,w*.45];fov=46;p=fitInspectionCamera(p,target,[s.radius*2.3,s.radius*2.3,s.radius*1.5],aspect,fov);break;
+  case 'wheel':p=[s.wheelbase*.65,s.radius*1.55,(options.side??-1)*w*.94];target=[s.wheelbase/2,s.radius,(options.side??-1)*w*.45];fov=46;p=fitInspectionCamera(p,target,[s.radius*2.3,s.radius*2.3,s.radius*1.5],aspect,fov);break;
   case 'interior':p=[l*.10+.08*Math.sin(time*.45),h*.86+.015*Math.sin(time*.35),-w*.85+.035*Math.cos(time*.45)];target=[0,h*.65,0];fov=48;break;
   case 'onboard':p=[-l*.10,h*.88,0];target=[l*1.5,h*.40,0];fov=65;break;
   case 'overhead':{const a=.24+.08*Math.sin(time*.6);p=[Math.cos(a)*l*.22,l*2,Math.sin(a)*l*.22];target=[0,0,0];overview=true;fov=46;break;}
