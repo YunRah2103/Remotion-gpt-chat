@@ -1,0 +1,67 @@
+{
+  "source": "User-uploaded original Cedar MP3, supplied in conversation (not present in GitHub Actions)",
+  "basename": "openai-fm-cedar-audio (3).mp3",
+  "sha256": "2391533bda92c22b2b248029f8c591e9daa52c7cfa79b046c77bd6bfc10bd336",
+  "mp3_bytes": 403968,
+  "audio_seconds": 25.248,
+  "frequency_hz": 24000,
+  "channels": 1,
+  "expected_video_frames_30fps": 758,
+  "frame_duration_seconds": 25.266666666666666,
+  "provenance_verified_by": "local ffprobe, sha256sum and FFmpeg silencedetect on original user upload",
+  "silencedetect_settings": {
+    "threshold_db": -32,
+    "min_duration_s": 0.14
+  },
+  "detected_intervals_s": [
+    [
+      2.525417,
+      3.206458
+    ],
+    [
+      4.336583,
+      5.107542
+    ],
+    [
+      5.758458,
+      6.609208
+    ],
+    [
+      8.708792,
+      9.212958
+    ],
+    [
+      9.959042,
+      10.318042
+    ],
+    [
+      11.911458,
+      12.701917
+    ],
+    [
+      13.578708,
+      14.008417
+    ],
+    [
+      16.283792,
+      17.071125
+    ],
+    [
+      19.658167,
+      20.602125
+    ],
+    [
+      22.330042,
+      22.753333
+    ],
+    [
+      23.87275,
+      24.224333
+    ],
+    [
+      25.042208,
+      25.248
+    ]
+  ],
+  "caution": "Acoustic silences, NOT verified word start/end timings. Never derive fake word stamps or claim forced alignment. Final narrated render remains blocked until original MP3 is on authorized render runner and actual word timings are independently verified."
+}

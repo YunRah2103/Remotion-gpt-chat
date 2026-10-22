@@ -1,0 +1,63 @@
+name: YUNEX EP004 Agent 13 real native V2 review
+on:
+  pull_request:
+    branches: [production/yunex-ep004-quality-v2]
+    paths:
+      - 'production/yunex/f1_sparks_ep004/quality/editor/**'
+      - 'production/yunex/f1_sparks_ep004/quality/tests/agent-13/**'
+      - '.github/workflows/yunex-ep004-agent13-native.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  agent13-video-only-native:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.head_ref == 'agent/ep004-13-master-editor' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Real FFmpeg and metadata probes
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          ffmpeg -version
+          ffprobe -version
+      - name: Strict isolated code and provenance gates
+        run: |
+          npx tsc -p production/yunex/f1_sparks_ep004/quality/editor/tsconfig.json
+          node --experimental-strip-types --test production/yunex/f1_sparks_ep004/quality/tests/agent-13/*.test.mjs
+      - name: NATIVE first-second physics-born spark hook 1080x1920 / 30fps
+        run: |
+          mkdir -p out/ep004-agent13
+          npx remotion render production/yunex/f1_sparks_ep004/quality/editor/entry.tsx \
+            EP004Agent13VideoOnlyReview out/ep004-agent13/first-second-actual-sparks.mp4 \
+            --frames=0-29 --gl=swangle --codec=h264 --pixel-format=yuv420p \
+            --concurrency=2 --log=error
+          node production/yunex/f1_sparks_ep004/quality/editor/native-qa.mjs \
+            out/ep004-agent13/first-second-actual-sparks.mp4 30 --video-only
+          ffmpeg -hide_banner -loglevel error -y -i out/ep004-agent13/first-second-actual-sparks.mp4 \
+            -vf 'select=eq(n\,0)' -frames:v 1 out/ep004-agent13/hook-frame-000.png
+          ffmpeg -hide_banner -loglevel error -y -i out/ep004-agent13/first-second-actual-sparks.mp4 \
+            -vf 'select=eq(n\,23)' -frames:v 1 out/ep004-agent13/hook-frame-023.png
+      - name: NATIVE FULL 758-frame six-shot picture review, no invented VO
+        run: |
+          node --experimental-strip-types \
+            production/yunex/f1_sparks_ep004/quality/editor/render-native.mjs \
+            > out/ep004-agent13/native-run.txt
+          ffprobe -v error -count_frames -show_entries \
+            stream=codec_type,codec_name,nb_read_frames,width,height,avg_frame_rate:format=duration \
+            -of json out/ep004-agent13/EP004-WIP-six-shot-VIDEO-ONLY-no-VO.mp4 \
+            > out/ep004-agent13/full-probe.json
+      - name: Upload actual H.264 video and full frame review artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: EP004-A13-WIP-NATIVE-758f-not-voiced
+          path: out/ep004-agent13/
+          if-no-files-found: warn
+          retention-days: 30
