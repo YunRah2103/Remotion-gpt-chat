@@ -1,0 +1,10 @@
+{
+  "extends": "../../../../../../tsconfig.json",
+  "include": [
+    "./Scene.tsx",
+    "./SourceTimeline.ts",
+    "./entry.tsx",
+    "../../sparks/**/*.ts",
+    "../../sparks/**/*.tsx"
+  ]
+}
