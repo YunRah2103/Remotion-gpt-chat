@@ -59,12 +59,12 @@ jobs:
           ffmpeg -hide_banner -loglevel error -i "$OUT" -f null -
           ffmpeg -hide_banner -loglevel error -i "$OUT" -vf "fps=1,scale=270:480,tile=5x2" -frames:v 1 "$PACK/10s-contact.jpg"
           # Genuine native focused clips for first-second nozzle and engine review.
-          for clip in "$PACK/render-shot-0.mp4" "$PACK/render-shot-3.mp4"; do
+          for clip in "$PACK/render-shot-0.mp4" "$PACK/render-shot-4.mp4"; do
             test -s "$clip"
             ffprobe -v error -select_streams v:0 -show_entries stream=width,height,nb_frames -of csv=p=0 "$clip"
             ffmpeg -hide_banner -loglevel error -i "$clip" -f null -
           done
-          sha256sum "$OUT" "$PACK/render-shot-0.mp4" "$PACK/render-shot-3.mp4" > "$PACK/native-mp4.sha256"
+          sha256sum "$OUT" "$PACK/render-shot-0.mp4" "$PACK/render-shot-4.mp4" > "$PACK/native-mp4.sha256"
           # Sample front/rear/engine motion, not only identical stills.
           ffmpeg -hide_banner -loglevel error -i "$OUT" -vf "select='eq(n,0)+eq(n,6)+eq(n,15)+eq(n,29)+eq(n,65)+eq(n,95)+eq(n,150)+eq(n,187)+eq(n,225)+eq(n,265)+eq(n,299)',scale=540:960,tile=4x3" -vsync vfr -frames:v 1 "$PACK/11-frame-quality.jpg"
           ffmpeg -hide_banner -loglevel error -i "$OUT" -vf "select='eq(n,0)+eq(n,6)+eq(n,15)+eq(n,29)'" -vsync vfr -f framemd5 "$PACK/hook-motion.framemd5"
