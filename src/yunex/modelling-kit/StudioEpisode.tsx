@@ -1,3 +1,4 @@
+import {fitModelCamera} from './model-framing.ts';
 import {applyEdits,createAssembly,animateAssembly,buildComponents,animateComponents} from './authoring';
 import React,{useMemo,useEffect} from 'react';
 import {AbsoluteFill,Audio,staticFile,useCurrentFrame,useVideoConfig} from 'remotion';
@@ -53,6 +54,7 @@ export const StudioEpisode:React.FC<{recipe:EpisodeRecipe}>=({recipe})=>{
   model.position.fromArray(pose.position);model.rotation.y=pose.yaw;model.updateMatrixWorld(true);
   const head=model.getObjectByName('head');if(head)head.visible=shot.camera!=='onboard';
   if(shot.camera==='onboard')camera=driverPovCamera(model);
+  else if(['tracking','chase','reveal','overhead'].includes(shot.camera))camera=fitModelCamera(model,camera,width/height);
  }
  animateEnergyFlow(model,shot.energyFlow,frame/fps);
  animateWeather(weather,{frame,fps,speed:state.speed,focus:pose.position});

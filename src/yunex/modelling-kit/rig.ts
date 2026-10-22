@@ -1,3 +1,4 @@
+import {sculptedFascia} from './fascia.ts';
 import {coachbuiltFinish} from './coachbuilt.ts';
 import {rallyDetails} from './rally.ts';
 import {createAssembly,animateAssembly} from './authoring.ts';
@@ -44,7 +45,7 @@ export function createCinematicVehicle(options:CinematicOptions):T.Group{
    if(quality==='hero'){const roll=mount.getObjectByName('wheel-roll')!;tyreDetail(roll,s.radius,s.family==='formula'?.32:s.family==='sports'?.28:.235,options.tyreType==='slick'||s.family==='formula');}
   }else shell.add(o);
  }
- if(quality==='hero'){roadHeroDetails(shell,s);premiumExterior(shell,s);sculptShell(shell,s);formulaHeroDetails(shell,mounts,s);enhanceCabin(shell,s,options);if(options.bodyDetail!=='legacy')coachbuiltFinish(shell,mounts,s);rallyDetails(shell,mounts,s,options.bodyDetail!=='legacy');}
+ if(quality==='hero'){roadHeroDetails(shell,s);premiumExterior(shell,s);if(options.bodyDetail!=='legacy')sculptedFascia(shell,s);sculptShell(shell,s);formulaHeroDetails(shell,mounts,s);enhanceCabin(shell,s,options);if(options.bodyDetail!=='legacy')coachbuiltFinish(shell,mounts,s);rallyDetails(shell,mounts,s,options.bodyDetail!=='legacy');}
  // Material clones isolate fades/highlights between components and between vehicles.
  const originals=new Set<T.Material>();
  for(const scope of [shell,...mounts]){const clones=new Map<T.Material,T.Material>();scope.traverse(o=>{if(o instanceof T.Mesh){const clone=(m:T.Material)=>{let c=clones.get(m);if(!c){c=m.clone();clones.set(m,c);originals.add(m);}return c;};o.material=Array.isArray(o.material)?o.material.map(clone):clone(o.material);}});}
