@@ -12,3 +12,7 @@ test('fit diagnostics report containment in rotated parent space without silentl
  assert.equal(fails.fits,false);assert.ok(fails.overflows.some(x=>x.axis==='x'&&x.side==='max'));
  assert.equal(part.scale.x,1);
 });
+test('fit assistance proposes a non-destructive uniform scale and parent-space translation',()=>{
+ const parent=new T.Group(),part=new T.Mesh(new T.BoxGeometry(4,2,2));part.position.x=3;parent.add(part);
+ const result=author.fitDiagnostics(parent,part,{min:[-1,-1,-1],max:[1,1,1]});assert.ok(result.suggestion);assert.equal(result.suggestion.uniformScale,.5);assert.deepEqual(result.suggestion.translation,[-1.5,0,0]);assert.equal(part.scale.x,1);assert.equal(part.position.x,3);
+});

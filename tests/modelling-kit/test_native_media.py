@@ -11,3 +11,15 @@ class NativeMediaSources(unittest.TestCase):
    original=source.read_text();module.configure(root)
    self.assertNotIn('http://',mirror.read_text());self.assertEqual(source.read_text(),original)
    before=mirror.read_bytes();module.configure(root);self.assertEqual(mirror.read_bytes(),before)
+
+class NativeMediaRetry(unittest.TestCase):
+ def test_transient_failures_retry_but_exhaustion_still_fails(self):
+  import subprocess
+  script=Path(__file__).parents[2]/'scripts/modelling-kit/install-native-media.sh'
+  with tempfile.TemporaryDirectory() as tmp:
+   state=Path(tmp)/'count';worker=Path(tmp)/'worker'
+   worker.write_text('#!/bin/bash\nn=0; [ ! -f "$1" ] || read -r n < "$1"\nn=$((n+1)); echo "$n" > "$1"\n[ "$n" -ge 2 ]\n');worker.chmod(0o755)
+   result=subprocess.run(['bash','-c',f'source "{script}"; retry_native_media 2 "{worker}" "{state}"'],capture_output=True,text=True)
+   self.assertEqual(result.returncode,0,result.stderr);self.assertEqual(state.read_text().strip(),'2')
+   result=subprocess.run(['bash','-c',f'source "{script}"; retry_native_media 2 false'],capture_output=True,text=True)
+   self.assertNotEqual(result.returncode,0)

@@ -16,7 +16,7 @@ export type {EpisodeRecipe,StudioShot} from './recipe.ts';
 export {STUDIO_RECIPES} from './studio-recipes.ts';
 export {createWeather,animateWeather} from './weather.ts';
 
-export {applyEdits,editModel,attachAt,createAssembly,animateAssembly,validateModel,modelCatalogue,fitDiagnostics} from './authoring.ts';
+export {applyEdits,editModel,attachAt,createAssembly,animateAssembly,validateModel,modelCatalogue,modelPath,selectModelObject,fitDiagnostics} from './authoring.ts';
 export type {ModelEdit,ModelVariation,AssemblySpec} from './authoring.ts';
 export {compileBrief,productionPlan} from './production.ts';
 
@@ -25,3 +25,5 @@ export type {ComponentSpec} from './authoring.ts';
 
 export {ComponentRegistry} from './registry.ts';
 export type {RegisteredComponent} from './registry.ts';
+
+export {animateEnergyFlow} from './systems.ts';
