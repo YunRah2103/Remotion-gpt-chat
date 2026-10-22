@@ -1,3 +1,4 @@
+import {shotContract} from './assemble.mjs';
 import {readFileSync,writeFileSync,mkdirSync,existsSync} from 'node:fs';
 import {resolve,relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
