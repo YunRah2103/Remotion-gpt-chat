@@ -20,6 +20,15 @@ const manifest = JSON.parse(await fsp.readFile(manifestPath, 'utf8'));
 
 const isSha = (s) => typeof s === 'string' && /^[0-9a-f]{64}$/i.test(s);
 const isCommit = (s) => typeof s === 'string' && /^[0-9a-f]{40}$/i.test(s);
+const REJECTED_AG6_CANDIDATE_A = 'bc0185ece668d6ebb1f0f58adbc62edec0ce2cb4';
+const REJECTED_VIDEO_SHA = new Set([
+  '0797444a04513418593b72cd6aaf58c1e2cbfc64574ae8d33c316ec4f7fddc81',
+  'b409370aab6cc68b4641abc4dc53b6c05c32f052c25411cb5dc0bea5d934e860',
+]);
+const hasApprovedSourceRef = (s) => typeof s === 'string' &&
+  /^https:\/\/github\.com\/YunRah2103\/Remotion-gpt-chat\/(issues|pull)\/(247|265|266|267|268|269|270)(?:#issuecomment-\d+)?$/.test(s);
+const isRejectedCandidate = (m) => [m.sourceCommit,m.agent6Commit].some(s => s === REJECTED_AG6_CANDIDATE_A) ||
+  REJECTED_VIDEO_SHA.has(m.sha256);
 const int = (n) => Number.isInteger(n);
 const safeLocal = (p) => typeof p === 'string' &&
   p.length > 0 && !path.isAbsolute(p) &&
@@ -48,13 +57,20 @@ function plan() {
     requireGate(['vehicle','science','integrated'].includes(beat.role), 'invalid visual source role at ' + beat.id);
     const m = beat.media || {};
     requireGate(m.approved === true && safeLocal(m.path) && isSha(m.sha256) &&
-      isCommit(m.sourceCommit) && /^https:\/\/github\.com\//.test(m.approvalRef || ''),
+      isCommit(m.sourceCommit) && hasApprovedSourceRef(m.approvalRef) &&
+      Number.isInteger(m.artifactRunId) && m.artifactRunId > 0 &&
+      typeof m.artifactName === 'string' && /^[\w.-]+$/.test(m.artifactName) &&
+      m.producerIssue === (beat.role === 'vehicle' ? 265 : 266) &&
+      !isRejectedCandidate(m),
       'unapproved/unpinned media for ' + beat.id);
     requireGate(int(m.sourceInFrame) && m.sourceInFrame >= 0, 'missing source trim frame for ' + beat.id);
     requireGate(typeof m.assetProvenance === 'string' && m.assetProvenance.trim().length > 5,
       'missing original footage provenance for ' + beat.id);
     if (beat.role === 'integrated') {
-      requireGate(isCommit(m.agent6Commit) && isCommit(m.agent7Commit) && isSha(m.portManifestSha256),
+      requireGate(isCommit(m.agent6Commit) && isCommit(m.agent7Commit) && isSha(m.portManifestSha256) &&
+        typeof m.portManifestVersion === 'string' && m.portManifestVersion !== 'candidate-A-v1' &&
+        /^https:\/\/github\.com\/YunRah2103\/Remotion-gpt-chat\//.test(m.portManifestRef || '') &&
+        !isRejectedCandidate(m),
         'integrated footage must lock BOTH Agent 6 and Agent 7 + exhaust port ABI for ' + beat.id);
     }
     if (beat.title != null) {
@@ -68,16 +84,25 @@ function plan() {
   const voice = manifest.voice || {};
   if (voice.approved) {
     requireGate(safeLocal(voice.path) && isSha(voice.sha256) &&
-      isCommit(voice.sourceCommit) && /^https:\/\/github\.com\//.test(voice.approvalRef || ''),
+      isCommit(voice.sourceCommit) && hasApprovedSourceRef(voice.approvalRef) &&
+      Number.isInteger(voice.artifactRunId) && voice.artifactRunId > 0 &&
+      typeof voice.artifactName === 'string' && /^[\w.-]+$/.test(voice.artifactName) &&
+      Number.isFinite(voice.verifiedDurationSeconds) &&
+      voice.verifiedDurationSeconds > 0 && voice.verifiedDurationSeconds <= 25.005,
       'voice provenance, checksum, source commit and approval required');
     requireGate(voice.captionsVerified === true &&
       Array.isArray(manifest.captions) && manifest.captions.length > 0,
       'real narration requires verified actual caption timings');
+    let previousCaptionEnd = 0;
     for (const c of manifest.captions || []) {
       requireGate(int(c.start) && int(c.end) && c.start >= 0 && c.end <= 750 &&
         c.end > c.start && c.verified === true && typeof c.text === 'string' &&
         c.text.length > 0 && c.text.length <= 88,
         'subtitle must have actual approved frame times + short readable text');
+      requireGate(c.start >= previousCaptionEnd, 'spoken caption overlap is not permitted');
+      requireGate(c.end / 30 <= voice.verifiedDurationSeconds + 0.06,
+        'spoken caption must not extend beyond original recording');
+      previousCaptionEnd = c.end;
     }
   } else {
     requireGate(!manifest.captions?.length, 'must not pretend silent review has timed narration captions');
@@ -117,7 +142,7 @@ async function sha256(p) {
     stream.on('end', ()=>resolve(hash.digest('hex')));
   });
 }
-async function validateMedia(p, checksum, neededFrames = null) {
+async function validateMedia(p, checksum, neededFrames = null, approvedVoiceDuration = null) {
   if (!fs.existsSync(p)) throw new Error('Approved media missing: '+p);
   if (await sha256(p) !== checksum.toLowerCase()) throw new Error('MEDIA SHA256 MISMATCH: '+p);
   const probe = JSON.parse(run('ffprobe',['-v','error','-count_frames','-select_streams','v:0',
@@ -126,6 +151,16 @@ async function validateMedia(p, checksum, neededFrames = null) {
     const v = probe.streams?.[0];
     if (!v || v.width !== 1080 || v.height !== 1920 || v.r_frame_rate !== '30/1' ||
         Number(v.nb_read_frames) < neededFrames) throw new Error('Non-native/wrong fps/truncated media: '+p);
+  }
+  if (approvedVoiceDuration != null) {
+    const audioprobe=JSON.parse(run('ffprobe',['-v','error','-show_entries',
+      'stream=codec_type,sample_rate,channels,duration:format=duration','-of','json',p],true));
+    const streams=audioprobe.streams || [];
+    const voice=streams.find(v=>v.codec_type === 'audio');
+    const actual=Number(voice?.duration || audioprobe.format?.duration);
+    if (!voice || !Number.isFinite(actual) || Math.abs(actual-approvedVoiceDuration) > 0.08 ||
+      actual > 25.005 || Number(voice.sample_rate) < 16000 || voice.channels < 1)
+      throw new Error('Approved VO duration/sample rate mismatch: no silent audio trimming: '+p);
   }
   run('ffmpeg',['-hide_banner','-loglevel','error','-xerror','-i',p,
     ...(neededFrames == null ? [] : ['-map','0:v:0']),'-f','null','-']);
@@ -166,7 +201,7 @@ for(const beat of manifest.beats) {
 }
 if(manifest.voice.approved) {
   const p=local(manifest.voice.path);
-  await validateMedia(p,manifest.voice.sha256);
+  await validateMedia(p,manifest.voice.sha256,null,manifest.voice.verifiedDurationSeconds);
   inputs.push(p);
 }
 for(const bed of manifest.optionalAudioBeds||[]) {
@@ -188,15 +223,26 @@ videoFilters.push("[whole]ass='"+safeAss+"'[vout]");
 let audioOut=null;
 if(manifest.voice.approved) {
   const voiceIndex=manifest.beats.length;
-  videoFilters.push('['+voiceIndex+':a:0]aresample=48000,atrim=duration=25,asetpts=PTS-STARTPTS,apad=pad_dur=25,atrim=duration=25[voice]');
-  const streams=['[voice]'];
+  // Original approved VO is preserved at original rate-of-speech and pitch;
+  // duration is pre-verified. Only the silence after its natural ending is extended.
+  videoFilters.push('['+voiceIndex+':a:0]aresample=48000,asetpts=PTS-STARTPTS,apad,atrim=duration=25[originalVoice]');
+  const streams=[];
   for(let i=0;i<(manifest.optionalAudioBeds||[]).length;i++) {
     const bed=manifest.optionalAudioBeds[i], idx=voiceIndex+1+i;
     videoFilters.push('['+idx+':a:0]aresample=48000,volume='+bed.gainDb+'dB,adelay='+
       Math.round(bed.startFrame*1000/30)+':all=1,atrim=duration=25[bed'+i+']');
     streams.push('[bed'+i+']');
   }
-  videoFilters.push(streams.join('')+'amix=inputs='+streams.length+':duration=first:dropout_transition=0,alimiter=limit=0.89[aout]');
+  if(streams.length) {
+    videoFilters.push('[originalVoice]asplit=2[voiceMain][voiceKey]');
+    videoFilters.push(streams.join('')+'amix=inputs='+streams.length+
+      ':duration=longest:dropout_transition=0:normalize=0[bedSum]');
+    videoFilters.push('[bedSum][voiceKey]sidechaincompress=threshold=0.02:ratio=6:attack=7:release=220[ducked]');
+    videoFilters.push('[voiceMain][ducked]amix=inputs=2:duration=first:dropout_transition=0:normalize=0,'+
+      'loudnorm=I=-16:LRA=9:TP=-1.5:linear=false[aout]');
+  } else {
+    videoFilters.push('[originalVoice]loudnorm=I=-16:LRA=9:TP=-1.5:linear=false[aout]');
+  }
   audioOut='[aout]';
 }
 const output=path.join(outDir,manifest.voice.approved?'EP005-FINAL-CANDIDATE.mp4':'EP005-SILENT-PICTURE-REVIEW.mp4');
