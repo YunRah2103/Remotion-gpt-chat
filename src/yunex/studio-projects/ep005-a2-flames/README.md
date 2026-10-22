@@ -1,23 +1,24 @@
-# YUNEX EP005 A2 — afterfire science and flame preview
-Source branch: agent/ep005-02-v3-flames. Built from V3 verified commit ce7316b364f96721b39100841eb386724ccf2d52.
-This project is an *isolated eight-second silent demonstration*, not the EP005 final film.
-No original narration has been provided or reproduced.
+# YUNEX EP005 Agent 2 — real-mounted turbulent exhaust afterfire
 
-## Critical mount contract with Agent 1
-- Exactly two unique named Object3D instances under V3 vehicle:
-  `mount:exhaust-tip-left`, `mount:exhaust-tip-right`.
-- Each has `userData.direction: [x,y,z]` as a *unit vector in the mount's own local axes*, pointing **out of the tailpipe**. Pin radius explicitly via Agent 1's JSON contract when the V3 component builder does not place `userData.radius` on the node. The mount's physical position is the true tip lip; transform inherited from body-shell.
-- `readExhaustMounts(vehicle)` converts to vehicle-local port pose after the full absolute-frame vehicle update; `createAfterfireRig(vehicle)` attaches real 3D flame under each named mount. It throws on missing/provisional ports.
-- Agent 1 draft contract #247: left `[-2.465,.420,+.570]`, right `[-2.465,.420,-.570]`, exit `[-1,0,0]`, inner radius `.085 m` each. Example: `createAfterfireRig(hero,{radii:{'exhaust-tip-left':.085,'exhaust-tip-right':.085}})`. Confirm actual hero component QA before manager integration; this JSON-derived radius is not guessed.
-- Agent 1 must publish exact tip origin, orientation, radius, transforms, and clearance verification. Draft recipe currently uses `.054 m` exhaust pipe tube radius versus `.085 m` declared nozzle inner radius: verify physically modelled flare/sleeve and exit clearance. No guess accepted as a final interface.
-- Only this test preview calls `addProvisionalPreviewExhaust`; production integrations must not.
+**Branch:** `agent/ep005-02-v3-flames`. Native render: `ep005-a2-flames`.
+**Source origin:** verified V3 `ce7316b364f96721b39100841eb386724ccf2d52`.
+**Agent 1 reviewed geometry snapshot SHA:** `8ba7a9624fc56973fa52658ef8d2600368dfc17a`, copied **without altering the Agent 1-owned branch** into `production/yunex/supercar_flames_ep005/flames/hero-reference/**` for the **isolated A2 film only**. The manager should use the live Agent 1-owned factory on eventual integration, not carry this snapshot as a new canonical hero.
 
-## API
-`sampleAfterfire(frame,fps,engineState,exhaustMounts)` is pure and returns per-port amplitude/length/phase/mode. `animateAfterfireRig(rig,sample)` animates attached 3D geometry and light by absolute frame. `createAfterfireCutaway()` returns editable V3 Registry+Assembly manifold/catalyst/muffler/tailpipe components and illustrative gas-flow markers. The V8 is an existing V3 asset. Parts and plumbing are not fitted OEM parts.
+## Real exhaust binding and flame API
 
-Modes are condition gated: `overrun` additionally requires low throttle, `antiLag` and `ignitionCut` are distinct optional inputs. The sampler does **not** infer combustion from RPM or all acceleration. Exhaust temperature is a *visual threshold proxy*, not a physical ignition predictor. No universal horsepower gain claimed.
+- `createEp005Hero()` builds the un-cloned V3 rig including actual hollow nozzle shrouds and physical outlet mounts under `ep005-left/right-exhaust-tube`.
+- `mount:exhaust-tip-left` at `[-2.465,0.420,+0.570]`, `mount:exhaust-tip-right` at `[-2.465,0.420,-0.570]` (metres; car +X forward). Exit directions `[-1,0,0]`, bore radius `.085`, outer barrel radius `.105`.
+- `createAfterfireRig(vehicle)` now works **without provisional sockets or radii overrides** against that A1 factory by reading `mount.userData.nozzleInnerRadius`. It verifies both ports are children of physically named exhaust-tube components. Invalid/missing ports fail closed.
+- `readExhaustMounts(vehicle)` samples local tip transforms after the actual rig pose and route placement. Fire geometries are attached under the named nodes, so do not have static world coordinates.
+- The new geometry uses **four tapered turbulent outer surfaces plus two narrow warm cores per tip**, 26 axial rings × 15 angular vertices, vertex-colour and alpha transitions, animated curls, shear and end taper. It contains **no spheres/glowing discs** and uses restrained orange bounce lights.
+- Absolute-frame sampling has no random state. `sampleAfterfire(frame,fps,state,ports)` accepts `afterfireDemand` 0..1. For Agent 3 integration, feed `stateFromCinemaDemand(sampleCinema(frame,30).afterfireDemand,sampleCinema(frame,30).throttle)`; no afterfire during normal throttle. Never claim this is CFD or a calibrated ignition model.
 
-## Commands
+## Mechanical explanation
+
+The `createAfterfireCutaway()` V3 `ComponentRegistry` and `createAssembly` creates connected V8, headers/collector, internal catalyst channels, muffler baffles and actual pipe exit. The isolated **mechanism** shot hides road geometry and frames the entire assembly from a fixed legible portrait side view. Model-attached moving flow markers are schematic, not simulated gas particles. Caption explains that unburnt fuel can ignite downstream in hot exhaust **under some operating and tune conditions**; no universal performance-gain claim.
+
+## QA
+
 ```sh
 npm ci
 npm run check
@@ -25,9 +26,10 @@ node --experimental-strip-types --test tests/ep005/*.test.mjs
 npm run kit:validate -- ep005-a2-flames
 npm run kit:plan -- ep005-a2-flames
 npm run kit:inspect -- ep005-a2-flames
-npm run kit:preview -- ep005-a2-flames
-npm run kit:review -- ep005-a2-flames --moving
 npm run kit:render -- ep005-a2-flames
 npm run kit:handoff -- ep005-a2-flames
 ```
-Inspect native 1080x1920 30fps MP4 in addition to tests. A passing source validation is not rendered evidence.
+
+The workflow `.github/workflows/ep005-agent2-afterfire.yml` runs these with independent native 1080×1920 / 30fps FFprobe, full FFmpeg decode, distinct frame hashes, nine-frame contact sheet, SHA256. It outputs a **silent eight-second development film**, not finished EP005. Human moving-film review of f0–30, tailpipe close-up, cutaway framing and payoff is still mandatory; technical checks alone are not visual approval. Agent 3 picture timeline is **750f** with afterfire windows f0–29, f430–489 and f674–709. No unauthorized original narration is generated.
+
+**NO MERGE.** Agent 0 approves source and exact video SHA only after viewing the native artifact; Agent 5 may then integrate into the 25s picture baseline.
