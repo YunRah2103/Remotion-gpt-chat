@@ -17,7 +17,7 @@ function registeredMaterial(mat:T.MeshStandardMaterial){
  return mat;
 }
 function paint(hex:string,metalness:number,roughness:number,emission?:string){
- return registeredMaterial(new T.MeshPhysicalMaterial({color:hex,metalness,roughness,clearcoat:.95,clearcoatRoughness:.13,emissive:emission??'#000000',emissiveIntensity:emission?.55:0,side:T.DoubleSide}));
+ return registeredMaterial(new T.MeshPhysicalMaterial({color:hex,metalness,roughness,clearcoat:.95,clearcoatRoughness:.13,emissive:emission??'#000000',emissiveIntensity:emission ? .55 : 0,side:T.DoubleSide}));
 }
 function add(parent:T.Object3D,name:string,geo:T.BufferGeometry,mat:T.Material,pos:[number,number,number],rot:[number,number,number]=[0,0,0]){
  const m=new T.Mesh(geo,mat);m.name=name;m.position.set(...pos);m.rotation.set(...rot);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;
@@ -82,7 +82,7 @@ export function createEp005Hero():T.Group{
  for(const spec of contract.ports){
   const mount=hero.getObjectByName(spec.node);
   if(!mount||!mount.parent||mount.parent.name!==spec.component)throw new Error(`Unfitted EP005 exhaust mount: ${spec.id}`);
-  const expected=new T.Vector3(...spec.position);
+  const expected=new T.Vector3(spec.position[0],spec.position[1],spec.position[2]);
   if(mount.position.distanceTo(expected)>1e-6)throw new Error(`Moved EP005 outlet: ${spec.id}`);
   mount.userData.nozzleInnerRadius=spec.innerRadius;
   mount.userData.nozzleOuterRadius=spec.outerRadius;
@@ -97,7 +97,7 @@ export function resolveEp005ExhaustPorts(vehicle:T.Group):ExhaustOutlet[]{
  return contract.ports.map(spec=>{
   const mount=vehicle.getObjectByName(spec.node);
   if(!mount)throw new Error(`Missing EP005 exhaust mount: ${spec.node}`);
-  const dir=new T.Vector3(...spec.direction).transformDirection(mount.matrixWorld).normalize();
+  const dir=new T.Vector3(spec.direction[0],spec.direction[1],spec.direction[2]).transformDirection(mount.matrixWorld).normalize();
   return {name:spec.id as ExhaustOutlet['name'],mount,position:mount.getWorldPosition(new T.Vector3()),direction:dir,innerRadius:spec.innerRadius};
  });
 }
