@@ -36,9 +36,12 @@ const integration:CinemaIntegration={
 /** Duplicate rig is evaluated at the exact same ABSOLUTE frame as picture to
  * project actual moving A1 named tailpipe ports; no world-fixed arrow guesses. */
 const useTailpipeProjection=(sample:CinemaSample):ScreenTarget|null=>{
- const anchorHero=useMemo(()=>createEp005Hero(),[]);
- useEffect(()=>()=>disposeObject(anchorHero),[anchorHero]);
- if(sample.shot.id!=='exhaust')return null;
+ // Only the exhaust beat needs an independent live-rig world-space mount
+ // projection. Avoid rebuilding a second high-poly hero in all 615 other frames.
+ const needsPort=sample.shot.id==='exhaust';
+ const anchorHero=useMemo(()=>needsPort?createEp005Hero():null,[needsPort]);
+ useEffect(()=>()=>{if(anchorHero)disposeObject(anchorHero);},[anchorHero]);
+ if(!anchorHero)return null;
  animateCinematicVehicle(anchorHero,{
   frame:sample.frame,fps:sample.fps,distance:sample.distanceMeters,
   steer:sample.steerRadians,cutaway:0,compression:.008,
