@@ -37,7 +37,7 @@ jobs:
             EP004Agent13VideoOnlyReview out/ep004-agent13/shot-${{ matrix.id }}.mp4 \
             --frames=${{ matrix.start }}-${{ matrix.end }} \
             --gl=swangle --codec=h264 --pixel-format=yuv420p \
-            --concurrency=2 --log=error
+            --concurrency=1 --timeout=180000 --log=error
           node production/yunex/f1_sparks_ep004/quality/editor/native-qa.mjs \
             out/ep004-agent13/shot-${{ matrix.id }}.mp4 ${{ matrix.frames }} --video-only
       - uses: actions/upload-artifact@v4
