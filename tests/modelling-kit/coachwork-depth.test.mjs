@@ -41,7 +41,7 @@ test('paint flank normals follow the continuous skin through densely sampled whe
   for(let i=0;i<normals.count;i++){const x=rest[i*3],y=rest[i*3+1],z=rest[i*3+2],side=Math.sign(z);
    if(Math.abs(x)>=s.length/2-.02||y>=bodyTop(s,x)-.045||Math.abs(Math.abs(z)-bodyHalfWidth(s,x,y))>=.00001)continue;
    const tx=skin(x+e,y,side).sub(skin(x-e,y,side)),ty=skin(x,y+e,side).sub(skin(x,y-e,side)),expected=tx.cross(ty).multiplyScalar(side).normalize(),actual=new T.Vector3().fromBufferAttribute(normals,i);
-   assert.ok(actual.dot(expected)>.995,variant+' reflected skin continuity');samples++;
+   assert.ok(actual.dot(expected)>.995,variant+' reflected skin continuity '+JSON.stringify({x,y,z,dot:actual.dot(expected),actual:actual.toArray(),expected:expected.toArray()}));samples++;
   }assert.ok(samples>100,variant+' actual flank coverage');disposeObject(g);
  }
 });
