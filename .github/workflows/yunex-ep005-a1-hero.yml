@@ -1,0 +1,97 @@
+name: YUNEX EP005 Agent 1 native hero QA
+on:
+  push:
+    branches:
+      - agent/ep005-01-v3-hero
+    paths:
+      - src/yunex/studio-projects/ep005-a1-hero/**
+      - production/yunex/supercar_flames_ep005/vehicle/**
+      - .github/workflows/yunex-ep005-a1-hero.yml
+  pull_request:
+    branches:
+      - production/yunex-ep005-v3-base
+    paths:
+      - src/yunex/studio-projects/ep005-a1-hero/**
+      - production/yunex/supercar_flames_ep005/vehicle/**
+      - .github/workflows/yunex-ep005-a1-hero.yml
+permissions:
+  contents: read
+concurrency:
+  group: ep005-agent1-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  native-hero:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - run: npm run check
+      - run: node --test production/yunex/supercar_flames_ep005/vehicle/hero-contract.test.mjs
+      - run: npm run kit:validate -- ep005-a1-hero
+      - run: npm run kit:plan -- ep005-a1-hero
+      - run: npm run kit:inspect -- ep005-a1-hero
+      - run: npm run kit:preview -- ep005-a1-hero
+      - run: npm run kit:render -- ep005-a1-hero
+      - run: npm run kit:scene -- ep005-a1-hero --shot=rear-hook
+      - run: npm run kit:scene -- ep005-a1-hero --shot=engine-reveal
+      - run: npm run kit:handoff -- ep005-a1-hero
+      - name: Full decode + native format verification, motion stats and contact sheet
+        run: |
+          set -eu
+          OUT=out/studio/ep005-a1-hero.mp4
+          PACK=out/studio/ep005-a1-hero
+          mkdir -p "$PACK"
+          ffprobe -v error -show_entries stream=width,height,r_frame_rate,nb_frames,codec_name -show_entries format=duration,size -of json "$OUT" > "$PACK/native-media.json"
+          python3 - <<'PY'
+          import json
+          x=json.load(open('out/studio/ep005-a1-hero/native-media.json'))
+          s=next(a for a in x['streams'] if a.get('width'))
+          assert (s['width'],s['height'],s['r_frame_rate'],int(s['nb_frames'])) == (1080,1920,'30/1',300),s
+          assert abs(float(x['format']['duration'])-10)<.1,x
+          print('Native portrait 1080x1920, 30fps, 300f / 10 seconds verified.')
+          PY
+          ffmpeg -hide_banner -loglevel error -i "$OUT" -f null -
+          ffmpeg -hide_banner -loglevel error -i "$OUT" -vf "fps=1,scale=270:480,tile=5x2" -frames:v 1 "$PACK/10s-contact.jpg"
+          # Genuine native focused clips for first-second nozzle and engine review.
+          for clip in "$PACK/render-shot-0.mp4" "$PACK/render-shot-3.mp4"; do
+            test -s "$clip"
+            ffprobe -v error -select_streams v:0 -show_entries stream=width,height,nb_frames -of csv=p=0 "$clip"
+            ffmpeg -hide_banner -loglevel error -i "$clip" -f null -
+          done
+          sha256sum "$OUT" "$PACK/render-shot-0.mp4" "$PACK/render-shot-3.mp4" > "$PACK/native-mp4.sha256"
+          # Sample front/rear/engine motion, not only identical stills.
+          ffmpeg -hide_banner -loglevel error -i "$OUT" -vf "select='eq(n,0)+eq(n,6)+eq(n,15)+eq(n,29)+eq(n,65)+eq(n,95)+eq(n,150)+eq(n,187)+eq(n,225)+eq(n,265)+eq(n,299)',scale=540:960,tile=4x3" -vsync vfr -frames:v 1 "$PACK/11-frame-quality.jpg"
+          ffmpeg -hide_banner -loglevel error -i "$OUT" -vf "select='eq(n,0)+eq(n,6)+eq(n,15)+eq(n,29)'" -vsync vfr -f framemd5 "$PACK/hook-motion.framemd5"
+          python3 - <<'PY'
+          from pathlib import Path
+          hashes=[line.rsplit(',',1)[-1].strip() for line in Path('out/studio/ep005-a1-hero/hook-motion.framemd5').read_text().splitlines() if line and not line.startswith('#')]
+          assert len(hashes)==4,hashes
+          assert len(set(hashes))>=3,'First-second frames not visibly changing'
+          print('First-second motion frames unique:',len(set(hashes)),'/',len(hashes))
+          PY
+          ls -lh "$OUT" "$PACK/"*.mp4 "$PACK/"*.jpg
+      - name: Upload actual native moving proof + QA
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EP005-Agent1-Hero-Native-Portrait-1080p30
+          path: |
+            out/studio/ep005-a1-hero.mp4
+            out/studio/ep005-a1-hero/native-media.json
+            out/studio/ep005-a1-hero/native-mp4.sha256
+            out/studio/ep005-a1-hero/10s-contact.jpg
+            out/studio/ep005-a1-hero/11-frame-quality.jpg
+            out/studio/ep005-a1-hero/hook-motion.framemd5
+            out/studio/ep005-a1-hero/render-shot-*.mp4
+            out/studio/ep005-a1-hero/render-shot-*.mp4.json
+            out/studio/ep005-a1-hero/handoff.json
+            out/studio/ep005-a1-hero/previews/
+            out/studio/ep005-a1-hero/model-report.json
+            out/studio/ep005-a1-hero/plan.json
+          retention-days: 30
