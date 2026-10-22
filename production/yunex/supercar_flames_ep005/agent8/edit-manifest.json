@@ -16,7 +16,11 @@
     "sha256": null,
     "sourceCommit": null,
     "approvalRef": null,
-    "captionsVerified": false
+    "captionsVerified": false,
+    "verifiedDurationSeconds": null,
+    "artifactRunId": null,
+    "artifactName": null,
+    "verificationNote": "No approved EP005 original recording or verified caption times supplied."
   },
   "captions": [],
   "beats": [
@@ -39,7 +43,10 @@
         "assetProvenance": null,
         "agent6Commit": null,
         "agent7Commit": null,
-        "portManifestSha256": null
+        "portManifestSha256": null,
+        "producerIssue": 266,
+        "portManifestRef": null,
+        "portManifestVersion": null
       }
     },
     {
@@ -65,7 +72,8 @@
         "assetProvenance": null,
         "agent6Commit": null,
         "agent7Commit": null,
-        "portManifestSha256": null
+        "portManifestSha256": null,
+        "producerIssue": 265
       }
     },
     {
@@ -91,7 +99,8 @@
         "assetProvenance": null,
         "agent6Commit": null,
         "agent7Commit": null,
-        "portManifestSha256": null
+        "portManifestSha256": null,
+        "producerIssue": 266
       }
     },
     {
@@ -117,7 +126,8 @@
         "assetProvenance": null,
         "agent6Commit": null,
         "agent7Commit": null,
-        "portManifestSha256": null
+        "portManifestSha256": null,
+        "producerIssue": 266
       }
     },
     {
@@ -143,7 +153,10 @@
         "assetProvenance": null,
         "agent6Commit": null,
         "agent7Commit": null,
-        "portManifestSha256": null
+        "portManifestSha256": null,
+        "producerIssue": 266,
+        "portManifestRef": null,
+        "portManifestVersion": null
       }
     },
     {
@@ -169,7 +182,8 @@
         "assetProvenance": null,
         "agent6Commit": null,
         "agent7Commit": null,
-        "portManifestSha256": null
+        "portManifestSha256": null,
+        "producerIssue": 265
       }
     },
     {
@@ -191,9 +205,16 @@
         "assetProvenance": null,
         "agent6Commit": null,
         "agent7Commit": null,
-        "portManifestSha256": null
+        "portManifestSha256": null,
+        "producerIssue": 266,
+        "portManifestRef": null,
+        "portManifestVersion": null
       }
     }
   ],
-  "optionalAudioBeds": []
+  "optionalAudioBeds": [],
+  "rejectedMedia": {
+    "candidateA": "Agent 6 Spectral GT RS candidate A rejected after native picture inspection; do not promote its footage or original exhaust-ports.v1.json.",
+    "oldProduction": "Legacy EP005 A1-A5 PRs #260-264 rejected; no fallback."
+  }
 }
