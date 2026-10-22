@@ -7,7 +7,7 @@ export interface AfterfireRig {
   root: T.Group;
   jets: Record<ExhaustSide,{root:T.Group; sheets:T.Mesh[]; spill:T.PointLight}>;
 }
-const vertex = /* glsl */ \`
+const vertex = /* glsl */ `
   uniform float uTime, uLength, uWidth, uLayer, uSeed, uWind;
   varying vec2 vUv;
   void main() {
@@ -21,8 +21,8 @@ const vertex = /* glsl */ \`
        .06*uWidth*x*sin(x*25.-uTime*18.+uSeed));
     gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);
   }
-\`;
-const fragment = /* glsl */ \`
+`;
+const fragment = /* glsl */ `
   uniform float uTime, uLayer, uSeed, uPower;
   varying vec2 vUv;
   float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
@@ -58,7 +58,7 @@ const fragment = /* glsl */ \`
     if(alpha<.008)discard;
     gl_FragColor=vec4(col*(1.3+1.45*base),min(.92,alpha));
   }
-\`;
+`;
 function ribbon():T.BufferGeometry {
   const xyz:number[]=[],uv:number[]=[],idx:number[]=[];
   const n=68;
