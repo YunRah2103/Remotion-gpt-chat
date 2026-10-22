@@ -14,8 +14,8 @@ import {CinematicLighting} from '../../../../../../../src/yunex/modelling-kit/Li
 import {disposeObject} from '../../../../../../../src/yunex/world-kit/geometry.ts';
 import {NightCircuitWorld} from '../../../../look/NightCircuitWorld.tsx';
 import type {SparkParticle, VehicleMotionState, Vec3} from '../../../../shared/contract.ts';
-import {createQualityKitDressing, assertNoAdditionalRoad} from 'kit-dressing.ts';
-import {QUALITY_NIGHT, qualityWetness, validatedSparkGain} from 'palette.ts';
+import {createQualityKitDressing, assertNoAdditionalRoad} from './kit-dressing.ts';
+import {QUALITY_NIGHT, qualityWetness, validatedSparkGain} from './palette.ts';
 
 export type QualityNightCircuitProps = {
   motion?: VehicleMotionState;
