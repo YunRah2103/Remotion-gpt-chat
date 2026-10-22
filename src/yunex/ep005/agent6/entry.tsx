@@ -25,8 +25,8 @@ export const MOUTH_INNER_DIAMETER_M = 0.082;
 export function sampleExhaustWorld(car: THREE.Object3D, frame: number) {
   car.updateWorldMatrix(true, true);
   return OUTLETS.map((port) => {
-    const p = new THREE.Vector3(...port.center).applyMatrix4(car.matrixWorld);
-    const direction = new THREE.Vector3(0, 0, -1)
+    const p = new THREE.Vector3(-2.515, 0.57, -port.side * 0.56).applyMatrix4(car.matrixWorld);
+    const direction = new THREE.Vector3(-1, 0, 0)
       .transformDirection(car.matrixWorld).normalize();
     return {
       frame,
