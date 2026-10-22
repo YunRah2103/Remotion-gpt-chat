@@ -40,6 +40,22 @@ export function createEP005CinematicNightCircuit():THREE.Group{
  const world=createEP005NightCircuit({premium:true}),set=new THREE.Group();
  world.name="EP005-cinematic-night-circuit-v2";
  set.name="ep005-v2-environment";world.add(set);set.add(skyDome());
+ // The generic V3 circuit's bright green parkland and ochre runoff read as
+ // daylight/game scenery. Retain every source mesh and its route coordinates,
+ // but grade only this independently constructed EP005 world into night.
+ const grade=(name:string,color:string,roughness=.94)=>{
+  const node=world.getObjectByName(name);
+  if(node instanceof THREE.Mesh && node.material instanceof THREE.MeshStandardMaterial){
+   node.material.color.set(color);node.material.roughness=roughness;
+   node.material.metalness=Math.min(.07,node.material.metalness);
+   node.material.needsUpdate=true;
+  }
+ };
+ grade("terrain","#1b2a2c",.99);
+ grade("runoff","#2c373d",.93);
+ grade("tree-crowns","#52616a",.96);
+ grade("conifer-tiers","#526875",.96);
+ grade("tree-trunks","#4a4d4d",.95);
  const L=EP005_ROUTE.lapMetres;
  const steel=mat("#596d79",.36,.62),dark=mat("#1e2931",.9,.035);
  const roadWhite=mat("#9da9af",.76,.07),rubber=mat("#1b252c",.96,.01);
