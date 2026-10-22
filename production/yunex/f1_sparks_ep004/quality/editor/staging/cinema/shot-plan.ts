@@ -3,7 +3,7 @@
  * these source-time handles are deliberately independent of narration.
  */
 import type {ShotId} from '../../../../shared/contract.ts';
-import {qualityCutAtFrame,qualityCutList} from 'cameras.ts';
+import {qualityCutAtFrame,qualityCutList} from './cameras.ts';
 
 export type PhysicalBeat=Readonly<{
  shot:ShotId;startDistanceM:number;sourceInSec:number;sourceRate:number;
