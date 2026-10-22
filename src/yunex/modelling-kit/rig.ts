@@ -1,3 +1,4 @@
+import {studioWheelFinish} from './studio-wheels.ts';
 import {installStudioExhaust} from './studio-exhaust.ts';
 import {cutOpening} from '../world-kit/cavity.ts';
 import {installStudioCoachwork,STUDIO_BODY_IDS} from './studio-coachwork.ts';
@@ -50,7 +51,7 @@ export function createCinematicVehicle(options:CinematicOptions):T.Group{
   if(o.name.startsWith('steer-')){const mount=o as T.Group;let corner=`${o.position.x>0?'front':'rear'}-${o.position.z>=0?'left':'right'}`;if(corners.has(corner))corner=`rear-aux-${o.position.z>=0?'left':'right'}`;corners.add(corner);mount.name=`mount-${corner}`;mount.userData.restPosition=mount.position.toArray();mounts.push(mount);
    mount.traverse(n=>{if(n instanceof T.Mesh&&n.name==='tyre'){const original=n.geometry;n.geometry=original.clone();original.dispose();n.userData.restVertices=Array.from(n.geometry.attributes.position.array);}});
    createTornCarcass(mount.getObjectByName('wheel-roll')!,s.radius,s.family==='formula'?.32:s.family==='sports'?.28:.235);
-   if(quality==='hero'){const roll=mount.getObjectByName('wheel-roll')!;tyreDetail(roll,s.radius,s.family==='formula'?.32:s.family==='sports'?.28:.235,options.tyreType==='slick'||s.family==='formula');}
+   if(quality==='hero'){const roll=mount.getObjectByName('wheel-roll')!;tyreDetail(roll,s.radius,s.family==='formula'?.32:s.family==='sports'?.28:.235,options.tyreType==='slick'||s.family==='formula');if(options.bodyDetail==='studio')studioWheelFinish(roll,s);}
   }else shell.add(o);
  }
  if(quality==='hero'){

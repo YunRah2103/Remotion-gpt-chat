@@ -9,7 +9,7 @@ export const STUDIO_BODY_IDS=['supercar','coupe','rally-hatch'] as const;
 type Profile={roof:number;frontBase:number;frontRoof:number;rearRoof:number;rearBase:number;belt:number;baseWidth:number;roofWidth:number};
 export function studioBodyProfile(s:VehicleSpec):Profile{
  const rally=s.id==='rally-hatch',coupe=s.id==='coupe',l=interiorLayout(s);
- return {roof:rally?1.54:coupe?1.37:1.39,frontBase:l.frontBase,frontRoof:rally?.37:coupe?.26:.20,rearRoof:rally?-1.02:coupe?-.79:-.74,rearBase:rally?-1.69:coupe?-1.49:-1.48,belt:rally?.98:.84,baseWidth:s.width*(rally?.445:.426),roofWidth:s.width*(rally?.365:.326)};
+ return {roof:rally?1.54:coupe?1.37:1.39,frontBase:l.frontBase,frontRoof:rally?.37:coupe?.26:.20,rearRoof:rally?-1.46:coupe?-.79:-.74,rearBase:rally?-1.90:coupe?-1.49:-1.48,belt:rally?.98:.84,baseWidth:s.width*(rally?.445:.426),roofWidth:s.width*(rally?.365:.326)};
 }
 const smooth=T.MathUtils.smoothstep;
 /** Shape-preserving cubic longitudinal interpolation, without uncontrolled spline overshoot. */
@@ -46,6 +46,11 @@ function closePatch(input:T.BufferGeometry,thickness:number){
  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setIndex(idx);g.computeVertexNormals();g.computeBoundingBox();g.computeBoundingSphere();return g;
 }
 function curve(parent:T.Object3D,mat:T.Material,points:V3[],radius:number,name:string){return mesh(parent,new T.TubeGeometry(new T.CatmullRomCurve3(points.map(p=>new T.Vector3(...p))),Math.max(32,points.length*3),radius,8,false),mat,[0,0,0],[0,0,0],name);}
+/** Formed painted pillar section, distinct from a round decorative pipe. */
+function formedRail(parent:T.Object3D,mat:T.Material,points:V3[],width:number,depth:number,name:string){
+ const w=width/2,d=depth/2,r=Math.min(width,depth)*.18,shape=new T.Shape();shape.moveTo(-w+r,-d);shape.lineTo(w-r,-d);shape.quadraticCurveTo(w,-d,w,-d+r);shape.lineTo(w,d-r);shape.quadraticCurveTo(w,d,w-r,d);shape.lineTo(-w+r,d);shape.quadraticCurveTo(-w,d,-w,d-r);shape.lineTo(-w,-d+r);shape.quadraticCurveTo(-w,-d,-w+r,-d);
+ return mesh(parent,new T.ExtrudeGeometry(shape,{steps:48,bevelEnabled:false,curveSegments:3,extrudePath:new T.CatmullRomCurve3(points.map(p=>new T.Vector3(...p)))}),mat,[0,0,0],[0,0,0],name);
+}
 function bodyGeometry(s:VehicleSpec){
  const half=s.length/2,nx=160,nz=32,ny=14,rows:number[][]=[],p:number[]=[],idx:number[]=[],arch=s.radius*1.12;
  const xs:number[]=[];for(let i=0;i<=nx;i++)xs.push(T.MathUtils.lerp(-half,half,i/nx));for(const axle of [-s.wheelbase/2,s.wheelbase/2])for(let i=0;i<=40;i++)xs.push(axle+arch*Math.cos(i/40*Math.PI));xs.sort((a,b)=>a-b);
@@ -81,7 +86,7 @@ function canopy(shell:T.Group,s:VehicleSpec,paint:T.Material,trim:T.Material,gla
  const screen=(rear:boolean,u:number,v:number)=>{const base=rear?c.rearBase:c.frontBase,top=rear?c.rearRoof:c.frontRoof,z=-1+2*v;const q=roofAt(top,z),p=new T.Vector3(base,c.belt-.025*z*z,c.baseWidth*z);p.lerp(q,u);p.x+=(rear?-.045:.055)*Math.sin(Math.PI*u)*(1-z*z);return p;};
  for(const rear of [false,true]){
   pane(rear?'rear-glass':'windshield',(u,v)=>screen(rear,u,v),glass,rear);
-  for(const side of [0,1]){const pts:V3[]=[];for(let i=0;i<=24;i++)pts.push(screen(rear,i/24,side).toArray() as V3);curve(shell,paint,pts,.033,rear?'c-pillar':'a-pillar');}
+  for(const side of [0,1]){const pts:V3[]=[];for(let i=0;i<=24;i++)pts.push(screen(rear,i/24,side).toArray() as V3);formedRail(shell,paint,pts,.065,.028,rear?'c-pillar':'a-pillar');}
   for(const edge of [0,1]){const pts:V3[]=[];for(let i=0;i<=32;i++)pts.push(screen(rear,edge,i/32).toArray() as V3);curve(shell,trim,pts,.009,rear?'rear-window-frame':'windshield-seal');}
  }
  const roofX=(t:number)=>t<.24?T.MathUtils.lerp(c.rearBase,c.rearRoof,t/.24):t>.77?T.MathUtils.lerp(c.frontRoof,c.frontBase,(t-.77)/.23):T.MathUtils.lerp(c.rearRoof,c.frontRoof,(t-.24)/.53);
@@ -89,7 +94,7 @@ function canopy(shell:T.Group,s:VehicleSpec,paint:T.Material,trim:T.Material,gla
  for(const side of [-1,1]){
   pane('side-glass',(u,v)=>{const t=.04+u*.92,x=roofX(t),y=topY(t),edge=1-v;return new T.Vector3(x,T.MathUtils.lerp(c.belt+.018,y-.018,v),side*T.MathUtils.lerp(c.baseWidth,c.roofWidth,(y-c.belt)/(c.roof-c.belt)*v)-side*.009*Math.sin(Math.PI*u)*Math.sin(Math.PI*v));},glass,side<0);
   const upper:V3[]=[],lower:V3[]=[];for(let i=0;i<=64;i++){const t=i/64,y=topY(t);upper.push([roofX(t),y,side*T.MathUtils.lerp(c.baseWidth,c.roofWidth,(y-c.belt)/(c.roof-c.belt))]);lower.push([T.MathUtils.lerp(c.rearBase,c.frontBase,t),c.belt,side*c.baseWidth]);}
-  curve(shell,paint,upper,.027,'window-frame');curve(shell,trim,lower,.012,'window-seal');
+  formedRail(shell,paint,upper,.040,.020,'window-frame');curve(shell,trim,lower,.012,'window-seal');
   if(s.id==='rally-hatch'){const t=.48,x=roofX(t);rod(shell,trim,[x,c.belt,side*c.baseWidth],[x,c.roof-.055,side*c.roofWidth],.026).name='b-pillar';}
  }
  const cabin=shell.getObjectByName('interior'),liner=cabin?.getObjectByName('roof-liner') as T.Mesh|undefined;
@@ -99,7 +104,7 @@ function intake(shell:T.Group,mat:T.Material,x:number,y:number,z:number,w:number
  const outer=new T.Shape();outer.moveTo(-w/2,-h/2);outer.lineTo(w/2,-h/2);outer.lineTo(w*.40,h/2);outer.lineTo(-w*.40,h/2);outer.closePath();
  const hole=new T.Path();hole.moveTo(-w*.42,-h*.32);hole.lineTo(-w*.34,h*.32);hole.lineTo(w*.34,h*.32);hole.lineTo(w*.42,-h*.32);hole.closePath();outer.holes.push(hole);
  const g=new T.ExtrudeGeometry(outer,{depth:.075,bevelEnabled:true,bevelSegments:3,bevelSize:.009,bevelThickness:.009,steps:1});g.rotateY(Math.PI/2);mesh(shell,g,mat,[x,y,z],[0,0,0],name);
- box(shell,mat,[.015,h*.80,w*.84],[x-.065,y,z],.009,name+'-backing');
+ box(shell,mat,[.020,h*1.07,w*1.07],[x-.080,y,z],.009,name+'-backing');
 }
 /** Replace, not overlay, the old exterior; canonical interior and wheel/driver hardpoints remain. */
 export function installStudioCoachwork(shell:T.Group,s:VehicleSpec){
@@ -151,7 +156,10 @@ export function installStudioCoachwork(shell:T.Group,s:VehicleSpec){
   // Fitted engine-deck blades and raised haunch buttresses distinguish mid-engine architecture.
   const deckX=s.id==='supercar'?-1.70:-1.80;
   for(const side of [-1,1])for(let i=0;i<6;i++){const x=deckX+i*.075,q=studioDeckPoint(s,x,side*.45);box(shell,carbon,[.028,.012,.29],[x,q.y+.012,side*.36],.004,'engine-deck-louvre');}
-  for(const side of [-1,1]){const p:V3[]=[[-.72,c.belt+.14,side*.83],[-1.02,.92,side*.94],[-1.40,.96,side*.95],[-1.80,.92,side*.88]];curve(shell,paint,p,.032,'rear-haunch-buttress');}
+  for(const side of [-1,1]){
+   const endX=-s.length*.409,deck=studioDeckPoint(s,endX,side*.85),start=new T.Vector3(c.rearRoof,c.roof-.055,side*c.roofWidth);
+   const shape=grid(40,8,(u,v)=>{const blend=u*u*(3-2*u),p=start.clone().lerp(deck,blend),width=.035+.065*Math.sin(Math.PI*u)+.045*u;p.z+=side*(v-.5)*width;p.y-=.025*(v-.5)*Math.sin(Math.PI*u);return p;},side<0),skin=closePatch(shape,.018);shape.dispose();const panel=mesh(shell,skin,paint,[0,0,0],[0,0,0],'rear-haunch-buttress-panel');panel.userData.sourceSurface='section-loft-v4';panel.userData.editablePanel=true;
+  }
   const lip=grid(32,6,(u,v)=>{const z=T.MathUtils.lerp(-s.width*.39,s.width*.39,u),x=-half+.11+v*.15;return new T.Vector3(x,.84+.035*Math.sin(Math.PI*u)+.035*v,z);},true);mesh(shell,lip,paint,[0,0,0],[0,0,0],'integrated-rear-spoiler');
  }
  for(const side of ['left','right']){const door=shell.getObjectByName(`studio-door-${side}`) as T.Mesh;const old=door.geometry;door.geometry=closePatch(old,.016);old.dispose();door.userData.wallThickness=.016;}
