@@ -9,7 +9,7 @@
 import * as T from 'three';
 import {createCinematicEnvironment} from '../../../../../../../src/yunex/modelling-kit/environments.ts';
 import {disposeObject} from '../../../../../../../src/yunex/world-kit/geometry.ts';
-import {QUALITY_NIGHT, qualityWetness} from 'palette.ts';
+import {QUALITY_NIGHT, qualityWetness} from './palette.ts';
 
 const ALLOWED_KIT_DETAILS = new Set(['pit-box-canopies', 'circuit-tyre-stacks']);
 
