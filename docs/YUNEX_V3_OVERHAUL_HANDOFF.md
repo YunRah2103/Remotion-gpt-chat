@@ -64,3 +64,17 @@ New shared source:
 Verification before source checkpoint:209/209 broad Node tests, zero skipped; modelling Python5/5; TypeScript and whitespace passed. Independent review constructed all36 IDs and checked positive signed volumes for all58 replacement panels and121 panes; focused5/5 passed with no important finding. Focused geometry/camera suite9/9 and panel/proof/quality suite6/6 passed. Actual source-side opening is checked by raycasting the original body without the replacement panel; glazing edge topology is checked directly rather than trusting metadata.
 
 Source still requires stable-checkpoint moving comparison review. Stills motivated the lighting balance; they do not establish final moving MP4 acceptance. Do not conflate the older1e849 six-film batch with this later geometry/lighting checkpoint. Remaining work includes richer Formula/rally internals, controlled rally slip/transient suspension, natural premium scenery and final all-family visual acceptance.
+
+### Moving review completed for454af53
+
+Two focused ordinary studio renders completed from exact source454af530e10ccb6c2e2d1c1e6a7e2a7ba9a07b86. Renderer fingerprint299cd7aa63f7232b25f530d9dc8fee37473df163aef33dc3d629202589ec9678; recipe/source-stability guards passed. Both native1080x1920/30fps, silent, full decode passed:
+- quality-supercar-coachbuilt/front:60frames/2s,60 unique decoded frames, SHA256f0c5865870458c04788f109daecc448da594fc3d7f4526bbc9d4bee816f1b330.
+- showcase-e-environment/street:90frames/3s,90 unique decoded frames, SHA256449a0e5ae7e6f2d913c2cdc87f77a70aa7f1e2d6fed75461e17a9b083b863f56.
+
+Compared complete sampled timelines with matching native baseline shots: supercar legacy artifact12450511920 from39832849132; night showcase E artifact12450299270 from39832849080. Baselines are PRhead1e849c7/merge286b3eaf. Same recipe decisions, route/time ranges and frame rate; model fitting may adjust slightly to changed bounds. No frame interpolation or invented narration.
+
+A5s side-by-side comparison reel was made from those native inputs at1080x960/30fps (each portrait input scaled equally for comparison). It is a comparison layout, not an additional claimed1080x1920 showcase. Filename:YUNEX-V3-before-after-checkpoint.mp4. Night readability is visibly improved across the moving shot. Wide-angle body differences are subtler; panel/glazing construction is verified, but finished premium hero-car quality is NOT approved yet.
+
+The20mm panel measurement is the geometric inward return/assembly envelope, not a claim that a car door uses20mm steel sheet. The convex glazing helper is not an arbitrary CAD offset solver. Keep these modelling limits explicit in educational work.
+
+New full native batches39840138011 (six showcases) and39840138014 (sixteen matching model proofs) remain underway. Their focus/geometry test jobs passed, but do not treat the full batches as complete until all actual MP4s have been inspected. Remaining priorities: much stronger family-specific body proportions/finish, natural scenery, richer fitted mechanics, and controlled rally slip/transient response. No merge.
