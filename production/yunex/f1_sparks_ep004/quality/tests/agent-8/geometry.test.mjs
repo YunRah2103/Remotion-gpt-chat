@@ -26,7 +26,7 @@ const {Vector3,Group,Mesh}=require('three');
 const {createQualityF1Vehicle,applyQualityF1Motion,assertQualitySkidGeometry,
   getQualitySkidDescriptors}=require('../../vehicle/QualityF1Vehicle.tsx');
 const {sampleDynamics,localToWorld}=require('../../../physics/dynamics.ts');
-const {disposeObject}=require('../../../../../src/yunex/world-kit/geometry.ts');
+const {disposeObject}=require('../../../../../../src/yunex/world-kit/geometry.ts');
 
 const within=(a,b,eps=1e-5)=>Math.abs(a-b)<eps;
 const skidPoint=(mesh,root)=>{
