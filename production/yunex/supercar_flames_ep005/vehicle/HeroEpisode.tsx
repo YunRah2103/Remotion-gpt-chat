@@ -12,6 +12,7 @@ import {CinematicLighting} from '../../../../src/yunex/modelling-kit/Lighting.ts
 import {drivingCamera} from '../../../../src/yunex/modelling-kit/driving.ts';
 import {compileRecipe,sampleRecipe} from '../../../../src/yunex/modelling-kit/recipe.ts';
 import {animateCinematicVehicle} from '../../../../src/yunex/modelling-kit/rig.ts';
+import {animateComponents} from '../../../../src/yunex/modelling-kit/authoring.ts';
 import type {EpisodeRecipe} from '../../../../src/yunex/modelling-kit/recipe.ts';
 import {createEp005Hero} from './hero.ts';
 
@@ -34,6 +35,7 @@ export const HeroEpisode:React.FC<{recipe:EpisodeRecipe}>=({recipe})=>{
  const delta=Math.atan2(Math.sin(ahead.yaw-pose.yaw),Math.cos(ahead.yaw-pose.yaw));
  const steer=T.MathUtils.clamp(-delta/.4*s.wheelbase,-.4,.4);
  animateCinematicVehicle(vehicle,{...state,steer});
+ animateComponents(vehicle,sample.joints);
  vehicle.position.fromArray(pose.position);
  vehicle.rotation.set(0,pose.yaw,0);
  vehicle.updateMatrixWorld(true);
