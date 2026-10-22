@@ -59,13 +59,9 @@ export function createEp005Hero():T.Group{
    new T.TorusGeometry(.055,.0025,9,48),alloy,[-2.380,.42,z],[0,-Math.PI/2,0]);
   add(shell,'ep005-'+side+'-bumper-recess-surround',
    new T.RingGeometry(.060,.065,48),forged,[-2.348,.42,z],[0,-Math.PI/2,0]);
-  for(let n=0;n<2;n++)add(shell,'ep005-'+side+'-lightblade-'+n,
-   new T.BoxGeometry(.018,.012,.275),red,[-2.375,.678+n*.036,sign*.75]);
   for(let n=0;n<5;n++)add(shell,'ep005-'+side+'-rear-grille-'+n,
    new T.BoxGeometry(.018,.011,.24),dark,[-2.373,.73+n*.035,sign*.31]);
  }
- for(let i=0;i<4;i++)add(shell,'ep005-diffuser-strake-'+i,
-  new T.BoxGeometry(.51,.12,.013),forged,[-2.11,.21,(i-1.5)*.31]);
  // Wing profiles and dashboard are already component-driven (jointTracks work).
  // Fine cabin details retain original steering, pedals, seats and dummy hardpoints.
  const dash=hero.getObjectByName('dashboard');
