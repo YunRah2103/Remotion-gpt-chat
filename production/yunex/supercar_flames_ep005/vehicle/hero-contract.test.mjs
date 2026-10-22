@@ -28,7 +28,9 @@ test('two named OUTWARD exhaust ports are attached to real continuous tailpipes'
   assert.equal(c.parent,'body-shell');
   assert.ok(c.shape.points.length>=5);
   assert.ok(c.shape.points[0][0]>-1.5,'pipe must lead forward into engine bay');
-  assert.deepEqual(c.shape.points.at(-1),port.position,'geometry ends exactly at anchor');
+  assert.deepEqual(c.shape.points.at(-1).slice(1),port.position.slice(1),'feed tube and lip concentric');
+  assert.ok(c.shape.points.at(-1)[0]>port.position[0]+.12,'feed pipe must end recessed >120mm behind hollow lip');
+  assert.ok(c.shape.points.at(-1)[0]<port.position[0]+.20,'feed pipe cannot terminate outside tapered transition');
   const mount=c.mounts.find(m=>m.name===port.id);
   assert.ok(mount);
   assert.equal(port.node,'mount:'+mount.name);
@@ -52,4 +54,19 @@ test('five distinct fully animated review shots / accurate portrait frame count'
  assert.ok(recipe.shots.some(s=>s.camera==='interior'&&s.cutaway>.5));
  assert.ok(recipe.shots.some(s=>s.jointTracks?.['ep005-active-rear-wing']));
  assert.equal(recipe.audio,undefined,'silent preview: do not invent narration');
+});
+
+test('premium V3 hero factory includes rig-safe material, moving wheel and real hollow nozzle build',()=>{
+ const src=readFileSync(new URL('./hero.ts',import.meta.url),'utf8');
+ const detail=readFileSync(new URL('./premium-details.ts',import.meta.url),'utf8');
+ assert.match(src,/createCinematicVehicle\(/);
+ assert.doesNotMatch(src,/editModel\(/);
+ assert.match(src,/applyEp005PremiumDetails\(hero\)/);
+ assert.match(src,/userData\.radius=spec\.innerRadius/);
+ assert.match(src,/ep005-\$\{side\}-tapered-nozzle-transition/);
+ assert.match(src,/CylinderGeometry\(\.085,\.054,\.16,48,3,true\)/);
+ assert.match(detail,/getObjectByName\('wheel-roll'\)/);
+ assert.match(detail,/getObjectByName\('driver-rig'\)/);
+ assert.match(detail,/function enhanceEngine/);
+ assert.match(detail,/bodyHalfWidth\(/);
 });
