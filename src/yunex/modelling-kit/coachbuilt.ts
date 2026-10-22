@@ -18,8 +18,24 @@ export function coachbuiltField(p:T.Vector3,s:VehicleSpec){
  p.z+=Math.sign(p.z)*free*flank*.026*Math.exp(-(((y-l.belt+.10)/.18)**2));
  p.y-=free*nose*.055*side**2*(1-roof);
  p.y+=roof*.026*(1-Math.min(1,side**2));
+ // Shape the actual bonnet and bumper together. The former shallow die left a
+ // horizontal slab between the headlamps; this gives the prow a broad plan-view
+ // sweep and a bonnet valley between independently crowned fender shoulders.
+ // Release only above the tyre envelope, never move the wheel/arch contact edge.
+ const athletic=sport&&s.bodyStyle!=='muscle';
+ const strength=athletic?1:s.family==='normal'?.38:s.family==='suv'?.24:0;
+ const bonnet=T.MathUtils.smoothstep(x,l.frontBase-.04,l.frontBase+.48);
+ const outboard=T.MathUtils.smoothstep(side,.55,.85);
+ const upper=T.MathUtils.smoothstep(y,T.MathUtils.lerp(.25,s.radius*1.90,outboard),l.belt+.04)*(1-T.MathUtils.smoothstep(y,l.belt+.10,l.belt+.34));
+ const centre=Math.exp(-((zRatio(p.z,s.width)/.64)**4));
+ const fender=Math.exp(-(((Math.abs(p.z)/(s.width/2)-.78)/.22)**2));
+ const axleCrown=Math.exp(-(((x-s.wheelbase/2)/.63)**2));
+ p.y+=strength*upper*bonnet*(-.125*centre+.075*fender*axleCrown);
+ const prow=T.MathUtils.smoothstep(x,half*.30,half);
+ p.x-=strength*.12*prow*Math.min(1.25,side)**2*(1-roof)*free;
  return p;
 }
+function zRatio(z:number,width:number){return z/(width/2);}
 function tube(g:T.Object3D,m:T.Material,points:V3[],radius:number,name:string){return mesh(g,new T.TubeGeometry(new T.CatmullRomCurve3(points.map(p=>new T.Vector3(...p))),40,radius,10,false),m,[0,0,0],[0,0,0],name);}
 function formulaFinish(shell:T.Group,s:VehicleSpec){
  const body=shell.getObjectByName('single-seater-body') as T.Mesh<T.BufferGeometry,T.MeshStandardMaterial>;if(!body)return;
