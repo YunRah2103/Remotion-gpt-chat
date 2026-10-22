@@ -36,11 +36,11 @@ const previewWords:readonly NarratorWord[]=[
  {text:'on',startSec:7.25,endSec:7.7},
 ];
 const previewCues:readonly SubtitleCue[]=[
- {startFrame:0,endFrame:30,wordIndices:[0,1]},
- {startFrame:30,endFrame:64,wordIndices:[2,3]},
- {startFrame:72,endFrame:128,wordIndices:[4,5,6,7]},
- {startFrame:129,endFrame:185,wordIndices:[8,9,10,11]},
- {startFrame:192,endFrame:231,wordIndices:[12,13,14]},
+ {startFrame:0,endFrameExclusive:30,wordIndices:[0,1]},
+ {startFrame:30,endFrameExclusive:64,wordIndices:[2,3]},
+ {startFrame:72,endFrameExclusive:128,wordIndices:[4,5,6,7]},
+ {startFrame:129,endFrameExclusive:185,wordIndices:[8,9,10,11]},
+ {startFrame:192,endFrameExclusive:231,wordIndices:[12,13,14]},
 ];
 const Camera:React.FC<{pose:CameraPose}>=({pose})=>{
  const {camera}=useThree();
