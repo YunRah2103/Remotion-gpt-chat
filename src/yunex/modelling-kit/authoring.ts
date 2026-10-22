@@ -7,7 +7,7 @@ import {pipe} from '../parts-kit/helpers.ts';
 import type {V3} from '../world-kit/geometry.ts';
 export type ModelEdit={target:string;position?:V3;rotation?:V3;scale?:V3;visible?:boolean;deform?:{axis:'x'|'y'|'z';amount:number;along:'x'|'y'|'z'}};
 export type ModelVariation={id:string;version:1;edits:ModelEdit[]};
-export type AssemblyNode={id:string;part:PartVariant|string;position?:V3;rotation?:V3;scale?:V3};
+export type AssemblyNode={id:string;part:PartVariant|string;components?:ComponentSpec[];position?:V3;rotation?:V3;scale?:V3};
 export type AssemblySpec={id:string;version:1;nodes:AssemblyNode[];connections:{from:string;to:string;radius?:number;via?:V3[]}[]};
 const finite=(v:number[])=>v.every(Number.isFinite);
 export function applyEdits(root:T.Object3D,variation:ModelVariation){
@@ -42,7 +42,7 @@ function endpoint(root:T.Object3D,address:string):V3{const split=address.indexOf
 export function createAssembly(spec:AssemblySpec,resolvePart?:(id:string)=>T.Group):T.Group{
  if(spec.version!==1||!spec.id||!Array.isArray(spec.nodes)||!Array.isArray(spec.connections))throw Error('Invalid assembly');
  const root=new T.Group();root.name=spec.id;root.userData.assembly=structuredClone(spec);const ids=new Set<string>();
- for(const node of spec.nodes){if(!/^[a-z][a-z0-9-]*$/.test(node.id)||ids.has(node.id))throw Error('Duplicate or invalid assembly node');ids.add(node.id);const part=resolvePart?resolvePart(node.part):createPart({variant:node.part as PartVariant,cutaway:true});part.name=node.id;root.add(part);applyEdits(part,{id:node.id,version:1,edits:[{target:node.id,position:node.position,rotation:node.rotation,scale:node.scale}]});}
+ for(const node of spec.nodes){if(!/^[a-z][a-z0-9-]*$/.test(node.id)||ids.has(node.id))throw Error('Duplicate or invalid assembly node');ids.add(node.id);const part=resolvePart?resolvePart(node.part):createPart({variant:node.part as PartVariant,cutaway:true});part.name=node.id;if(node.components)buildComponents(part,node.components);root.add(part);applyEdits(part,{id:node.id,version:1,edits:[{target:node.id,position:node.position,rotation:node.rotation,scale:node.scale}]});}
  spec.connections.forEach((c,i)=>{if(c.radius!==undefined&&(!Number.isFinite(c.radius)||c.radius<=0||c.radius>.2))throw Error('Pipe radius must be 0..0.2');const a=endpoint(root,c.from),b=endpoint(root,c.to);if(new T.Vector3(...a).distanceTo(new T.Vector3(...b))<1e-6)throw Error('Connection has zero length');const via=c.via??[new T.Vector3(...a).lerp(new T.Vector3(...b),.5).add(new T.Vector3(0,.18,0)).toArray() as V3];if(via.some(p=>p.length!==3||!finite(p)))throw Error('Invalid pipe route');const link=pipe(root,new T.MeshStandardMaterial({color:c.from.includes('exhaust')?'#ad7756':'#3ba6ad',metalness:.65,roughness:.32}),[a,...via,b],c.radius??.035,`connection-${i}`);link.userData.connection={from:c.from,to:c.to,start:a,end:b};});
  return root;
 }
