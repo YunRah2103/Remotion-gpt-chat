@@ -44,12 +44,15 @@ jobs:
             echo "ready=false" >> "$GITHUB_OUTPUT"
             echo "SOURCE ONLY / NATIVE FILM BLOCKED — do not imply picture lock."
           fi
-      - name: Install FFmpeg and subtitle fonts
-        if: steps.gate.outputs.ready == 'true'
+      - name: Install FFmpeg and subtitle fonts for audio-only diagnostic and real render
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg fonts-dejavu-core
           ffmpeg -hide_banner -filters | grep -E ' ass ' | head -1
+      - name: Prove audio sidechain and loudness filter independently without real media
+        run: |
+          node --check production/yunex/supercar_flames_ep005/agent8/audio-filter-smoke.mjs
+          node production/yunex/supercar_flames_ep005/agent8/audio-filter-smoke.mjs
       - name: Retrieve source-version-pinned video and approved narration
         if: steps.gate.outputs.ready == 'true'
         env:
