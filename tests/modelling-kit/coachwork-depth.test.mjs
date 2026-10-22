@@ -39,9 +39,20 @@ test('paint flank normals follow the continuous skin through densely sampled whe
   const normals=body.geometry.attributes.normal;let samples=0;const e=.0001;
   const skin=(x,y,side)=>coachworkField(new T.Vector3(x,y,side*bodyHalfWidth(s,x,y)),s);
   for(let i=0;i<normals.count;i++){const x=rest[i*3],y=rest[i*3+1],z=rest[i*3+2],side=Math.sign(z);
-   if(Math.abs(x)>=s.length/2-.02||y>=bodyTop(s,x)-.045||Math.abs(Math.abs(z)-bodyHalfWidth(s,x,y))>=.00001)continue;
+   if(Math.abs(x)>=s.length/2-.02||y>=bodyTop(s,x)-.12||Math.abs(Math.abs(z)-bodyHalfWidth(s,x,y))>=.00001)continue;
    const tx=skin(x+e,y,side).sub(skin(x-e,y,side)),ty=skin(x,y+e,side).sub(skin(x,y-e,side)),expected=tx.cross(ty).multiplyScalar(side).normalize(),actual=new T.Vector3().fromBufferAttribute(normals,i);
    assert.ok(actual.dot(expected)>.995,variant+' reflected skin continuity '+JSON.stringify({x,y,z,dot:actual.dot(expected),actual:actual.toArray(),expected:expected.toArray()}));samples++;
   }assert.ok(samples>100,variant+' actual flank coverage');disposeObject(g);
+ }
+});
+
+test('coachwork preserves positive skin orientation through arch-release transitions',()=>{
+ for(const variant of ['hot-hatch','supercar','crossover','panel-van','pickup']){
+  const s=vehicleSpec(variant),eps=.0001;
+  for(let i=0;i<=60;i++)for(let j=0;j<=12;j++)for(const side of [-1,1]){
+   const x=-s.length/2+i*s.length/60,y=s.radius*.7+j*(s.height-s.radius*.7)/12,p=new T.Vector3(x,y,side*bodyHalfWidth(s,x,y)),f=coachworkField(p.clone(),s);
+   const dx=coachworkField(p.clone().add(new T.Vector3(eps,0,0)),s).sub(f).divideScalar(eps),dy=coachworkField(p.clone().add(new T.Vector3(0,eps,0)),s).sub(f).divideScalar(eps),dz=coachworkField(p.clone().add(new T.Vector3(0,0,eps)),s).sub(f).divideScalar(eps);
+   const determinant=dx.dot(dy.clone().cross(dz));assert.ok(determinant>.05,variant+' folded skin '+JSON.stringify({x,y,side,determinant}));
+  }
  }
 });

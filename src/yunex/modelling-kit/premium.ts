@@ -21,7 +21,7 @@ export function sculptShell(shell:T.Group,s:VehicleSpec){
    // apertures. Area-weighted triangle normals then pinch an otherwise smooth skin.
    // Use the actual surface derivatives, independent of tessellation density.
    const flank=o.name==='arched-body'&&Math.abs(p.x)<s.length/2-.02&&p.y<bodyTop(s,p.x)-.045&&Math.abs(Math.abs(p.z)-bodyHalfWidth(s,p.x,p.y))<.002;
-   if(flank){const dx=(bodyHalfWidth(s,p.x+e,p.y)-bodyHalfWidth(s,p.x-e,p.y))/(2*e),dy=(bodyHalfWidth(s,p.x,p.y+e)-bodyHalfWidth(s,p.x,p.y-e))/(2*e);normal.set(-dx,-dy,Math.sign(p.z)).normalize();}
+   if(flank){const dx=(bodyHalfWidth(s,p.x+e,p.y)-bodyHalfWidth(s,p.x-e,p.y))/(2*e),dy=(bodyHalfWidth(s,p.x,p.y+e)-bodyHalfWidth(s,p.x,p.y-e))/(2*e);const analytic=new T.Vector3(-dx,-dy,Math.sign(p.z)).normalize(),blend=(1-T.MathUtils.smoothstep(p.y,bodyTop(s,p.x)-.12,bodyTop(s,p.x)-.045))*(1-T.MathUtils.smoothstep(Math.abs(Math.abs(p.z)-bodyHalfWidth(s,p.x,p.y)),.00001,.002));normal.fromBufferAttribute(norm,i).applyMatrix3(toWorld).normalize().lerp(analytic,blend).normalize();}
    else normal.fromBufferAttribute(norm,i).applyMatrix3(toWorld);
    normal.applyMatrix3(j).applyMatrix3(toLocal).normalize();norm.setXYZ(i,normal.x,normal.y,normal.z);}
    local.copy(mapped).applyMatrix4(inverse);a.setXYZ(i,local.x,local.y,local.z);

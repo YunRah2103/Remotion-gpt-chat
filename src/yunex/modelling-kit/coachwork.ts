@@ -9,7 +9,8 @@ import {interiorLayout} from '../world-kit/interiors.ts';
 export function coachworkField(p:T.Vector3,s:VehicleSpec){
  const l=interiorLayout(s),half=s.length/2,x=p.x,y=p.y,z=p.z,side=Math.abs(z)/(s.width/2);
  const axleDistance=Math.min(Math.abs(x-s.wheelbase/2),Math.abs(x+s.wheelbase/2));
- const archLock=(1-T.MathUtils.smoothstep(axleDistance,s.radius*1.10,s.radius*1.50))*(1-T.MathUtils.smoothstep(y,s.radius*1.92,s.radius*2.42));
+ // The release spans more than the nose displacement: a narrow mask folds the skin.
+ const archLock=(1-T.MathUtils.smoothstep(axleDistance,s.radius*1.10,s.radius*2.40))*(1-T.MathUtils.smoothstep(y,s.radius*1.92,s.radius*2.42));
  const free=1-archLock,roof=T.MathUtils.smoothstep(y,l.belt+.08,s.height-.04);
  const nose=T.MathUtils.smoothstep(x,half*.55,half),tail=1-T.MathUtils.smoothstep(x,-half,-half*.68);
  p.x+=(-nose*.16+tail*.12)*Math.pow(side,3)*free;
