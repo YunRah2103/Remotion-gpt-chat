@@ -1,0 +1,91 @@
+name: EP005 Agent 3 native cinema review
+on:
+  pull_request:
+    paths:
+      - 'production/yunex/supercar_flames_ep005/cinema/**'
+      - 'src/yunex/studio-projects/ep005-a3-driving/**'
+      - '.github/workflows/yunex-ep005-agent3.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cinema:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Install full native FFmpeg and FFprobe verification tools
+        run: bash scripts/modelling-kit/install-native-media.sh
+      - name: V3 typecheck and continuous-motion camera tests
+        run: |
+          npm run check
+          node --experimental-strip-types --test production/yunex/supercar_flames_ep005/cinema/timeline.test.mjs
+      - name: V3 recipe, shot plan, real 3D catalogue and source handoff
+        run: |
+          npm run kit:validate -- ep005-a3-driving
+          npm run kit:plan -- ep005-a3-driving
+          npm run kit:inspect -- ep005-a3-driving
+          npm run kit:handoff -- ep005-a3-driving
+      - name: Stage cross-agent SHA-pinned sources for INTEGRATION REVIEW ONLY
+        shell: bash
+        run: |
+          set -euo pipefail
+          hero=23eda32c1796fd9af546ea80c3d6e5117e8e6ba8
+          flames=e8a8f5e415e4abb03b0fa8a2c0959df5eaceab32
+          look=92f28465b83183815605fcb3f13291bba87b2714
+          git fetch --no-tags origin "$hero" "$flames" "$look"
+          pull_file() {
+            mkdir -p "$(dirname "$2")"
+            git show "$1:$2" > "$2"
+          }
+          pull_file "$hero" production/yunex/supercar_flames_ep005/vehicle/hero.ts
+          pull_file "$hero" production/yunex/supercar_flames_ep005/vehicle/premium-details.ts
+          pull_file "$hero" production/yunex/supercar_flames_ep005/vehicle/exhaust-contract.json
+          pull_file "$hero" src/yunex/studio-projects/ep005-a1-hero/recipe.json
+          pull_file "$flames" production/yunex/supercar_flames_ep005/flames/afterfire.ts
+          pull_file "$flames" production/yunex/supercar_flames_ep005/flames/exhaust-rig.ts
+          pull_file "$look" production/yunex/supercar_flames_ep005/look/route.ts
+          pull_file "$look" production/yunex/supercar_flames_ep005/look/NightCircuit.ts
+          pull_file "$look" production/yunex/supercar_flames_ep005/look/PracticalLighting.tsx
+          cp production/yunex/supercar_flames_ep005/cinema/integration-entry.template.txt src/yunex/studio-projects/ep005-a3-driving/entry.tsx
+          cat > out/studio/ep005-a3-driving/integration-review-sources.json <<JSON
+          {"hero":"$hero","afterfire":"$flames","environment":"$look","approval":"INTEGRATION REVIEW ONLY - NOT MANAGER-APPROVED MASTER","audio":"silent"}
+          JSON
+          npm run check
+      - name: Native 750-frame moving QA with real A1 ports, A2 flames and A4 matched circuit
+        run: npm run kit:render -- ep005-a3-driving
+      - name: Frame, decode, media and checksum verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          film=out/studio/ep005-a3-driving.mp4
+          out=out/studio/ep005-a3-driving
+          mkdir -p "$out/frame-qa"
+          ffprobe -v error -show_entries stream=codec_name,width,height,avg_frame_rate,nb_frames -show_entries format=duration -of json "$film" | tee "$out/ffprobe.json"
+          python - <<'PY'
+          import json
+          info=json.load(open('out/studio/ep005-a3-driving/ffprobe.json'))
+          v=next(s for s in info['streams'] if s.get('codec_name')=='h264')
+          assert (v['width'],v['height'])==(1080,1920),v
+          assert v['avg_frame_rate']=='30/1',v
+          assert int(v['nb_frames'])==750,v
+          assert abs(float(info['format']['duration'])-25)<.04,info
+          PY
+          ffmpeg -hide_banner -loglevel error -i "$film" -f null -
+          sha256sum "$film" | tee "$out/sha256.txt"
+          ffmpeg -y -hide_banner -loglevel error -i "$film" -vf "select='eq(n,0)+eq(n,10)+eq(n,23)+eq(n,29)+eq(n,44)+eq(n,45)+eq(n,164)+eq(n,165)+eq(n,284)+eq(n,285)+eq(n,419)+eq(n,420)+eq(n,554)+eq(n,555)+eq(n,674)+eq(n,709)+eq(n,749)'" -vsync vfr "$out/frame-qa/frame-%02d.png"
+          test "$(find "$out/frame-qa" -name 'frame-*.png' | wc -l)" -eq 17
+          ffmpeg -y -hide_banner -loglevel error -i "$film" -vf "fps=1,scale=270:480,tile=5x5" -frames:v 1 "$out/25sec-timeline.jpg"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EP005-A3-SILENT-SHA-PINNED-INTEGRATION-REVIEW-1080x1920-30fps
+          path: |
+            out/studio/ep005-a3-driving.mp4
+            out/studio/ep005-a3-driving/
+          retention-days: 30

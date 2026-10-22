@@ -1,0 +1,41 @@
+import React from 'react';
+import {Composition,registerRoot} from 'remotion';
+import {EP005DrivingFilm} from '../../../../production/yunex/supercar_flames_ep005/cinema/DrivingFilm';
+import type {CinemaIntegration} from '../../../../production/yunex/supercar_flames_ep005/cinema/DrivingFilm';
+import {CINEMA_FRAMES,CINEMA_FPS} from '../../../../production/yunex/supercar_flames_ep005/cinema/timeline';
+import type {CinemaSample} from '../../../../production/yunex/supercar_flames_ep005/cinema/timeline';
+import {createEp005Hero} from '../../../../production/yunex/supercar_flames_ep005/vehicle/hero';
+import {createAfterfireRig,readExhaustMounts,animateAfterfireRig} from '../../../../production/yunex/supercar_flames_ep005/flames/exhaust-rig';
+import {sampleAfterfire,stateFromCinemaDemand} from '../../../../production/yunex/supercar_flames_ep005/flames/afterfire';
+import {createEP005NightCircuit} from '../../../../production/yunex/supercar_flames_ep005/look/NightCircuit';
+import {sampleEP005Route} from '../../../../production/yunex/supercar_flames_ep005/look/route';
+import {EP005PracticalLighting,EP005NightAtmosphere} from '../../../../production/yunex/supercar_flames_ep005/look/PracticalLighting';
+import input from './recipe.json';
+import {compileRecipe} from '../../modelling-kit/recipe';
+import type {EpisodeRecipe} from '../../modelling-kit/recipe';
+
+/** SHA-pinned ephemeral renderer source: no agent PR branches are merged.
+ * Flame geometry is Agent 2's original attach-to-real-mount rig, NOT a 2D overlay.
+ * This is an isolated SILENT VISUAL-INTEGRATION REVIEW, not an approved film. */
+const radii={'exhaust-tip-left':.085,'exhaust-tip-right':.085};
+const integration:CinemaIntegration={
+ createHero:createEp005Hero,
+ createWorld:()=>createEP005NightCircuit({premium:true}),
+ routeSampler:sampleEP005Route,
+ practicalLight:sample=><><EP005NightAtmosphere premium/><EP005PracticalLighting pose={sample.pose} flameIntensity={sample.afterfireDemand}/></>,
+ attachAfterfire:hero=>{
+  const rig=createAfterfireRig(hero,{radii,requireAuthoritative:true});
+  return (sample:CinemaSample)=>{
+   const demand=sample.afterfireDemand;
+   const mounts=readExhaustMounts(hero,radii);
+   const state=stateFromCinemaDemand(demand,sample.throttle);
+   const fx=sampleAfterfire(sample.frame,sample.fps,state,mounts);
+   animateAfterfireRig(rig,fx);
+  };
+ }
+};
+const compiled=compileRecipe(input as EpisodeRecipe);
+if(compiled.durationInFrames!==CINEMA_FRAMES)throw Error('Agent 3 editorial recipe/frame mismatch');
+const Film:React.FC=()=> <EP005DrivingFilm integration={integration}/>;
+const Root=()=> <Composition id="StudioEpisode" component={Film} width={1080} height={1920} fps={CINEMA_FPS} durationInFrames={CINEMA_FRAMES}/>;
+registerRoot(Root);
