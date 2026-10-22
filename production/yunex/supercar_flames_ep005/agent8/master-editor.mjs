@@ -109,9 +109,12 @@ function plan() {
   }
   for (const b of manifest.optionalAudioBeds || []) {
     requireGate(voice.approved && b.approved === true && safeLocal(b.path) && isSha(b.sha256) &&
-      typeof b.provenance === 'string' && int(b.startFrame) &&
-      b.startFrame >= 0 && b.startFrame < 750 &&
-      typeof b.gainDb === 'number' && b.gainDb <= -10,
+      isCommit(b.sourceCommit) && hasApprovedSourceRef(b.approvalRef) &&
+      Number.isInteger(b.artifactRunId) && b.artifactRunId > 0 &&
+      typeof b.artifactName === 'string' && /^[\\w.-]+$/.test(b.artifactName) &&
+      typeof b.provenance === 'string' && b.provenance.trim().length >= 8 &&
+      int(b.startFrame) && b.startFrame >= 0 && b.startFrame < 750 &&
+      Number.isFinite(b.gainDb) && b.gainDb >= -48 && b.gainDb <= -10,
       'optional sound beds must be licensed, approved and safely ducked beneath real narration');
   }
   return {ready:blockers.length === 0, mode:voice.approved ? 'FINAL_WITH_APPROVED_AUDIO' : 'SILENT_PICTURE_REVIEW',
@@ -249,7 +252,7 @@ const output=path.join(outDir,manifest.voice.approved?'EP005-FINAL-CANDIDATE.mp4
 const args=['-hide_banner','-y'];
 for(const p of inputs) args.push('-i',p);
 args.push('-filter_complex',videoFilters.join(';'),'-map','[vout]');
-if(audioOut) args.push('-map',audioOut,'-c:a','aac','-b:a','192k','-ar','48000');
+if(audioOut) args.push('-map',audioOut,'-c:a','aac','-b:a','192k','-ar','48000','-ac','2');
 else args.push('-an');
 args.push('-c:v','libx264','-crf','18','-preset','medium','-pix_fmt','yuv420p',
   '-r','30','-frames:v','750','-movflags','+faststart','-t','25',output);
