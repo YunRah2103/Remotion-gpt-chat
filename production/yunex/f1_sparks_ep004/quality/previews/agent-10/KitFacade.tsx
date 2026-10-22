@@ -6,8 +6,8 @@
  */
 import React,{useEffect,useMemo} from 'react';
 import * as T from 'three';
-import {createCinematicVehicle,animateCinematicVehicle} from '../../../../../src/yunex/modelling-kit/rig.ts';
-import {disposeObject} from '../../../../../src/yunex/world-kit/geometry.ts';
+import {createCinematicVehicle,animateCinematicVehicle} from '../../../../../../src/yunex/modelling-kit/rig.ts';
+import {disposeObject} from '../../../../../../src/yunex/world-kit/geometry.ts';
 import {SKID_LAYOUT,SKID_BOTTOM_Y_M,SKID_THICKNESS_M,SKID_WIDTH_M} from '../../../mechanics/skids.ts';
 import type {VehicleMotionState} from '../../../shared/contract.ts';
 
