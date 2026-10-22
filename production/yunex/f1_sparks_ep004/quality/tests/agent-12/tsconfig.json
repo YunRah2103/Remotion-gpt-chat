@@ -1,0 +1,9 @@
+{
+  "extends": "../../../../../../tsconfig.json",
+  "include": [
+    "../../graphics/**/*.ts",
+    "../../graphics/**/*.tsx",
+    "../../previews/agent-12/**/*.tsx"
+  ],
+  "exclude": []
+}
