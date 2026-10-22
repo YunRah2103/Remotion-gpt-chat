@@ -43,7 +43,7 @@ function lampPatch(shell:T.Object3D,o:PatchOptions){
   const u=i/columns;
   const z=o.side*(.432+.488*u);
   const taper=.13+.87*Math.pow(Math.max(0,1-Math.pow(2*u-1,4)),.48);
-  const centerY=.732+.018*Math.sin(Math.PI*u)-.041*smooth((u-.78)/.22)+(o.yOffset??0);
+  const centerY=.690+.015*Math.sin(Math.PI*u)-.028*smooth((u-.78)/.22)+(o.yOffset??0);
   const depth=-2.366+.041*smooth((u-.72)/.28)-.007*Math.sin(Math.PI*u)+o.xOffset;
   for(let j=0;j<=rows;j++){
    const v=j/rows;
@@ -110,15 +110,15 @@ export function refineEp005RearFinish(hero:T.Group):T.Group{
   const tag=side===1?'left':'right';
   lampPatch(shell,{
    name:'ep005-integrated-tail-housing-'+tag,
-   side,halfHeight:.054,xOffset:.009,material:housing
+   side,halfHeight:.066,xOffset:.009,material:housing
   });
   lampPatch(shell,{
    name:'ep005-continuous-smoked-tail-lens-'+tag,
-   side,halfHeight:.046,xOffset:0,material:smoked
+   side,halfHeight:.054,xOffset:0,material:smoked
   });
   lampPatch(shell,{
    name:'ep005-flush-diffused-led-'+tag,
-   side,halfHeight:.0068,xOffset:-.011,yOffset:.009,material:diffuser
+   side,halfHeight:.0068,xOffset:-.011,yOffset:.018,material:diffuser
   });
  }
  for(const item of mounts){
