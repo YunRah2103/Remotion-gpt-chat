@@ -63,9 +63,11 @@ export function materialPins(request:StoryRequest,pose:CameraPose):readonly Scie
   if(!pt.onScreen||pt.x<72||pt.x>SCREEN.width-190||pt.y<SCREEN.top||pt.y>SCREEN.scienceBottom)continue;
   const desiredX=pt.x<SCREEN.width*.55?pt.x+55:pt.x-345;
   const x=clamp(desiredX,SCREEN.left,SCREEN.width-SCREEN.right-315);
-  let y=clamp(pt.y-63,SCREEN.top,SCREEN.scienceBottom-70);
-  for(const prior of pins)if(Math.abs(y-prior.labelY)<98&&Math.abs(x-prior.labelX)<340)
-    y=clamp(prior.labelY+101,SCREEN.top,SCREEN.scienceBottom-70);
+  const ideal=clamp(pt.y-63,SCREEN.top,SCREEN.scienceBottom-70);
+  const slots=[ideal,ideal-106,ideal+106,ideal-212,ideal+212,SCREEN.top,SCREEN.scienceBottom-70];
+  const y=slots.map(s=>clamp(s,SCREEN.top,SCREEN.scienceBottom-70))
+    .find(s=>pins.every(prior=>Math.abs(s-prior.labelY)>=98||Math.abs(x-prior.labelX)>=340));
+  if(y===undefined)continue;
   pins.push({id:pt.id,title:pt.id==='metal'?'METAL SKID BLOCK':pt.id==='plank'?'COMPOSITE PLANK':'CARBON FLOOR',
    hint:pt.id==='metal'?'SPARK SOURCE':'DOES NOT MAKE SPARKS',color:pt.color,
    anchorX:pt.x,anchorY:pt.y,labelX:x,labelY:y});
