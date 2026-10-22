@@ -63,12 +63,12 @@ const add=(a:V3,b:V3):V3=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]];
 type LensPose={p:V3;target:V3;fov:number};
 const cameraLocal:Record<CinemaShotId,{from:LensPose;to:LensPose}>={
  hook:{
-  from:{p:[-8.45,2.20,4.45],target:[-1.16,.62,0],fov:52},
-  to:{p:[-8.10,1.94,4.23],target:[-1.35,.56,0],fov:54}
+  from:{p:[-8.10,1.90,3.70],target:[-1.50,.57,0],fov:55},
+  to:{p:[-7.40,1.60,3.40],target:[-1.65,.56,0],fov:58}
  },
  launch:{
-  from:{p:[2.6,1.72,10.75],target:[.30,.66,0],fov:53},
-  to:{p:[-1.00,1.45,9.85],target:[.08,.60,0],fov:56}
+  from:{p:[3.00,1.14,8.90],target:[.30,.58,0],fov:59},
+  to:{p:[-1.20,1.22,8.80],target:[0,.58,0],fov:59}
  },
  'engine-reveal':{
   from:{p:[8.6,2.74,5.95],target:[.45,.77,0],fov:54},
@@ -79,12 +79,12 @@ const cameraLocal:Record<CinemaShotId,{from:LensPose;to:LensPose}>={
   to:{p:[1.1,5.6,7.5],target:[-.15,.65,0],fov:58}
  },
  exhaust:{
-  from:{p:[-8.3,1.93,4.10],target:[-1.7,.53,0],fov:54},
-  to:{p:[-7.8,1.53,3.65],target:[-1.82,.50,0],fov:58}
+  from:{p:[-7.80,1.81,-4.30],target:[-1.90,.52,0],fov:56},
+  to:{p:[-7.30,1.53,-3.70],target:[-2.00,.49,0],fov:59}
  },
  payoff:{
-  from:{p:[-9.5,2.35,5.20],target:[-.74,.71,0],fov:52},
-  to:{p:[-7.9,1.60,4.45],target:[-1.13,.62,0],fov:54}
+  from:{p:[-9.00,2.10,5.50],target:[-1.20,.65,0],fov:54},
+  to:{p:[-7.00,1.43,-3.60],target:[-1.40,.55,0],fov:59}
  }
 };
 const lerp=(a:number,b:number,u:number)=>a+(b-a)*u;
@@ -97,6 +97,10 @@ export function cameraAt(shot:CinemaShot,pose:RoutePose,localFrame:number):Camer
  // A restrained dolly arc, zero at both endpoints; never frame-random shake.
  p[1]+=.075*arc;
  p[2]+=.12*arc*(shot.id==='payoff'?-1:1);
+ // Payoff uses an intentionally *crossing* trackside jib (from +Z to -Z)
+ // while remaining several metres behind the real driving car. This gives
+ // clear changing background parallax and a moving finale, not a frozen chase.
+ // No camera teleport, fake wheel translation or extra road dynamics.
  const target=lerp3(spec.from.target,spec.to.target,eased);
  return {
   position:add(rotateY(p,pose.yaw),pose.position),
