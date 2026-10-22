@@ -52,7 +52,7 @@ const fragment = /* glsl */ `
     col=mix(col,gold,smoothstep(.15,.50,x+.10*r));
     col=mix(col,red,smoothstep(.38,.97,x+.13*r));
     col=mix(col,vec3(.67,.82,1.),base*.34);
-    float layerWeight=uLayer<.5 ? .20 : (uLayer<1.5 ? .105 : .070);
+    float layerWeight=uLayer<.5 ? .42 : (uLayer<1.5 ? .18 : .095);
     float alpha=body*layerWeight*(.32+.68*hot)*uPower;
     alpha*=.80+.20*noise(vec2(x*49.+flow,uv.y*41.));
     if(alpha<.008)discard;
@@ -126,8 +126,8 @@ export function animateAfterfire(
     jet.root.position.copy(port.origin);
     jet.root.quaternion.setFromUnitVectors(new T.Vector3(1,0,0),port.outward);
     jet.root.visible=env>.012;
-    const width=port.innerRadiusM*(2.0+.85*env);
-    const length=(.16+1.10*env)*(1+.17*Math.sin(time*37+ (port.id==='left'?0:2)));
+    const width=port.innerRadiusM*(3.0+1.35*env);
+    const length=(.19+1.24*env)*(1+.17*Math.sin(time*37+ (port.id==='left'?0:2)));
     const wind=worldVelocity ? -worldVelocity.dot(new T.Vector3(0,1,0))*0.002 : 0;
     jet.sheets.forEach(mesh=>{
       const m=mesh.material as T.ShaderMaterial;
