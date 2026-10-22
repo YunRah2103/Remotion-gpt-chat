@@ -1,6 +1,6 @@
 import React from 'react';
 import {AbsoluteFill,useCurrentFrame} from 'remotion';
-import {frameBeat,explanationAt} from './picture-contract';
+import {frameBeat} from './picture-contract';
 
 /** Callouts must be derived from actually animated Agent-1 real nozzle nodes.
  * Screen-space arbitrary guesses are not accepted as real mechanical tracking. */
@@ -37,7 +37,6 @@ export const PremiumOverlay:React.FC<Props>=({exhaustTarget,verifiedCaptions=[],
   exhaustTarget?.visible&&exhaustTarget.x>150&&exhaustTarget.x<820&&
   exhaustTarget.y>240&&exhaustTarget.y<1400;
  const labelX=exhaustTarget?.x??0,labelY=exhaustTarget?.y??0;
- const progress=clamp(local/Math.max(1,beat.end-beat.start));
  const cta=payoff?'YUNEX / THE SCIENCE OF SPEED':'YUNEX / AUTOMOTIVE SCIENCE';
  return <AbsoluteFill style={{pointerEvents:'none',fontFamily:font,color:'#f5fbff',overflow:'hidden'}}>
   {/* restrained optical vignette and soft framing; no animated game-like fog */}
