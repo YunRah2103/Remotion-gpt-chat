@@ -25,8 +25,15 @@ export const IntegratedBeat:React.FC<{beat:EditorBeat}>=({beat})=>{
   speedMps:PREVIEW_SPEED_MPS,aeroLoad01:beat.aeroLoad01});
  const {contacts,particles}=sampleContactDrivenSparks(beat.sourceSec,motion,SKIDS,
   {aeroLoad01:beat.aeroLoad01});
+ // Retain genuine A2 contact at frame zero, but reveal the recognisable V2
+ // Formula car IMMEDIATELY. The old camera's 0.18-second offset kept the
+ // 3.4-second hook in an almost full-width skid macro for its entire first
+ // second. A cinematic tracking view at 57% of the A10 camera spline shows
+ // both the actual car and the actual spark plume from frame zero.
+ const openingReveal01=Math.max(0,Math.min(1,beat.localSec/.56));
+ const openingEased=openingReveal01*openingReveal01*(3-2*openingReveal01);
  const lensSec=beat.shot==='spark-hook'
-  ?Math.min(beat.durationSec,beat.localSec+.18):beat.localSec;
+  ?(.57+.36*openingEased)*beat.durationSec:beat.localSec;
  const pose=sampleRetimedQualityCamera(beat.shot,lensSec,beat.durationSec,motion);
  const uncover=beat.shot==='underfloor-reveal'?0.84:
   beat.shot==='contact-macro'?0.64:0;
