@@ -24,6 +24,8 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci --no-audit --no-fund
+      - name: Install native media test dependency
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - run: npm run check
       - run: node --experimental-strip-types --test tests/modelling-kit/*.test.mjs tests/world-kit/*.test.mjs tests/parts-kit/*.test.mjs
       - run: python -m unittest discover -s tests/modelling-kit -p 'test_*.py'
