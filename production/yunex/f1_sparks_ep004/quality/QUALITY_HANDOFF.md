@@ -8,7 +8,7 @@
 - Existing EP004 source A1–A5 on parent manager dashboard #215; existing Agent 6 editor PR #223; original accepted six-shot silent film GitHub Actions run #39620074977, 420 frames. It is NOT a finished original-VO film.
 - The owner-supplied **original EP004** Cedar MP3 duration 25.248s has NOT been made available in the repo/workflow; user was provided a prior handoff ZIP. Estimated transcript timing is not a verified forced word alignment. Preserve original voice; do not fake it.
 
-## New four independent workstreams
+## Five independent workstreams
 1. **Agent 8** Issue #235, branch `agent/ep004-08-kit-hero`. PREMADE kit `createCinematicVehicle/animateCinematicVehicle`, real cinematic Formula hero, original EP004 metal skid geometry adapter. `quality/vehicle/**` owner.
 2. **Agent 9** Issue #236, branch `agent/ep004-09-spark-look`. Render only real A2 particles/signed-gap metal skid impacts, no kit contact-sparks. `quality/sparks/**` owner.
 3. **Agent 10** Issue #237, branch `agent/ep004-10-camera-action`. Six moving 9:16 director rigs with strong opening/payoff, no blank asphalt, real V2 hero and authentic contact. `quality/cinema/**` owner.
@@ -18,7 +18,11 @@
 
 ## Source integration approval
 - Agent 0 evaluate actual PR source, test, native moving MP4, high-resolution screenshots from first/middle/end, motion hashes, before/after film; **reject** technical-only passes with weak visual results. No automatic approval.
-- Agent 0 can selectively approve & merge four PRs into isolated quality base only after each is reviewed; leave upstream kit branch #233 and original EP004 base unmodified.
+- Agent 0 can selectively approve & merge five PRs into isolated quality base only after each is reviewed; leave upstream kit branch #233 and original EP004 base unmodified.
 - The four agents must expose reusable interfaces and honour one authoritative vehicle pose, science skid descriptors, contact physics and route. Integration test physics signed-gap vs visible skid vs road geometry. Verify full film before handing to editor.
 - Existing **Agent6** PR #223 receives approved quality modules via a **non-destructive source sync**, keeps actual original voice, validated per-word cues, ~758 native frames for 25.248 seconds at 30fps, both captioned/clean with ffmpeg full decode/audio correlation/safe subtitles. Never just attach the 25s voice to 420 frames or use estimated word timings as verified.
 - Owner needs to judge full moving picture before picture lock; only then original Agent7 sound design and final mastered MP4 with stems.
+
+5. **Agent 12** [Issue #239](https://github.com/YunRah2103/Remotion-gpt-chat/issues/239), branch `agent/ep004-12-motion-graphics`. Premium subtitle styling / minimal data-grounded 3D material callouts / aero and skid-contact UI. `quality/graphics/**` exclusively; all other original A5 and A6 text interfaces remain intact.
+
+**Important caption integration rule for Agent 6:** Agent12 `QualitySubtitleOverlay` must be a *single optional substitution* for the pre-existing `PictureEdit` word subtitle output, never additive simultaneous duplicate captions. Take **only verified word timing from genuine original Cedar EP004 25.248s recording** with intended `PicturePlan.words` once available; if not available, label sample timings provisional and block native full-VO approval. `QualityScienceCallouts` takes existing approved geometry projection/real metal-road contacts and must not overlap the 326px bottom subtitle reserve. Renderer hooks are adapter suggestions, not already-built exports. Five quality PRs (8–12), all independently reviewed and authorized, constitute the upgrade gate.
