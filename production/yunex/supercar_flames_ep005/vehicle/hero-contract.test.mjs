@@ -60,7 +60,7 @@ test('premium V3 hero factory includes rig-safe material, moving wheel and real 
  const src=readFileSync(new URL('./hero.ts',import.meta.url),'utf8');
  const detail=readFileSync(new URL('./premium-details.ts',import.meta.url),'utf8');
  assert.match(src,/createCinematicVehicle\(/);
- assert.doesNotMatch(src,/editModel\(/);
+ assert.match(src,/applyEdits\(hero,options.model\)/);
  assert.match(src,/applyEp005PremiumDetails\(hero\)/);
  assert.match(src,/userData\.radius=spec\.innerRadius/);
  assert.match(src,/ep005-\$\{side\}-tapered-nozzle-transition/);
