@@ -1,0 +1,101 @@
+name: YUNEX EP004 Agent13 parallel six-shot visual proof
+on:
+  pull_request:
+    branches: [production/yunex-ep004-quality-v2]
+    paths:
+      - '.github/workflows/yunex-ep004-agent13-parallel-review.yml'
+      - 'production/yunex/f1_sparks_ep004/quality/editor/**'
+permissions:
+  contents: read
+jobs:
+  render-segment:
+    if: ${{ github.head_ref == 'agent/ep004-13-master-editor' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { id: '01', start: 0, end: 101, frames: 102 }
+          - { id: '02', start: 102, end: 167, frames: 66 }
+          - { id: '03', start: 168, end: 299, frames: 132 }
+          - { id: '04', start: 300, end: 456, frames: 157 }
+          - { id: '05', start: 457, end: 579, frames: 123 }
+          - { id: '06', start: 580, end: 757, frames: 178 }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Render ACTUAL native pixels for assigned shot
+        shell: bash
+        run: |
+          mkdir -p out/ep004-agent13
+          npx remotion render production/yunex/f1_sparks_ep004/quality/editor/entry.tsx \
+            EP004Agent13VideoOnlyReview out/ep004-agent13/shot-${{ matrix.id }}.mp4 \
+            --frames=${{ matrix.start }}-${{ matrix.end }} \
+            --gl=swangle --codec=h264 --pixel-format=yuv420p \
+            --concurrency=2 --log=error
+          node production/yunex/f1_sparks_ep004/quality/editor/native-qa.mjs \
+            out/ep004-agent13/shot-${{ matrix.id }}.mp4 ${{ matrix.frames }} --video-only
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EP004-A13-shot-${{ matrix.id }}
+          path: out/ep004-agent13/shot-${{ matrix.id }}.mp4
+          if-no-files-found: warn
+          retention-days: 30
+  assemble-proof:
+    if: ${{ github.head_ref == 'agent/ep004-13-master-editor' }}
+    needs: render-segment
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '24', cache: npm}
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: EP004-A13-shot-*
+          path: out/ep004-agent13/parts
+          merge-multiple: true
+      - name: Concat exact frame-aligned moving MP4 shots without re-encode blur
+        shell: bash
+        run: |
+          cd out/ep004-agent13
+          for n in 01 02 03 04 05 06; do test -s "parts/shot-$n.mp4" || exit 42; done
+          printf "file 'parts/shot-01.mp4'\nfile 'parts/shot-02.mp4'\nfile 'parts/shot-03.mp4'\nfile 'parts/shot-04.mp4'\nfile 'parts/shot-05.mp4'\nfile 'parts/shot-06.mp4'\n" > concat.txt
+          ffmpeg -hide_banner -loglevel error -xerror -y -f concat -safe 0 -i concat.txt \
+            -c copy EP004-six-shot-WIP-parallel-758f.mp4
+      - name: Full native decode, exact 758 frames, 6 distinct moving shots
+        shell: bash
+        run: |
+          node production/yunex/f1_sparks_ep004/quality/editor/native-qa.mjs \
+            out/ep004-agent13/EP004-six-shot-WIP-parallel-758f.mp4 758 --video-only
+          ffprobe -v error -count_frames -show_entries \
+            stream=codec_name,codec_type,width,height,avg_frame_rate,nb_read_frames:format=duration \
+            -of json out/ep004-agent13/EP004-six-shot-WIP-parallel-758f.mp4 \
+            > out/ep004-agent13/concat-ffprobe.json
+      - name: Print 8 actual decoded portrait frames for independent visual review
+        shell: bash
+        run: |
+          MOV=out/ep004-agent13/EP004-six-shot-WIP-parallel-758f.mp4
+          for n in 0 23 102 168 300 457 580 757; do
+            ffmpeg -hide_banner -loglevel error -y -i "$MOV" \
+              -vf "select=eq(n\\,$n),scale=270:480" -frames:v 1 -q:v 6 \
+              "out/ep004-agent13/visual-$n.jpg"
+            echo "YUNEX_VISUAL_START:$n"
+            base64 -w0 "out/ep004-agent13/visual-$n.jpg"
+            echo
+            echo "YUNEX_VISUAL_END:$n"
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EP004-Agent13-Parallel-Native-SixShot-758f
+          path: out/ep004-agent13
+          retention-days: 30
+          if-no-files-found: warn
