@@ -75,6 +75,8 @@ export const MechanicalScienceProof:React.FC=()=>{
   const frame=useCurrentFrame(),{fps,width,height}=useVideoConfig(),t=frame/fps;
   const a=useMemo(()=>buildScienceEngine(),[]);
   const phase:0|1|2=t<1.6?0:t<3.3?1:2;
+  const smooth=(x:number)=>{const a=Math.max(0,Math.min(1,x));return a*a*(3-2*a);};
+  const reveal=smooth(t/1.90),tail=smooth((t-2.75)/2.0);
   animateScienceEngine(a,t,phase);
   const story=[
     {h:'INSIDE THE ENGINE',sub:'Fuel normally burns inside the cylinders.',tag:'01 / CONTROLLED COMBUSTION'},
@@ -93,8 +95,8 @@ export const MechanicalScienceProof:React.FC=()=>{
         <meshStandardMaterial color="#293642" metalness={.62} roughness={.39}/>
       </mesh>
       <primitive object={a.root}/>
-      <CameraAim position={[-1.45+.55*Math.sin(t*.35),4.2,13.4-.55*Math.sin(t*.30)]}
-         target={[-.52+.14*Math.sin(t*.32),.32,0]} fov={38}/>
+      <CameraAim position={[.40-1.9*reveal-1.4*tail,3.4+.8*reveal-1.1*tail,9.4+4.0*reveal-3.0*tail]}
+         target={[.10-.62*reveal-.8*tail,.55-.23*reveal-.10*tail,0]} fov={38}/>
     </ThreeCanvas>
     <Frame tag={'YUNEX / ' + story.tag} title={story.h}
       subtitle={story.sub}
