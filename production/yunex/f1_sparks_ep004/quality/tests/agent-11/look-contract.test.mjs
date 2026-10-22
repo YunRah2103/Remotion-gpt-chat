@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {QUALITY_NIGHT, qualityWetness, validatedSparkGain} from '../../look/palette.ts';
 import {classifyNightMaterial} from '../../look/materials.ts';
 import {createQualityKitDressing, assertNoAdditionalRoad} from '../../look/kit-dressing.ts';
-import {disposeObject} from '../../../../../src/yunex/world-kit/geometry.ts';
+import {disposeObject} from '../../../../../../src/yunex/world-kit/geometry.ts';
 import {buildRoadRibbonGeometry, sampleCircuitRoadPoint} from '../../../look/road.ts';
 import {sampleTrackSurface} from '../../../shared/track.ts';
 
