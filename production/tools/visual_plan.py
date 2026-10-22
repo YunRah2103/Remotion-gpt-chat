@@ -27,6 +27,7 @@ def plan(base,candidate,changed):
         try:
             old=json.loads((Path(base)/"package.json").read_text())
             new=json.loads((Path(candidate)/"package.json").read_text())
+            if not isinstance(old,dict) or not isinstance(new,dict):raise ValueError("Package manifest must be an object")
             old.pop("scripts",None);new.pop("scripts",None)
             package_runtime_changed=old!=new
         except (OSError,ValueError,AttributeError):package_runtime_changed=True

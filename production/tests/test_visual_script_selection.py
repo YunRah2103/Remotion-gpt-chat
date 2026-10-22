@@ -14,3 +14,7 @@ class ScriptSelection(unittest.TestCase):
    package['dependencies']['remotion']='5.0.0';(candidate/'package.json').write_text(json.dumps(package))
    self.assertEqual(len(module.plan(base,candidate,['package.json'])['targets']),2)
    self.assertEqual(len(module.plan(base,candidate,['package-lock.json'])['targets']),2)
+
+   for malformed in ['[]','null','{invalid']:
+    (candidate/'package.json').write_text(malformed)
+    self.assertEqual(len(module.plan(base,candidate,['package.json'])['targets']),2)

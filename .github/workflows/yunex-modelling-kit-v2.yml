@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-      - run: npm ci
+      - run: npm ci --no-audit --no-fund
       - run: npm run check
       - run: node --experimental-strip-types --test tests/modelling-kit/*.test.mjs tests/world-kit/*.test.mjs tests/parts-kit/*.test.mjs
       - run: node --experimental-strip-types scripts/modelling-kit/measure.mjs
@@ -49,7 +49,7 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-      - run: npm ci
+      - run: npm ci --no-audit --no-fund
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - run: node scripts/modelling-kit/review.mjs --id=${{ matrix.composition }}
       - if: matrix.composition == 'KitA'
@@ -72,7 +72,7 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-      - run: npm ci
+      - run: npm ci --no-audit --no-fund
       - uses: actions/download-artifact@v4
         with:
           pattern: YUNEX-KIT-*
