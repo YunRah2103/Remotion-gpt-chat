@@ -3,7 +3,7 @@
   "title": "Supercar hero asset tests / SILENT",
   "vehicle": {
     "variant": "supercar",
-    "color": "#126378",
+    "color": "#17384f",
     "driver": true,
     "powertrain": {
       "id": "ep005-parallel-twin-turbo-v8",
@@ -159,7 +159,7 @@
           "deform": {
             "axis": "z",
             "along": "x",
-            "amount": 0.022
+            "amount": 0.035
           }
         },
         {
@@ -369,14 +369,14 @@
               -0.57
             ],
             [
-              -2.465,
+              -2.31,
               0.42,
               -0.57
             ]
           ],
           "radius": 0.054
         },
-        "color": "#797b7b",
+        "color": "#777b80",
         "mounts": [
           {
             "name": "exhaust-tip-right",
@@ -551,14 +551,14 @@
               0.57
             ],
             [
-              -2.465,
+              -2.31,
               0.42,
               0.57
             ]
           ],
           "radius": 0.054
         },
-        "color": "#797b7b",
+        "color": "#777b80",
         "mounts": [
           {
             "name": "exhaust-tip-left",
@@ -695,7 +695,7 @@
       "duration": 2,
       "camera": "chase",
       "action": "acceleration",
-      "caption": "DUAL EXHAUST / MODEL REVEAL",
+      "caption": "Sculpted carbon, real twin outlets",
       "joints": {
         "ep005-active-rear-wing": 0.2
       }
@@ -705,7 +705,7 @@
       "duration": 2,
       "camera": "reveal",
       "action": "acceleration",
-      "caption": "CAR BODY / ACTIVE AERO",
+      "caption": "Deep lacquer. Functional aero.",
       "jointTracks": {
         "ep005-active-rear-wing": [
           {
@@ -729,7 +729,7 @@
       "camera": "interior",
       "action": "cornering",
       "cutaway": 0.82,
-      "caption": "REAL CABIN / WORKING DRIVER RIG"
+      "caption": "Cockpit detail, articulated driver"
     },
     {
       "id": "engine-reveal",
@@ -738,14 +738,14 @@
       "action": "cruise",
       "cutaway": 0.93,
       "highlight": "engine",
-      "caption": "FITTED TWIN-TURBO V8"
+      "caption": "Animated V8 & twin turbo installation"
     },
     {
       "id": "road-payoff",
       "duration": 2,
       "camera": "chase",
       "action": "acceleration",
-      "caption": "REAL WHEEL MOTION / EXHAUST MOUNTS"
+      "caption": "Steering, suspension, rear nozzles"
     }
   ]
 }
