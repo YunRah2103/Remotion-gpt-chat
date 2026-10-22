@@ -22,7 +22,7 @@ export const QualityScienceCallouts:React.FC<QualityScienceProps>=({request,came
    letterSpacing:1.2,opacity:opacity*.85,textShadow:'0 3px 9px #000'}}>WHAT'S SCRAPING?</div>}
   {material.length>0&&<svg viewBox="0 0 1080 1920" style={{position:'absolute',inset:0,width:'100%',height:'100%',opacity}}>
    {material.map(pin=><g key={pin.id}>
-    <path d={`M ${pin.anchorX.toFixed(2)} ${pin.anchorY.toFixed(2)} L ${(pin.labelX-12).toFixed(2)} ${(pin.labelY+13).toFixed(2)}`}
+    <path d={`M ${pin.anchorX.toFixed(2)} ${pin.anchorY.toFixed(2)} L ${(pin.labelX<pin.anchorX?pin.labelX+321:pin.labelX-12).toFixed(2)} ${(pin.labelY+13).toFixed(2)}`}
      stroke={pin.color} strokeWidth="2.5" strokeDasharray="3 6" strokeLinecap="round" fill="none" opacity=".8"/>
     <circle cx={pin.anchorX} cy={pin.anchorY} r="6" fill={pin.color} stroke="#091520" strokeWidth="3"/>
     <rect x={pin.labelX} y={pin.labelY-25} width="309" height="73" rx="12" fill="#06101a" fillOpacity=".75" stroke={pin.color} strokeOpacity=".39"/>
