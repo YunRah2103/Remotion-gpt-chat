@@ -22,3 +22,6 @@ export {compileBrief,productionPlan} from './production.ts';
 
 export {buildComponents,animateComponents,importGLB,exportGLB} from './authoring.ts';
 export type {ComponentSpec} from './authoring.ts';
+
+export {ComponentRegistry} from './registry.ts';
+export type {RegisteredComponent} from './registry.ts';

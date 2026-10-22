@@ -7,7 +7,7 @@ import {pipe} from '../parts-kit/helpers.ts';
 import type {V3} from '../world-kit/geometry.ts';
 export type ModelEdit={target:string;position?:V3;rotation?:V3;scale?:V3;visible?:boolean;deform?:{axis:'x'|'y'|'z';amount:number;along:'x'|'y'|'z'}};
 export type ModelVariation={id:string;version:1;edits:ModelEdit[]};
-export type AssemblyNode={id:string;part:PartVariant;position?:V3;rotation?:V3;scale?:V3};
+export type AssemblyNode={id:string;part:PartVariant|string;position?:V3;rotation?:V3;scale?:V3};
 export type AssemblySpec={id:string;version:1;nodes:AssemblyNode[];connections:{from:string;to:string;radius?:number;via?:V3[]}[]};
 const finite=(v:number[])=>v.every(Number.isFinite);
 export function applyEdits(root:T.Object3D,variation:ModelVariation){
@@ -39,10 +39,10 @@ export function attachAt(parent:T.Object3D,socketName:string,child:T.Object3D,pl
  const target=parent.worldToLocal(socket.getWorldPosition(new T.Vector3())),origin=parent.worldToLocal(plug.getWorldPosition(new T.Vector3()));child.position.add(target.sub(origin));parent.updateWorldMatrix(true,true);return child;
 }
 function endpoint(root:T.Object3D,address:string):V3{const split=address.indexOf(':'),id=address.slice(0,split),name=address.slice(split+1),node=root.children.find(n=>n.name===id);if(split<1||!node)throw Error(`Unknown assembly mount: ${address}`);return root.worldToLocal(new T.Vector3(...partMount(node,name).position)).toArray() as V3;}
-export function createAssembly(spec:AssemblySpec):T.Group{
+export function createAssembly(spec:AssemblySpec,resolvePart?:(id:string)=>T.Group):T.Group{
  if(spec.version!==1||!spec.id||!Array.isArray(spec.nodes)||!Array.isArray(spec.connections))throw Error('Invalid assembly');
  const root=new T.Group();root.name=spec.id;root.userData.assembly=structuredClone(spec);const ids=new Set<string>();
- for(const node of spec.nodes){if(!/^[a-z][a-z0-9-]*$/.test(node.id)||ids.has(node.id))throw Error('Duplicate or invalid assembly node');ids.add(node.id);const part=createPart({variant:node.part,cutaway:true});part.name=node.id;root.add(part);applyEdits(part,{id:node.id,version:1,edits:[{target:node.id,position:node.position,rotation:node.rotation,scale:node.scale}]});}
+ for(const node of spec.nodes){if(!/^[a-z][a-z0-9-]*$/.test(node.id)||ids.has(node.id))throw Error('Duplicate or invalid assembly node');ids.add(node.id);const part=resolvePart?resolvePart(node.part):createPart({variant:node.part as PartVariant,cutaway:true});part.name=node.id;root.add(part);applyEdits(part,{id:node.id,version:1,edits:[{target:node.id,position:node.position,rotation:node.rotation,scale:node.scale}]});}
  spec.connections.forEach((c,i)=>{if(c.radius!==undefined&&(!Number.isFinite(c.radius)||c.radius<=0||c.radius>.2))throw Error('Pipe radius must be 0..0.2');const a=endpoint(root,c.from),b=endpoint(root,c.to);if(new T.Vector3(...a).distanceTo(new T.Vector3(...b))<1e-6)throw Error('Connection has zero length');const via=c.via??[new T.Vector3(...a).lerp(new T.Vector3(...b),.5).add(new T.Vector3(0,.18,0)).toArray() as V3];if(via.some(p=>p.length!==3||!finite(p)))throw Error('Invalid pipe route');const link=pipe(root,new T.MeshStandardMaterial({color:c.from.includes('exhaust')?'#ad7756':'#3ba6ad',metalness:.65,roughness:.32}),[a,...via,b],c.radius??.035,`connection-${i}`);link.userData.connection={from:c.from,to:c.to,start:a,end:b};});
  return root;
 }
@@ -52,7 +52,7 @@ export function validateModel(root:T.Object3D){
  root.traverse(o=>{let shown=true;for(let p:T.Object3D|null=o;p;p=p.parent)if(!p.visible)shown=false;if(!shown)return;if(!finite([...o.position.toArray(),...o.scale.toArray(),...o.quaternion.toArray()]))errors.push(`Nonfinite transform: ${o.name}`);if(o.scale.toArray().some(v=>v<=0))errors.push(`Nonpositive scale: ${o.name}`);if(o instanceof T.Mesh&&o.visible){meshes.push(o);const a=o.geometry.attributes.position;if(!a||!finite(Array.from(a.array)))errors.push(`Nonfinite or absent vertices: ${o.name}`);}});
  // Bounded broad phase. Overlapping intentional assemblies are warnings, never fake triangle-level failures.
  const boxes=meshes.slice(0,150).map(m=>new T.Box3().setFromObject(m));for(let i=0;i<boxes.length;i++)for(let j=i+1;j<boxes.length;j++)if(boxes[i].intersectsBox(boxes[j])&&warnings.length<30)warnings.push(`Bounds overlap (review required): ${meshes[i].name} / ${meshes[j].name}`);
- root.traverse(o=>{const c=o.userData.connection;if(c)for(const [address,key] of [[c.from,'start'],[c.to,'end']] as const){try{if(new T.Vector3(...endpoint(root,address)).distanceTo(new T.Vector3(...c[key]))>.001)errors.push(`Broken connection: ${address}`);}catch(e){errors.push(String(e));}}});
+ root.traverse(o=>{const c=o.userData.connection;let owner:T.Object3D|null=o.parent;while(owner&&!owner.userData.assembly)owner=owner.parent;if(c)for(const [address,key] of [[c.from,'start'],[c.to,'end']] as const){try{if(new T.Vector3(...endpoint(owner??root,address)).distanceTo(new T.Vector3(...c[key]))>.001)errors.push(`Broken connection: ${address}`);}catch(e){errors.push(String(e));}}});
  return {errors,warnings,meshCount:meshes.length,bounds:new T.Box3().setFromObject(root).getSize(new T.Vector3()).toArray(),coverage:'Finite geometry, transforms, static port endpoints and bounded AABB broad phase; visual/triangle clearance still requires review'};
 }
 /** Inventory stable named editing surfaces, bounds and mounting metadata. */
