@@ -1,0 +1,60 @@
+name: EP005 Agent 6 — CC0 hero car-only visual gate
+on:
+  push:
+    branches:
+      - agent/ep005-06-hero-car-proof-cc0
+    paths:
+      - 'src/yunex/ep005/agent6/**'
+      - 'scripts/ep005-agent6/**'
+      - 'docs/ep005/**'
+      - '.github/workflows/ep005-agent6-hero-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ep005-agent6-${${ github.ref }}
+  cancel-in-progress: true
+jobs:
+  car-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Set up production renderer and media inspectors
+        run: |
+          npm ci --no-audit --no-fund
+          python -m pip install --disable-pip-version-check pillow
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          npm run check
+      - name: Fetch integrity-pinned CC0 3D asset and license
+        run: bash scripts/ep005-agent6/fetch-asset.sh
+      - name: Render 4s native 1080x1920 portrait car-only preview
+        run: |
+          mkdir -p out/ep005-agent6
+          npx remotion render src/yunex/ep005/agent6/entry.tsx Ep005Agent6HeroProofPortrait out/ep005-agent6/hero-proof-portrait.mp4 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
+      - name: Render 4s native 1920x1080 full-car evidence
+        run: |
+          npx remotion render src/yunex/ep005/agent6/entry.tsx Ep005Agent6HeroProofLandscape out/ep005-agent6/hero-proof-landscape.mp4 --codec=h264 --pixel-format=yuv420p --gl=swangle --concurrency=1
+      - name: Native full-frame decodes, ffprobe, source hashes and contact sheets
+        run: |
+          bash scripts/ep005-agent6/verify.sh out/ep005-agent6/hero-proof-portrait.mp4 out/ep005-agent6/portrait-qa
+          bash scripts/ep005-agent6/verify.sh out/ep005-agent6/hero-proof-landscape.mp4 out/ep005-agent6/landscape-qa
+          cp public/ep005-agent6/UPSTREAM_SHA256SUMS.txt out/ep005-agent6/UPSTREAM_SHA256SUMS.txt
+          cp src/yunex/ep005/agent6/exhaust-ports.v1.json out/ep005-agent6/exhaust-ports.v1.json
+          git rev-parse HEAD > out/ep005-agent6/SOURCE_COMMIT.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EP005-Agent6-CarOnly-Hero-Proof
+          path: out/ep005-agent6/
+          retention-days: 30
+          if-no-files-found: warn
