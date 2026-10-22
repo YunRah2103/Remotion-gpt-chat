@@ -1,3 +1,5 @@
+import {installStudioExhaust} from './studio-exhaust.ts';
+import {cutOpening} from '../world-kit/cavity.ts';
 import {installStudioCoachwork,STUDIO_BODY_IDS} from './studio-coachwork.ts';
 import {refineGlazing} from './glazing.ts';
 import {coachbuiltPanels} from './body-panels.ts';
@@ -37,6 +39,7 @@ function fade(root:T.Object3D,value:number,highlight=false){materials(root,m=>{c
 export function createCinematicVehicle(options:CinematicOptions):T.Group{
  if(options.bodyDetail!==undefined&&!['legacy','coachbuilt','studio'].includes(options.bodyDetail))throw Error('Unknown body detail');
  if(options.bodyDetail==='studio'&&!STUDIO_BODY_IDS.includes(options.variant as typeof STUDIO_BODY_IDS[number]))throw Error('Studio body supported for supercar, coupe and rally-hatch; choose coachbuilt for other vehicles');
+ if(options.bodyDetail==='studio'&&options.quality!==undefined&&options.quality!=='hero')throw Error('Studio body requires quality:hero; use coachbuilt for standard/lightweight');
  const quality=options.quality??'hero';if(!['lightweight','standard','hero'].includes(quality))throw new Error('Unknown quality');
  const root=createVehicle(options),s=vehicleSpec(options.variant);root.userData.quality=quality;root.userData.accuracy='Illustrative kinematic rig; not validated engineering simulation';
  if(quality==='lightweight')return root;
@@ -53,7 +56,12 @@ export function createCinematicVehicle(options:CinematicOptions):T.Group{
  if(quality==='hero'){
   roadHeroDetails(shell,s);
   if(options.bodyDetail==='studio'){
-   enhanceCabin(shell,s,options);installStudioCoachwork(shell,s);rallyDetails(shell,mounts,s,true);root.userData.bodyArchitecture='section-loft-v4';
+   enhanceCabin(shell,s,options);installStudioCoachwork(shell,s);rallyDetails(shell,mounts,s,true);
+   for(const name of ['rally-exhaust-tip','rally-exhaust-route','rally-rear-silencer']){const old=shell.getObjectByName(name);if(old){old.parent?.remove(old);old.traverse(o=>{if(o instanceof T.Mesh)o.geometry.dispose();});}}
+   const exhaust=installStudioExhaust(shell,s),diffuser=shell.getObjectByName('rear-diffuser') as T.Mesh;
+   for(const outlet of exhaust.outlets){const p=outlet.mount.position,r=outlet.outerDiameter/2+.009,old=diffuser.geometry;diffuser.updateMatrix();const inverse=diffuser.matrix.clone().invert(),a=new T.Vector3(-s.length/2-.1,p.y-r,p.z-r).applyMatrix4(inverse),b=new T.Vector3(-s.length/2+.35,p.y+r,p.z+r).applyMatrix4(inverse);diffuser.geometry=cutOpening(old,a.toArray(),b.toArray());old.dispose();
+    const engineX=mechanicalLayout(s).engineX,points=[new T.Vector3(engineX,.38,Math.sign(p.z)*.28),new T.Vector3(engineX-.15,.26,Math.sign(p.z)*.24),new T.Vector3(-s.length*.38,.26,Math.sign(p.z)*.32),new T.Vector3(p.x+.25,p.y,p.z),new T.Vector3(p.x+.05,p.y,p.z)];const pipe=new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(points),48,.028,12,false),new T.MeshStandardMaterial({color:'#8d7a67',metalness:.8,roughness:.43}));pipe.name='connected-exhaust-route';shell.add(pipe);}
+   root.userData.bodyArchitecture='section-loft-v4';
   }else{
    premiumExterior(shell,s);if(options.bodyDetail!=='legacy'){sculptedFascia(shell,s);coachbuiltPanels(shell,s);}sculptShell(shell,s);formulaHeroDetails(shell,mounts,s);enhanceCabin(shell,s,options);if(options.bodyDetail!=='legacy')coachbuiltFinish(shell,mounts,s);rallyDetails(shell,mounts,s,options.bodyDetail!=='legacy');if(options.bodyDetail!=='legacy')refineGlazing(shell);
   }
@@ -63,7 +71,7 @@ export function createCinematicVehicle(options:CinematicOptions):T.Group{
  const originals=new Set<T.Material>();
  for(const scope of [shell,...mounts]){const clones=new Map<T.Material,T.Material>();scope.traverse(o=>{if(o instanceof T.Mesh){const clone=(m:T.Material)=>{let c=clones.get(m);if(!c){c=m.clone();clones.set(m,c);originals.add(m);}return c;};o.material=Array.isArray(o.material)?o.material.map(clone):clone(o.material);}});}
  originals.forEach(m=>m.dispose());
- materials(shell,m=>{if(m instanceof T.MeshPhysicalMaterial&&m.transparent){m.roughness=.075;m.envMapIntensity=.8;}else if(m instanceof T.MeshPhysicalMaterial&&m.clearcoat>0){m.clearcoat=1;m.roughness=options.paintPreset==='satin'?.43:.22;m.clearcoatRoughness=.13;m.envMapIntensity=1.1;}});
+ materials(shell,m=>{if(m instanceof T.MeshPhysicalMaterial&&m.transparent){m.roughness=.075;m.envMapIntensity=.8;}else if(m instanceof T.MeshPhysicalMaterial&&m.clearcoat>0){m.clearcoat=1;m.roughness=options.paintPreset==='satin'?.43:options.bodyDetail==='studio'?.28:.22;m.clearcoatRoughness=options.bodyDetail==='studio'?.16:.13;m.envMapIntensity=options.bodyDetail==='studio'?.9:1.1;}});
  let engine:T.Group|undefined,floor:T.Group|undefined;
  const engineConfig=engineConfiguration(s);
  if(engineConfig){engine=options.powertrain?createAssembly(options.powertrain):createPart({variant:engineConfig.variant,cutaway:true});engine.name='engine';if(options.powertrain){const bounds=new T.Box3().setFromObject(engine).getSize(new T.Vector3());engine.scale.setScalar(Math.min(.9/Math.max(bounds.x,.001),.65/Math.max(bounds.y,.001),s.width*.7/Math.max(bounds.z,.001)));}else engine.scale.setScalar(engineConfig.scale);engine.position.fromArray(engineConfig.position);engine.userData.mount=engine.position.toArray();shell.add(engine);}

@@ -105,7 +105,7 @@ function intake(shell:T.Group,mat:T.Material,x:number,y:number,z:number,w:number
 export function installStudioCoachwork(shell:T.Group,s:VehicleSpec){
  if(!STUDIO_BODY_IDS.includes(s.id as typeof STUDIO_BODY_IDS[number]))throw Error('Studio body supported for supercar, coupe and rally-hatch; use coachbuilt for other catalogue vehicles');
  const source=shell.getObjectByName('arched-body') as T.Mesh<T.BufferGeometry,T.MeshStandardMaterial>;
- const paint=new T.MeshPhysicalMaterial({color:source.material.color,metalness:.60,roughness:.235,clearcoat:1,clearcoatRoughness:.10,envMapIntensity:1.2});
+ const paint=new T.MeshPhysicalMaterial({color:source.material.color,metalness:.36,roughness:.28,clearcoat:1,clearcoatRoughness:.10,envMapIntensity:1.2});
  const carbon=surface('#11171b',.25,.32),rubber=surface('#11181b',.02,.76),chrome=surface('#a4adb0',.93,.18),glass=new T.MeshPhysicalMaterial({color:'#849fa4',metalness:.05,roughness:.055,clearcoat:1,transparent:true,opacity:.52,depthWrite:false,side:T.DoubleSide});
  const retained=shell.children.filter(o=>['interior','console-switch-bank'].includes(o.name));
  for(const o of [...shell.children])if(!retained.includes(o)){shell.remove(o);o.traverse(n=>{if(n instanceof T.Mesh)n.geometry.dispose();});}

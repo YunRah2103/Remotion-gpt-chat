@@ -33,3 +33,13 @@ export type {DynamicsInput} from './dynamics.ts';
 
 export {doorRegions} from './body-panels.ts';
 export {glazingVolume} from './glazing.ts';
+
+export {STUDIO_BODY_IDS,studioBodyProfile,studioDeckPoint} from './studio-coachwork.ts';
+export {installStudioExhaust} from './studio-exhaust.ts';
+export type {StudioExhaustOptions,StudioExhaustOutlet,StudioExhaustResult} from './studio-exhaust.ts';
+export {sampleCameraMove,fitCameraMove,validateCameraMove} from './camera-move.ts';
+export type {CameraMove,CameraMovePose} from './camera-move.ts';
+export {createV4Production,V4_DEMONSTRATIONS,v4ReviewPlan} from './v4-production.ts';
+export type {V4Brief,V4Kind,V4Beat} from './v4-production.ts';
+export {auditVehicleGeometry,qualityStates} from './visual-quality.ts';
+export type {QualityState,QualityStages,GeometryDiagnostic} from './visual-quality.ts';
