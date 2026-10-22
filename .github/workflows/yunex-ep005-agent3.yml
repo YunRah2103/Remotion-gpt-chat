@@ -35,15 +35,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          hero=8ba7a9624fc56973fa52658ef8d2600368dfc17a
-          flames=dc734d7061c17daa43116e4f7c91d63010ea1709
-          look=72e0be1028062bf38fdf84f76cfcf51139a0b400
+          hero=23eda32c1796fd9af546ea80c3d6e5117e8e6ba8
+          flames=e8a8f5e415e4abb03b0fa8a2c0959df5eaceab32
+          look=92f28465b83183815605fcb3f13291bba87b2714
           git fetch --no-tags origin "$hero" "$flames" "$look"
           pull_file() {
             mkdir -p "$(dirname "$2")"
             git show "$1:$2" > "$2"
           }
           pull_file "$hero" production/yunex/supercar_flames_ep005/vehicle/hero.ts
+          pull_file "$hero" production/yunex/supercar_flames_ep005/vehicle/premium-details.ts
           pull_file "$hero" production/yunex/supercar_flames_ep005/vehicle/exhaust-contract.json
           pull_file "$hero" src/yunex/studio-projects/ep005-a1-hero/recipe.json
           pull_file "$flames" production/yunex/supercar_flames_ep005/flames/afterfire.ts

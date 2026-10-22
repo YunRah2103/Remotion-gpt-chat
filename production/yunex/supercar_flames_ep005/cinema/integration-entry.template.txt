@@ -6,10 +6,10 @@ import {CINEMA_FRAMES,CINEMA_FPS} from '../../../../production/yunex/supercar_fl
 import type {CinemaSample} from '../../../../production/yunex/supercar_flames_ep005/cinema/timeline';
 import {createEp005Hero} from '../../../../production/yunex/supercar_flames_ep005/vehicle/hero';
 import {createAfterfireRig,readExhaustMounts,animateAfterfireRig} from '../../../../production/yunex/supercar_flames_ep005/flames/exhaust-rig';
-import {sampleAfterfire} from '../../../../production/yunex/supercar_flames_ep005/flames/afterfire';
+import {sampleAfterfire,stateFromCinemaDemand} from '../../../../production/yunex/supercar_flames_ep005/flames/afterfire';
 import {createEP005NightCircuit} from '../../../../production/yunex/supercar_flames_ep005/look/NightCircuit';
 import {sampleEP005Route} from '../../../../production/yunex/supercar_flames_ep005/look/route';
-import {EP005PracticalLighting} from '../../../../production/yunex/supercar_flames_ep005/look/PracticalLighting';
+import {EP005PracticalLighting,EP005NightAtmosphere} from '../../../../production/yunex/supercar_flames_ep005/look/PracticalLighting';
 import input from './recipe.json';
 import {compileRecipe} from '../../modelling-kit/recipe';
 import type {EpisodeRecipe} from '../../modelling-kit/recipe';
@@ -22,20 +22,15 @@ const integration:CinemaIntegration={
  createHero:createEp005Hero,
  createWorld:()=>createEP005NightCircuit({premium:true}),
  routeSampler:sampleEP005Route,
- practicalLight:sample=><EP005PracticalLighting pose={sample.pose} flameIntensity={sample.afterfireDemand}/>,
+ practicalLight:sample=><><EP005NightAtmosphere premium/><EP005PracticalLighting pose={sample.pose} flameIntensity={sample.afterfireDemand}/></>,
  attachAfterfire:hero=>{
   const rig=createAfterfireRig(hero,{radii,requireAuthoritative:true});
   return (sample:CinemaSample)=>{
    const demand=sample.afterfireDemand;
    const mounts=readExhaustMounts(hero,radii);
-   const fx=sampleAfterfire(sample.frame,sample.fps,{
-    throttle:sample.throttle,unburntFuel:demand>.01?.98:.02,
-    exhaustTemperatureC:demand>.01?870:590,
-    overrun:demand>.01,antiLag:false,ignitionCut:false,seed:5
-   },mounts);
-   animateAfterfireRig(rig,{...fx,ports:fx.ports.map(p=>({
-    ...p,intensity:p.intensity*demand,length:p.length*demand
-   }))});
+   const state=stateFromCinemaDemand(demand,sample.throttle);
+   const fx=sampleAfterfire(sample.frame,sample.fps,state,mounts);
+   animateAfterfireRig(rig,fx);
   };
  }
 };
