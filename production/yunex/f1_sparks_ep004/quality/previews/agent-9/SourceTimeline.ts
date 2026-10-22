@@ -2,9 +2,9 @@
  * Two natural contact peaks are selected from the existing asphalt waveform.
  * This is EDITORIAL time selection, not a second spark/contact solver.
  */
-import {getSkidDescriptors} from '../../mechanics/skids.ts';
-import {sampleDynamics} from '../../physics/dynamics.ts';
-import {sampleSkidContacts} from '../../physics/contacts.ts';
+import {getSkidDescriptors} from '../../../mechanics/skids.ts';
+import {sampleDynamics} from '../../../physics/dynamics.ts';
+import {sampleSkidContacts} from '../../../physics/contacts.ts';
 export type SourceTake=Readonly<{startDistanceM:number;sourceSec:number;kind:'contact'|'release';score:number}>;
 const SKIDS=getSkidDescriptors();
 const STARTS=[63.65,69,132.30,134,70.6] as const;
