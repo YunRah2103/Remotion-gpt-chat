@@ -28,3 +28,23 @@ test('exhaust cutaway uses V3 genuine port-connected assembly',()=>{
  assert.equal(r.errors.length,0,JSON.stringify(r.errors));
  assert.ok(g.getObjectByName('connection-0'));
 });
+
+test('Agent 1 draft port positions and JSON radius contract are supported without fake userData.radius',()=>{
+ const car=new T.Group(),body=new T.Group();body.name='body-shell';car.add(body);
+ for(const [name,z] of [['exhaust-tip-left',.57],['exhaust-tip-right',-.57]]){
+  const mount=new T.Object3D();mount.name='mount:'+name;mount.position.set(-2.465,.42,z);
+  mount.userData={mount:true,mountName:name,direction:[-1,0,0]};body.add(mount);
+ }
+ const radii={'exhaust-tip-left':.085,'exhaust-tip-right':.085};
+ assert.throws(()=>readExhaustMounts(car),/Missing direction\/radius/);
+ const ports=readExhaustMounts(car,radii);
+ assert.deepEqual(ports.map(p=>p.position),[[-2.465,.42,.57],[-2.465,.42,-.57]]);
+ const rig=createAfterfireRig(car,{radii});
+ assert.equal(rig.provisional,false);
+ const f=sampleAfterfire(0,30,{throttle:.05,unburntFuel:1,exhaustTemperatureC:850,overrun:true},ports);
+ animateAfterfireRig(rig,f);
+ assert.ok(rig.elements.some(x=>x.root.visible));
+ const origin=rig.elements[0].socket.getWorldPosition(new T.Vector3()).clone();
+ car.position.set(12,0,3);car.rotation.y=.3;car.updateMatrixWorld(true);
+ assert.ok(rig.elements[0].socket.getWorldPosition(new T.Vector3()).distanceTo(origin)>11);
+});
