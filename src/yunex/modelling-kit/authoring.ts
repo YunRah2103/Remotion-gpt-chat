@@ -5,14 +5,28 @@ import type {PartVariant} from '../parts-kit/catalog.ts';
 import {animatePart,partMount} from '../parts-kit/motion.ts';
 import {pipe} from '../parts-kit/helpers.ts';
 import type {V3} from '../world-kit/geometry.ts';
-export type ModelEdit={target:string;position?:V3;rotation?:V3;scale?:V3;visible?:boolean;deform?:{axis:'x'|'y'|'z';amount:number;along:'x'|'y'|'z'}};
+export type ModelEdit={target:string;match?:'unique'|'first';position?:V3;rotation?:V3;scale?:V3;visible?:boolean;deform?:{axis:'x'|'y'|'z';amount:number;along:'x'|'y'|'z'}};
 export type ModelVariation={id:string;version:1;edits:ModelEdit[]};
 export type AssemblyNode={id:string;part:PartVariant|string;components?:ComponentSpec[];position?:V3;rotation?:V3;scale?:V3};
 export type AssemblySpec={id:string;version:1;nodes:AssemblyNode[];connections:{from:string;to:string;radius?:number;via?:V3[];flow?:{speed:number;count?:number}}[]};
 const finite=(v:number[])=>v.every(Number.isFinite);
+/** Stable source-tree paths distinguish repeated wheel and rim names. */
+export function modelPath(root:T.Object3D,object:T.Object3D):string{
+ if(object===root)return '/';const segments:string[]=[];let node:T.Object3D|null=object;
+ while(node&&node!==root){const parent:T.Object3D|null=node.parent;if(!parent)throw Error('Object is outside model');segments.unshift(`${encodeURIComponent(node.name)}[${parent.children.indexOf(node)}]`);node=parent;}
+ if(node!==root)throw Error('Object is outside model');return '/'+segments.join('/');
+}
+export function selectModelObject(root:T.Object3D,target:string):T.Object3D{
+ const matches:T.Object3D[]=[];root.traverse(o=>{if(target.startsWith('/')?modelPath(root,o)===target:o.name===target)matches.push(o);});
+ if(!matches.length)throw Error(`Missing model target: ${target}`);
+ if(matches.length>1)throw Error(`Ambiguous model target: ${target}; use catalogue path: ${matches.map(o=>modelPath(root,o)).join(', ')}`);
+ return matches[0];
+}
 export function applyEdits(root:T.Object3D,variation:ModelVariation){
  if(variation.version!==1||!variation.id||!Array.isArray(variation.edits))throw Error('Invalid model variation');
- for(const edit of variation.edits){const object=root.getObjectByName(edit.target);if(!object)throw Error(`Missing model target: ${edit.target}`);
+ for(const edit of variation.edits){let object:T.Object3D;
+  try{object=selectModelObject(root,edit.target);}catch(error){if(edit.match==='unique'||edit.target.startsWith('/')||!String(error).includes('Ambiguous'))throw error;object=root.getObjectByName(edit.target)!;const warnings:string[]=root.userData.authoringWarnings??=[];const message=String(error);if(!warnings.includes(message))warnings.push(message);}
+
   for(const key of ['position','rotation','scale'] as const){const value=edit[key];if(value&&(!Array.isArray(value)||value.length!==3||!finite(value)||(key==='scale'&&value.some(v=>v<=0))))throw Error(`Invalid ${key}`);}
   if(edit.position)object.position.fromArray(edit.position);if(edit.rotation)object.rotation.set(...edit.rotation);if(edit.scale)object.scale.fromArray(edit.scale);if(edit.visible!==undefined)object.visible=edit.visible;
   if(edit.deform){const d=edit.deform;if(!['x','y','z'].includes(d.axis)||!['x','y','z'].includes(d.along)||!Number.isFinite(d.amount))throw Error('Invalid deformation');
@@ -32,7 +46,10 @@ export function editModel(source:T.Group,variation:ModelVariation):T.Group{const
 function anchor(root:T.Object3D,name:string){const result=root.getObjectByName(`mount:${name}`);if(!result)throw Error(`Unknown mount: ${name}`);return result;}
 /** Attach child plug to parent socket in parent-local space, including opposing port directions. */
 export function attachAt(parent:T.Object3D,socketName:string,child:T.Object3D,plugName='mount'){
- const socket=anchor(parent,socketName),plug=anchor(child,plugName);parent.add(child);child.position.set(0,0,0);child.quaternion.identity();parent.updateWorldMatrix(true,true);
+ const socket=anchor(parent,socketName),plug=anchor(child,plugName);
+ for(const [a,b] of [[socket,plug],[plug,socket]])if(a.userData.accepts?.length&&(!b.userData.kind||!a.userData.accepts.includes(b.userData.kind)))throw Error(`Incompatible mounts: ${socketName} / ${plugName}`);
+ for(const port of [socket,plug]){const d=port.userData.direction??[1,0,0];if(!finite(d)||new T.Vector3(...d).lengthSq()<1e-12)throw Error('Invalid mount direction');}
+ parent.add(child);child.position.set(0,0,0);child.quaternion.identity();parent.updateWorldMatrix(true,true);
  const desired=new T.Vector3(...(socket.userData.direction??[1,0,0])).transformDirection(socket.matrixWorld).negate();
  const parentRotation=parent.getWorldQuaternion(new T.Quaternion());desired.applyQuaternion(parentRotation.clone().invert());
  const actual=new T.Vector3(...(plug.userData.direction??[1,0,0])).transformDirection(plug.matrixWorld).applyQuaternion(parentRotation.clone().invert());child.quaternion.setFromUnitVectors(actual,desired);parent.updateWorldMatrix(true,true);
@@ -48,7 +65,7 @@ export function createAssembly(spec:AssemblySpec,resolvePart?:(id:string)=>T.Gro
 }
 export function animateAssembly(root:T.Group,frame:number,fps:number){if(!Number.isFinite(frame)||!Number.isFinite(fps)||fps<=0)throw Error('Invalid animation time');for(const node of root.children)if(node.userData.variant)animatePart(node,{shaftAngle:frame/fps*(node.userData.family==='turbo'?36:8)});root.traverse(o=>{const flow=o.userData.flow;if(flow)o.position.copy(flow.curve.getPointAt((frame/fps*flow.speed+flow.offset)%1));});root.updateMatrixWorld(true);}
 export function validateModel(root:T.Object3D){
- const errors:string[]=[],warnings:string[]=[],meshes:T.Mesh[]=[];root.updateMatrixWorld(true);
+ const errors:string[]=[],warnings:string[]=[...(root.userData.authoringWarnings??[])],meshes:T.Mesh[]=[];root.updateMatrixWorld(true);
  root.traverse(o=>{let shown=true;for(let p:T.Object3D|null=o;p;p=p.parent)if(!p.visible)shown=false;if(!shown)return;if(!finite([...o.position.toArray(),...o.scale.toArray(),...o.quaternion.toArray()]))errors.push(`Nonfinite transform: ${o.name}`);if(o.scale.toArray().some(v=>v<=0))errors.push(`Nonpositive scale: ${o.name}`);if(o instanceof T.Mesh&&o.visible){meshes.push(o);const a=o.geometry.attributes.position;if(!a||!finite(Array.from(a.array)))errors.push(`Nonfinite or absent vertices: ${o.name}`);}});
  // Bounded broad phase. Overlapping intentional assemblies are warnings, never fake triangle-level failures.
  const boxes=meshes.slice(0,150).map(m=>new T.Box3().setFromObject(m));for(let i=0;i<boxes.length;i++)for(let j=i+1;j<boxes.length;j++)if(boxes[i].intersectsBox(boxes[j])&&warnings.length<30)warnings.push(`Bounds overlap (review required): ${meshes[i].name} / ${meshes[j].name}`);
@@ -56,8 +73,8 @@ export function validateModel(root:T.Object3D){
  return {errors,warnings,meshCount:meshes.length,bounds:new T.Box3().setFromObject(root).getSize(new T.Vector3()).toArray(),coverage:'Finite geometry, transforms, static port endpoints and bounded AABB broad phase; visual/triangle clearance still requires review'};
 }
 /** Inventory stable named editing surfaces, bounds and mounting metadata. */
-export function modelCatalogue(root:T.Object3D){root.updateMatrixWorld(true);const nodes:{name:string;type:string;bounds:number[];mount?:unknown}[]=[];root.traverse(o=>{if(o.name)nodes.push({name:o.name,type:o.type,bounds:new T.Box3().setFromObject(o).getSize(new T.Vector3()).toArray(),mount:o.userData.direction});});return nodes;}
-export type ComponentSpec={id:string;parent?:string;replace?:string;position?:V3;rotation?:V3;scale?:V3;color?:string;shape:{kind:'box';size:V3}|{kind:'pipe';points:V3[];radius:number}|{kind:'loft';sections:{x:number;y:number;halfWidth:number;height:number}[]};joint?:{axis:'x'|'y'|'z';min:number;max:number};mounts?:{name:string;position:V3;direction:V3}[]};
+export function modelCatalogue(root:T.Object3D){root.updateMatrixWorld(true);const nodes:{name:string;path:string;type:string;bounds:number[];mount?:unknown}[]=[];root.traverse(o=>{if(o.name)nodes.push({name:o.name,path:modelPath(root,o),type:o.type,bounds:new T.Box3().setFromObject(o).getSize(new T.Vector3()).toArray(),mount:o.userData.direction});});return nodes;}
+export type ComponentSpec={id:string;parent?:string;replace?:string;position?:V3;rotation?:V3;scale?:V3;color?:string;shape:{kind:'box';size:V3}|{kind:'pipe';points:V3[];radius:number}|{kind:'loft';sections:{x:number;y:number;halfWidth:number;height:number}[]};joint?:{axis:'x'|'y'|'z';min:number;max:number};mounts?:{name:string;position:V3;direction:V3;kind?:string;accepts?:string[]}[]};
 /** Build declarative geometry; raw TS factories remain available for unrestricted custom meshes. */
 export function buildComponents(root:T.Object3D,components:ComponentSpec[]){
  for(const c of components){if(!c.id||root.getObjectByName(c.id))throw Error(`Duplicate component: ${c.id}`);const parent=c.parent?root.getObjectByName(c.parent):root;if(!parent)throw Error(`Missing component parent: ${c.parent}`);const shape=c.shape;let geometry:T.BufferGeometry;
@@ -68,7 +85,7 @@ export function buildComponents(root:T.Object3D,components:ComponentSpec[]){
   const mesh=new T.Mesh(geometry,new T.MeshPhysicalMaterial({color:c.color??'#215e67',metalness:.55,roughness:.29,clearcoat:.8,side:T.DoubleSide}));mesh.name=c.id;mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);applyEdits(root,{id:c.id,version:1,edits:[{target:c.id,position:c.position,rotation:c.rotation,scale:c.scale}]});
   if(c.replace){const target=root.getObjectByName(c.replace);if(!target||target===mesh)throw Error(`Missing replacement target: ${c.replace}`);target.visible=false;}
   if(c.joint){if(!['x','y','z'].includes(c.joint.axis)||!finite([c.joint.min,c.joint.max])||c.joint.min>c.joint.max)throw Error('Invalid joint limits');mesh.userData.authorJoint={...c.joint,rest:mesh.rotation.toArray().slice(0,3)};}
-  for(const m of c.mounts??[]){if(!m.name||!finite([...m.position,...m.direction]))throw Error('Invalid mount');const node=new T.Object3D();node.name=`mount:${m.name}`;node.position.fromArray(m.position);node.userData={mount:true,mountName:m.name,direction:m.direction};mesh.add(node);}
+  for(const m of c.mounts??[]){if(!m.name||!finite([...m.position,...m.direction]))throw Error('Invalid mount');const node=new T.Object3D();node.name=`mount:${m.name}`;node.position.fromArray(m.position);node.userData={mount:true,mountName:m.name,direction:m.direction,kind:m.kind,accepts:m.accepts};mesh.add(node);}
  }
  root.updateMatrixWorld(true);return root;
 }
@@ -86,5 +103,7 @@ export function fitDiagnostics(parent:T.Object3D,part:T.Object3D,envelope:{min:V
  if(bounds.isEmpty())throw Error('Fit requires visible geometry');
  const clearance:number[]=[],overflows:{axis:string;side:string;metres:number}[]=[];
  (['x','y','z'] as const).forEach((axis,i)=>{const lower=bounds.min[axis]-envelope.min[i],upper=envelope.max[i]-bounds.max[axis];clearance.push(Math.min(lower,upper));if(lower<-.000001)overflows.push({axis,side:'min',metres:-lower});if(upper<-.000001)overflows.push({axis,side:'max',metres:-upper});});
- return {fits:overflows.length===0,clearance,overflows,bounds:{min:bounds.min.toArray(),max:bounds.max.toArray()},coverage:'Visible vertex bounds in installation space; not triangle collision or manufacturer compatibility'};
+ const size=bounds.getSize(new T.Vector3()),center=bounds.getCenter(new T.Vector3());const uniformScale=Math.min(1,...(['x','y','z'] as const).map((axis,i)=>(envelope.max[i]-envelope.min[i])/Math.max(size[axis],1e-12)));
+ const translation=center.toArray().map((v,i)=>(envelope.min[i]+envelope.max[i])/2-v*uniformScale);
+ return {fits:overflows.length===0,clearance,overflows,suggestion:{uniformScale,translation,automatic:false,warning:'Review geometry and mounting alignment before applying; not a clearance certification'},bounds:{min:bounds.min.toArray(),max:bounds.max.toArray()},coverage:'Visible vertex bounds in installation space; not triangle collision or manufacturer compatibility'};
 }
