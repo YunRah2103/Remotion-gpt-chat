@@ -6,16 +6,16 @@ import React,{useEffect,useMemo} from 'react';
 import {AbsoluteFill,useCurrentFrame,useVideoConfig} from 'remotion';
 import {ThreeCanvas} from '@remotion/three';
 import * as THREE from 'three';
-import {createCinematicVehicle,animateCinematicVehicle} from '../../../../../src/yunex/modelling-kit/rig.ts';
-import {disposeObject} from '../../../../../src/yunex/world-kit/geometry.ts';
-import {F1HeroVehicle,getSkidDescriptors} from '../../mechanics/index.ts';
-import {sampleDynamics,sampleContactDrivenSparks} from '../../physics/index.ts';
-import {NightCircuitWorld} from '../../look/index.ts';
-import {sampleRetimedShotCamera} from '../../cinema/cameras.ts';
-import {ApplyCameraPose} from '../../cinema/ShotCamera.tsx';
+import {createCinematicVehicle,animateCinematicVehicle} from '../../../../../../src/yunex/modelling-kit/rig.ts';
+import {disposeObject} from '../../../../../../src/yunex/world-kit/geometry.ts';
+import {F1HeroVehicle,getSkidDescriptors} from '../../../mechanics/index.ts';
+import {sampleDynamics,sampleContactDrivenSparks} from '../../../physics/index.ts';
+import {NightCircuitWorld} from '../../../look/index.ts';
+import {sampleRetimedShotCamera} from '../../../cinema/cameras.ts';
+import {ApplyCameraPose} from '../../../cinema/ShotCamera.tsx';
 import {QualityContactSparks} from '../../sparks/index.ts';
 import {selectRealSparkTakes,sourceTakeAt} from './SourceTimeline.ts';
-import type {VehicleMotionState} from '../../shared/contract.ts';
+import type {VehicleMotionState} from '../../../shared/contract.ts';
 
 const SKIDS=getSkidDescriptors();
 const KIT_OPTIONS={variant:'formula-modern' as const,quality:'hero' as const,
