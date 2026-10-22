@@ -12,6 +12,7 @@ import {QualityContactSparks} from './staging/sparks/QualityContactSparks.tsx';
 import {sampleRetimedQualityCamera} from './staging/cinema/cameras.ts';
 import {QualityNightCircuit} from './staging/look/QualityNightCircuit.tsx';
 import {QualityScienceCallouts} from './staging/graphics/QualityScienceCallouts.tsx';
+import {CameraContactGlints} from './CameraContactGlints.tsx';
 import {ApplyCameraPose} from '../../cinema/ShotCamera.tsx';
 import {sampleDynamics,sampleContactDrivenSparks} from '../../physics/index.ts';
 import {PREVIEW_SPEED_MPS} from './hook.ts';
@@ -55,6 +56,11 @@ export const IntegratedBeat:React.FC<{beat:EditorBeat}>=({beat})=>{
        shutterSec={.014} enableContactLights={false}/>
      <ApplyCameraPose pose={pose} near={.025}/>
    </ThreeCanvas>
+   {/* Cinematic exposure lens of TRUE Agent2 particles, never an emitter.
+       Retained from earlier editor code; extra strength only changes optical
+       brightness/width, not count, birth timing or trajectories. */}
+   <CameraContactGlints particles={particles} pose={pose}
+      strength={beat.shot==='spark-hook'?2.4:beat.shot==='racing-payoff'?1.5:1.0}/>
    <QualityScienceCallouts request={request} cameraPose={pose}
      unloadedMotion={unloadedMotion}/>
  </AbsoluteFill>;
