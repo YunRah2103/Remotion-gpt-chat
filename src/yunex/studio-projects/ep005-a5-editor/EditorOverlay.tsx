@@ -33,8 +33,8 @@ export const EditorOverlay:React.FC<{shots:TimedShot[];hasVerifiedWords:boolean}
  const cut=hook?0:clamp(1-local/4,0,1);
  const isScience=Boolean(cue.index);
  // Caption-safe lower 18% is kept entirely clear of explanatory UI.
- // Main annotation sits in the upper/middle-left, away from rear tip region.
- const cardTop=h*(isScience?.185:.158);
+ // Science card sits well below the V3-native projected engine/part arrow\n // (which occupies the upper-left), yet above the reserved bottom subtitle lane.
+ const cardTop=h*(isScience?.65:.158);
  return <AbsoluteFill style={{pointerEvents:'none',fontFamily:FONT,color:'#f0f8f7'}}>
   <div style={{position:'absolute',left:w*.07,right:w*.07,top:h*.075,
    display:'flex',justifyContent:'space-between',alignItems:'center',opacity:.83}}>
