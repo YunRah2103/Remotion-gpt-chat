@@ -132,4 +132,4 @@ function Stage(){
   </ThreeCanvas>;
 }
 export const Manthey992Film:React.FC=()=> <AbsoluteFill style={{backgroundColor:'#1a2126'}}><Stage/></AbsoluteFill>;
-registerRoot(()=> <Composition id="YunexManthey992NewModel" component={PorschePhotorealism} width={1080} height={1920} fps={FPS} durationInFrames={FRAMES}/>);
+registerRoot(()=> <Composition id="YunexManthey992NewModel" component={Manthey992Film} width={1080} height={1920} fps={FPS} durationInFrames={FRAMES}/>);
