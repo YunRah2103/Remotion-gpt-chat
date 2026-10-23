@@ -11,14 +11,14 @@ function instances(g:T.Group,geo:T.BufferGeometry,material:T.Material,transforms
 export function addNature(g:T.Group,road:Road,c:Config,heightAt:(x:number,z:number)=>number){
  const r=random(c.seed),count=Math.round((c.quality==='hero'?220:90)*c.vegetation),trunks:T.Object3D[]=[],crowns:T.Object3D[]=[],rocks:T.Object3D[]=[],grass:T.Object3D[]=[];
  for(let i=0;i<count;i++){
- const d=r()*road.length,side=r()<.5?-1:1,offset=side*(Math.max(road.width/2+3,c.cameraSafeWidth)+r()*45),s=sampleRoad(road,d,offset),height=5+r()*9;
+ const d=r()*road.length,side=r()<.5?-1:1,offset=side*(Math.max(road.width/2+3,c.cameraSafeWidth+4)+r()*45),s=sampleRoad(road,d,offset),height=5+r()*9;
  s.position.y=heightAt(s.position.x,s.position.z);
  const trunk=new T.Object3D();trunk.position.copy(s.position).add(new T.Vector3(0,height*.36,0));trunk.scale.set(.18+r()*.16,height*.72,.18+r()*.16);trunk.rotation.z=(r()-.5)*.12;trunks.push(trunk);
  // Radial needle clusters: distinct branch tiers, scanned foliage is applied by the native asset loader.
- for(let layer=0;layer<9;layer++)for(let ray=0;ray<7;ray++){
- const u=layer/9,a=ray*2.399+layer*.45+r()*.3,length=(1-u)*2.9+.3;
- for(let segment=0;segment<2;segment++){
- const o=new T.Object3D(),rad=length*(segment?.78:.32);o.position.copy(s.position).add(new T.Vector3(Math.cos(a)*rad,height*(.30+u*.65)+(segment?.12:0),Math.sin(a)*rad));o.scale.set(1.4+length*.28,.7+length*.15,1);o.rotation.order='YXZ';o.rotation.set(-.8+(r()-.5)*.4,a,r()*.25);crowns.push(o);
+ for(let layer=0;layer<14;layer++)for(let ray=0;ray<9;ray++){
+ const u=Math.min(.98,(layer+r()*.4)/14),a=ray*2.399+layer*.45+r()*.3,length=(1-u)*2.9+.3;
+ for(let segment=0;segment<3;segment++){
+ const o=new T.Object3D(),rad=length*(.25+segment*.32);o.position.copy(s.position).add(new T.Vector3(Math.cos(a)*rad,height*(.30+u*.65)+(segment?.12:0),Math.sin(a)*rad));o.scale.set(1.7+length*.35,1.1+length*.20,1);o.rotation.order='YXZ';o.rotation.set(-.8+(r()-.5)*.4,a,r()*.25);crowns.push(o);
  }}
  }
  for(let i=0;i<(c.preset==='rally'||c.preset==='mountain'?180:25);i++){

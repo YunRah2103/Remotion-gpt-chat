@@ -1,7 +1,7 @@
 name: YUNEX V5 road-led studio native QA
 on:
   pull_request:
-    paths: ['src/yunex/studio-v5/**', 'tests/studio-v5/**', 'scripts/studio-v5/**', '.github/workflows/yunex-v5-studio.yml']
+    paths: ['src/yunex/studio-v5/**', 'tests/studio-v5/**', 'scripts/studio-v5/**', '.github/workflows/yunex-v5-studio.yml', 'public/yunex-v5/**']
   workflow_dispatch:
 permissions:
   contents: read
@@ -35,6 +35,12 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: bash scripts/modelling-kit/install-native-media.sh
       - run: npx remotion render src/yunex/studio-v5/Film.tsx V5-${{ matrix.preset }} out/v5/${{ matrix.preset }}.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --color-space=bt709 --crf=18 --concurrency=2
+      - name: Controlled surface comparison (same road, car, lighting and camera)
+        if: matrix.preset == 'mountain'
+        run: |
+          npx remotion render src/yunex/studio-v5/Film.tsx V5-mountain out/v5/before-surfaces.mp4 --frames=0-59 --props='{"config":{"preset":"mountain","quality":"hero"},"scanned":false}' --gl=swangle --codec=h264 --pixel-format=yuv420p --color-space=bt709 --crf=18 --concurrency=2
+          ffmpeg -v error -i out/v5/before-surfaces.mp4 -i out/v5/mountain.mp4 -filter_complex '[0:v]trim=end_frame=60,setpts=PTS-STARTPTS[a];[1:v]trim=end_frame=60,setpts=PTS-STARTPTS[b];[a][b]hstack=inputs=2[v]' -map '[v]' -c:v libx264 -crf 18 -pix_fmt yuv420p out/v5/controlled-surfaces-ab.mp4
+          ffmpeg -v error -xerror -i out/v5/controlled-surfaces-ab.mp4 -f null -
       - name: Verify native master
         run: |
           ffmpeg -v error -xerror -i out/v5/${{ matrix.preset }}.mp4 -f null -

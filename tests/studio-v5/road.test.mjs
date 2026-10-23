@@ -25,3 +25,9 @@ test('absolute samples are independent of seek order',()=>{
  const first=sampleRoad(r,23).quaternion.toArray();sampleRoad(r,60);sampleRoad(r,2);
  assert.deepEqual(sampleRoad(r,23).quaternion.toArray(),first);
 });
+test('rough gravel ribbon and sampled wheel elevation remain shared',()=>{
+ const r=createRoad({points:[[0,0,0],[50,0,0],[100,0,0]],width:6,roughness:.025});
+ const g=roadGeometry(r,-3,3,400),a=g.attributes.position;
+ for(let i=0;i<=400;i++){const centre=(a.getY(i*2)+a.getY(i*2+1))/2;assert.ok(Math.abs(centre-sampleRoad(r,i*r.length/400).position.y)<1e-6);}
+ assert.throws(()=>createRoad({points:[[0,0,0],[50,0,0]],width:6,roughness:.2}),/roughness/);
+});

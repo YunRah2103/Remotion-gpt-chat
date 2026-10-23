@@ -11,16 +11,16 @@ export const PRESETS={
  rally:{points:[[-150,0,0],[-80,1,-20],[0,3,5],[60,5,28],[125,3,-5],[180,4,-24],[250,7,8]],width:6,bank:.018,timeOfDay:'day',surface:'gravel',vegetation:1},
 } as const;
 export type Preset=keyof typeof PRESETS;
-export type StudioConfig={preset:Preset;road?:{points?:Point[];width?:number;bank?:number};timeOfDay?:'day'|'dusk'|'night';weather?:'clear'|'wet';surface?:'asphalt'|'gravel';vegetation?:number;quality?:'preview'|'hero';seed?:number;scenery?:boolean;cameraSafeWidth?:number};
+export type StudioConfig={preset:Preset;road?:{points?:Point[];width?:number;bank?:number;roughness?:number};timeOfDay?:'day'|'dusk'|'night';weather?:'clear'|'wet';surface?:'asphalt'|'gravel';vegetation?:number;quality?:'preview'|'hero';seed?:number;scenery?:boolean;cameraSafeWidth?:number};
 export function resolveConfig(input:StudioConfig){
  for(const k of Object.keys(input))if(!['preset','road','timeOfDay','weather','surface','vegetation','quality','seed','scenery','cameraSafeWidth'].includes(k))throw Error('Unknown V5 configuration key: '+k);
  if(!(input.preset in PRESETS))throw Error('Choose preset mountain, circuit, city or rally');
- const p=PRESETS[input.preset],c={...p,...input,road:{points:p.points.map(x=>[...x]) as Point[],width:p.width,bank:p.bank,...input.road},quality:input.quality??'hero',weather:input.weather??(input.preset==='city'||input.preset==='circuit'?'wet':'clear'),seed:input.seed??37,scenery:input.scenery??true,cameraSafeWidth:input.cameraSafeWidth??12};
+ const p=PRESETS[input.preset],c={...p,...input,road:{points:p.points.map(x=>[...x]) as Point[],width:p.width,bank:p.bank,roughness:input.preset==='rally'?.018:0,...input.road},quality:input.quality??'hero',weather:input.weather??(input.preset==='city'||input.preset==='circuit'?'wet':'clear'),seed:input.seed??37,scenery:input.scenery??true,cameraSafeWidth:input.cameraSafeWidth??12};
  for(const [key,choices] of Object.entries({timeOfDay:['day','dusk','night'],weather:['clear','wet'],surface:['asphalt','gravel'],quality:['preview','hero']}))if(!choices.includes(c[key as keyof typeof c] as string))throw Error('Invalid '+key);
  if(!Number.isFinite(c.vegetation)||c.vegetation<0||c.vegetation>1)throw Error('vegetation must be 0..1');
  if(!Number.isInteger(c.seed))throw Error('seed must be an integer');
  if(!Number.isFinite(c.cameraSafeWidth)||c.cameraSafeWidth<8||c.cameraSafeWidth>40)throw Error('cameraSafeWidth must be 8..40 metres');
- if(input.road)for(const key of Object.keys(input.road))if(!['points','width','bank'].includes(key))throw Error('Unknown road option '+key);
+ if(input.road)for(const key of Object.keys(input.road))if(!['points','width','bank','roughness'].includes(key))throw Error('Unknown road option '+key);
  return c;
 }
 export function random(seed:number){let n=seed>>>0;return()=>{n=(1664525*n+1013904223)>>>0;return n/4294967296;};}

@@ -11,7 +11,7 @@ export function terrainContext(road:Road,preset:string){
  const delta=new T.Vector3(x-nearest.position.x,0,z-nearest.position.z),offset=delta.dot(nearest.left),dist=Math.sqrt(best),edge=Math.max(0,dist-road.width/2-1.0),blend=T.MathUtils.smoothstep(edge,0,preset==='mountain'?28:10);
  const n=(noise2(x*.018,z*.018)*.65+noise2(x*.05+12,z*.05)*.24+noise2(x*.14,z*.14)*.085+noise2(x*.36,z*.36)*.025);
  const roadY=nearest.position.y+offset*nearest.left.y;
- const relief=preset==='mountain'?(offset>0?Math.pow(edge,.7)*2.0*(.4+n): -Math.min(28,edge*.32)+Math.pow(Math.max(0,edge-90),.83)*2.5*(.4+n)+n*9):preset==='rally'?(n-.4)*6:(n-.4)*.5;
+ const relief=preset==='mountain'?(offset>0?Math.pow(edge,.7)*2.0*(.4+n): -Math.min(28,edge*.32)+Math.pow(Math.max(0,edge-150),.75)*1.8*(.4+n)+n*9):preset==='rally'?(n-.4)*6:(n-.4)*.5;
  return roadY+blend*relief-.05;
  }
  return {height,bounds};
