@@ -14,13 +14,34 @@ def registry(root):
 
 def plan(base,candidate,changed):
     a=registry(base);b=registry(candidate);paths=set(changed);selected=set()
+    # A modelling-kit integration changes only separate studio implementations and opt-in
+    # root registrations. Rendering unrelated legacy films may require private media not
+    # distributed with the repository; the dedicated kit workflow renders the V4 car.
+    kit_source=("src/yunex/modelling-kit/","src/yunex/world-kit/","src/yunex/parts-kit/","src/yunex/studio-projects/")
+    kit_other=("scripts/modelling-kit/","scripts/world-kit/","scripts/parts-kit/",
+               "tests/modelling-kit/","tests/world-kit/","tests/parts-kit/",
+               "docs/modelling-kit/","docs/world-kit/","docs/parts-kit/",
+               "docs/YUNEX_V3_","docs/YUNEX_V4_")
+    kit_files={"src/Root.tsx","package.json","tsconfig.json",
+               "production/tools/visual_plan.py",
+               "docs/YUNEX_AGENT_STUDIO.md","docs/YUNEX_MAIN_STUDIO_QUICKSTART.md"}
+    kit_workflows={".github/workflows/"+n for n in (
+        "yunex-modelling-kit-v2.yml","yunex-parts-kit.yml","yunex-studio-overhaul.yml",
+        "yunex-studio-v3.yml","yunex-v4-studio.yml","yunex-vehicle-quality.yml",
+        "yunex-world-kit.yml","yunex-kit-main-integration.yml")}
+    def studio_path(p):
+        return p in kit_files or p in kit_workflows or p.startswith(kit_source+kit_other)
+    studio_only=(bool(paths) and a==b and "StudioMaterialProof" in b
+                 and any(p.startswith(kit_source) for p in paths)
+                 and all(studio_path(p) for p in paths))
     def add(name):
         if name in b:selected.add(name)
     if any(p.startswith("src/GpuDriveFilm") for p in paths):add("GpuDriveFilm")
     if any(p.startswith(("src/TurboDocumentary","src/turbo/")) for p in paths):add("TurboDocumentary")
     if "src/ProductionCaptions.tsx" in paths:
         selected.update(k for k in b if k.endswith("Captioned"))
-    if any(p in {"src/Root.tsx","package.json","package-lock.json"} or p.startswith("src/mechanics/") for p in paths):
+    if studio_only:add("StudioMaterialProof")
+    if not studio_only and any(p in {"src/Root.tsx","package.json","package-lock.json"} or p.startswith("src/mechanics/") for p in paths):
         selected.update(b.keys())
     for p in paths:
         m=re.fullmatch(r"production/videos/([^/]+)/.*",p)
