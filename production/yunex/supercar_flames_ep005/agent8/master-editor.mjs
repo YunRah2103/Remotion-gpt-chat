@@ -105,6 +105,12 @@ function plan() {
   requireGate(cursor === s.totalFrames, 'editor must cover all '+s.totalFrames+' frames, no gap or tail trim');
   const voice = manifest.voice || {};
   if (voice.approved) {
+    if(voice.userProvidedOriginal === true) {
+      // Unlike a GitHub Actions asset, the user-supplied original is not
+      // fetched by gh run download; check the actual local render worker.
+      requireGate(safeLocal(voice.path) && fs.existsSync(path.resolve(ROOT,voice.path)),
+        'original Cedar MP3 from chat is NOT staged on this render worker; cannot build narrated film');
+    }
     requireGate(safeLocal(voice.path) && isSha(voice.sha256) &&
       hasApprovedSourceRef(voice.approvalRef) && (
         (isCommit(voice.sourceCommit) && Number.isInteger(voice.artifactRunId) &&
