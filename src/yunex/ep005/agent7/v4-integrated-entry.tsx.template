@@ -59,6 +59,8 @@ function buildTrack():THREE.Group{
 const Integrated:React.FC<{section:'hook'|'finale'}>=({section})=>{
  const localFrame=useCurrentFrame(),{fps,width,height}=useVideoConfig();
  const masterFrame=section==='hook'?localFrame:675+localFrame;
+ // Each frame samples a fresh analytic driving pose and world exhaust transform.
+ // Finale runs 92 ORIGINAL frames: 675–766 of the original 767-frame Cedar master.
  const sourceFrame=section==='hook'?localFrame:30+localFrame;
  const car=useMemo(()=>createApprovedV4(),[]);
  const track=useMemo(()=>buildTrack(),[]);
@@ -78,21 +80,50 @@ const Integrated:React.FC<{section:'hook'|'finale'}>=({section})=>{
  const camera=section==='hook'
     ?v4Camera('rear-proof',Math.min(sourceFrame,119),fps)
     :v4Camera('rear-chase',Math.min(sourceFrame,119),fps);
- // Push in close for payoff; keep the actual car moving and the ports in WORLD space.
- if(section==='hook'){
-    // Mobile-first rear-quarter ignition: tighter optical framing and lower lens.
-    // Car stays in true world motion; NO 2D crop or flame projection trick.
-    camera.position=[motion.x-6.05,1.42,3.25];
-    camera.target=[motion.x-.60,.73,0];
-    camera.fov=37;
+ // Frame the ACTUAL car AND both genuine world-space plumes, not just the bumper.
+ // Perspective narrows the landscape field to 9:16: the old 37-degree/6m
+ // lens cut the f0 tongue off LEFT and the final pulses off RIGHT.
+ // Aim slightly behind the car with a low, rear 3/4 tracked lens; fit measured
+ // factory-body geometry and worst-case outward tongues into phone-safe NDC.
+ const u=localFrame/(section==='hook'?44:91);
+ const travel=THREE.MathUtils.smoothstep(u,0,1);
+ const side=section==='hook'?1:-1;
+ camera.position=[motion.x-9.9-.70*travel,1.43+.08*travel,side*(3.40-.32*travel)];
+ camera.target=[motion.x-1.13,.48,0];
+ camera.fov=46;
+ const bounds=new THREE.Box3().setFromObject(car);
+ const pts:THREE.Vector3[]=[];
+ for(const x of [bounds.min.x,bounds.max.x])
+   for(const y of [bounds.min.y,bounds.max.y])
+     for(const z of [bounds.min.z,bounds.max.z]) pts.push(new THREE.Vector3(x,y,z));
+ for(const port of ports){
+   pts.push(port.origin.clone());
+   // GPU sheets peak below 1.7m; reserve 2.15m + lateral turbulence.
+   const end=port.origin.clone().addScaledVector(port.outward,2.15);
+   for(const y of [-.32,.32])for(const z of [-.32,.32])
+     pts.push(end.clone().add(new THREE.Vector3(0,y,z)));
  }
- if(section==='finale'){
-    // A closer, more aggressive opposite-side rear-chase for the final pay-off.
-    // Keep exhaust, flame length and a portion of road visible on mobile.
-    camera.position=[motion.x-6.15,1.52,-3.28];
-    camera.target=[motion.x-.62,.75,0];
-    camera.fov=38;
+ const virtualLens=new THREE.PerspectiveCamera(camera.fov,width/height,.025,480);
+ for(let i=0;i<5;i++){
+   virtualLens.position.set(...camera.position);
+   virtualLens.lookAt(...camera.target);
+   virtualLens.updateMatrixWorld(true);
+   virtualLens.updateProjectionMatrix();
+   let maxRatio=1;
+   for(const point of pts){
+     const ndc=point.clone().project(virtualLens);
+     if(![ndc.x,ndc.y,ndc.z].every(Number.isFinite) || ndc.z>=1)
+       throw Error('Camera cannot see V4 body and live flames');
+     maxRatio=Math.max(maxRatio,Math.abs(ndc.x)/.84,Math.abs(ndc.y)/.80);
+   }
+   if(maxRatio<1.006)break;
+   // Only physical camera re-positioning; no image-space fake flame or crop.
+   const target=new THREE.Vector3(...camera.target);
+   const next=new THREE.Vector3(...camera.position).sub(target)
+     .multiplyScalar(Math.min(1.8,maxRatio*1.035)).add(target);
+   camera.position=next.toArray() as [number,number,number];
  }
+
  return <AbsoluteFill style={{background:'#1a2630'}}>
  <ThreeCanvas width={width} height={height} shadows
    camera={{fov:camera.fov,near:.025,far:480}}
@@ -111,6 +142,6 @@ const Integrated:React.FC<{section:'hook'|'finale'}>=({section})=>{
 };
 const Root=()=> <>
  <Composition id="EP005A7V4IntegratedHook" component={Integrated} defaultProps={{section:'hook'}} width={1080} height={1920} fps={30} durationInFrames={45}/>
- <Composition id="EP005A7V4IntegratedFinale" component={Integrated} defaultProps={{section:'finale'}} width={1080} height={1920} fps={30} durationInFrames={75}/>
+ <Composition id="EP005A7V4IntegratedFinale" component={Integrated} defaultProps={{section:'finale'}} width={1080} height={1920} fps={30} durationInFrames={92}/>
  </>;
 registerRoot(Root);
