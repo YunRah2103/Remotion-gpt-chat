@@ -1,0 +1,34 @@
+name: YUNEX V5 authored car native proof
+on:
+  push:
+    branches: [feat/yunex-v5-authored-car-checkpoint]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '24', cache: npm}
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
+      - run: node --experimental-strip-types --test tests/studio-v5/*.test.mjs
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - run: npx remotion render src/yunex/studio-v5/ConceptProof.tsx V5-AuthoredConceptCar out/v5/authored-city.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --color-space=bt709 --crf=18 --concurrency=2
+      - name: Verify actual native moving model video
+        run: |
+          ffmpeg -v error -xerror -i out/v5/authored-city.mp4 -f null -
+          ffprobe -v error -count_frames -show_entries stream=width,height,avg_frame_rate,nb_read_frames -of json out/v5/authored-city.mp4 > out/v5/probe.json
+          python3 -c 'import json; s=json.load(open("out/v5/probe.json"))["streams"][0]; assert (s["width"],s["height"],s["avg_frame_rate"],s["nb_read_frames"])==(1080,1920,"30/1","240")'
+          ffmpeg -v error -i out/v5/authored-city.mp4 -f framemd5 out/v5/frame-hashes.txt
+          python3 -c 'from pathlib import Path; h=[s.rsplit(",",1)[-1].strip() for s in Path("out/v5/frame-hashes.txt").read_text().splitlines() if s and not s.startswith("#")]; assert len(h)==240 and len(set(h))>=230'
+          sha256sum out/v5/authored-city.mp4 public/yunex-v5/concept-car/CarConcept.glb > out/v5/sha256.txt
+          git rev-parse HEAD > out/v5/source-sha.txt
+          cp public/yunex-v5/concept-car/NOTICE.md out/v5/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-V5-authored-car-native
+          path: out/v5/
