@@ -2,6 +2,8 @@
 
 **STATUS: SOURCE ONLY / NATIVE FILM BLOCKED — not owner-approved video.** Issue #267, master #247. Independent branch agent/ep005-08-master-editor based on production/yunex-ep005-v3-base. No merges.
 
+**Owner hero design lock (23 October):** approved exterior is exactly `v4-a-supercar` / `supercar + bodyDetail:studio + #18636b`, source `9052a539e10a7cb97487c1435455bb9962ad58e1`, genuine 420-frame preview MP4 SHA256 `1654a5efd3a3403871b0a52a3140a9e7aeb1222a2e4bd4242e6edaa8d879cd88` from [Actions run 39866437063, artifact 12465297894](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39866437063/artifacts/12465297894). Exact approval: [owner comment in #267](https://github.com/YunRah2103/Remotion-gpt-chat/issues/267#issuecomment-6355060737). **Scope is exterior look ONLY.** The proof's generated `src/yunex/studio-projects/v4-a-supercar/recipe.json` is in that workflow's `editable-project` artifact, *not* a tracked Git file at source commit. Reference source is separate from any still-undelivered episode footage. The manifest enforces this exterior reference for ALL car-bearing clips, with a separate original source SHA, explicit shot approval and new V4-native live exhaust ports. Spectral A, unrendered CarConcept B and old EP005 A1–A5 sources remain prohibited.
+
 This branch deliberately imports NONE of the rejected A1–A5 footage, PRs #260–264, or a stock V3 car as finished footage. It prepares an approval-locked finishing workflow for NEW Agent 6 (#265) and NEW Agent 7 (#266).
 
 ## Native 25-second editorial timeline (750 frames, 30fps)
@@ -30,8 +32,9 @@ For every beat in edit-manifest.json provide a real portrait 1080x1920/30fps sou
 - media.sourceInFrame: source-inclusive absolute trim start, with enough source frames
 - media.assetProvenance: complete 3D asset or purchased-media provenance/license
 - media.approved: true ONLY after confirmed explicit approval
+- for vehicle and integrated shots, media.approvedHeroSourceCommit must equal `9052a539e10a7cb97487c1435455bb9962ad58e1` AND media.approvedHeroReferenceProject must equal `v4-a-supercar`; these are appearance lineage, not fabricated camera-shot approval
 
-For role "integrated" scenes, Agent 7 must supply actual car+fire visual rendered on Agent 6 moving car and its REAL local/world exhaust port transforms. Store full 40-hex agent6Commit and agent7Commit, plus 64-hex portManifestSha256 from the actual exhaust interface manifest. No separate post-production 2D flare at guessed screen coordinates. For a reusable all-film 750-frame source clip, repeat the exact file hash and change each beat sourceInFrame, but only after genuinely verifying ALL its shots.
+For role "integrated" scenes, Agent 7 must supply actual car+fire visual rendered on Agent 6 moving car and its REAL local/world exhaust port transforms. Store full 40-hex agent6Commit and agent7Commit, new `v4-*` version (NEVER candidate A), plus 64-hex portManifestSha256 from the actual exhaust interface manifest. No separate post-production 2D flare at guessed screen coordinates. For a reusable all-film 750-frame source clip, repeat the exact file hash and change each beat sourceInFrame, but only after genuinely verifying ALL its shots.
 
 Accepted clips must visibly show the vehicle; no pitch-black start, smooth but clearly moving driving, a credible 3D engine and pipes, flame/light reacting to nozzles, clean restrained tail lights and bodywork. Old A1–A5 rejected proofs are NOT approved regardless of CI.
 
@@ -85,3 +88,7 @@ No changes to EP003, EP004, kit PR #233 or rejected EP005 production branches.
 - In addition to cut and opening/ending sample frames, the renderer exports ALL f0–29 and f675–749 frames (105 compact thumbnails) and rejects an essentially static hook or ending. This is automated motion QA, NOT a replacement for watching the entire genuine MP4 and separately approving car geometry/fire/science.
 
 **Next authorized edit step:** Agent 6 supplies owner-accepted car B-or-later moving video and new exhaust port ABI; Agent 7 supplies matching port-anchored transient flame and science clips, both source/media hashes plus approval comments; editor pins only those exact files. If no approved voice exists, produce only genuine SILENT PICTURE REVIEW; no dummy narrator or undeserved final-audio claim. No merge.
+
+## October 23 V4 pivot
+
+Agent 6 #265 / draft PR #270 must stop candidate sourcing, bring the owner-approved V4 model and actual source dependencies from kit into its isolated branch, then deliver verified NEW driving MP4s and exact frame-varying V4 port interface. Agent 7 #266 / draft PR #268 must attach genuine transient afterfire and remake science around those ports, then hand off actual integrated clips. Agent 8 must recheck every run, clip hash and explicit owner/manager shot approval, then render only the 750f video. Existing workflow will auto-run on this PR update; when footage is still absent its gate should remain closed. The published 14s appearance reference is **not** a substitute for EP005 driving, flames or engine-science shots. Original EP005 narrator is not yet identified; silence must be clearly labelled. No merge.
