@@ -31,3 +31,8 @@ test('rough gravel ribbon and sampled wheel elevation remain shared',()=>{
  for(let i=0;i<=400;i++){const centre=(a.getY(i*2)+a.getY(i*2+1))/2;assert.ok(Math.abs(centre-sampleRoad(r,i*r.length/400).position.y)<1e-6);}
  assert.throws(()=>createRoad({points:[[0,0,0],[50,0,0]],width:6,roughness:.2}),/roughness/);
 });
+test('camera road frame excludes high frequency surface vibration',async()=>{
+ const {sampleCameraRoad}=await import('../../src/yunex/studio-v5/road.ts');
+ const r=createRoad({points:[[0,0,0],[50,0,0],[100,0,0]],width:6,roughness:.025});
+ const a=sampleCameraRoad(r,20),b=sampleCameraRoad(r,21);assert.ok(a.quaternion.angleTo(b.quaternion)<1e-5);assert.ok(sampleRoad(r,20).quaternion.angleTo(sampleRoad(r,21).quaternion)>.001);
+});

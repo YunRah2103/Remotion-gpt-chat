@@ -33,3 +33,5 @@ export function roadGeometry(road:Road,a:number,b:number,segments=600,lift=0){
  for(let i=0;i<segments;i++){const n=i*2;indices.push(n,n+1,n+2,n+1,n+3,n+2);}
  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(positions,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(indices);g.computeVertexNormals();return g;
 }
+/** Camera orientation follows grade/banking, excluding high-frequency tyre-scale undulation. */
+export function sampleCameraRoad(road:Road,distance:number){return sampleRoad({...road,roughness:0},distance);}

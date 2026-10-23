@@ -4,7 +4,7 @@ import {ThreeCanvas} from '@remotion/three';
 import * as T from 'three';
 import {createStudioEnvironment} from './environment.ts';
 import type {StudioConfig,Preset} from './environment.ts';
-import {sampleRoad} from './road.ts';
+import {sampleRoad,sampleCameraRoad} from './road.ts';
 import {createStudioVehicle,poseStudioVehicle} from './vehicle.ts';
 import {createCinematicVehicle,animateCinematicVehicle} from '../modelling-kit/rig.ts';
 import {CinematicLighting} from '../modelling-kit/Lighting';
@@ -34,7 +34,8 @@ export const StudioFilm:React.FC<FilmProps>=({config,baseline=false,scanned=true
  // A matched legacy view uses the original route and corresponding vehicle-local camera.
  if(legacy){const p=sampleRoute(c.preset==='circuit'?'track':c.preset==='rally'?'rally':c.preset,distance);car.position.fromArray(p.position);car.rotation.set(0,p.yaw,0);}
  const a=.78+.12*Math.sin(t*.32),radius=13.8,local=new T.Vector3(Math.cos(a)*radius,2.5+Math.sin(t*.35)*.18,(c.preset==='mountain'?1:-1)*Math.sin(a)*radius),target=new T.Vector3(0,1.0,0).applyQuaternion(car.quaternion).add(car.position);
- const position=local.applyQuaternion(car.quaternion).add(car.position),night=c.timeOfDay==='night';
+ const cameraFrame=baseline?car.quaternion:sampleCameraRoad(road,distance).quaternion;
+ const position=local.applyQuaternion(cameraFrame).add(car.position),night=c.timeOfDay==='night';
  const background=c.timeOfDay==='dusk'?'#aab3ba':night?'#101c2a':'#a6b9c5';
  return <ThreeCanvas width={width} height={height} shadows camera={{fov:40,near:.05,far:1400}} gl={{antialias:true}}>
  <CinematicLighting focus={car.position.toArray() as V3} timeOfDay={c.timeOfDay}/>
