@@ -20,6 +20,9 @@ jobs:
       - name: Install audio requirements
         run: |
           python3 -m pip install --disable-pip-version-check 'numpy>=1.26,<3' 'scipy>=1.12,<2' 'soundfile>=0.12,<1'
+          sudo apt-get update -o Acquire::Retries=3
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -o Acquire::Retries=3 ffmpeg
+          command -v ffmpeg && command -v ffprobe
           ffmpeg -version | head -1
       - name: Produce non-voice stems
         run: python3 production/yunex/supercar_flames_ep005/agent9/build_soundtrack.py --out out/ep005-agent9
