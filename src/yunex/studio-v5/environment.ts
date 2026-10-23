@@ -2,6 +2,7 @@ import * as T from 'three';
 import {createRoad,sampleRoad,roadGeometry} from './road.ts';
 import type {Point,Road} from './road.ts';
 import {createTerrain} from './terrain.ts';
+import {createShoulderGeometry,createShoulderMaterial} from './shoulder.ts';
 import {batchScenery} from './batch.ts';
 import {addNature,addArchitecture} from './scenery.ts';
 export const PRESETS={
@@ -34,9 +35,9 @@ function roadMaterial(gravel:boolean,wet:boolean){
 function addRibbon(g:T.Group,road:Road,a:number,b:number,mat:T.Material,name:string,lift=0){const m=new T.Mesh(roadGeometry(road,a,b,undefined,lift),mat);m.name=name;m.receiveShadow=true;g.add(m);return m;}
 export function createStudioEnvironment(input:StudioConfig){
  const config=resolveConfig(input),road=createRoad(config.road),group=new T.Group();group.name='v5-'+config.preset;
- const asphalt=roadMaterial(config.surface==='gravel',config.weather==='wet'),shoulder=new T.MeshStandardMaterial({color:config.surface==='gravel'?'#80715b':'#666258',roughness:.98,side:T.DoubleSide});
+ const asphalt=roadMaterial(config.surface==='gravel',config.weather==='wet'),landscape=createTerrain(road,config.preset),shoulder=createShoulderMaterial();
  addRibbon(group,road,-road.width/2,road.width/2,asphalt,'v5-road');
- for(const side of [-1,1])addRibbon(group,road,side*road.width/2,side*(road.width/2+1.15),shoulder,'v5-shoulder',-.012);
+ for(const side of [-1,1]){const mesh=new T.Mesh(createShoulderGeometry(road,side,landscape.height,config.surface),shoulder);mesh.name='v5-shoulder';mesh.receiveShadow=true;group.add(mesh);}
  if(config.surface==='asphalt'){
  const line=new T.MeshStandardMaterial({color:'#d8d7c7',roughness:.78,side:T.DoubleSide});
  for(const side of [-1,1])addRibbon(group,road,side*(road.width/2-.22),side*(road.width/2-.12),line,'v5-edge-line',.008);
@@ -44,7 +45,7 @@ export function createStudioEnvironment(input:StudioConfig){
  const q=new T.Mesh(new T.PlaneGeometry(4,.105),line);const s=sampleRoad(road,d);q.position.copy(s.position).addScaledVector(s.normal,.009);q.quaternion.copy(s.quaternion).multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),-Math.PI/2));q.name='v5-centre-dash';group.add(q);
  }
  }
- const landscape=createTerrain(road,config.preset);group.add(landscape.mesh);
+ group.add(landscape.mesh);
  const scenery=new T.Group();scenery.name='v5-scenery';group.add(scenery);
  if(config.scenery){addNature(scenery,road,config,landscape.height);addArchitecture(scenery,road,config);batchScenery(scenery);}
  group.userData.config=config;group.userData.accuracy='Deterministic cinematic route; not calibrated driving simulation';

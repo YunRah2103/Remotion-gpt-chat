@@ -15,7 +15,7 @@ export function addNature(g:T.Group,road:Road,c:Config,heightAt:(x:number,z:numb
  s.position.y=heightAt(s.position.x,s.position.z);
  const trunk=new T.Object3D();trunk.position.copy(s.position).add(new T.Vector3(0,height*.36,0));trunk.scale.set(.18+r()*.16,height*.72,.18+r()*.16);trunk.rotation.z=(r()-.5)*.12;trunks.push(trunk);
  // Radial needle clusters: distinct branch tiers, scanned foliage is applied by the native asset loader.
- const near=d>55&&d<230,layers=near?14:5,rays=near?9:5;
+ const near=d>55&&d<230,layers=near?14:10,rays=near?9:7;
  for(let layer=0;layer<layers;layer++)for(let ray=0;ray<rays;ray++){
  const u=Math.min(.98,(layer+r()*.4)/layers),a=ray*2.399+layer*.45+r()*.3,length=(1-u)*2.9+.3;
  for(let segment=0;segment<(near?3:1);segment++){
