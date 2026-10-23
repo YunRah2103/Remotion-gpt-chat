@@ -94,8 +94,12 @@ export const FlameFixtureProof:React.FC=()=>{
        footer="NEUTRAL FIXTURE TEST — NOT AGENT 6'S HERO CAR"/>
   </AbsoluteFill>;
 };
-export const MechanicalScienceProof:React.FC=()=>{
-  const frame=useCurrentFrame(),{fps,width,height}=useVideoConfig(),t=frame/fps;
+/** Narration-scale >1 retimes the complete 3D mechanism as genuine unique frames.
+ * 255 frames cover editor's native Cedar f165–419 without holding or looping.
+ * The legacy 150f proof retains its original speed for A/B visual comparison.
+ */
+export const MechanicalScienceProof:React.FC<{narrationScale?:number}>=({narrationScale=1})=>{
+  const frame=useCurrentFrame(),{fps,width,height}=useVideoConfig(),t=frame/(fps*narrationScale);
   const a=useMemo(()=>buildScienceEngine(),[]);
   // Science-only outlet geometry: these are NOT car exhaust measurements.
   // Reuse the identical volumetric flame renderer, never the cartoon cone mockup.
