@@ -19,7 +19,7 @@ jobs:
       - run: npm run check
       - run: node --experimental-strip-types --test tests/studio-v5/*.test.mjs
       - run: bash scripts/modelling-kit/install-native-media.sh
-      - run: npx remotion render src/yunex/studio-v5/ConceptProof.tsx V5-AuthoredConceptCar out/v5/authored-city.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --color-space=bt709 --crf=18 --concurrency=2
+      - run: npx remotion render src/yunex/studio-v5/ConceptProof.tsx V5-AuthoredConceptCar out/v5/authored-city.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --color-space=bt709 --crf=18 --concurrency=2 --timeout=120000
       - name: Verify actual native moving model video
         run: |
           ffmpeg -v error -xerror -i out/v5/authored-city.mp4 -f null -
