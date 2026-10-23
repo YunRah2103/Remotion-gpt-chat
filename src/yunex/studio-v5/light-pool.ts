@@ -8,3 +8,11 @@ export function limitStudioLights(world:T.Object3D,focus:T.Vector3,budget=4){
  candidates.sort((a,b)=>a.distance-b.distance||a.order-b.order);const selected=new Set(candidates.slice(0,budget).map(c=>c.light));for(const {light}of candidates)light.visible=selected.has(light);return selected.size;
 }
 export function restoreStudioLights(world:T.Object3D){const original=baselines.get(world);original?.forEach((visible,light)=>{light.visible=visible;});baselines.delete(world);}
+
+/** Reflection probes use authored visibility, independent of live per-frame light budgets. */
+export function cloneStudioForReflections(world:T.Group){
+ const clone=world.clone(true),original=baselines.get(world),source:T.Object3D[]=[],copies:T.Object3D[]=[];
+ world.traverse(o=>source.push(o));clone.traverse(o=>copies.push(o));
+ source.forEach((o,i)=>{if(o instanceof T.PointLight&&original?.has(o))copies[i].visible=original.get(o)!;});
+ return clone;
+}

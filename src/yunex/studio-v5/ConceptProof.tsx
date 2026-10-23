@@ -9,7 +9,18 @@ const ReadyModel:React.FC<{model:T.Group;handle:number}>=({model,handle})=>{cons
 export const ConceptProof:React.FC=()=>{
  const {delayRender,cancelRender}=useDelayRender(),frame=useCurrentFrame(),{fps,width,height}=useVideoConfig(),[model,setModel]=useState<T.Group|null>(null),[handle]=useState(()=>delayRender('Load authored car and vendored city materials'));
  const world=useMemo(()=>createStudioEnvironment({preset:'city',vegetation:0,quality:'hero'}),[]);
- useEffect(()=>{let active=true,car:T.Group|undefined,cleanup:(()=>void)|undefined;Promise.all([loadConceptVehicle(staticFile('yunex-v5/concept-car/CarConcept.glb')),applyScannedMaterials(world.group,staticFile,'city','asphalt')]).then(([value,clean])=>{car=value;cleanup=clean;if(!active){disposeObject(value);clean();return;}for(const side of [-1,1]){const target=new T.Object3D();target.position.set(25,.04,side*.75);const lamp=new T.SpotLight('#dce9fa',120,40,.28,.7,2);lamp.position.set(2.2,.50,side*.75);lamp.target=target;car.add(lamp,target);}setModel(value);}).catch(cancelRender);return()=>{active=false;if(car)disposeObject(car);cleanup?.();};},[handle,world,cancelRender]);
+ useEffect(()=>{
+  let active=true,car:T.Group|undefined,cleanup:(()=>void)|undefined;
+  const release=()=>{if(car){disposeObject(car);car=undefined;}if(cleanup){cleanup();cleanup=undefined;}};
+  const modelReady=loadConceptVehicle(staticFile('yunex-v5/concept-car/CarConcept.glb')).then(value=>{car=value;if(!active)release();return value;});
+  const materialsReady=applyScannedMaterials(world.group,staticFile,'city','asphalt').then(clean=>{cleanup=clean;if(!active)release();});
+  Promise.all([modelReady,materialsReady]).then(([value])=>{
+   if(!active)return;
+   for(const side of [-1,1]){const target=new T.Object3D();target.position.set(25,.04,side*.75);const lamp=new T.SpotLight('#dce9fa',120,40,.28,.7,2);lamp.position.set(2.2,.50,side*.75);lamp.target=target;value.add(lamp,target);}
+   setModel(value);
+  }).catch(error=>{active=false;release();cancelRender(error);});
+  return()=>{active=false;release();};
+ },[handle,world,cancelRender]);
  useEffect(()=>()=>disposeObject(world.group),[world]);
  const t=frame/fps,d=78+t*13,pose=sampleRoad(world.road,d),ahead=sampleRoad(world.road,d+.5),curvature=Math.atan2(Math.sin(ahead.yaw-pose.yaw),Math.cos(ahead.yaw-pose.yaw))/.5;
  limitStudioLights(world.group,pose.position,4);
