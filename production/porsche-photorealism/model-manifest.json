@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "status": "EXPERIMENTAL_REVIEW_ONLY_NOT_APPROVED",
+  "vehicle": "Porsche 911 GT3 RS (992) — 2023 2.7 Carrera Tribute variant (as named by distributor)",
+  "file": "public/porsche-photorealism/911-gt3-rs-992.glb",
+  "upstreamDistribution": {
+    "repository": "Nissmo89/Supercar-Vault-3D",
+    "commit": "00f08b282d6b2c0f6834f91c582f9d539dcc02fd",
+    "path": "models/2023_porsche_911_gt3_rs_2.7_carrera_tribute_992.glb",
+    "gitBlobSHA1": "2d2229e5c9207498ca30f78f85294ccb675b8e59"
+  },
+  "claimedOriginal": {
+    "creator": "Alex Giardina (@milosworkshop)",
+    "url": "https://sketchfab.com/3d-models/2023-porsche-911-gt3-rs-carrera-tribute-992-ada99e6e80764bc992f2da35cb601ea2",
+    "listedLicense": "Creative Commons Attribution (CC BY)",
+    "verifiedLinkToDistributor": "NOT VERIFIED — identical descriptive filename/title alone do not establish provenance"
+  },
+  "alternativeCandidates": [
+    {
+      "creator": "DR1KING100K",
+      "url": "https://sketchfab.com/3d-models/porsche-911-gt3-rs-992-70bf9c89c71442149009193233de43d5",
+      "listedLicense": "CC BY",
+      "directDownloadVerified": false
+    },
+    {
+      "creator": "HYPR:IMPS 3D",
+      "url": "https://sketchfab.com/3d-models/2024-manthey-racing-porsche-911-gt3-rs-09ccead93fb34944bde812d4b4684eff",
+      "listedLicense": "CC BY",
+      "directDownloadVerified": false
+    },
+    {
+      "creator": "Black Snow",
+      "url": "https://sketchfab.com/3d-models/porsche-gt3-rs-e738eae819c34d19a31dd066c45e0f3d",
+      "note": "fallback is not verifiably the required 992 variant"
+    }
+  ],
+  "alteration": "Transform normalization and opt-in look development at runtime; geometry and source texture data preserved.",
+  "rules": "Private internal review only until actual GLB provenance is traced and source identity/license confirmed. Do not merge, republish the imported asset, or promote to the Premium Car Library automatically."
+}
