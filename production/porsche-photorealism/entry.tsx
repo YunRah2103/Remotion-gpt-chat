@@ -18,9 +18,12 @@ const clamp=(v:number)=>Math.max(0,Math.min(1,v));
 const smooth=(t:number)=>{const v=clamp(t);return v*v*(3-2*v);};
 type V3=[number,number,number];
 const cameraShots:{from:V3;to:V3;look:V3;fov:number}[]=[
-  {from:[7.4,2.35,8.5],to:[6.9,2.05,7.8],look:[0,1.05,0],fov:43},
-  {from:[0.7,1.9,12.2],to:[-.35,1.75,11.6],look:[0,1.10,0],fov:42},
-  {from:[-7.8,2.4,8.7],to:[-7.0,2.1,8.0],look:[0,1.20,0],fov:43}
+  // Shot 1: genuine front three-quarter Porsche design, headlights and splitter.
+  {from:[-5.3,1.48,6.8],to:[-6.2,1.65,7.8],look:[-.20,.90,0],fov:43},
+  // Shot 2: lateral silhouette and both visible wheel/tire contact patches.
+  {from:[1.45,1.62,9.3],to:[-1.15,1.52,9.6],look:[0,.93,0],fov:46},
+  // Shot 3: rear three-quarter wing and diffuser hero.
+  {from:[5.85,1.8,7.05],to:[6.7,2.0,7.8],look:[.15,.94,0],fov:43}
 ];
 function Camera():null{
   const f=useCurrentFrame(),{camera}=useThree();
@@ -37,7 +40,7 @@ function FilmicOutput():null{
   useLayoutEffect(()=>{
     const before={mapping:gl.toneMapping,exposure:gl.toneMappingExposure,color:gl.outputColorSpace,environment:scene.environmentIntensity};
     gl.toneMapping=T.ACESFilmicToneMapping;
-    gl.toneMappingExposure=1.05;
+    gl.toneMappingExposure=1.00;
     gl.outputColorSpace=T.SRGBColorSpace;
     scene.environmentIntensity=1.10;
     return()=>{gl.toneMapping=before.mapping;gl.toneMappingExposure=before.exposure;gl.outputColorSpace=before.color;scene.environmentIntensity=before.environment;};
@@ -110,22 +113,23 @@ function ImportedPorsche(){
 function Stage(){
   const {width,height}=useVideoConfig();
   return <ThreeCanvas width={width} height={height} shadows camera={{fov:43,near:.05,far:100}}>
-    <WorldLighting timeOfDay="day" studio focus={[0,1,0]}/>
-    <color attach="background" args={['#353b3e']}/>
+    <WorldLighting timeOfDay="dusk" studio focus={[0,1,0]}/>
+    <color attach="background" args={['#1a2126']}/>
+    <fog attach="fog" args={['#1a2126',18,52]}/>
     <FilmicOutput/>
-    <hemisphereLight args={['#dce5ee','#3b4141',.8]}/>
-    <directionalLight color="#f5f2ed" intensity={2.5} position={[4.8,9.0,5.5]} castShadow
+    <hemisphereLight args={['#d5e0ea','#34393d',.65]}/>
+    <directionalLight color="#f5f2ed" intensity={1.7} position={[4.8,9.0,5.5]} castShadow
       shadow-mapSize={[2048,2048]} shadow-camera-left={-9} shadow-camera-right={9}
       shadow-camera-top={9} shadow-camera-bottom={-9} shadow-camera-near={.5}
       shadow-camera-far={30} shadow-bias={-.00014} shadow-normalBias={.025}/>
-    <directionalLight color="#d5e7ff" intensity={.9} position={[-6,7,-4]}/>
+    <directionalLight color="#d5e7ff" intensity={1.35} position={[-6,7,-4]}/>
     <mesh rotation={[-Math.PI/2,0,0]} position={[0,-.024,0]} receiveShadow>
       <planeGeometry args={[200,200]}/>
-      <meshStandardMaterial color="#414648" roughness={.69} metalness={.08}/>
+      <meshPhysicalMaterial color="#252e32" roughness={.42} metalness={.14} clearcoat={.09} clearcoatRoughness={.4}/>
     </mesh>
     <ImportedPorsche/>
     <Camera/>
   </ThreeCanvas>;
 }
-export const PorschePhotorealism:React.FC=()=> <AbsoluteFill style={{backgroundColor:'#353b3e'}}><Stage/></AbsoluteFill>;
+export const PorschePhotorealism:React.FC=()=> <AbsoluteFill style={{backgroundColor:'#1a2126'}}><Stage/></AbsoluteFill>;
 registerRoot(()=> <Composition id="YunexPorsche992Photorealism" component={PorschePhotorealism} width={1080} height={1920} fps={FPS} durationInFrames={FRAMES}/>);
