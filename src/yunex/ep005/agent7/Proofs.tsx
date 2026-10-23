@@ -40,12 +40,14 @@ type VectorTuple=[number,number,number];
 /** Shot-sized optical compositions rather than one tiny wide orthographic diagram. */
 function scienceCamera(t:number):{position:VectorTuple;target:VectorTuple}{
   const k:{t:number;position:VectorTuple;target:VectorTuple}[]=[
-    {t:0,position:[3.35,2.45,7.1],target:[.05,.42,0]},
-    {t:1.35,position:[3.0,2.65,6.7],target:[-.05,.42,0]},
-    {t:1.90,position:[2.45,2.65,7.0],target:[-.45,.35,0]},
-    {t:2.83,position:[.85,2.6,7.15],target:[-.75,.26,0]},
-    {t:3.50,position:[-4.35,1.85,5.25],target:[-2.35,.02,0]},
-    {t:5,position:[-4.60,1.80,4.95],target:[-2.70,-.02,0]},
+    // Portrait cinematic passes: oblique views foreshorten the 4m V8-to-tailpipe
+    // assembly so headers and ignition never disappear off the left/right crop.
+    {t:0,position:[3.6,2.10,7.9],target:[.10,.45,0]},
+    {t:1.35,position:[2.75,2.32,8.0],target:[-.10,.43,0]},
+    {t:1.90,position:[1.70,2.13,8.4],target:[-.52,.37,0]},
+    {t:2.83,position:[-.90,2.12,8.25],target:[-1.13,.26,0]},
+    {t:3.50,position:[-3.70,1.72,7.80],target:[-1.91,.13,0]},
+    {t:5,position:[-4.25,1.66,7.90],target:[-2.08,.10,0]},
   ];
   let i=0;while(i<k.length-2&&t>k[i+1].t)i++;
   const a=k[i],b=k[i+1],u=Math.max(0,Math.min(1,(t-a.t)/(b.t-a.t)));
@@ -113,23 +115,25 @@ export const MechanicalScienceProof:React.FC=()=>{
   ]);
   const story=[
     {h:'INSIDE THE ENGINE',sub:'Fuel normally burns inside the cylinders.',tag:'01 / CONTROLLED COMBUSTION'},
-    {h:'HOT EXHAUST',sub:'On some tuned overrun events, fuel reaches the exhaust.',tag:'02 / FUEL + HEAT'},
-    {h:'A BRIEF IGNITION',sub:'Fuel, oxygen and enough heat can create afterfire.',tag:'03 / CONDITIONAL AFTERFIRE'},
+    {h:'HOT EXHAUST',sub:'On some tuned overrun events, unburned fuel enters hot exhaust.',tag:'02 / FUEL + HEAT'},
+    {h:'AFTERFIRE',sub:'Unburned fuel + oxygen + hot exhaust = brief ignition.',tag:'03 / CONDITIONAL IGNITION'},
   ][phase];
   return <AbsoluteFill style={{background:backdrop}}>
-    <ThreeCanvas width={width} height={height} camera={{fov:38,near:.025,far:90}} gl={{antialias:true}}>
+    <ThreeCanvas width={width} height={height} camera={{fov:49,near:.025,far:90}} gl={{antialias:true}}>
       <color attach="background" args={[backdrop]}/>
-      <ambientLight intensity={1.35} color="#bfd8e8"/>
-      <directionalLight position={[4,8,6]} intensity={4.1} color="#fff5e2"/>
-      <directionalLight position={[-5,4,-4]} intensity={2.3} color="#8db8dc"/>
-      <pointLight position={[-2,1,2]} intensity={5.5} distance={8} color="#f4aa75"/>
+      <ambientLight intensity={.95} color="#b5d3eb"/>
+      <directionalLight position={[4,8,6]} intensity={3.9} color="#fff0d3"/>
+      <directionalLight position={[-5,4,-4]} intensity={2.8} color="#80c8ff"/>
+      <pointLight position={[-2,1,2]} intensity={phase>=1?6:2.5} distance={8} color="#ff9c5f"/>
+      <pointLight position={[.2,1.1,-.5]} intensity={phase===0?4.6:1.3} distance={5} color="#ffb76b"/>
+      <pointLight position={[-1.1,1.4,-2]} intensity={2} distance={6} color="#4baeff"/>
       <mesh position={[-.45,-.52,0]} receiveShadow>
         <boxGeometry args={[3.9,.12,1.95]}/>
         <meshStandardMaterial color="#394954" metalness={.26} roughness={.53}/>
       </mesh>
       <primitive object={a.root}/>
       <primitive object={scienceAfterfire.root}/>
-      <CameraAim position={camera.position} target={camera.target} fov={38}/>
+      <CameraAim position={camera.position} target={camera.target} fov={49}/>
     </ThreeCanvas>
     <Frame tag={'YUNEX / ' + story.tag} title={story.h}
       subtitle={story.sub}
@@ -138,7 +142,7 @@ export const MechanicalScienceProof:React.FC=()=>{
       fontFamily:'Arial',fontSize:31,letterSpacing:1.2,fontWeight:700,
       color:'#f2ecdf',textAlign:'center',padding:'16px 22px',
       background:'rgba(9,20,29,.72)',borderTop:'2px solid #e89a64'}}>
-      {phase===0?'PISTONS • CYLINDER IGNITION':phase===1?'HOT GAS THROUGH CONNECTED HEADERS':'BRIEF AFTERFIRE — ONLY IN SOME CONDITIONS'}
+      {phase===0?'PISTONS • CYLINDER IGNITION':phase===1?'UNBURNED FUEL THROUGH HOT HEADERS':'HOT GAS + OXYGEN → BRIEF FLAME'}
     </div>
   </AbsoluteFill>;
 };
