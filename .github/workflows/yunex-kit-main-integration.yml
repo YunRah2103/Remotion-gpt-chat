@@ -1,0 +1,93 @@
+name: YUNEX kit main integration and native smoke
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/yunex-kit-main-integration.yml'
+      - 'src/yunex/modelling-kit/**'
+      - 'src/yunex/world-kit/**'
+      - 'src/yunex/parts-kit/**'
+      - 'src/yunex/studio-projects/**'
+      - 'scripts/modelling-kit/**'
+      - 'scripts/world-kit/**'
+      - 'scripts/parts-kit/**'
+      - 'tests/modelling-kit/**'
+      - 'tests/world-kit/**'
+      - 'tests/parts-kit/**'
+      - 'package.json'
+      - 'src/Root.tsx'
+      - 'tsconfig.json'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/yunex-kit-main-integration.yml'
+      - 'src/yunex/modelling-kit/**'
+      - 'src/yunex/world-kit/**'
+      - 'src/yunex/parts-kit/**'
+      - 'scripts/modelling-kit/**'
+      - 'tests/modelling-kit/**'
+      - 'package.json'
+      - 'src/Root.tsx'
+      - 'tsconfig.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  model-contracts:
+    name: Node, Python, TypeScript, kit contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
+      - run: node --experimental-strip-types --test tests/modelling-kit/*.test.mjs tests/world-kit/*.test.mjs tests/parts-kit/*.test.mjs
+      - run: python3 -m unittest discover -s tests/modelling-kit -p 'test_*.py'
+
+  native-smoke:
+    name: Fresh 30-frame teal supercar H264 full decode
+    needs: model-contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - name: Render a new source-owned moving model orbit
+        run: >-
+          npx remotion render src/yunex/modelling-kit/studio-quality-entry.tsx StudioModelPortrait
+          out/main-v4-smoke/teal-supercar.mp4
+          --props='{"variant":"supercar","bodyDetail":"studio","timeOfDay":"day"}'
+          --frames=0-29 --gl=swangle --codec=h264 --pixel-format=yuv420p
+          --color-space=bt709 --crf=19 --concurrency=2
+      - name: Assert real video and full frame decode
+        shell: bash
+        run: |
+          set -euo pipefail
+          f=out/main-v4-smoke/teal-supercar.mp4
+          test -s "$f"
+          codec=$(ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of default=nw=1:nk=1 "$f")
+          dims=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$f")
+          frames=$(ffprobe -v error -count_frames -select_streams v:0 -show_entries stream=nb_read_frames -of default=nw=1:nk=1 "$f")
+          [[ "$codec" == "h264" ]]
+          [[ "$dims" == "1080x1920" ]]
+          [[ "$frames" == "30" ]]
+          ffmpeg -v error -xerror -i "$f" -f null -
+          sha256sum "$f" | tee out/main-v4-smoke/sha256.txt
+          git rev-parse HEAD | tee out/main-v4-smoke/source-sha.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-V4-MAIN-native-smoke
+          path: out/main-v4-smoke/
+          retention-days: 14

@@ -1,0 +1,148 @@
+{
+  "film": "C",
+  "source_commit": "2021bc5",
+  "video": "/workspace/scratch/773eb3d6aefe/yunex-native-2021/out/studio/v4-c-film/proof.mp4",
+  "sha256": "38a138feea706f1e26817ddb7d2de3b6b5aefe8e964452e9f03f1c9f461ffc15",
+  "review_method": "FFmpeg decoded selected frames directly from actual MP4 to unscaled 1080x1920 PNG; every selected PNG individually opened using view_image in chronological batches. No contact sheets or source edits. No real-time full movie playback available.",
+  "inspected_windows_inclusive": [
+    [
+      0,
+      5
+    ],
+    [
+      654,
+      659
+    ],
+    [
+      35,
+      40
+    ],
+    [
+      111,
+      116
+    ],
+    [
+      187,
+      192
+    ],
+    [
+      264,
+      269
+    ],
+    [
+      353,
+      358
+    ],
+    [
+      454,
+      459
+    ],
+    [
+      543,
+      548
+    ],
+    [
+      619,
+      624
+    ],
+    [
+      74,
+      77
+    ],
+    [
+      150,
+      153
+    ],
+    [
+      226,
+      229
+    ],
+    [
+      303,
+      306
+    ],
+    [
+      404,
+      407
+    ],
+    [
+      506,
+      509
+    ],
+    [
+      582,
+      585
+    ]
+  ],
+  "inspected_frame_count": 88,
+  "gate": "pending_full_moving_playback_and_art_review",
+  "observations": {
+    "road_motion": "Visible sequential lane, wall, vegetation movement in road windows and changing wheel spokes. No freeze apparent in sampled sequences. Exact speed/rolling correspondence and all-frame behavior not certified.",
+    "camera": "Cuts occur at specified boundaries; no extra within-window camera pop or transient occluder observed. Whole car fits reveal, flight and rear ending windows. Wheel/interior/POV crops are purposeful.",
+    "mechanical_story": "Rotating turbo, reciprocating pistons/crank and moving colored flow markers read as an explanatory schematic. Driver hands remain near steering wheel; feet near pedals. Physical engineering correctness and exact connections are not certified.",
+    "captions": "Engine captions and two-line final caption remain readable inside lower safe margins, clear of subject. Proof title ends with isolated PROOF on second line.",
+    "lighting": "Teal paint catches broad highlights; dark lower grille/rear details and tires lose separation. Road scenes have flat, muted lighting and visibly repeated procedural vegetation/stonework.",
+    "art_quality": "Clearly stylized procedural vehicle, mannequin and environment. Adequate proof readability, but no premium automotive beauty certification."
+  },
+  "findings": [
+    {
+      "severity": "medium",
+      "category": "visual_contact",
+      "frames": [
+        228,
+        229,
+        264,
+        265,
+        266,
+        267,
+        268,
+        269,
+        303,
+        304
+      ],
+      "finding": "Tire closeup reads weakly grounded: lower silhouette stays round with little contact-patch cue and soft shadow appears separated below. This is a visual concern, not proof of a geometric gap; reported geometry passes were not repeated.",
+      "recommendation": "Inspect moving closeup and improve contact shadow/contact-patch visual cue if realism is required."
+    },
+    {
+      "severity": "medium",
+      "category": "environment_art",
+      "frames": [
+        406,
+        407,
+        454,
+        455,
+        456,
+        457,
+        458,
+        459,
+        506,
+        507
+      ],
+      "finding": "POV has a very large plain straight diagonal background boundary behind road/trees, which reads as a procedural environment edge or slab rather than natural mountain silhouette. Dark dashboard occupies roughly lower third.",
+      "recommendation": "Art review background silhouette and tonal depth before beauty approval."
+    },
+    {
+      "severity": "low",
+      "category": "interior_legibility",
+      "frames": [
+        152,
+        153,
+        187,
+        188,
+        189,
+        190,
+        191,
+        192,
+        226,
+        227
+      ],
+      "finding": "Transparent body shell produces broad layered ghost lines across driver/seat/dashboard. Cutaway purpose remains readable but visual layering is busy.",
+      "recommendation": "Review transparency ordering and simplify shell overlay if polish is required."
+    }
+  ],
+  "limitations": [
+    "88 inspected frames cover local 0.13\u20130.2 second windows only; cannot establish continuous 22 second motion quality or pacing.",
+    "Silent proof: audio, narration and synchronization unreviewed.",
+    "No beauty approval or full playback pass granted."
+  ]
+}

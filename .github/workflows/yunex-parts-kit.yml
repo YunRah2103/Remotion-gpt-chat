@@ -1,0 +1,32 @@
+name: YUNEX generic automotive parts kit
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'src/yunex/parts-kit/**'
+      - 'tests/parts-kit/**'
+      - 'scripts/parts-kit/**'
+      - '.github/workflows/yunex-parts-kit.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run partskit:test
+      - run: npm run worldkit:test
+      - run: npm run partskit:export
+      - run: npm run partskit:review
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-55-PARTS-BASELINE
+          path: out/parts-kit
+          retention-days: 30
