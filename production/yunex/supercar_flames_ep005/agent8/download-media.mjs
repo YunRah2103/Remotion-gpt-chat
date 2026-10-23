@@ -8,7 +8,7 @@ import {fileURLToPath} from 'node:url';
 import {resolveArtifactDestination} from './source-layout.mjs';
 const HERE=path.dirname(fileURLToPath(import.meta.url));
 const ROOT=process.cwd();
-const manifest=JSON.parse(fs.readFileSync(path.join(HERE,'edit-manifest.json'),'utf8'));
+const manifest=JSON.parse(fs.readFileSync(path.resolve(process.env.EP005_MANIFEST_PATH || path.join(HERE,'edit-manifest.json')),'utf8'));
 const all=[...manifest.beats.map(x=>({id:x.id,media:x.media}))];
 if(manifest.voice.approved) all.push({id:'voice',media:manifest.voice});
 for(let i=0;i<(manifest.optionalAudioBeds||[]).length;i++) all.push({id:'bed'+i,media:manifest.optionalAudioBeds[i]});
