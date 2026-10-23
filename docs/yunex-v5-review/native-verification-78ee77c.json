@@ -1,0 +1,58 @@
+{
+  "source_commit": "76c97bf5c1011646e217648c0809c70c05d69700",
+  "source_tree": "1889e28b959e931512fca039d3b2e3e63175592a",
+  "workflow_run": 40004862150,
+  "independent_full_decode": "passed all four with ffmpeg",
+  "movies": {
+    "mountain": {
+      "sha256": "12779bbb0d0d6a3608ac33db55a56726f4f6ac88491a767d7aedb9eeb98e1fd5",
+      "width": 1080,
+      "height": 1920,
+      "fps": 30,
+      "frames": 240,
+      "seconds": 8,
+      "unique_decoded_frames": 240
+    },
+    "circuit": {
+      "sha256": "a7e548b5407c5a179f333934e24d16758a44ed0beb4a369f1350c396033a49a8",
+      "width": 1080,
+      "height": 1920,
+      "fps": 30,
+      "frames": 240,
+      "seconds": 8,
+      "unique_decoded_frames": 240
+    },
+    "city": {
+      "sha256": "962ce63c6149ea8996b7d60a8d64f2008e9e635de11cad5eb68887a3caa7da6a",
+      "width": 1080,
+      "height": 1920,
+      "fps": 30,
+      "frames": 240,
+      "seconds": 8,
+      "unique_decoded_frames": 240
+    },
+    "rally": {
+      "sha256": "5405a7d873d418bb3a13cb50e60fbfe4e4791d1dacd4a4b102bdf4b4a07e8188",
+      "width": 1080,
+      "height": 1920,
+      "fps": 30,
+      "frames": 240,
+      "seconds": 8,
+      "unique_decoded_frames": 240
+    }
+  },
+  "visual_review": {
+    "method": "six decoded frames spanning 0\u20137.8 seconds per video, plus full decode; not a claim of real-time playback review",
+    "decision": "not approved for final flagship release",
+    "findings": [
+      "Cars stay readable and road-aligned in sampled frames; independent wheel mesh-contact regression passed on CI.",
+      "Mountain: continuous backdrop but terrain remains stylized; shoulders too uniform.",
+      "Circuit: coherent reflected light pools and kerbs; pit architecture sparse.",
+      "City: readable vehicle and wet-looking surface; facades too repetitive and artificial.",
+      "Rally: real movement and gravel contact; distant foliage LOD sparse and silhouettes repetitive."
+    ],
+    "scope": "Controlled A/B isolates scanned surfaces only, not an entire legacy-versus-V5 overhaul."
+  },
+  "pull_request_head": "78ee77cf081e12a1e477087a0b6472d990267200",
+  "source_commit_note": "Actions rendered its synthetic PR merge checkout; its tree equals the PR head tree."
+}

@@ -1,0 +1,17 @@
+{
+  "config": {
+    "preset": "mountain",
+    "timeOfDay": "dusk",
+    "weather": "clear",
+    "quality": "hero",
+    "vegetation": 0.35,
+    "seed": 37
+  },
+  "camera": {
+    "side": "left",
+    "distance": 14.5,
+    "height": 2.9,
+    "angle": 0.78,
+    "orbit": 0.1
+  }
+}

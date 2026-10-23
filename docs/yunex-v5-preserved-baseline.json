@@ -1,0 +1,422 @@
+{
+  "source_commit": "c5d2fc0b02f5a4f41da99fb910964c5fe668f109",
+  "policy": "Original V4 source is protected. V5 is opt-in and adds files outside these directories. Updating this manifest requires deliberate source and visual review.",
+  "files": [
+    {
+      "path": "src/yunex/modelling-kit/Demos.tsx",
+      "sha256": "a4b892258b1e1041870e4f3988278d911be3630de0b16aeac2374bf23d12468f"
+    },
+    {
+      "path": "src/yunex/modelling-kit/DrivingDemo.tsx",
+      "sha256": "e3b58aba2f6756b173673bd49f97da4b4405ae3bb7ebee159e05fc9bd743409c"
+    },
+    {
+      "path": "src/yunex/modelling-kit/Lighting.tsx",
+      "sha256": "7a8abd285f49fe5ff215726ffb23ec52ff069a539bc72a170ceab77e6d1de5e2"
+    },
+    {
+      "path": "src/yunex/modelling-kit/Stage.tsx",
+      "sha256": "1b0c0e413fe740994ef057ce224ff221de0fdbabbb76c94770dabb0c732248a9"
+    },
+    {
+      "path": "src/yunex/modelling-kit/StudioEpisode.tsx",
+      "sha256": "161220a286ad6944d226460f077ab1864d024df43a9846145db926f39fbbf80c"
+    },
+    {
+      "path": "src/yunex/modelling-kit/SystemsDemo.tsx",
+      "sha256": "4d581ab1a571860e41198d2e2a29a85bceb137e998808e0f5b6aa920cf5f545d"
+    },
+    {
+      "path": "src/yunex/modelling-kit/authoring.ts",
+      "sha256": "38e5e659927a8e4bf104abd55f3351ac0ab102ab598e9d4c6b2f9b0f9c45149e"
+    },
+    {
+      "path": "src/yunex/modelling-kit/barrier.ts",
+      "sha256": "96203a0c8c1e5e46719532d1591ab7c838db492de4161b69dd694f2b87a53e75"
+    },
+    {
+      "path": "src/yunex/modelling-kit/body-panels.ts",
+      "sha256": "a3a5c55dca503cd2c879b3c57fbc6b4a5db0d94640c718301f651edda17cdd30"
+    },
+    {
+      "path": "src/yunex/modelling-kit/cabin-depth.ts",
+      "sha256": "b53fcf9078674d97b9b766d5eb99ef707236630fc7fa0ecc8051941bfe778a8f"
+    },
+    {
+      "path": "src/yunex/modelling-kit/camera-clearance.ts",
+      "sha256": "305295317467a0334743fb3bc4ee3605fd542b58e36b629e99f075fff4a74c08"
+    },
+    {
+      "path": "src/yunex/modelling-kit/camera-move.ts",
+      "sha256": "50f535abff4944e8a7b50fefb8d8a1065a64be2e99c941ab12bcd23ec53a32fa"
+    },
+    {
+      "path": "src/yunex/modelling-kit/coachbuilt.ts",
+      "sha256": "ec3c573598018cda9fd89d59169cff6f500f3839a75c3891d3e91aa8553dac5c"
+    },
+    {
+      "path": "src/yunex/modelling-kit/coachwork.ts",
+      "sha256": "959c4d7ea25a701bb14bc3869499656d500878ad2b89e7bf77ace30fecd247a5"
+    },
+    {
+      "path": "src/yunex/modelling-kit/components.tsx",
+      "sha256": "1598dd871bce1f19d7f8e6ed2b8079bbd46d877928ba0813242f7cf678781c83"
+    },
+    {
+      "path": "src/yunex/modelling-kit/damage.ts",
+      "sha256": "bb9fc3617264b238bdac03f3eb1952d52549a00977be9876c5871d59f9400185"
+    },
+    {
+      "path": "src/yunex/modelling-kit/details.ts",
+      "sha256": "e8a8861193454aa8984817d5b28a96de0500ecf1d9b2950d4bb6fb62e58e7d5e"
+    },
+    {
+      "path": "src/yunex/modelling-kit/driving.ts",
+      "sha256": "27d3e955c947586316e32ef9ff4510f67df592c8621c4263863bbbe8878453d5"
+    },
+    {
+      "path": "src/yunex/modelling-kit/dynamics.ts",
+      "sha256": "ace31f0dea5144364ad40c7c46a04be9d60226670ddef1c8c2c288d343f70a02"
+    },
+    {
+      "path": "src/yunex/modelling-kit/entry.tsx",
+      "sha256": "57a79bf3072c264b1f1f377868da38a7a25ec91f3df14afc84c51a3d3a900322"
+    },
+    {
+      "path": "src/yunex/modelling-kit/environments.ts",
+      "sha256": "9381a07ceb8f2bd5378f0a6e0fdfca99c5bd25d59a034c4dbc4b04b0dd1c97ae"
+    },
+    {
+      "path": "src/yunex/modelling-kit/exterior.ts",
+      "sha256": "bf818ea0389b55942d95589c2c571c0b9f7c28ae3ed5bce8c0416804400e4778"
+    },
+    {
+      "path": "src/yunex/modelling-kit/fascia.ts",
+      "sha256": "1e45f1b3ad12fcff2e5c78d1c8a3ff69cc669e13d3b983ed1cd1670ddbfc6874"
+    },
+    {
+      "path": "src/yunex/modelling-kit/framing.ts",
+      "sha256": "aaa5d43c07d5c2158ad2a9a21698fbfeec7ff452233e3dfa6a6aa1819daee673"
+    },
+    {
+      "path": "src/yunex/modelling-kit/glazing.ts",
+      "sha256": "668b797d34b9b7e0178d70e803bc55eea4b7ead658213a8cefa5c5bbae6be59d"
+    },
+    {
+      "path": "src/yunex/modelling-kit/index.ts",
+      "sha256": "1c54ee2fec01186a68c08a60802eb2afc9b4e3b4fc4070ef6f653a9e6ea32148"
+    },
+    {
+      "path": "src/yunex/modelling-kit/lighting-profile.ts",
+      "sha256": "9a2b610c3d1d8ba029c2b9b4ec47f88ecbdfa1ad944067ce88c2ed972e20e257"
+    },
+    {
+      "path": "src/yunex/modelling-kit/model-framing.ts",
+      "sha256": "38925f15e685020a3668e640086d1101a7ac7793a8baec8662cbe95a33217d99"
+    },
+    {
+      "path": "src/yunex/modelling-kit/natural-scenery.ts",
+      "sha256": "02b0bd770059ddb152533af2f9188e0f2fae029d6a6d60146bd38d3c0b658799"
+    },
+    {
+      "path": "src/yunex/modelling-kit/occupant.ts",
+      "sha256": "08f502a4c538eb3c18c6cc7e01657f34e7b530b625d4489cedfe5b0156ff3975"
+    },
+    {
+      "path": "src/yunex/modelling-kit/optimize.ts",
+      "sha256": "dcd31d687f084580c30495c37e3545d8d0282427c5f2619359f0725d5a17f7d4"
+    },
+    {
+      "path": "src/yunex/modelling-kit/package.json",
+      "sha256": "1239d4d885dcad42201a27ed9324f8f0f760b78700d8db9ced39a511cffe7eae"
+    },
+    {
+      "path": "src/yunex/modelling-kit/powertrain.ts",
+      "sha256": "c273dc177322ac59dcc20ea48555a2e3b3d2085ca59ff048b6b2c1824438bfc6"
+    },
+    {
+      "path": "src/yunex/modelling-kit/premium.ts",
+      "sha256": "30008e4f29f7e99250d4ff492cb04717bae30241720b4b56ce656ea6337c4aa0"
+    },
+    {
+      "path": "src/yunex/modelling-kit/presets.ts",
+      "sha256": "e06d9629ceb3573f5bcb5afb4e60c13eb72056b582194e27b0e62ef388d47a35"
+    },
+    {
+      "path": "src/yunex/modelling-kit/production.ts",
+      "sha256": "383892312f977d8948c9e187f1742acdd813a9ae5bdd2935e8be2142b68a470d"
+    },
+    {
+      "path": "src/yunex/modelling-kit/racing-occupant.ts",
+      "sha256": "81e5600307b0ffd658ba15d425fed493b686d4ad8607c3f30eed4ecc8daa933b"
+    },
+    {
+      "path": "src/yunex/modelling-kit/rally.ts",
+      "sha256": "8058fe6848cc92b9f0f2eda7d395b12a61d88d0e9a4d291932edd4d36b3a679a"
+    },
+    {
+      "path": "src/yunex/modelling-kit/recipe.ts",
+      "sha256": "9da88f77c252ac897ca9dff528bf03f56f22dace3768eb23f4320c5a04bff585"
+    },
+    {
+      "path": "src/yunex/modelling-kit/regeneration-demo.ts",
+      "sha256": "fa8ddf1ddb088d61b0af60736dd9718a5d1462def27b8e08092bbf3f6d04caa9"
+    },
+    {
+      "path": "src/yunex/modelling-kit/registry.ts",
+      "sha256": "61d0878f444fc8220eb68dab107d36b2757d2da51be3c505c897fbaaef2bd727"
+    },
+    {
+      "path": "src/yunex/modelling-kit/rig.ts",
+      "sha256": "d309066c7d5d08491662f00bc77a9d15ecaf774e333847e57ccd3470af3acd9a"
+    },
+    {
+      "path": "src/yunex/modelling-kit/rough-road.ts",
+      "sha256": "c96d99defebc02823d54ab974f6f02f922a0e16f106fe2fe36994be1ce22dec7"
+    },
+    {
+      "path": "src/yunex/modelling-kit/scenery.ts",
+      "sha256": "e68912bf8165279b7e47d7fbb0fa7baa0378fb3fb79c66740a8b2f3180fe1cf8"
+    },
+    {
+      "path": "src/yunex/modelling-kit/showcases.ts",
+      "sha256": "d4128d1396cce656ba9c430338f7ce5aba4cdbf7d7678fb328dc85995e15c495"
+    },
+    {
+      "path": "src/yunex/modelling-kit/studio-camera.ts",
+      "sha256": "6503a4169acbd59f75e5d9af6f970b475a3640cb787678ab00cb9c1734b88f1a"
+    },
+    {
+      "path": "src/yunex/modelling-kit/studio-coachwork.ts",
+      "sha256": "8c89bf48f866bd7425a8a06c575ec40a50cd30643880aadc45adc02b1355b3be"
+    },
+    {
+      "path": "src/yunex/modelling-kit/studio-exhaust.ts",
+      "sha256": "967e538c252d0645c2844df3264f2fb2e196acb3ce1d3c8970d2e7130a99ba1d"
+    },
+    {
+      "path": "src/yunex/modelling-kit/studio-normals.ts",
+      "sha256": "53cf1a737372a6a0ee789eed9107316c9bc7d5c923521b357d70e77fc15b84d7"
+    },
+    {
+      "path": "src/yunex/modelling-kit/studio-quality-entry.tsx",
+      "sha256": "1bb5069c416af22af59cbaea64a43e35d16638e72cb90f77d76e7a7b68610692"
+    },
+    {
+      "path": "src/yunex/modelling-kit/studio-recipes.ts",
+      "sha256": "ce466b6bdf6211b2b6fb54d9b9a5e946a32812b1e84244a087fa0abf62c88a45"
+    },
+    {
+      "path": "src/yunex/modelling-kit/studio-wheels.ts",
+      "sha256": "c809607bcc4416efe0e1493cf0d798e065e9f5b1accc2e078a7dc39eef4be480"
+    },
+    {
+      "path": "src/yunex/modelling-kit/systems.ts",
+      "sha256": "2ab8c35fc039f50a1f38e1384472042eb961d64a448c4a53d90a11f332d65806"
+    },
+    {
+      "path": "src/yunex/modelling-kit/twin-turbo-demo.ts",
+      "sha256": "3a2894d63c364e0918fe40d3b3c23db71d28d0c74e5216cdc6e8382e0fe4c381"
+    },
+    {
+      "path": "src/yunex/modelling-kit/v3-entry.tsx",
+      "sha256": "aeb594f6de51f1a3a42b10036eed24521147755866471e0ff26e2c08ef3a582b"
+    },
+    {
+      "path": "src/yunex/modelling-kit/v3-proofs.ts",
+      "sha256": "48d827ae555736605666159fc1fac12182a0cfaed0473df9debbd48f52d5bd82"
+    },
+    {
+      "path": "src/yunex/modelling-kit/v4-production.ts",
+      "sha256": "609824ede79647c535548188184cca0b851075252f10421cfb9f40240210d736"
+    },
+    {
+      "path": "src/yunex/modelling-kit/vehicle-quality.ts",
+      "sha256": "a8b4afa4ab5c691581ab0a916207beddeb43411aea2162072d58b47c6346d39f"
+    },
+    {
+      "path": "src/yunex/modelling-kit/visual-quality.ts",
+      "sha256": "c7ed4d0b94afc1011372640606b9e87535eb293e3ded577c28e4d1c5b0eebfad"
+    },
+    {
+      "path": "src/yunex/modelling-kit/weather.ts",
+      "sha256": "1425164e94b100665d39912aedf4f8bf9d0695ebbbdbf86373b0250daa8acc8c"
+    },
+    {
+      "path": "src/yunex/modelling-kit/world-detail.ts",
+      "sha256": "406abd10493f88e9fe8e89bf9099440c706ea7b5c81f0b65aaf38a10ef9e62e4"
+    },
+    {
+      "path": "src/yunex/parts-kit/Preview.tsx",
+      "sha256": "b987d833ef73b932b5d2549e70b0b90bb9b2963c9377fdbe0ed78bf74ae24305"
+    },
+    {
+      "path": "src/yunex/parts-kit/aero.ts",
+      "sha256": "3a56baf21b2afdceaa6f368d9ee0b9515a1c136c06fb14a7cfbb8c295fb2aab1"
+    },
+    {
+      "path": "src/yunex/parts-kit/cameras.ts",
+      "sha256": "3b6ffe450236215daf3e498a9d2a4c1be5c5861aaadabe4c133929bade444d7d"
+    },
+    {
+      "path": "src/yunex/parts-kit/catalog.ts",
+      "sha256": "af505c0dec6e270f70fe2bfe0edecb15fa141a9686eac53ad5b70f529386d2ea"
+    },
+    {
+      "path": "src/yunex/parts-kit/chassis.ts",
+      "sha256": "962ac1eff1a3ab02b0d76d7ceaf62dab27076515d849161a1ef6945f052fdbbe"
+    },
+    {
+      "path": "src/yunex/parts-kit/components.tsx",
+      "sha256": "dc11286acb35934c210e85f61e5da7c21dffa45eee042063c92782c80a337e9f"
+    },
+    {
+      "path": "src/yunex/parts-kit/entry.tsx",
+      "sha256": "9d1e1ad3ca323526b84217bceb501cc660acb7494583ffbb7c8792420037ba4b"
+    },
+    {
+      "path": "src/yunex/parts-kit/helpers.ts",
+      "sha256": "2bea8c9e92d9019ffb7bdde47d23e45b2a7afa134afeec703d0d7b0f8d941b0e"
+    },
+    {
+      "path": "src/yunex/parts-kit/index.ts",
+      "sha256": "7a687c29b0a5edf34e8ca9311b98f89aa8df44d6b0fca2e4bf5fe0f5d9117fd9"
+    },
+    {
+      "path": "src/yunex/parts-kit/models.ts",
+      "sha256": "27f33b0f089bfb676b1cf0566bd8b43e6a5b25c307705aff0eb2b923cf53229d"
+    },
+    {
+      "path": "src/yunex/parts-kit/motion.ts",
+      "sha256": "6a1530c24ab079265beea1804d327233850846e4b970bedd01d100b26fd0a498"
+    },
+    {
+      "path": "src/yunex/parts-kit/package.json",
+      "sha256": "1239d4d885dcad42201a27ed9324f8f0f760b78700d8db9ced39a511cffe7eae"
+    },
+    {
+      "path": "src/yunex/parts-kit/powertrain.ts",
+      "sha256": "dfa155f0068a5c2674f1cf4fcbc0442d7d56f83294ac81b9bef88959025c680f"
+    },
+    {
+      "path": "src/yunex/parts-kit/systems.ts",
+      "sha256": "5c8deb072d092ec889d70fe66259c8764a1f082dca92587a6bf21613fe024ff3"
+    },
+    {
+      "path": "src/yunex/world-kit/EnvironmentOverview.tsx",
+      "sha256": "de132ddf6e99836fcb2ee20b12d76029c17d752f546d299cb701e7ae11872315"
+    },
+    {
+      "path": "src/yunex/world-kit/InteriorPreview.tsx",
+      "sha256": "d030059eb06669f0e4d21bba8523a50df23a08bed5cb2c771f01a4ef6ea8561c"
+    },
+    {
+      "path": "src/yunex/world-kit/PropPreview.tsx",
+      "sha256": "37f5febd052783b90d6f3641d64c6467ff4c348f1d9640793e6ba66064487ed0"
+    },
+    {
+      "path": "src/yunex/world-kit/QualityReel.tsx",
+      "sha256": "da7538c0ecfd293467543b395fd09b5d3d42765062aa17ff5d81d6e626364b45"
+    },
+    {
+      "path": "src/yunex/world-kit/Showcase.tsx",
+      "sha256": "d240f0d72af370ec6cfca9ab1cb4e1109e8ce8fb645830f5734ef3708b53ee0a"
+    },
+    {
+      "path": "src/yunex/world-kit/cameras.ts",
+      "sha256": "8efa4671ccd1c839992ada9f1a20c65ae04c565d9242b49eefeb9b39c26c5a3a"
+    },
+    {
+      "path": "src/yunex/world-kit/catalog.ts",
+      "sha256": "6f24422d83897a41f3cac7bff1387f7713bffaa727e83e8fe4a137c00c44fe6f"
+    },
+    {
+      "path": "src/yunex/world-kit/cavity.ts",
+      "sha256": "53038b3b3e299091994432bfc715895c524da76c95c7dde5aa94c26c87e2dfd0"
+    },
+    {
+      "path": "src/yunex/world-kit/components.tsx",
+      "sha256": "84b4750f0d5a8f5a3c4def0068d1d36a9a95eb1dbb130326f7ac3ba6c9841752"
+    },
+    {
+      "path": "src/yunex/world-kit/entry.tsx",
+      "sha256": "4ecc5b0d1e2fae6d0a27ff79a3f95ffad8a81c479ebe737ef6858af47e9dc194"
+    },
+    {
+      "path": "src/yunex/world-kit/environments.ts",
+      "sha256": "4231a6247cb9523b44c193e794acf3164465d821b0e3dacf0470935fc3225378"
+    },
+    {
+      "path": "src/yunex/world-kit/family-shapes.ts",
+      "sha256": "7fbbdf91d5889b4f9dbe20816d25f809d671786c33498191720319f272a0c86c"
+    },
+    {
+      "path": "src/yunex/world-kit/geometry.ts",
+      "sha256": "b6447f9ca8e6f03203d43dc53e22728f8972052494dae073d5a3a065ec3ed1fd"
+    },
+    {
+      "path": "src/yunex/world-kit/index.ts",
+      "sha256": "b789f278d2e08543f4268a6fb0a16af0e577e49712dc622a9d055acaee825736"
+    },
+    {
+      "path": "src/yunex/world-kit/interiors.ts",
+      "sha256": "bcb5b751152105743e94b6971e6912d77c0cd967647acdbb7daa4700e64d6ec4"
+    },
+    {
+      "path": "src/yunex/world-kit/motion.ts",
+      "sha256": "c7ab4d9d79f1bf005b6e80e218f6b4dc8cc6e01a7b3595e15d7756fe106e5aa3"
+    },
+    {
+      "path": "src/yunex/world-kit/new-environments.ts",
+      "sha256": "e1431ae22a18a97dddf179c2021d77d8b15b8d486bcaa6064aad22853bcb0af6"
+    },
+    {
+      "path": "src/yunex/world-kit/package.json",
+      "sha256": "1239d4d885dcad42201a27ed9324f8f0f760b78700d8db9ced39a511cffe7eae"
+    },
+    {
+      "path": "src/yunex/world-kit/props.ts",
+      "sha256": "64ee2ca00509b057abe6ace9cd71c97981f0cb9e5c5d92414eb45f0af1fb3c36"
+    },
+    {
+      "path": "src/yunex/world-kit/registrations.tsx",
+      "sha256": "0f7aa23c12c2a8e2e65df52bc047ea495df1151bb498e0d8dcb39da72977e38e"
+    },
+    {
+      "path": "src/yunex/world-kit/scenery.ts",
+      "sha256": "6ce8dbf89b8a9342071063e61c2cf42244664b4892c1e3d5779c2047eee669a4"
+    },
+    {
+      "path": "src/yunex/world-kit/vehicle-body.ts",
+      "sha256": "7d3ebded1e19ef0837c7d5b19ca106a375e57b238015d511aaf4c48f60f2f3be"
+    },
+    {
+      "path": "src/yunex/world-kit/vehicle-details.ts",
+      "sha256": "f5b2f731efc53d5cb1701a7538b45cb41ad19d4977f6eece74f20345ab144adb"
+    },
+    {
+      "path": "src/yunex/world-kit/vehicle-wheels.ts",
+      "sha256": "7da533e45bf3822055ccaf380dd506cd1a53e94c626c27f5a8747afdbfb46c90"
+    },
+    {
+      "path": "src/yunex/world-kit/vehicles.ts",
+      "sha256": "384ef8520673dfbc230d0e62c1eb5061f355de1001499528231b1c6ac5e1819e"
+    },
+    {
+      "path": "src/yunex/world-kit/world-catalog.ts",
+      "sha256": "d12679e5e042f64efd59434570788106240856ef05e7567e2cb5f7d0f627c94d"
+    },
+    {
+      "path": "src/yunex/world-kit/world-detail.ts",
+      "sha256": "2ae2b48dc64dd34773aac313d5403263ba9e3a8bab18d1c93a0a1e2cfbb4f5c3"
+    },
+    {
+      "path": "src/yunex/world-kit/world-surfaces.ts",
+      "sha256": "7a44f6cff9913896ec3fe0bd3e7d1bd883eac28c133341c8292ac9bfb60f43c2"
+    },
+    {
+      "path": "src/yunex/world-kit/world-terrain.ts",
+      "sha256": "a8c86c93a660487960da05ce412136d194e282fe2b02682286d3749046a50d14"
+    }
+  ]
+}

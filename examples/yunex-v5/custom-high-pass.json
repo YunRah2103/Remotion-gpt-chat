@@ -1,0 +1,62 @@
+{
+  "config": {
+    "preset": "mountain",
+    "timeOfDay": "dusk",
+    "quality": "preview",
+    "vegetation": 0.4,
+    "seed": 83,
+    "road": {
+      "points": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          35,
+          3,
+          10
+        ],
+        [
+          65,
+          7,
+          35
+        ],
+        [
+          45,
+          12,
+          55
+        ],
+        [
+          5,
+          16,
+          45
+        ],
+        [
+          -25,
+          20,
+          70
+        ],
+        [
+          -10,
+          24,
+          110
+        ],
+        [
+          35,
+          28,
+          130
+        ]
+      ],
+      "width": 7,
+      "bank": 0.02
+    }
+  },
+  "camera": {
+    "side": "left",
+    "distance": 13,
+    "height": 3.5,
+    "angle": 0.8,
+    "orbit": 0.06
+  }
+}
