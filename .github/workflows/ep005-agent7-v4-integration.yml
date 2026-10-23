@@ -60,11 +60,7 @@ jobs:
           set -euo pipefail
           npm ci
           node --experimental-strip-types --test tests/ep005-agent7.test.mjs
-          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
-            sudo apt-get update -qq
-            sudo apt-get install -y -qq ffmpeg
-          fi
-          ffmpeg -version | head -n 1
+          echo "Node/tests complete. Do NOT block original native render on apt mirrors."
       - name: Genuine 1080x1920 30fps V4 driving with framewise physical nozzle jets
         shell: bash
         run: |
@@ -74,6 +70,10 @@ jobs:
         shell: bash
         run: |
           set -euxo pipefail
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
+            timeout 120s sudo apt-get update -qq
+            timeout 120s sudo apt-get install -y -qq ffmpeg
+          fi
           F="out/ep005/agent7/integrated-v4/${{ matrix.slug }}.mp4"
           ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,width,height,r_frame_rate,nb_frames -of default=noprint_wrappers=1 "$F" | tee "${F%.mp4}.ffprobe.txt"
           test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of csv=p=0 "$F")" = "${{ matrix.frames }}"
