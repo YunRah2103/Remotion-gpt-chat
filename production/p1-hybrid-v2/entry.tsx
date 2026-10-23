@@ -46,7 +46,17 @@ function OriginalP1({shot}:{shot:number}){
    obj.castShadow=true;obj.receiveShadow=true;
    const tune=(base:T.Material)=>{
     if(!(base instanceof T.MeshStandardMaterial))return base.clone();
-    const m=new T.MeshPhysicalMaterial().copy(base);
+    const m=new T.MeshPhysicalMaterial({
+     name:base.name,color:base.color.clone(),map:base.map,normalMap:base.normalMap,
+     normalScale:base.normalScale.clone(),metalness:base.metalness,roughness:base.roughness,
+     roughnessMap:base.roughnessMap,metalnessMap:base.metalnessMap,
+     emissive:base.emissive.clone(),emissiveMap:base.emissiveMap,
+     emissiveIntensity:base.emissiveIntensity,alphaMap:base.alphaMap,
+     opacity:base.opacity,transparent:base.transparent,alphaTest:base.alphaTest,
+     side:base.side,depthWrite:base.depthWrite,vertexColors:base.vertexColors,
+     aoMap:base.aoMap,aoMapIntensity:base.aoMapIntensity,
+     lightMap:base.lightMap,lightMapIntensity:base.lightMapIntensity
+    });
     const n=(base.name||'').toLowerCase();
     m.envMapIntensity=1.65;
     if(n.includes('carpaint')||n.includes('body_paint')||n==='body'){
