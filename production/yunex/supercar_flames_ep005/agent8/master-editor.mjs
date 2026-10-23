@@ -21,6 +21,8 @@ const manifest = JSON.parse(await fsp.readFile(manifestPath, 'utf8'));
 const isSha = (s) => typeof s === 'string' && /^[0-9a-f]{64}$/i.test(s);
 const isCommit = (s) => typeof s === 'string' && /^[0-9a-f]{40}$/i.test(s);
 const REJECTED_AG6_CANDIDATE_A = 'bc0185ece668d6ebb1f0f58adbc62edec0ce2cb4';
+const OWNER_APPROVED_HERO_SHA = '9052a539e10a7cb97487c1435455bb9962ad58e1';
+const OWNER_APPROVED_PREVIEW_SHA = '1654a5efd3a3403871b0a52a3140a9e7aeb1222a2e4bd4242e6edaa8d879cd88';
 const REJECTED_VIDEO_SHA = new Set([
   '0797444a04513418593b72cd6aaf58c1e2cbfc64574ae8d33c316ec4f7fddc81',
   'b409370aab6cc68b4641abc4dc53b6c05c32f052c25411cb5dc0bea5d934e860',
@@ -47,6 +49,21 @@ function plan() {
   requireGate(manifest.schemaVersion === 1, 'manifest schema version must be 1');
   requireGate(s.fps === 30 && s.width === 1080 && s.height === 1920 && s.totalFrames === 750,
     'native format must remain 1080x1920 / 30fps / 750 frames');
+  // The user approved the car exterior only; never interpret that as permission to
+  // reuse the old 14-second demo or to approve arbitrary replacement vehicles.
+  const hero = manifest.approvedHero || {};
+  requireGate(hero.appearanceApproved === true &&
+    hero.approvalScope === 'CAR_APPEARANCE_ONLY__NOT_FULL_FILM_OR_MOVING_SHOTS' &&
+    hero.referenceProject === 'v4-a-supercar' &&
+    hero.sourceCommit === OWNER_APPROVED_HERO_SHA &&
+    hero.vehicle?.variant === 'supercar' &&
+    hero.vehicle?.bodyDetail === 'studio' &&
+    hero.vehicle?.color === '#18636b' &&
+    hero.sourceVideo?.sha256 === OWNER_APPROVED_PREVIEW_SHA &&
+    hero.sourceVideo?.runId === 39866437063 &&
+    hero.sourceVideo?.artifactId === 12465297894 &&
+    hasApprovedSourceRef(hero.approvalRef),
+    'owner-approved V4 appearance reference is absent or changed');
   requireGate(Array.isArray(manifest.beats) && manifest.beats.length >= 6, 'missing editorial beats');
   let cursor = 0;
   for (const beat of manifest.beats || []) {
@@ -66,9 +83,14 @@ function plan() {
     requireGate(int(m.sourceInFrame) && m.sourceInFrame >= 0, 'missing source trim frame for ' + beat.id);
     requireGate(typeof m.assetProvenance === 'string' && m.assetProvenance.trim().length > 5,
       'missing original footage provenance for ' + beat.id);
+    if (beat.role === 'vehicle' || beat.role === 'integrated') {
+      requireGate(m.approvedHeroSourceCommit === OWNER_APPROVED_HERO_SHA &&
+        m.approvedHeroReferenceProject === 'v4-a-supercar',
+        'missing approved V4 hero appearance proof on moving footage: ' + beat.id);
+    }
     if (beat.role === 'integrated') {
       requireGate(isCommit(m.agent6Commit) && isCommit(m.agent7Commit) && isSha(m.portManifestSha256) &&
-        typeof m.portManifestVersion === 'string' && m.portManifestVersion !== 'candidate-A-v1' &&
+        typeof m.portManifestVersion === 'string' && /^v4[-_.]/i.test(m.portManifestVersion) &&
         /^https:\/\/github\.com\/YunRah2103\/Remotion-gpt-chat\//.test(m.portManifestRef || '') &&
         !isRejectedCandidate(m),
         'integrated footage must lock BOTH Agent 6 and Agent 7 + exhaust port ABI for ' + beat.id);
