@@ -16,3 +16,7 @@ test('natural shoulders share the road edge and settle onto the terrain on both 
   for(const v of geo.getAttribute('normal').array)assert.ok(Number.isFinite(v));
  }
 });
+test('terrain placement height follows visible triangles, including between grid vertices',async()=>{
+ const {createTerrain}=await import('../../src/yunex/studio-v5/terrain.ts');const road=createRoad({points:[[0,0,0],[40,7,20],[100,12,-20]],width:7,bank:.05}),terrain=createTerrain(road,'mountain');terrain.mesh.updateMatrixWorld(true);
+ for(const d of [15,33,60,90])for(const side of [-1,1]){const p=sampleRoad(road,d,side*4.2).position,ray=new T.Raycaster(new T.Vector3(p.x,100,p.z),new T.Vector3(0,-1,0));const hit=ray.intersectObject(terrain.mesh)[0];assert.ok(hit);assert.ok(Math.abs(hit.point.y-terrain.height(p.x,p.z))<.001,'scenery/verge samples must lie on the rendered terrain');}
+});

@@ -9,6 +9,7 @@ import {createStudioVehicle,poseStudioVehicle} from './vehicle.ts';
 import {createCinematicVehicle,animateCinematicVehicle} from '../modelling-kit/rig.ts';
 import {CinematicLighting} from '../modelling-kit/Lighting';
 import {sampleProofMotion} from './proof-motion.ts';
+import {sampleStudioShot} from './shot.ts';import type {StudioShot} from './shot.ts';
 import {applyScannedMaterials} from './assets.ts';
 import {StudioSky} from './Sky';
 import {LocationReflections} from './Reflections';
@@ -17,8 +18,8 @@ import {disposeObject} from '../world-kit/geometry.ts';
 import {createCinematicEnvironment} from '../modelling-kit/environments.ts';
 import {sampleRoute} from '../world-kit/environments.ts';
 import type {V3} from '../world-kit/geometry.ts';
-export type FilmProps={config:StudioConfig;baseline?:boolean;scanned?:boolean};
-export const StudioFilm:React.FC<FilmProps>=({config,baseline=false,scanned=true})=>{
+export type FilmProps={config:StudioConfig;baseline?:boolean;scanned?:boolean;camera?:StudioShot};
+export const StudioFilm:React.FC<FilmProps>=({config,baseline=false,scanned=true,camera})=>{
  const frame=useCurrentFrame(),{fps,width,height}=useVideoConfig(),t=frame/fps;
  const environment=useMemo(()=>createStudioEnvironment(config),[config]);
  const {road,config:c}=environment;
@@ -36,12 +37,13 @@ export const StudioFilm:React.FC<FilmProps>=({config,baseline=false,scanned=true
  const a=.78+.12*Math.sin(t*.32),radius=13.8,local=new T.Vector3(Math.cos(a)*radius,2.5+Math.sin(t*.35)*.18,(c.preset==='mountain'?1:-1)*Math.sin(a)*radius),target=new T.Vector3(0,1.0,0).applyQuaternion(car.quaternion).add(car.position);
  const cameraFrame=baseline?car.quaternion:sampleCameraRoad(road,distance).quaternion;
  const position=local.applyQuaternion(cameraFrame).add(car.position),night=c.timeOfDay==='night';
+ const shot=sampleStudioShot(road,distance,frame,fps,{side:c.preset==='mountain'?'left':'right',...camera});
  const background=c.timeOfDay==='dusk'?'#aab3ba':night?'#101c2a':'#a6b9c5';
  return <ThreeCanvas width={width} height={height} shadows camera={{fov:40,near:.05,far:1400}} gl={{antialias:true}}>
  <CinematicLighting focus={car.position.toArray() as V3} timeOfDay={c.timeOfDay}/>
  <StudioSky time={c.timeOfDay}/><color attach="background" args={[background]}/><fog attach="fog" args={[background,night?75:180,night?300:850]}/>
  <hemisphereLight args={[night?'#8ba9ce':'#d6e2eb',night?'#343c43':'#786d58',night?.55:.35]}/>
- {assetsReady?<LocationReflections world={legacy??environment.group} focus={sampleRoad(road,125).position} night={night}/>:null}<primitive object={legacy??environment.group}/><primitive object={car}/><CameraAim position={position.toArray() as V3} target={target.toArray() as V3} fov={40}/>
+ {assetsReady?<LocationReflections world={legacy??environment.group} focus={sampleRoad(road,125).position} night={night}/>:null}<primitive object={legacy??environment.group}/><primitive object={car}/><CameraAim position={baseline?position.toArray() as V3:shot.position} target={baseline?target.toArray() as V3:shot.target} fov={40}/>
  </ThreeCanvas>;
 };
 const Root=()=> <>{(['mountain','circuit','city','rally'] as Preset[]).map(preset=><Composition key={preset} id={'V5-'+preset} component={StudioFilm} width={1080} height={1920} fps={30} durationInFrames={240} defaultProps={{config:{preset,quality:'hero'}}}/>)}</>;

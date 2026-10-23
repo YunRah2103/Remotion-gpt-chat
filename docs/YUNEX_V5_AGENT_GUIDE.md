@@ -60,3 +60,28 @@ The native workflow also renders a 60-frame controlled surface comparison: left 
 Foliage uses instanced scanned twig cards. The proof's hero corridor (road distance 55–230m) receives full branch tiers, with reduced tiers elsewhere. Leaf/verge cards receive scene light but do not cast expensive alpha shadow passes; trunks and solid architecture still cast shadows. This is an explicit performance tradeoff, not photoreal canopy lighting. The regression budget caps the default hero rally foliage below 50,000 instances (previous experimental layout was 83,160).
 
 `docs/yunex-v5-preserved-baseline.json` stores SHA256 values taken from the actual main starting commit for every original world-kit, modelling-kit and parts-kit file. Its test reads current bytes, so even uncommitted accidental edits fail. New files may be added separately; the approved source must not be silently rewritten. A separate rough-road regression raycasts the rendered triangle mesh beneath each wheel over the proof timeline, requiring tyre-radius contact within 2mm at tested frames. This is a geometric check, not physical validation or all-frame aesthetic approval.
+
+## Structured driving cameras and preflight
+
+The preview accepts a separate `camera` object beside `config`. All values below are optional. Defaults preserve the original V5 tracking view. `side` uses the car's road frame, so bends and route rotation do not flip it.
+
+```json
+{
+  "config": {"preset":"city", "quality":"hero", "weather":"wet"},
+  "camera": {"side":"right", "distance":14, "height":2.8, "angle":0.78, "orbit":0.08, "lookHeight":1}
+}
+```
+
+`distance` is 8–40 metres, `height` 1–12m, `angle` 0.2–1.4 radians from the vehicle front, `orbit` 0–0.3 radians, and `lookHeight` 0.3–2.5m. Unknown camera keys fail with a specific diagnostic. This is structured configuration, not natural-language generation.
+
+```sh
+node --experimental-strip-types scripts/studio-v5/studio.mjs create city out/v5/my-city.json
+# Edit config and camera in that JSON, then:
+node --experimental-strip-types scripts/studio-v5/studio.mjs validate my-city out/v5/my-city.json
+node --experimental-strip-types scripts/studio-v5/studio.mjs audit my-city out/v5/my-city.json
+node --experimental-strip-types scripts/studio-v5/studio.mjs render my-city out/v5/my-city.json
+```
+
+`audit` reuses the existing V4 camera-clearance diagnostic on the actual posed V5 vehicle/world at five times across the proof. It returns JSON with blocking object/instance names, sample counts and corrective guidance, and exits nonzero for failed views. Adjust the camera distance, angle, height, side or environment `cameraSafeWidth`, then repeat the audit and inspect an actual moving preview. This diagnostic does not automatically move cameras. Five samples cannot certify every frame; foliage planes are conservatively treated as solid because the CLI does not sample texture alpha. It is not a substitute for visual review.
+
+The create command writes a minimal, round-trip-valid input configuration and refuses to overwrite existing files. Defaults are resolved by the renderer; they are not copied into unknown top-level configuration keys.

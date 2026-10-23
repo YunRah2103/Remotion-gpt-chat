@@ -28,5 +28,13 @@ export function createTerrain(road:Road,preset:string){
  const data=new Uint8Array(128*128*4);for(let i=0;i<128*128;i++){const v=150+hash(i%128,Math.floor(i/128))*90;data[i*4]=data[i*4+1]=data[i*4+2]=v;data[i*4+3]=255;}
  const tex=new T.DataTexture(data,128,128,T.RGBAFormat);tex.wrapS=tex.wrapT=T.RepeatWrapping;tex.colorSpace=T.SRGBColorSpace;tex.generateMipmaps=true;tex.minFilter=T.LinearMipmapLinearFilter;tex.magFilter=T.LinearFilter;tex.anisotropy=4;tex.needsUpdate=true;
  const mat=new T.MeshStandardMaterial({vertexColors:true,map:tex,bumpMap:tex,bumpScale:.07,roughness:1,side:T.DoubleSide});
- const mesh=new T.Mesh(geo,mat);mesh.name='v5-continuous-heightfield';mesh.receiveShadow=true;return {mesh,...context};
+ const mesh=new T.Mesh(geo,mat);mesh.name='v5-continuous-heightfield';mesh.receiveShadow=true;
+ // Place scenery on the actual triangulated heightfield, not a higher-frequency analytic approximation.
+ const vertex=geo.getAttribute('position');
+ function visibleHeight(x:number,z:number){
+  const fx=T.MathUtils.clamp((x-minX)/(maxX-minX)*nx,0,nx),fz=T.MathUtils.clamp((z-minZ)/(maxZ-minZ)*nz,0,nz),i=Math.min(nx-1,Math.floor(fx)),j=Math.min(nz-1,Math.floor(fz)),u=fx-i,v=fz-j,a=i*(nz+1)+j;
+  const y00=vertex.getY(a),y01=vertex.getY(a+1),y10=vertex.getY(a+nz+1),y11=vertex.getY(a+nz+2);
+  return u+v<=1?y00+(y10-y00)*u+(y01-y00)*v:y11+(y01-y11)*(1-u)+(y10-y11)*(1-v);
+ }
+ return {mesh,...context,height:visibleHeight};
 }
