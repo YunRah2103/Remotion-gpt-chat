@@ -1,0 +1,46 @@
+name: YUNEX V5 road-led studio native QA
+on:
+  push:
+    branches: [feat/yunex-v5-environment-studio]
+  pull_request:
+    paths: ['src/yunex/studio-v5/**', 'tests/studio-v5/**', 'scripts/studio-v5/**', '.github/workflows/yunex-v5-studio.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '24', cache: npm}
+      - run: npm ci --no-audit --no-fund
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - run: npm run check
+      - run: node --experimental-strip-types --test tests/studio-v5/*.test.mjs tests/modelling-kit/*.test.mjs tests/world-kit/*.test.mjs tests/parts-kit/*.test.mjs
+      - run: python3 -m unittest discover -s tests/modelling-kit -p 'test_*.py'
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        preset: [mountain, circuit, city, rally]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '24', cache: npm}
+      - run: npm ci --no-audit --no-fund
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - run: npx remotion render src/yunex/studio-v5/Film.tsx V5-${{ matrix.preset }} out/v5/${{ matrix.preset }}.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --color-space=bt709 --crf=18 --concurrency=2
+      - name: Verify native master
+        run: |
+          ffmpeg -v error -xerror -i out/v5/${{ matrix.preset }}.mp4 -f null -
+          ffprobe -v error -count_frames -show_entries stream=width,height,avg_frame_rate,nb_read_frames -of json out/v5/${{ matrix.preset }}.mp4 > out/v5/probe.json
+          python3 -c 'import json; s=json.load(open("out/v5/probe.json"))["streams"][0]; assert (s["width"],s["height"],s["avg_frame_rate"],s["nb_read_frames"])==(1080,1920,"30/1","240")'
+          sha256sum out/v5/*.mp4 > out/v5/sha256.txt
+          git rev-parse HEAD > out/v5/source-sha.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-V5-${{ matrix.preset }}-native
+          path: out/v5/
