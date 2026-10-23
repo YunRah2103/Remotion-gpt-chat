@@ -4,7 +4,7 @@ This is an honest intermediate review, **not flagship visual approval**. All fou
 
 ## Frozen native evidence
 
-Source commit `78ee77cf081e12a1e477087a0b6472d990267200`, tree `1889e28b959e931512fca039d3b2e3e63175592a`.
+PR head `78ee77cf081e12a1e477087a0b6472d990267200`; actual Actions merge checkout `76c97bf5c1011646e217648c0809c70c05d69700`. Both have tree `1889e28b959e931512fca039d3b2e3e63175592a`.
 
 [Native GitHub Actions run](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/40004862150): regression and all four movie jobs succeeded. This exact revision passed 280 Node tests, 9 Python tests and TypeScript. The preserved-baseline test hashes the actual bytes of all 104 original kit source files; catalogue regression covers the original 36 vehicles and 20 environments.
 
@@ -39,3 +39,5 @@ Local shoulder refinement adds a granular, varying verge cross-section and terra
 ![Intermediate rally verge and foliage comparison](rally-refinement-ab.jpg)
 
 Unfinished owner requirements include materially better class-distinct performance/rally geometry, exceptional flagship scenery, robust obstruction-aware cinematography, broader high-level shot authoring, and completed before/after moving visual approval. Formula is optional after the first three upgraded vehicle classes; those prerequisites are not yet met.
+
+The subsequent agent-camera checkpoint passed all **289 local Node regression tests**, the nine Python tests and TypeScript. All five committed example JSON files passed the actual CLI validator. Review caught and fixed the CLI create/validate round-trip failure, invalid road inputs passing validation, and nonboolean preview flags. Structured camera defaults are tested against the previous tracking trajectory. The terrain placement callback now interpolates the actual visible grid triangles; raycasts verify it between vertices. These are technical findings, not an upgrade of the visual acceptance decision above.

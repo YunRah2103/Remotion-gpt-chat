@@ -1,5 +1,5 @@
 {
-  "source_commit": "78ee77cf081e12a1e477087a0b6472d990267200",
+  "source_commit": "76c97bf5c1011646e217648c0809c70c05d69700",
   "source_tree": "1889e28b959e931512fca039d3b2e3e63175592a",
   "workflow_run": 40004862150,
   "independent_full_decode": "passed all four with ffmpeg",
@@ -52,5 +52,7 @@
       "Rally: real movement and gravel contact; distant foliage LOD sparse and silhouettes repetitive."
     ],
     "scope": "Controlled A/B isolates scanned surfaces only, not an entire legacy-versus-V5 overhaul."
-  }
+  },
+  "pull_request_head": "78ee77cf081e12a1e477087a0b6472d990267200",
+  "source_commit_note": "Actions rendered its synthetic PR merge checkout; its tree equals the PR head tree."
 }

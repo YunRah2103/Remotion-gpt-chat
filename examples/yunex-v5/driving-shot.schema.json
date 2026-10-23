@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "YUNEX V5 driving preview props",
+  "description": "Structured authoring input. Runtime validation additionally checks route length, duplicate points and finite values. No natural-language parser.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "config"
+  ],
+  "properties": {
+    "config": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "preset"
+      ],
+      "properties": {
+        "preset": {
+          "enum": [
+            "mountain",
+            "circuit",
+            "city",
+            "rally"
+          ]
+        },
+        "road": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "width": {
+              "type": "number",
+              "minimum": 3,
+              "maximum": 30
+            },
+            "bank": {
+              "type": "number",
+              "minimum": -0.15,
+              "maximum": 0.15
+            },
+            "roughness": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 0.08
+            },
+            "points": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "timeOfDay": {
+          "enum": [
+            "day",
+            "dusk",
+            "night"
+          ]
+        },
+        "weather": {
+          "enum": [
+            "clear",
+            "wet"
+          ]
+        },
+        "surface": {
+          "enum": [
+            "asphalt",
+            "gravel"
+          ]
+        },
+        "quality": {
+          "enum": [
+            "preview",
+            "hero"
+          ]
+        },
+        "vegetation": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "seed": {
+          "type": "integer"
+        },
+        "scenery": {
+          "type": "boolean"
+        },
+        "cameraSafeWidth": {
+          "type": "number",
+          "minimum": 8,
+          "maximum": 40
+        }
+      }
+    },
+    "camera": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "side": {
+          "enum": [
+            "left",
+            "right"
+          ]
+        },
+        "distance": {
+          "type": "number",
+          "minimum": 8,
+          "maximum": 40
+        },
+        "height": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "angle": {
+          "type": "number",
+          "minimum": 0.2,
+          "maximum": 1.4
+        },
+        "orbit": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.3
+        },
+        "lookHeight": {
+          "type": "number",
+          "minimum": 0.3,
+          "maximum": 2.5
+        }
+      }
+    },
+    "baseline": {
+      "type": "boolean"
+    },
+    "scanned": {
+      "type": "boolean"
+    }
+  }
+}
