@@ -1,0 +1,16 @@
+{
+  "title": "2024 Manthey Racing Porsche 911 GT3 RS",
+  "generation": "992",
+  "creator": "HYPR:IMPS 3D",
+  "originalURL": "https://sketchfab.com/3d-models/2024-manthey-racing-porsche-911-gt3-rs-09ccead93fb34944bde812d4b4684eff",
+  "listedLicense": "CC BY 4.0 (as declared on Sketchfab and in third-party credit manifest)",
+  "commercialRightsStatus": "Uploader CC BY listed; original modelling ownership cannot be independently guaranteed",
+  "distributionRepo": "Priyanshh1407/porsche-react",
+  "sourceCommit": "afc3c19c8a29f28e253e2cee4285bbb4b2c92a1e",
+  "sourcePath": "porsche-react-master/public/2024_manthey_racing_porsche_911_gt3_rs.glb",
+  "sourceGitBlobSHA1": "4642ff67ba3c0570e0d36ee94bbc843b040e5346",
+  "rendersFrom": "public/porsche-manthey/manthey-992.glb",
+  "differenceFromPriorYUNEX": "Entirely different source model and creator. Previous YUNEX white/Python Green Carrera Tribute (Ddiaz/CSR2) is not imported or used.",
+  "preservation": "GLB geometry and textures preserved. Camera, exposure, paint/rubber tune, stage lights are runtime-only.",
+  "status": "EXPERIMENTAL — visual approval needed; do not merge to main or publish without rights review."
+}
