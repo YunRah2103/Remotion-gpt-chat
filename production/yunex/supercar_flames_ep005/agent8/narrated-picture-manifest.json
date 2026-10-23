@@ -1,0 +1,372 @@
+{
+  "schemaVersion": 1,
+  "episode": "YUNEX EP005 — Why Do Supercars Shoot Flames?",
+  "state": "USER_CEDAR_VOICE_25_56S_REQUIRES_767_FRAMES__MEDIA_PICTURE_PENDING",
+  "settings": {
+    "fps": 30,
+    "width": 1080,
+    "height": 1920,
+    "totalFrames": 767,
+    "codec": "libx264",
+    "crf": 18
+  },
+  "voice": {
+    "approved": false,
+    "userProvidedOriginal": true,
+    "sourceName": "openai-fm-cedar-audio.mp3",
+    "path": "out/ep005-agent8-sources/user-cedar/openai-fm-cedar-audio.mp3",
+    "sha256": "90dd2e299b1cdd9b7f2d3bc508b064c43dda7bfc36caa345b2f502ec13c200d8",
+    "sourceCommit": null,
+    "approvalRef": null,
+    "verifiedDurationSeconds": 25.56,
+    "artifactRunId": null,
+    "artifactName": null,
+    "captionsVerified": false,
+    "verificationNote": "User supplied actual original Cedar MP3 in chat, bytes are not present in GitHub Actions workspace yet; no VO stream should be claimed in unrendered film."
+  },
+  "captions": [],
+  "beats": [
+    {
+      "id": "hook",
+      "start": 0,
+      "end": 45,
+      "role": "integrated",
+      "visual": "Already-rendered V4 exhaust-attached moving opening; aesthetic rework requested for true WOW first second.",
+      "title": null,
+      "media": {
+        "approved": false,
+        "reviewStatus": "TECHNICALLY_DECODED_PICTURE_REVISIONS_REQUIRED",
+        "path": "out/ep005-agent8-sources/hook/opening-45f.mp4",
+        "artifactExtractDir": "out/ep005-agent8-sources/hook",
+        "sha256": "9388010364f05d3dfbe7a88013231c2264c02277248d8c2eb20f4843888b55e2",
+        "sourceCommit": "de7d847ea1dc626744a0cee9b521b24782ce81be",
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": 39886214728,
+        "artifactName": "EP005-Agent7-V4-opening-45f-REVIEW-ONLY",
+        "assetProvenance": "Original YUNEX EP005 V4 computer-rendered footage; source de7d847ea1dc626744a0cee9b521b24782ce81be",
+        "producerIssue": 266,
+        "approvedHeroSourceCommit": "9052a539e10a7cb97487c1435455bb9962ad58e1",
+        "approvedHeroReferenceProject": "v4-a-supercar",
+        "agent6Commit": "26980fe1f509484bb612cd47ffcbf7c53f26fddf",
+        "agent7Commit": "de7d847ea1dc626744a0cee9b521b24782ce81be",
+        "portManifestSha256": "5f756ab40a6b2219a50485c94cf7592d73469478e7ddf49fd3644ca84624672d",
+        "portManifestVersion": "v4-exhaust-ports@1",
+        "portManifestRef": "https://github.com/YunRah2103/Remotion-gpt-chat/blob/26980fe1f509484bb612cd47ffcbf7c53f26fddf/src/yunex/ep005/agent6/v4-exhaust-ports.json"
+      }
+    },
+    {
+      "id": "drive",
+      "start": 45,
+      "end": 165,
+      "role": "vehicle",
+      "visual": "Front moving car; cinematic reframe requested (too much empty sky).",
+      "title": null,
+      "media": {
+        "approved": false,
+        "reviewStatus": "TECHNICALLY_DECODED_PICTURE_REVISIONS_REQUIRED",
+        "path": "out/ep005-agent8-sources/front/native/front-pursuit.mp4",
+        "artifactExtractDir": "out/ep005-agent8-sources/front",
+        "sha256": "279d51b96b536d7cf1a963c29930e25fdf9bafae35de1433950e520c00ddbf39",
+        "sourceCommit": "8ad08a173e9795fafc813edacb0df721396a6e4c",
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": 39884937145,
+        "artifactName": "EP005-Agent6-APPROVED-V4-front-pursuit",
+        "assetProvenance": "Original YUNEX EP005 V4 computer-rendered footage; source 8ad08a173e9795fafc813edacb0df721396a6e4c",
+        "producerIssue": 265,
+        "approvedHeroSourceCommit": "9052a539e10a7cb97487c1435455bb9962ad58e1",
+        "approvedHeroReferenceProject": "v4-a-supercar"
+      }
+    },
+    {
+      "id": "engine",
+      "start": 165,
+      "end": 240,
+      "role": "science",
+      "visual": "Mechanical science part 1: cylinder ignition and residual fuel. Current CAD framing/crop needs review.",
+      "title": null,
+      "media": {
+        "approved": false,
+        "reviewStatus": "TECHNICALLY_DECODED_PICTURE_REVISIONS_REQUIRED",
+        "path": "out/ep005-agent8-sources/science/science.mp4",
+        "artifactExtractDir": "out/ep005-agent8-sources/science",
+        "sha256": "a3598efcd9ff000cb2fd4c4837870d4abbb4d9f84d5c074077b7c291852a778c",
+        "sourceCommit": "949f26028a26c8ea32a3ed9d6f83bb2cf897e3cb",
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": 39885531109,
+        "artifactName": "ep005-agent7-unapproved-motion-proofs",
+        "assetProvenance": "Original YUNEX EP005 V4 computer-rendered footage; source 949f26028a26c8ea32a3ed9d6f83bb2cf897e3cb",
+        "producerIssue": 266,
+        "approvedHeroSourceCommit": null,
+        "approvedHeroReferenceProject": null
+      }
+    },
+    {
+      "id": "side",
+      "start": 240,
+      "end": 360,
+      "role": "vehicle",
+      "visual": "Moving side profile; camera reframe needed as car clips at last frames.",
+      "title": null,
+      "media": {
+        "approved": false,
+        "reviewStatus": "TECHNICALLY_DECODED_PICTURE_REVISIONS_REQUIRED",
+        "path": "out/ep005-agent8-sources/side/native/side-tracking.mp4",
+        "artifactExtractDir": "out/ep005-agent8-sources/side",
+        "sha256": "40bd840d8c74507d108d5be5c0cdace26a65e2259f859215a8e12fa3f77efde2",
+        "sourceCommit": "8ad08a173e9795fafc813edacb0df721396a6e4c",
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": 39884937145,
+        "artifactName": "EP005-Agent6-APPROVED-V4-side-tracking",
+        "assetProvenance": "Original YUNEX EP005 V4 computer-rendered footage; source 8ad08a173e9795fafc813edacb0df721396a6e4c",
+        "producerIssue": 265,
+        "approvedHeroSourceCommit": "9052a539e10a7cb97487c1435455bb9962ad58e1",
+        "approvedHeroReferenceProject": "v4-a-supercar"
+      }
+    },
+    {
+      "id": "flow",
+      "start": 360,
+      "end": 435,
+      "role": "science",
+      "visual": "Mechanical science part 2: exhaust pipes and brief afterfire under specific conditions; no universal claims.",
+      "title": null,
+      "media": {
+        "approved": false,
+        "reviewStatus": "TECHNICALLY_DECODED_PICTURE_REVISIONS_REQUIRED",
+        "path": "out/ep005-agent8-sources/science/science.mp4",
+        "artifactExtractDir": "out/ep005-agent8-sources/science",
+        "sha256": "a3598efcd9ff000cb2fd4c4837870d4abbb4d9f84d5c074077b7c291852a778c",
+        "sourceCommit": "949f26028a26c8ea32a3ed9d6f83bb2cf897e3cb",
+        "approvalRef": null,
+        "sourceInFrame": 75,
+        "artifactRunId": 39885531109,
+        "artifactName": "ep005-agent7-unapproved-motion-proofs",
+        "assetProvenance": "Original YUNEX EP005 V4 computer-rendered footage; source 949f26028a26c8ea32a3ed9d6f83bb2cf897e3cb",
+        "producerIssue": 266,
+        "approvedHeroSourceCommit": null,
+        "approvedHeroReferenceProject": null
+      }
+    },
+    {
+      "id": "rear-chase",
+      "start": 435,
+      "end": 555,
+      "role": "vehicle",
+      "visual": "V4 rear moving chase; true 4s MP4 verified, camera/road premium polish required.",
+      "title": null,
+      "media": {
+        "approved": false,
+        "reviewStatus": "TECHNICALLY_DECODED_PICTURE_REVISIONS_REQUIRED",
+        "path": "out/ep005-agent8-sources/rear-chase/native/rear-chase.mp4",
+        "artifactExtractDir": "out/ep005-agent8-sources/rear-chase",
+        "sha256": "6558f96ae6ba2a0ebc3b0d5b87620f2b2219a38f90dfbfda566b5c0c88d7e9f9",
+        "sourceCommit": "8ad08a173e9795fafc813edacb0df721396a6e4c",
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": 39884937145,
+        "artifactName": "EP005-Agent6-APPROVED-V4-rear-chase",
+        "assetProvenance": "Original YUNEX EP005 V4 computer-rendered footage; source 8ad08a173e9795fafc813edacb0df721396a6e4c",
+        "producerIssue": 265,
+        "approvedHeroSourceCommit": "9052a539e10a7cb97487c1435455bb9962ad58e1",
+        "approvedHeroReferenceProject": "v4-a-supercar"
+      }
+    },
+    {
+      "id": "rear-proof",
+      "start": 555,
+      "end": 675,
+      "role": "vehicle",
+      "visual": "Rear three-quarter cinematic V4 flame-base shot required, still native job pending.",
+      "title": null,
+      "media": {
+        "approved": false,
+        "reviewStatus": "MISSING_PRODUCER_MP4",
+        "path": null,
+        "artifactExtractDir": "out/ep005-agent8-sources/rear-proof",
+        "sha256": null,
+        "sourceCommit": null,
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": null,
+        "artifactName": null,
+        "assetProvenance": null,
+        "producerIssue": 265,
+        "approvedHeroSourceCommit": "9052a539e10a7cb97487c1435455bb9962ad58e1",
+        "approvedHeroReferenceProject": "v4-a-supercar"
+      }
+    },
+    {
+      "id": "payoff",
+      "start": 675,
+      "end": 767,
+      "role": "integrated",
+      "visual": "Need genuinely 92 frame visible driving V4-attached flame finale (currently actual proof 75 frames: missing 17 distinct moving frames). Original Cedar closes at f763.",
+      "title": null,
+      "media": {
+        "approved": false,
+        "reviewStatus": "REQUIRES_92F_NEW_PRODUCER_SHOT__CURRENT_75F_TECHNICAL_PROOF_NOT_LONG_ENOUGH",
+        "path": "out/ep005-agent8-sources/finale/finale-75f.mp4",
+        "artifactExtractDir": "out/ep005-agent8-sources/finale",
+        "sha256": "ba89e51e8f68ffed8d44baa518139d962b91c2a0a2381aeb49d36506f467a3fe",
+        "sourceCommit": "de7d847ea1dc626744a0cee9b521b24782ce81be",
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": 39886214728,
+        "artifactName": "EP005-Agent7-V4-finale-75f-REVIEW-ONLY",
+        "assetProvenance": "Original YUNEX EP005 V4 computer-rendered footage; source de7d847ea1dc626744a0cee9b521b24782ce81be",
+        "producerIssue": 266,
+        "approvedHeroSourceCommit": "9052a539e10a7cb97487c1435455bb9962ad58e1",
+        "approvedHeroReferenceProject": "v4-a-supercar",
+        "agent6Commit": "26980fe1f509484bb612cd47ffcbf7c53f26fddf",
+        "agent7Commit": "de7d847ea1dc626744a0cee9b521b24782ce81be",
+        "portManifestSha256": "5f756ab40a6b2219a50485c94cf7592d73469478e7ddf49fd3644ca84624672d",
+        "portManifestVersion": "v4-exhaust-ports@1",
+        "portManifestRef": "https://github.com/YunRah2103/Remotion-gpt-chat/blob/26980fe1f509484bb612cd47ffcbf7c53f26fddf/src/yunex/ep005/agent6/v4-exhaust-ports.json"
+      }
+    }
+  ],
+  "optionalAudioBeds": [],
+  "rejectedMedia": {
+    "candidateA": "Agent 6 Spectral GT RS candidate A rejected after native picture inspection; do not promote its footage or original exhaust-ports.v1.json.",
+    "oldProduction": "Legacy EP005 A1-A5 PRs #260-264 rejected; no fallback.",
+    "candidateB": "Agent 6 Khronos CarConcept candidate B is superseded by explicit V4 owner choice; do not use CarConcept in EP005."
+  },
+  "approvedHero": {
+    "appearanceApproved": true,
+    "approvalScope": "CAR_APPEARANCE_ONLY__NOT_FULL_FILM_OR_MOVING_SHOTS",
+    "referenceProject": "v4-a-supercar",
+    "sourceCommit": "9052a539e10a7cb97487c1435455bb9962ad58e1",
+    "referenceRecipe": "src/yunex/studio-projects/v4-a-supercar/recipe.json",
+    "recipeSource": "Generated editable-project in YUNEX-V4-supercar workflow artifact; not tracked in Git tree",
+    "vehicle": {
+      "variant": "supercar",
+      "bodyDetail": "studio",
+      "color": "#18636b"
+    },
+    "sourceVideo": {
+      "runId": 39866437063,
+      "artifactId": 12465297894,
+      "sha256": "1654a5efd3a3403871b0a52a3140a9e7aeb1222a2e4bd4242e6edaa8d879cd88",
+      "frames": 420,
+      "fps": 30,
+      "width": 1080,
+      "height": 1920
+    },
+    "approvalRef": "https://github.com/YunRah2103/Remotion-gpt-chat/issues/267#issuecomment-6355060737",
+    "excludedSources": [
+      "rejected Spectral candidate A",
+      "unrendered CarConcept candidate B",
+      "old EP005 A1-A5"
+    ],
+    "drivingSourceApproval": "PENDING",
+    "flameAndPortApproval": "PENDING"
+  },
+  "pictureReview": {
+    "approvalScope": "NONE_OF_THE_CANDIDATES_APPROVED_FOR_FILM",
+    "notAnApprovedFilm": true,
+    "qaDate": "2026-10-23",
+    "strategy": "Replanned 767f for original 25.56s Cedar, original speech duration/rate preserved, no reused/frozen or cropped source; 120f missing rear drive + 17f additional integrated V4 flame payoff",
+    "verifiedFrameCoverage": 630,
+    "missingFrameCount": 137,
+    "note": "Technical evidence only; 630 candidate frames available, 120-frame rear-proof missing, and most existing clips need camera/art corrections; source proof QA is not picture approval.",
+    "approvedVoiceNowUserProvided": true,
+    "targetFrames": 767
+  },
+  "pendingCaptionTiming": [
+    {
+      "start": 0,
+      "end": 80,
+      "text": "Why does this supercar suddenly shoot fire?",
+      "verified": false,
+      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
+    },
+    {
+      "start": 96,
+      "end": 126,
+      "text": "It's not a flamethrower.",
+      "verified": false,
+      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
+    },
+    {
+      "start": 138,
+      "end": 189,
+      "text": "Something even crazier is happening.",
+      "verified": false,
+      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
+    },
+    {
+      "start": 212,
+      "end": 249,
+      "text": "In some performance cars,",
+      "verified": false,
+      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
+    },
+    {
+      "start": 260,
+      "end": 313,
+      "text": "a little fuel can escape the engine",
+      "verified": false,
+      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
+    },
+    {
+      "start": 322,
+      "end": 352,
+      "text": "without fully burning.",
+      "verified": false,
+      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
+    },
+    {
+      "start": 374,
+      "end": 462,
+      "text": "When it mixes with oxygen inside the scorching hot exhaust,",
+      "verified": false,
+      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
+    },
+    {
+      "start": 474,
+      "end": 492,
+      "text": "it can ignite.",
+      "verified": false,
+      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
+    },
+    {
+      "start": 517,
+      "end": 574,
+      "text": "That sudden combustion sends flames",
+      "verified": false,
+      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
+    },
+    {
+      "start": 580,
+      "end": 616,
+      "text": "shooting out of the tailpipe.",
+      "verified": false,
+      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
+    },
+    {
+      "start": 635,
+      "end": 668,
+      "text": "It's called afterfire.",
+      "verified": false,
+      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
+    },
+    {
+      "start": 683,
+      "end": 700,
+      "text": "And at night,",
+      "verified": false,
+      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
+    },
+    {
+      "start": 712,
+      "end": 763,
+      "text": "it looks absolutely insane.",
+      "verified": false,
+      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
+    }
+  ]
+}
