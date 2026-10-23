@@ -3,6 +3,7 @@ on:
   push:
     branches: [agent/ep005-06-hero-car-proof-cc0]
     paths:
+      - 'tsconfig.json'
       - 'src/yunex/ep005/agent6/v4-*'
       - 'scripts/ep005-agent6/v4-*'
       - '.github/workflows/ep005-agent6-v4-driving.yml'
