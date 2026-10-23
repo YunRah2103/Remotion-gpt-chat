@@ -47,7 +47,10 @@ jobs:
           ffprobe -v error -count_frames -show_entries stream=width,height,avg_frame_rate,nb_read_frames -of json out/v5/${{ matrix.preset }}.mp4 > out/v5/probe.json
           python3 -c 'import json; s=json.load(open("out/v5/probe.json"))["streams"][0]; assert (s["width"],s["height"],s["avg_frame_rate"],s["nb_read_frames"])==(1080,1920,"30/1","240")'
           sha256sum out/v5/*.mp4 > out/v5/sha256.txt
+          ffmpeg -v error -i out/v5/${{ matrix.preset }}.mp4 -f framemd5 out/v5/frame-hashes.txt
+          python3 -c 'from pathlib import Path; h=[s.rsplit(",",1)[-1].strip() for s in Path("out/v5/frame-hashes.txt").read_text().splitlines() if s and not s.startswith("#")]; assert len(h)==240 and len(set(h))>=230, "Frozen/duplicate native frames"'
           git rev-parse HEAD > out/v5/source-sha.txt
+          git rev-parse 'HEAD^{tree}' > out/v5/source-tree.txt
       - uses: actions/upload-artifact@v4
         with:
           name: YUNEX-V5-${{ matrix.preset }}-native

@@ -31,7 +31,7 @@ function roadMaterial(gravel:boolean,wet:boolean){
  const texture=new T.DataTexture(data,n,n,T.RGBAFormat);texture.colorSpace=T.SRGBColorSpace;texture.wrapS=texture.wrapT=T.RepeatWrapping;texture.repeat.set(.65,.65);texture.generateMipmaps=true;texture.minFilter=T.LinearMipmapLinearFilter;texture.needsUpdate=true;
  return new T.MeshStandardMaterial({map:texture,bumpMap:texture,bumpScale:gravel?.024:.004,roughness:wet?.29:.91,metalness:wet?.10:.015,color:wet?'#8394a2':'#ffffff'});
 }
-function addRibbon(g:T.Group,road:Road,a:number,b:number,mat:T.Material,name:string,lift=0){const m=new T.Mesh(roadGeometry(road,a,b,600,lift),mat);m.name=name;m.receiveShadow=true;g.add(m);return m;}
+function addRibbon(g:T.Group,road:Road,a:number,b:number,mat:T.Material,name:string,lift=0){const m=new T.Mesh(roadGeometry(road,a,b,undefined,lift),mat);m.name=name;m.receiveShadow=true;g.add(m);return m;}
 export function createStudioEnvironment(input:StudioConfig){
  const config=resolveConfig(input),road=createRoad(config.road),group=new T.Group();group.name='v5-'+config.preset;
  const asphalt=roadMaterial(config.surface==='gravel',config.weather==='wet'),shoulder=new T.MeshStandardMaterial({color:config.surface==='gravel'?'#80715b':'#666258',roughness:.98,side:T.DoubleSide});

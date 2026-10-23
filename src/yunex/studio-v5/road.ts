@@ -23,7 +23,7 @@ export function sampleRoad(road:Road,distance:number,offset=0){
  const quaternion=new T.Quaternion().setFromRotationMatrix(new T.Matrix4().makeBasis(forward,normal,left));
  return {position,forward,left,normal,quaternion,yaw:Math.atan2(-forward.z,forward.x)};
 }
-export function roadGeometry(road:Road,a:number,b:number,segments=600,lift=0){
+export function roadGeometry(road:Road,a:number,b:number,segments=(road.roughness>0?Math.min(10000,Math.max(600,Math.ceil(road.length/.15))):600),lift=0){
  if(!Number.isInteger(segments)||segments<2||segments>10000)throw Error('Road segments must be 2..10000');
  const positions:number[]=[],uv:number[]=[],indices:number[]=[];
  for(let i=0;i<=segments;i++)for(const offset of [a,b]){
