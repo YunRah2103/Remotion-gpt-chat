@@ -1,0 +1,5 @@
+import React,{useMemo} from 'react';import * as T from 'three';
+export const StudioSky:React.FC<{time:'day'|'dusk'|'night'}>=({time})=>{
+ const uniforms=useMemo(()=>({top:{value:new T.Color(time==='night'?'#071320':time==='dusk'?'#667f9a':'#6590b0')},horizon:{value:new T.Color(time==='night'?'#253b50':time==='dusk'?'#d9b49a':'#b5cad3')},sun:{value:new T.Vector3(-.6,.16,-.7).normalize()},strength:{value:time==='night'?0:time==='dusk'?1.8:.6}}),[time]);
+ return <mesh><sphereGeometry args={[1100,32,24]}/><shaderMaterial side={T.BackSide} depthWrite={false} uniforms={uniforms} vertexShader={'varying vec3 ray;void main(){ray=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}'} fragmentShader={'varying vec3 ray;uniform vec3 top;uniform vec3 horizon;uniform vec3 sun;uniform float strength;void main(){vec3 d=normalize(ray);float h=pow(max(0.,d.y),.55);vec3 c=mix(horizon,top,clamp(h*1.3,0.,1.));float s=max(0.,dot(d,sun));c+=vec3(1.,.69,.36)*strength*(pow(s,420.)*.65+pow(s,18.)*.13);gl_FragColor=vec4(c,1.);}'}/></mesh>;
+};

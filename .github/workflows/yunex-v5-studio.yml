@@ -1,12 +1,13 @@
 name: YUNEX V5 road-led studio native QA
 on:
-  push:
-    branches: [feat/yunex-v5-environment-studio]
   pull_request:
     paths: ['src/yunex/studio-v5/**', 'tests/studio-v5/**', 'scripts/studio-v5/**', '.github/workflows/yunex-v5-studio.yml']
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: yunex-v5-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
 jobs:
   regression:
     runs-on: ubuntu-latest
@@ -20,6 +21,7 @@ jobs:
       - run: node --experimental-strip-types --test tests/studio-v5/*.test.mjs tests/modelling-kit/*.test.mjs tests/world-kit/*.test.mjs tests/parts-kit/*.test.mjs
       - run: python3 -m unittest discover -s tests/modelling-kit -p 'test_*.py'
   render:
+    needs: regression
     runs-on: ubuntu-latest
     timeout-minutes: 90
     strategy:

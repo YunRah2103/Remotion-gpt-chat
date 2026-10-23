@@ -1,6 +1,7 @@
 import * as T from 'three';
 import {createRoad,sampleRoad,roadGeometry} from './road.ts';
 import type {Point,Road} from './road.ts';
+import {createTerrain} from './terrain.ts';
 import {batchScenery} from './batch.ts';
 import {addNature,addArchitecture} from './scenery.ts';
 export const PRESETS={
@@ -31,26 +32,6 @@ function roadMaterial(gravel:boolean,wet:boolean){
  return new T.MeshStandardMaterial({map:texture,bumpMap:texture,bumpScale:gravel?.024:.004,roughness:wet?.29:.91,metalness:wet?.10:.015,color:wet?'#8394a2':'#ffffff'});
 }
 function addRibbon(g:T.Group,road:Road,a:number,b:number,mat:T.Material,name:string,lift=0){const m=new T.Mesh(roadGeometry(road,a,b,600,lift),mat);m.name=name;m.receiveShadow=true;g.add(m);return m;}
-function terrain(g:T.Group,road:Road,preset:Preset){
- const forest=preset==='rally',mountain=preset==='mountain',rows=180,columns=70;
- for(const side of [-1,1]){
- const pos:number[]=[],colors:number[]=[],indices:number[]=[];
- for(let i=0;i<=rows;i++)for(let j=0;j<=columns;j++){
-  const d=road.length*i/rows,offset=side*(road.width/2+1.1+j/columns*(mountain?210:85)),s=sampleRoad(road,d,offset),x=s.position.x,z=s.position.z;
-  const fade=Math.min(1,j/8),noise=Math.sin(x*.037+Math.sin(z*.026)*2)*Math.cos(z*.044)+.35*Math.sin(x*.11+z*.09);
-  s.position.y+=fade*(mountain?(side===1?Math.pow(j/columns,.85)*55+noise*5:-Math.pow(j/columns,.75)*20+noise*3):forest?noise*1.8:noise*.18)-.05;
-  pos.push(...s.position.toArray());const rock=mountain&&side===1&&j>5;const c=new T.Color(rock?'#7b7770':forest?'#454b2e':mountain?'#666c46':'#343b3e');c.multiplyScalar(.84+noise*.08);colors.push(c.r,c.g,c.b);
- }
- for(let i=0;i<rows;i++)for(let j=0;j<columns;j++){const a=i*(columns+1)+j,b=a+columns+1;indices.push(a,b,a+1,b,b+1,a+1);}
- const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(pos,3));geo.setAttribute('color',new T.Float32BufferAttribute(colors,3));geo.setIndex(indices);geo.computeVertexNormals();
- const mat=new T.MeshStandardMaterial({vertexColors:true,roughness:1,side:T.DoubleSide});const mesh=new T.Mesh(geo,mat);mesh.name='v5-continuous-terrain';mesh.receiveShadow=true;g.add(mesh);
- }
- if(mountain){
- for(let layer=0;layer<4;layer++){
- const pos:number[]=[],idx:number[]=[];for(let i=0;i<=100;i++){const x=-450+i*12,z=-300-layer*140,h=20+layer*15+Math.sin(i*.19+layer*1.7)*18+Math.sin(i*.57+layer)*8;pos.push(x,-80,z,x,h,z);if(i<100){const a=i*2;idx.push(a,a+1,a+2,a+1,a+3,a+2);}}
- const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(pos,3));geo.setIndex(idx);geo.computeVertexNormals();const m=new T.Mesh(geo,new T.MeshStandardMaterial({color:['#626c70','#7b8285','#90979a','#a6abad'][layer],roughness:1,side:T.DoubleSide}));m.name='v5-distant-ridge';g.add(m);
- }}
-}
 export function createStudioEnvironment(input:StudioConfig){
  const config=resolveConfig(input),road=createRoad(config.road),group=new T.Group();group.name='v5-'+config.preset;
  const asphalt=roadMaterial(config.surface==='gravel',config.weather==='wet'),shoulder=new T.MeshStandardMaterial({color:config.surface==='gravel'?'#80715b':'#666258',roughness:.98,side:T.DoubleSide});
@@ -63,9 +44,9 @@ export function createStudioEnvironment(input:StudioConfig){
  const q=new T.Mesh(new T.PlaneGeometry(4,.105),line);const s=sampleRoad(road,d);q.position.copy(s.position).addScaledVector(s.normal,.009);q.quaternion.copy(s.quaternion).multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),-Math.PI/2));q.name='v5-centre-dash';group.add(q);
  }
  }
- terrain(group,road,config.preset);
+ const landscape=createTerrain(road,config.preset);group.add(landscape.mesh);
  const scenery=new T.Group();scenery.name='v5-scenery';group.add(scenery);
- if(config.scenery){addNature(scenery,road,config);addArchitecture(scenery,road,config);batchScenery(scenery);}
+ if(config.scenery){addNature(scenery,road,config,landscape.height);addArchitecture(scenery,road,config);batchScenery(scenery);}
  group.userData.config=config;group.userData.accuracy='Deterministic cinematic route; not calibrated driving simulation';
  return {group,road,config};
 }

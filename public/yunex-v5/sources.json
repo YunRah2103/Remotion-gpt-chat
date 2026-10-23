@@ -1,0 +1,68 @@
+[
+  {
+    "file": "forest-diff.jpg",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/forrest_ground_01/forrest_ground_01_diff_1k.jpg",
+    "source": "https://polyhaven.com/a/forrest_ground_01",
+    "license": "CC0-1.0",
+    "sha256": "3dd6875cb3908e022a3c45ebbffa5e84c670ff2691fbbb6dc9ea4bff88523800",
+    "bytes": 833711
+  },
+  {
+    "file": "forest-normal.jpg",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/forrest_ground_01/forrest_ground_01_nor_gl_1k.jpg",
+    "source": "https://polyhaven.com/a/forrest_ground_01",
+    "license": "CC0-1.0",
+    "sha256": "32528a7cdee962cc0b248ee4023a74d0df175737ea90e1eb425122351e0bdab4",
+    "bytes": 1428763
+  },
+  {
+    "file": "asphalt-diff.jpg",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/aerial_asphalt_01/aerial_asphalt_01_diff_1k.jpg",
+    "source": "https://polyhaven.com/a/aerial_asphalt_01",
+    "license": "CC0-1.0",
+    "sha256": "28bfd71288b364f825e0feb750e487410422d80bf3c31d32da01cae3bf085b58",
+    "bytes": 635143
+  },
+  {
+    "file": "asphalt-normal.jpg",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/aerial_asphalt_01/aerial_asphalt_01_nor_gl_1k.jpg",
+    "source": "https://polyhaven.com/a/aerial_asphalt_01",
+    "license": "CC0-1.0",
+    "sha256": "7a58cb4460f75b66359b8e19bc92585554a79c2b0009e2b9e21eccac0a58d3f6",
+    "bytes": 560227
+  },
+  {
+    "file": "pine-twig.jpg",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/pine_tree_01/pine_tree_01_twig_diff_1k.jpg",
+    "source": "https://polyhaven.com/a/pine_tree_01",
+    "license": "CC0-1.0",
+    "sha256": "e649f0f9bc74d1af5f1a45eaf2fe7a29adaaddfab251f746b983da301e4b80e1",
+    "bytes": 510932
+  },
+  {
+    "file": "pine-alpha.png",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/pine_tree_01/pine_tree_01_twig_alpha_1k.jpg",
+    "source": "https://polyhaven.com/a/pine_tree_01",
+    "license": "CC0-1.0",
+    "sha256": "bee10734c529a874570da6e4091758de5cc7dee17a359eeacd9c67fde1cb0947",
+    "bytes": 195206
+  },
+  {
+    "file": "bark.jpg",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/pine_tree_01/pine_tree_01_bark_diff_1k.jpg",
+    "source": "https://polyhaven.com/a/pine_tree_01",
+    "license": "CC0-1.0",
+    "sha256": "5c76836b01c3536fa0e24207b67bf4f3315b53ebe2b4ecc6f08dfcf3f8d74929",
+    "bytes": 725265
+  },
+  {
+    "file": "pine-branch.png",
+    "derived_from": [
+      "pine-twig.jpg",
+      "pine-alpha.png"
+    ],
+    "operation": "Crop horizontal twig; remove edge-connected opaque atlas padding; combine source alpha.",
+    "license": "CC0-1.0",
+    "sha256": "d2f6bbfff7759afe6ed4b2b958043a0a8910731da848b7819f2b7d973eea9df9"
+  }
+]

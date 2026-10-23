@@ -1,5 +1,5 @@
-import React,{useMemo,useEffect} from 'react';
-import {Composition,registerRoot,useCurrentFrame,useVideoConfig} from 'remotion';
+import React,{useMemo,useEffect,useState} from 'react';
+import {Composition,registerRoot,useCurrentFrame,useVideoConfig,delayRender,continueRender,cancelRender,staticFile} from 'remotion';
 import {ThreeCanvas} from '@remotion/three';
 import * as T from 'three';
 import {createStudioEnvironment} from './environment.ts';
@@ -8,19 +8,23 @@ import {sampleRoad} from './road.ts';
 import {createStudioVehicle,poseStudioVehicle} from './vehicle.ts';
 import {createCinematicVehicle,animateCinematicVehicle} from '../modelling-kit/rig.ts';
 import {CinematicLighting} from '../modelling-kit/Lighting';
+import {applyScannedMaterials} from './assets.ts';
+import {StudioSky} from './Sky';
 import {LocationReflections} from './Reflections';
 import {CameraAim} from '../world-kit/components';
 import {disposeObject} from '../world-kit/geometry.ts';
 import {createCinematicEnvironment} from '../modelling-kit/environments.ts';
 import {sampleRoute} from '../world-kit/environments.ts';
 import type {V3} from '../world-kit/geometry.ts';
-export type FilmProps={config:StudioConfig;baseline?:boolean};
-export const StudioFilm:React.FC<FilmProps>=({config,baseline=false})=>{
+export type FilmProps={config:StudioConfig;baseline?:boolean;scanned?:boolean};
+export const StudioFilm:React.FC<FilmProps>=({config,baseline=false,scanned=true})=>{
  const frame=useCurrentFrame(),{fps,width,height}=useVideoConfig(),t=frame/fps;
  const environment=useMemo(()=>createStudioEnvironment(config),[config]);
  const {road,config:c}=environment;
+ const [assetsReady,setAssetsReady]=useState(false),[assetHandle]=useState(()=>delayRender('Load vendored V5 scanned materials'));
+ useEffect(()=>{if(!scanned){setAssetsReady(true);continueRender(assetHandle);return;}let active=true,dispose:(()=>void)|undefined;applyScannedMaterials(environment.group,staticFile,c.preset).then(clean=>{dispose=clean;if(active){setAssetsReady(true);continueRender(assetHandle);}}).catch(cancelRender);return()=>{active=false;dispose?.();};},[environment,assetHandle,c.preset,scanned]);
  const variant=c.preset==='city'?'coupe':c.preset==='rally'?'rally-hatch':'supercar';
- const car=useMemo(()=>createStudioVehicle(variant),[variant]);
+ const car=useMemo(()=>{const model=createStudioVehicle(variant);if(c.timeOfDay==='night')for(const side of [-1,1]){const target=new T.Object3D();target.position.set(25,.08,side*.65);const light=new T.SpotLight('#dce9fa',160,45,.30,.7,2);light.position.set(variant==='coupe'?2.05:2.18,.65,side*.65);light.target=target;model.add(light,target);}return model;},[variant,c.timeOfDay]);
  const legacy=useMemo(()=>baseline?createCinematicEnvironment({kind:c.preset==='circuit'?'track':c.preset==='rally'?'rally':c.preset,timeOfDay:c.timeOfDay,wetness:c.weather==='wet'?.7:0,quality:'hero'}):null,[baseline,c.preset,c.timeOfDay,c.weather]);
  useEffect(()=>()=>{disposeObject(environment.group);},[environment]);useEffect(()=>()=>disposeObject(car),[car]);useEffect(()=>()=>{if(legacy)disposeObject(legacy);},[legacy]);
  const distance=78+t*(c.preset==='rally'?10:13),pose=sampleRoad(road,distance),ahead=sampleRoad(road,distance+.5);
@@ -33,9 +37,9 @@ export const StudioFilm:React.FC<FilmProps>=({config,baseline=false})=>{
  const background=c.timeOfDay==='dusk'?'#aab3ba':night?'#101c2a':'#a6b9c5';
  return <ThreeCanvas width={width} height={height} shadows camera={{fov:40,near:.05,far:1400}} gl={{antialias:true}}>
  <CinematicLighting focus={car.position.toArray() as V3} timeOfDay={c.timeOfDay}/>
- <color attach="background" args={[background]}/><fog attach="fog" args={[background,night?75:180,night?300:850]}/>
+ <StudioSky time={c.timeOfDay}/><color attach="background" args={[background]}/><fog attach="fog" args={[background,night?75:180,night?300:850]}/>
  <hemisphereLight args={[night?'#8ba9ce':'#d6e2eb',night?'#343c43':'#786d58',night?.55:.35]}/>
- <LocationReflections world={legacy??environment.group} focus={sampleRoad(road,125).position} night={night}/><primitive object={legacy??environment.group}/><primitive object={car}/><CameraAim position={position.toArray() as V3} target={target.toArray() as V3} fov={40}/>
+ {assetsReady?<LocationReflections world={legacy??environment.group} focus={sampleRoad(road,125).position} night={night}/>:null}<primitive object={legacy??environment.group}/><primitive object={car}/><CameraAim position={position.toArray() as V3} target={target.toArray() as V3} fov={40}/>
  </ThreeCanvas>;
 };
 const Root=()=> <>{(['mountain','circuit','city','rally'] as Preset[]).map(preset=><Composition key={preset} id={'V5-'+preset} component={StudioFilm} width={1080} height={1920} fps={30} durationInFrames={240} defaultProps={{config:{preset,quality:'hero'}}}/>)}</>;
