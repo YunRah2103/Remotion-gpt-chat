@@ -74,6 +74,22 @@ jobs:
           ffmpeg -hide_banner -loglevel error -y -i "$F" -vf "fps=4,scale=270:480,tile=4x3" -frames:v 1 "${F%.mp4}-contact.jpg"
           ffmpeg -hide_banner -loglevel error -y -i "$F" -vf "select='lt(n,30)',scale=180:320,tile=6x5" -frames:v 1 "${F%.mp4}-first30.jpg"
           echo "Native decode technically valid; visual inspection and owner approval still mandatory." >> out/ep005/agent7/integrated-v4/source-lock.txt
+      - name: Print exact native pixel review strips as chunked JPEG evidence
+        if: success()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import base64
+          from pathlib import Path
+          for path in sorted(Path("out/ep005/agent7/integrated-v4").glob("*-contact.jpg")):
+              b64=base64.b64encode(path.read_bytes()).decode()
+              for i in range(0,len(b64),1400):
+                  print("YUNEX_V4_INTEGRATED_CONTACT="+b64[i:i+1400])
+          for path in sorted(Path("out/ep005/agent7/integrated-v4").glob("*-first30.jpg")):
+              b64=base64.b64encode(path.read_bytes()).decode()
+              for i in range(0,len(b64),1400):
+                  print("YUNEX_V4_INTEGRATED_FIRST30="+b64[i:i+1400])
+          PY
       - name: Publish genuine MP4 and pixel review contact sheets
         if: always()
         uses: actions/upload-artifact@v4
