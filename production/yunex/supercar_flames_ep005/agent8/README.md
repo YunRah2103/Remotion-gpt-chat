@@ -92,3 +92,27 @@ No changes to EP003, EP004, kit PR #233 or rejected EP005 production branches.
 ## October 23 V4 pivot
 
 Agent 6 #265 / draft PR #270 must stop candidate sourcing, bring the owner-approved V4 model and actual source dependencies from kit into its isolated branch, then deliver verified NEW driving MP4s and exact frame-varying V4 port interface. Agent 7 #266 / draft PR #268 must attach genuine transient afterfire and remake science around those ports, then hand off actual integrated clips. Agent 8 must recheck every run, clip hash and explicit owner/manager shot approval, then render only the 750f video. Existing workflow will auto-run on this PR update; when footage is still absent its gate should remain closed. The published 14s appearance reference is **not** a substitute for EP005 driving, flames or engine-science shots. Original EP005 narrator is not yet identified; silence must be clearly labelled. No merge.
+
+
+## 23 October — independently verified V4 preview source intake, NOT picture approval
+
+**Alternative short-science 750f cut:** `rough-picture-manifest.json` (source-status `UNAPPROVED_25S_V4_REVIEW_CUT_SOURCE_INTAKE_ONLY`) documents a fully frame-budgeted, distinct-source assembly compatible with current preview durations. It is an alternate edit for evaluation, **not** an approved clip list and not a finished movie. All `media.approved` fields deliberately remain false, `approvalRef` fields remain null, and the existing `edit-manifest.json` master cut remains unchanged until picture acceptance.
+
+| Timeline frames | Required source | Exact proof status |
+| --- | --- | --- |
+| 0–44 / 45f | Agent 7 real V4 nozzle-attached hook | Run 39886214728, artifact 12472384523, SHA256 `9388010364f05d3dfbe7a88013231c2264c02277248d8c2eb20f4843888b55e2`; full decode PASS, visual revision still needed |
+| 45–164 / 120f | Agent 6 front moving shot | Run 39884937145, artifact 12471824657, SHA256 `279d51b96b536d7cf1a963c29930e25fdf9bafae35de1433950e520c00ddbf39`; too much sky |
+| 165–239 / 75f | Agent 7 science, original input frames 0–74 | Run 39885531109, artifact 12472238710, science.mp4 SHA256 `a3598efcd9ff000cb2fd4c4837870d4abbb4d9f84d5c074077b7c291852a778c`; 3D grey CAD still too small/cropped |
+| 240–359 / 120f | Agent 6 side-moving shot | Run 39884937145, artifact 12472720631, SHA256 `40bd840d8c74507d108d5be5c0cdace26a65e2259f859215a8e12fa3f77efde2`; body cut off at end |
+| 360–434 / 75f | Agent 7 science, original input frames 75–149 | Same 150f science file, **nonoverlapping original frames**; exhaust hot-gas / conditional afterfire illustration |
+| 435–554 / 120f | Agent 6 rear chase moving shot | Run 39884937145, artifact 12472557527, SHA256 `6558f96ae6ba2a0ebc3b0d5b87620f2b2219a38f90dfbfda566b5c0c88d7e9f9`; decoded and visually reviewed, car too small / track basic |
+| 555–674 / 120f | Agent 6 new moving rear 3/4 | **MISSING** from reviewed artifact set (rear-proof job pending) |
+| 675–749 / 75f | Agent 7 actual V4 port-anchored flame finale | Run 39886214728, artifact 12472972362, SHA256 `ba89e51e8f68ffed8d44baa518139d962b91c2a0a2381aeb49d36506f467a3fe`; full decode PASS, current rear-close shot too similar to hook and fire too restrained |
+
+Current **technical source coverage: 630/750 frames = 21/25 seconds**. The remaining 120 frames are a separate rear-driving proof; additionally current verified clips need aesthetic improvements (therefore **0/750 frames are picture-approved**). The active master workflow checks both this plan and its protected master manifest and refuses a film render until every actual shot is approved. New source selections supersede these provisional SHA values rather than silently inheriting false approval.
+
+**Verified physical source ABI:** Agent 6 real `src/yunex/ep005/agent6/v4-exhaust-ports.json` and artifact matching SHA256 `5f756ab40a6b2219a50485c94cf7592d73469478e7ddf49fd3644ca84624672d`, named `exhaust-outlet-left/right`, 112mm outer diameter, 104mm bore; artifact file currently encodes `"version": 1`. The editor's explicit V4 namespaced *display contract* `v4-exhaust-ports@1` refers to that **exact unchanged 1st version of the V4-only manifest**; it does not pretend the underlying JSON version was renamed. If Agent 6 releases an updated ABI/file, lock its new SHA/version and rerender every dependent A7 shot as necessary. Port metadata does NOT itself prove flame cinematic acceptance.
+
+**Downloader correction:** GitHub Action artifacts containing nested `native/front-pursuit.mp4` etc must unpack at `media.artifactExtractDir` (for example `out/ep005-agent8-sources/front/`), while `media.path` names the exact resulting MP4. The old behavior unpacked into the file's immediate parent folder, causing an unintended `native/native/` duplication. `source-layout.mjs` and regression tests enforce correct isolated extraction layout and reject traversal.
+
+**No final yet:** The audience-facing first actual 25s result must be exported `EP005-SILENT-PICTURE-REVIEW.mp4` with exactly zero audio channels when authentic approved VO is not found, and must be independently reviewed before picture approval. Never fill a missing 4-second slot by repeating an existing car video, holding frames, using flame fixture, or claiming CI proof equals owner approval.
