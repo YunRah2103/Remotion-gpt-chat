@@ -40,12 +40,12 @@ type VectorTuple=[number,number,number];
 /** Shot-sized optical compositions rather than one tiny wide orthographic diagram. */
 function scienceCamera(t:number):{position:VectorTuple;target:VectorTuple}{
   const k:{t:number;position:VectorTuple;target:VectorTuple}[]=[
-    {t:0,position:[.2,1.7,3.3],target:[.15,.45,0]},
-    {t:1.35,position:[.48,1.85,3.35],target:[-.10,.47,0]},
-    {t:1.90,position:[-1.4,3.8,11.3],target:[-.50,.35,0]},
-    {t:2.83,position:[-1.2,3.6,11.1],target:[-.90,.28,0]},
-    {t:3.50,position:[-5.5,1.55,3.25],target:[-2.48,-.02,0]},
-    {t:5,position:[-5.2,1.30,3.1],target:[-2.48,-.02,0]},
+    {t:0,position:[3.35,2.45,7.1],target:[.05,.42,0]},
+    {t:1.35,position:[3.0,2.65,6.7],target:[-.05,.42,0]},
+    {t:1.90,position:[2.45,2.65,7.0],target:[-.45,.35,0]},
+    {t:2.83,position:[.85,2.6,7.15],target:[-.75,.26,0]},
+    {t:3.50,position:[-2.9,2.45,6.25],target:[-1.35,.16,0]},
+    {t:5,position:[-3.5,2.3,5.95],target:[-1.60,.10,0]},
   ];
   let i=0;while(i<k.length-2&&t>k[i+1].t)i++;
   const a=k[i],b=k[i+1],u=Math.max(0,Math.min(1,(t-a.t)/(b.t-a.t)));
@@ -95,9 +95,22 @@ export const FlameFixtureProof:React.FC=()=>{
 export const MechanicalScienceProof:React.FC=()=>{
   const frame=useCurrentFrame(),{fps,width,height}=useVideoConfig(),t=frame/fps;
   const a=useMemo(()=>buildScienceEngine(),[]);
+  // Science-only outlet geometry: these are NOT car exhaust measurements.
+  // Reuse the identical volumetric flame renderer, never the cartoon cone mockup.
+  const scienceAfterfire=useMemo(()=>createAfterfireRig(),[]);
   const phase:0|1|2=t<1.6?0:t<3.3?1:2;
   const camera=scienceCamera(t);
   animateScienceEngine(a,t,phase);
+  const sciencePorts:WorldExhaustPort[] = (['left','right'] as const).map((id,i)=>({
+    id, frame, fps, origin:new T.Vector3(-2.56,-.06,i===0?.71:-.71),
+    outward:new T.Vector3(-1,0,0), innerRadiusM:.044, outerDiameterM:.118,
+  }));
+  animateAfterfire(scienceAfterfire,sciencePorts,t,[
+    {at:3.24,duration:.49,strength:.95},
+    {at:3.80,duration:.39,strength:1},
+    {at:4.28,duration:.43,strength:.94},
+    {at:4.76,duration:.32,strength:.95},
+  ]);
   const story=[
     {h:'INSIDE THE ENGINE',sub:'Fuel normally burns inside the cylinders.',tag:'01 / CONTROLLED COMBUSTION'},
     {h:'HOT EXHAUST',sub:'On some tuned overrun events, fuel reaches the exhaust.',tag:'02 / FUEL + HEAT'},
@@ -110,11 +123,12 @@ export const MechanicalScienceProof:React.FC=()=>{
       <directionalLight position={[4,8,6]} intensity={4.1} color="#fff5e2"/>
       <directionalLight position={[-5,4,-4]} intensity={2.3} color="#8db8dc"/>
       <pointLight position={[-2,1,2]} intensity={5.5} distance={8} color="#f4aa75"/>
-      <mesh position={[-.50,-.52,0]} receiveShadow>
-        <boxGeometry args={[5.25,.18,2.7]}/>
+      <mesh position={[-.45,-.52,0]} receiveShadow>
+        <boxGeometry args={[3.9,.12,1.95]}/>
         <meshStandardMaterial color="#394954" metalness={.26} roughness={.53}/>
       </mesh>
       <primitive object={a.root}/>
+      <primitive object={scienceAfterfire.root}/>
       <CameraAim position={camera.position} target={camera.target} fov={38}/>
     </ThreeCanvas>
     <Frame tag={'YUNEX / ' + story.tag} title={story.h}
