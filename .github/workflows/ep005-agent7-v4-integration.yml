@@ -38,9 +38,9 @@ jobs:
           test -f src/yunex/ep005/agent6/v4-exhaust-ports.json
           grep -q '"source": "9052a539e10a7cb97487c1435455bb9962ad58e1"' src/yunex/ep005/agent6/v4-exhaust-ports.json
           V4_PORT_SHA="$(sha256sum src/yunex/ep005/agent6/v4-exhaust-ports.json | cut -d' ' -f1)"
-          test "$V4_PORT_SHA" = "b595d83fefe30e57be2ccd2a7973d3f4745051f81e8d757e6c019b5bfbdd6391"
+          test "$V4_PORT_SHA" = "d8ab9e92341fe1786ffc81cedd592c7ccfb23a35997b71d48a841f4baa3581e4"
           grep -q '"version": 2' src/yunex/ep005/agent6/v4-exhaust-ports.json
-          echo "V4-2 live port contract verified against independent rear-chase media."
+          echo "V4-2 exact checked-in Agent6 live manifest validated; artifact ZIP metadata may use a DIFFERENT serialization checksum."
           cp src/yunex/ep005/agent7/v4-integrated-entry.tsx.template src/yunex/ep005/agent7/v4-integrated-entry.tsx
           sed -i "s/__AGENT6_SHA__/$AGENT6_SHA/g" src/yunex/ep005/agent7/v4-integrated-entry.tsx
           sed -i "s/__V4_PORT_SHA__/$V4_PORT_SHA/g" src/yunex/ep005/agent7/v4-integrated-entry.tsx
