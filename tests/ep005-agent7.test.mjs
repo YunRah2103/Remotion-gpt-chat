@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import {sampleActualPorts,adaptAgent6WorldPorts} from '../src/yunex/ep005/agent7/ports.ts';
+import {sampleActualPorts,adaptAgent6WorldPorts,adaptApprovedV4WorldPorts} from '../src/yunex/ep005/agent7/ports.ts';
 import {createAfterfireRig,animateAfterfire,pulseEnvelope} from '../src/yunex/ep005/agent7/afterfire.ts';
 import {buildScienceEngine,animateScienceEngine} from '../src/yunex/ep005/agent7/science.ts';
 
@@ -67,4 +67,29 @@ test('NEW Agent 6 actual sampled world transforms have no duplicate transform an
   assert.throws(()=>adaptAgent6WorldPorts(raw,9,30));
   assert.throws(()=>adaptAgent6WorldPorts([raw[0],raw[0]],10,30));
   assert.throws(()=>adaptAgent6WorldPorts(raw.map(p=>({...p,visibleOuterDiameterM:.2})),10,30));
+});
+
+test('V4-only production port gate blocks candidate-A provenance and physically detached jets',()=>{
+  const approved={
+    version:2, vehicle:'v4-a-supercar',coordinateConvention:'world-three-y-up-metres',
+    referenceKitCommit:'9052a539e10a7cb97487c1435455bb9962ad58e1',
+    referenceApprovalUrl:'https://github.com/YunRah2103/Remotion-gpt-chat/issues/247#issuecomment-6355059494',
+    agent6ShotCommit:'a'.repeat(40),v4PortManifestSha256:'b'.repeat(64),
+  };
+  const ports=[
+    {frame:0,name:'exhaust-left',worldOrigin:[-.56,.55,-2.5],
+      worldOutward:[0,0,-1],innerRadiusM:.044,visibleOuterDiameterM:.114},
+    {frame:0,name:'exhaust-right',worldOrigin:[.56,.55,-2.5],
+      worldOutward:[0,0,-1],innerRadiusM:.044,visibleOuterDiameterM:.114},
+  ];
+  assert.equal(adaptApprovedV4WorldPorts(ports,0,approved).length,2);
+  assert.throws(()=>adaptApprovedV4WorldPorts(ports,0,{
+    ...approved,agent6ShotCommit:'bc0185ece668d6ebb1f0f58adbc62edec0ce2cb4'}));
+  assert.throws(()=>adaptApprovedV4WorldPorts(ports,0,{
+    ...approved,referenceKitCommit:'c'.repeat(40)}));
+  assert.throws(()=>adaptApprovedV4WorldPorts(ports,1,approved));
+  assert.throws(()=>adaptApprovedV4WorldPorts(ports.map(p=>({
+    ...p,worldOrigin:[.001,.55,-2.5]})),0,approved));
+  assert.throws(()=>adaptApprovedV4WorldPorts(ports.map((p,i)=>({
+    ...p,worldOutward:i?[0,0,1]:[0,0,-1]})),0,approved));
 });
