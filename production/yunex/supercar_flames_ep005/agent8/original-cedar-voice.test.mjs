@@ -33,7 +33,7 @@ test('all thirteen user-transcript phrases have ordered measured cadence and saf
     assert.ok(c.start>=last);
     assert.ok(c.end>c.start && c.end<=767);
     assert.ok(c.text.length<=88);
-    assert.equal(c.text.replace(/\\n/g,' ').replace(/\\s+/g,' ').toLowerCase(),source.cues[i].text.toLowerCase());
+    assert.equal(c.text.replace(/\n/g,' ').replace(/\s+/g,' ').toLowerCase(),source.cues[i].text.toLowerCase());
     last=c.end;
   }
   assert.equal(last,763);
@@ -55,6 +55,6 @@ test('native 767-frame narrated film is source-gated until every approved shot e
 
 test('source-locked recorder explicitly preserves original duration rather than forcing a 25s crop',()=>{
   const editor=fs.readFileSync(path.join(here,'master-editor.mjs'),'utf8');
-  assert.match(editor,/apad,atrim=duration='\\+filmDuration/);
-  assert.doesNotMatch(editor,/apad,atrim=duration=25\\[originalVoice\\]/);
+  assert.ok(editor.includes("apad,atrim=duration='+filmDuration+'[originalVoice]"));
+  assert.ok(!editor.includes('apad,atrim=duration=25[originalVoice]'));
 });
