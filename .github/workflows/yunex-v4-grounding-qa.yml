@@ -1,0 +1,57 @@
+name: YUNEX V4.1 optional grounding A-B native proof
+on:
+  push:
+    branches: [feat/yunex-v4-premium-grounding-safe]
+    paths:
+      - src/yunex/modelling-kit/**
+      - tests/modelling-kit/**
+      - .github/workflows/yunex-v4-grounding-qa.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '24', cache: npm}
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
+      - run: node --experimental-strip-types --test tests/modelling-kit/ground-contact.test.mjs tests/modelling-kit/recipe.test.mjs
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - name: Render original V4 frame-matched reference
+        run: >-
+          npx remotion render src/yunex/modelling-kit/studio-quality-entry.tsx StudioModelPortrait
+          out/grounding-ab/original.mp4 --frames=0-29
+          --props='{"variant":"supercar","bodyDetail":"studio","timeOfDay":"day","look":"original"}'
+          --gl=swangle --codec=h264 --pixel-format=yuv420p --color-space=bt709 --crf=18 --concurrency=2
+      - name: Render opt-in grounded V4 from identical source car
+        run: >-
+          npx remotion render src/yunex/modelling-kit/studio-quality-entry.tsx StudioModelPortrait
+          out/grounding-ab/grounded.mp4 --frames=0-29
+          --props='{"variant":"supercar","bodyDetail":"studio","timeOfDay":"day","look":"grounded"}'
+          --gl=swangle --codec=h264 --pixel-format=yuv420p --color-space=bt709 --crf=18 --concurrency=2
+      - name: Fully decode both movies, reject missing/static output
+        shell: bash
+        run: |
+          set -euo pipefail
+          for mode in original grounded; do
+            f="out/grounding-ab/$mode.mp4"
+            test -s "$f"
+            [[ "$(ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of default=nw=1:nk=1 "$f")" == h264 ]]
+            [[ "$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$f")" == 1080x1920 ]]
+            [[ "$(ffprobe -v error -count_frames -select_streams v:0 -show_entries stream=nb_read_frames -of default=nw=1:nk=1 "$f")" == 30 ]]
+            ffmpeg -v error -xerror -i "$f" -f null -
+            sha256sum "$f" | tee "out/grounding-ab/$mode.sha256"
+          done
+          if cmp -s out/grounding-ab/original.mp4 out/grounding-ab/grounded.mp4; then
+            echo "Grounded look did not change output" >&2; exit 1
+          fi
+          git rev-parse HEAD | tee out/grounding-ab/source-sha.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-V4.1-original-vs-grounded-native
+          path: out/grounding-ab/
+          retention-days: 14
