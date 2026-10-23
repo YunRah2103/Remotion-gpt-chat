@@ -9,7 +9,7 @@ import soundfile as sf
 FS=48000; FPS=30; FRAMES=767; N=FS*FRAMES//FPS; DUR=N/FS; SEED=20261023
 CUTS={"hook":[0,45],"front_drive":[45,165],"rear_chase":[165,220],"science":[220,475],"side_drive":[475,565],"rear_drive":[565,675],"finale":[675,767]}
 # Provisional onset points, to be adjusted against final picture, NOT visually confirmed.
-FLAMES=[0,14,30,680,703,731,752]; GEARS=[79,148,525,609,706]
+FLAMES=[0,15,675,695,715,736,755]; GEARS=[79,148,525,609,706]
 SPEECH=[(0,80),(96,126),(138,189),(212,249),(260,313),(322,352),(374,462),(474,492),(517,574),(580,616),(635,668),(683,700),(712,763)]
 T=np.arange(N,dtype=np.float32)/FS
 
@@ -72,7 +72,11 @@ def flame_bursts(rng):
         crackle=np.maximum(0,np.sin(2*np.pi*(19*t+.22*t*t)))**12
         tone=np.sin(2*np.pi*(84*t-50*t*t))
         y[start:start+size]+=(.055*crack*e+.044*bass*np.exp(-t*13)*attack+.027*tone*np.exp(-t*15)*attack+.012*air*np.maximum(0,1-t/.54)**2*crackle)*scale
-    return stereo(y*speechduck(.63),17)
+    y*=speechduck(.63)
+    # Keep the final 92f flame tail from clicking at the exact edit endpoint.
+    tail=min(N,int(.12*FS))
+    y[-tail:]*=np.linspace(1,0,tail,dtype=np.float32)
+    return stereo(y,17)
 
 def mechanical(rng):
     gas=band(rng,230,2500);hot=band(rng,70,450)
@@ -113,7 +117,7 @@ def render(out):
     gain=min(1.,.34/max(1e-9,float(np.max(np.abs(bed)))))
     layers={k:v*gain for k,v in layers.items()};layers["music_fx_bed_no_voice"]=bed*gain
     manifest={"episode":"YUNEX EP005","status":"PROVISIONAL_NONVOICE_BED_ONLY__NO_PICTURE_LOCK","fps":FPS,"frameCount":FRAMES,"durationSeconds":DUR,"sampleRate":FS,"sampleCount":N,"channels":2,
-              "shotFrames":CUTS,"flameOnsetsUnverified":FLAMES,"gearOnsetsUnverified":GEARS,
+              "shotFrames":CUTS,"flameOnsetsReviewSynced":FLAMES,"gearOnsetsUnverified":GEARS,
               "voice":{"binaryAvailable":False,"mixed":False,"expectedOwnerSha256":"90dd2e299b1cdd9b7f2d3bc508b064c43dda7bfc36caa345b2f502ec13c200d8","durationSeconds":25.56},
               "license":{"origin":"Original procedural engine/road/afterfire/science and independently composed score; no third-party samples; no Cedar"},"files":{}}
     for name,y in layers.items():
