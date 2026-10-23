@@ -19,7 +19,7 @@ jobs:
       matrix:
         include:
           - {id: EP005A7V4IntegratedHook, slug: opening-45f, frames: 45}
-          - {id: EP005A7V4IntegratedFinale, slug: finale-75f, frames: 75}
+          - {id: EP005A7V4IntegratedFinale, slug: finale-92f, frames: 92}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,7 +30,7 @@ jobs:
         run: |
           set -euxo pipefail
           AGENT7_SHA="$(git rev-parse HEAD)"
-          AGENT6_SHA="26980fe1f509484bb612cd47ffcbf7c53f26fddf"
+          AGENT6_SHA="9b52d32a4fefb4fe3715da81ae736ad251a806b2"
           git fetch origin "$AGENT6_SHA"
           git checkout --detach "$AGENT6_SHA"
           git restore --source="$AGENT7_SHA" -- src/yunex/ep005/agent7 tests/ep005-agent7.test.mjs
@@ -38,6 +38,9 @@ jobs:
           test -f src/yunex/ep005/agent6/v4-exhaust-ports.json
           grep -q '"source": "9052a539e10a7cb97487c1435455bb9962ad58e1"' src/yunex/ep005/agent6/v4-exhaust-ports.json
           V4_PORT_SHA="$(sha256sum src/yunex/ep005/agent6/v4-exhaust-ports.json | cut -d' ' -f1)"
+          test "$V4_PORT_SHA" = "b595d83fefe30e57be2ccd2a7973d3f4745051f81e8d757e6c019b5bfbdd6391"
+          grep -q '"version": 2' src/yunex/ep005/agent6/v4-exhaust-ports.json
+          echo "V4-2 live port contract verified against independent rear-chase media."
           cp src/yunex/ep005/agent7/v4-integrated-entry.tsx.template src/yunex/ep005/agent7/v4-integrated-entry.tsx
           sed -i "s/__AGENT6_SHA__/$AGENT6_SHA/g" src/yunex/ep005/agent7/v4-integrated-entry.tsx
           sed -i "s/__V4_PORT_SHA__/$V4_PORT_SHA/g" src/yunex/ep005/agent7/v4-integrated-entry.tsx
@@ -73,6 +76,8 @@ jobs:
           sha256sum "$F" | tee "${F%.mp4}.sha256"
           ffmpeg -hide_banner -loglevel error -y -i "$F" -vf "fps=4,scale=270:480,tile=4x3" -frames:v 1 "${F%.mp4}-contact.jpg"
           ffmpeg -hide_banner -loglevel error -y -i "$F" -vf "select='lt(n,30)',scale=180:320,tile=6x5" -frames:v 1 "${F%.mp4}-first30.jpg"
+          ffmpeg -hide_banner -loglevel error -y -i "$F" -vf "select='gte(n,$((${{ matrix.frames }}-15)))',scale=180:320,tile=5x3" -frames:v 1 "${F%.mp4}-last15.jpg"
+          ffmpeg -hide_banner -loglevel error -y -i "$F" -vf "select='eq(n,0)+eq(n,12)+eq(n,30)+eq(n,$((${{ matrix.frames }}-1)))',scale=270:480,tile=2x2" -frames:v 1 "${F%.mp4}-keyframes.jpg"
           echo "Native decode technically valid; visual inspection and owner approval still mandatory." >> out/ep005/agent7/integrated-v4/source-lock.txt
       - name: Print exact native pixel review strips as chunked JPEG evidence
         if: success()
