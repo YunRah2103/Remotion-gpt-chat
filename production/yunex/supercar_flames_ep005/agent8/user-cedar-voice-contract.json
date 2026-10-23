@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "episode": "EP005",
+  "provenance": "user_uploaded_original_audio_in_active_chat",
+  "sourceFileName": "openai-fm-cedar-audio.mp3",
+  "expectedLocalMediaPath": "out/ep005-agent8-sources/user-cedar/openai-fm-cedar-audio.mp3",
+  "sha256": "90dd2e299b1cdd9b7f2d3bc508b064c43dda7bfc36caa345b2f502ec13c200d8",
+  "ffprobe": {
+    "codec": "mp3",
+    "sampleRateHz": 24000,
+    "channels": 1,
+    "containerDurationSeconds": 25.56
+  },
+  "film": {
+    "fps": 30,
+    "totalFrames": 767,
+    "runtimeSeconds": 25.566666666666666,
+    "width": 1080,
+    "height": 1920
+  },
+  "approval": {
+    "userSuppliedRecording": true,
+    "recordingOriginal": true,
+    "githubActionsAssetUploaded": false,
+    "nativePictureApproved": false
+  },
+  "subtitleTimingMethod": "phrase pauses from original MP3, ffmpeg silencedetect noise=-38dB:d=0.12; actual phrasing user-supplied; per-word timestamps not verified",
+  "exactOriginalTranscript": "Why does this supercar suddenly shoot fire?\nIt's not a flamethrower.\nSomething even crazier is happening.\nIn some performance cars, a little fuel can escape the engine without fully burning.\nWhen it mixes with oxygen inside the scorching hot exhaust, it can ignite.\nThat sudden combustion sends flames shooting out of the tailpipe.\nIt's called afterfire.\nAnd at night, it looks absolutely insane.",
+  "cues": [
+    {
+      "index": 1,
+      "startSeconds": 0,
+      "endSeconds": 2.6365,
+      "startFrame": 0,
+      "endFrame": 80,
+      "text": "Why does this supercar suddenly shoot fire?",
+      "assText": "Why does this supercar\\Nsuddenly shoot fire?"
+    },
+    {
+      "index": 2,
+      "startSeconds": 3.1944,
+      "endSeconds": 4.1745,
+      "startFrame": 96,
+      "endFrame": 126,
+      "text": "It's not a flamethrower.",
+      "assText": "It's not a flamethrower."
+    },
+    {
+      "index": 3,
+      "startSeconds": 4.5845,
+      "endSeconds": 6.287,
+      "startFrame": 138,
+      "endFrame": 189,
+      "text": "Something even crazier is happening.",
+      "assText": "Something even crazier\\Nis happening."
+    },
+    {
+      "index": 4,
+      "startSeconds": 7.0758,
+      "endSeconds": 8.2903,
+      "startFrame": 212,
+      "endFrame": 249,
+      "text": "In some performance cars,",
+      "assText": "In some performance cars,"
+    },
+    {
+      "index": 5,
+      "startSeconds": 8.6781,
+      "endSeconds": 10.4299,
+      "startFrame": 260,
+      "endFrame": 313,
+      "text": "a little fuel can escape the engine",
+      "assText": "a little fuel can escape\\Nthe engine"
+    },
+    {
+      "index": 6,
+      "startSeconds": 10.7439,
+      "endSeconds": 11.704,
+      "startFrame": 322,
+      "endFrame": 352,
+      "text": "without fully burning.",
+      "assText": "without fully burning."
+    },
+    {
+      "index": 7,
+      "startSeconds": 12.4512,
+      "endSeconds": 15.3841,
+      "startFrame": 374,
+      "endFrame": 462,
+      "text": "When it mixes with oxygen inside the scorching hot exhaust,",
+      "assText": "When it mixes with oxygen\\Ninside the scorching hot exhaust,"
+    },
+    {
+      "index": 8,
+      "startSeconds": 15.7936,
+      "endSeconds": 16.3911,
+      "startFrame": 474,
+      "endFrame": 492,
+      "text": "it can ignite.",
+      "assText": "it can ignite."
+    },
+    {
+      "index": 9,
+      "startSeconds": 17.219,
+      "endSeconds": 19.1193,
+      "startFrame": 517,
+      "endFrame": 574,
+      "text": "That sudden combustion sends flames",
+      "assText": "That sudden combustion\\Nsends flames"
+    },
+    {
+      "index": 10,
+      "startSeconds": 19.3294,
+      "endSeconds": 20.5103,
+      "startFrame": 580,
+      "endFrame": 616,
+      "text": "shooting out of the tailpipe.",
+      "assText": "shooting out of the tailpipe."
+    },
+    {
+      "index": 11,
+      "startSeconds": 21.1525,
+      "endSeconds": 22.2361,
+      "startFrame": 635,
+      "endFrame": 668,
+      "text": "It's called afterfire.",
+      "assText": "It's called afterfire."
+    },
+    {
+      "index": 12,
+      "startSeconds": 22.7762,
+      "endSeconds": 23.3217,
+      "startFrame": 683,
+      "endFrame": 700,
+      "text": "And at night,",
+      "assText": "And at night,"
+    },
+    {
+      "index": 13,
+      "startSeconds": 23.7489,
+      "endSeconds": 25.4096,
+      "startFrame": 712,
+      "endFrame": 763,
+      "text": "it looks absolutely insane.",
+      "assText": "it looks absolutely insane."
+    }
+  ],
+  "notes": [
+    "User-supplied original is now available in this conversation; it is not committed as binary to GitHub PR, so remote Actions cannot claim to have it yet.",
+    "Preserve all narration and natural pauses, no duration compression, no fabricated Cedar audio.",
+    "The full narrated film requires 767 actual source frames and approved moving visuals. Existing 750f silent rough cut remains a separate source-only plan."
+  ]
+}
