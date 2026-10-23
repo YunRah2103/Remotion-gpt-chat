@@ -44,6 +44,11 @@ jobs:
             echo "ready=false" >> "$GITHUB_OUTPUT"
             echo "SOURCE ONLY / NATIVE FILM BLOCKED — do not imply picture lock."
           fi
+      - name: Validate full 750-frame V4 rough-cut intake without treating candidates as approved
+        run: |
+          node production/yunex/supercar_flames_ep005/agent8/master-editor.mjs --check production/yunex/supercar_flames_ep005/agent8/rough-picture-manifest.json > ep005-a8-rough-gate.json
+          cat ep005-a8-rough-gate.json
+          node -e "const s=require('./ep005-a8-rough-gate.json'); if(s.ready || s.frameCount!==750 || s.mode!=='SILENT_PICTURE_REVIEW')process.exit(1)"
       - name: Install FFmpeg and subtitle fonts for audio-only diagnostic and real render
         run: |
           sudo apt-get update
@@ -74,6 +79,7 @@ jobs:
           name: ep005-a8-editorial-${{ github.run_id }}
           path: |
             ep005-a8-gate.json
+            ep005-a8-rough-gate.json
             out/ep005-agent8/EP005-*.mp4
             out/ep005-agent8/render-proof.json
             out/ep005-agent8/audio-qc-report.json
