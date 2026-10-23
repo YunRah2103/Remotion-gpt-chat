@@ -1,0 +1,62 @@
+name: YUNEX EP003 Krispy original P1 private source scout
+on:
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: read
+jobs:
+  verify:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.issue.number == 276 && github.event.comment.user.login == 'YunRah2103' && startsWith(github.event.comment.body, 'YUNEX_PHONE_DONE_V4')) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - id: source
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '276'
+          token: ${{ github.token }}
+          destination: private/krispy276
+      - name: Inspect authentic original and centered 9 by 16 framing
+        shell: bash
+        env:
+          VIDEO: ${{ steps.source.outputs.asset_path }}
+          ORIGINAL_SHA: ${{ steps.source.outputs.sha256 }}
+          RIGHTS: ${{ steps.source.outputs.rights_status }}
+        run: |
+          set -euo pipefail
+          mkdir -p qa
+          ffprobe -v error -show_format -show_streams -of json "$VIDEO" > qa/ffprobe.json
+          printf '%s\n' "$ORIGINAL_SHA" > qa/original_sha256.txt
+          ffmpeg -hide_banner -loglevel error -xerror -i "$VIDEO" -f null -
+          width="$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of csv=p=0 "$VIDEO")"
+          height="$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=p=0 "$VIDEO")"
+          duration="$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$VIDEO")"
+          [[ "$width" -ge 1920 && "$height" -ge 1080 ]] || { echo "::error::Native source below 1080p, no creative approval"; exit 3; }
+          crop_width=$((height*9/16))
+          crop_width=$((crop_width/2*2))
+          crop_x=$(((width-crop_width)/2))
+          [[ "$crop_width" -gt 0 && "$crop_x" -ge 0 ]] || exit 3
+          for start in 0 30 60 90; do
+            if awk -v d="$duration" -v s="$start" 'BEGIN {exit !(s<d)}'; then
+              ffmpeg -hide_banner -loglevel error -y -ss "$start" -t 30 -i "$VIDEO" -vf "fps=2,scale=480:-2,tile=6x10:padding=2:margin=2" -frames:v 1 -update 1 "qa/wide-$start.jpg"
+              ffmpeg -hide_banner -loglevel error -y -ss "$start" -t 30 -i "$VIDEO" -vf "fps=2,crop=${crop_width}:${height}:${crop_x}:0,scale=192:342,tile=6x10:padding=2:margin=2" -frames:v 1 -update 1 "qa/portrait-$start.jpg"
+            fi
+          done
+          {
+            echo "Source original filmmaker Krispy Media, Monticello Motor Club four hypercars incl. road McLaren P1."
+            echo "Source: https://www.youtube.com/watch?v=RfU5m_Oea4Q"
+            echo "Authenticated original issue #276, SHA256 $ORIGINAL_SHA"
+            echo "Rights status: $RIGHTS; do not publish, redistribute, license or imply permission."
+            echo "The video may feature multiple OTHER hypercars; every proposed P1 shot needs model-specific human visual QC."
+            echo "Contact grids 2fps are only scouting; verify exact source timecodes and continuous car motion with real MP4 before approving."
+            echo "Landscape center-crop is not native 9:16. No documentary audio, edit or master modified."
+          } > qa/README.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yunex-ep003-krispy276-owner-only-contact-qa
+          path: qa/
+          retention-days: 2
+          if-no-files-found: error
