@@ -1,0 +1,66 @@
+name: EP005 Agent 6 — owner-approved V4 genuine driving previews
+on:
+  push:
+    branches: [agent/ep005-06-hero-car-proof-cc0]
+    paths:
+      - 'tsconfig.json'
+      - 'src/yunex/ep005/agent6/v4-*'
+      - 'scripts/ep005-agent6/v4-*'
+      - '.github/workflows/ep005-agent6-v4-driving.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  approved-car-drive:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - {id: Ep005Agent6V4RearProof, slug: rear-proof}
+          - {id: Ep005Agent6V4SideTracking, slug: side-tracking}
+          - {id: Ep005Agent6V4FrontPursuit, slug: front-pursuit}
+          - {id: Ep005Agent6V4RearChase, slug: rear-chase}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with: {node-version: '24', cache: npm}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Install native Remotion, media inspect and tests
+        run: |
+          npm ci --no-audit --no-fund
+          python -m pip install --disable-pip-version-check Pillow==11.3.0
+          npm run check
+      - name: Verify locked V4 source and moving factory exhaust interfaces
+        run: |
+          set -euo pipefail
+          test "$(git hash-object src/yunex/modelling-kit/v4-production.ts)" = "df4e0c60e8ba617fae85f524613d9cd26b84d034"
+          node --experimental-strip-types scripts/ep005-agent6/v4-ports.mjs out/ep005-agent6/ports
+          node --experimental-strip-types scripts/ep005-agent6/v4-camera-qc.mjs out/ep005-agent6/camera-qc
+      - name: Install official native FFmpeg with bounded retry and corrected mirrors
+        run: bash scripts/modelling-kit/install-native-media.sh
+      - name: Render four-second genuine moving V4 car at 1080x1920 / 30fps
+        run: |
+          set -euo pipefail
+          mkdir -p out/ep005-agent6/native
+          npx remotion render src/yunex/ep005/agent6/v4-driving-entry.tsx ${{ matrix.id }} out/ep005-agent6/native/${{ matrix.slug }}.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --color-space=bt709 --concurrency=1
+      - name: Independently decode 120/120 native frames and produce visible proof
+        run: |
+          set -euo pipefail
+          python3 scripts/ep005-agent6/v4-verify.py out/ep005-agent6/native/${{ matrix.slug }}.mp4 out/ep005-agent6/qa/${{ matrix.slug }}
+          cp out/ep005-agent6/ports/v4-exhaust-ports.json out/ep005-agent6/v4-exhaust-ports.json
+          cp out/ep005-agent6/ports/agent7-v4-port-lock.json out/ep005-agent6/agent7-v4-port-lock.json
+          git rev-parse HEAD > out/ep005-agent6/SOURCE_COMMIT.txt
+          echo "OWNER APPROVED EXTERIOR REFERENCE ONLY: moving scenes pending independent picture review." > out/ep005-agent6/REVIEW-REQUIRED.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EP005-Agent6-APPROVED-V4-${{ matrix.slug }}
+          path: out/ep005-agent6/
+          retention-days: 30
+          if-no-files-found: warn

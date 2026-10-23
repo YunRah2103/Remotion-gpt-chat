@@ -1,0 +1,101 @@
+name: EP005 Agent 6 — QA recovery of rendered MP4s
+on:
+  push:
+    branches: [agent/ep005-06-hero-car-proof-cc0]
+    paths: ['.github/workflows/ep005-agent6-qa-recovery.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify-existing-renders:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prepare independent native media QA tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check pillow
+      - name: Recover both already rendered videos without rendering again
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39865710573
+          name: EP005-Agent6-CarOnly-Hero-Proof
+          github-token: ${${ github.token }}
+          path: out/ep005-agent6/upstream
+      - name: FFprobe source, normalize full-range to yuv420p, decode every frame and create review sheets
+        run: |
+          set -euo pipefail
+          mkdir -p out/ep005-agent6/verified
+          python3 - <<'PY'
+          import hashlib,json,subprocess
+          from pathlib import Path
+          from PIL import Image,ImageDraw
+          base=Path('out/ep005-agent6')
+          sources=[
+            ('portrait',base/'upstream/hero-proof-portrait.mp4',1080,1920),
+            ('landscape',base/'upstream/hero-proof-landscape.mp4',1920,1080)
+          ]
+          report={'source_render_workflow_run':39865710573,'source_render_commit':'bc0185ece668d6ebb1f0f58adbc62edec0ce2cb4','files':[],'note':'Original MP4s native H.264 full-range yuvj420p; loss-minimized verified exports mapped to legal-range yuv420p with scale=in_range=full:out_range=limited'}
+          def execute(args):
+              subprocess.run(args,check=True)
+          def probe(path):
+              return json.loads(subprocess.check_output(['ffprobe','-v','error','-select_streams','v:0','-show_entries','stream=codec_name,pix_fmt,width,height,r_frame_rate,nb_frames,duration','-of','json',str(path)]))['streams'][0]
+          def sha(path):
+              h=hashlib.sha256()
+              with open(path,'rb') as f:
+                  for chunk in iter(lambda:f.read(2**20),b''):h.update(chunk)
+              return h.hexdigest()
+          for orientation,src,width,height in sources:
+              if not src.is_file():raise FileNotFoundError(f'Missing required genuine source MP4: {src}')
+              original=probe(src)
+              assert original['codec_name']=='h264',original
+              assert (original['width'],original['height'])==(width,height),original
+              assert original['r_frame_rate']=='30/1' and int(original['nb_frames'])==120,original
+              assert original['pix_fmt'] in ('yuvj420p','yuv420p'),original
+              output=base/'verified'/f'hero-proof-{orientation}-verified-yuv420p.mp4'
+              execute(['ffmpeg','-hide_banner','-v','error','-y','-i',str(src),'-vf','scale=in_range=full:out_range=limited,format=yuv420p','-c:v','libx264','-preset','medium','-crf','17','-pix_fmt','yuv420p','-color_range','tv','-colorspace','bt709','-color_primaries','bt709','-color_trc','bt709','-movflags','+faststart',str(output)])
+              s=probe(output)
+              assert s['codec_name']=='h264',s
+              assert s['pix_fmt']=='yuv420p',s
+              assert (s['width'],s['height'])==(width,height),s
+              assert s['r_frame_rate']=='30/1' and int(s['nb_frames'])==120,s
+              for video in [src,output]:
+                  execute(['ffmpeg','-hide_banner','-v','error','-xerror','-i',str(video),'-f','null','-'])
+              sample_dir=base/'verified'/f'{orientation}-frames';sample_dir.mkdir(exist_ok=True)
+              imgs=[]
+              for frame in (0,24,52,76,92,119):
+                  image=sample_dir/f'frame-{frame:03}.png'
+                  execute(['ffmpeg','-hide_banner','-v','error','-y','-i',str(output),'-vf',f'select=eq(n\\,{frame})','-vsync','vfr','-frames:v','1',str(image)])
+                  assert image.exists() and image.stat().st_size>100
+                  im=Image.open(image).convert('RGB');im.thumbnail((570,605));imgs.append((frame,im))
+              sheet=Image.new('RGB',(1800,1370),(230,233,235))
+              for i,(frame,im) in enumerate(imgs):
+                  x=i%3*600+(600-im.width)//2
+                  y=i//3*685+(650-im.height)//2
+                  sheet.paste(im,(x,y))
+                  ImageDraw.Draw(sheet).text((i%3*600+24,i//3*685+651),f'{orientation.upper()} — frame {frame}',fill=(19,25,34))
+              contact=base/'verified'/f'{orientation}-contact-sheet.jpg';sheet.save(contact,quality=91)
+              report['files'].append({'view':orientation,'native_path':str(src),'native_sha256':sha(src),'native_probe':original,'verified_path':str(output),'verified_sha256':sha(output),'verified_probe':s,'contact_sheet_path':str(contact),'contact_sheet_sha256':sha(contact),'native_and_verified_all_frames_decoded':True})
+          (base/'verified'/'REVIEW-MANIFEST.json').write_text(json.dumps(report,indent=2)+'\n')
+          (base/'verified'/'SOURCE_COMMIT.txt').write_text(report['source_render_commit']+'\n')
+          print(json.dumps(report,indent=2))
+          PY
+          cp src/yunex/ep005/agent6/exhaust-ports.v1.json out/ep005-agent6/verified/
+          echo 'NOTE: Codec/decoding validated; still requires human visual inspection and owner approval.' > out/ep005-agent6/verified/NOT-APPROVED.txt
+      - name: Upload recovered original videos and fully checked normalized review pack
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: EP005-Agent6-CAR-GATE-Verified-MP4s
+          path: out/ep005-agent6/
+          retention-days: 30
+          if-no-files-found: error

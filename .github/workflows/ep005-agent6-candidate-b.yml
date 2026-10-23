@@ -1,0 +1,70 @@
+name: EP005 Agent 6 — Candidate B Khronos professional-car inspection
+on:
+  push:
+    branches: [agent/ep005-06-hero-car-proof-cc0]
+    paths: ['.github/workflows/ep005-agent6-candidate-b.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  car-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Prepare native Remotion and FFmpeg
+        run: |
+          npm ci --no-audit --no-fund
+          python -m pip install --disable-pip-version-check pillow
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          npm run check
+      - name: Reproducibly fetch CC-BY PBR hero and license
+        run: bash scripts/ep005-agent6/fetch-khronos.sh
+      - name: Render real 4-second 1080x1920 moving-camera neutral-light car proof
+        run: |
+          mkdir -p out/ep005-agent6/candidate-b
+          npx remotion render src/yunex/ep005/agent6/khronos-entry.tsx Ep005Agent6KhronosPortrait out/ep005-agent6/candidate-b/khronos-portrait.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
+      - name: Decode all 120 frames and create visual evidence
+        run: |
+          set -euo pipefail
+          mkdir -p out/ep005-agent6/candidate-b/stills
+          python3 - <<'PY'
+          import json,hashlib,subprocess
+          from pathlib import Path
+          from PIL import Image,ImageDraw
+          dest=Path('out/ep005-agent6/candidate-b')
+          video=dest/'khronos-portrait.mp4'
+          args=['ffprobe','-v','error','-select_streams','v:0','-show_entries','stream=codec_name,pix_fmt,width,height,r_frame_rate,nb_frames','-of','json',str(video)]
+          probe=json.loads(subprocess.check_output(args))['streams'][0]
+          assert probe['codec_name']=='h264',probe
+          assert probe['pix_fmt'] in ('yuv420p','yuvj420p'),probe
+          assert (probe['width'],probe['height'])==(1080,1920),probe
+          assert probe['r_frame_rate']=='30/1' and int(probe['nb_frames'])==120,probe
+          subprocess.run(['ffmpeg','-hide_banner','-v','error','-xerror','-i',str(video),'-f','null','-'],check=True)
+          report={'probe':probe,'sha256':hashlib.sha256(video.read_bytes()).hexdigest(),'every_frame_decoded':True,'upstream_blob':'391795d5e3f7daa5519ec2e077e8def16bcecdd7','license':'CC-BY-4.0','original_source':'KhronosGroup/glTF-Sample-Assets@15cd02d304e54cb42a4db4eefe719f76190f4b68','status':'candidate; visual gate not approved'}
+          (dest/'media-qa.json').write_text(json.dumps(report,indent=2)+'\n')
+          sheet=Image.new('RGB',(1500,1550),(226,230,232));d=ImageDraw.Draw(sheet)
+          for idx,frame in enumerate([0,15,30,45,60,75,90,105,119]):
+              still=dest/'stills'/f'{frame:03}.png'
+              subprocess.run(['ffmpeg','-hide_banner','-v','error','-y','-i',str(video),'-vf',f'select=eq(n\\,{frame})','-vsync','vfr','-frames:v','1',str(still)],check=True)
+              im=Image.open(still).convert('RGB');im.thumbnail((470,470))
+              x=(idx%3)*500+(500-im.width)//2
+              y=(idx//3)*515+(490-im.height)//2
+              sheet.paste(im,(x,y));d.text(((idx%3)*500+16,(idx//3)*515+491),f'Frame {frame}',fill='#243341')
+          sheet.save(dest/'contact-sheet.jpg',quality=91)
+          print(json.dumps(report,indent=2))
+          PY
+          cp public/ep005-agent6-khronos/SHA256SUMS.txt out/ep005-agent6/candidate-b/source-sha256.txt
+          cp public/ep005-agent6-khronos/LICENSE.md out/ep005-agent6/candidate-b/LICENSE.md
+          git rev-parse HEAD > out/ep005-agent6/candidate-b/source-commit.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EP005-Agent6-Candidate-B-Professional-PBR-Car
+          path: out/ep005-agent6/candidate-b
+          retention-days: 30
+          if-no-files-found: warn
