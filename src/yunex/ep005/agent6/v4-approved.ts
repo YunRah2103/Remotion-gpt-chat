@@ -113,16 +113,18 @@ export function v4Camera(shot: V4Shot, frame: number, fps=V4_DRIVING_FPS) {
   const smooth=u*u*(3-2*u);
   const settings = {
     // Side: keep complete bumpers/wheels in narrow 9:16 aperture over all 120f.
-    'rear-proof':    {a:[-8.9,1.70, 4.65],b:[-8.25,1.55, 4.4],fov:45,target:[-.25,.58,0]},
-    'side-tracking': {a:[ .15,1.75,-13.8],b:[ .70,1.61,-13.2],fov:46,target:[ .15,.39,0]},
+    'rear-proof':    {a:[-9.15,2.25, 4.65],b:[-8.50,2.00, 4.4],fov:45,target:[-.25,.28,-.65]},
+    'side-tracking': {a:[ 1.40,2.22,-13.8],b:[-.40,2.02,-13.2],fov:46,target:[ .15,.19,0]},
     // Front: tilt down to put the horizon higher and reveal road contact, not empty sky.
-    'front-pursuit': {a:[ 9.65,2.70,-4.05],b:[ 9.30,2.52,-3.85],fov:48,target:[ .1,.40,0]},
+    'front-pursuit': {a:[ 9.95,3.12,-4.05],b:[ 9.60,2.92,-3.85],fov:48,target:[ .1,.16,0]},
     // Low but readable rear tail/outlet view, stable camera with exhaust in shot.
-    'rear-chase':    {a:[-10.7,1.72,-3.1],b:[-9.4,1.55,-2.7],fov:44,target:[-.3,.52,0]}
+    'rear-chase':    {a:[-9.8,2.30,-3.1],b:[-8.5,1.92,-2.8],fov:44,target:[-.3,.25,0]}
   }[shot];
   if (!settings) throw Error('Unknown V4 moving shot');
   const lerp=(a:number,b:number)=>THREE.MathUtils.lerp(a,b,smooth);
-  // X follows the genuine travelling vehicle; Y/Z remain steady world-space offsets.
+  // Native 9:16 shot pass: pitched-down targets reduce blank sky, camera-relative X movement
+  // creates organic perspective change while matching the exact live port frame clock.
+  // X follows genuine world travel; all offsets remain deterministic per absolute frame.
   const position:[number,number,number] = [
     p.x+lerp(settings.a[0],settings.b[0]),
     lerp(settings.a[1],settings.b[1]),
