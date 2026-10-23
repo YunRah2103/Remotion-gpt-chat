@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "coordinateConvention": "three-y-up-metres",
+  "version": 2,
+  "coordinateConvention": "world-three-y-up-metres",
   "owner": "agent6",
   "source": "9052a539e10a7cb97487c1435455bb9962ad58e1",
   "heroRecipe": "v4-a-supercar",
@@ -40,5 +40,8 @@
       "innerRadiusM": 0.052,
       "outerDiameterM": 0.112
     }
-  ]
+  ],
+  "vehicle": "v4-a-supercar",
+  "mountCoordinateConvention": "three-y-up-metres",
+  "referenceApprovalUrl": "https://github.com/YunRah2103/Remotion-gpt-chat/issues/247#issuecomment-6355059494"
 }
