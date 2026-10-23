@@ -42,6 +42,23 @@ test('new Agent 6/7 approval gate cannot silently use rejected source or manufac
   assert.ok(manifest.beats.every(b=>b.media.approved===false));
 });
 
+test('approved teal V4 exterior is pinned without falsely approving shots, ports or audio',()=>{
+  const hero=manifest.approvedHero;
+  assert.equal(hero.appearanceApproved,true);
+  assert.equal(hero.referenceProject,'v4-a-supercar');
+  assert.equal(hero.sourceCommit,'9052a539e10a7cb97487c1435455bb9962ad58e1');
+  assert.deepEqual(hero.vehicle,{variant:'supercar',bodyDetail:'studio',color:'#18636b'});
+  assert.equal(hero.sourceVideo.sha256,'1654a5efd3a3403871b0a52a3140a9e7aeb1222a2e4bd4242e6edaa8d879cd88');
+  assert.equal(hero.approvalScope,'CAR_APPEARANCE_ONLY__NOT_FULL_FILM_OR_MOVING_SHOTS');
+  for(const beat of manifest.beats) {
+    assert.equal(beat.media.approved,false,'appearance approval must not unlock '+beat.id);
+    if(['vehicle','integrated'].includes(beat.role)) {
+      assert.equal(beat.media.approvedHeroSourceCommit,null);
+    }
+  }
+  assert.equal(manifest.voice.approved,false);
+});
+
 test('render hard-stops with missing approval and no false finished MP4',()=>{
   const r=spawnSync(process.execPath,[editor,'--render'],{cwd:process.cwd(),encoding:'utf8'});
   assert.equal(r.status,2);
