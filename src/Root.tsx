@@ -1,4 +1,5 @@
 import React from 'react';
+import {WorldKitCompositions} from './yunex/world-kit/registrations';
 import {AIEraSevenV3,AI_ERA_SEVEN_V3_FRAMES} from './ai-era/AIEraSevenV3';
 import {AIEraAllAgents,EXPANDED_FRAMES} from './ai-era/AIEraAllAgents';
 import {AIEraRealFootage,AI_ERA_FRAMES} from './ai-era/AIEraRealFootage';
@@ -12,6 +13,7 @@ import {StudioMaterialProof} from './studio/StudioMaterialProof';
 import {TwoVersionFilm} from './advanced/TwoVersionFilm';
 
 export const VideoRoot=()=> <>
+  <WorldKitCompositions/>
   <Composition id="AIEraSevenV3" component={AIEraSevenV3} width={1080} height={1920} fps={30} durationInFrames={AI_ERA_SEVEN_V3_FRAMES}/>
   <Composition id="AIEraAllAgents" component={AIEraAllAgents} width={1080} height={1920} fps={30} durationInFrames={EXPANDED_FRAMES}/>
   <Composition id="AIEraRealFootage" component={AIEraRealFootage} width={1080} height={1920} fps={30} durationInFrames={AI_ERA_FRAMES}/>

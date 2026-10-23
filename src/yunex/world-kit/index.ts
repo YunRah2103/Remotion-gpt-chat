@@ -1,0 +1,15 @@
+export {VEHICLES,ENVIRONMENTS,vehicleSpec} from './catalog.ts';
+export type {VehicleFamily,VehicleSpec,VehicleOptions,VehicleVariant,EnvironmentKind,TimeOfDay} from './catalog.ts';
+export {createVehicle} from './vehicles.ts';
+export {createEnvironment,sampleRoute,routeLength} from './environments.ts';
+export type {EnvironmentOptions,RoutePose} from './environments.ts';
+export {animateVehicle,placeVehicle} from './motion.ts';
+export {disposeObject} from './geometry.ts';
+export {Vehicle,Environment,WorldLighting,CameraAim} from './components';
+export {vehicleCamera} from './cameras.ts';
+export type {CameraPreset} from './cameras.ts';
+export {ENVIRONMENT_CATALOG,environmentSpec} from './world-catalog.ts';
+export {PROP_KINDS,createProp} from './props.ts';
+export type {PropKind,PropOptions} from './props.ts';
+export {SceneProp} from './components';
+export {createInterior,interiorLayout,interiorCamera} from './interiors.ts';

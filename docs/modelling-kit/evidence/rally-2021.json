@@ -1,0 +1,206 @@
+{
+  "video": "/workspace/scratch/773eb3d6aefe/yunex-native-2021/out/studio/v4-b-rally/proof.mp4",
+  "sourceRevision": "2021bc5",
+  "sha256": "6a8c6c40a1d97cb77a7a91f6bf9aa0ca0dc1747476ad135c0cafafca8b904f61",
+  "native": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "frames": 300,
+    "seconds": 10
+  },
+  "method": {
+    "fullDecode": "ffmpeg -v error -xerror -i proof.mp4 -f null -; completed without error",
+    "visualInspection": "Individual original-resolution decoded PNG sequences, ordered within each contiguous window. No real-time playback attestation.",
+    "visuallyInspectedFrames": 56,
+    "totalFrames": 300,
+    "fullVisualCoverage": false,
+    "midpointWindowsInclusive": [
+      [
+        24,
+        31
+      ],
+      [
+        81,
+        88
+      ],
+      [
+        137,
+        144
+      ],
+      [
+        193,
+        200
+      ],
+      [
+        259,
+        266
+      ]
+    ],
+    "cutWindowsInclusive": [
+      [
+        54,
+        57
+      ],
+      [
+        111,
+        114
+      ],
+      [
+        167,
+        170
+      ],
+      [
+        223,
+        226
+      ]
+    ],
+    "frameDirectory": "/workspace/scratch/773eb3d6aefe/yunex/out/review-findings/rally-2021-frames"
+  },
+  "decision": "No confirmed critical or important blocker in the inspected sequences. Sampled visual review only; does not certify photorealism, full-film temporal quality, or mechanical engineering fidelity.",
+  "shots": [
+    {
+      "name": "read-the-corner",
+      "timeline": [
+        0,
+        55
+      ],
+      "inspected": [
+        [
+          24,
+          31
+        ],
+        [
+          54,
+          55
+        ]
+      ],
+      "observations": [
+        "Complete roof, mirrors, front rally lamps and rear wing fit in frame. Smooth car-to-gravel movement and stable paint highlights.",
+        "Tight overhead framing provides little road-corridor or bend context; sampled images establish the car more clearly than the corner."
+      ]
+    },
+    {
+      "name": "commit",
+      "timeline": [
+        56,
+        112
+      ],
+      "inspected": [
+        [
+          56,
+          57
+        ],
+        [
+          81,
+          88
+        ],
+        [
+          111,
+          112
+        ]
+      ],
+      "observations": [
+        "Full front-three-quarter silhouette; lamps, roof scoop, wing and wheels remain visible. Wheel rotation and passing gravel/foliage demonstrate motion.",
+        "Raised rally stance and chunky tread read clearly; no sampled camera jump, arch/body pop or foreground obstruction."
+      ]
+    },
+    {
+      "name": "contact-patch",
+      "timeline": [
+        113,
+        168
+      ],
+      "inspected": [
+        [
+          113,
+          114
+        ],
+        [
+          137,
+          144
+        ],
+        [
+          167,
+          168
+        ]
+      ],
+      "observations": [
+        "Entire near front wheel stays visible. Spokes/disc rotate, caliper stays at its mounting position, and wheel/arch motion changes smoothly across midpoint sequence.",
+        "Soft displaced shadow and lack of a visually strong contact patch make the wheel appear suspended. This is a visual grounding concern, not a confirmed physical float. Separate numeric report has minimum carcass gaps -0.000444 to -0.000110 metres against analytic road height for frames137\u2013144.",
+        "Closeup mostly shows tyre/brake, with limited visibility of the suspension hardware; cannot certify linkage function from these images."
+      ]
+    },
+    {
+      "name": "driver-input",
+      "timeline": [
+        169,
+        224
+      ],
+      "inspected": [
+        [
+          169,
+          170
+        ],
+        [
+          193,
+          200
+        ],
+        [
+          223,
+          224
+        ]
+      ],
+      "observations": [
+        "Helmet, torso, hands at wheel and boots at pedals stay within frame. Cage and transparent body intentionally overlay the driver.",
+        "No obvious limb disconnect or sampled sudden pose/camera pop. Input movement is subtle in these short windows; detailed ergonomic or force-path correctness is not established."
+      ]
+    },
+    {
+      "name": "traction-exit",
+      "timeline": [
+        225,
+        299
+      ],
+      "inspected": [
+        [
+          225,
+          226
+        ],
+        [
+          259,
+          266
+        ]
+      ],
+      "observations": [
+        "Complete rear-three-quarter silhouette with wing, rear lamps, exhaust and visible wheels. Continuous roadside and gravel translation with wheel rotation.",
+        "Paint remains stable. Stance and rear cage remain readable. No dust plume or strong gravel spray in these inspected frames; stylized clean presentation offers limited traction/drama cues."
+      ]
+    }
+  ],
+  "cuts": "All four expected hard changes of viewpoint are present at56,113,169,225. Two frames before and two after each cut inspected; no intervening black frame, unexpected extra angle, or duplicated transition found in those windows.",
+  "concerns": [
+    {
+      "severity": "visual-quality",
+      "frames": [
+        113,
+        168
+      ],
+      "issue": "Soft contact-shadow separation weakens perceived tyre grounding in wheel closeup. Numeric evidence rules out analytic-field float for midpoint137\u2013144, but screen-space grounding remains unconvincing."
+    },
+    {
+      "severity": "editorial-limit",
+      "frames": [
+        0,
+        55
+      ],
+      "issue": "Tight overhead read-the-corner view gives little bend context in inspected frames."
+    }
+  ],
+  "knownStyleLimits": [
+    "Faceted foliage, simple grass triangles and clean unmarked car/road feel game-like. No photoreal beauty certification.",
+    "56/300 frames were visually inspected; full decode is a technical check and does not substitute for all-frame visual inspection."
+  ],
+  "contactNumericEvidence": "/workspace/scratch/773eb3d6aefe/yunex/out/v4-qa-runtime/rally-contact-numeric.json",
+  "sourceEdits": false
+}
