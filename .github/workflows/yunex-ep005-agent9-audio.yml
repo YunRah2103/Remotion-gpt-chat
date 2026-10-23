@@ -1,0 +1,60 @@
+name: EP005 Agent9 - original cinematic audio stems
+on:
+  push:
+    branches: [agent/ep005-09-final-audio]
+    paths:
+      - 'production/yunex/supercar_flames_ep005/agent9/**'
+      - '.github/workflows/yunex-ep005-agent9-audio.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sound:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install audio requirements
+        run: |
+          python3 -m pip install --disable-pip-version-check 'numpy>=1.26,<3' 'scipy>=1.12,<2' 'soundfile>=0.12,<1'
+          ffmpeg -version | head -1
+      - name: Produce non-voice stems
+        run: python3 production/yunex/supercar_flames_ep005/agent9/build_soundtrack.py --out out/ep005-agent9
+      - name: Verify 767f audio, bed summation and decode
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in out/ep005-agent9/*.wav; do
+            ffmpeg -hide_banner -v error -xerror -i "$f" -f null -
+            ffprobe -hide_banner -v error -show_entries stream=codec_name,sample_rate,channels,duration -of csv=p=0 "$f"
+          done
+          python3 - <<'PY'
+          import json, soundfile as sf, pathlib, numpy as np
+          p=pathlib.Path("out/ep005-agent9")
+          m=json.loads((p/"manifest.json").read_text())
+          assert m["frameCount"]==767 and m["sampleCount"]==1227200
+          for path in p.glob("*.wav"):
+              x,sr=sf.read(path)
+              assert x.shape==(1227200,2) and sr==48000 and np.isfinite(x).all(),path
+          parts=sum((sf.read(p/(name+".wav"))[0] for name in ("engine_road","exhaust_afterfire","engine_science","cinematic_score")))
+          bed=sf.read(p/"music_fx_bed_no_voice.wav")[0]
+          assert np.max(np.abs(parts-bed))<2e-6
+          print("PASS: all WAVs 767f sample-equivalent, sum and decode. No Cedar voice present.")
+          PY
+          ffmpeg -hide_banner -nostats -i out/ep005-agent9/music_fx_bed_no_voice.wav -filter_complex ebur128=peak=true -f null - 2> out/ep005-agent9/loudness-report.log
+          tail -20 out/ep005-agent9/loudness-report.log
+          sha256sum out/ep005-agent9/*.wav out/ep005-agent9/*.mp3 > out/ep005-agent9/SHA256SUMS.txt
+      - name: Publish ONLY original nonvoice audio files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: EP005-Agent9-Original-Audio-Stems-${{ github.run_id }}
+          path: |
+            out/ep005-agent9/
+            production/yunex/supercar_flames_ep005/agent9/build_soundtrack.py
+            production/yunex/supercar_flames_ep005/agent9/README.md
+          if-no-files-found: warn
+          retention-days: 30
