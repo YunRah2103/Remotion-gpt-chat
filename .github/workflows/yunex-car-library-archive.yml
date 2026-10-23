@@ -1,0 +1,56 @@
+name: YUNEX Car Library - Full 532 Model Archive
+on:
+  push:
+    branches: [feat/yunex-external-car-library-20261023]
+    paths: [.github/workflows/yunex-car-library-archive.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download all original pinned models
+        run: node external-assets/cars/library.mjs download all --concurrency=8
+      - name: Verify all GLB checksums
+        run: node external-assets/cars/library.mjs verify all
+      - name: Create license-labelled ZIP archives
+        run: python3 external-assets/cars/build_release.py
+      - name: Verify catalogue and archive counts
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('out/external-cars-release')
+          x=json.loads((p/'release-index.json').read_text())
+          assert x['totalCars']==532 and x['totalGLBBytes']==1883125972
+          assert sum(y['models'] for y in x['shards'])==532
+          assert all((p/y['file']).is_file() for y in x['shards'])
+          print('Verified all models in',len(x['shards']),'ZIP archives')
+          PY
+      - name: Publish archives separately from repository code
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          TAG=yunex-real-cars-532-2026-10-23
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --target "$GITHUB_SHA" --title "YUNEX 532 Real Car Models" --notes-file out/external-cars-release/README.md --latest=false
+          fi
+          gh release upload "$TAG" out/external-cars-release/*.zip out/external-cars-release/release-index.json out/external-cars-release/README.md --clobber
+          gh release view "$TAG" --json name,url,assets
+      - name: Upload small status files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: yunex-car-library-report
+          path: |
+            out/external-cars-release/release-index.json
+            out/external-cars-release/README.md
+          retention-days: 14
+          if-no-files-found: ignore
