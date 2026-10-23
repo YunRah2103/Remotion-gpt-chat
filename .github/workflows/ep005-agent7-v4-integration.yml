@@ -7,6 +7,9 @@ on:
       - 'tests/ep005-agent7.test.mjs'
       - '.github/workflows/ep005-agent7-v4-integration.yml'
   workflow_dispatch:
+concurrency:
+  group: ep005-agent7-v4-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
@@ -57,8 +60,11 @@ jobs:
           set -euo pipefail
           npm ci
           node --experimental-strip-types --test tests/ep005-agent7.test.mjs
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
+          ffmpeg -version | head -n 1
       - name: Genuine 1080x1920 30fps V4 driving with framewise physical nozzle jets
         shell: bash
         run: |
