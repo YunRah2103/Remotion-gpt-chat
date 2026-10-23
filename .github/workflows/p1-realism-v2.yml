@@ -1,0 +1,63 @@
+name: P1 - Model Kit Realism V2
+on:
+  push:
+    branches:
+      - film/mclaren-p1-realism-v2
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Download original source P1 GLB
+        run: |
+          mkdir -p public/p1-hybrid out/p1-realism-v2
+          curl --fail --location --retry 4 --silent --show-error \
+            'https://raw.githubusercontent.com/pedrosoandre/carros/2d18dfd9db96bbf0d9cffa949deaf7f571388cbf/assets/mclaren-p1.glb' \
+            -o public/p1-hybrid/mclaren-p1.glb
+          test "$(head -c 4 public/p1-hybrid/mclaren-p1.glb)" = 'glTF'
+          sha256sum public/p1-hybrid/mclaren-p1.glb > out/p1-realism-v2/model.sha256
+      - name: Render actual GLB with modelling kit stage
+        run: |
+          npx remotion render production/p1-hybrid/entry-v2.tsx P1RealismV2 out/p1-realism-v2/p1-realism-v2-silent.mp4 \
+            --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+      - name: Install ffmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Inspect frames, decode full film and generate contact sheet
+        run: |
+          ffprobe -v error -show_entries format=duration,size -show_entries stream=width,height,avg_frame_rate,nb_frames \
+            -of default=noprint_wrappers=1 out/p1-realism-v2/p1-realism-v2-silent.mp4 | tee out/p1-realism-v2/video-report.txt
+          ffmpeg -v error -i out/p1-realism-v2/p1-realism-v2-silent.mp4 -f null -
+          ffmpeg -y -v error -i out/p1-realism-v2/p1-realism-v2-silent.mp4 \
+            -vf "fps=1/1.5,scale=350:-1,tile=3x2" -frames:v 1 out/p1-realism-v2/contact-sheet.jpg
+      - name: Save revision notes
+        if: always()
+        run: |
+          cat > out/p1-realism-v2/README.txt <<'EOF'
+          REALISM V2 - YUNEX P1 cinematic
+          Actual McLaren P1 geometry from pedrosoandre/carros.
+          Creator vecarz, licence CC BY 4.0. Keep source and licence attribution.
+          Changes: real-time IBL using YUNEX WorldLighting/RoomEnvironment,
+          YUNEX garage/showroom/tyre-stack assets, local clearcoat BRDF tuning,
+          filmic tone-mapping, physically brighter workshop, tighter camera motion.
+          Source: production/p1-hybrid/entry-v2.tsx
+          No geometry replacement. Original V1 left intact.
+          Audio stems are from previous cut and are to be reused in final export.
+          EOF
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p1-model-kit-realism-v2
+          path: out/p1-realism-v2/
+          retention-days: 14
