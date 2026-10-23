@@ -68,10 +68,10 @@ export const ApprovedV4Driving:React.FC<{shot:V4Shot}>=({shot})=>{
  return <AbsoluteFill style={{background:'#36414a'}}>
  <ThreeCanvas width={width} height={height} shadows camera={{fov:camera.fov,near:.025,far:550}} gl={{antialias:true}}>
  <CinematicLighting focus={[pose.x,0,0]} timeOfDay="dusk"/>
- <hemisphereLight args={['#d9ecff','#4c5360',.9]}/>
- <directionalLight position={[pose.x+7,13,-7]} intensity={2.2} color="#e8f3ff"/>
- <directionalLight position={[pose.x-3,8,9]} intensity={1.75} color="#ffd7b1"/>
- <spotLight position={[pose.x+2,9,-7]} angle={.85} distance={25} intensity={70} penumbra={.85} color="#d1ebff"/>
+ <hemisphereLight args={['#d9ecff','#4c5360',1.05]}/>
+ <directionalLight position={[8,13,-7]} intensity={1.65} color="#e8f3ff"/>
+ <directionalLight position={[-3,8,9]} intensity={1.3} color="#ffd7b1"/>
+ <spotLight position={[pose.x+2,9,-7]} angle={.85} distance={25} intensity={28} penumbra={1} color="#d1ebff"/>
  <primitive object={track}/>
  <primitive object={car}/>
  <CameraAim {...camera}/>
