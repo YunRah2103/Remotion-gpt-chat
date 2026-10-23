@@ -58,7 +58,7 @@ export const StudioEpisode:React.FC<{recipe:EpisodeRecipe}>=({recipe})=>{
   model.position.fromArray(pose.position);model.rotation.set(0,pose.yaw,parked?0:Math.atan2(ahead.position[1]-pose.position[1],.4));model.updateMatrixWorld(true);
   const head=model.getObjectByName('head');if(head)head.visible=shot.camera!=='onboard';
   if(shot.camera==='interior'&&(state.cutaway??0)>.5)camera=cabinInspectionCamera(model,width/height);
-  else if(shot.camera==='onboard')camera=driverPovCamera(model);
+  else if(shot.camera==='onboard'){const aheadRoad=!parked&&model.userData.bodyArchitecture==='section-loft-v4'?sampleRoute(recipe.world.kind,distance+10):undefined;camera=driverPovCamera(model,aheadRoad?[aheadRoad.position[0],aheadRoad.position[1]+.7,aheadRoad.position[2]]:undefined);}
   else if(['tracking','chase','reveal','overhead'].includes(shot.camera))camera=fitModelCamera(model,camera,width/height);
  }
  if(shot.cameraMove){camera=sampleCameraMove(shot.cameraMove,sample.localFrame,shot.endFrame-shot.startFrame,model,camera.fov);if(['tracking','chase','reveal','overhead'].includes(shot.camera))camera=fitCameraMove(model,camera,width/height);}

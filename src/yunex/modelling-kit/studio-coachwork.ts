@@ -1,5 +1,6 @@
 /** Original authored section lofts. Metres, +X forward. Shared surface equations keep adjoining panels fitted. */
 import * as T from 'three';
+import {angleWeightedNormals} from './studio-normals.ts';
 import {mesh,box,rod,surface} from '../world-kit/geometry.ts';
 import type {V3} from '../world-kit/geometry.ts';
 import type {VehicleSpec} from '../world-kit/catalog.ts';
@@ -66,7 +67,7 @@ function bodyGeometry(s:VehicleSpec){
  }
  const n=rows[0].length;for(let i=0;i<rows.length-1;i++)for(let j=0;j<n;j++){const a=rows[i][j],b=rows[i][(j+1)%n],c=rows[i+1][j],d=rows[i+1][(j+1)%n];idx.push(a,b,c,b,d,c);}
  for(const end of [0,rows.length-1]){const row=rows[end],centre=new T.Vector3();for(const i of row)centre.add(new T.Vector3(p[i*3],p[i*3+1],p[i*3+2]));centre.multiplyScalar(1/n);const ci=p.length/3;p.push(...centre.toArray());for(let j=0;j<n;j++)idx.push(...(end===0?[ci,row[(j+1)%n],row[j]]:[ci,row[j],row[(j+1)%n]]));}
- let g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setIndex(idx);const position=g.attributes.position;for(let i=0;i<position.count;i++){const x=position.getX(i),y=position.getY(i),z=position.getZ(i);position.setX(i,x-.13*(z/(s.width/2))**2*smooth(x,half-.50,half)+.07*(z/(s.width/2))**2*(1-smooth(x,-half,-half+.42)));}g.computeVertexNormals();
+ let g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setIndex(idx);const position=g.attributes.position;for(let i=0;i<position.count;i++){const x=position.getX(i),y=position.getY(i),z=position.getZ(i);position.setX(i,x-.13*(z/(s.width/2))**2*smooth(x,half-.50,half)+.07*(z/(s.width/2))**2*(1-smooth(x,-half,-half+.42)));}angleWeightedNormals(g);
  const c=studioBodyProfile(s);g=cutOpening(g,[c.rearBase+.06,.49,-c.baseWidth*.91],[c.frontBase-.05,2,c.baseWidth*.91]);
  return g;
 }
