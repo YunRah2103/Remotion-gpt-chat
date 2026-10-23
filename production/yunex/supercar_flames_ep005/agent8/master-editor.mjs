@@ -204,7 +204,7 @@ function assTime(frame) {
   return h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+'.'+String(centi%100).padStart(2,'0');
 }
 function escapeAss(text) {
-  return text.replace(/[{}\\]/g,'').replace(/\r?\n/g,' ');
+  return text.replace(/[{}\\]/g,'').replace(/\r?\n/g,'\\N');
 }
 function createAss() {
   const header = [
