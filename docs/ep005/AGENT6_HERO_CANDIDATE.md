@@ -1,40 +1,45 @@
-# YUNEX EP005 — Agent 6: car-only visual gate
+# YUNEX EP005 — Agent 6 approved V4-A supercar handoff
 
-**STATUS: UNAPPROVED CANDIDATE — explicit owner / Agent 0 inspection required before driving production.**
+**Owner approval is for the exterior teal V4-A vehicle look, not for any previous candidate, the driving scenes, or a final EP005 film.**
 
-## Source audit and selection
+## Pinned exterior source (do not swap cars)
 
-Rejected A1–A5 geometry was not reused. PR #233 kit architecture was audited: its QA describes a stylized procedural body with remaining faceting. This isolated branch starts on main without merging kit PR #233 or altering EP003/EP004.
+- Approved PR #233 source: `9052a539e10a7cb97487c1435455bb9962ad58e1`
+- Approved native 14-second preview: https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39866437063/artifacts/12465297894
+- Approved original MP4 SHA256: `1654a5efd3a3403871b0a52a3140a9e7aeb1222a2e4bd4242e6edaa8d879cd88`
+- V4 source recipe: `createV4Production({kind:'supercar'})`; `variant:'supercar', bodyDetail:'studio', driver:true, color:'#18636b', powertrain:TWIN_TURBO_V8`.
+- Source locked by copying the **exact Git trees** for `src/yunex/modelling-kit`, `src/yunex/world-kit`, `src/yunex/parts-kit`, `scripts/modelling-kit`, and `tests/modelling-kit` from approved commit onto this *isolated episode branch*. This is not a PR #233 merge; kit branch is untouched.
+- Current builder: `src/yunex/ep005/agent6/v4-approved.ts`; native compositions: `src/yunex/ep005/agent6/v4-driving-entry.tsx`.
+- Historic Spectral CC0 candidate A and Khronos CarConcept candidate B in this PR are **rejected/retired**. The old `entry.tsx`, `khronos-entry.tsx`, `exhaust-ports.v1.json`, old workflows and their MP4s are **NOT APPROVED EP005 assets**, must never be consumed by Agents 7/8.
 
-Candidate asset: **Spectral GT RS** by **JaronKBragg7337** (original CC0 1.0 Universal), from https://github.com/JaronKBragg7337/spectral-gt-rs . The source includes Blender 5.1.2 editable scene, generator and GLB. It is a candidate for visual review, not a claim of high-end automotive CAD.
+## Native driving source and shot routing
 
-- Immutable upstream commit: 34499c501908818a2b08e589a7aecf963343cee7
-- GLB git blob SHA: f5b814848453a6c75a48f5047fdadaa7bdc78969
-- License git blob SHA: 8f40c549094ff25ff1e2a8cdc597f29f78195b9a
-- Full editable source: spectral_gt_rs_master.blend and spectral_gt_car.py at same source commit
-- CC0 legal code: https://creativecommons.org/publicdomain/zero/1.0/legalcode
-- Asset source and license are downloaded from immutable upstream paths and git-blob verified by scripts/ep005-agent6/fetch-asset.sh. Build publishes their SHA256. No expiring/signed URL dependency.
+All four select compositions are 120 frames at 30 fps, 1080x1920, silent originals. The car moves *in world space* on +X along a fixed track with analytic distance `26.5t+0.725t²` metres, not by scrolling a texture; wheels receive this same travelled distance from the V4 vehicle rig. The camera follows a distinct authored moving relative path with real parallax, continuous animation, stable lighting, tyre contact/shadows, barriers and pit architecture:
 
-## Native inspection deliverables
+| Composition | Purpose |
+|---|---|
+| `Ep005Agent6V4RearProof` | First rear three-quarter action gate and flame-tip visibility for Agent 7 |
+| `Ep005Agent6V4SideTracking` | Moving body profile / rolling wheels |
+| `Ep005Agent6V4FrontPursuit` | Aggressive front low-action select |
+| `Ep005Agent6V4RearChase` | Moving rear payoff/recovery base |
 
-Two registered Remotion H.264 compositions:
-- Ep005Agent6HeroProofPortrait: 1080 x 1920, 30 fps, 120 frames
-- Ep005Agent6HeroProofLandscape: 1920 x 1080, 30 fps, 120 frames
+Exact source/MP4 hashes and artifact names are generated per matrix job by `.github/workflows/ep005-agent6-v4-driving.yml`. Do not claim proof complete until FFprobe, full 120-frame decode, unique-motion stills and full-resolution contact-sheet inspection pass.
 
-Continuous neutral studio camera front -> front 3/4 -> pure side -> rear 3/4 -> rear. No darkness, flames, cuts to hide shape, grading, post blur or moving-road illusion. Car stays stationary to expose real geometry. Originally oversized 156mm rings are hidden, replaced by recessed 114mm outer-diameter tips and 82mm bores. Remaining aesthetic defects must be judged from full-resolution moving videos and all six sample frames. Reject the entire candidate and choose a different asset if it still looks wrong; no repeated ornament patches.
+## Authoritative Agent 7 exhaust ABI
 
-Reproduce from repo root:
+Source: `src/yunex/ep005/agent6/v4-exhaust-ports.json` (also exported as TypeScript `V4_EXHAUST_MANIFEST`).
 
-    npm ci --no-audit --no-fund
-    bash scripts/ep005-agent6/fetch-asset.sh
-    npx remotion render src/yunex/ep005/agent6/entry.tsx Ep005Agent6HeroProofPortrait out/ep005-agent6/hero-proof-portrait.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
-    npx remotion render src/yunex/ep005/agent6/entry.tsx Ep005Agent6HeroProofLandscape out/ep005-agent6/hero-proof-landscape.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=1
-    bash scripts/ep005-agent6/verify.sh out/ep005-agent6/hero-proof-portrait.mp4 out/ep005-agent6/portrait-qa
+- Vehicle coordinate frame: +X forward, +Y up, +Z driver's left, metres.
+- Name **left**: `exhaust-outlet-left` (inside animated `body-shell`).
+- Name **right**: `exhaust-outlet-right` (inside animated `body-shell`).
+- Node-local mouth offset: `[0,0,0]`, node-local flow/outward axis: `[0,0,1]`; the mount's quaternion maps local +Z to vehicle -X backward.
+- Authentic V4 kit factory measured parameters: **112 mm outer visible diameter**, 4 mm wall, **104 mm inner bore**, 52 mm inner radius per tip. Recess/connected pipe exist in approved rig; do not duplicate tips or inflate tips to support bigger flames.
+- Update actual world pose via `poseApprovedV4(car, frame)` then read `sampleV4Ports(car, frame)` from the same car, or call Agent 7 `sampleActualPorts(car, manifest, frame, fps)`; never reuse old candidate A world coordinates.
+- `scripts/ep005-agent6/v4-ports.mjs` exports independent 120-frame world positions, outward axes and `matrixWorld` for each source node, checks travel and lateral ordering, hashes both manifest and timeline.
 
-Workflow .github/workflows/ep005-agent6-hero-proof.yml runs both renders, full FFmpeg decode, FFprobe dimension/fps/frame count/pixel format, hash and contact sheet. Its GitHub artifact is the deliverable, not this document.
+## Required handoff gate
 
-## New Agent 7 and Agent 8 interfaces
-
-See src/yunex/ep005/agent6/exhaust-ports.v1.json. Car axes after GLB adapter: +Z forward, +Y up, -X left; mounts (metres) left [-0.56, 0.57, -2.515], right [+0.56, 0.57, -2.515], local outward [0,0,-1], inner radius 0.041m and outer diameter 0.114m. Native GLTF before -90deg Y rotation: left [-2.515,0.57,+0.56], right [-2.515,0.57,-0.56], direction [-1,0,0]. Source function sampleExhaustWorld(car,frame) applies car's complete matrixWorld to original asset-local mounts to emit frame-specific values for Agent 7. Particles must inherit the current vehicle transform.
-
-This is a static hero approval proof. **No full driving scene, editor handoff, final approval or merge until owner explicitly accepts the car.** Once approved, build moving route footage with wheel rotation, real road parallax, suspension, contact and purposeful camera motion for Agent 8.
+1. Native MP4 render and visual check of exact V4 car in motion (owner only approved car look).
+2. Agent 7 attaches afterfire directly to these **world-sampled moving mouths** on this car. 
+3. Agent 8 takes only native MP4s with exact run IDs, source commit, SHA256 and picture-approved comment URL; silent-picture review remains mandatory if no authenticated VO.
+4. **NO MERGE.**
