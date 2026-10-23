@@ -44,8 +44,8 @@ function scienceCamera(t:number):{position:VectorTuple;target:VectorTuple}{
     {t:1.35,position:[3.0,2.65,6.7],target:[-.05,.42,0]},
     {t:1.90,position:[2.45,2.65,7.0],target:[-.45,.35,0]},
     {t:2.83,position:[.85,2.6,7.15],target:[-.75,.26,0]},
-    {t:3.50,position:[-2.9,2.45,6.25],target:[-1.35,.16,0]},
-    {t:5,position:[-3.5,2.3,5.95],target:[-1.60,.10,0]},
+    {t:3.50,position:[-4.35,1.85,5.25],target:[-2.35,.02,0]},
+    {t:5,position:[-4.60,1.80,4.95],target:[-2.70,-.02,0]},
   ];
   let i=0;while(i<k.length-2&&t>k[i+1].t)i++;
   const a=k[i],b=k[i+1],u=Math.max(0,Math.min(1,(t-a.t)/(b.t-a.t)));
