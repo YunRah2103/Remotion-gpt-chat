@@ -1,0 +1,92 @@
+[
+  {
+    "variant": "hot-hatch",
+    "quality": "lightweight",
+    "buildMS": 739.5801329999999,
+    "averageUpdateMS": 0.4202375416666655,
+    "meshes": 377,
+    "uniqueGeometries": 373,
+    "uniqueMaterials": 49,
+    "drawTriangles": 96750
+  },
+  {
+    "variant": "hot-hatch",
+    "quality": "standard",
+    "buildMS": 808.813733,
+    "averageUpdateMS": 9.95151016666666,
+    "meshes": 487,
+    "uniqueGeometries": 470,
+    "uniqueMaterials": 79,
+    "drawTriangles": 131590
+  },
+  {
+    "variant": "hot-hatch",
+    "quality": "hero",
+    "buildMS": 898.6966229999998,
+    "averageUpdateMS": 9.156600333333339,
+    "meshes": 595,
+    "uniqueGeometries": 578,
+    "uniqueMaterials": 83,
+    "drawTriangles": 169734
+  },
+  {
+    "variant": "supercar",
+    "quality": "lightweight",
+    "buildMS": 442.8525239999999,
+    "averageUpdateMS": 0.05586454166666499,
+    "meshes": 361,
+    "uniqueGeometries": 317,
+    "uniqueMaterials": 43,
+    "drawTriangles": 86024
+  },
+  {
+    "variant": "supercar",
+    "quality": "standard",
+    "buildMS": 461.1619649999998,
+    "averageUpdateMS": 9.772159291666677,
+    "meshes": 528,
+    "uniqueGeometries": 471,
+    "uniqueMaterials": 73,
+    "drawTriangles": 143948
+  },
+  {
+    "variant": "supercar",
+    "quality": "hero",
+    "buildMS": 698.6346309999999,
+    "averageUpdateMS": 5.829546958333329,
+    "meshes": 636,
+    "uniqueGeometries": 579,
+    "uniqueMaterials": 77,
+    "drawTriangles": 182092
+  },
+  {
+    "variant": "formula-modern",
+    "quality": "lightweight",
+    "buildMS": 56.91390500000034,
+    "averageUpdateMS": 0.01699887500001296,
+    "meshes": 190,
+    "uniqueGeometries": 186,
+    "uniqueMaterials": 18,
+    "drawTriangles": 42640
+  },
+  {
+    "variant": "formula-modern",
+    "quality": "standard",
+    "buildMS": 115.10151200000018,
+    "averageUpdateMS": 2.696213458333356,
+    "meshes": 339,
+    "uniqueGeometries": 322,
+    "uniqueMaterials": 52,
+    "drawTriangles": 91804
+  },
+  {
+    "variant": "formula-modern",
+    "quality": "hero",
+    "buildMS": 194.99581200000011,
+    "averageUpdateMS": 1.5640184583333319,
+    "meshes": 447,
+    "uniqueGeometries": 430,
+    "uniqueMaterials": 56,
+    "drawTriangles": 126492
+  }
+]

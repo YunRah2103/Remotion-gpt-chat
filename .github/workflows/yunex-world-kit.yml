@@ -1,0 +1,45 @@
+name: YUNEX reusable world kit
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'src/yunex/world-kit/**'
+      - 'tests/world-kit/**'
+      - 'scripts/world-kit/**'
+      - '.github/workflows/yunex-world-kit.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run worldkit:test
+      - run: npm run worldkit:export
+      - run: node scripts/world-kit/validate-glb.mjs
+      - run: npm run worldkit:export-props
+      - name: Native model and environment review
+        run: npm run worldkit:review-v3
+      - name: Refined vehicles native review
+        run: npm run worldkit:review-quality
+      - name: Detailed environments native review
+        run: npm run worldkit:review-worlds
+      - name: Reusable prop stills
+        run: npm run worldkit:environments -- --props-only --stills-only
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-WORLD-KIT-QUALITY
+          path: |
+            out/world-kit
+            out/world-kit-v2
+            out/world-kit-v3
+            out/world-kit-quality
+            out/world-kit-scenic
+          retention-days: 30
