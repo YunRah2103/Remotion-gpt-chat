@@ -15,3 +15,6 @@ test('structured configuration rejects typos and out of range settings',()=>{
  assert.throws(()=>resolveConfig({preset:'city',qualty:'hero'}),/Unknown/);
  assert.equal(resolveConfig({preset:'mountain',vegetation:0}).vegetation,0);
 });
+test('hero rally foliage uses a bounded instanced LOD budget',()=>{
+ const e=createStudioEnvironment({preset:'rally',quality:'hero'}),foliage=e.group.getObjectByName('v5-instanced-foliage-branches');assert.ok(foliage.isInstancedMesh);assert.ok(foliage.count<50000,`Unbounded foliage: ${foliage.count}`);assert.equal(foliage.castShadow,false);disposeObject(e.group);
+});
