@@ -134,3 +134,23 @@ Audio evidence and files:
 **Critical artifact availability:** The owner MP3 was attached in chat, **not committed as a binary GitHub file**, so workflow run cannot directly download it from GitHub Actions. To make a true narrated film the authenticated render environment must have the **exact** MP3 at `out/ep005-agent8-sources/user-cedar/openai-fm-cedar-audio.mp3` with identical SHA. The approval gate checks real file presence and blocks native render if absent. No claim that workflow has this binary or that finished EP005 audio/movie exists.
 
 Caption visual QA: use restrained, centered lower-third phone-safe captions, max two lines, no bottom clipping. The original MP3 supplies 13 independently identified speech phrase spans; they are **not** invented per-word timestamps. Inspect actual audio sync, the first half second of picture, cut boundaries, actual science/afterfire and the final 75+ frames before reporting final readiness. Existing `edit-manifest.json` and `rough-picture-manifest.json` remain historical 750f **silent** source-review plans; do not use them for authoritative owner-provided narration.
+
+
+## 23 October — original Cedar narrated preview (767f; no picture lock)
+
+The owner-supplied Cedar MP3 is 25.560 seconds (SHA256 `90dd2e299b1cdd9b7f2d3bc508b064c43dda7bfc36caa345b2f502ec13c200d8`). Final narration's native timeline is **767 frames at 30fps**, not the historical 750-frame silent edit. Do not trim/respeed the original voice to 25 seconds.
+
+**Secure staging on a trusted local render worker:** after checking out this PR and installing Node + FFmpeg, use:
+
+```bash
+node production/yunex/supercar_flames_ep005/agent8/stage-owner-voice.mjs /path/to/private/openai-fm-cedar-audio.mp3
+```
+
+The staging tool requires the exact original 408,960-byte MP3, matching SHA256, 24 kHz mono and 25.56s ffprobe duration. It writes a restricted local file at `out/ep005-agent8-sources/user-cedar/openai-fm-cedar-audio.mp3` and does not contact any network service. **Never add this private voice file to GitHub/Git history, logs, public Actions artifacts, or an issue attachment.** GitHub-hosted Actions still lacks access to the user's chat upload; successful validation there must never be presented as a final render.
+
+Run the native editor only after each visual has received a real source-specific approval and the 92-frame A7 finale is genuinely delivered:
+```bash
+node production/yunex/supercar_flames_ep005/agent8/master-editor.mjs --check production/yunex/supercar_flames_ep005/agent8/narrated-picture-manifest.json
+```
+
+A **real narrated 767-frame local rough review** was rendered, fully decoded, checked for safe subtitles and its audio cross-correlated against the original owner MP3 (r>0.999 for start, middle and end samples). Its SHA256 is `f0d7b37f3b5d1b3c810de63b905fd8c82133e2335ee1c9987a261b3150ded291`. It was provided in the owner's active ChatGPT conversation only, **not** published as a GitHub artifact. Important visual blockers: cropped integrated V4 flame hook and finale; schematic science; underdeveloped road/sky staging; no approved cinematic effects/music beds. The preview uses a distinct 17f A6 drive insert before the proven 75f final fire clip, not an approved 92-native-frame integrated shot. No merge.
