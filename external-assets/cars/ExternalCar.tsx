@@ -5,7 +5,7 @@
  * Credits and original licences: ./catalog.json.
  */
 import React, {useMemo} from 'react';
-import {staticFile,useCurrentFrame} from 'remotion';
+import {staticFile,useCurrentFrame,useVideoConfig} from 'remotion';
 import {useLoader} from '@react-three/fiber';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {MeshoptDecoder} from 'three/examples/jsm/libs/meshopt_decoder.module.js';
@@ -28,6 +28,7 @@ export const ExternalCar:React.FC<ExternalCarProps>=({
 })=>{
  if(!/^[a-z0-9][a-z0-9-]*\.glb$/.test(file))throw Error('Only catalogued filename-safe GLB files are accepted');
  const frame=useCurrentFrame();
+ const {fps}=useVideoConfig();
  const loaded=useLoader(GLTFLoader,staticFile('external-cars/'+file),
   loader=>loader.setMeshoptDecoder(MeshoptDecoder));
  const {scene,scale,offset}=useMemo(()=>{
@@ -46,7 +47,7 @@ export const ExternalCar:React.FC<ExternalCarProps>=({
   });
   return {scene:source,scale,offset:new Vector3(-center.x*scale,-bounds.min.y*scale,-center.z*scale)};
  },[loaded.scene,file,length]);
- return <group position={position} rotation={[0,rotationY+frame*rotateSpeed/30,0]}>
+ return <group position={position} rotation={[0,rotationY+frame*rotateSpeed/fps,0]}>
   <group scale={scale} position={offset.toArray()}>
    <primitive object={scene}/>
   </group>
