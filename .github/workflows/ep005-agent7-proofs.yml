@@ -11,6 +11,9 @@ on:
       - 'tests/ep005-agent7.test.mjs'
       - '.github/workflows/ep005-agent7-proofs.yml'
   workflow_dispatch:
+concurrency:
+  group: ep005-agent7-science-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   visual-proof:
     runs-on: ubuntu-latest
@@ -28,8 +31,10 @@ jobs:
         run: node --experimental-strip-types --test tests/ep005-agent7.test.mjs
       - name: Install verification tools
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y ffmpeg
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
           ffmpeg -version | head -n 1
           ffprobe -version | head -n 1
       - name: Render genuine native 3s moving fixture preview
