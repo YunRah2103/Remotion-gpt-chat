@@ -1,0 +1,116 @@
+{
+  "sourceRevision": "16fe656766c01eba55126d598c53770bd72d1947",
+  "automated": {
+    "nodePassed": 213,
+    "failed": 0,
+    "skipped": 0,
+    "typescript": "pass",
+    "focusedPassed": 11
+  },
+  "media": [
+    {
+      "name": "studio",
+      "metadata": {
+        "programs": [],
+        "streams": [
+          {
+            "width": 1920,
+            "height": 1080,
+            "r_frame_rate": "30/1",
+            "nb_read_frames": "90"
+          }
+        ],
+        "format": {
+          "duration": "3.000000"
+        }
+      },
+      "frames": 90,
+      "uniqueFrames": 90,
+      "sha256": "36ff6026382d56ed83e09f675c447f37240b0ef9b464c38523656b55f731eb65",
+      "contract": {
+        "schema": 2,
+        "source": "5bdfd66a40e88b26c1b4502c287525f480e990dac5c6a1b1f80836b49d5676b5",
+        "renderHash": "bde96d406e53010369efa945e439f92cd7611b7cd03a76b7a2c8f07146ab6fa4",
+        "entry": "3a3417f35743a032b46e3526c86d7dfda4250ad45547c4ba0363844a47797359",
+        "shot": "silhouette",
+        "shotHash": "574fc72a",
+        "range": [
+          0,
+          89
+        ],
+        "dimensions": {
+          "width": 1920,
+          "height": 1080
+        },
+        "fps": 30,
+        "sha256": "36ff6026382d56ed83e09f675c447f37240b0ef9b464c38523656b55f731eb65",
+        "file": "out/studio/quality-supercar-volume/render-full-landscape.mp4"
+      }
+    },
+    {
+      "name": "driving",
+      "metadata": {
+        "programs": [],
+        "streams": [
+          {
+            "width": 1080,
+            "height": 1920,
+            "r_frame_rate": "30/1",
+            "nb_read_frames": "60"
+          }
+        ],
+        "format": {
+          "duration": "2.000000"
+        }
+      },
+      "frames": 60,
+      "uniqueFrames": 60,
+      "sha256": "adb724acee8e6bd24dc47580c76f9c94af2becb6686ea8c639257b9a00d12773",
+      "contract": {
+        "schema": 2,
+        "source": "35fc91290f5e54758fc81bc1722612fdd8f47ba67424696fb56aa46b2a4f5a4e",
+        "renderHash": "4c9004f4ab32b8e558c7d5185b60ea87ac67355fd3acd65d80f0d309f779ee13",
+        "entry": "ab0cf6294f8e979571a2d80fe6b577329cc395eb532aa81bdf40eeaa4d6dc745",
+        "shot": "front",
+        "shotHash": "3e7560a1",
+        "range": [
+          0,
+          59
+        ],
+        "dimensions": {
+          "width": 1080,
+          "height": 1920
+        },
+        "fps": 30,
+        "sha256": "adb724acee8e6bd24dc47580c76f9c94af2becb6686ea8c639257b9a00d12773",
+        "file": "out/studio/quality-supercar-coachbuilt/render-shot-0.mp4"
+      }
+    },
+    {
+      "name": "presentation",
+      "metadata": {
+        "programs": [],
+        "streams": [
+          {
+            "width": 1920,
+            "height": 1080,
+            "r_frame_rate": "30/1",
+            "nb_read_frames": "150"
+          }
+        ],
+        "format": {
+          "duration": "5.000000"
+        }
+      },
+      "frames": 150,
+      "uniqueFrames": 150,
+      "sha256": "7a2b9775e0d90f53b9f9e1bed4a04b4542cd7e7e5f05f3da38aadbd9bfccd54e"
+    }
+  ],
+  "visual": {
+    "bodyVolume": "reviewed visible fuller bonnet and taller curved canopy",
+    "views": "entire sampled studio orbit and matching moving driving timeline inspected",
+    "status": "focused volume correction; not full premium automotive model approval"
+  },
+  "presentation": "5-second1920x1080/30fps reel;3s studio orbit cropped1280x720 and scaled;2s matched portrait sources identically cropped/scaled side by side; no interpolation or invented audio"
+}

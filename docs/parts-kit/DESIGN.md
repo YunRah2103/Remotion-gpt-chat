@@ -1,0 +1,11 @@
+# Generic automotive parts baseline
+
+Purpose: a reusable modest-detail modelling baseline for other YUNEX agents. Original generic illustrative geometry, no manufacturer identity or CAD accuracy claims. Extend the approved 35-vehicle/20-world kit without changing those models, old films or other agents' mechanisms.
+
+55 variants across 15 families: engines 6, turbos 4, brakes 4, suspension 4, aero 6, gearboxes 3, drivetrain 4, cooling 4, intake 3, exhaust 3, electrical 4, fuel 3, wheels 3, chassis/steering 4. Models remain separate assemblies so consumers can mount, rescale and refine them. Prior mechanics components were inspected; keep their APIs and films unchanged and reuse their simple disc/caliper/spring/gear modelling approach at the world kit's metre scale.
+
+Coordinates match the vehicle kit: metres, +X forward, +Y up, +Z left. Assembly origin is the named primary mounting datum, not a universal ground point. Named mount nodes expose installation and pipe/shaft connections. Factory returns an owned Three.Group; React wrapper disposes it. Animation state is evaluated directly, never accumulated. Rotating nodes carry axis/ratio metadata; piston and suspension travel are bounded. No simulation, thermal solver, certified fit or engineering tolerances are claimed. Exploded and cutaway inspection modes expose named subassemblies without modifying original rest transforms.
+
+Use a single catalogue and factory, split geometry builders by mechanical family. Public API: PARTS, partSpec, createPart({variant,color?,accent?,cutaway?}), animatePart(group,{shaftAngle?,compression?,steer?,deployment?,explode?,heat?}), partMount(group,name), partCamera(group,portrait?). Option/state inputs reject invalid and nonfinite values. GLB exports preserve names and metadata; loaded scenes use the same animation helper.
+
+Add isolated Remotion entry and parameterised part previews, portrait preview and family catalogue scenes. Inspect all 55 stills and representative animated/exploded samples. Export 55 GLBs and validate geometry, hierarchy, ground-independent scale, mounting nodes and animation determinism after loader roundtrip. Provide README, catalogue, usage examples and an agent handoff. Packaging includes dependencies' lockfile and the shared world-kit modules required by the source.

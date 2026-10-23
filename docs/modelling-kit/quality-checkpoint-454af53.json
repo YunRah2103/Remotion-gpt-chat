@@ -1,0 +1,46 @@
+{
+  "sourceRevision": "454af530e10ccb6c2e2d1c1e6a7e2a7ba9a07b86",
+  "automated": {
+    "node": {
+      "passed": 209,
+      "failed": 0,
+      "skipped": 0
+    },
+    "python": {
+      "passed": 5,
+      "failed": 0
+    },
+    "typescript": "pass"
+  },
+  "movingProofs": [
+    {
+      "name": "supercar",
+      "frames": 60,
+      "duration": 2.0,
+      "uniqueFrames": 60,
+      "sourceRevision": "454af530e10ccb6c2e2d1c1e6a7e2a7ba9a07b86",
+      "source": "299cd7aa63f7232b25f530d9dc8fee37473df163aef33dc3d629202589ec9678",
+      "sha256": "f0c5865870458c04788f109daecc448da594fc3d7f4526bbc9d4bee816f1b330",
+      "fullDecode": "pass"
+    },
+    {
+      "name": "night",
+      "frames": 90,
+      "duration": 3.0,
+      "uniqueFrames": 90,
+      "sourceRevision": "454af530e10ccb6c2e2d1c1e6a7e2a7ba9a07b86",
+      "source": "299cd7aa63f7232b25f530d9dc8fee37473df163aef33dc3d629202589ec9678",
+      "sha256": "449a0e5ae7e6f2d913c2cdc87f77a70aa7f1e2d6fed75461e17a9b083b863f56",
+      "fullDecode": "pass"
+    }
+  ],
+  "visual": {
+    "nightReadability": "reviewed improvement in complete sampled moving shot",
+    "bodyGeometry": "real openings, closure and reset verified; premium aesthetic approval pending",
+    "completeStudio": "not complete"
+  },
+  "fullNativeRuns": [
+    39840138011,
+    39840138014
+  ]
+}

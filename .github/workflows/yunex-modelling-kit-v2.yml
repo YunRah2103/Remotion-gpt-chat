@@ -1,0 +1,166 @@
+name: YUNEX modelling kit V2
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'src/yunex/modelling-kit/**'
+      - 'tests/modelling-kit/**'
+      - 'scripts/modelling-kit/**'
+      - '.github/workflows/yunex-modelling-kit-v2.yml'
+concurrency:
+  group: modelling-kit-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+  actions: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Install native media test dependency
+        run: bash scripts/modelling-kit/install-native-media.sh
+      - run: npm run check
+      - run: node --experimental-strip-types --test tests/modelling-kit/*.test.mjs tests/world-kit/*.test.mjs tests/parts-kit/*.test.mjs
+      - run: python -m unittest discover -s tests/modelling-kit -p 'test_*.py'
+      - run: python -m py_compile scripts/modelling-kit/*.py
+      - run: node --check scripts/modelling-kit/review.mjs
+      - run: node --experimental-strip-types scripts/modelling-kit/measure.mjs
+      - run: node --experimental-strip-types scripts/modelling-kit/export.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-KIT-MODELS-AND-PERFORMANCE
+          path: |
+            out/modelling-kit-v2/glb
+            out/modelling-kit-v2/performance.json
+          retention-days: 30
+  agent-preview:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run kit:create -- ci-agent-preview powertrain
+      - run: npm run kit:preview -- ci-agent-preview
+      - run: |
+          python - <<'PY'
+          import json,pathlib,struct
+          manifest=pathlib.Path('out/studio/ci-agent-preview/previews/shots.json')
+          shots=json.loads(manifest.read_text())
+          assert len(shots)==6
+          assert [s['frame'] for s in shots]==[45,135,225,315,405,495]
+          for shot in shots:
+              data=pathlib.Path(shot['file']).read_bytes()
+              assert data[:8]==bytes([137,80,78,71,13,10,26,10])
+              assert struct.unpack('>II',data[16:24])==(540,960)
+          print('Six generated-project preview PNGs and shot manifest verified')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-AGENT-PREVIEW
+          path: out/studio/ci-agent-preview
+          retention-days: 30
+  render_plan:
+    needs: validate
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: plan
+        run: python scripts/modelling-kit/render-plan.py >> "$GITHUB_OUTPUT"
+  render:
+    needs: [validate, render_plan]
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.render_plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - run: node scripts/modelling-kit/review.mjs --id=${{ matrix.composition }} ${{ matrix.range && format('--frames={0}', matrix.range) || '' }}
+      - if: matrix.composition == 'KitA'
+        run: node scripts/modelling-kit/review.mjs --compare-only --compare
+      - run: python -m pip install numpy pillow
+      - if: matrix.range == ''
+        run: python scripts/modelling-kit/verify.py out/modelling-kit-v2-hd --partial
+      - if: matrix.range != ''
+        run: python scripts/modelling-kit/shards.py verify out/modelling-kit-v2-hd --id=${{ matrix.composition }} --range=${{ matrix.range }}
+      - run: python scripts/modelling-kit/visual-handoff.py out/modelling-kit-v2-hd --id=${{ matrix.composition }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-KIT-${{ matrix.composition }}${{ matrix.suffix }}
+          path: out/modelling-kit-v2-hd
+          retention-days: 30
+  native-review:
+    needs: [validate, render, agent-preview]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: YUNEX-KIT-*
+          merge-multiple: true
+          path: out/modelling-kit-v2-hd
+      - uses: actions/download-artifact@v4
+        continue-on-error: true # Historical comparisons may expire; current renders remain mandatory.
+        with:
+          github-token: ${{ github.token }}
+          run-id: 39711449059
+          pattern: YUNEX-KIT-Studio*
+          merge-multiple: true
+          path: out/previous-studio
+      - uses: actions/download-artifact@v4
+        continue-on-error: true # Historical comparisons may expire; current renders remain mandatory.
+        with:
+          github-token: ${{ github.token }}
+          run-id: 39700360543
+          name: YUNEX-KIT-KitAPortrait
+          path: out/previous-hero
+      - run: python -m pip install numpy pillow
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - run: python scripts/modelling-kit/shards.py assemble out/modelling-kit-v2-hd
+      - run: node scripts/modelling-kit/verify-colour.mjs
+      - run: python scripts/modelling-kit/visual-handoff.py out/modelling-kit-v2-hd --before out/previous-studio --body-before out/previous-hero
+      - run: python scripts/modelling-kit/verify.py
+      - run: python scripts/modelling-kit/visual-handoff.py out/modelling-kit-v2-hd --before out/previous-studio --body-before out/previous-hero --showcase
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-MODELLING-KIT-V2-REVIEW
+          path: out/modelling-kit-v2-hd
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-STUDIO-SHOWCASE
+          path: |
+            out/modelling-kit-v2-hd/handoff
+            out/modelling-kit-v2-hd/native-camera-comparison.jpg
+            out/modelling-kit-v2-hd/native-body-comparison.jpg
+          retention-days: 30
