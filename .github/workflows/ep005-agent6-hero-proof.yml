@@ -1,13 +1,5 @@
 name: EP005 Agent 6 — CC0 hero car-only visual gate
 on:
-  push:
-    branches:
-      - agent/ep005-06-hero-car-proof-cc0
-    paths:
-      - 'src/yunex/ep005/agent6/**'
-      - 'scripts/ep005-agent6/**'
-      - 'docs/ep005/**'
-      - '.github/workflows/ep005-agent6-hero-proof.yml'
   workflow_dispatch:
 permissions:
   contents: read
