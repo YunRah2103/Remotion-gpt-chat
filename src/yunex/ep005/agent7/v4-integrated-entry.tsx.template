@@ -79,10 +79,19 @@ const Integrated:React.FC<{section:'hook'|'finale'}>=({section})=>{
     ?v4Camera('rear-proof',Math.min(sourceFrame,119),fps)
     :v4Camera('rear-chase',Math.min(sourceFrame,119),fps);
  // Push in close for payoff; keep the actual car moving and the ports in WORLD space.
+ if(section==='hook'){
+    // Mobile-first rear-quarter ignition: tighter optical framing and lower lens.
+    // Car stays in true world motion; NO 2D crop or flame projection trick.
+    camera.position=[motion.x-6.05,1.42,3.25];
+    camera.target=[motion.x-.60,.73,0];
+    camera.fov=37;
+ }
  if(section==='finale'){
-    camera.position=[motion.x-7.9,1.63,-2.85];
-    camera.target=[motion.x-.50,.76,0];
-    camera.fov=43;
+    // A closer, more aggressive opposite-side rear-chase for the final pay-off.
+    // Keep exhaust, flame length and a portion of road visible on mobile.
+    camera.position=[motion.x-6.15,1.52,-3.28];
+    camera.target=[motion.x-.62,.75,0];
+    camera.fov=38;
  }
  return <AbsoluteFill style={{background:'#1a2630'}}>
  <ThreeCanvas width={width} height={height} shadows
