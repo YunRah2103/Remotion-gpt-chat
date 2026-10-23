@@ -43,3 +43,6 @@ export {createV4Production,V4_DEMONSTRATIONS,v4ReviewPlan} from './v4-production
 export type {V4Brief,V4Kind,V4Beat} from './v4-production.ts';
 export {auditVehicleGeometry,qualityStates} from './visual-quality.ts';
 export type {QualityState,QualityStages,GeometryDiagnostic} from './visual-quality.ts';
+
+export {auditCameraClearance} from './camera-clearance.ts';
+export type {ClearanceView} from './camera-clearance.ts';

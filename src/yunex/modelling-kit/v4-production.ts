@@ -14,7 +14,7 @@ const shot=(id:string,duration:number,camera:StudioShot['camera'],action:StudioS
 export const V4_DEMONSTRATIONS:Record<V4Kind,Demonstration>={
  supercar:{id:'v4-a-supercar',title:'Form follows force',duration:14,vehicle:{variant:'supercar',bodyDetail:'studio',driver:true,color:'#18636b',powertrain:V4_TWIN_TURBO_V8},world:{kind:'track',timeOfDay:'dusk'},shots:[
   shot('front-three-quarter',2.5,'tracking','cruise','Establish the complete silhouette, front lighting and sculpted intake surfaces.'),
-  shot('side-profile',2,'tracking','cruise','Read the complete side silhouette, wheelbase and roof line without perspective ambiguity.',{cameraMove:{start:{position:[0,1.3,-7.6],target:[0,.72,0],fov:40},end:{position:[.12,1.32,-7.4],target:[0,.72,0],fov:40},easing:'smooth'}}),
+  shot('side-profile',2,'tracking','cruise','Read the complete side silhouette, wheelbase and roof line without perspective ambiguity.',{cameraMove:{start:{position:[0,1.3,-7.6],target:[0,.72,0],fov:48},end:{position:[.12,1.32,-7.4],target:[0,.72,0],fov:48},easing:'smooth'}}),
   shot('rear-three-quarter',2.5,'chase','cruise','Show the full rear proportion and exhaust; give the front view a meaningful reverse.'),
   shot('planform',2,'overhead','cornering','Expose planform, wheelbase and a whole-car change of direction.'),
   shot('driver-controls',3,'interior','cornering','Show the fitted occupant operating steering and pedals before the launch.',{cutaway:.94}),
