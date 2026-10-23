@@ -44,10 +44,12 @@ for(const shot of shots){
    if(frame%20===0||frame===119)samples.push({frame,xExtent,yExtent,centerWorld:hull.getCenter(new THREE.Vector3()).toArray()});
  }
  results.shots[shot]={largestAbsoluteNdcX:largestX,largestAbsoluteNdcY:largestY,closestFrameToCrop:edgeFrame,samples};
- // Establishing frames must show ALL of the actual car, no cut bumpers/wheels.
- if(shot==='side-tracking')assert(largestX<.94,'Side V4 car clipped horizontally in 9:16 at frame '+edgeFrame+': '+largestX);
- if(shot==='front-pursuit')assert(largestX<.96,'Front V4 car clipped horizontally in 9:16');
 }
 const dest=path.join(out,'camera-framing-report.json');
 fs.writeFileSync(dest,JSON.stringify(results,null,2)+'\n');
 console.log(JSON.stringify(results,null,2));
+// Diagnostic JSON is preserved in always-uploaded artifacts even on quality failure.
+assert(results.shots['side-tracking'].largestAbsoluteNdcX<.94,
+  'Side V4 cropped at frame '+results.shots['side-tracking'].closestFrameToCrop);
+assert(results.shots['front-pursuit'].largestAbsoluteNdcX<.96,
+  'Front V4 cropped at frame '+results.shots['front-pursuit'].closestFrameToCrop);
