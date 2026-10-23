@@ -35,11 +35,6 @@ jobs:
         run: |
           npm ci --no-audit --no-fund
           python -m pip install --disable-pip-version-check Pillow==11.3.0
-          if ! command -v ffmpeg >/dev/null 2>&1; then
-            timeout 180 sudo apt-get update -qq
-            timeout 180 sudo apt-get install -y -qq ffmpeg
-          fi
-          ffprobe -version | head -1
           npm run check
       - name: Verify locked V4 source and moving factory exhaust interfaces
         run: |
@@ -47,6 +42,8 @@ jobs:
           test "$(git hash-object src/yunex/modelling-kit/v4-production.ts)" = "df4e0c60e8ba617fae85f524613d9cd26b84d034"
           node --experimental-strip-types scripts/ep005-agent6/v4-ports.mjs out/ep005-agent6/ports
           node --experimental-strip-types scripts/ep005-agent6/v4-camera-qc.mjs out/ep005-agent6/camera-qc
+      - name: Install official native FFmpeg with bounded retry and corrected mirrors
+        run: bash scripts/modelling-kit/install-native-media.sh
       - name: Render four-second genuine moving V4 car at 1080x1920 / 30fps
         run: |
           set -euo pipefail
