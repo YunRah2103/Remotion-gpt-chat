@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import {sampleActualPorts,adaptAgent6WorldPorts,adaptApprovedV4WorldPorts} from '../src/yunex/ep005/agent7/ports.ts';
-import {createAfterfireRig,animateAfterfire,pulseEnvelope} from '../src/yunex/ep005/agent7/afterfire.ts';
+import {createAfterfireRig,animateAfterfire,pulseEnvelope,EP005_25S_AFTERFIRE_BEATS} from '../src/yunex/ep005/agent7/afterfire.ts';
 import {buildScienceEngine,animateScienceEngine} from '../src/yunex/ep005/agent7/science.ts';
 
 function setup(){
@@ -92,4 +92,14 @@ test('V4-only production port gate blocks candidate-A provenance and physically 
     ...p,worldOrigin:[.001,.55,-2.5]})),0,approved));
   assert.throws(()=>adaptApprovedV4WorldPorts(ports.map((p,i)=>({
     ...p,worldOutward:i?[0,0,1]:[0,0,-1]})),0,approved));
+});
+
+test('EP005 master flame cues ignite on frame zero, rest between shots and pay off on frame 749',()=>{
+  const pulses=EP005_25S_AFTERFIRE_BEATS;
+  const env=t=>pulses.reduce((sum,p)=>sum+pulseEnvelope(t,p),0);
+  assert.ok(env(0)>.1,'immediate first-frame burst is mandatory');
+  assert.equal(env(1.5),0,'no endless flame throughout the car film');
+  assert.ok(env(22.5)>.05,'final shot starts with new ignition');
+  assert.ok(env(749/30)>.05,'real flame should remain visible at loop/end');
+  for(const p of pulses)assert.ok(p.duration>=.2&&p.duration<=.55);
 });
