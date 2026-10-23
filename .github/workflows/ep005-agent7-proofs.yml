@@ -29,22 +29,32 @@ jobs:
         run: npm run check
       - name: Deterministic port and engine unit tests
         run: node --experimental-strip-types --test tests/ep005-agent7.test.mjs
-      - name: Install verification tools
-        run: |
-          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
-            sudo apt-get update -qq
-            sudo apt-get install -y -qq ffmpeg
-          fi
-          ffmpeg -version | head -n 1
-          ffprobe -version | head -n 1
+      - name: Create original film output directory
+        run: mkdir -p out/ep005/agent7
+      - name: Render narrator-duration 255 UNIQUE moving science frames FIRST (A8 f165–419)
+        run: npx remotion render src/yunex/ep005/agent7/entry.tsx Agent7CedarScience255 out/ep005/agent7/science-255f.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+      - name: Publish 255-frame science immediately before nonessential diagnostic renders
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: EP005-Agent7-Cedar-science255-REVIEW-ONLY
+          path: out/ep005/agent7/science-255f.mp4
+          retention-days: 30
+          if-no-files-found: warn
       - name: Render genuine native 3s moving fixture preview
         run: |
           mkdir -p out/ep005/agent7
           npx remotion render src/yunex/ep005/agent7/entry.tsx Agent7FlameFixture out/ep005/agent7/flame-fixture.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
       - name: Render genuine native 5s moving engine cutaway
         run: npx remotion render src/yunex/ep005/agent7/entry.tsx Agent7Science out/ep005/agent7/science.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
-      - name: Render narrator-duration 255 UNIQUE moving science frames (A8 f165–419)
-        run: npx remotion render src/yunex/ep005/agent7/entry.tsx Agent7CedarScience255 out/ep005/agent7/science-255f.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+      - name: Install FFmpeg only AFTER native footage exists, with bounded apt timeout
+        run: |
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
+            timeout 120s sudo apt-get update -qq
+            timeout 120s sudo apt-get install -y -qq ffmpeg
+          fi
+          ffmpeg -version | head -n 1
+          ffprobe -version | head -n 1
       - name: Full decode, stream checks and reproducible hashes
         run: |
           set -euxo pipefail
