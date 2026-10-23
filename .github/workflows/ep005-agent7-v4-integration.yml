@@ -33,7 +33,7 @@ jobs:
           AGENT6_SHA="26980fe1f509484bb612cd47ffcbf7c53f26fddf"
           git fetch origin "$AGENT6_SHA"
           git checkout --detach "$AGENT6_SHA"
-          git restore --source="$AGENT7_SHA" -- src/yunex/ep005/agent7
+          git restore --source="$AGENT7_SHA" -- src/yunex/ep005/agent7 tests/ep005-agent7.test.mjs
           test "$(git hash-object src/yunex/modelling-kit/v4-production.ts)" = "df4e0c60e8ba617fae85f524613d9cd26b84d034"
           test -f src/yunex/ep005/agent6/v4-exhaust-ports.json
           grep -q '"source": "9052a539e10a7cb97487c1435455bb9962ad58e1"' src/yunex/ep005/agent6/v4-exhaust-ports.json
