@@ -1,6 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
+import {compileRecipe} from '../../src/yunex/modelling-kit/recipe.ts';
 import {createGroundContactShadows,updateGroundContactShadows} from '../../src/yunex/modelling-kit/ground-contact.ts';
 const car=()=>{const root=new T.Group();root.userData.variant='supercar';for(const x of [-1.2,1.2])for(const z of [-.7,.7]){const m=new T.Group();m.name='mount-'+(x>0?'front':'rear')+'-'+(z>0?'left':'right');m.position.set(x,.34,z);root.add(m);}return root;};
 test('opt-in ground contact has four wheel shadows and a lightweight central falloff',()=>{
@@ -31,4 +32,14 @@ test('invalid rig or optical parameters fail before modifying the source',()=>{
  assert.throws(()=>createGroundContactShadows(source,{groundHeight:NaN}),/finite/);
  source.children.pop();
  assert.throws(()=>createGroundContactShadows(source),/intact mounted wheel rig/);
+});
+
+test('recipe uses explicit opt-in and rejects false contact on unmodelled terrain',()=>{
+ const base={id:'safe-grounding-proof',title:'Safe ground contact',vehicle:{variant:'supercar'},world:{kind:'track'},shots:[{id:'shot',duration:2,camera:'tracking',action:'cruise',caption:''}]};
+ const legacy=compileRecipe(base);
+ assert.equal(legacy.world.grounding,undefined);
+ const enhanced=compileRecipe({...base,world:{kind:'track',grounding:'enhanced'}});
+ assert.equal(enhanced.world.grounding,'enhanced');
+ assert.throws(()=>compileRecipe({...base,world:{kind:'rally',grounding:'enhanced'}}),/flat track/);
+ assert.throws(()=>compileRecipe({...base,world:{kind:'track',grounding:'disabled'}}),/Unknown ground contact mode/);
 });
