@@ -116,7 +116,7 @@ export function v4Camera(shot: V4Shot, frame: number, fps=V4_DRIVING_FPS) {
     'rear-proof':    {a:[-8.9,1.70, 4.65],b:[-8.25,1.55, 4.4],fov:45,target:[-.25,.58,0]},
     'side-tracking': {a:[ .15,1.75,-13.8],b:[ .70,1.61,-13.2],fov:46,target:[ .15,.39,0]},
     // Front: tilt down to put the horizon higher and reveal road contact, not empty sky.
-    'front-pursuit': {a:[ 8.6,2.67,-3.65],b:[ 8.0,2.48,-3.35],fov:45,target:[ .1,.44,0]},
+    'front-pursuit': {a:[ 9.65,2.70,-4.05],b:[ 9.30,2.52,-3.85],fov:48,target:[ .1,.40,0]},
     // Low but readable rear tail/outlet view, stable camera with exhaust in shot.
     'rear-chase':    {a:[-10.7,1.72,-3.1],b:[-9.4,1.55,-2.7],fov:44,target:[-.3,.52,0]}
   }[shot];
