@@ -3,6 +3,8 @@ on:
   push:
     branches: [experiment/yunex-manthey-gt3rs-new-model]
     paths: ['.github/workflows/yunex-manthey-parallel.yml', 'production/porsche-manthey/**']
+  pull_request:
+    paths: ['.github/workflows/yunex-manthey-parallel.yml', 'production/porsche-manthey/**']
   workflow_dispatch:
 permissions:
   contents: read
