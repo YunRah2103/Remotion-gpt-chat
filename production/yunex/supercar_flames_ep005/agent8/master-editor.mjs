@@ -197,7 +197,7 @@ async function validateMedia(p, checksum, neededFrames = null, approvedVoiceDura
     const voice=streams.find(v=>v.codec_type === 'audio');
     const actual=Number(voice?.duration || audioprobe.format?.duration);
     if (!voice || !Number.isFinite(actual) || Math.abs(actual-approvedVoiceDuration) > 0.08 ||
-      actual > s.totalFrames/s.fps + 0.02 || Number(voice.sample_rate) < 16000 || voice.channels < 1)
+      actual > manifest.settings.totalFrames/manifest.settings.fps + 0.02 || Number(voice.sample_rate) < 16000 || voice.channels < 1)
       throw new Error('Approved VO duration/sample rate mismatch: no silent audio trimming: '+p);
   }
   run('ffmpeg',['-hide_banner','-loglevel','error','-xerror','-i',p,
