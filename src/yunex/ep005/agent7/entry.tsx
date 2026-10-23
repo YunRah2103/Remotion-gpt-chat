@@ -8,5 +8,8 @@ const Root=()=> <>
     width={1080} height={1920} fps={30} durationInFrames={90}/>
   <Composition id="Agent7Science" component={MechanicalScienceProof}
     width={1080} height={1920} fps={30} durationInFrames={150}/>
+  <Composition id="Agent7CedarScience255" component={MechanicalScienceProof}
+    defaultProps={{narrationScale:1.7}}
+    width={1080} height={1920} fps={30} durationInFrames={255}/>
 </>;
 registerRoot(Root);
