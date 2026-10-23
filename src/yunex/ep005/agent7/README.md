@@ -1,6 +1,6 @@
 # EP005 — Agent 7 independent afterfire / mechanical science source
 
-**Status: UNAPPROVED R&D SOURCE / NATIVE RENDER PENDING.** Owner and Agent 0 must review actual moving footage. No reuse of rejected Agent 2 flame shots, no changes to Agent 6 or 8 files.
+**Status: appearance-approved V4 hero identified; science/fixture native proofs exist, but V4 CAR-INTEGRATED afterfire is still pending Agent 6's NEW moving port ABI and visual QA.** No reuse of rejected Agent 2 flame shots, no changes to Agent 6 or 8 files.
 
 ## Sources
 - `ports.ts`: strict versioned Agent 6 named-mouth ABI; read true mouth origin and outward normal each absolute frame with `Object3D.localToWorld` / `transformDirection`. No fallback world positions. Units = metres, Three +Y up, local vehicle rig from Agent 6; validate outer outlet diameter 0.075–0.16 m (visual acceptance target 0.105–0.120 m).
@@ -9,15 +9,18 @@
 - `Proofs.tsx` and `entry.tsx`: 1080x1920 30fps, independent `Agent7FlameFixture` (3s) and `Agent7Science` (5s). **Fixture plate is NOT the Agent 6 car.** Final hero shot is blocked by the missing Agent 6 manifest and explicit owner hero-car approval.
 
 
-## Agent 6 real interface now found (PR #270 — STILL UNAPPROVED)
-Agent 6 branch `agent/ep005-06-hero-car-proof-cc0` introduced `src/yunex/ep005/agent6/exhaust-ports.v1.json`, which specifies 0.114m metal outlet OD and 0.041m bore radius on each side, and an exported `sampleExhaustWorld(car, frame)` in their proof source. The manifest's **corrected vehicle-local** axes and the helper's **pre-correction GLTF-local** sample call are not interchangeable. To prevent double-applying the correction, consume exactly the *already-transformed* live world samples:
-```ts
-// Inside a future approval-gated Agent 6 integration scene:
-const measuredWorld = sampleExhaustWorld(actualAgent6Car, frame);
-const ports = adaptAgent6WorldPorts(measuredWorld, frame, 30);
-animateAfterfire(afterfireRig, ports, frame/30, pulses, currentVelocity);
-```
-Both `sampleExhaustWorld` and the actual car instance MUST be provided by Agent 6's published approved shot integration, not imported from its Remotion `entry.tsx` registration module. This adapter is in `ports.ts` and deliberately copies world transforms WITHOUT applying a second model transform. Its 105–120mm OD safeguard matches the agreed aesthetic gate. The local named-node adapter remains available for a future verified v1 named-mount carrier.
+## OWNER-APPROVED V4 HERO ONLY — Candidate A/B invalid
+
+On 23 Oct 2026 the owner approved the **EXTERIOR APPEARANCE** of the teal V4-A supercar from the actual 14s video:
+- Kit preview commit `9052a539e10a7cb97487c1435455bb9962ad58e1`, project `v4-a-supercar`, vehicle `supercar`, `bodyDetail:'studio'`, paint `#18636b`.
+- Reference: [V4-A actual 14s preview artifact](https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39866437063/artifacts/12465297894), original video SHA256 `1654a5efd3a3403871b0a52a3140a9e7aeb1222a2e4bd4242e6edaa8d879cd88`.
+- [Owner/manager appearance approval](https://github.com/YunRah2103/Remotion-gpt-chat/issues/247#issuecomment-6355059494).
+
+**Important:** Agent 6 previous Spectral CC0 car (Candidate A), Khronos CarConcept B, and ALL their coordinates/manifests are invalid for this V4 car. Do not reuse `exhaust-ports.v1.json` or the old `sampleExhaustWorld` from Candidate A. Agent 6 issue #265 / draft PR #270 must publish the **NEW V4-native physical nozzles** and world-space moving samples.
+
+`adaptApprovedV4WorldPorts(raw,frame,lock,fps)` on `ports.ts` enforces identity, required latest V4 source/provenance metadata, frame equality, two coherent ports with plausible dimensions and moving world-space axis. Lock must be assembled from Agent 6's **genuine new** source commit, port-manifest SHA256 and exact approval ref, NOT made-up values. It is an admission check, not an assertion that any input video was rendered or approved. The editor additionally verifies real native media SHA256 and human sign-off.
+
+The existing `adaptAgent6WorldPorts` is a low-level converter retained for unit-test compatibility; by itself it does **NOT** prove that samples come from the accepted V4. It must never be called directly to admit a production hero shot. Only `adaptApprovedV4WorldPorts` may admit Agent 6's new V4 port data.
 
 ## Mandatory integration — Agent 6
 Publish an exact `ExhaustMountManifest` (`ports.ts`):
@@ -59,10 +62,10 @@ ffprobe -v error -show_streams out/ep005/agent7/science.mp4
 ffmpeg -v error -xerror -i out/ep005/agent7/science.mp4 -f null -
 sha256sum out/ep005/agent7/*.mp4
 ```
-The PR workflow produces contact sheets, decode logs and native MP4 artifacts. Source presence/green TypeScript is **not** a visual-quality pass. Agent 7 must inspect all video frames at 0s/peaks/tail and conduct final live-port integration after receiving the manifest.
+The PR workflow produces contact sheets, decode logs and native MP4 artifacts. The science-only cutaway now fits more of the V8 on a portrait frame and uses the SAME multi-layer turbulent afterfire shader at the **science model's illustrative outlet** instead of schematic cone flames. Those positions are local to the illustrative assembly, never claimed as the V4 car's ports. Source presence/green TypeScript is **not** a visual-quality pass. Agent 7 must inspect all video frames at 0s/peaks/tail and conduct final live-port integration after receiving the manifest.
 
 ## Acceptance blockers
-1. Agent 6 must publish true named exhaust-mouth transforms + moving hero car proof, and gain explicit owner acceptance.
+1. Agent 6 must reproduce the **approved V4 exterior**, publish measured NEW V4 named exhaust-mouth transforms / moving world samples and actual 1080x1920 moving driving MP4(s); get action/flame pixel acceptance. Approval of the CAR LOOK alone does not approve the shots.
 2. Agent 8 must confirm shot durations and approved narration/word-timings.
-3. CI MP4 artifact must be decoded and watched; quality review and native SHA256 must be reported.
+3. Latest code's own CI MP4 artifact must be FFprobed, fully decoded and actual moving-picture frames inspected; post SHA256, render head and run/artifact IDs. Previous revisions do not transfer approval.
 4. No merge or picture lock before all three gates.
