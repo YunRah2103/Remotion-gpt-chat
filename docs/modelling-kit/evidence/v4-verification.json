@@ -1,0 +1,212 @@
+{
+  "schema": "yunex-v4-proof-delivery/1",
+  "latestKitSource": "a2296090e6b94ac145126bbfa137000930629497",
+  "renderSource": "2021bc5fbcb99a7b98cebc06211680a6ac37db06",
+  "renderSourceExplanation": "All actual MP4s are pinned to 2021bc5. A uses the editable FOV48 side-shot recipe, now the default in a229609. The latter adds only camera-clearance diagnostics, that preset change, exports, tests and documentation; no vehicle/material/driving changes. Compare source against the pinned render revision, not an unrelated current checkout.",
+  "AAssembly": "Seven unchanged Actions shots plus one locally rerendered FOV48 side shot; all eight source/entry/recipe/video contracts verified without bypass.",
+  "BAndCAssembly": "Original guarded assembler using all native Actions shots at the same pinned source.",
+  "nativeWorkflow": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/39940289918",
+  "tests": {
+    "node": {
+      "passed": 261,
+      "failed": 0,
+      "skipped": 0
+    },
+    "python": {
+      "passed": 5
+    },
+    "typescript": "pass"
+  },
+  "files": [
+    {
+      "demonstration": "A",
+      "file": "YUNEX-V4-A-Supercar-SILENT.mp4",
+      "sha256": "d7ecff2c45aa3b7d5d7917efee18594f296d24b64ccc4bb7be3eed72b7896089",
+      "renderRevision": "2021bc5fbcb99a7b98cebc06211680a6ac37db06",
+      "sourceFingerprint": "133e35891669ecbb2fb2f6b8a40fe3020f5be0d847546d5a0b208eaf14469a2c",
+      "recipeSha256": "803cb1b25e0b4bf3196acd18f486915654e8f64ff58d6624f826868c3a0e908c",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "frames": 420,
+      "fps": 30,
+      "duration": 14.0,
+      "audio": "silent",
+      "fullDecode": "pass",
+      "uniqueSceneFramesByShot": [
+        {
+          "id": "front-three-quarter",
+          "frames": 53,
+          "uniqueSceneFrames": 53
+        },
+        {
+          "id": "side-profile",
+          "frames": 42,
+          "uniqueSceneFrames": 42
+        },
+        {
+          "id": "rear-three-quarter",
+          "frames": 52,
+          "uniqueSceneFrames": 52
+        },
+        {
+          "id": "planform",
+          "frames": 42,
+          "uniqueSceneFrames": 42
+        },
+        {
+          "id": "driver-controls",
+          "frames": 63,
+          "uniqueSceneFrames": 63
+        },
+        {
+          "id": "engine-system",
+          "frames": 63,
+          "uniqueSceneFrames": 63
+        },
+        {
+          "id": "driver-speed",
+          "frames": 42,
+          "uniqueSceneFrames": 42
+        },
+        {
+          "id": "speed-payoff",
+          "frames": 63,
+          "uniqueSceneFrames": 63
+        }
+      ],
+      "stages": {
+        "source": "pass",
+        "native": "pass",
+        "geometry": "pass",
+        "visual": "pending",
+        "final": "pending"
+      },
+      "warnings": [],
+      "frozenSpans": []
+    },
+    {
+      "demonstration": "B",
+      "file": "YUNEX-V4-B-Rally-SILENT.mp4",
+      "sha256": "6a8c6c40a1d97cb77a7a91f6bf9aa0ca0dc1747476ad135c0cafafca8b904f61",
+      "renderRevision": "2021bc5fbcb99a7b98cebc06211680a6ac37db06",
+      "sourceFingerprint": "133e35891669ecbb2fb2f6b8a40fe3020f5be0d847546d5a0b208eaf14469a2c",
+      "recipeSha256": "93ec9fc03b537495061d2ea84ddd3304e2b5b9c51264b57f5208b43d800bfd86",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "frames": 300,
+      "fps": 30,
+      "duration": 10.0,
+      "audio": "silent",
+      "fullDecode": "pass",
+      "uniqueSceneFramesByShot": [
+        {
+          "id": "read-the-corner",
+          "frames": 56,
+          "uniqueSceneFrames": 56
+        },
+        {
+          "id": "commit",
+          "frames": 57,
+          "uniqueSceneFrames": 57
+        },
+        {
+          "id": "contact-patch",
+          "frames": 56,
+          "uniqueSceneFrames": 56
+        },
+        {
+          "id": "driver-input",
+          "frames": 56,
+          "uniqueSceneFrames": 56
+        },
+        {
+          "id": "traction-exit",
+          "frames": 75,
+          "uniqueSceneFrames": 75
+        }
+      ],
+      "stages": {
+        "source": "pass",
+        "native": "pass",
+        "geometry": "pass",
+        "visual": "pending",
+        "final": "pending"
+      },
+      "warnings": [],
+      "frozenSpans": []
+    },
+    {
+      "demonstration": "C",
+      "file": "YUNEX-V4-C-Pressure-Becomes-Motion-SILENT.mp4",
+      "sha256": "38a138feea706f1e26817ddb7d2de3b6b5aefe8e964452e9f03f1c9f461ffc15",
+      "renderRevision": "2021bc5fbcb99a7b98cebc06211680a6ac37db06",
+      "sourceFingerprint": "133e35891669ecbb2fb2f6b8a40fe3020f5be0d847546d5a0b208eaf14469a2c",
+      "recipeSha256": "eb855742bf934dc5872d5a2ce9fff842c36edf77c060af9b8cc0973b43a37834",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "frames": 660,
+      "fps": 30,
+      "duration": 22.0,
+      "audio": "silent",
+      "fullDecode": "pass",
+      "uniqueSceneFramesByShot": [
+        {
+          "id": "hook-hidden-motion",
+          "frames": 76,
+          "uniqueSceneFrames": 76
+        },
+        {
+          "id": "reveal-the-machine",
+          "frames": 76,
+          "uniqueSceneFrames": 76
+        },
+        {
+          "id": "intent",
+          "frames": 76,
+          "uniqueSceneFrames": 76
+        },
+        {
+          "id": "contact",
+          "frames": 77,
+          "uniqueSceneFrames": 77
+        },
+        {
+          "id": "pressure-path",
+          "frames": 101,
+          "uniqueSceneFrames": 101
+        },
+        {
+          "id": "release",
+          "frames": 102,
+          "uniqueSceneFrames": 102
+        },
+        {
+          "id": "flight",
+          "frames": 76,
+          "uniqueSceneFrames": 76
+        },
+        {
+          "id": "afterimage",
+          "frames": 76,
+          "uniqueSceneFrames": 76
+        }
+      ],
+      "stages": {
+        "source": "pass",
+        "native": "pass",
+        "geometry": "pass",
+        "visual": "pending",
+        "final": "pending"
+      },
+      "warnings": [],
+      "frozenSpans": []
+    }
+  ],
+  "visualReviewBoundary": "Independent native decoded-frame sequence reviews and sampled film review are recorded separately; no real-time moving-playback attestation or final aesthetic approval is fabricated. Full visual and final gates remain pending."
+}

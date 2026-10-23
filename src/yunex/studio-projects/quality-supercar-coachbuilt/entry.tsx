@@ -1,0 +1,10 @@
+import React from 'react';
+import {Composition,registerRoot} from 'remotion';
+import input from './recipe.json';
+import {StudioEpisode} from '../../modelling-kit/StudioEpisode';
+import {compileRecipe} from '../../modelling-kit/recipe';
+import type {EpisodeRecipe} from '../../modelling-kit/recipe';
+const recipe=input as EpisodeRecipe;
+const compiled=compileRecipe(recipe);
+const Root=()=> <Composition id="StudioEpisode" component={StudioEpisode} width={1080} height={1920} fps={30} durationInFrames={compiled.durationInFrames} defaultProps={{recipe}}/>;
+registerRoot(Root);

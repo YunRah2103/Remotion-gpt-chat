@@ -1,0 +1,22 @@
+{
+  "id": "quality-supercar-volume",
+  "title": "Sports body volume inspection",
+  "vehicle": {
+    "variant": "supercar",
+    "color": "#a72b26",
+    "driver": false
+  },
+  "world": {
+    "kind": "showroom",
+    "timeOfDay": "day"
+  },
+  "shots": [
+    {
+      "id": "silhouette",
+      "duration": 3,
+      "camera": "reveal",
+      "action": "cruise",
+      "caption": ""
+    }
+  ]
+}

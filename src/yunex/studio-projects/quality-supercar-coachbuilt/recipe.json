@@ -1,0 +1,37 @@
+{
+  "id": "quality-supercar-coachbuilt",
+  "title": "supercar / coachbuilt",
+  "vehicle": {
+    "variant": "supercar",
+    "bodyDetail": "coachbuilt",
+    "driver": true,
+    "color": "#267c83"
+  },
+  "world": {
+    "kind": "track",
+    "timeOfDay": "day"
+  },
+  "shots": [
+    {
+      "id": "front",
+      "duration": 2,
+      "camera": "tracking",
+      "action": "cruise",
+      "caption": "Matching camera / revised body geometry."
+    },
+    {
+      "id": "rear",
+      "duration": 2,
+      "camera": "chase",
+      "action": "cruise",
+      "caption": "Matching rear view / original animation rigs."
+    },
+    {
+      "id": "wheel",
+      "duration": 2,
+      "camera": "wheel",
+      "action": "cruise",
+      "caption": "Wheel, brake and road-contact detail."
+    }
+  ]
+}

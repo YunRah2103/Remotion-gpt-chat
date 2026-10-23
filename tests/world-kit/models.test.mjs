@@ -4,10 +4,10 @@ import * as T from 'three';
 import {VEHICLES} from '../../src/yunex/world-kit/catalog.ts';
 import {createVehicle} from '../../src/yunex/world-kit/vehicles.ts';
 
-test('35 body variants cover seven vehicle families',()=>{
- assert.equal(VEHICLES.length,35);
+test('36 body variants cover seven vehicle families',()=>{
+ assert.equal(VEHICLES.length,36);
  assert.deepEqual([...new Set(VEHICLES.map(v=>v.family))].sort(),['bike','formula','normal','sports','suv','truck','van']);
- assert.equal(new Set(VEHICLES.map(v=>v.id)).size,35);
+ assert.equal(new Set(VEHICLES.map(v=>v.id)).size,36);
 });
 test('all models have finite geometry, realistic metre bounds and tyre contact',()=>{
  for(const spec of VEHICLES){

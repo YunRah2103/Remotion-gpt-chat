@@ -1,6 +1,6 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import * as T from 'three';
 import {VEHICLES,ENVIRONMENTS} from '../../src/yunex/world-kit/catalog.ts';import {createVehicle} from '../../src/yunex/world-kit/vehicles.ts';import {interiorLayout,interiorCamera} from '../../src/yunex/world-kit/interiors.ts';import {disposeObject} from '../../src/yunex/world-kit/geometry.ts';
-test('expanded kit contains 35 vehicles and 20 environments',()=>{assert.equal(VEHICLES.length,35);assert.equal(ENVIRONMENTS.length,20);});
+test('expanded kit contains 36 vehicles and 20 environments',()=>{assert.equal(VEHICLES.length,36);assert.equal(ENVIRONMENTS.length,20);});
 test('every enclosed vehicle has a fitted modelled interior and driver controls',()=>{
  for(const s of VEHICLES.filter(s=>s.family!=='bike'&&s.family!=='formula')){const g=createVehicle({variant:s.id});for(const name of ['interior','front-seat-left','front-seat-right','dashboard','steering-wheel','pedals','console','door-panel-left','door-panel-right'])assert.ok(g.getObjectByName(name),`${s.id}/${name}`);g.updateMatrixWorld(true);const b=new T.Box3().setFromObject(g.getObjectByName('interior'),true);assert.ok(b.min.z>=-s.width*.49&&b.max.z<=s.width*.49,s.id);assert.ok(b.max.y<s.height+.02,s.id);disposeObject(g);}
 });

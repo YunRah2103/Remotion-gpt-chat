@@ -1,0 +1,31 @@
+{
+  "file": "/workspace/scratch/773eb3d6aefe/yunex-native-2021/out/studio/v4-a-supercar/render-shot-6.mp4",
+  "sha256": "73d93b0ef79d0e589b395550f716a25b480395fc58dde9c2b7ce423711b68141",
+  "source": "2021bc5 (provided frozen source)",
+  "decodedFrames": 42,
+  "dimensions": [
+    1080,
+    1920
+  ],
+  "fps": "30/1",
+  "reviewedEncodedFrameRange": [
+    0,
+    41
+  ],
+  "timelineRange": [
+    315,
+    356
+  ],
+  "method": "Viewed all 42 native-resolution decoded PNGs individually in contiguous order. Not real-time playback.",
+  "decision": "pass-specific-onboard-visibility-and-temporal-check",
+  "findings": [
+    "Clear contiguous asphalt strip above bonnet throughout all42frames; no headliner, coilover, driver head or suspension intrusion.",
+    "Kerb, fence posts and trees translate continuously through the beat; no visually evident frame jump, disappearance, geometry pop or freeze.",
+    "Bonnet remains stable in bottom approximately30percent; asphalt occupies middle approximately20percent.",
+    "Dusk exposure is subdued and sky/bonnet dominate. Composition gives restrained travel cues, not a strong high-speed impression."
+  ],
+  "limitations": [
+    "No real-time playback attestation.",
+    "Standalone clip check does not approve surrounding cuts, final assembled A, B or C."
+  ]
+}

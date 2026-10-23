@@ -1,0 +1,130 @@
+# Revision 3: verify moving-review fixes for glazing, reflection normals, onboard and connected housings.
+name: YUNEX V4 native flagship films
+on:
+  push:
+    branches: [feat/yunex-modelling-kit-v2]
+    paths: ['.github/workflows/yunex-v4-studio.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: yunex-v4-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      shots: ${{ steps.matrix.outputs.shots }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '24', cache: npm}
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
+      - run: node --experimental-strip-types --test tests/modelling-kit/v4-*.test.mjs
+      - id: matrix
+        shell: bash
+        run: |
+          node --experimental-strip-types --input-type=module <<'JS' >> "$GITHUB_OUTPUT"
+          import {createV4Production} from './src/yunex/modelling-kit/v4-production.ts';
+          const include=['supercar','rally','film'].flatMap(kind=>createV4Production({kind}).recipe.shots.map(shot=>({kind,shot:shot.id,project:createV4Production({kind}).recipe.id})));
+          console.log('shots='+JSON.stringify({include}));
+          JS
+  shots:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix: ${{ fromJSON(needs.plan.outputs.shots) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '24', cache: npm}
+      - run: npm ci --no-audit --no-fund
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - run: node --experimental-strip-types scripts/modelling-kit/v4-native.mjs --kind=${{ matrix.kind }} --shot=${{ matrix.shot }} --render
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: V4-shot-${{ matrix.kind }}-${{ matrix.shot }}
+          path: out/studio/${{ matrix.project }}/render-shot-*.mp4*
+          retention-days: 30
+  films:
+    needs: shots
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {kind: supercar, project: v4-a-supercar}
+          - {kind: rally, project: v4-b-rally}
+          - {kind: film, project: v4-c-film}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '24', cache: npm}
+      - run: npm ci --no-audit --no-fund
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: V4-shot-${{ matrix.kind }}-*
+          path: out/studio/${{ matrix.project }}
+          merge-multiple: true
+      - run: node --experimental-strip-types scripts/modelling-kit/v4-native.mjs --kind=${{ matrix.kind }} --assemble
+      - run: python -m pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Verify source, native media and perceptual diagnostics
+        env:
+          PROOF_PROJECT: ${{ matrix.project }}
+        run: |
+          PROOF_SOURCE_FINGERPRINT=$(node --experimental-strip-types --input-type=module -e "import {sourceFingerprint} from './scripts/modelling-kit/assemble.mjs';console.log(sourceFingerprint(process.cwd(),'src/yunex/studio-projects/'+process.env.PROOF_PROJECT));")
+          python scripts/modelling-kit/v4-media-qc.py "out/studio/$PROOF_PROJECT/proof.mp4" --plan "out/studio/$PROOF_PROJECT/plan.json" --source-fingerprint "$PROOF_SOURCE_FINGERPRINT" --out "out/studio/$PROOF_PROJECT/perceptual"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-V4-${{ matrix.kind }}
+          path: out/studio/${{ matrix.project }}
+          retention-days: 30
+  models:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        include:
+          - {variant: supercar, body: coachbuilt, time: day}
+          - {variant: supercar, body: studio, time: day}
+          - {variant: supercar, body: studio, time: dusk}
+          - {variant: supercar, body: studio, time: night}
+          - {variant: coupe, body: studio, time: day}
+          - {variant: rally-hatch, body: studio, time: day}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '24', cache: npm}
+      - run: npm ci --no-audit --no-fund
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - name: Render matched native orbit
+        run: >-
+          npx remotion render src/yunex/modelling-kit/studio-quality-entry.tsx StudioModelPortrait
+          out/v4-models/${{ matrix.variant }}-${{ matrix.body }}-${{ matrix.time }}.mp4
+          --props='{"variant":"${{ matrix.variant }}","bodyDetail":"${{ matrix.body }}","timeOfDay":"${{ matrix.time }}"}'
+          --gl=swangle --codec=h264 --pixel-format=yuv420p --color-space=bt709 --crf=18 --concurrency=2
+      - run: python -m pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Verify native model orbit
+        run: >-
+          python scripts/modelling-kit/v4-media-qc.py
+          out/v4-models/${{ matrix.variant }}-${{ matrix.body }}-${{ matrix.time }}.mp4
+          --frames 120 --out out/v4-models/${{ matrix.variant }}-${{ matrix.body }}-${{ matrix.time }}-qc
+      - run: git rev-parse HEAD > out/v4-models/source-revision.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: V4-model-${{ matrix.variant }}-${{ matrix.body }}-${{ matrix.time }}
+          path: out/v4-models
+          retention-days: 30

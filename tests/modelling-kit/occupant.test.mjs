@@ -1,0 +1,47 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import * as T from 'three';
+import {createCinematicVehicle,animateCinematicVehicle} from '../../src/yunex/modelling-kit/rig.ts';
+import {disposeObject} from '../../src/yunex/world-kit/geometry.ts';
+const pose=g=>{const a=[];g.getObjectByName('driver-rig').traverse(o=>a.push([o.name,...o.position,...o.quaternion]));return JSON.stringify(a);};
+test('opt-in articulated driver has jointed limbs and returns exactly after impact seek',()=>{
+ const g=createCinematicVehicle({variant:'hot-hatch',driver:true});assert.ok(g.getObjectByName('driver-rig'));
+ for(const name of ['head','neck','thorax','pelvis','hand-left','hand-right','foot-left','foot-right','belt-diagonal','belt-lap'])assert.ok(g.getObjectByName(name),name);
+ animateCinematicVehicle(g,{frame:0,fps:30});const rest=pose(g);
+ animateCinematicVehicle(g,{frame:90,fps:30,braking:1,impact:1,steer:.3});assert.notEqual(pose(g),rest);
+ animateCinematicVehicle(g,{frame:0,fps:30});assert.equal(pose(g),rest);disposeObject(g);
+});
+test('hands stay attached to steering grips during full supported wheel movement',()=>{
+ for(const variant of ['hot-hatch','supercar','formula-modern']){const g=createCinematicVehicle({variant,driver:true});
+ for(const steer of [-.45,0,.45]){animateCinematicVehicle(g,{frame:30,fps:30,steer,braking:1,impact:.8});for(const side of ['left','right']){const hand=g.getObjectByName(`hand-${side}`),grip=g.getObjectByName(`grip-target-${side}`);assert.ok(hand.getWorldPosition(new T.Vector3()).distanceTo(grip.getWorldPosition(new T.Vector3()))<1e-5,variant);}}
+ disposeObject(g);}
+});
+test('driver is opt-in and invalid reaction input does not mutate a vehicle',()=>{
+ const a=createCinematicVehicle({variant:'hot-hatch'});assert.ok(!a.getObjectByName('driver-rig'));disposeObject(a);
+ const g=createCinematicVehicle({variant:'supercar',driver:true}),before=pose(g);for(const impact of [-1,2,NaN])assert.throws(()=>animateCinematicVehicle(g,{frame:30,fps:30,impact}));assert.equal(pose(g),before);disposeObject(g);
+});
+
+test('Formula grips lie in the actual steering torus plane',()=>{const g=createCinematicVehicle({variant:'formula-modern',driver:true}),wheel=g.getObjectByName('racing-steering-wheel'),centre=wheel.getWorldPosition(new T.Vector3()),grip=wheel.getObjectByName('grip-target-left').getWorldPosition(new T.Vector3());assert.ok(Math.abs(grip.x-centre.x)<1e-5);assert.ok(Math.abs(Math.abs(grip.z-centre.z)-.11)<1e-5);disposeObject(g);});
+
+test('Formula seated head clears the roll-hoop height and feet meet real pedal targets',()=>{for(const variant of ['hot-hatch','supercar','formula-modern']){const g=createCinematicVehicle({variant,driver:true});if(variant==='formula-modern')assert.ok(new T.Box3().setFromObject(g.getObjectByName('head')).max.y<1.05);for(const side of ['left','right']){const foot=g.getObjectByName(`foot-${side}`),pad=g.getObjectByName(`pedal-target-${side}`);assert.ok(foot.getWorldPosition(new T.Vector3()).distanceTo(pad.getWorldPosition(new T.Vector3()))<.10,variant);}disposeObject(g);}});
+test('pelvis sits on the selected cushion rather than intersecting it',()=>{for(const variant of ['hot-hatch','supercar','formula-modern','tractor-truck']){const g=createCinematicVehicle({variant,driver:true});const driver=g.getObjectByName('driver-rig'),pelvis=new T.Box3().setFromObject(driver.getObjectByName('pelvis'));let cushions=[];g.traverse(o=>{if(['seat-cushion','driver-seat-cushion'].includes(o.name)&&o.parent?.visible!==false&&o.visible){const b=new T.Box3().setFromObject(o),p=driver.getObjectByName('pelvis').getWorldPosition(new T.Vector3());if(p.x>=b.min.x-.1&&p.x<=b.max.x+.1&&p.z>=b.min.z&&p.z<=b.max.z)cushions.push(b);}});assert.ok(cushions.some(b=>pelvis.min.y>=b.max.y-.01&&pelvis.min.y<=b.max.y+.025),variant);disposeObject(g);}});
+test('feet and knees retain anatomical left-right ordering on both steering layouts',()=>{for(const steeringSide of ['left','right'])for(const variant of ['hot-hatch','supercar','formula-modern']){const g=createCinematicVehicle({variant,driver:true,steeringSide});for(const steer of [-.3,0,.3]){animateCinematicVehicle(g,{frame:60,fps:30,steer,braking:1,impact:.7});for(const part of ['foot','knee']){const left=g.getObjectByName(`${part}-left`).getWorldPosition(new T.Vector3()),right=g.getObjectByName(`${part}-right`).getWorldPosition(new T.Vector3());assert.ok(left.z>right.z,`${variant}/${steeringSide}/${part}`);}}disposeObject(g);}});
+test('all restraint webbing stays outside actual posed pelvis and chest triangles',()=>{
+ const inside=(p,body)=>{const ray=new T.Raycaster(p,new T.Vector3(1,.137,.071).normalize(),1e-6,5),mat=body.material,side=mat.side;mat.side=T.DoubleSide;const hits=ray.intersectObject(body,false);mat.side=side;const unique=hits.filter((h,i)=>!i||Math.abs(h.distance-hits[i-1].distance)>1e-5);return unique.length%2===1;};
+ for(const steeringSide of ['left','right'])for(const variant of ['hot-hatch','supercar','formula-modern']){const g=createCinematicVehicle({variant,driver:true,steeringSide}),driver=g.getObjectByName('driver-rig'),bodies=['pelvis','thorax'].map(n=>driver.getObjectByName(n));
+ for(const [braking,impact] of [[0,0],[1,0],[1,1]]){animateCinematicVehicle(g,{frame:90,fps:30,braking,impact});driver.traverse(o=>{if(o.geometry?.type!=='BoxGeometry'||!o.name.startsWith('belt-'))return;for(let i=1;i<20;i++)for(const [x,y] of [[0,0],[.004,.0225],[-.004,.0225],[.004,-.0225],[-.004,-.0225]]){const p=new T.Vector3(x,y,i/20-.5).applyMatrix4(o.matrixWorld);for(const body of bodies)assert.equal(inside(p,body),false,`${variant}/${steeringSide}/${braking}/${impact}: ${o.name} inside ${body.name}`);}});}disposeObject(g);}
+});
+test('chest webbing remains close to the posed front surface',()=>{for(const variant of ['hot-hatch','supercar','formula-modern']){const g=createCinematicVehicle({variant,driver:true});for(const [braking,impact] of [[0,0],[1,0],[1,1]]){animateCinematicVehicle(g,{frame:90,fps:30,braking,impact});const chest=g.getObjectByName('thorax'),belt=g.getObjectByName('belt-lower'),p=belt.getWorldPosition(new T.Vector3()),normal=new T.Vector3(-1,0,0).transformDirection(chest.matrixWorld),hits=new T.Raycaster(p,normal,0,1).intersectObject(chest,false);assert.ok(hits.length&&hits[0].distance<.04,`${variant}: loose front strap ${hits[0]?.distance}`);}disposeObject(g);}});
+test('driver cutaways preserve opaque seating and steering hardware',()=>{const g=createCinematicVehicle({variant:'hot-hatch',driver:true}),interior=g.getObjectByName('interior'),seat=interior.getObjectByName('bucket-seat-shell').getObjectByName('seat-cushion'),wheel=interior.getObjectByName('steering-wheel');let rim;wheel.traverse(o=>{if(o.isMesh&&o.geometry.type==='TorusGeometry')rim=o;});animateCinematicVehicle(g,{frame:90,fps:30,cutaway:.97,braking:1,impact:.8});assert.equal(seat.material.opacity,1);assert.equal(rim.material.opacity,1);assert.equal(interior.getObjectByName('door-panel-right').visible,false);animateCinematicVehicle(g,{frame:0,fps:30});assert.equal(interior.getObjectByName('door-panel-right').visible,true);animateCinematicVehicle(g,{frame:90,fps:30,cutaway:.97});assert.ok(g.getObjectByName('arched-body').material.opacity<.1);disposeObject(g);});
+
+test('gear change reaches the actual console knob with the correct hand and seeks back to steering',()=>{
+ for(const steeringSide of ['left','right']){
+  const g=createCinematicVehicle({variant:'hot-hatch',driver:true,steeringSide}),side=steeringSide==='left'?'right':'left';
+  animateCinematicVehicle(g,{frame:60,fps:30,gearChange:1,steer:.2});
+  const hand=g.getObjectByName(`hand-${side}`).getWorldPosition(new T.Vector3()),knob=g.getObjectByName('gear-knob');assert.ok(knob,'use existing console hardware');
+  assert.ok(hand.distanceTo(knob.getWorldPosition(new T.Vector3()))<.01);
+  animateCinematicVehicle(g,{frame:0,fps:30});
+  assert.ok(g.getObjectByName(`hand-${side}`).getWorldPosition(new T.Vector3()).distanceTo(g.getObjectByName(`grip-target-${side}`).getWorldPosition(new T.Vector3()))<1e-5);
+  assert.throws(()=>animateCinematicVehicle(g,{frame:1,fps:30,gearChange:2}));disposeObject(g);
+ }
+});
