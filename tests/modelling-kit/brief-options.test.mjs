@@ -1,0 +1,4 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {compileBrief} from '../../src/yunex/modelling-kit/production.ts';
+test('brief preserves private geometry, environment and supplied exact audio timing independently',()=>{
+ const b={id:'ev-proof',subject:'Regeneration',duration:2,vehicle:{variant:'city-ev',model:{id:'private',version:1,edits:[]}},environment:{kind:'city',timeOfDay:'night'},audio:{narration:'audio/original.mp3',music:'audio/music.mp3',musicVolume:.1},words:[{text:'Supplied',start:.2,end:.6}],scenes:[{id:'drive',camera:'tracking',action:'braking',caption:'Slow down'}]};const r=compileBrief(b);assert.deepEqual(r.vehicle,b.vehicle);assert.deepEqual(r.world,b.environment);assert.deepEqual(r.audio,b.audio);assert.deepEqual(r.words,b.words);r.vehicle.model.edits.push({target:'body-shell',visible:false});assert.equal(b.vehicle.model.edits.length,0);
+});
