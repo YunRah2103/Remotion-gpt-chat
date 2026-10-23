@@ -27,15 +27,15 @@ Exact source/MP4 hashes and artifact names are generated per matrix job by `.git
 
 ## Authoritative Agent 7 exhaust ABI
 
-Source: `src/yunex/ep005/agent6/v4-exhaust-ports.json` (also exported as TypeScript `V4_EXHAUST_MANIFEST`).
+Source: `src/yunex/ep005/agent6/v4-exhaust-ports.json` (also exported as TypeScript `V4_EXHAUST_MANIFEST`). **V4-specific manifest numeric version 2**, editor schema ID `v4-2`, approval anchor `https://github.com/YunRah2103/Remotion-gpt-chat/issues/247#issuecomment-6355059494`.
 
 - Vehicle coordinate frame: +X forward, +Y up, +Z driver's left, metres.
 - Name **left**: `exhaust-outlet-left` (inside animated `body-shell`).
 - Name **right**: `exhaust-outlet-right` (inside animated `body-shell`).
 - Node-local mouth offset: `[0,0,0]`, node-local flow/outward axis: `[0,0,1]`; the mount's quaternion maps local +Z to vehicle -X backward.
 - Authentic V4 kit factory measured parameters: **112 mm outer visible diameter**, 4 mm wall, **104 mm inner bore**, 52 mm inner radius per tip. Recess/connected pipe exist in approved rig; do not duplicate tips or inflate tips to support bigger flames.
-- Update actual world pose via `poseApprovedV4(car, frame)` then read `sampleV4Ports(car, frame)` from the same car, or call Agent 7 `sampleActualPorts(car, manifest, frame, fps)`; never reuse old candidate A world coordinates.
-- `scripts/ep005-agent6/v4-ports.mjs` exports independent 120-frame world positions, outward axes and `matrixWorld` for each source node, checks travel and lateral ordering, hashes both manifest and timeline.
+- Update actual world pose via `poseApprovedV4(car, frame)` then read `sampleV4Ports(car, frame)` from the same car. Agent 7 must use its **v2** `adaptApprovedV4WorldPorts(framePortRecords, frame, lock, fps)`; the old v1-only `sampleActualPorts` rejects this manifest. Frame records + `agent7-v4-port-lock.json` are exported together by CI. Never reuse old candidate A/B world coordinates.
+- `scripts/ep005-agent6/v4-ports.mjs` exports 120 absolute-frame world positions, outward axes, all 16 `matrixWorld` elements and frame-synchronous four-camera paths. It also writes `agent7-world-ports-120frames.json` with exact Agent7 adapter field names, `agent7-v4-port-lock.json` (numeric v2, Git commit and SHA256), and `SHA256S.json`. Editor `portManifestVersion` must be **`v4-2`**, while Agent7's `lock.version` remains numeric 2. Port provenance is independent of footage's MP4 SHA256.
 
 ## Required handoff gate
 
