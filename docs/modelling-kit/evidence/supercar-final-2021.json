@@ -1,0 +1,309 @@
+{
+  "video": "/workspace/scratch/773eb3d6aefe/yunex-native-2021/out/studio/v4-a-supercar/proof.mp4",
+  "sourceRevision": "2021bc5",
+  "sha256": "d7ecff2c45aa3b7d5d7917efee18594f296d24b64ccc4bb7be3eed72b7896089",
+  "native": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "frames": 420,
+    "seconds": 14
+  },
+  "decision": "No new confirmed critical or important temporal, fit, or camera blocker in the inspected sequences. This is sampled continuity review, not full-film aesthetic approval.",
+  "evidence": {
+    "fullDecode": "All420 frames decoded using ffmpeg -v error -xerror to framemd5, no error.",
+    "assembledFrameSequencesIndividuallyViewed": 64,
+    "assembledMidpointWindowsInclusive": [
+      [
+        24,
+        29
+      ],
+      [
+        118,
+        123
+      ],
+      [
+        165,
+        170
+      ],
+      [
+        218,
+        223
+      ],
+      [
+        281,
+        286
+      ],
+      [
+        386,
+        391
+      ]
+    ],
+    "assembledCutWindowsInclusive": [
+      [
+        51,
+        54
+      ],
+      [
+        93,
+        96
+      ],
+      [
+        145,
+        148
+      ],
+      [
+        187,
+        190
+      ],
+      [
+        250,
+        253
+      ],
+      [
+        313,
+        316
+      ],
+      [
+        355,
+        358
+      ]
+    ],
+    "previouslyIndividuallyViewedNativeClipWindowsInclusive": [
+      [
+        53,
+        94
+      ],
+      [
+        315,
+        356
+      ]
+    ],
+    "previousClipFrameCount": 84,
+    "clipIdentityValidation": "All42 decoded frame hashes in render-shot-1.mp4 exactly match assembly53\u201394; all42 in render-shot-6.mp4 exactly match assembly315\u2013356.",
+    "combinedDistinctTimelineFramesVisuallyInspected": 140,
+    "combinedFrameIndices": [
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      118,
+      119,
+      120,
+      121,
+      122,
+      123,
+      145,
+      146,
+      147,
+      148,
+      165,
+      166,
+      167,
+      168,
+      169,
+      170,
+      187,
+      188,
+      189,
+      190,
+      218,
+      219,
+      220,
+      221,
+      222,
+      223,
+      250,
+      251,
+      252,
+      253,
+      281,
+      282,
+      283,
+      284,
+      285,
+      286,
+      313,
+      314,
+      315,
+      316,
+      317,
+      318,
+      319,
+      320,
+      321,
+      322,
+      323,
+      324,
+      325,
+      326,
+      327,
+      328,
+      329,
+      330,
+      331,
+      332,
+      333,
+      334,
+      335,
+      336,
+      337,
+      338,
+      339,
+      340,
+      341,
+      342,
+      343,
+      344,
+      345,
+      346,
+      347,
+      348,
+      349,
+      350,
+      351,
+      352,
+      353,
+      354,
+      355,
+      356,
+      357,
+      358,
+      386,
+      387,
+      388,
+      389,
+      390,
+      391
+    ],
+    "fullVisualCoverage": false,
+    "realTimePlaybackAttested": false,
+    "inspectionMethod": "Ordered individual native1080x1920 PNG sequences, not a contact-sheet-only review.",
+    "priorReports": [
+      "/workspace/scratch/773eb3d6aefe/yunex/out/review-findings/side-2021.json",
+      "/workspace/scratch/773eb3d6aefe/yunex/out/review-findings/onboard-2021.json"
+    ]
+  },
+  "shotObservations": [
+    {
+      "shot": "front-three-quarter",
+      "timeline": [
+        0,
+        52
+      ],
+      "observation": "Whole car fits. Wheel rotation and track translation are smooth within24\u201329 and51\u201352. Broad bonnet highlight is strong but stable; front intakes and dark tyres lose some detail."
+    },
+    {
+      "shot": "side-profile",
+      "timeline": [
+        53,
+        94
+      ],
+      "observation": "All42 frames previously individually viewed and decoded-identical to assembly. Complete silhouette, no foreground fence obstruction, clear wheel/kerb motion. Paint is very dark; some foreground kerb joins show striped/stair-step artifacts. FOV48 is recipe lens data on frozen2021 source."
+    },
+    {
+      "shot": "rear-three-quarter",
+      "timeline": [
+        95,
+        146
+      ],
+      "observation": "Complete rear silhouette, two exhaust outlets, rear lamps and wheels fit. Continuous wheel/background motion; stable rear glazing and paint. No sampled body/road pop."
+    },
+    {
+      "shot": "planform",
+      "timeline": [
+        147,
+        188
+      ],
+      "observation": "Entire planform/mirrors fit. Fender/body edges no longer show old pronounced triangular serrations in sampled sequence. Stable highlight and smooth small camera motion; limited speed cues from featureless asphalt."
+    },
+    {
+      "shot": "driver-controls",
+      "timeline": [
+        189,
+        251
+      ],
+      "observation": "Entire mannequin from head through boots fits; hands remain at steering wheel and boots at pedals. Transparent shell is intentional. Short windows show no sudden limb disconnect or camera pop; expressive human realism and ergonomics are not established."
+    },
+    {
+      "shot": "engine-system",
+      "timeline": [
+        252,
+        314
+      ],
+      "observation": "Whole isolated engine system fits. Piston/crank/flow animation changes continuously in281\u2013286; no sampled pose discontinuity. Turbo housing now visibly encases the visible impeller. Diagram remains schematic: copper pipe open end and simplified exposed mechanisms cannot certify a sealed functioning gas path. White flow segments are prominent."
+    },
+    {
+      "shot": "driver-speed",
+      "timeline": [
+        315,
+        356
+      ],
+      "observation": "All42 frames previously individually viewed and decoded-identical to assembly. Clear continuous asphalt view above stable bonnet, no old headliner/coilover obstruction. Subdued lighting, large bonnet and sky areas limit speed impression."
+    },
+    {
+      "shot": "speed-payoff",
+      "timeline": [
+        357,
+        419
+      ],
+      "observation": "Whole car visible at sampled beginning and386\u2013391. Wheel rotation and track scenery move continuously; smooth highlights. Front-three-quarter composition closely resembles opening, so payoff has modest visual escalation."
+    }
+  ],
+  "cutObservations": "Two native frames on each side of every cut53,95,147,189,252,315,357 inspected from assembled film. Expected viewpoint changes occur with no black intermediary, accidental extra angle, or duplicate transition in those neighborhoods. Hard cuts intentionally change composition and visibility; no all-frame continuity claim.",
+  "aestheticLimits": [
+    "Faceted foliage, sparse track scenery and simple shading remain stylized/game-like, not photoreal beauty.",
+    "Dark side/front recesses and broad bonnet reflections limit fine surface readability.",
+    "Motion is established by wheel/scenery changes; lack of motion blur and modest camera escalation produce a restrained speed impression.",
+    "Engine and driver views are explanatory schematic cutaways, not verified engineering or lifelike performance."
+  ],
+  "sourceEdits": false
+}

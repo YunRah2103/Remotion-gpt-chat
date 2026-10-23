@@ -1,0 +1,66 @@
+{
+  "file": "/workspace/scratch/773eb3d6aefe/yunex-native-2021/out/studio/v4-a-supercar/render-shot-1.mp4",
+  "sha256": "be95505f769aa18dee5490f687654ebd1cbd1285fcf9dcfd706f50d5af0da222",
+  "providedSourceRevision": "2021bc5",
+  "sourceFingerprintFromShotContract": "133e35891669ecbb2fb2f6b8a40fe3020f5be0d847546d5a0b208eaf14469a2c",
+  "renderHash": "3c4ac1cf275eca657cd151083563ee6fe8c2a27fc23c2d11d3a143b9635d8427",
+  "recipeCameraMove": {
+    "start": {
+      "position": [
+        0,
+        1.3,
+        -7.6
+      ],
+      "target": [
+        0,
+        0.72,
+        0
+      ],
+      "fov": 48
+    },
+    "end": {
+      "position": [
+        0.12,
+        1.32,
+        -7.4
+      ],
+      "target": [
+        0,
+        0.72,
+        0
+      ],
+      "fov": 48
+    },
+    "easing": "smooth"
+  },
+  "sourceDataDistinction": "Parent reports unchanged frozen renderer2021bc5; corrected camera FOV48 is per-project recipe data. Sidecar source fingerprint and recipe renderHash recorded separately. This review did not mutate source or recipe.",
+  "decodedFrames": 42,
+  "dimensions": [
+    1080,
+    1920
+  ],
+  "fps": "30/1",
+  "reviewedEncodedFrameRange": [
+    0,
+    41
+  ],
+  "timelineRange": [
+    53,
+    94
+  ],
+  "method": "Full ffmpeg -xerror decode/extraction; viewed all42native1080x1920PNGs individually in contiguous order. Not real-time playback.",
+  "decision": "pass-specific-silhouette-occlusion-and-continuity-check",
+  "findings": [
+    "Complete front-to-rear silhouette including both wheel circles, roof, mirror and bumper stays within frame throughout42frames.",
+    "No close foreground fence post or other object crosses/obscures vehicle; background fence remains behind car throughout.",
+    "Wheel spoke rotation and steadily passing kerbs, startfinish line and trees show actual scene movement.",
+    "Car holds stable side-profile placement and size; no visible camera pop, geometry disappearance or frame freeze.",
+    "Tyre bottoms appear consistently at road plane; no obvious detached tyre/road gap.",
+    "Paint remains dark in dusk; outline/shoulder highlight is readable but door/intake detail has limited contrast.",
+    "Small stair-step/striped artifacts remain at some foreground kerb tile joins; they do not obscure vehicle."
+  ],
+  "limitations": [
+    "Standalone42frame beat only; surrounding cuts/final assembled films unreviewed.",
+    "No real-time playback attestation or aesthetic final-film approval."
+  ]
+}
