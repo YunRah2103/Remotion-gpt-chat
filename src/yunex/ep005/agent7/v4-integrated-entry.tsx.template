@@ -1,0 +1,107 @@
+/**
+ * Agent 7 genuine V4-on-car proof compositions.
+ * This file is intentionally a template: native CI overlays Agent 7 source
+ * onto one PINNED Agent 6 V4 shot source commit, then replaces immutable
+ * AGENT6_SHA / PORT_SHA placeholders and validates both before rendering.
+ * Never use this unmaterialized template as a finished movie.
+ */
+import React,{useMemo,useEffect} from 'react';
+import * as THREE from 'three';
+import {AbsoluteFill,Composition,registerRoot,useCurrentFrame,useVideoConfig} from 'remotion';
+import {ThreeCanvas} from '@remotion/three';
+import {CameraAim} from '../../world-kit/components.tsx';
+import {CinematicLighting} from '../../modelling-kit/Lighting.tsx';
+import {disposeObject} from '../../world-kit/geometry.ts';
+import {createApprovedV4,poseApprovedV4,sampleV4Ports,v4Camera} from '../agent6/v4-approved.ts';
+import {adaptApprovedV4WorldPorts} from './ports';
+import {createAfterfireRig,animateAfterfire,EP005_25S_AFTERFIRE_BEATS} from './afterfire';
+
+const V4_LOCK={
+ version:2 as const,vehicle:'v4-a-supercar' as const,
+ coordinateConvention:'world-three-y-up-metres' as const,
+ referenceKitCommit:'9052a539e10a7cb97487c1435455bb9962ad58e1',
+ referenceApprovalUrl:'https://github.com/YunRah2103/Remotion-gpt-chat/issues/247#issuecomment-6355059494',
+ agent6ShotCommit:'__AGENT6_SHA__',
+ v4PortManifestSha256:'__V4_PORT_SHA__',
+};
+const roadMat=new THREE.MeshStandardMaterial({color:'#2c343b',metalness:.13,roughness:.48});
+const lineMat=new THREE.MeshStandardMaterial({color:'#b7cbd3',metalness:.05,roughness:.59});
+const concreteMat=new THREE.MeshStandardMaterial({color:'#626e79',metalness:.1,roughness:.76});
+const blueMat=new THREE.MeshStandardMaterial({color:'#243843',metalness:.26,roughness:.53});
+function buildTrack():THREE.Group{
+ const track=new THREE.Group();track.name='EP005 moving V4 night road: continuous 3D geometry';
+ const add=(name:string,s:[number,number,number],p:[number,number,number],m:THREE.Material)=>{
+   const mesh=new THREE.Mesh(new THREE.BoxGeometry(...s),m);
+   mesh.name=name;mesh.position.set(...p);mesh.castShadow=name!=='road';
+   mesh.receiveShadow=true;track.add(mesh);return mesh;
+ };
+ add('road',[600,.12,17],[130,-.10,0],roadMat);
+ add('grassward',[650,.07,95],[130,-.22,0],blueMat);
+ // Road is physically fixed; the approved car travels 26–32m/s past markers.
+ for(const side of [-1,1]){
+   add('edge paint',[600,.008,.18],[130,-.027,side*7.9],lineMat);
+   add('runoff',[600,.05,6.6],[130,-.13,side*12],blueMat);
+   for(let x=-95;x<315;x+=12){
+      add('real track barrier',[11.8,.8,.35],[x,.42,side*16.8],concreteMat);
+   }
+ }
+ for(let x=-95;x<315;x+=13){
+   add('track dash',[.8,.012,.09],[x,-.027,0],lineMat);
+ }
+ const towerMat=new THREE.MeshStandardMaterial({color:'#7b93a4',metalness:.42,roughness:.41});
+ for(let x=-100;x<330;x+=48){
+   const pole=add('distant lighting pole',[.22,7,.22],[x,3.5,26],concreteMat);
+   pole.castShadow=false;
+   add('lighting panel',[1.9,.38,.40],[x,7.0,26],towerMat);
+ }
+ return track;
+}
+const Integrated:React.FC<{section:'hook'|'finale'}>=({section})=>{
+ const localFrame=useCurrentFrame(),{fps,width,height}=useVideoConfig();
+ const masterFrame=section==='hook'?localFrame:675+localFrame;
+ const sourceFrame=section==='hook'?localFrame:30+localFrame;
+ const car=useMemo(()=>createApprovedV4(),[]);
+ const track=useMemo(()=>buildTrack(),[]);
+ const flame=useMemo(()=>createAfterfireRig(),[]);
+ useEffect(()=>()=>{disposeObject(car);disposeObject(track);},[car,track]);
+ const motion=poseApprovedV4(car,sourceFrame,fps);
+ const samples=sampleV4Ports(car,sourceFrame,fps).map(p=>({
+    frame:masterFrame,name:(p.id==='left'?'exhaust-left':'exhaust-right') as 'exhaust-left'|'exhaust-right',
+    worldOrigin:p.worldOrigin as [number,number,number],
+    worldOutward:p.worldOutward as [number,number,number],
+    innerRadiusM:p.innerRadiusM,
+    visibleOuterDiameterM:p.outerDiameterM,
+ }));
+ const ports=adaptApprovedV4WorldPorts(samples,masterFrame,V4_LOCK,fps);
+ animateAfterfire(flame,ports,masterFrame/fps,EP005_25S_AFTERFIRE_BEATS,
+    new THREE.Vector3(motion.speed,0,0));
+ const camera=section==='hook'
+    ?v4Camera('rear-proof',Math.min(sourceFrame,119),fps)
+    :v4Camera('rear-chase',Math.min(sourceFrame,119),fps);
+ // Push in close for payoff; keep the actual car moving and the ports in WORLD space.
+ if(section==='finale'){
+    camera.position=[motion.x-7.9,1.63,-2.85];
+    camera.target=[motion.x-.50,.76,0];
+    camera.fov=43;
+ }
+ return <AbsoluteFill style={{background:'#1a2630'}}>
+ <ThreeCanvas width={width} height={height} shadows
+   camera={{fov:camera.fov,near:.025,far:480}}
+   gl={{antialias:true,alpha:false}}>
+  <color attach="background" args={['#182631']}/>
+  <CinematicLighting focus={[motion.x,0,0]} timeOfDay="dusk"/>
+  <hemisphereLight args={['#d6e7ff','#48505b',.94]}/>
+  <directionalLight position={[motion.x+6,13,-8]} intensity={1.95} color="#d7e8ff"/>
+  <directionalLight position={[motion.x-3,6,8]} intensity={1.55} color="#f9cda9"/>
+  <primitive object={track}/>
+  <primitive object={car}/>
+  <primitive object={flame.root}/>
+  <CameraAim {...camera}/>
+ </ThreeCanvas>
+ </AbsoluteFill>;
+};
+const Root=()=> <>
+ <Composition id="EP005A7V4IntegratedHook" component={Integrated} defaultProps={{section:'hook'}} width={1080} height={1920} fps={30} durationInFrames={45}/>
+ <Composition id="EP005A7V4IntegratedFinale" component={Integrated} defaultProps={{section:'finale'}} width={1080} height={1920} fps={30} durationInFrames={75}/>
+ </>;
+registerRoot(Root);
