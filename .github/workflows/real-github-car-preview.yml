@@ -1,0 +1,55 @@
+name: Real GitHub Cars - MP4 Preview
+on:
+  push:
+    branches:
+      - preview/real-github-models-20261023
+permissions:
+  contents: read
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install Remotion
+        run: npm ci
+      - name: Download original licensed GLB files
+        run: |
+          mkdir -p public/real-github out/real-github
+          for file in mclaren-p1.glb porsche-911-gt3.glb lamborghini-aventador.glb; do
+            curl --fail --location --retry 4 --retry-delay 2 --silent --show-error \
+              "https://raw.githubusercontent.com/pedrosoandre/carros/main/assets/$file" \
+              --output "public/real-github/$file"
+            test "$(head -c 4 "public/real-github/$file")" = glTF
+            ls -lh "public/real-github/$file"
+          done
+      - name: Render genuine models (not procedural reconstructions)
+        run: |
+          npx remotion render preview-real-cars/entry.tsx RealGitHubCars out/real-github/REAL-GITHUB-CARS.mp4 \
+            --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+      - name: Validate footage and produce contact sheet
+        run: |
+          ffprobe -v error -show_entries format=duration,size -show_entries stream=width,height,nb_frames \
+            -of default=noprint_wrappers=1 out/real-github/REAL-GITHUB-CARS.mp4
+          ffmpeg -v error -i out/real-github/REAL-GITHUB-CARS.mp4 -f null -
+          ffmpeg -y -v error -i out/real-github/REAL-GITHUB-CARS.mp4 -vf "fps=1/2,scale=360:-1,tile=3x2" -frames:v 1 out/real-github/contact-sheet.jpg
+      - name: Copy credits
+        run: |
+          cat > out/real-github/CREDITS.txt <<'CREDITS'
+          McLaren P1 model by vecarz, CC Attribution.
+          Porsche 911 GT3 model by ChevroletSS, CC Attribution.
+          Lamborghini Aventador model by BlackCube, CC Attribution.
+          Assets from https://github.com/pedrosoandre/carros
+          Original source creators and full provenance in cars.json in the source repository.
+          This preview contains original GLB geometry and materials (no procedural body substitutes).
+          CREDITS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: real-github-cars-mp4
+          path: out/real-github/
+          retention-days: 14
