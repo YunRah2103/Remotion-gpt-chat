@@ -47,8 +47,8 @@ function requireGate(ok, message) { if (!ok) blockers.push(message); }
 function plan() {
   const s = manifest.settings || {};
   requireGate(manifest.schemaVersion === 1, 'manifest schema version must be 1');
-  requireGate(s.fps === 30 && s.width === 1080 && s.height === 1920 && s.totalFrames === 750,
-    'native format must remain 1080x1920 / 30fps / 750 frames');
+  requireGate(s.fps === 30 && s.width === 1080 && s.height === 1920 && (s.totalFrames === 750 || s.totalFrames === 767),
+    'native format must be 1080x1920 / 30fps / 750f or original Cedar 767f');
   // The user approved the car exterior only; never interpret that as permission to
   // reuse the old 14-second demo or to approve arbitrary replacement vehicles.
   const hero = manifest.approvedHero || {};
@@ -102,22 +102,29 @@ function plan() {
         'invalid on-screen visual fact label at ' + beat.id);
     }
   }
-  requireGate(cursor === s.totalFrames, 'editor must cover all 750 frames, no gap or tail trim');
+  requireGate(cursor === s.totalFrames, 'editor must cover all '+s.totalFrames+' frames, no gap or tail trim');
   const voice = manifest.voice || {};
   if (voice.approved) {
     requireGate(safeLocal(voice.path) && isSha(voice.sha256) &&
-      isCommit(voice.sourceCommit) && hasApprovedSourceRef(voice.approvalRef) &&
-      Number.isInteger(voice.artifactRunId) && voice.artifactRunId > 0 &&
-      typeof voice.artifactName === 'string' && /^[\w.-]+$/.test(voice.artifactName) &&
+      hasApprovedSourceRef(voice.approvalRef) && (
+        (isCommit(voice.sourceCommit) && Number.isInteger(voice.artifactRunId) &&
+         voice.artifactRunId > 0 && typeof voice.artifactName === 'string' &&
+         /^[\\w.-]+$/.test(voice.artifactName)) ||
+        (voice.userProvidedOriginal === true && voice.sourceName === 'openai-fm-cedar-audio.mp3' &&
+         voice.path === 'out/ep005-agent8-sources/user-cedar/openai-fm-cedar-audio.mp3' &&
+         voice.sha256 === '90dd2e299b1cdd9b7f2d3bc508b064c43dda7bfc36caa345b2f502ec13c200d8' &&
+         voice.verifiedDurationSeconds === 25.56)
+      ) &&
       Number.isFinite(voice.verifiedDurationSeconds) &&
-      voice.verifiedDurationSeconds > 0 && voice.verifiedDurationSeconds <= 25.005,
+      voice.verifiedDurationSeconds > 0 &&
+      Math.ceil(voice.verifiedDurationSeconds * s.fps) === s.totalFrames,
       'voice provenance, checksum, source commit and approval required');
     requireGate(voice.captionsVerified === true &&
       Array.isArray(manifest.captions) && manifest.captions.length > 0,
       'real narration requires verified actual caption timings');
     let previousCaptionEnd = 0;
     for (const c of manifest.captions || []) {
-      requireGate(int(c.start) && int(c.end) && c.start >= 0 && c.end <= 750 &&
+      requireGate(int(c.start) && int(c.end) && c.start >= 0 && c.end <= s.totalFrames &&
         c.end > c.start && c.verified === true && typeof c.text === 'string' &&
         c.text.length > 0 && c.text.length <= 88,
         'subtitle must have actual approved frame times + short readable text');
@@ -135,12 +142,12 @@ function plan() {
       Number.isInteger(b.artifactRunId) && b.artifactRunId > 0 &&
       typeof b.artifactName === 'string' && /^[\w.-]+$/.test(b.artifactName) &&
       typeof b.provenance === 'string' && b.provenance.trim().length >= 8 &&
-      int(b.startFrame) && b.startFrame >= 0 && b.startFrame < 750 &&
+      int(b.startFrame) && b.startFrame >= 0 && b.startFrame < s.totalFrames &&
       Number.isFinite(b.gainDb) && b.gainDb >= -48 && b.gainDb <= -10,
       'optional sound beds must be licensed, approved and safely ducked beneath real narration');
   }
   return {ready:blockers.length === 0, mode:voice.approved ? 'FINAL_WITH_APPROVED_AUDIO' : 'SILENT_PICTURE_REVIEW',
-    frameCount:750, fps:30, blockers};
+    frameCount:s.totalFrames, fps:30, blockers};
 }
 const status = plan();
 if (mode === '--check') {
@@ -184,7 +191,7 @@ async function validateMedia(p, checksum, neededFrames = null, approvedVoiceDura
     const voice=streams.find(v=>v.codec_type === 'audio');
     const actual=Number(voice?.duration || audioprobe.format?.duration);
     if (!voice || !Number.isFinite(actual) || Math.abs(actual-approvedVoiceDuration) > 0.08 ||
-      actual > 25.005 || Number(voice.sample_rate) < 16000 || voice.channels < 1)
+      actual > s.totalFrames/s.fps + 0.02 || Number(voice.sample_rate) < 16000 || voice.channels < 1)
       throw new Error('Approved VO duration/sample rate mismatch: no silent audio trimming: '+p);
   }
   run('ffmpeg',['-hide_banner','-loglevel','error','-xerror','-i',p,
@@ -211,7 +218,7 @@ function createAss() {
   ];
   const ev = (style,a,b,text) => 'Dialogue: 0,'+assTime(a)+','+assTime(b)+','+style+',,0,0,0,,'+escapeAss(text);
   const events = [];
-  if (!manifest.voice.approved) events.push(ev('Review',0,750,'SILENT PICTURE REVIEW  /  VO PENDING'));
+  if (!manifest.voice.approved) events.push(ev('Review',0,manifest.settings.totalFrames,'SILENT PICTURE REVIEW  /  VO PENDING'));
   for (const beat of manifest.beats) if (beat.title) events.push(ev('Fact',beat.title.start,beat.title.end,beat.title.text));
   if (manifest.voice.approved) for (const c of manifest.captions) events.push(ev('Spoken',c.start,c.end,c.text));
   return header.concat(events).join('\n')+'\n';
@@ -234,6 +241,7 @@ for(const bed of manifest.optionalAudioBeds||[]) {
   await validateMedia(p,bed.sha256);
   inputs.push(p);
 }
+const filmDuration=manifest.settings.totalFrames/manifest.settings.fps;
 const assPath=path.join(outDir,'approved-caption-overlay.ass');
 await fsp.writeFile(assPath,createAss());
 const videoFilters=manifest.beats.map((beat,i)=>{
@@ -250,12 +258,12 @@ if(manifest.voice.approved) {
   const voiceIndex=manifest.beats.length;
   // Original approved VO is preserved at original rate-of-speech and pitch;
   // duration is pre-verified. Only the silence after its natural ending is extended.
-  videoFilters.push('['+voiceIndex+':a:0]aresample=48000,asetpts=PTS-STARTPTS,apad,atrim=duration=25[originalVoice]');
+  videoFilters.push('['+voiceIndex+':a:0]aresample=48000,asetpts=PTS-STARTPTS,apad,atrim=duration='+filmDuration+'[originalVoice]');
   const streams=[];
   for(let i=0;i<(manifest.optionalAudioBeds||[]).length;i++) {
     const bed=manifest.optionalAudioBeds[i], idx=voiceIndex+1+i;
     videoFilters.push('['+idx+':a:0]aresample=48000,volume='+bed.gainDb+'dB,adelay='+
-      Math.round(bed.startFrame*1000/30)+':all=1,atrim=duration=25[bed'+i+']');
+      Math.round(bed.startFrame*1000/30)+':all=1,atrim=duration='+filmDuration+'[bed'+i+']');
     streams.push('[bed'+i+']');
   }
   if(streams.length) {
@@ -277,19 +285,20 @@ args.push('-filter_complex',videoFilters.join(';'),'-map','[vout]');
 if(audioOut) args.push('-map',audioOut,'-c:a','aac','-b:a','192k','-ar','48000','-ac','2');
 else args.push('-an');
 args.push('-c:v','libx264','-crf','18','-preset','medium','-pix_fmt','yuv420p',
-  '-r','30','-frames:v','750','-movflags','+faststart','-t','25',output);
+  '-r','30','-frames:v',String(manifest.settings.totalFrames),'-movflags','+faststart','-t',String(filmDuration),output);
 run('ffmpeg',args);
 const probe=JSON.parse(run('ffprobe',['-v','error','-count_frames','-show_streams','-show_format','-of','json',output],true));
 const vid=probe.streams.find(s=>s.codec_type==='video');
 const aud=probe.streams.filter(s=>s.codec_type==='audio');
 if(vid?.width!==1080 || vid?.height!==1920 || vid?.r_frame_rate!=='30/1' ||
-  Number(vid?.nb_read_frames)!==750) throw new Error('OUTPUT QA FAIL: native format/frame count');
+  Number(vid?.nb_read_frames)!==manifest.settings.totalFrames) throw new Error('OUTPUT QA FAIL: native format/frame count');
 if(manifest.voice.approved ? aud.length<1 : aud.length!==0) throw new Error('OUTPUT QA FAIL: audio integrity');
 run('ffmpeg',['-hide_banner','-loglevel','error','-xerror','-i',output,'-f','null','-']);
-const samples=new Set([0,1,5,14,29,30,674,675,700,724,748,749]);
+const last=manifest.settings.totalFrames-1;
+const samples=new Set([0,1,5,14,29,30,last-75,last-74,last-50,last-25,last-1,last]);
 for(const beat of manifest.beats) {
-  samples.add(Math.max(0,beat.start-2)); samples.add(beat.start); samples.add(Math.min(749,beat.start+2));
-  samples.add(Math.max(0,beat.end-2)); samples.add(Math.min(749,beat.end-1));
+  samples.add(Math.max(0,beat.start-2)); samples.add(beat.start); samples.add(Math.min(last,beat.start+2));
+  samples.add(Math.max(0,beat.end-2)); samples.add(Math.min(last,beat.end-1));
 }
 const sampleFrames=[...samples].sort((a,b)=>a-b);
 const expr=sampleFrames.map(n=>'eq(n\\,'+n+')').join('+');
@@ -298,7 +307,7 @@ run('ffmpeg',['-hide_banner','-loglevel','error','-i',output,'-vf','select='+exp
 // Export EVERY opening frame and EVERY final 75-frame payoff frame for real
 // moving-image visual review, instead of claiming that a few stills prove quality.
 run('ffmpeg',['-hide_banner','-loglevel','error','-i',output,
-  '-vf','select=lte(n\\,29)+gte(n\\,675),scale=270:-2',
+  '-vf','select=lte(n\\,29)+gte(n\\,'+(manifest.settings.totalFrames-75)+'),scale=270:-2',
   '-vsync','0','-q:v','4',path.join(outDir,'mandatory-visual-%03d.jpg')]);
 const visualFiles=(await fsp.readdir(outDir)).filter(x=>/^mandatory-visual-\d+\.jpg$/.test(x)).sort();
 if(visualFiles.length!==105) throw new Error('MANDATORY QA FAIL: expected exactly first 30 + last 75 review frames');
@@ -310,7 +319,7 @@ if(openingUnique<5 || endingUnique<12)
   throw new Error('MANDATORY QA FAIL: opening or ending looks frame-static; inspect replacement source');
 const report={
   episode:'EP005',candidate:true,humanVisualApproval:'PENDING',
-  mode:status.mode,frameCount:750,width:1080,height:1920,fps:30,
+  mode:status.mode,frameCount:manifest.settings.totalFrames,width:1080,height:1920,fps:30,
   sha256:await sha256(output),videoPath:output,
   audioStreamCount:aud.length,sourceCommitHashes:manifest.beats.map(b=>({id:b.id,commit:b.media.sourceCommit,sha256:b.media.sha256,approval:b.media.approvalRef})),
   sampleFrames,mandatoryVisualFrames:105,openingUniqueFrames:openingUnique,endingUniqueFrames:endingUnique,
