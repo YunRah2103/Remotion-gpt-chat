@@ -11,7 +11,7 @@ import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 
 const here=path.dirname(fileURLToPath(import.meta.url));
-const manifest=JSON.parse(fs.readFileSync(path.join(here,'edit-manifest.json'),'utf8'));
+const manifest=JSON.parse(fs.readFileSync(path.resolve(process.env.EP005_MANIFEST_PATH || path.join(here,'edit-manifest.json')),'utf8'));
 const file=path.resolve(process.argv[2] || '');
 if(process.argv.length < 3 || !fs.existsSync(file)) throw new Error('Missing real master MP4 — will not fabricate audio proof');
 function run(bin,args) {
@@ -24,7 +24,8 @@ const aud=probe.streams.filter(s=>s.codec_type==='audio');
 const duration=Number(probe.format?.duration);
 const expected=manifest.voice.approved ? 1 : 0;
 if(aud.length!==expected) throw new Error('AUDIO CONTENT CLAIM MISMATCH: wanted '+expected+', got '+aud.length);
-if(Math.abs(duration-25)>0.125) throw new Error('Master duration is not 25 seconds: '+duration);
+const expectedDuration=manifest.settings.totalFrames/manifest.settings.fps;
+if(Math.abs(duration-expectedDuration)>0.125) throw new Error('Master duration mismatch: expected '+expectedDuration+' got '+duration);
 const out={
  schemaVersion:1,source:file,
  mode:manifest.voice.approved?'ORIGINAL_NARRATION_AUDIO_CANDIDATE':'SILENT_PICTURE_REVIEW',
