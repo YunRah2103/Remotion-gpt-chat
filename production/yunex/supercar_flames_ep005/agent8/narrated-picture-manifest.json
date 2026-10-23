@@ -354,8 +354,20 @@
     "targetFrames": 767,
     "voiceSourceSelected": true,
     "voiceSourceReadyOnGitHubActions": false,
-    "latestLocalPreviewSha256": "4eed3998de71d60280aadb31c8ea1799c1a8e277de4559c8661eea06b88b239e",
-    "latestLocalPreviewStatus": "REAL_FULL_767F_LOCAL_CEDAR_NARRATED_REVIEW_WITH_ALL_CORRECTED_A6_A7_SOURCES__NOT_PICTURE_APPROVED"
+    "latestLocalPreviewSha256": "bbf6e825c45db99a0d24e202f1ac7929a34eefc1cbc36624f5051f81dc5945bc",
+    "latestLocalPreviewStatus": "FULL_767F_PICTURE_REVIEW_WITH_ORIGINAL_OWNER_CEDAR_13_CAPTIONS_AND_ORIGINAL_SYNTH_AUTOMOTIVE_FX__LOCAL_ONLY__NOT_PUBLIC_GITHUB",
+    "localQA": {
+      "fullDecodingPass": true,
+      "allDecodedVideoFramesUnique": 767,
+      "videoLengthSeconds": 25.566666666666666,
+      "integratedLUFS": -15.5,
+      "truePeakDBFS": -2,
+      "captionsMeasuredFromOwnerVoice": 13,
+      "originalCedarPrivateSha256": "90dd2e299b1cdd9b7f2d3bc508b064c43dda7bfc36caa345b2f502ec13c200d8",
+      "ownerPictureApproval": false,
+      "localReviewFilename": "YUNEX-EP005-CEDAR-767F-PICTURE-REVIEW.mp4",
+      "publicGithubMp3Uploaded": false
+    }
   },
   "localEditorialNotes": {
     "reviewOnly": true,
@@ -370,6 +382,7 @@
       "payoff": "source crop x95 y240 800x1422 scaled 1080x1920, contrast 1.07 saturation 1.10"
     },
     "audio": "actual Cedar MP3 user private; original procedural subdued engine and afterfire sounds, no third-party music/sample",
-    "pictureApproved": false
+    "pictureApproved": false,
+    "reviewWatermark": "f0–44 only; stripped from science title and end shots for mobile readability"
   }
 }
