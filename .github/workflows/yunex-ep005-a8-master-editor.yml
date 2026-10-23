@@ -1,0 +1,95 @@
+name: EP005 NEW Agent 8 - approved master film delivery
+
+on:
+  push:
+    branches:
+      - agent/ep005-08-master-editor
+  pull_request:
+    paths:
+      - 'production/yunex/supercar_flames_ep005/agent8/**'
+      - '.github/workflows/yunex-ep005-a8-master-editor.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  editorial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Verify source compilation, editor and science QA
+        run: |
+          npm run check
+          node --check production/yunex/supercar_flames_ep005/agent8/master-editor.mjs
+          node --check production/yunex/supercar_flames_ep005/agent8/download-media.mjs
+          node --check production/yunex/supercar_flames_ep005/agent8/audio-qc.mjs
+          node --test production/yunex/supercar_flames_ep005/agent8/*.test.mjs
+      - name: Determine whether owner approved footage exists
+        id: gate
+        shell: bash
+        run: |
+          node production/yunex/supercar_flames_ep005/agent8/master-editor.mjs --check production/yunex/supercar_flames_ep005/agent8/narrated-picture-manifest.json > ep005-a8-gate.json
+          cat ep005-a8-gate.json
+          if node -e "process.exit(JSON.parse(require('fs').readFileSync('ep005-a8-gate.json')).ready ? 0 : 1)"; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "SOURCE ONLY / NATIVE FILM BLOCKED — do not imply picture lock."
+          fi
+      - name: Validate full 750-frame V4 rough-cut intake without treating candidates as approved
+        run: |
+          node production/yunex/supercar_flames_ep005/agent8/master-editor.mjs --check production/yunex/supercar_flames_ep005/agent8/rough-picture-manifest.json > ep005-a8-rough-gate.json
+          cat ep005-a8-rough-gate.json
+          node -e "const s=require('./ep005-a8-rough-gate.json'); if(s.ready || s.frameCount!==750 || s.mode!=='SILENT_PICTURE_REVIEW')process.exit(1)"
+      - name: Check 25.56-second user Cedar source and 767-frame narration gate
+        run: |
+          node -e "const s=require('./ep005-a8-gate.json'); if(s.frameCount!==767 || s.mode!=='FINAL_WITH_APPROVED_AUDIO') process.exit(1)"
+          echo "Original user narration is identified by SHA; actual remote MP3 remains required before any render."
+      - name: Install FFmpeg and subtitle fonts for audio-only diagnostic and real render
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+          ffmpeg -hide_banner -filters | grep -E ' ass ' | head -1
+      - name: Prove audio sidechain and loudness filter independently without real media
+        run: |
+          node --check production/yunex/supercar_flames_ep005/agent8/audio-filter-smoke.mjs
+          node production/yunex/supercar_flames_ep005/agent8/audio-filter-smoke.mjs
+      - name: Retrieve source-version-pinned video and approved narration
+        if: steps.gate.outputs.ready == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EP005_MANIFEST_PATH: production/yunex/supercar_flames_ep005/agent8/narrated-picture-manifest.json
+        run: node production/yunex/supercar_flames_ep005/agent8/download-media.mjs
+      - name: Render and fully decode exact 767-frame native H264 film with original Cedar narration
+        if: steps.gate.outputs.ready == 'true'
+        run: |
+          node production/yunex/supercar_flames_ep005/agent8/master-editor.mjs --render production/yunex/supercar_flames_ep005/agent8/narrated-picture-manifest.json
+          if test -f out/ep005-agent8/EP005-FINAL-CANDIDATE.mp4; then
+            EP005_MANIFEST_PATH=production/yunex/supercar_flames_ep005/agent8/narrated-picture-manifest.json node production/yunex/supercar_flames_ep005/agent8/audio-qc.mjs out/ep005-agent8/EP005-FINAL-CANDIDATE.mp4
+          else
+            EP005_MANIFEST_PATH=production/yunex/supercar_flames_ep005/agent8/narrated-picture-manifest.json node production/yunex/supercar_flames_ep005/agent8/audio-qc.mjs out/ep005-agent8/EP005-SILENT-PICTURE-REVIEW.mp4
+          fi
+      - name: Preserve blocker report, proof, native video, cut and flame review stills
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ep005-a8-editorial-${{ github.run_id }}
+          path: |
+            ep005-a8-gate.json
+            ep005-a8-rough-gate.json
+            out/ep005-agent8/EP005-*.mp4
+            out/ep005-agent8/render-proof.json
+            out/ep005-agent8/audio-qc-report.json
+            out/ep005-agent8/review-*.png
+            out/ep005-agent8/mandatory-visual-*.jpg
+            out/ep005-agent8/approved-caption-overlay.ass
+          if-no-files-found: warn
+          retention-days: 30

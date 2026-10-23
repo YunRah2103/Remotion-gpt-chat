@@ -1,0 +1,261 @@
+{
+  "schemaVersion": 1,
+  "episode": "YUNEX EP005 — Why Do Supercars Shoot Flames?",
+  "state": "V4_APPEARANCE_APPROVED__DRIVING_AFTERFIRE_SCIENCE_AND_VO_PENDING",
+  "settings": {
+    "fps": 30,
+    "width": 1080,
+    "height": 1920,
+    "totalFrames": 750,
+    "codec": "libx264",
+    "crf": 18
+  },
+  "voice": {
+    "approved": false,
+    "path": null,
+    "sha256": null,
+    "sourceCommit": null,
+    "approvalRef": null,
+    "captionsVerified": false,
+    "verifiedDurationSeconds": null,
+    "artifactRunId": null,
+    "artifactName": null,
+    "verificationNote": "No approved EP005 original recording or verified caption times supplied."
+  },
+  "captions": [],
+  "beats": [
+    {
+      "id": "hook",
+      "start": 0,
+      "end": 45,
+      "role": "integrated",
+      "visual": "Moving approved Agent 6 hero; Agent 7 afterfire attached to actual exhaust ports. Flame visible at f0-f14.",
+      "title": null,
+      "media": {
+        "approved": false,
+        "path": null,
+        "sha256": null,
+        "sourceCommit": null,
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": null,
+        "artifactName": null,
+        "assetProvenance": null,
+        "agent6Commit": null,
+        "agent7Commit": null,
+        "portManifestSha256": null,
+        "producerIssue": 266,
+        "portManifestRef": null,
+        "portManifestVersion": null,
+        "approvedHeroSourceCommit": null,
+        "approvedHeroReferenceProject": null
+      }
+    },
+    {
+      "id": "drive",
+      "start": 45,
+      "end": 165,
+      "role": "vehicle",
+      "visual": "Purposeful fast side/front supercar tracking; authentic rotating wheels, road speed and parallax.",
+      "title": {
+        "text": "WHAT CAUSES THE FLAMES?",
+        "start": 77,
+        "end": 147
+      },
+      "media": {
+        "approved": false,
+        "path": null,
+        "sha256": null,
+        "sourceCommit": null,
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": null,
+        "artifactName": null,
+        "assetProvenance": null,
+        "agent6Commit": null,
+        "agent7Commit": null,
+        "portManifestSha256": null,
+        "producerIssue": 265,
+        "approvedHeroSourceCommit": null,
+        "approvedHeroReferenceProject": null
+      }
+    },
+    {
+      "id": "engine",
+      "start": 165,
+      "end": 285,
+      "role": "science",
+      "visual": "Realistic engine combustion with rich/modified overrun condition; no floating fake boxes.",
+      "title": {
+        "text": "UNBURNED FUEL",
+        "start": 186,
+        "end": 272
+      },
+      "media": {
+        "approved": false,
+        "path": null,
+        "sha256": null,
+        "sourceCommit": null,
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": null,
+        "artifactName": null,
+        "assetProvenance": null,
+        "agent6Commit": null,
+        "agent7Commit": null,
+        "portManifestSha256": null,
+        "producerIssue": 266
+      }
+    },
+    {
+      "id": "flow",
+      "start": 285,
+      "end": 420,
+      "role": "science",
+      "visual": "3D exhaust manifolds and correctly connected pipes, hot gas flow and oxygen; no simulated-CFD claim.",
+      "title": {
+        "text": "HOT EXHAUST + OXYGEN",
+        "start": 307,
+        "end": 402
+      },
+      "media": {
+        "approved": false,
+        "path": null,
+        "sha256": null,
+        "sourceCommit": null,
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": null,
+        "artifactName": null,
+        "assetProvenance": null,
+        "agent6Commit": null,
+        "agent7Commit": null,
+        "portManifestSha256": null,
+        "producerIssue": 266
+      }
+    },
+    {
+      "id": "ignition",
+      "start": 420,
+      "end": 555,
+      "role": "integrated",
+      "visual": "Brief ignition traced from real recessed tip; science not constant flamethrower.",
+      "title": {
+        "text": "BRIEF AFTERFIRE",
+        "start": 462,
+        "end": 522
+      },
+      "media": {
+        "approved": false,
+        "path": null,
+        "sha256": null,
+        "sourceCommit": null,
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": null,
+        "artifactName": null,
+        "assetProvenance": null,
+        "agent6Commit": null,
+        "agent7Commit": null,
+        "portManifestSha256": null,
+        "producerIssue": 266,
+        "portManifestRef": null,
+        "portManifestVersion": null,
+        "approvedHeroSourceCommit": null,
+        "approvedHeroReferenceProject": null
+      }
+    },
+    {
+      "id": "context",
+      "start": 555,
+      "end": 675,
+      "role": "vehicle",
+      "visual": "Fast moving premium car footage; mention tuned/condition-specific behaviour, not universal.",
+      "title": {
+        "text": "NOT EVERY SUPERCAR",
+        "start": 586,
+        "end": 646
+      },
+      "media": {
+        "approved": false,
+        "path": null,
+        "sha256": null,
+        "sourceCommit": null,
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": null,
+        "artifactName": null,
+        "assetProvenance": null,
+        "agent6Commit": null,
+        "agent7Commit": null,
+        "portManifestSha256": null,
+        "producerIssue": 265,
+        "approvedHeroSourceCommit": null,
+        "approvedHeroReferenceProject": null
+      }
+    },
+    {
+      "id": "payoff",
+      "start": 675,
+      "end": 750,
+      "role": "integrated",
+      "visual": "Moving rear/side car with striking transient twin exhaust flames on authentic ports; clean cinematic exit.",
+      "title": null,
+      "media": {
+        "approved": false,
+        "path": null,
+        "sha256": null,
+        "sourceCommit": null,
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": null,
+        "artifactName": null,
+        "assetProvenance": null,
+        "agent6Commit": null,
+        "agent7Commit": null,
+        "portManifestSha256": null,
+        "producerIssue": 266,
+        "portManifestRef": null,
+        "portManifestVersion": null,
+        "approvedHeroSourceCommit": null,
+        "approvedHeroReferenceProject": null
+      }
+    }
+  ],
+  "optionalAudioBeds": [],
+  "rejectedMedia": {
+    "candidateA": "Agent 6 Spectral GT RS candidate A rejected after native picture inspection; do not promote its footage or original exhaust-ports.v1.json.",
+    "oldProduction": "Legacy EP005 A1-A5 PRs #260-264 rejected; no fallback.",
+    "candidateB": "Agent 6 Khronos CarConcept candidate B is superseded by explicit V4 owner choice; do not use CarConcept in EP005."
+  },
+  "approvedHero": {
+    "appearanceApproved": true,
+    "approvalScope": "CAR_APPEARANCE_ONLY__NOT_FULL_FILM_OR_MOVING_SHOTS",
+    "referenceProject": "v4-a-supercar",
+    "sourceCommit": "9052a539e10a7cb97487c1435455bb9962ad58e1",
+    "referenceRecipe": "src/yunex/studio-projects/v4-a-supercar/recipe.json",
+    "recipeSource": "Generated editable-project in YUNEX-V4-supercar workflow artifact; not tracked in Git tree",
+    "vehicle": {
+      "variant": "supercar",
+      "bodyDetail": "studio",
+      "color": "#18636b"
+    },
+    "sourceVideo": {
+      "runId": 39866437063,
+      "artifactId": 12465297894,
+      "sha256": "1654a5efd3a3403871b0a52a3140a9e7aeb1222a2e4bd4242e6edaa8d879cd88",
+      "frames": 420,
+      "fps": 30,
+      "width": 1080,
+      "height": 1920
+    },
+    "approvalRef": "https://github.com/YunRah2103/Remotion-gpt-chat/issues/267#issuecomment-6355060737",
+    "excludedSources": [
+      "rejected Spectral candidate A",
+      "unrendered CarConcept candidate B",
+      "old EP005 A1-A5"
+    ],
+    "drivingSourceApproval": "PENDING",
+    "flameAndPortApproval": "PENDING"
+  }
+}

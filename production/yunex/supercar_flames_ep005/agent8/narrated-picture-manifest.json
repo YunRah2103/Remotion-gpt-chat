@@ -1,0 +1,388 @@
+{
+  "schemaVersion": 1,
+  "episode": "YUNEX EP005 — Why Do Supercars Shoot Flames?",
+  "state": "SOURCE_VERIFIED_767F_WITH_PRIVATE_CEDAR_NARRATED_REVIEW__PICTURE_APPROVAL_PENDING",
+  "settings": {
+    "fps": 30,
+    "width": 1080,
+    "height": 1920,
+    "totalFrames": 767,
+    "codec": "libx264",
+    "crf": 18
+  },
+  "voice": {
+    "approved": true,
+    "userProvidedOriginal": true,
+    "sourceName": "openai-fm-cedar-audio.mp3",
+    "path": "out/ep005-agent8-sources/user-cedar/openai-fm-cedar-audio.mp3",
+    "sha256": "90dd2e299b1cdd9b7f2d3bc508b064c43dda7bfc36caa345b2f502ec13c200d8",
+    "sourceCommit": null,
+    "approvalRef": "https://github.com/YunRah2103/Remotion-gpt-chat/issues/267#issuecomment-6355895803",
+    "verifiedDurationSeconds": 25.56,
+    "artifactRunId": null,
+    "artifactName": null,
+    "captionsVerified": true,
+    "verificationNote": "Original owner SHA confirmed, 25.560s; local narrated 767f review MP4 rendered, full-decoded and inspected, NOT final/picture-approved. The remote Actions runner still lacks the audio bytes.",
+    "originalMp3AvailableToRenderer": false,
+    "originalMp3LocationNote": "Owner MP3 staged on trusted local editing worker for narrated review only; GitHub Actions has no MP3. Run stage-owner-voice.mjs with private uploaded file on a trusted runner before attempting public-repo workflow rendering. Never commit owner audio."
+  },
+  "captions": [
+    {
+      "start": 0,
+      "end": 80,
+      "text": "Why does this supercar\nsuddenly shoot fire?",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 96,
+      "end": 126,
+      "text": "It's not a flamethrower.",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 138,
+      "end": 189,
+      "text": "Something even crazier\nis happening.",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 212,
+      "end": 249,
+      "text": "In some performance cars,",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 260,
+      "end": 313,
+      "text": "a little fuel can escape\nthe engine",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 322,
+      "end": 352,
+      "text": "without fully burning.",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 374,
+      "end": 462,
+      "text": "When it mixes with oxygen\ninside the scorching hot exhaust,",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 474,
+      "end": 492,
+      "text": "it can ignite.",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 517,
+      "end": 574,
+      "text": "That sudden combustion\nsends flames",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 580,
+      "end": 616,
+      "text": "shooting out of the tailpipe.",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 635,
+      "end": 668,
+      "text": "It's called afterfire.",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 683,
+      "end": 700,
+      "text": "And at night,",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 712,
+      "end": 763,
+      "text": "it looks absolutely insane.",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    }
+  ],
+  "beats": [
+    {
+      "id": "hook",
+      "start": 0,
+      "end": 45,
+      "role": "integrated",
+      "visual": "Corrected 45f true V4 attached flame hook, frame0 fire fully visible; gentle editorial zoom, shots still stylized and not owner-approved.",
+      "title": null,
+      "media": {
+        "approved": false,
+        "reviewStatus": "REAL_45F_FULL_DECODE_FIRE_ONSCREEN__OWNER_PICTURE_APPROVAL_PENDING",
+        "path": "out/ep005-agent8-sources/hook/opening-45f.mp4",
+        "artifactExtractDir": "out/ep005-agent8-sources/hook",
+        "sha256": "b7704bbfb28715c6c7f77e0a22831c8cd4cdf6f7282c5ed5204c78ff9a5f9b66",
+        "sourceCommit": "e78a6139100d0b5b4ff2e43da5a92b5660bf7862",
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": 39946845223,
+        "artifactName": "EP005-Agent7-V4-opening-45f-REVIEW-ONLY",
+        "assetProvenance": "Original V4 moving-car afterfire integrated via actual A6 live ports and Agent7 code e78a6139; user-approved car appearance only, no picture approval.",
+        "producerIssue": 266,
+        "approvedHeroSourceCommit": "9052a539e10a7cb97487c1435455bb9962ad58e1",
+        "approvedHeroReferenceProject": "v4-a-supercar",
+        "agent6Commit": "9b52d32a4fefb4fe3715da81ae736ad251a806b2",
+        "agent7Commit": "e78a6139100d0b5b4ff2e43da5a92b5660bf7862",
+        "portManifestSha256": "d8ab9e92341fe1786ffc81cedd592c7ccfb23a35997b71d48a841f4baa3581e4",
+        "portManifestVersion": "v4-2",
+        "portManifestRef": "https://github.com/YunRah2103/Remotion-gpt-chat/blob/9b52d32a4fefb4fe3715da81ae736ad251a806b2/src/yunex/ep005/agent6/v4-exhaust-ports.json",
+        "verifiedSourceFrames": 45
+      }
+    },
+    {
+      "id": "drive",
+      "start": 45,
+      "end": 165,
+      "role": "vehicle",
+      "visual": "Corrected real moving V4 front pursuit exists; visual still has surplus sky, final grading/camera review pending.",
+      "title": null,
+      "media": {
+        "approved": false,
+        "reviewStatus": "REAL_120F_MP4_SHA_AND_FULL_DECODE_VERIFIED__PICTURE_APPROVAL_PENDING",
+        "path": "out/ep005-agent8-sources/front/native/front-pursuit.mp4",
+        "artifactExtractDir": "out/ep005-agent8-sources/front",
+        "sha256": "2ae4f1cf137886cbe431728ae794b4005cc23841a536eec5711b80efbefd4933",
+        "sourceCommit": "be336eb56ecb07512960c32025bf74431fe07269",
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": 39945510296,
+        "artifactName": "EP005-Agent6-APPROVED-V4-front-pursuit",
+        "assetProvenance": "Original owner-approved teal YUNEX V4 car; genuine A6 enhanced driving from exact source be336eb56ecb07512960c32025bf74431fe07269; frame and video SHA verified, artistic approval pending.",
+        "producerIssue": 265,
+        "approvedHeroSourceCommit": "9052a539e10a7cb97487c1435455bb9962ad58e1",
+        "approvedHeroReferenceProject": "v4-a-supercar",
+        "verifiedSourceFrames": 120
+      }
+    },
+    {
+      "id": "rear-chase",
+      "start": 165,
+      "end": 220,
+      "role": "vehicle",
+      "visual": "V4 rear moving chase; true 4s MP4 verified, camera/road premium polish required.",
+      "title": null,
+      "media": {
+        "approved": false,
+        "reviewStatus": "REAL_120F_MP4_SHA_AND_FULL_DECODE_VERIFIED__PICTURE_APPROVAL_PENDING",
+        "path": "out/ep005-agent8-sources/rear-chase/native/rear-chase.mp4",
+        "artifactExtractDir": "out/ep005-agent8-sources/rear-chase",
+        "sha256": "010b02c6277ec56bfdb5178fb89b5b52daf2780f8a9b2c89a58d0bf8ac9c6340",
+        "sourceCommit": "be336eb56ecb07512960c32025bf74431fe07269",
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": 39945510296,
+        "artifactName": "EP005-Agent6-APPROVED-V4-rear-chase",
+        "assetProvenance": "Original owner-approved teal YUNEX V4 car; genuine A6 enhanced driving from exact source be336eb56ecb07512960c32025bf74431fe07269; frame and video SHA verified, artistic approval pending.",
+        "producerIssue": 265,
+        "approvedHeroSourceCommit": "9052a539e10a7cb97487c1435455bb9962ad58e1",
+        "approvedHeroReferenceProject": "v4-a-supercar",
+        "verifiedSourceFrames": 120
+      }
+    },
+    {
+      "id": "engine",
+      "start": 220,
+      "end": 475,
+      "role": "science",
+      "visual": "Original three-act animated V8, hot exhaust, afterfire 255f science, some right-edge engine framing and small scene remain visible.",
+      "title": null,
+      "media": {
+        "approved": false,
+        "reviewStatus": "REAL_255_NATIVE_SOURCE_FRAMES_FULL_DECODE__SCHEMATIC_SCENE_CROP_WARNING",
+        "path": "out/ep005-agent8-sources/science/science-255f.mp4",
+        "artifactExtractDir": "out/ep005-agent8-sources/science",
+        "sha256": "83ea852b0f51f98f3d28269172fc654232064434f34ff64e0cb05ae68eec9672",
+        "sourceCommit": "2b6c0a73bb0335892b9b3d2b0c27584146f1987c",
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": 39948702635,
+        "artifactName": "EP005-Agent7-Cedar-science255-REVIEW-ONLY",
+        "assetProvenance": "Agent7 original source 2b6c0a73, 255 native 3D V8 and physical header path frames; cancelled CI job with actual artifact and independent full decode; artistic review not approved.",
+        "producerIssue": 266,
+        "approvedHeroSourceCommit": null,
+        "approvedHeroReferenceProject": null,
+        "verifiedSourceFrames": 255
+      }
+    },
+    {
+      "id": "side",
+      "start": 475,
+      "end": 565,
+      "role": "vehicle",
+      "visual": "Corrected real 120f moving V4 side shot now keeps complete silhouette; still needs compelling cinematic framing.",
+      "title": null,
+      "media": {
+        "approved": false,
+        "reviewStatus": "REAL_120F_MP4_SHA_AND_FULL_DECODE_VERIFIED__PICTURE_APPROVAL_PENDING",
+        "path": "out/ep005-agent8-sources/side/native/side-tracking.mp4",
+        "artifactExtractDir": "out/ep005-agent8-sources/side",
+        "sha256": "9d9a5d52d16f6846e173b25f4b33f83e067581dbe5cfaf7f239f4a81718fdbd4",
+        "sourceCommit": "be336eb56ecb07512960c32025bf74431fe07269",
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": 39945510296,
+        "artifactName": "EP005-Agent6-APPROVED-V4-side-tracking",
+        "assetProvenance": "Original owner-approved teal YUNEX V4 car; genuine A6 enhanced driving from exact source be336eb56ecb07512960c32025bf74431fe07269; frame and video SHA verified, artistic approval pending.",
+        "producerIssue": 265,
+        "approvedHeroSourceCommit": "9052a539e10a7cb97487c1435455bb9962ad58e1",
+        "approvedHeroReferenceProject": "v4-a-supercar",
+        "verifiedSourceFrames": 120
+      }
+    },
+    {
+      "id": "rear-proof",
+      "start": 565,
+      "end": 675,
+      "role": "vehicle",
+      "visual": "Real full 120f V4 rear proof from A6 now decoded/source verified; picture approval pending.",
+      "title": null,
+      "media": {
+        "approved": false,
+        "reviewStatus": "REAL_120F_MP4_SHA_AND_FULL_DECODE_VERIFIED__PICTURE_APPROVAL_PENDING",
+        "path": "out/ep005-agent8-sources/rear-proof/native/rear-proof.mp4",
+        "artifactExtractDir": "out/ep005-agent8-sources/rear-proof",
+        "sha256": "ff257c49bcc40b8ef7c4c41951ed834d228d3e4817c24f42727a31d364687ca7",
+        "sourceCommit": "be336eb56ecb07512960c32025bf74431fe07269",
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": 39945510296,
+        "artifactName": "EP005-Agent6-APPROVED-V4-rear-proof",
+        "assetProvenance": "Original owner-approved teal YUNEX V4 car; genuine A6 enhanced driving from exact source be336eb56ecb07512960c32025bf74431fe07269; frame and video SHA verified, artistic approval pending.",
+        "producerIssue": 265,
+        "approvedHeroSourceCommit": "9052a539e10a7cb97487c1435455bb9962ad58e1",
+        "approvedHeroReferenceProject": "v4-a-supercar",
+        "verifiedSourceFrames": 120
+      }
+    },
+    {
+      "id": "payoff",
+      "start": 675,
+      "end": 767,
+      "role": "integrated",
+      "visual": "92 source-authentic moving-car exhaust-integrated frames now exist and are fully visible; flames still visually underwhelming; artistic picture approval pending.",
+      "title": null,
+      "media": {
+        "approved": false,
+        "reviewStatus": "REAL_92_DISTINCT_NATIVE_FRAMES__FLAMES_IN_FRAME__ARTISTIC_APPROVAL_PENDING",
+        "path": "out/ep005-agent8-sources/finale/finale-92f.mp4",
+        "artifactExtractDir": "out/ep005-agent8-sources/finale",
+        "sha256": "849edcd6ac9d867a87919dbddd8232765597c70cbdff6b75c2476d238e19ab12",
+        "sourceCommit": "e78a6139100d0b5b4ff2e43da5a92b5660bf7862",
+        "approvalRef": null,
+        "sourceInFrame": 0,
+        "artifactRunId": 39946845223,
+        "artifactName": "EP005-Agent7-V4-finale-92f-REVIEW-ONLY",
+        "assetProvenance": "Real source-locked A6 moving V4 + A7 port-anchored afterfire (92 unique frames); checked-in source JSON SHA d8ab distinct from ZIP lock b595; cinematic picture requires approval.",
+        "producerIssue": 266,
+        "approvedHeroSourceCommit": "9052a539e10a7cb97487c1435455bb9962ad58e1",
+        "approvedHeroReferenceProject": "v4-a-supercar",
+        "agent6Commit": "9b52d32a4fefb4fe3715da81ae736ad251a806b2",
+        "agent7Commit": "e78a6139100d0b5b4ff2e43da5a92b5660bf7862",
+        "portManifestSha256": "d8ab9e92341fe1786ffc81cedd592c7ccfb23a35997b71d48a841f4baa3581e4",
+        "portManifestVersion": "v4-2",
+        "portManifestRef": "https://github.com/YunRah2103/Remotion-gpt-chat/blob/9b52d32a4fefb4fe3715da81ae736ad251a806b2/src/yunex/ep005/agent6/v4-exhaust-ports.json",
+        "verifiedSourceFrames": 92
+      }
+    }
+  ],
+  "optionalAudioBeds": [],
+  "rejectedMedia": {
+    "candidateA": "Agent 6 Spectral GT RS candidate A rejected after native picture inspection; do not promote its footage or original exhaust-ports.v1.json.",
+    "oldProduction": "Legacy EP005 A1-A5 PRs #260-264 rejected; no fallback.",
+    "candidateB": "Agent 6 Khronos CarConcept candidate B is superseded by explicit V4 owner choice; do not use CarConcept in EP005."
+  },
+  "approvedHero": {
+    "appearanceApproved": true,
+    "approvalScope": "CAR_APPEARANCE_ONLY__NOT_FULL_FILM_OR_MOVING_SHOTS",
+    "referenceProject": "v4-a-supercar",
+    "sourceCommit": "9052a539e10a7cb97487c1435455bb9962ad58e1",
+    "referenceRecipe": "src/yunex/studio-projects/v4-a-supercar/recipe.json",
+    "recipeSource": "Generated editable-project in YUNEX-V4-supercar workflow artifact; not tracked in Git tree",
+    "vehicle": {
+      "variant": "supercar",
+      "bodyDetail": "studio",
+      "color": "#18636b"
+    },
+    "sourceVideo": {
+      "runId": 39866437063,
+      "artifactId": 12465297894,
+      "sha256": "1654a5efd3a3403871b0a52a3140a9e7aeb1222a2e4bd4242e6edaa8d879cd88",
+      "frames": 420,
+      "fps": 30,
+      "width": 1080,
+      "height": 1920
+    },
+    "approvalRef": "https://github.com/YunRah2103/Remotion-gpt-chat/issues/267#issuecomment-6355060737",
+    "excludedSources": [
+      "rejected Spectral candidate A",
+      "unrendered CarConcept candidate B",
+      "old EP005 A1-A5"
+    ],
+    "drivingSourceApproval": "PENDING",
+    "flameAndPortApproval": "PENDING"
+  },
+  "pictureReview": {
+    "approvalScope": "NO_FINAL_PICTURE_APPROVAL__TECHNICAL_PREVIEW_ONLY",
+    "notAnApprovedFilm": true,
+    "qaDate": "2026-10-23",
+    "strategy": "Seven beats 45+120+55+255+90+110+92 =767; no repeated source frames, original user narration 25.560s. Local cinema V5 editorial scales/crops 3D renders only; no geometry/VFX modification; final picture NOT approved.",
+    "verifiedFrameCoverage": 767,
+    "missingFrameCount": 0,
+    "note": "FULL 767f native VERIFIED genuine source set now in manifest, with distinct Agent6 be336eb... 4-angle source versus Agent7 integrated actual 9b52d32... port ABI. Review footage remains visually stylized; small flame plumes, plain track, right-cropped late 3D science. No owner picture lock.",
+    "approvedVoiceNowUserProvided": true,
+    "targetFrames": 767,
+    "voiceSourceSelected": true,
+    "voiceSourceReadyOnGitHubActions": false,
+    "latestLocalPreviewSha256": "bbf6e825c45db99a0d24e202f1ac7929a34eefc1cbc36624f5051f81dc5945bc",
+    "latestLocalPreviewStatus": "FULL_767F_PICTURE_REVIEW_WITH_ORIGINAL_OWNER_CEDAR_13_CAPTIONS_AND_ORIGINAL_SYNTH_AUTOMOTIVE_FX__LOCAL_ONLY__NOT_PUBLIC_GITHUB",
+    "localQA": {
+      "fullDecodingPass": true,
+      "allDecodedVideoFramesUnique": 767,
+      "videoLengthSeconds": 25.566666666666666,
+      "integratedLUFS": -15.5,
+      "truePeakDBFS": -2,
+      "captionsMeasuredFromOwnerVoice": 13,
+      "originalCedarPrivateSha256": "90dd2e299b1cdd9b7f2d3bc508b064c43dda7bfc36caa345b2f502ec13c200d8",
+      "ownerPictureApproval": false,
+      "localReviewFilename": "YUNEX-EP005-CEDAR-767F-PICTURE-REVIEW.mp4",
+      "publicGithubMp3Uploaded": false
+    }
+  },
+  "localEditorialNotes": {
+    "reviewOnly": true,
+    "sourceCropPolicy": "2D source crop/reframe only; no added flame objects or repeated frames",
+    "shotScaleCrops": {
+      "hook": "scale 1177x2092 crop x48 y120",
+      "drive": "scale 1242x2208 crop x81 y250",
+      "rear-chase": "scale 1199x2132 crop x59 y190",
+      "engine": "source unchanged",
+      "side": "scale 1242x2208 crop x81 y190",
+      "rear-proof": "scale 1210x2151 crop x65 y190",
+      "payoff": "source crop x95 y240 800x1422 scaled 1080x1920, contrast 1.07 saturation 1.10"
+    },
+    "audio": "actual Cedar MP3 user private; original procedural subdued engine and afterfire sounds, no third-party music/sample",
+    "pictureApproved": false,
+    "reviewWatermark": "f0–44 only; stripped from science title and end shots for mobile readability"
+  }
+}
