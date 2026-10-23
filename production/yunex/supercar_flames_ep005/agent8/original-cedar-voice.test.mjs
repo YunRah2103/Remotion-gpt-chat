@@ -74,9 +74,14 @@ test('native 767-frame narrated film is source-gated until every approved shot e
   assert.equal(cut.pictureReview.verifiedFrameCoverage,covered);
   assert.equal(cut.pictureReview.missingFrameCount,cut.settings.totalFrames-covered);
   assert.ok(covered<=767);
-  // Existing review used 750 independently rendered frames; a 92f unique
-  // A7 payoff is required to close the remaining 17f without padding or freeze.
-  assert.equal(cut.settings.totalFrames-covered,17);
+  // A new, verified 92f A7 shot can close the previous 17-frame deficit.
+  // Source-coverage is derived above: never hard-code a stale deficit.
+  const payoff=cut.beats.at(-1);
+  assert.equal(payoff.id,'payoff');
+  assert.equal(payoff.end-payoff.start,92);
+  assert.equal(payoff.media.verifiedSourceFrames,92);
+  assert.equal(payoff.media.sourceInFrame,0);
+  assert.equal(payoff.media.approved,false,'technical verification is not picture approval');
 });
 
 test('source-locked recorder explicitly preserves original duration rather than forcing a 25s crop',()=>{
