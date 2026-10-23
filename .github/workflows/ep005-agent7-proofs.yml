@@ -38,6 +38,8 @@ jobs:
           npx remotion render src/yunex/ep005/agent7/entry.tsx Agent7FlameFixture out/ep005/agent7/flame-fixture.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
       - name: Render genuine native 5s moving engine cutaway
         run: npx remotion render src/yunex/ep005/agent7/entry.tsx Agent7Science out/ep005/agent7/science.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+      - name: Render narrator-duration 255 UNIQUE moving science frames (A8 f165–419)
+        run: npx remotion render src/yunex/ep005/agent7/entry.tsx Agent7CedarScience255 out/ep005/agent7/science-255f.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
       - name: Full decode, stream checks and reproducible hashes
         run: |
           set -euxo pipefail
@@ -45,9 +47,12 @@ jobs:
             ffprobe -v error -select_streams v:0 -show_entries stream=width,height,r_frame_rate,nb_frames -of default=noprint_wrappers=1 "$f"
             ffmpeg -v error -xerror -i "$f" -f null -
           done
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of csv=p=0 out/ep005/agent7/science-255f.mp4)" = "255"
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height,r_frame_rate -of csv=p=0 out/ep005/agent7/science-255f.mp4)" = "1080,1920,30/1"
           sha256sum out/ep005/agent7/*.mp4 > out/ep005/agent7/SHA256SUMS
           ffmpeg -y -i out/ep005/agent7/flame-fixture.mp4 -vf "fps=1,scale=270:480,tile=3x1" -frames:v 1 out/ep005/agent7/flame-contact.png
           ffmpeg -y -i out/ep005/agent7/science.mp4 -vf "fps=1,scale=270:480,tile=5x1" -frames:v 1 out/ep005/agent7/science-contact.png
+          ffmpeg -y -i out/ep005/agent7/science-255f.mp4 -vf "fps=1,scale=270:480,tile=5x2" -frames:v 1 out/ep005/agent7/science-255f-contact.png
       - name: Publish contact thumbnails to logs for visual inspection
         run: |
           ffmpeg -y -i out/ep005/agent7/flame-contact.png -q:v 8 out/ep005/agent7/flame-contact.jpg
