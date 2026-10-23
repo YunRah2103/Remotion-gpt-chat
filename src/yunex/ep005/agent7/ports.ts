@@ -102,3 +102,51 @@ export function adaptAgent6WorldPorts(
     };
   });
 }
+
+/**
+ * Production-only gate for the appearance-approved teal V4 car.
+ * Previous Candidate-A and Candidate-B world transforms are INVALID.
+ * Agent 6 must issue a NEW native-port manifest with real shot provenance.
+ *
+ * These metadata assertions complement (do not replace) editor's SHA256 media
+ * verification and human pixel approval. No fake example port coordinates.
+ */
+export interface ApprovedV4PortLock {
+  version: 2;
+  vehicle: 'v4-a-supercar';
+  coordinateConvention: 'world-three-y-up-metres';
+  referenceKitCommit: string;
+  referenceApprovalUrl: string;
+  agent6ShotCommit: string;
+  v4PortManifestSha256: string;
+}
+const LOCKED_V4_REFERENCE='9052a539e10a7cb97487c1435455bb9962ad58e1';
+const LOCKED_V4_APPROVAL='https://github.com/YunRah2103/Remotion-gpt-chat/issues/247#issuecomment-6355059494';
+
+export function adaptApprovedV4WorldPorts(
+  raw: readonly Agent6SampledWorldPort[],
+  frame: number,
+  lock: ApprovedV4PortLock,
+  fps = 30,
+): WorldExhaustPort[] {
+  if (lock.version !== 2 || lock.vehicle !== 'v4-a-supercar'
+      || lock.coordinateConvention !== 'world-three-y-up-metres'
+      || lock.referenceKitCommit !== LOCKED_V4_REFERENCE
+      || lock.referenceApprovalUrl !== LOCKED_V4_APPROVAL
+      || !/^[a-f0-9]{40}$/.test(lock.agent6ShotCommit)
+      || !/^[a-f0-9]{64}$/.test(lock.v4PortManifestSha256)
+      || [
+        'bc0185ece668d6ebb1f0f58adbc62edec0ce2cb4',
+      ].includes(lock.agent6ShotCommit))
+    throw Error('Missing approved V4-specific Agent 6 source and port provenance (old candidate barred)');
+  const ports=adaptAgent6WorldPorts(raw,frame,fps);
+  // Geometric cross-check, AFTER consuming authoritative frame-varying world data.
+  // Do not project the jet into a static 2D image coordinate.
+  const l=ports.find(p=>p.id==='left')!,r=ports.find(p=>p.id==='right')!;
+  const span=l.origin.distanceTo(r.origin);
+  if (span < .35 || span > 1.75
+      || l.outward.dot(r.outward) < .75
+      || Math.abs(l.origin.y-r.origin.y) > .2)
+    throw Error('Live V4 twin-exhaust sample fails physical spacing/axis checks');
+  return ports;
+}
