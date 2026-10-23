@@ -1,0 +1,89 @@
+name: EP005 Agent7 Flame and Science Previews
+on:
+  push:
+    branches:
+      - agent/ep005-07-v4-afterfire-science
+  pull_request:
+    branches:
+      - production/yunex-ep005-v3-base
+    paths:
+      - 'src/yunex/ep005/agent7/**'
+      - 'tests/ep005-agent7.test.mjs'
+      - '.github/workflows/ep005-agent7-proofs.yml'
+  workflow_dispatch:
+concurrency:
+  group: ep005-agent7-science-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  visual-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: TypeScript validation
+        run: npm run check
+      - name: Deterministic port and engine unit tests
+        run: node --experimental-strip-types --test tests/ep005-agent7.test.mjs
+      - name: Create original film output directory
+        run: mkdir -p out/ep005/agent7
+      - name: Render narrator-duration 255 UNIQUE moving science frames FIRST (A8 f165–419)
+        run: npx remotion render src/yunex/ep005/agent7/entry.tsx Agent7CedarScience255 out/ep005/agent7/science-255f.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+      - name: Publish 255-frame science immediately before nonessential diagnostic renders
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: EP005-Agent7-Cedar-science255-REVIEW-ONLY
+          path: out/ep005/agent7/science-255f.mp4
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Render genuine native 3s moving fixture preview
+        run: |
+          mkdir -p out/ep005/agent7
+          npx remotion render src/yunex/ep005/agent7/entry.tsx Agent7FlameFixture out/ep005/agent7/flame-fixture.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+      - name: Render genuine native 5s moving engine cutaway
+        run: npx remotion render src/yunex/ep005/agent7/entry.tsx Agent7Science out/ep005/agent7/science.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+      - name: Install FFmpeg only AFTER native footage exists, with bounded apt timeout
+        run: |
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
+            timeout 120s sudo apt-get update -qq
+            timeout 120s sudo apt-get install -y -qq ffmpeg
+          fi
+          ffmpeg -version | head -n 1
+          ffprobe -version | head -n 1
+      - name: Full decode, stream checks and reproducible hashes
+        run: |
+          set -euxo pipefail
+          for f in out/ep005/agent7/*.mp4; do
+            ffprobe -v error -select_streams v:0 -show_entries stream=width,height,r_frame_rate,nb_frames -of default=noprint_wrappers=1 "$f"
+            ffmpeg -v error -xerror -i "$f" -f null -
+          done
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of csv=p=0 out/ep005/agent7/science-255f.mp4)" = "255"
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height,r_frame_rate -of csv=p=0 out/ep005/agent7/science-255f.mp4)" = "1080,1920,30/1"
+          sha256sum out/ep005/agent7/*.mp4 > out/ep005/agent7/SHA256SUMS
+          ffmpeg -y -i out/ep005/agent7/flame-fixture.mp4 -vf "fps=1,scale=270:480,tile=3x1" -frames:v 1 out/ep005/agent7/flame-contact.png
+          ffmpeg -y -i out/ep005/agent7/science.mp4 -vf "fps=1,scale=270:480,tile=5x1" -frames:v 1 out/ep005/agent7/science-contact.png
+          ffmpeg -y -i out/ep005/agent7/science-255f.mp4 -vf "fps=1,scale=270:480,tile=5x2" -frames:v 1 out/ep005/agent7/science-255f-contact.png
+      - name: Publish contact thumbnails to logs for visual inspection
+        run: |
+          ffmpeg -y -i out/ep005/agent7/flame-contact.png -q:v 8 out/ep005/agent7/flame-contact.jpg
+          ffmpeg -y -i out/ep005/agent7/science-contact.png -q:v 8 out/ep005/agent7/science-contact.jpg
+          python3 - <<'PY'
+          from base64 import b64encode
+          from pathlib import Path
+          for which in ('flame','science'):
+              data=b64encode(Path(f'out/ep005/agent7/{which}-contact.jpg').read_bytes()).decode()
+              for i in range(0,len(data),1500):
+                  print(f'YUNEX_CONTACT_{which.upper()}={data[i:i+1500]}')
+          PY
+      - name: Upload unapproved R&D proofs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ep005-agent7-unapproved-motion-proofs
+          path: out/ep005/agent7/
+          retention-days: 14
