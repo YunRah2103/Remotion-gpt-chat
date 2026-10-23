@@ -1,0 +1,85 @@
+name: YUNEX Manthey parallel cinematic render
+on:
+  push:
+    branches: [experiment/yunex-manthey-gt3rs-new-model]
+    paths: ['.github/workflows/yunex-manthey-parallel.yml', 'production/porsche-manthey/**']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  shot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [0, 1, 2]
+    env:
+      PART: ${{ matrix.part }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '24', cache: npm}
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
+      - run: bash production/porsche-manthey/acquire.sh
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - name: Render 60 actual HD frames for this original vehicle shot
+        run: |
+          set -euo pipefail
+          START=$((PART*60))
+          END=$((START+59))
+          mkdir -p out/manthey-shots
+          npx remotion render production/porsche-manthey/entry.tsx YunexManthey992NewModel \
+            "out/manthey-shots/shot-$PART.mp4" --frames="$START-$END" \
+            --gl=swangle --codec=h264 --pixel-format=yuv420p --color-space=bt709 \
+            --crf=18 --concurrency=1 --timeout=120000
+          ffmpeg -v error -xerror -i "out/manthey-shots/shot-$PART.mp4" -f null -
+          FRAMES=$(ffprobe -v error -count_frames -select_streams v:0 -show_entries stream=nb_read_frames -of default=nk=1:nw=1 "out/manthey-shots/shot-$PART.mp4")
+          test "$FRAMES" = 60
+      - uses: actions/upload-artifact@v4
+        with:
+          name: manthey-part-${{ matrix.part }}
+          path: out/manthey-shots/shot-*.mp4
+          retention-days: 14
+  assemble:
+    needs: shot
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: manthey-part-*
+          path: out/manthey-shots
+          merge-multiple: true
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - name: Assemble actual six-second H264 and inspect decoded frames
+        run: |
+          set -euo pipefail
+          mkdir -p out/manthey-final
+          for n in 0 1 2; do
+            test -s "out/manthey-shots/shot-$n.mp4"
+            printf "file '%s'\n" "$PWD/out/manthey-shots/shot-$n.mp4"
+          done > out/manthey-final/list.txt
+          ffmpeg -v error -xerror -y -f concat -safe 0 -i out/manthey-final/list.txt -c copy -movflags +faststart out/manthey-final/Manthey_GT3_RS_992_NEW.mp4
+          VIDEO=out/manthey-final/Manthey_GT3_RS_992_NEW.mp4
+          ffmpeg -v error -xerror -i "$VIDEO" -f null -
+          ffprobe -v error -count_frames -show_entries stream=codec_name,width,height,avg_frame_rate,nb_read_frames -show_entries format=duration -of json "$VIDEO" > out/manthey-final/probe.json
+          python3 - <<'PY'
+          import json
+          j=json.load(open('out/manthey-final/probe.json'));s=j['streams'][0]
+          assert (s['codec_name'],s['width'],s['height'],s['avg_frame_rate'],s['nb_read_frames'])==('h264',1080,1920,'30/1','180'),s
+          assert abs(float(j['format']['duration'])-6)<.04,j['format']
+          print('FULL NATIVE 180-FRAME H264 PASS')
+          PY
+          ffmpeg -v error -i "$VIDEO" -f framemd5 out/manthey-final/frame-hashes.txt
+          ffmpeg -v error -y -i "$VIDEO" -vf "select='eq(n,0)+eq(n,24)+eq(n,59)+eq(n,60)+eq(n,90)+eq(n,119)+eq(n,120)+eq(n,150)+eq(n,179)',scale=360:-1,tile=3x3" -frames:v 1 out/manthey-final/contact-sheet.jpg
+          sha256sum "$VIDEO" out/manthey-final/contact-sheet.jpg > out/manthey-final/sha256.txt
+          git rev-parse HEAD > out/manthey-final/source-commit.txt
+          cp production/porsche-manthey/model-manifest.json out/manthey-final/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-Manthey-992-NEW-MP4-parallel
+          path: out/manthey-final/
+          retention-days: 14
