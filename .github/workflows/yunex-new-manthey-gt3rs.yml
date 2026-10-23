@@ -1,0 +1,80 @@
+name: YUNEX new HYPRIMPS Manthey 992 six-second render
+on:
+  push:
+    branches: [experiment/yunex-manthey-gt3rs-new-model]
+    paths:
+      - 'production/porsche-manthey/**'
+      - '.github/workflows/yunex-new-manthey-gt3rs.yml'
+  pull_request:
+    paths:
+      - 'production/porsche-manthey/**'
+      - '.github/workflows/yunex-new-manthey-gt3rs.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render_porsche:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '24', cache: npm}
+      - name: Install project
+        run: npm ci --no-audit --no-fund
+      - name: Compile check and explicit source licence manifest
+        run: |
+          npm run check
+          python3 -m json.tool production/porsche-manthey/model-manifest.json >/dev/null
+      - name: Verify pinned external GLB and prepare local Draco decoder
+        run: bash production/porsche-manthey/acquire.sh
+      - name: Install native media tools
+        run: bash scripts/modelling-kit/install-native-media.sh
+      - name: Render real Porsche GLB, no fallback geometry
+        run: |
+          npx remotion render production/porsche-manthey/entry.tsx \
+            YunexManthey992NewModel out/porsche-manthey/manthey-992-six-second.mp4 \
+            --gl=swangle --codec=h264 --pixel-format=yuv420p \
+            --color-space=bt709 --crf=18 --concurrency=1 --timeout=120000
+      - name: Independently decode and audit all 180 frames
+        run: |
+          set -euo pipefail
+          VIDEO=out/porsche-manthey/manthey-992-six-second.mp4
+          ffmpeg -v error -xerror -i "$VIDEO" -f null -
+          ffprobe -v error -count_frames -select_streams v:0 \
+            -show_entries stream=codec_name,width,height,avg_frame_rate,nb_read_frames \
+            -show_entries format=duration -of json "$VIDEO" \
+            > out/porsche-manthey/probe.json
+          python3 - <<'PY'
+          import json
+          j=json.load(open("out/porsche-manthey/probe.json"))
+          s=j["streams"][0]
+          assert (s["codec_name"],s["width"],s["height"],s["avg_frame_rate"],s["nb_read_frames"]) == ("h264",1080,1920,"30/1","180"),s
+          assert abs(float(j["format"]["duration"])-6.0)<0.03,j["format"]
+          print("PASS 1080x1920 H264/30fps/180 frames/6s")
+          PY
+          ffmpeg -v error -i "$VIDEO" -f framemd5 out/porsche-manthey/frame-hashes.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          raw=Path("out/porsche-manthey/frame-hashes.txt").read_text().splitlines()
+          hashes=[s.rsplit(",",1)[-1].strip() for s in raw if s and not s.startswith("#")]
+          assert len(hashes)==180,len(hashes)
+          assert len(set(hashes))>160,("Too many duplicate frames",len(set(hashes)))
+          print("PASS moving native frames",len(set(hashes)))
+          PY
+          ffmpeg -y -v error -i "$VIDEO" \
+            -vf "select='eq(n,0)+eq(n,24)+eq(n,59)+eq(n,60)+eq(n,90)+eq(n,119)+eq(n,120)+eq(n,150)+eq(n,179)',scale=360:-1,tile=3x3" \
+            -frames:v 1 out/porsche-manthey/contact-sheet.jpg
+          test -s out/porsche-manthey/contact-sheet.jpg
+          sha256sum "$VIDEO" out/porsche-manthey/contact-sheet.jpg \
+            > out/porsche-manthey/output-sha256.txt
+          git rev-parse HEAD > out/porsche-manthey/source-commit.txt
+          cp production/porsche-manthey/model-manifest.json out/porsche-manthey/
+      - name: Save playable MP4, contact sheet and provenance (even if QA fails)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-Manthey-New-GT3RS-MP4-Review
+          path: out/porsche-manthey/
+          if-no-files-found: warn
+          retention-days: 14
