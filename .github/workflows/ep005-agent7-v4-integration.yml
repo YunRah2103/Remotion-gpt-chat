@@ -1,0 +1,84 @@
+name: EP005 Agent7 V4 Real Moving Port-Attached Flames
+on:
+  push:
+    branches: [agent/ep005-07-v4-afterfire-science]
+    paths:
+      - 'src/yunex/ep005/agent7/**'
+      - 'tests/ep005-agent7.test.mjs'
+      - '.github/workflows/ep005-agent7-v4-integration.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integrated-v4:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - {id: EP005A7V4IntegratedHook, slug: opening-45f, frames: 45}
+          - {id: EP005A7V4IntegratedFinale, slug: finale-75f, frames: 75}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Materialize locked Agent6 V4 scene + Agent7 VFX source without merging
+        shell: bash
+        run: |
+          set -euxo pipefail
+          AGENT7_SHA="$(git rev-parse HEAD)"
+          AGENT6_SHA="26980fe1f509484bb612cd47ffcbf7c53f26fddf"
+          git fetch origin "$AGENT6_SHA"
+          git checkout --detach "$AGENT6_SHA"
+          git restore --source="$AGENT7_SHA" -- src/yunex/ep005/agent7
+          test "$(git hash-object src/yunex/modelling-kit/v4-production.ts)" = "df4e0c60e8ba617fae85f524613d9cd26b84d034"
+          test -f src/yunex/ep005/agent6/v4-exhaust-ports.json
+          grep -q '"source": "9052a539e10a7cb97487c1435455bb9962ad58e1"' src/yunex/ep005/agent6/v4-exhaust-ports.json
+          V4_PORT_SHA="$(sha256sum src/yunex/ep005/agent6/v4-exhaust-ports.json | cut -d' ' -f1)"
+          cp src/yunex/ep005/agent7/v4-integrated-entry.tsx.template src/yunex/ep005/agent7/v4-integrated-entry.tsx
+          sed -i "s/__AGENT6_SHA__/$AGENT6_SHA/g" src/yunex/ep005/agent7/v4-integrated-entry.tsx
+          sed -i "s/__V4_PORT_SHA__/$V4_PORT_SHA/g" src/yunex/ep005/agent7/v4-integrated-entry.tsx
+          mkdir -p out/ep005/agent7/integrated-v4
+          echo "Agent6 shot source SHA: $AGENT6_SHA" | tee out/ep005/agent7/integrated-v4/source-lock.txt
+          echo "Agent7 VFX source SHA: $AGENT7_SHA" | tee -a out/ep005/agent7/integrated-v4/source-lock.txt
+          echo "Agent6 V4 physical port manifest SHA256: $V4_PORT_SHA" | tee -a out/ep005/agent7/integrated-v4/source-lock.txt
+          echo "Approved hero appearance source: 9052a539e10a7cb97487c1435455bb9962ad58e1" | tee -a out/ep005/agent7/integrated-v4/source-lock.txt
+          echo "Source/geometry verified, PICTURE AND NEW FLAMES ARE NOT OWNER-APPROVED YET." | tee -a out/ep005/agent7/integrated-v4/source-lock.txt
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm}
+      - name: Native render dependencies and port/afterfire unit tests
+        run: |
+          set -euo pipefail
+          npm ci
+          node --experimental-strip-types --test tests/ep005-agent7.test.mjs
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Genuine 1080x1920 30fps V4 driving with framewise physical nozzle jets
+        shell: bash
+        run: |
+          set -euxo pipefail
+          npx remotion render src/yunex/ep005/agent7/v4-integrated-entry.tsx ${{ matrix.id }} out/ep005/agent7/integrated-v4/${{ matrix.slug }}.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --color-space=bt709 --concurrency=1
+      - name: FFprobe, FULL decode, exact frames, SHA256 and proof strip
+        shell: bash
+        run: |
+          set -euxo pipefail
+          F="out/ep005/agent7/integrated-v4/${{ matrix.slug }}.mp4"
+          ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,width,height,r_frame_rate,nb_frames -of default=noprint_wrappers=1 "$F" | tee "${F%.mp4}.ffprobe.txt"
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of csv=p=0 "$F")" = "${{ matrix.frames }}"
+          test "$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height,r_frame_rate -of csv=p=0 "$F")" = "1080,1920,30/1"
+          ffmpeg -hide_banner -v error -xerror -i "$F" -f null -
+          sha256sum "$F" | tee "${F%.mp4}.sha256"
+          ffmpeg -hide_banner -loglevel error -y -i "$F" -vf "fps=4,scale=270:480,tile=4x3" -frames:v 1 "${F%.mp4}-contact.jpg"
+          ffmpeg -hide_banner -loglevel error -y -i "$F" -vf "select='lt(n,30)',scale=180:320,tile=6x5" -frames:v 1 "${F%.mp4}-first30.jpg"
+          echo "Native decode technically valid; visual inspection and owner approval still mandatory." >> out/ep005/agent7/integrated-v4/source-lock.txt
+      - name: Publish genuine MP4 and pixel review contact sheets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: EP005-Agent7-V4-${{ matrix.slug }}-REVIEW-ONLY
+          path: out/ep005/agent7/integrated-v4/
+          retention-days: 30
+          if-no-files-found: warn
