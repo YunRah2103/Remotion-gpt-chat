@@ -23,7 +23,7 @@ All audio is an original synthesized soundtrack from readable source code, with 
 - Rear proof: f565-674
 - Flame finale: f675-766 (92 frames)
 
-Exhaust pop times currently PROVISIONAL: f0, f14, f30, f680, f703, f731, f752. Shift accents likewise approximate: f79, f148, f525, f609, f706. Agent8 MUST manually inspect actual flame activation on every transient and resync before a final lock. The 750f previous sound cue sheet is superseded.
+After analyzing the actual 45-frame and 92-frame V4 flame plates, transient sound events are aligned near visible flare clusters: f0, f15, f675, f695, f715, f736, f755. The final sound is faded cleanly at frame 767. These remain ear/eye review timings, not engine telemetry. Gear shifts are approximate: f79, f148, f525, f609, f706. The older 750f cue sheet is superseded.
 
 ## Cedar preservation + later muxing
 
@@ -36,3 +36,6 @@ Before claiming finished MP4, receive actual 767-frame 1080x1920/30fps owner-app
 ## Transparency
 
 This is an original provisional design, not actual engine field recordings; visual flame onset telemetry and human listening have not been verified here. User should review and approve aesthetics before final owner lock. The branch/workflow contains ZERO Cedar binary; the preview audio alone does not constitute a final audio mix or final MP4.
+## 23 October private owner-narrated review delivery (not GitHub hosted)
+
+The owner explicitly re-uploaded the Cedar file into the active Agent9 chat. Its bytes were SHA256-matched to the original locked source and kept **strictly in the private conversation workspace**. Agent9 locally assembled 7 verified native picture segments at 767f and exact 13 phrase captions, mixed original Cedar + Agent9 timed bed, rendered H264 1080x1920@30 and AAC stereo 48k. No car/scene content changed from the source plates; this is **NOT Agent8's privately hosted V3 master**, but a faithful new source-plate review with added sound. Local MP4 SHA256 `9cd2c432fba3ecc04277ef5afe0a790b34730e1d7d64c755ac32aa512848e43e`, verified full 767-frame FFmpeg decode, loudness `-16.0 LUFS`, true peak `-1.7 dBFS`. Beginning/middle/final speech correlations against the original source confirm full original timing and delivery, no pitch/speed change. The owner has the playable file directly inside the chat; we have **NOT** attached the owner voice or narrated MP4 to GitHub, Actions, branch or PR. Owner aesthetic approval pending, no merge.
