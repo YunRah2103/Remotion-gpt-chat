@@ -13,8 +13,11 @@ export const APPROVED_V4_COLOR = '#18636b';
 export const V4_DRIVING_FPS = 30;
 export const V4_DRIVING_FRAMES = 120;
 export const V4_EXHAUST_MANIFEST = {
-  version: 1,
-  coordinateConvention: 'three-y-up-metres',
+  version: 2,
+  vehicle: 'v4-a-supercar',
+  coordinateConvention: 'world-three-y-up-metres',
+  mountCoordinateConvention: 'three-y-up-metres',
+  referenceApprovalUrl: 'https://github.com/YunRah2103/Remotion-gpt-chat/issues/247#issuecomment-6355059494',
   owner: 'agent6',
   source: APPROVED_V4_SOURCE,
   heroRecipe: APPROVED_V4_RECIPE_ID,
@@ -109,18 +112,22 @@ export function v4Camera(shot: V4Shot, frame: number, fps=V4_DRIVING_FPS) {
   const p = drivingPose(frame, fps), u=THREE.MathUtils.clamp(frame/(V4_DRIVING_FRAMES-1),0,1);
   const smooth=u*u*(3-2*u);
   const settings = {
-    'rear-proof':    {a:[-9.0,2.08, 5.3], b:[-8.4,1.74, 4.8], fov:43, target:[-.35,.83,0]},
-    'side-tracking': {a:[-.7,1.40,-10.8],b:[2.3,1.25,-9.25],fov:43,target:[.25,.79,0]},
-    'front-pursuit': {a:[10.7,1.90,-5.2],b:[9.5,1.56,-4.5], fov:43,target:[.15,.84,0]},
-    'rear-chase':    {a:[-13.0,2.16,-2.8],b:[-11.0,1.74,-2.1],fov:41,target:[0,.77,0]}
+    // Side: keep complete bumpers/wheels in narrow 9:16 aperture over all 120f.
+    'rear-proof':    {a:[-8.9,1.70, 4.65],b:[-8.25,1.55, 4.4],fov:45,target:[-.25,.58,0]},
+    'side-tracking': {a:[ .15,1.75,-13.8],b:[ .70,1.61,-13.2],fov:46,target:[ .15,.39,0]},
+    // Front: tilt down to put the horizon higher and reveal road contact, not empty sky.
+    'front-pursuit': {a:[ 8.6,2.67,-3.65],b:[ 8.0,2.48,-3.35],fov:45,target:[ .1,.44,0]},
+    // Low but readable rear tail/outlet view, stable camera with exhaust in shot.
+    'rear-chase':    {a:[-10.7,1.72,-3.1],b:[-9.4,1.55,-2.7],fov:44,target:[-.3,.52,0]}
   }[shot];
   if (!settings) throw Error('Unknown V4 moving shot');
   const lerp=(a:number,b:number)=>THREE.MathUtils.lerp(a,b,smooth);
-  const position = settings.a.map((value,i)=>value+p.x+(i===0?0:-p.x) + (settings.b[i]-value)*smooth);
-  // X is the moving travel axis; Y/Z are pure offsets.
-  position[0]=p.x+lerp(settings.a[0],settings.b[0]);
-  position[1]=lerp(settings.a[1],settings.b[1]);
-  position[2]=lerp(settings.a[2],settings.b[2]);
+  // X follows the genuine travelling vehicle; Y/Z remain steady world-space offsets.
+  const position:[number,number,number] = [
+    p.x+lerp(settings.a[0],settings.b[0]),
+    lerp(settings.a[1],settings.b[1]),
+    lerp(settings.a[2],settings.b[2]),
+  ];
   const target:[number,number,number]=[p.x+settings.target[0],settings.target[1],settings.target[2]];
   return {position:position as [number,number,number], target, fov:settings.fov};
 }
