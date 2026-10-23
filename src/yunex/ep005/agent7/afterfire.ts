@@ -147,8 +147,10 @@ export function animateAfterfire(
     jet.root.position.copy(port.origin);
     jet.root.quaternion.setFromUnitVectors(new T.Vector3(1,0,0),port.outward);
     jet.root.visible=env>.012;
-    const width=port.innerRadiusM*(3.0+1.35*env);
-    const length=(.19+1.24*env)*(1+.17*Math.sin(time*37+ (port.id==='left'?0:2)));
+    // Strong but SHORT real afterfire: the existing factory 104mm bores stay
+    // unchanged. Geometry expands ONLY as turbulent incandescent exhaust gas.
+    const width=port.innerRadiusM*(3.15+2.2*env);
+    const length=(.24+1.92*env)*(1+.13*Math.sin(time*37+(port.id==='left'?0:2)));
     const wind=worldVelocity ? -worldVelocity.dot(new T.Vector3(0,1,0))*0.002 : 0;
     jet.sheets.forEach(mesh=>{
       const m=mesh.material as T.ShaderMaterial;
