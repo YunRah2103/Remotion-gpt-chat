@@ -131,14 +131,9 @@ export function buildScienceEngine():ScienceAssembly {
   }
   const flameRoot=new T.Group();flameRoot.name='external-afterfire-explainer-only';
   flameRoot.position.set(-2.56,-.06,0);root.add(flameRoot);
+  // No opaque cartoon cones here. Proofs.tsx mounts the same turbulent
+  // physically oriented afterfire rig used by the final moving-car integration.
   const flame:T.Mesh[]=[];
-  for(const side of [-1,1]){
-    const tongue=new T.Mesh(new T.ConeGeometry(.08,.30,18,12,true),
-       new T.MeshBasicMaterial({color:'#ff8029',transparent:true,opacity:0,
-          side:T.DoubleSide,depthWrite:false,blending:T.AdditiveBlending}));
-    tongue.position.set(-.17,0,side*.71);tongue.rotation.z=-Math.PI/2;
-    flameRoot.add(tongue);flame.push(tongue);
-  }
   return {root,crank,pistons,gas,flameRoot,flame,ignitions};
 }
 /**
