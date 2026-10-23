@@ -4,8 +4,8 @@ import type {ExhaustSide, WorldExhaustPort} from './ports';
 /** Author pulse times in seconds at throttle lift, NOT at every idle frame. */
 export interface AfterfirePulse {at: number; duration: number; strength: number; side?: ExhaustSide}
 /**
- * Absolute film clock for Agent 8's fixed 750f / 30fps master.
- * Visible flash at frame ZERO; 22.5–25s final burst crescendo.
+ * Absolute film clock for Agent 8's authentic 767f / 30fps Cedar master.
+ * Visible flash at frame ZERO; uniquely animated 22.5–25.56s crescendo.
  * These are ignition requests; the true moving port/source gate is elsewhere.
  */
 export const EP005_25S_AFTERFIRE_BEATS: readonly AfterfirePulse[] = [
@@ -21,6 +21,8 @@ export const EP005_25S_AFTERFIRE_BEATS: readonly AfterfirePulse[] = [
   {at:23.83,duration:.43,strength:.98,side:'right'},
   {at:24.57,duration:.52,strength:1,side:'left'},
   {at:24.60,duration:.51,strength:1,side:'right'},
+  {at:25.18,duration:.33,strength:.88,side:'left'},
+  {at:25.22,duration:.31,strength:.93,side:'right'},
 ];
 export interface AfterfireRig {
   root: T.Group;
