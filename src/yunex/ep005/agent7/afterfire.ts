@@ -3,6 +3,25 @@ import type {ExhaustSide, WorldExhaustPort} from './ports';
 
 /** Author pulse times in seconds at throttle lift, NOT at every idle frame. */
 export interface AfterfirePulse {at: number; duration: number; strength: number; side?: ExhaustSide}
+/**
+ * Absolute film clock for Agent 8's fixed 750f / 30fps master.
+ * Visible flash at frame ZERO; 22.5–25s final burst crescendo.
+ * These are ignition requests; the true moving port/source gate is elsewhere.
+ */
+export const EP005_25S_AFTERFIRE_BEATS: readonly AfterfirePulse[] = [
+  {at:-.065,duration:.50,strength:1,side:'left'},
+  {at:-.045,duration:.55,strength:.98,side:'right'},
+  {at:.48,duration:.37,strength:.78,side:'left'},
+  {at:.53,duration:.33,strength:.74,side:'right'},
+  {at:22.44,duration:.49,strength:.90,side:'left'},
+  {at:22.49,duration:.46,strength:.94,side:'right'},
+  {at:23.13,duration:.43,strength:.96,side:'right'},
+  {at:23.16,duration:.43,strength:.94,side:'left'},
+  {at:23.78,duration:.43,strength:1,side:'left'},
+  {at:23.83,duration:.43,strength:.98,side:'right'},
+  {at:24.57,duration:.52,strength:1,side:'left'},
+  {at:24.60,duration:.51,strength:1,side:'right'},
+];
 export interface AfterfireRig {
   root: T.Group;
   jets: Record<ExhaustSide,{root:T.Group; sheets:T.Mesh[]; spill:T.PointLight}>;
