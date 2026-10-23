@@ -11,20 +11,114 @@
     "crf": 18
   },
   "voice": {
-    "approved": false,
+    "approved": true,
     "userProvidedOriginal": true,
     "sourceName": "openai-fm-cedar-audio.mp3",
     "path": "out/ep005-agent8-sources/user-cedar/openai-fm-cedar-audio.mp3",
     "sha256": "90dd2e299b1cdd9b7f2d3bc508b064c43dda7bfc36caa345b2f502ec13c200d8",
     "sourceCommit": null,
-    "approvalRef": null,
+    "approvalRef": "https://github.com/YunRah2103/Remotion-gpt-chat/issues/267#issuecomment-6355895803",
     "verifiedDurationSeconds": 25.56,
     "artifactRunId": null,
     "artifactName": null,
-    "captionsVerified": false,
-    "verificationNote": "User supplied actual original Cedar MP3 in chat, bytes are not present in GitHub Actions workspace yet; no VO stream should be claimed in unrendered film."
+    "captionsVerified": true,
+    "verificationNote": "Original MP3 directly provided by owner: source SHA and container duration independently probed. No approved complete video and original MP3 not yet staged into Actions.",
+    "originalMp3AvailableToRenderer": false,
+    "originalMp3LocationNote": "Raw voice delivered in chat; remote GitHub Actions runner must be provided exact source bytes before render."
   },
-  "captions": [],
+  "captions": [
+    {
+      "start": 0,
+      "end": 80,
+      "text": "Why does this supercar\nsuddenly shoot fire?",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 96,
+      "end": 126,
+      "text": "It's not a flamethrower.",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 138,
+      "end": 189,
+      "text": "Something even crazier\nis happening.",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 212,
+      "end": 249,
+      "text": "In some performance cars,",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 260,
+      "end": 313,
+      "text": "a little fuel can escape\nthe engine",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 322,
+      "end": 352,
+      "text": "without fully burning.",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 374,
+      "end": 462,
+      "text": "When it mixes with oxygen\ninside the scorching hot exhaust,",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 474,
+      "end": 492,
+      "text": "it can ignite.",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 517,
+      "end": 574,
+      "text": "That sudden combustion\nsends flames",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 580,
+      "end": 616,
+      "text": "shooting out of the tailpipe.",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 635,
+      "end": 668,
+      "text": "It's called afterfire.",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 683,
+      "end": 700,
+      "text": "And at night,",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    },
+    {
+      "start": 712,
+      "end": 763,
+      "text": "it looks absolutely insane.",
+      "verified": true,
+      "timingBasis": "owner_original_audio_phrase_boundaries_verified_by_listening_and_silence_detection"
+    }
+  ],
   "beats": [
     {
       "id": "hook",
@@ -274,99 +368,8 @@
     "missingFrameCount": 137,
     "note": "Technical evidence only; 630 candidate frames available, 120-frame rear-proof missing, and most existing clips need camera/art corrections; source proof QA is not picture approval.",
     "approvedVoiceNowUserProvided": true,
-    "targetFrames": 767
-  },
-  "pendingCaptionTiming": [
-    {
-      "start": 0,
-      "end": 80,
-      "text": "Why does this supercar suddenly shoot fire?",
-      "verified": false,
-      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
-    },
-    {
-      "start": 96,
-      "end": 126,
-      "text": "It's not a flamethrower.",
-      "verified": false,
-      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
-    },
-    {
-      "start": 138,
-      "end": 189,
-      "text": "Something even crazier is happening.",
-      "verified": false,
-      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
-    },
-    {
-      "start": 212,
-      "end": 249,
-      "text": "In some performance cars,",
-      "verified": false,
-      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
-    },
-    {
-      "start": 260,
-      "end": 313,
-      "text": "a little fuel can escape the engine",
-      "verified": false,
-      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
-    },
-    {
-      "start": 322,
-      "end": 352,
-      "text": "without fully burning.",
-      "verified": false,
-      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
-    },
-    {
-      "start": 374,
-      "end": 462,
-      "text": "When it mixes with oxygen inside the scorching hot exhaust,",
-      "verified": false,
-      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
-    },
-    {
-      "start": 474,
-      "end": 492,
-      "text": "it can ignite.",
-      "verified": false,
-      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
-    },
-    {
-      "start": 517,
-      "end": 574,
-      "text": "That sudden combustion sends flames",
-      "verified": false,
-      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
-    },
-    {
-      "start": 580,
-      "end": 616,
-      "text": "shooting out of the tailpipe.",
-      "verified": false,
-      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
-    },
-    {
-      "start": 635,
-      "end": 668,
-      "text": "It's called afterfire.",
-      "verified": false,
-      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
-    },
-    {
-      "start": 683,
-      "end": 700,
-      "text": "And at night,",
-      "verified": false,
-      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
-    },
-    {
-      "start": 712,
-      "end": 763,
-      "text": "it looks absolutely insane.",
-      "verified": false,
-      "notes": "Phrase-level boundaries from original audio; image/audio editorial QC required before final caption approval"
-    }
-  ]
+    "targetFrames": 767,
+    "voiceSourceSelected": true,
+    "voiceSourceReadyOnGitHubActions": false
+  }
 }
