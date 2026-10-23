@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 75
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 2
       matrix:
         include:
           - {id: Ep005Agent6V4RearProof, slug: rear-proof}
@@ -35,14 +35,18 @@ jobs:
         run: |
           npm ci --no-audit --no-fund
           python -m pip install --disable-pip-version-check Pillow==11.3.0
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            timeout 180 sudo apt-get update -qq
+            timeout 180 sudo apt-get install -y -qq ffmpeg
+          fi
+          ffprobe -version | head -1
           npm run check
       - name: Verify locked V4 source and moving factory exhaust interfaces
         run: |
           set -euo pipefail
           test "$(git hash-object src/yunex/modelling-kit/v4-production.ts)" = "df4e0c60e8ba617fae85f524613d9cd26b84d034"
           node --experimental-strip-types scripts/ep005-agent6/v4-ports.mjs out/ep005-agent6/ports
+          node --experimental-strip-types scripts/ep005-agent6/v4-camera-qc.mjs out/ep005-agent6/camera-qc
       - name: Render four-second genuine moving V4 car at 1080x1920 / 30fps
         run: |
           set -euo pipefail
@@ -52,7 +56,9 @@ jobs:
         run: |
           set -euo pipefail
           python3 scripts/ep005-agent6/v4-verify.py out/ep005-agent6/native/${{ matrix.slug }}.mp4 out/ep005-agent6/qa/${{ matrix.slug }}
-          cp src/yunex/ep005/agent6/v4-exhaust-ports.json out/ep005-agent6/v4-exhaust-ports.json
+          cp out/ep005-agent6/ports/v4-exhaust-ports.json out/ep005-agent6/v4-exhaust-ports.json
+          cp out/ep005-agent6/ports/agent7-v4-port-lock.json out/ep005-agent6/agent7-v4-port-lock.json
+          git rev-parse HEAD > out/ep005-agent6/SOURCE_COMMIT.txt
           echo "OWNER APPROVED EXTERIOR REFERENCE ONLY: moving scenes pending independent picture review." > out/ep005-agent6/REVIEW-REQUIRED.txt
       - uses: actions/upload-artifact@v4
         if: always()
