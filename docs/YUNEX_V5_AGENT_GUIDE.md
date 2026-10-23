@@ -22,7 +22,7 @@ Example props JSON:
 
 All distances are metres. Bank is radians, limited to ±0.15; road width 3–30. Optional `road.roughness` is 0–0.08m and defaults to 0.018m for rally: the same analytic undulation changes visible ribbon geometry, vehicle pitch and individual wheel samples. Vegetation 0–1; quality `preview` or `hero`; time `day`, `dusk`, `night`; weather `clear` or `wet`; surface `asphalt` or `gravel`. Wet changes surface treatment; it does not claim volumetric rainfall. Disable scenery to inspect the road in isolation. Typos reject with corrective diagnostics.
 
-For a custom route keep its length greater than 200m for these proof shots, which cover distance 78–182m. The road API clamps outside its ends; a too-short route will stop a proof car. No natural-language generation is claimed. GPT agents populate this schema directly.
+The proof fits its travel to custom road length, retaining 3m endpoint clearance and reducing speed on short routes. Routes below 12m reject with an actionable error. Long default roads retain the authored speed and starting position. No natural-language generation is claimed. GPT agents populate this schema directly.
 
 ## Road, vehicle and shot APIs
 
@@ -55,4 +55,4 @@ The preset uses a declared camera corridor for scenery setback. The existing V4 
 
 Run `npm run check`, the complete Node kit suites plus `tests/studio-v5/*.test.mjs`, and the Python modelling tests. Render all four native films; fully decode, check 240 frames and record SHA256. Record source identity and review the whole moving image for clipping, contact, vegetation, lighting and subject visibility. Keep V5 opt-in and reject visibly worse outputs. The guide does not certify photorealism, all-frame visual approval, a complete Formula overhaul or production readiness.
 
-The native workflow also renders a 60-frame controlled surface comparison: left uses source-authored fallback materials and right uses the bundled scanned maps. Route, car geometry, camera and lights are identical. This isolates surface treatment; it is not a matched whole-V4-versus-V5 comparison.
+The native workflow also renders a 60-frame controlled surface comparison: left uses source-authored road/terrain fallback materials and right uses their bundled scanned maps. Tree alpha textures remain identical on both sides so the comparison does not turn foliage into opaque rectangles. Route, car geometry, camera and lights are identical. This isolates surface treatment; it is not a matched whole-V4-versus-V5 comparison.

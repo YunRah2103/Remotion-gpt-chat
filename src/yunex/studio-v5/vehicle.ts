@@ -12,7 +12,7 @@ export function createStudioVehicle(variant:'supercar'|'coupe'|'rally-hatch',col
 export function poseStudioVehicle(car:T.Group,road:Road,distance:number,frame:number,fps:number,speed:number){
  if(![distance,frame,fps,speed].every(Number.isFinite)||fps<=0||speed<0)throw Error('Finite motion, positive fps and nonnegative speed required');
  const pose=sampleRoad(road,distance),next=sampleRoad(road,distance+.5),s=vehicleSpec(car.userData.variant),inv=pose.quaternion.clone().invert();
- const curvature=-Math.atan2(Math.sin(next.yaw-pose.yaw),Math.cos(next.yaw-pose.yaw))/.5;
+ const curvature=Math.atan2(Math.sin(next.yaw-pose.yaw),Math.cos(next.yaw-pose.yaw))/.5;
  const heights=[1,-1].flatMap(axle=>[1,-1].map(side=>sampleRoad(road,distance+axle*s.wheelbase/2,side*s.width*.415).position.sub(pose.position).applyQuaternion(inv).y));
  animateCinematicVehicle(car,{frame,fps,distance,speed,curvature,roadFrontLeft:heights[0],roadFrontRight:heights[1],roadRearLeft:heights[2],roadRearRight:heights[3]});
  car.position.copy(pose.position);car.quaternion.copy(pose.quaternion);return pose;

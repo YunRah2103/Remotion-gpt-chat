@@ -12,3 +12,6 @@ test('four wheels follow graded banked road within 5mm and reverse seeking is ex
  poseStudioVehicle(car,road,80,160,30,12);poseStudioVehicle(car,road,55,90,30,12);assert.deepEqual(positions(),first);disposeObject(car);
 });
 test('unsupported model gives clear guidance',()=>assert.throws(()=>createStudioVehicle('truck'),/supercar/));
+test('front wheel steering follows the actual yaw change in both bend directions',()=>{
+ for(const side of [-1,1]){const road=createRoad({points:[[0,0,0],[30,0,side*10],[60,0,side*35],[100,0,side*40]],width:8});const car=createStudioVehicle('coupe');const a=sampleRoad(road,30),b=sampleRoad(road,30.5);poseStudioVehicle(car,road,30,60,30,12);assert.equal(Math.sign(car.getObjectByName('mount-front-left').rotation.y),Math.sign(b.yaw-a.yaw));disposeObject(car);}
+});
