@@ -3,8 +3,8 @@
  * Never import into the eventual EP006 master. Camera module itself stays source-agnostic.
  * This temporary pose feed tests airborne, touchdown and getaway framing until Agent 2 merges.
  */
-import {sampleRoute} from '../../../world-kit/environments.ts';
-import {rallySurfaceHeight} from '../../../modelling-kit/rough-road.ts';
+import {sampleRoute} from '../../world-kit/environments.ts';
+import {rallySurfaceHeight} from '../../modelling-kit/rough-road.ts';
 import type {Ep006MotionPose,Ep006Phase,Ep006Wheel} from '../../ep006/cameras/shot-motion.ts';
 const clamp=(v:number,min:number,max:number)=>Math.max(min,Math.min(max,v));
 const pulse=(f:number,at:number,decay:number)=>f<at?0:Math.exp(-(f-at)/decay);
