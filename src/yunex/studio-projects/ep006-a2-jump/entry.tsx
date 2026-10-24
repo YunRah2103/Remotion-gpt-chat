@@ -74,7 +74,7 @@ const JumpProof:React.FC=()=>{
   if(tyre)tyre.scale.y=1-wheel.tyreSquishM/.36;
   const links=car.getObjectByName(`links-mount-${corner}`);
   links?.children.forEach(part=>{
-   const ends=part.userData.link as {a:number[];b:number[];unit?:boolean}|undefined;
+   const ends=part.userData.link as {a:[number,number,number];b:[number,number,number];unit?:boolean}|undefined;
    if(!ends)return;
    const a=new T.Vector3(...ends.a),b=new T.Vector3(...ends.b);
    if(shell){a.applyEuler(shell.rotation).add(shell.position);}
