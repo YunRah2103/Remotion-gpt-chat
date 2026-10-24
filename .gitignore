@@ -5,3 +5,6 @@ dist/
 
 # Downloaded attributed 3D models; source metadata stays tracked in production/assets/imported-cars.
 public/yunex/imported-cars/
+
+# Unverified external private-review GLBs (96 candidates); never commit/re-distribute.
+public/yunex-external-cars/

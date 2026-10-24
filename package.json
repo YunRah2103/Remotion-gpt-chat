@@ -33,7 +33,8 @@
     "kit:assemble": "node --experimental-strip-types scripts/modelling-kit/assemble.mjs",
     "kit:cars:list": "node scripts/imported-cars.mjs list",
     "kit:cars:fetch": "node scripts/imported-cars.mjs fetch",
-    "kit:cars:verify": "node scripts/imported-cars.mjs verify"
+    "kit:cars:verify": "node scripts/imported-cars.mjs verify",
+    "kit:cars:agent": "node scripts/yunex-agent-car.mjs"
   },
   "dependencies": {
     "@remotion/captions": "4.0.533",
