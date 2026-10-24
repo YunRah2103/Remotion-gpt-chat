@@ -15,25 +15,28 @@ import {sampleEp006Effects} from '../../ep006/fx/contact-effects';
 
 const FRAMES=225;
 function makeCollisionTerrain(){
- const geo=new T.BufferGeometry(),positions:number[]=[],indices:number[]=[];
- const x0=-42,dx=3,nx=265,nz=20,z0=-13,dz=1.3;
- for(let i=0;i<=nx;i++)for(let j=0;j<=nz;j++){
-  const x=x0+dx*i,z=z0+dz*j;
-  positions.push(x,ep006SurfaceHeightM(x,z),z);
+ const world=new T.Group();world.name='Agent 2 contract-identical heightfield proof fixture';
+ // Dense patches near each jump; use the same surface sampler as physics.
+ for(const [start,end] of [[-34,125],[555,725]]){
+  const geo=new T.BufferGeometry(),positions:number[]=[],indices:number[]=[];
+  const nx=Math.ceil((end-start)/.65),nz=40,z0=-13,dz=26/nz;
+  for(let i=0;i<=nx;i++)for(let j=0;j<=nz;j++){
+   const x=start+(end-start)*i/nx,z=z0+dz*j;
+   positions.push(x,ep006SurfaceHeightM(x,z),z);
+  }
+  for(let i=0;i<nx;i++)for(let j=0;j<nz;j++){
+   const a=i*(nz+1)+j,b=a+nz+1;
+   indices.push(a,a+1,b,a+1,b+1,b);
+  }
+  geo.setAttribute('position',new T.Float32BufferAttribute(positions,3));
+  geo.setIndex(indices);geo.computeVertexNormals();
+  const mesh=new T.Mesh(geo,new T.MeshStandardMaterial({color:'#8d7460',roughness:1,side:T.DoubleSide}));
+  mesh.receiveShadow=true;world.add(mesh);
  }
- for(let i=0;i<nx;i++)for(let j=0;j<nz;j++){
-  const a=i*(nz+1)+j,b=a+nz+1;
-  indices.push(a,a+1,b,a+1,b+1,b);
- }
- geo.setAttribute('position',new T.Float32BufferAttribute(positions,3));
- geo.setIndex(indices);geo.computeVertexNormals();
- const world=new T.Group();world.name='temporary Agent 2 collision mesh fixture';
- const mesh=new T.Mesh(geo,new T.MeshStandardMaterial({color:'#8d7460',roughness:1,side:T.DoubleSide}));
- mesh.receiveShadow=true;world.add(mesh);
  const rocks=new T.InstancedMesh(new T.DodecahedronGeometry(1,0),new T.MeshStandardMaterial({color:'#766a61',roughness:1}),105);
  const dummy=new T.Object3D();
  for(let i=0;i<105;i++){
-  const x=-20+i*7.2,z=(i%2===0?-1:1)*(5+(i%5)*1.1);
+  const x=i<52?-20+i*2.8:560+(i-52)*3.0,z=(i%2===0?-1:1)*(5+(i%5)*1.1);
   dummy.position.set(x,ep006SurfaceHeightM(x,z)+.11,z);
   dummy.scale.set(.19+(i%7)*.035,.14+(i%4)*.027,.20+(i%5)*.035);
   dummy.rotation.set(i*.4,i*.6,i*.23);dummy.updateMatrix();rocks.setMatrixAt(i,dummy.matrix);
@@ -100,17 +103,19 @@ const JumpProof:React.FC=()=>{
  });
  for(let i=sample.gravel.length;i<effects.gravel.count;i++){d.scale.setScalar(0);d.updateMatrix();effects.gravel.setMatrixAt(i,d.matrix);}
  effects.gravel.instanceMatrix.needsUpdate=true;
- const impact=(frame>=60&&frame<=104)||(frame>=739&&frame<=780);
- const follow=impact?6.8:12.4;
+ const impact=(frame>=70&&frame<=92)||(frame>=748&&frame<=770);
+ const follow=impact?8.4:16.5;
  const cx=pose.positionM[0],cy=pose.positionM[1];
- const cameraPosition:[number,number,number]=[cx+(impact?1.2:-4.3),cy+(impact?1.9:3.0),pose.positionM[2]+follow];
- const target:[number,number,number]=[cx+1.25,cy+.75,pose.positionM[2]];
- return <ThreeCanvas width={width} height={height} shadows camera={{fov:impact?42:36,near:.05,far:1200}} gl={{antialias:true}}>
+ const cameraPosition:[number,number,number]=[cx+(impact?1.5:-2.0),cy+(impact?1.9:2.6),pose.positionM[2]+follow];
+ // Wide shots show the complete chassis and both axle sets; touchdown
+ // deliberately punches in toward the FRONT WHEEL, then returns to full-car.
+ const target:[number,number,number]=[cx+(impact?1.2:0),cy+(impact?.55:.78),pose.positionM[2]];
+ return <ThreeCanvas width={width} height={height} shadows camera={{fov:42,near:.05,far:1200}} gl={{antialias:true}}>
   <CinematicLighting focus={[cx,cy,0]} timeOfDay="dusk"/>
   <primitive object={terrain}/>
   <primitive object={car}/>
   <primitive object={effects.group}/>
-  <CameraAim position={cameraPosition} target={target} fov={impact?42:36}/>
+  <CameraAim position={cameraPosition} target={target} fov={42}/>
  </ThreeCanvas>;
 };
 const Root:React.FC=()=> <Composition id="ep006-a2-jump" component={JumpProof} width={1080} height={1920} fps={30} durationInFrames={FRAMES}/>;
