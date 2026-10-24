@@ -1,0 +1,98 @@
+name: YUNEX EP006 Agent 3 native camera proofs
+on:
+  push:
+    branches: ['agent/ep006-03-cameras']
+    paths:
+      - 'src/yunex/ep006/cameras/**'
+      - 'src/yunex/studio-projects/ep006-a3-cameras/**'
+      - 'tests/ep006/a3-cameras.test.mjs'
+      - '.github/workflows/yunex-ep006-a3-cameras.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ep006-a3-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify-camera:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
+      - run: node --experimental-strip-types --test tests/ep006/a3-cameras.test.mjs
+  native-previews:
+    needs: verify-camera
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        include:
+          - {composition: Ep006A3Hook, frames: 66, slug: hook}
+          - {composition: Ep006A3Impact, frames: 55, slug: impact}
+          - {composition: Ep006A3FinalLaunch, frames: 64, slug: final-launch}
+          - {composition: Ep006A3FinalLanding, frames: 62, slug: final-landing}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - name: Render real 1080x1920 moving H.264 proof
+        run: |
+          mkdir -p out/ep006/agent-03/${{ matrix.slug }}
+          npx remotion render src/yunex/studio-projects/ep006-a3-cameras/entry.tsx ${{ matrix.composition }} out/ep006/agent-03/${{ matrix.slug }}/proof.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --color-space=bt709 --crf=19 --concurrency=2
+      - name: FFprobe, full FFmpeg decode, SHA256 and non-static video gate
+        env:
+          PROOF_FRAMES: ${{ matrix.frames }}
+          PROOF_SLUG: ${{ matrix.slug }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "out/ep006/agent-03/$PROOF_SLUG"
+          ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,width,height,avg_frame_rate,nb_frames -show_entries format=duration -of json proof.mp4 > metadata.json
+          python3 - <<'PY'
+          import json,os
+          m=json.load(open('metadata.json'))
+          s=m['streams'][0]
+          assert s['codec_name']=='h264',s
+          assert s['width']==1080 and s['height']==1920,s
+          assert s['avg_frame_rate']=='30/1',s
+          assert int(s['nb_frames'])==int(os.environ['PROOF_FRAMES']),s
+          print('FFPROBE PASS:',s)
+          PY
+          ffmpeg -v error -xerror -i proof.mp4 -f null -
+          sha256sum proof.mp4 > sha256.txt
+          ffmpeg -v error -y -i proof.mp4 -vf scale=64:112 -pix_fmt gray -f rawvideo sampled.y8
+          python3 - <<'PY'
+          import json,os,statistics
+          data=open('sampled.y8','rb').read()
+          w,h=64,112;n=w*h
+          frames=[data[i:i+n] for i in range(0,len(data),n)]
+          assert len(frames)==int(os.environ['PROOF_FRAMES']),(len(frames),os.environ['PROOF_FRAMES'])
+          scores=[sum(abs(a-b) for a,b in zip(frames[i],frames[i+1]))/n for i in range(len(frames)-1)]
+          summary={'frames':len(frames),'mean_adjacent_mae':statistics.mean(scores),'moving_frame_pairs_gt_0_4':sum(x>.4 for x in scores),'note':'Pixel-motion gate cannot replace human moving-video review; source uses fixture poses.'}
+          open('motion-diagnostics.json','w').write(json.dumps(summary,indent=2))
+          print(summary)
+          assert summary['moving_frame_pairs_gt_0_4']>=max(2,int((len(frames)-1)*.5)), 'Video appears static; inspect renderer'
+          PY
+          rm sampled.y8
+          MID=$((PROOF_FRAMES/2)); LAST=$((PROOF_FRAMES-1))
+          ffmpeg -v error -y -i proof.mp4 -vf "select=eq(n\\,0)+eq(n\\,$MID)+eq(n\\,$LAST)" -vsync vfr check-%02d.png
+          printf '%s\n' "${{ github.sha }}" > source-sha.txt
+          printf '%s\n' 'Fixture camera framing proof only: requires Agent 2/4 canonical integrated re-render and actual visual sign-off.' > review-status.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ep006-a3-cameras-${{ matrix.slug }}
+          path: out/ep006/agent-03/${{ matrix.slug }}/
+          retention-days: 30
