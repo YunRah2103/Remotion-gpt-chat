@@ -59,7 +59,7 @@ export const EP006_JUMP_EVENTS = EP006_JUMPS.map(j=>({
 }));
 /** Damped oscillation after impact. The tyre does not leave the ground as it rebounds. */
 function oscillation(age:number,scale:number){
- if(age<0)return {compression:0,rate:0};
+ if(!Number.isFinite(age)||age<0)return {compression:0,rate:0};
  const e=Math.exp(-3.65*age),s=Math.sin(12.5*age),c=Math.cos(12.5*age);
  return {compression:scale*e*s,rate:scale*e*(12.5*c-3.65*s)};
 }
