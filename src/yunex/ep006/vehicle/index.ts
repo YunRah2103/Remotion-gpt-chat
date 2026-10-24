@@ -103,7 +103,7 @@ function coil(parent:THREE.Object3D,name:string) {
     const u=i/360,a=u*Math.PI*2*12;
     const end=Math.min(1,u*24,(1-u)*24);
     const radius=.051*(.75+.25*Math.max(0,end));
-    points.push(new THREE.Vector3(Math.cos(a)*radius,u,Math.sin(a)*radius));
+    points.push(new THREE.Vector3(Math.cos(a)*radius,u-.5,Math.sin(a)*radius));
   }
   const path=new THREE.CatmullRomCurve3(points);
   const object=new THREE.Mesh(new THREE.TubeGeometry(path,360,.0075,6,false),accent);
