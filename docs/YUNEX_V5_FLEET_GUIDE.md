@@ -40,3 +40,13 @@ node scripts/modelling-kit/fleet-render.mjs
 Four silent native H.264/yuv420p 1080x1920 30fps films: A protected supercar (6s); B GT road car (6s); C rally (6s); D matched V4/V5 split-screen of 12 catalogue representatives (12s). Each driving proof has front, side, rear, wheel detail and tracking beats. The comparison uses the same camera/lens/paint/lighting on both models. It is development evidence, not an approved published episode. The floor is deliberately neutral to expose geometry; rally uses moving loose gravel context, not a finished natural environment. Full-frame native motion and per-file hashes must accompany a visual handoff.
 
 `auditFleetVehicle` is a rest-pose structural diagnostic: finite attributes, named surfaces, axle count/height, roof envelope and sample wheel aperture rays. It does not certify glazing/pillar continuity, complete mesh intersections, all normals, realism or visual approval. Review every class and complete moving proof; keep visual status pending until the owner approves. Legacy paths remain available while refinement continues.
+
+## Road-model geometry refinement — 24 October
+
+`createFleetVehicle` and recipes with `bodyDetail:'fleet'` now select the refined road models automatically. The 28 rebuilt road bodies gain curved roof ends and taper, fitted greenhouse edges, a structural side-window divider, painted quarter sails, front-face-only glazing and surface-following bonnet seams where applicable. These are editable geometry changes, not a lighting preset. Open/targa behavior, the roof liner and existing wheel/driver/cutaway controls remain.
+
+The 26 non-classic road variants additionally gain shaped recessed headlamp housings with twin three-dimensional projector optics per side, optical tail-light ribs, tapered intake surrounds, open hexagonal grille cells and class-sized fascia proportions. Non-van models have body-cut side intakes with recessed louvres; sports/rally models have modelled rear diffuser fins. Classics keep their round reflectors, bezels and lenses; the protected V4 supercar, Formula vehicles, motorcycles and heavy commercial vehicles retain their prior geometry. EVs still have no fake exhaust.
+
+Moving GT and rally films use the existing proof composition and its unchanged camera/lighting to expose the model changes. The neutral floor remains a development environment. Models remain generic original designs, not manufacturer-matched CAD. Full-fleet structural tests do not substitute for visual inspection of every variant.
+
+Cutaway intentionally retains the painted quarter sails as C-pillar structure, consistent with the A/B/C pillars; roof, glazing and liner remain removable.

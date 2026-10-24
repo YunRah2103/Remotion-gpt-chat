@@ -4,6 +4,7 @@ import type {VehicleOptions,VehicleSpec} from '../world-kit/catalog.ts';
 import {box,mesh,surface} from '../world-kit/geometry.ts';
 import {cutOpening} from '../world-kit/cavity.ts';
 import {angleWeightedNormals} from './studio-normals.ts';
+import {installRefinedFascia} from './fleet-fascia.ts';
 import {fleetProfile} from './fleet-profiles.ts';
 import {fleetCurve,fleetSkin,fleetPillar,fleetPatch,lerp,station} from './fleet-surfaces.ts';
 export function fleetSection(s:VehicleSpec,x:number){
@@ -44,7 +45,10 @@ function roadShell(s:VehicleSpec){
  return g;
 }
 function canopy(shell:T.Group,s:VehicleSpec,paint:T.Material,glass:T.Material,trim:T.Material){
- const c=fleetProfile(s),roof=(x:number,z:number)=>new T.Vector3(x,c.roof-.048*z*z+.018*Math.sin(Math.PI*(x-c.rearRoof)/(c.frontRoof-c.rearRoof)),c.roofWidth*z);
+ const c=fleetProfile(s),roof=(x:number,z:number)=>{
+  const t=T.MathUtils.clamp((x-c.rearRoof)/(c.frontRoof-c.rearRoof),0,1),crown=Math.sin(Math.PI*t);
+  return new T.Vector3(x+(1-2*t)*(c.van?.025:.065)*z*z,c.roof-.060*z*z+.018*crown,c.roofWidth*z*(.955+.045*crown));
+ };
  const screen=(rear:boolean,t:number,z:number)=>{const base=rear?c.rearBase:c.frontBase,top=rear?c.rearRoof:c.frontRoof,p=new T.Vector3(base,c.belt-.020*z*z,c.baseWidth*z).lerp(roof(top,z),t);p.x+=(rear?-.045:.065)*Math.sin(Math.PI*t)*(1-z*z);return p;};
  const rail=(name:string,fn:(t:number)=>T.Vector3,mat:T.Material,r:number)=>{const points=Array.from({length:33},(_,i)=>fn(i/32));return name==='a-pillar'||name==='c-pillar'||name==='roof-side-rail'?fleetPillar(shell,mat,points,r*2,.026,name):fleetCurve(shell,mat,points,r,name);};
  if(!c.open&&!c.targa)fleetSkin(shell,paint,'roof',(u,v)=>roof(lerp(c.rearRoof,c.frontRoof,u),-1+2*v),true);
@@ -55,14 +59,14 @@ function canopy(shell:T.Group,s:VehicleSpec,paint:T.Material,glass:T.Material,tr
   for(const side of [-1,1])rail(rear?'c-pillar':'a-pillar',t=>screen(rear,t,side),paint,c.utility||c.van?.035:.027);
   for(const t of [0,1])rail(rear?'rear-window-seal':'windshield-seal',z=>screen(rear,t,-1+2*z),trim,.008);
  }
- const roofX=(t:number)=>t<.22?lerp(c.rearBase,c.rearRoof,t/.22):t>.78?lerp(c.frontRoof,c.frontBase,(t-.78)/.22):lerp(c.rearRoof,c.frontRoof,(t-.22)/.56);
- const roofY=(t:number)=>t<.22?lerp(c.belt,c.roof-.048,t/.22):t>.78?lerp(c.roof-.048,c.belt,(t-.78)/.22):c.roof-.048+.018*Math.sin(Math.PI*(t-.22)/.56);
  for(const side of [-1,1]){
-  const edge=(t:number)=>new T.Vector3(roofX(t),roofY(t),side*lerp(c.baseWidth,c.roofWidth,(roofY(t)-c.belt)/(c.roof-c.belt)));
+  const edge=(t:number)=>t<.22?screen(true,t/.22,side):t>.78?screen(false,1-(t-.78)/.22,side):roof(lerp(c.rearRoof,c.frontRoof,(t-.22)/.56),side);
   if(!c.open){
    fleetSkin(shell,glass,'side-glass',(u,v)=>{const t=.025+u*.95,q=edge(t);return new T.Vector3(q.x,lerp(c.belt+.008,q.y,v),lerp(side*c.baseWidth,q.z,v)-side*.015*Math.sin(Math.PI*u)*Math.sin(Math.PI*v));},side<0,64,20);
    rail('roof-side-rail',edge,paint,.020);
-   if(!c.sports){const px=lerp(c.rearRoof,c.frontRoof,.56);rail('b-pillar',t=>new T.Vector3(px,lerp(c.belt,c.roof-.042,t),side*lerp(c.baseWidth,c.roofWidth,t)),trim,c.rally?.028:.032);}
+   {const px=lerp(c.rearRoof,c.frontRoof,.56);rail('b-pillar',t=>new T.Vector3(px,c.belt,side*c.baseWidth).lerp(roof(px,side),t),trim,c.sports?.018:c.rally?.028:.032);}
+   // Painted rear sail follows the same curved greenhouse evaluator.
+   fleetSkin(shell,paint,'quarter-sail',(u,v)=>{const t=u*(c.sports?.18:.12),q=edge(t);return new T.Vector3(q.x,lerp(c.belt+.002,q.y,v),lerp(side*c.baseWidth,q.z,v)+side*.004);},side<0,16,12);
   }
   rail('belt-window-seal',t=>new T.Vector3(lerp(c.rearBase,c.frontBase,t),c.belt,side*c.baseWidth),trim,.010);
  }
@@ -88,11 +92,16 @@ export function installFleetRoad(shell:T.Group,s:VehicleSpec,options:Partial<Veh
  const source=shell.getObjectByName('arched-body') as T.Mesh<T.BufferGeometry,T.MeshStandardMaterial>;
  const paint=new T.MeshPhysicalMaterial({color:source.material.color,metalness:.58,roughness:.25,clearcoat:1,clearcoatRoughness:.09});
  const trim=surface('#13191d',.12,.55),rubber=surface('#111519',.01,.82),metal=surface('#a5afb4',.94,.22);
- const glass=new T.MeshPhysicalMaterial({color:'#617b86',metalness:.12,roughness:.065,clearcoat:1,transparent:true,opacity:options.glassOpacity??.78,depthWrite:false,side:T.DoubleSide});
+ const glass=new T.MeshPhysicalMaterial({color:'#617b86',metalness:.12,roughness:.065,clearcoat:1,transparent:true,opacity:options.glassOpacity??.78,depthWrite:false,side:T.FrontSide});
  for(const o of [...shell.children])if(!['interior','console-switch-bank'].includes(o.name)){shell.remove(o);o.traverse(n=>{if(n instanceof T.Mesh)n.geometry.dispose();});}
  const c=fleetProfile(s),half=s.length/2;
  const body=mesh(shell,roadShell(s),paint,[0,0,0],[0,0,0],'arched-body');body.userData.sourceSurface='fleet-v5';
  canopy(shell,s,paint,glass,trim);
+ if(!c.van){
+  const start=Math.max(c.frontBase+.08,-half+.2),end=half-.24;
+  for(const side of [-1,1])fleetCurve(shell,trim,Array.from({length:49},(_,i)=>{const t=i/48;return fleetDeck(s,start+(end-start)*t,side*(.52-.12*t)).add(new T.Vector3(0,.003,0));}),.0025,'bonnet-shut-line');
+  fleetCurve(shell,trim,Array.from({length:33},(_,i)=>fleetDeck(s,end,(-.40+.8*i/32)).add(new T.Vector3(0,.003,0))),.0025,'bonnet-leading-seam');
+ }
  for(const side of [-1,1]){
   const x0=-s.wheelbase/2+c.arch+.03,x1=s.wheelbase/2-c.arch-.03;
   // Skin and seams follow the identical body evaluator. No hovering rectangular door slabs.
@@ -111,7 +120,8 @@ export function installFleetRoad(shell:T.Group,s:VehicleSpec,options:Partial<Veh
   mesh(shell,new T.SphereGeometry(1,24,12).scale(.008,.043,.063),metal,[p.x-.12,p.y,p.z],[0,0,0],'mirror-glass');
  }
  const white=new T.MeshStandardMaterial({color:'#dce9f0',emissive:'#c7e2ff',emissiveIntensity:options.lights===false?0:.65}),red=new T.MeshStandardMaterial({color:'#90121e',emissive:'#f12432',emissiveIntensity:options.lights===false?0:.45});
- for(const front of [true,false]){
+ if(c.kind!=='classic')installRefinedFascia(shell,body,s,{paint,trim,metal,white,red});
+ else for(const front of [true,false]){
   const sign=front?1:-1,x=sign*half,y=c.belt-(front?.24:.15),lampWidth=s.width*(c.kind==='classic'?.13:.20),lampH=c.kind==='classic'?.12:c.utility?.075:.045;
   for(const side of [-1,1]){
    const z=side*s.width*.29;
