@@ -1,0 +1,61 @@
+name: YUNEX Real Imported Car Showcase MP4
+on:
+  push:
+    branches:
+      - feat/yunex-imported-cars-agent-ready
+    paths:
+      - '.github/workflows/yunex-imported-car-montage.yml'
+      - 'scripts/modelling-kit/imported-car-montage.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  car-showcase:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Install Pillow and media tooling
+        run: |
+          python3 -m pip install --break-system-packages pillow
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+      - name: Fetch all 10 attributed real imported GLB files
+        run: |
+          npm run kit:cars:fetch -- all
+          npm run kit:cars:verify -- all
+      - name: Render real 3D mesh stills for every eligible model
+        run: |
+          mkdir -p out/imported-cars/showcase/stills
+          python3 - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          catalog=json.loads(Path('production/assets/imported-cars/catalog.json').read_text())['vehicles']
+          cars=[x for x in catalog if x['readiness']=='attribution-required']
+          assert len(cars)==10
+          for i,car in enumerate(cars,1):
+            print('RENDER',i,'/10',car['id'],flush=True)
+            subprocess.run([
+              'npx','remotion','still','src/yunex/imported-cars/entry.tsx',
+              'YunexImportedCarPreview',
+              f"out/imported-cars/showcase/stills/{car['id']}.png",
+              '--frame=65','--gl=swangle','--timeout=120000',
+              '--props='+json.dumps({'carId':car['id'],'privateReview':False,'lengthMeters':4.7})
+            ],check=True)
+          PY
+      - name: Assemble and verify real imported car montage
+        run: python3 scripts/modelling-kit/imported-car-montage.py
+      - name: Upload labelled MP4 and credits
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-10-Real-Imported-Cars-Showcase
+          path: |
+            out/imported-cars/showcase/YUNEX-Real-Imported-Cars-Showcase.mp4
+            out/imported-cars/showcase/showcase-manifest.json
+          if-no-files-found: error
+          retention-days: 14
