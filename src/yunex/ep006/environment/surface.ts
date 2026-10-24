@@ -31,8 +31,10 @@ export function heightAt(x:number,z:number):number{
   const blend=smooth(edge,edge+15,d);
   const rolling=.43*Math.sin(x*.038+z*.024)+.38*Math.sin(z*.056-x*.015)
     +.20*Math.cos(z*.113+x*.046);
-  const hillside=(1.85+rolling)*blend + Math.pow(Math.max(0,d-edge-16)/22,1.05)
-    *(.48+.18*Math.sin(x*.017+z*.03));
+  // Distant rolling forest banks preserve the unchanged driving corridor.
+  const ridge=Math.pow(Math.max(0,d-edge-14)/19,1.13)
+    *(1.30+.38*Math.sin(x*.028+z*.031));
+  const hillside=(3.10+rolling*1.4+1.10*Math.sin(x*.044+z*.017))*blend+ridge;
   const bank=.13*smooth(edge,edge+3,d)*Math.sin(x*.12+z*.17);
   return roadBed(x,z)+hillside+bank;
 }

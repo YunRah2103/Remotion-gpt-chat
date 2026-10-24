@@ -40,12 +40,12 @@ const RallyStageProof:React.FC=()=>{
   car.rotation.set(0,0,pose.air?-.055:0);
   // Motion, pan and hero scale are real frame-by-frame Three.js updates.
   const cam=t<2.5?
-    {position:[pose.x-10.8,pose.y+3.15,-8.2] as [number,number,number],
-      target:[pose.x+.8,pose.y+.95,0] as [number,number,number],fov:46}:
+    {position:[pose.x-8.9,pose.y+2.85,-7.5] as [number,number,number],
+      target:[pose.x+.8,pose.y+.95,0] as [number,number,number],fov:42}:
     t<4.3?
-    {position:[pose.x+8.5,pose.y+2.2,10.2] as [number,number,number],
+    {position:[pose.x+7.2,pose.y+2.3,9.1] as [number,number,number],
       target:[pose.x,pose.y+.75,0] as [number,number,number],fov:42}:
-    {position:[pose.x-13,pose.y+7.0,-12.5] as [number,number,number],
+    {position:[pose.x-11.0,pose.y+6.0,-11.0] as [number,number,number],
       target:[pose.x+2,pose.y+.85,0] as [number,number,number],fov:44};
   return <ThreeCanvas width={width} height={height} shadows camera={{fov:46,near:.1,far:1800}}>
     <color attach="background" args={['#a9c7d3']}/>
