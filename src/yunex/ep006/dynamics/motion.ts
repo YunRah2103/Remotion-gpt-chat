@@ -9,7 +9,7 @@ export const EP006_GRAVITY_MPS2 = 9.81;
 export const EP006_WHEELBASE_M = 2.62;
 export const EP006_TRACK_M = 1.64;
 export const EP006_TYRE_RADIUS_M = 0.36;
-export const EP006_SUSPENSION_LIMITS_M = {droop:-0.085,bump:0.16,tyreSquishMax:0.03} as const;
+export const EP006_SUSPENSION_LIMITS_M = {droop:-0.155,bump:0.092,tyreSquishMax:0.022} as const;
 export type Ep006Corner = 'front-left'|'front-right'|'rear-left'|'rear-right';
 export const EP006_CORNERS:readonly Ep006Corner[] = ['front-left','front-right','rear-left','rear-right'];
 export type Ep006Phase = 'approach'|'takeoff'|'airborne'|'touchdown'|'rebound'|'driving';
@@ -27,17 +27,36 @@ export type Ep006Motion = {
 };
 const clamp=(x:number,a:number,b:number)=>Math.min(b,Math.max(a,x));
 const smooth=(a:number,b:number,x:number)=>{const u=clamp((x-a)/(b-a),0,1);return u*u*(3-2*u);};
-const vxAt=(t:number)=>24+0.10*t;
-export const ep006TravelXM=(tSeconds:number)=>24*tSeconds+0.05*tSeconds*tSeconds;
-/** Low-road / crest height profile. This EXACT function must build Agent 4's collision mesh. */
+const vxAt=(t:number)=>25.6+0.10*t;
+export const ep006TravelXM=(tSeconds:number)=>25.6*tSeconds+0.05*tSeconds*tSeconds;
+/**
+ * Exact independent-branch mirror of Agent 4's published environment/surface.ts
+ * `heightAt` implementation. On integration use their heightAt as the single
+ * shared import; mathematical parity here keeps this branch independently
+ * buildable and gives the native fixture the same sampled collision heights.
+ * Avoid changing either copy without notifying Agents 2 + 4.
+ */
+const lift=(x:number,crest:number)=>
+  3.65*smooth(crest-38,crest+2,x)-3.75*smooth(crest+4,crest+32,x);
+const roadEdge=(x:number)=>4.25+.16*Math.sin(x*.057)+.09*Math.sin(x*.159);
+const roadBase=(x:number)=>.26*Math.sin(x*.025)+.16*Math.sin(x*.066)+lift(x,0)+lift(x,610);
+function roadBed(x:number,z:number){
+  const crown=.055*(1-Math.min(1,Math.abs(z)/5)**2);
+  const rut=-.034*Math.exp(-(((Math.abs(z)-1.18)/.29)**2));
+  const aggregate=.016*Math.sin(x*1.91+z*3.37)*Math.sin(x*3.26-z*2.41)
+    +.012*Math.sin(x*.68+z*1.34);
+  return roadBase(x)+crown+rut+aggregate;
+}
 export function ep006SurfaceHeightM(x:number,z=0):number {
-  const crest=(centre:number,h:number)=>
-    h*smooth(centre-29,centre-1.5,x)*(1-smooth(centre+1.5,centre+25,x));
-  const second=ep006TravelXM(684/EP006_FPS);
-  // Wheel-scale ripple <12mm. Never inject random frame-by-frame noise.
-  return .12+crest(0,1.07)+crest(second,1.00)
-    +.006*Math.sin(x*.17+z*.39)*Math.cos(x*.11-z*.56)
-    +.004*Math.sin(z*.95+x*.06);
+  if(!Number.isFinite(x)||!Number.isFinite(z))throw Error('EP006 ground query must be finite metres');
+  const d=Math.abs(z),edge=roadEdge(x);
+  const blend=smooth(edge,edge+15,d);
+  const rolling=.43*Math.sin(x*.038+z*.024)+.38*Math.sin(z*.056-x*.015)
+    +.20*Math.cos(z*.113+x*.046);
+  const hillside=(1.85+rolling)*blend + Math.pow(Math.max(0,d-edge-16)/22,1.05)
+    *(.48+.18*Math.sin(x*.017+z*.03));
+  const bank=.13*smooth(edge,edge+3,d)*Math.sin(x*.12+z*.17);
+  return roadBed(x,z)+hillside+bank;
 }
 export const EP006_JUMPS = [
   {id:'J1' as const,launchFrame:0,landingFrame:72},
@@ -75,11 +94,11 @@ export function sampleEp006Motion(frame:number):Ep006Motion {
  const landed=latestLanding(frame);
  const landAge=landed?(frame-landed.landingFrame)/EP006_FPS:Infinity;
  const activeLanding=landed&&landAge<1.25?landed:null;
- const wave=oscillation(landAge,.205);
+ const wave=oscillation(landAge,.14);
  const suspension=clamp(wave.compression,EP006_SUSPENSION_LIMITS_M.droop,EP006_SUSPENSION_LIMITS_M.bump);
  const compression=landAge<1.25?suspension:.010+.004*Math.sin(x*.34);
  const suspensionRate=landAge<1.25?wave.rate:.004*.34*vx*Math.cos(x*.34);
- const tyreSquish=landAge<1.25?.026*(1-Math.exp(-24*landAge))*Math.exp(-4.7*landAge):.007;
+ const tyreSquish=landAge<1.25?.020*(1-Math.exp(-24*landAge))*Math.exp(-4.7*landAge):.007;
  let y:number,vy:number,pitch:number;
  let phase:Ep006Phase='driving',jumpId:Ep006JumpId|null=null;
  if(airborne){
@@ -91,7 +110,7 @@ export function sampleEp006Motion(frame:number):Ep006Motion {
  }else{
   y=ep006SurfaceHeightM(x,z)-compression-tyreSquish;
   const delta=.04,slope=(ep006SurfaceHeightM(x+delta,z)-ep006SurfaceHeightM(x-delta,z))/(delta*2);
-  const tyreRate=landAge<1.25?.026*(24*Math.exp(-24*landAge)*Math.exp(-4.7*landAge)-4.7*(1-Math.exp(-24*landAge))*Math.exp(-4.7*landAge)):0;
+  const tyreRate=landAge<1.25?.020*(24*Math.exp(-24*landAge)*Math.exp(-4.7*landAge)-4.7*(1-Math.exp(-24*landAge))*Math.exp(-4.7*landAge)):0;
   vy=slope*vx-suspensionRate-tyreRate;
   pitch=landAge<.75?-.020*Math.exp(-4*landAge)*Math.sin(9*landAge):.004*Math.sin(x*.055);
   if(activeLanding){jumpId=activeLanding.id;phase=landAge===0?'touchdown':landAge<.8?'rebound':'driving';}
