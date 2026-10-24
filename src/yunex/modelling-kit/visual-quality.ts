@@ -65,7 +65,7 @@ export function auditVehicleGeometry(root:T.Object3D){
  if(roof){
   const top=roof.box.max.y;
   const shell=root.getObjectByName('body-shell'),offset=shell?.position.y??0;
-  const expectedRoof=(root.userData.bodyArchitecture==='fleet-v5'?fleetProfile(s).roof:root.userData.bodyArchitecture==='section-loft-v4'?studioBodyProfile(s).roof+.012:shell?.userData.coachbuilt?coachbuiltField(new T.Vector3(0,s.height+.02,0),s).y:s.height+.02)+offset;
+  const expectedRoof=(root.userData.bodyArchitecture==='fleet-v5'?(s.id==='supercar'?studioBodyProfile(s).roof+.012:fleetProfile(s).roof+.018):root.userData.bodyArchitecture==='section-loft-v4'?studioBodyProfile(s).roof+.012:shell?.userData.coachbuilt?coachbuiltField(new T.Vector3(0,s.height+.02,0),s).y:s.height+.02)+offset;
   if(Math.abs(top-expectedRoof)>.055)issue('roof-height','roof',top,expectedRoof,'Actual roof apex differs from the selected body architecture.','Inspect roof field/deformation against its architecture profile, not nominal catalogue height.');
   if(liner){
    // Local nearest surface comparison catches a protruding liner even beneath a curved roof apex.

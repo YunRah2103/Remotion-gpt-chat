@@ -17,7 +17,7 @@ export function createFleetVehicle(options:FleetOptions={}){
  if(options.reference&&variant!=='supercar')throw Error('Approved V4 reference requires supercar');
  return createCinematicVehicle({...options,variant,bodyDetail:options.reference?'studio':'fleet',tyreType:options.trim==='track'?'slick':options.tyreType});
 }
-export function fleetCatalogue(){return VEHICLES.map(s=>({...s,architecture:fleetArchitecture(s),source:'original source-owned fleet rebuild 2026-10-24'}));}
+export function fleetCatalogue(){return VEHICLES.map(s=>({...s,architecture:fleetArchitecture(s),source:'original source-owned V5 / protected V4 supercar'}));}
 export function createFleetRecipe({id,variant='grand-tourer',color,world='track'}:{id:string;variant?:VehicleVariant;color?:string;world?:EpisodeRecipe['world']['kind']}):EpisodeRecipe{
  return {id,title:'V5 vehicle proof',presentation:'cinematic',vehicle:{variant,color,bodyDetail:'fleet'},world:{kind:world,timeOfDay:'day'},shots:[
   {id:'front',duration:1.5,camera:'tracking',action:'cruise',caption:''},
