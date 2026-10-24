@@ -111,7 +111,7 @@ export function createEp006MechanicalReveal(vehicle:T.Group):MechanicalReveal{
     const spring=helix(gold,'active-coil-spring-'+corner);
     overlay.add(barrel,shaft,topCollar,bottomCollar,spring);
     const pos=tyre.geometry.attributes.position.array;
-    const tyreRest=Array.from((tyre.userData.restVertices as number[]|undefined)??pos);
+    const tyreRest=Array.from(((tyre.userData.restVertices as number[]|undefined)??pos) as ArrayLike<number>);
     corners.push({corner,mount,rest:new T.Vector3(...(mount.userData.restPosition as [number,number,number])),
       links,damper,upper:new T.Vector3(...datum.a),lower:new T.Vector3(...datum.b),
       overlay,coil:spring,barrel,shaft,topCollar,bottomCollar,
