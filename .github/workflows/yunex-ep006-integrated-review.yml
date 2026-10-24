@@ -6,11 +6,14 @@ on:
     paths:
       - 'src/yunex/ep006/**'
       - 'src/yunex/studio-projects/ep006-integrated-review/**'
+      - 'src/yunex/studio-projects/ep006-full-visual/**'
+      - '.github/workflows/yunex-ep006-full-picture.yml'
       - 'tests/ep006/**'
       - '.github/workflows/yunex-ep006-integrated-review.yml'
   pull_request:
     paths:
       - 'src/yunex/ep006/**'
+      - 'src/yunex/studio-projects/ep006-full-visual/**'
       - 'src/yunex/studio-projects/ep006-integrated-review/**'
       - 'tests/ep006/**'
       - '.github/workflows/yunex-ep006-integrated-review.yml'
@@ -92,4 +95,54 @@ jobs:
         with:
           name: YUNEX-EP006-A8-INTEGRATED-MOVING-PROOF
           path: out/ep006/integrated-pass-01/
+          retention-days: 30
+  render-full-picture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install native media and Remotion
+        run: |
+          npm ci --no-audit --no-fund
+          bash scripts/modelling-kit/install-native-media.sh
+      - name: Compile shared A1-A4 composition
+        run: |
+          npm run check
+          node --experimental-strip-types --test tests/ep006/*.test.mjs
+      - name: Render real 810-frame physics-coherent film
+        run: |
+          mkdir -p out/ep006/full-picture
+          npx remotion render src/yunex/studio-projects/ep006-full-visual/entry.tsx Ep006FullVisualNarrationBase out/ep006/full-picture/ep006-full-silent-picture.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+      - name: Validate decode frame count and save visual evidence
+        run: |
+          set -euo pipefail
+          dir=out/ep006/full-picture
+          ffprobe -v error -show_streams -of json "$dir/ep006-full-silent-picture.mp4" > "$dir/ffprobe.json"
+          ffmpeg -v error -xerror -i "$dir/ep006-full-silent-picture.mp4" -f null -
+          sha256sum "$dir/ep006-full-silent-picture.mp4" > "$dir/sha256.txt"
+          git rev-parse HEAD > "$dir/source-commit.txt"
+          ffmpeg -v error -i "$dir/ep006-full-silent-picture.mp4" -vf "select='eq(n,0)+eq(n,72)+eq(n,210)+eq(n,320)+eq(n,430)+eq(n,530)+eq(n,580)+eq(n,650)+eq(n,700)+eq(n,750)+eq(n,809)',scale=216:384,tile=4x3" -frames:v 1 "$dir/contact-sheet.png"
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=Path('out/ep006/full-picture')
+          streams=json.loads((d/'ffprobe.json').read_text())['streams']
+          video=[s for s in streams if s['codec_type']=='video']
+          assert len(video)==1
+          s=video[0]
+          assert s['codec_name']=='h264',s
+          assert (s['width'],s['height'])==(1080,1920),s
+          assert s['avg_frame_rate']=='30/1',s
+          assert int(s['nb_frames'])==810,s
+          (d/'qa.json').write_text(json.dumps({'status':'render and full decode pass; moving visual review required','frames':810,'fps':30,'size':[1080,1920],'audio':'none, awaiting user-provided Cedar narration'},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-EP006-27SEC-NATIVE-PICTURE
+          path: out/ep006/full-picture/
           retention-days: 30
