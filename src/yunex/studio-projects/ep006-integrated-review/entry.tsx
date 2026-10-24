@@ -68,15 +68,31 @@ const VisualPass:React.FC=()=>{
     aspect:width/height,terrainHeightM:heightAt,
     vehicleBoundsM:{length:4.25,width:1.94,height:1.52}
   });
+  // VISUAL QA fix: the inherited below-rocker underbody view was occluded by
+  // the triangulated terrain for almost the entire replay (frames 125..189).
+  // Author a safe, close wheel-level lateral dolly above the true surface,
+  // still replaying the SAME canonical J1 dynamics/suspension samples.
+  const isMechanicalReplay=local>=125&&local<190;
+  const replayU=isMechanicalReplay?(local-125)/64:0;
+  const focusAxleX=replayU<.5?1.31:-1.31;
+  const cameraX=pose.positionM[0]+2.6-4.9*replayU;
+  const cameraZ=pose.positionM[2]-5.4;
+  const cameraSurface=heightAt(cameraX,cameraZ);
+  const safeView=isMechanicalReplay?{
+    ...view,
+    position:[cameraX,Math.max(cameraSurface+1.65,pose.positionM[1]+1.45),cameraZ] as [number,number,number],
+    target:[pose.positionM[0]+focusAxleX,pose.positionM[1]+.31,pose.positionM[2]-.72] as [number,number,number],
+    fov:42
+  }:view;
   return <ThreeCanvas width={width} height={height} shadows
-    camera={{fov:view.fov,near:view.near,far:1800}} gl={{antialias:true}}>
+    camera={{fov:safeView.fov,near:safeView.near,far:1800}} gl={{antialias:true}}>
     <color attach="background" args={['#a9c3ce']}/>
     <fog attach="fog" args={['#a8bab9',130,390]}/>
     <CinematicLighting focus={pose.positionM} timeOfDay="day"/>
     <primitive object={stage}/>
     <primitive object={vehicle}/>
     <primitive object={particles.group}/>
-    <CameraAim position={view.position} target={view.target} fov={view.fov}/>
+    <CameraAim position={safeView.position} target={safeView.target} fov={safeView.fov}/>
   </ThreeCanvas>;
 };
 const Root:React.FC=()=> <Composition id="Ep006IntegratedVisualPass01"
