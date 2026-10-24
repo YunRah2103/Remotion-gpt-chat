@@ -62,7 +62,7 @@ function heightGeometry(
   for(let ix=0;ix<nx;ix++)for(let iz=0;iz<nz;iz++){
     const a=ix*(nz+1)+iz,b=a+nz+1;
     // X and Z increasing: positive-Y winding (cross Z vector with X).
-    indices.push(a,b,a+1,b,b+1,a+1);
+    indices.push(a,a+1,b,b,a+1,b+1);
   }
   const geo=new T.BufferGeometry();
   geo.setAttribute('position',new T.Float32BufferAttribute(vertices,3));
