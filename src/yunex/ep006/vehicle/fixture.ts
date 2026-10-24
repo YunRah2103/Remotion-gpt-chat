@@ -25,7 +25,7 @@ export function sampleEp006VehicleFixture(frame:number):Ep006MotionPose {
   }
   return {frame:f,timeSeconds:f/30,phase,jumpId,positionM:[x,bodyY,0],
     rotationRad:[contact?-.012*Math.sin(u*Math.PI):0,.015*Math.sin(f*.012),
-      segment===0?-.065*(1-u):segment===2?.045*Math.sin(u*Math.PI):0],
+      segment===0?-.065*(1-u):segment===2?.006*Math.sin(u*Math.PI):0],
     velocityMps:[.96,0,0],wheels,impact01:segment===2?1-u:0,dust01:0,gravel01:0,
     event:segment===2&&f===60?'fixture_touchdown':null};
 }
