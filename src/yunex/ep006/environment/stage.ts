@@ -108,7 +108,7 @@ function firBranchGeometry(seed:number){
   }
   for(let j=0;j<R;j++)for(let k=0;k<N;k++){
     const a=j*N+k,b=j*N+(k+1)%N,c=(j+1)*N+k,d=(j+1)*N+(k+1)%N;
-    idx.push(a,b,c,b,d,c);
+    idx.push(a,c,b,b,c,d);
   }
   const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pts,3));
   g.setIndex(idx);g.computeVertexNormals();return g;
