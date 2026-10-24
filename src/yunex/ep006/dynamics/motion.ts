@@ -132,7 +132,7 @@ export function sampleEp006Motion(frame:number):Ep006Motion {
  const meanRear=(grounds[2][1]+grounds[3][1])/2;
  const meanLeft=(grounds[0][1]+grounds[2][1])/2;
  const meanRight=(grounds[1][1]+grounds[3][1])/2;
- const roll=airborne?.002*Math.sin(t*.8):Math.atan2(meanRight-meanLeft,EP006_TRACK_M);
+ const roll=airborne ? .002*Math.sin(t*.8) : Math.atan2(meanRight-meanLeft,EP006_TRACK_M);
  if(!airborne)pitch+=Math.atan2(meanFront-meanRear,EP006_WHEELBASE_M);
  const targets=EP006_CORNERS.map((c,i)=>{
   const axle=c.startsWith('front')?EP006_WHEELBASE_M/2:-EP006_WHEELBASE_M/2;
