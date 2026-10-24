@@ -19,11 +19,11 @@ const clamp=(n:number)=>Math.max(0,Math.min(1,n));
 const ease=(n:number)=>{const x=clamp(n);return x*x*(3-2*x)};
 const shots:{start:V3;end:V3;look:V3;fov:number}[]=[
   // 0-2s: front aero blades, splitter, dramatic low front-three-quarter tracking.
-  {start:[-3.45,1.04,6.35],end:[-3.05,1.00,5.95],look:[-.48,.69,0],fov:43},
+  {start:[-5.30,1.30,9.20],end:[-4.90,1.20,8.95],look:[-.18,.74,0],fov:47},
   // 2-4s: genuine wheels, see-through door shape and Senna side air intake.
-  {start:[-.9,1.03,7.9],end:[.85,1.02,7.4],look:[0,.68,0],fov:45},
+  {start:[-.78,1.30,9.60],end:[.65,1.28,9.60],look:[0,.80,0],fov:55},
   // 4-6s: huge Senna wing, diffuser and luminous architectural reveal.
-  {start:[3.65,1.22,6.5],end:[3.35,1.00,5.9],look:[.55,.80,0],fov:43}
+  {start:[5.50,1.48,9.00],end:[5.15,1.38,8.80],look:[.10,.92,0],fov:49}
 ];
 function CameraRig(){
   const frame=useCurrentFrame(),{camera}=useThree();
@@ -49,9 +49,9 @@ function PhysicalPipeline(){
     const envScene=new RoomEnvironment();
     const renderTarget=pmrem.fromScene(envScene,.03);
     scene.environment=renderTarget.texture;
-    scene.environmentIntensity=.92;
+    scene.environmentIntensity=1.02;
     gl.toneMapping=THREE.ACESFilmicToneMapping;
-    gl.toneMappingExposure=.73;
+    gl.toneMappingExposure=.86;
     gl.outputColorSpace=THREE.SRGBColorSpace;
     return()=>{scene.environment=previous;scene.background=background;
       gl.toneMapping=tone;gl.toneMappingExposure=exposure;
