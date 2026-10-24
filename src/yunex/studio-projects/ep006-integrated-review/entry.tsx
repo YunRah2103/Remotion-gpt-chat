@@ -16,18 +16,8 @@ import {createEp006RallyVehicle,applyEp006RallyPose} from '../../ep006/vehicle/i
 import {sampleEp006Motion} from '../../ep006/dynamics/motion';
 import {sampleEp006Effects} from '../../ep006/fx/contact-effects';
 import {sampleEp006Camera} from '../../ep006/cameras/shot-motion';
+import {EP006_INTEGRATED_PROOF_FRAMES,integratedFrameAt} from './timeline';
 
-export const EP006_INTEGRATED_PROOF_FRAMES=350;
-
-/** Select absolute canonical samples: J1, impact, slowed factual J1 replay, chase, J2. */
-export function integratedFrameAt(local:number):{source:number;camera:number;replay:boolean}{
-  if(!Number.isInteger(local)||local<0||local>=EP006_INTEGRATED_PROOF_FRAMES)
-    throw Error('EP006 local proof frame outside [0,350)');
-  if(local<125)return {source:local,camera:local,replay:false};
-  if(local<190)return {source:72+Math.floor((local-125)/4),camera:192+local-125,replay:true};
-  if(local<218)return {source:610+local-190,camera:610+local-190,replay:false};
-  return {source:678+local-218,camera:678+local-218,replay:false};
-}
 type Instances={group:T.Group;dust:T.InstancedMesh;gravel:T.InstancedMesh};
 function createParticles():Instances{
   const group=new T.Group();group.name='ep006-integrated-contact-fx';
