@@ -1,0 +1,22 @@
+{
+  "title": "Ferrari F40",
+  "film": "YUNEX ROSSO AFTER DARK",
+  "originalCreator": "Black Snow (@BlackSnow02)",
+  "originalSource": "https://sketchfab.com/3d-models/ferrari-f40-52a66c41cfcd4f999fb1b1c49bf24d70",
+  "originalModelTrianglesApprox": 245600,
+  "originalModelVerticesApprox": 125300,
+  "declaredLicense": "Creative Commons Attribution 4.0 (CC BY 4.0)",
+  "licenseURL": "https://creativecommons.org/licenses/by/4.0/",
+  "licenseEvidence": "https://sceneview.github.io/credits.html (Ferrari F40 by Black Snow)",
+  "distributor": "sceneview/sceneview.github.io",
+  "modelMirror": "https://github.com/sceneview/sceneview.github.io/blob/main/models/platforms/ferrari_f40.glb",
+  "sourceCommit": "fd7e851a96cd144ee5e72e217e2a83a9480bfe2f",
+  "sourcePath": "models/platforms/ferrari_f40.glb",
+  "expectedGitBlobSHA1": "ba7883f03490b2f3e5820d0c0a2f6b0b489b91e9",
+  "expectedBytes": 8058920,
+  "downloadTo": "public/f40-noir/ferrari_f40.glb",
+  "authorshipCaveat": "Original Sketchfab uploader declares CC BY; this does not independently prove all trademark, third-party or underlying design rights. Non-public review only until commercial-rights assessment.",
+  "modifications": "Source mesh proportions, source textures and car identity preserved; runtime material tuning for named paint/rubber only. New garage, cameras and lighting created for YUNEX.",
+  "licenseAttribution": "Ferrari F40 3D model by Black Snow (@BlackSnow02), licensed CC BY 4.0, via Sketchfab; distribution mirror by SceneView.",
+  "publication": "Draft non-commercial review; do not promote before YUNEX owner approval and independent rights check."
+}
