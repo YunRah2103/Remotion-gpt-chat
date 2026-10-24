@@ -1,0 +1,33 @@
+name: YUNEX Senna V3 key-frame camera QA
+on:
+  push:
+    branches: [experiment/yunex-mclaren-senna-noir]
+    paths:
+      - 'production/senna-noir/**'
+      - '.github/workflows/yunex-senna-stills.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preview:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '24', cache: npm}
+      - run: npm ci --no-audit --no-fund
+      - run: bash production/senna-noir/acquire.sh
+      - name: Three calibrated portrait stills from native GLB
+        run: |
+          mkdir -p out/senna-noir/stills
+          npx remotion still production/senna-noir/entry.tsx YunexSennaAfterDark out/senna-noir/stills/front-000.png --frame=0 --gl=swangle --timeout=120000
+          npx remotion still production/senna-noir/entry.tsx YunexSennaAfterDark out/senna-noir/stills/wheel-090.png --frame=90 --gl=swangle --timeout=120000
+          npx remotion still production/senna-noir/entry.tsx YunexSennaAfterDark out/senna-noir/stills/rear-150.png --frame=150 --gl=swangle --timeout=120000
+      - name: Save full-resolution frames for visual review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-Senna-V3-Keyframes
+          path: out/senna-noir/stills/
+          retention-days: 14
