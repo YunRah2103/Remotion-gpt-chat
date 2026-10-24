@@ -59,6 +59,19 @@ test('each landing compresses, damps and rebounds rather than freezing',()=>{
   assert.ok(sampleEp006Motion(j.landingFrame).impact01>.99);
  }
 });
+test('every rendered-frame wheel avoids terrain tunnelling on flight and contact',()=>{
+ for(let frame=0;frame<810;frame++){
+  const s=sampleEp006Motion(frame);
+  for(const c of EP006_CORNERS){
+   const w=s.wheels[c],axle=c.startsWith('front')?1.31:-1.31,side=c.endsWith('left')?.82:-.82;
+   const tyreBottomM=s.positionM[1]+w.compressionM+w.tyreSquishM+
+    axle*Math.sin(s.rotationRad[2])-side*Math.sin(s.rotationRad[0]);
+   const clearanceM=tyreBottomM-w.surfaceHeightM;
+   if(w.contact)near(clearanceM,0,.009);
+   else assert.ok(clearanceM>-.012,`frame ${frame} ${c} clearance ${clearanceM}`);
+  }
+ }
+});
 test('FX originate at physical contact and do not emit before touchdown',()=>{
  assert.equal(sampleEp006Effects(71).dust.length,0);
  assert.equal(sampleEp006Effects(749).gravel.length,0);
