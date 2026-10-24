@@ -1,6 +1,6 @@
 # YUNEX V5 fleet authoring
 
-V5 is opt-in and does not change existing `createVehicle`, default cinematic models, approved V4 recipes, contact projection or episode branches. New productions should use `createFleetVehicle`. The protected teal supercar retains its V4 coachwork, exhaust mounts and exact silhouette; it is not described as a newly rebuilt V5 supercar.
+The current `createFleetVehicle` default rebuilds the main body shapes of all 36 procedural catalogue vehicles, including the supercar, Formula cars, motorcycles and commercials. This replaces the previous shared body volumes. Existing legacy factory defaults remain available. Request `reference:'v4-approved'` explicitly for the earlier approved supercar. See [the complete rebuild guide](YUNEX_FLEET_REBUILD.md) for scope and review limits.
 
 ```ts
 import {createFleetVehicle,animateCinematicVehicle,createFleetRecipe,compileRecipe,auditFleetVehicle} from './src/yunex/modelling-kit/index.ts';

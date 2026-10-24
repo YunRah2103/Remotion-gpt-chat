@@ -58,18 +58,18 @@ export function createCinematicVehicle(options:CinematicOptions):T.Group{
  }
  if(quality==='hero'||options.bodyDetail==='fleet'){
   roadHeroDetails(shell,s);
-  if(options.bodyDetail==='fleet'&&options.variant!=='supercar'){
+  if(options.bodyDetail==='fleet'){
    enhanceCabin(shell,s,options);
    if(s.family==='formula'||s.family==='bike'||s.id==='box-truck'||s.id==='tractor-truck')installFleetSpecialty(shell,s);else installFleetRoad(shell,s,options);
    if(s.bodyStyle==='rally')rallyDetails(shell,mounts,s,true);
-   root.userData.bodyArchitecture='fleet-v5';
-  }else if(options.bodyDetail==='studio'||(options.bodyDetail==='fleet'&&options.variant==='supercar')){
+   root.userData.bodyArchitecture='fleet-v5';root.userData.bodyRevision='fleet-rebuild-20261024';
+  }else if(options.bodyDetail==='studio'){
    enhanceCabin(shell,s,options);installStudioCoachwork(shell,s);rallyDetails(shell,mounts,s,true);
    for(const name of ['rally-exhaust-tip','rally-exhaust-route','rally-rear-silencer']){const old=shell.getObjectByName(name);if(old){old.parent?.remove(old);old.traverse(o=>{if(o instanceof T.Mesh)o.geometry.dispose();});}}
    const exhaust=installStudioExhaust(shell,s),diffuser=shell.getObjectByName('rear-diffuser') as T.Mesh;
    for(const outlet of exhaust.outlets){const p=outlet.mount.position,r=outlet.outerDiameter/2+.009,old=diffuser.geometry;diffuser.updateMatrix();const inverse=diffuser.matrix.clone().invert(),a=new T.Vector3(-s.length/2-.1,p.y-r,p.z-r).applyMatrix4(inverse),b=new T.Vector3(-s.length/2+.35,p.y+r,p.z+r).applyMatrix4(inverse);diffuser.geometry=cutOpening(old,a.toArray(),b.toArray());old.dispose();
     const engineX=mechanicalLayout(s).engineX,points=[new T.Vector3(engineX,.38,Math.sign(p.z)*.28),new T.Vector3(engineX-.15,.26,Math.sign(p.z)*.24),new T.Vector3(-s.length*.38,.26,Math.sign(p.z)*.32),new T.Vector3(p.x+.25,p.y,p.z),new T.Vector3(p.x+.05,p.y,p.z)];const pipe=new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(points),48,.028,12,false),new T.MeshStandardMaterial({color:'#8d7a67',metalness:.8,roughness:.43}));pipe.name='connected-exhaust-route';shell.add(pipe);}
-   root.userData.bodyArchitecture=options.bodyDetail==='fleet'?'fleet-v5':'section-loft-v4';
+   root.userData.bodyArchitecture='section-loft-v4';
   }else{
    premiumExterior(shell,s);if(options.bodyDetail!=='legacy'){sculptedFascia(shell,s);coachbuiltPanels(shell,s);}sculptShell(shell,s);formulaHeroDetails(shell,mounts,s);enhanceCabin(shell,s,options);if(options.bodyDetail!=='legacy')coachbuiltFinish(shell,mounts,s);rallyDetails(shell,mounts,s,options.bodyDetail!=='legacy');if(options.bodyDetail!=='legacy')refineGlazing(shell);
   }

@@ -7,20 +7,32 @@ import {angleWeightedNormals} from './studio-normals.ts';
 import {installRefinedFascia} from './fleet-fascia.ts';
 import {fleetProfile} from './fleet-profiles.ts';
 import {fleetCurve,fleetSkin,fleetPillar,fleetPatch,lerp,station} from './fleet-surfaces.ts';
+/** Longitudinal section: one monotonic bonnet and one boot volume with broad fender lobes. */
 export function fleetSection(s:VehicleSpec,x:number){
- const c=fleetProfile(s),u=x/(s.length/2),axle=Math.max(Math.exp(-(((x-s.wheelbase/2)/.45)**2)),Math.exp(-(((x+s.wheelbase/2)/.50)**2)));
- const rear=c.kind==='hatch'||c.kind==='rally'||c.kind==='estate'||c.van;
- const deck=c.belt+station(u,[[-1,-.13],[-.78,rear?-.01:.015],[-.35,.0],[.24,-.015],[.66,-.055],[1,-.19]]);
- const w=s.width*.5*station(u,[[-1,c.utility?.91:.84],[-.68,1],[0,1-c.waist],[.67,.99],[1,c.van?.93:.83]]);
- return {deck,width:w,axle};
+ const c=fleetProfile(s),u=x/(s.length/2),f=c.form;
+ const front=T.MathUtils.smoothstep(x,c.frontBase,s.length/2),rear=1-T.MathUtils.smoothstep(x,-s.length/2,c.rearBase);
+ const frontAxle=Math.exp(-(((x-s.wheelbase/2)/(.24*s.length))**4));
+ const rearAxle=Math.exp(-(((x+s.wheelbase/2)/(.22*s.length))**4));
+ const axle=Math.max(frontAxle,rearAxle);
+ const deck=c.belt-f.nose*front-f.tail*rear-f.hood*front*(1-front);
+ const width=s.width*.5*station(u,[[-1,f.endWidth],[-.77,.985],[-s.wheelbase/s.length,1],[0,1-c.waist],[s.wheelbase/s.length,.998],[.82,.97],[1,f.endWidth]]);
+ return {deck,width,axle,frontAxle,rearAxle};
 }
 export function fleetDeck(s:VehicleSpec,x:number,v:number){
  const c=fleetProfile(s),a=fleetSection(s,x),z=Math.abs(v);
- return new T.Vector3(x,a.deck+c.crown*(1-v*v)+c.shoulder*a.axle*Math.exp(-(((z-.83)/.23)**2)),a.width*v);
+ // The centre bonnet stays low. Full shoulders rise continuously into the fender peaks,
+ // then roll back down at the edge, producing a round section rather than a flat slab.
+ const shoulder=station(z,[[0,0],[.42,.04],[.68,.72],[.80,1],[.94,.57],[1,.22]]);
+ const rise=c.form.shoulder*a.frontAxle+c.form.haunch*a.rearAxle*(1-a.frontAxle*.35);
+ return new T.Vector3(x,a.deck+c.crown*(1-v*v)+rise*shoulder,a.width*v);
 }
-function flank(s:VehicleSpec,x:number,y:number,side:number){
- const c=fleetProfile(s),q=fleetDeck(s,x,side),t=T.MathUtils.clamp((q.y-y)/(q.y-c.sill),0,1);
- return new T.Vector3(x,y,q.z*(1-.070*Math.sin(Math.PI*t)) +side*.012*Math.exp(-(((t-.25)/.12)**2)));
+export function fleetFlank(s:VehicleSpec,x:number,y:number,side:number){
+ const c=fleetProfile(s),q=fleetDeck(s,x,side),t=T.MathUtils.clamp((q.y-y)/(q.y-c.sill),0,1),a=fleetSection(s,x);
+ // Rolled upper shoulder / concave door / returned rocker, all in the continuous shell.
+ // At the wheel housings the fuller section wraps around the actual aperture.
+ const inset=c.form.inset*(1-.44*a.axle);
+ const section=station(t,[[0,1],[.16,1.018],[.36,1-inset*.40],[.58,1-inset],[.79,1-inset*.74],[1,1-c.form.rocker]]);
+ return new T.Vector3(x,y,side*a.width*section);
 }
 function roadShell(s:VehicleSpec){
  const c=fleetProfile(s),half=s.length/2,xs:number[]=[];
@@ -31,9 +43,9 @@ function roadShell(s:VehicleSpec){
  for(const x of values){let low=c.sill;for(const ax of [-s.wheelbase/2,s.wheelbase/2])if(Math.abs(x-ax)<c.arch)low=Math.max(low,s.radius+Math.sqrt(c.arch**2-(x-ax)**2));
   const row:number[]=[],add=(q:T.Vector3)=>{row.push(p.length/3);p.push(...q.toArray());};
   for(let j=0;j<=32;j++)add(fleetDeck(s,x,-1+j/16));
-  for(let j=1;j<=16;j++)add(flank(s,x,lerp(fleetDeck(s,x,1).y,low,j/16),1));
-  for(let j=1;j<=8;j++)add(new T.Vector3(x,low,lerp(flank(s,x,low,1).z,flank(s,x,low,-1).z,j/8)));
-  for(let j=15;j>0;j--)add(flank(s,x,lerp(fleetDeck(s,x,-1).y,low,j/16),-1));rows.push(row);
+  for(let j=1;j<=16;j++)add(fleetFlank(s,x,lerp(fleetDeck(s,x,1).y,low,j/16),1));
+  for(let j=1;j<=8;j++)add(new T.Vector3(x,low,lerp(fleetFlank(s,x,low,1).z,fleetFlank(s,x,low,-1).z,j/8)));
+  for(let j=15;j>0;j--)add(fleetFlank(s,x,lerp(fleetDeck(s,x,-1).y,low,j/16),-1));rows.push(row);
  }
  const n=rows[0].length;
  for(let i=0;i<rows.length-1;i++)for(let j=0;j<n;j++){const a=rows[i][j],b=rows[i][(j+1)%n],d=rows[i+1][j],e=rows[i+1][(j+1)%n];idx.push(a,b,d,b,e,d);}
@@ -44,12 +56,20 @@ function roadShell(s:VehicleSpec){
  if(c.kind==='pickup')g=cutOpening(g,[-half+.11,c.belt-.18,-s.width*.40],[c.rearBase-.06,c.roof+.1,s.width*.40]);
  return g;
 }
+export function fleetRoof(s:VehicleSpec,x:number,z:number){
+ const c=fleetProfile(s),t=T.MathUtils.clamp((x-c.rearRoof)/(c.frontRoof-c.rearRoof),0,1),arch=4*t*(1-t),roll=z*z;
+ return new T.Vector3(x+(1-2*t)*(c.van?.035:.10)*roll,
+  c.roof-c.form.roofArc*(1-arch)-c.form.roofRoll*roll,
+  c.roofWidth*z*(1-c.form.roofTaper*(1-arch)));
+}
+/** Aperture boundary lies on the authored deck, including its raised shoulder. */
+export function fleetBelt(s:VehicleSpec,x:number,z:number){
+ const c=fleetProfile(s),width=fleetSection(s,x).width;
+ return fleetDeck(s,x,c.baseWidth*z/width);
+}
 function canopy(shell:T.Group,s:VehicleSpec,paint:T.Material,glass:T.Material,trim:T.Material){
- const c=fleetProfile(s),roof=(x:number,z:number)=>{
-  const t=T.MathUtils.clamp((x-c.rearRoof)/(c.frontRoof-c.rearRoof),0,1),crown=Math.sin(Math.PI*t);
-  return new T.Vector3(x+(1-2*t)*(c.van?.025:.065)*z*z,c.roof-.060*z*z+.018*crown,c.roofWidth*z*(.955+.045*crown));
- };
- const screen=(rear:boolean,t:number,z:number)=>{const base=rear?c.rearBase:c.frontBase,top=rear?c.rearRoof:c.frontRoof,p=new T.Vector3(base,c.belt-.020*z*z,c.baseWidth*z).lerp(roof(top,z),t);p.x+=(rear?-.045:.065)*Math.sin(Math.PI*t)*(1-z*z);return p;};
+ const c=fleetProfile(s),roof=(x:number,z:number)=>fleetRoof(s,x,z);
+ const screen=(rear:boolean,t:number,z:number)=>{const base=rear?c.rearBase:c.frontBase,top=rear?c.rearRoof:c.frontRoof,p=fleetBelt(s,base,z).lerp(roof(top,z),t);p.x+=(rear?-.045:.065)*Math.sin(Math.PI*t)*(1-z*z);return p;};
  const rail=(name:string,fn:(t:number)=>T.Vector3,mat:T.Material,r:number)=>{const points=Array.from({length:33},(_,i)=>fn(i/32));return name==='a-pillar'||name==='c-pillar'||name==='roof-side-rail'?fleetPillar(shell,mat,points,r*2,.026,name):fleetCurve(shell,mat,points,r,name);};
  if(!c.open&&!c.targa)fleetSkin(shell,paint,'roof',(u,v)=>roof(lerp(c.rearRoof,c.frontRoof,u),-1+2*v),true);
  if(c.targa)fleetSkin(shell,paint,'targa-bar',(u,v)=>roof(lerp(c.rearRoof,c.rearRoof+.15,u),-1+2*v),true);
@@ -62,13 +82,13 @@ function canopy(shell:T.Group,s:VehicleSpec,paint:T.Material,glass:T.Material,tr
  for(const side of [-1,1]){
   const edge=(t:number)=>t<.22?screen(true,t/.22,side):t>.78?screen(false,1-(t-.78)/.22,side):roof(lerp(c.rearRoof,c.frontRoof,(t-.22)/.56),side);
   if(!c.open){
-   fleetSkin(shell,glass,'side-glass',(u,v)=>{const t=.025+u*.95,q=edge(t);return new T.Vector3(q.x,lerp(c.belt+.008,q.y,v),lerp(side*c.baseWidth,q.z,v)-side*.015*Math.sin(Math.PI*u)*Math.sin(Math.PI*v));},side<0,64,20);
+   fleetSkin(shell,glass,'side-glass',(u,v)=>{const t=.025+u*.95,q=edge(t);return new T.Vector3(q.x,lerp(fleetBelt(s,q.x,side).y+.008,q.y,v),lerp(side*c.baseWidth,q.z,v)-side*.015*Math.sin(Math.PI*u)*Math.sin(Math.PI*v));},side<0,64,20);
    rail('roof-side-rail',edge,paint,.020);
-   {const px=lerp(c.rearRoof,c.frontRoof,.56);rail('b-pillar',t=>new T.Vector3(px,c.belt,side*c.baseWidth).lerp(roof(px,side),t),trim,c.sports?.018:c.rally?.028:.032);}
+   {const px=lerp(c.rearRoof,c.frontRoof,.56);rail('b-pillar',t=>fleetBelt(s,px,side).lerp(roof(px,side),t),trim,c.sports?.018:c.rally?.028:.032);}
    // Painted rear sail follows the same curved greenhouse evaluator.
-   fleetSkin(shell,paint,'quarter-sail',(u,v)=>{const t=u*(c.sports?.18:.12),q=edge(t);return new T.Vector3(q.x,lerp(c.belt+.002,q.y,v),lerp(side*c.baseWidth,q.z,v)+side*.004);},side<0,16,12);
+   fleetSkin(shell,paint,'quarter-sail',(u,v)=>{const t=u*(c.sports?.18:.12),q=edge(t);return new T.Vector3(q.x,lerp(fleetBelt(s,q.x,side).y+.002,q.y,v),lerp(side*c.baseWidth,q.z,v)+side*.004);},side<0,16,12);
   }
-  rail('belt-window-seal',t=>new T.Vector3(lerp(c.rearBase,c.frontBase,t),c.belt,side*c.baseWidth),trim,.010);
+  rail('belt-window-seal',t=>{const x=lerp(c.rearBase,c.frontBase,t);return fleetBelt(s,x,side);},trim,.010);
  }
  const liner=shell.getObjectByName('roof-liner') as T.Mesh|undefined;
  if(liner){
@@ -105,12 +125,12 @@ export function installFleetRoad(shell:T.Group,s:VehicleSpec,options:Partial<Veh
  for(const side of [-1,1]){
   const x0=-s.wheelbase/2+c.arch+.03,x1=s.wheelbase/2-c.arch-.03;
   // Skin and seams follow the identical body evaluator. No hovering rectangular door slabs.
-  const seam=(x:number)=>fleetCurve(shell,trim,Array.from({length:25},(_,j)=>flank(s,x,lerp(c.sill+.08,c.belt-.06,j/24),side).add(new T.Vector3(0,0,side*.002))),.003,'door-shut-line');
+  const seam=(x:number)=>fleetCurve(shell,trim,Array.from({length:25},(_,j)=>fleetFlank(s,x,lerp(c.sill+.08,c.belt-.06,j/24),side).add(new T.Vector3(0,0,side*.002))),.003,'door-shut-line');
   seam(x0);seam(x1);if(!c.sports)seam(lerp(x0,x1,.43));
-  for(const x of c.sports?[x0+.16]:[x0+.16,lerp(x0,x1,.43)+.13]){const p=flank(s,x,c.belt-.12,side);box(shell,metal,[.13,.018,.018],p.toArray(),.006,'door-handle');}
-  fleetCurve(shell,paint,Array.from({length:49},(_,i)=>flank(s,lerp(x0,x1,i/48),c.sill+.07,side)),.026,'sculpted-rocker');
+  for(const x of c.sports?[x0+.16]:[x0+.16,lerp(x0,x1,.43)+.13]){const p=fleetFlank(s,x,c.belt-.12,side);box(shell,metal,[.13,.018,.018],p.toArray(),.006,'door-handle');}
+  fleetCurve(shell,paint,Array.from({length:49},(_,i)=>fleetFlank(s,lerp(x0,x1,i/48),c.sill+.07,side)),.026,'sculpted-rocker');
   for(const ax of [-s.wheelbase/2,s.wheelbase/2]){
-   const point=(u:number,v:number)=>{const a=u*Math.PI,x=ax+Math.cos(a)*c.arch,y=s.radius+Math.sin(a)*c.arch;return new T.Vector3(x,y,flank(s,x,y,side).z-side*v*.15);};
+   const point=(u:number,v:number)=>{const a=u*Math.PI,x=ax+Math.cos(a)*c.arch,y=s.radius+Math.sin(a)*c.arch;return new T.Vector3(x,y,fleetFlank(s,x,y,side).z-side*v*.15);};
    fleetSkin(shell,rubber,'wheel-well-return',point,side<0,64,5);
    fleetCurve(shell,c.rally||c.utility?trim:paint,Array.from({length:65},(_,i)=>point(i/64,0)),c.rally?.028:.014,'formed-wheel-arch');
   }
