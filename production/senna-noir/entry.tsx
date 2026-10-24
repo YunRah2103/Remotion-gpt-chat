@@ -19,11 +19,11 @@ const clamp=(n:number)=>Math.max(0,Math.min(1,n));
 const ease=(n:number)=>{const x=clamp(n);return x*x*(3-2*x)};
 const shots:{start:V3;end:V3;look:V3;fov:number}[]=[
   // 0-2s: front aero blades, splitter, dramatic low front-three-quarter tracking.
-  {start:[-5.30,1.30,9.20],end:[-4.90,1.20,8.95],look:[-.18,.74,0],fov:47},
-  // 2-4s: genuine wheels, see-through door shape and Senna side air intake.
-  {start:[-.78,1.30,9.60],end:[.65,1.28,9.60],look:[0,.80,0],fov:55},
-  // 4-6s: huge Senna wing, diffuser and luminous architectural reveal.
-  {start:[5.50,1.48,9.00],end:[5.15,1.38,8.80],look:[.10,.92,0],fov:49}
+  {start:[-5.15,1.20,8.40],end:[-4.70,1.13,8.10],look:[-.15,.76,0],fov:48},
+  // 2-4s: true punch-in: the front wheel, carbon duct and brake rotor fill the frame.
+  {start:[-1.40,.80,3.15],end:[-1.08,.73,2.87],look:[-1.42,.65,0],fov:48},
+  // 4-6s: reverse-angle rear three-quarter detail, signature aero and wing.
+  {start:[4.20,1.45,5.50],end:[3.55,1.22,5.00],look:[.77,.95,0],fov:53}
 ];
 function CameraRig(){
   const frame=useCurrentFrame(),{camera}=useThree();
@@ -49,9 +49,9 @@ function PhysicalPipeline(){
     const envScene=new RoomEnvironment();
     const renderTarget=pmrem.fromScene(envScene,.03);
     scene.environment=renderTarget.texture;
-    scene.environmentIntensity=1.02;
+    scene.environmentIntensity=1.04;
     gl.toneMapping=THREE.ACESFilmicToneMapping;
-    gl.toneMappingExposure=.86;
+    gl.toneMappingExposure=.90;
     gl.outputColorSpace=THREE.SRGBColorSpace;
     return()=>{scene.environment=previous;scene.background=background;
       gl.toneMapping=tone;gl.toneMappingExposure=exposure;
@@ -206,21 +206,22 @@ function Scene(){
     camera={{fov:43,near:.06,far:100,position:[-5,1.7,11]}}>
     <PhysicalPipeline/>
     <Hangar/>
-    <hemisphereLight args={['#d9eaf2','#111921',.49]}/>
-    <ambientLight intensity={.07}/>
-    <directionalLight color="#eef5ff" intensity={2.8} position={[-3.8,7.2,5.3]} castShadow
+    <hemisphereLight args={['#d9eaf2','#111921',.26]}/>
+    <ambientLight intensity={.055}/>
+    <directionalLight color="#edf5ff" intensity={3.5} position={[-4.5,7.2,5.0]} castShadow
       shadow-mapSize={[2048,2048]} shadow-camera-left={-10} shadow-camera-right={10}
       shadow-camera-top={10} shadow-camera-bottom={-10} shadow-camera-near={.1}
       shadow-camera-far={35} shadow-bias={-.00012} shadow-normalBias={.025}/>
-    <directionalLight color="#69a6e1" intensity={1.3} position={[7,4,-4]}/>
-    <spotLight color="#b9f8ff" intensity={26} position={[-3,7,-4]}
+    <directionalLight color="#5baaca" intensity={.72} position={[-7,3,-1]}/>
+    <directionalLight color="#f3bd8a" intensity={2.25} position={[7,5,-3]}/>
+    <spotLight color="#b9f8ff" intensity={21} position={[-3,7,-4]}
       angle={.48} penumbra={.9} distance={22}/>
     <SennaAsset/>
     <CameraRig/>
   </ThreeCanvas>;
 }
 const Film:React.FC=()=> <AbsoluteFill style={{backgroundColor:'#070a0c'}}>
-  <AbsoluteFill style={{filter:'contrast(1.14) saturate(1.14)'}}><Scene/></AbsoluteFill>
+  <AbsoluteFill style={{filter:'contrast(1.18) saturate(1.22)'}}><Scene/></AbsoluteFill>
   <AbsoluteFill style={{pointerEvents:'none',background:'radial-gradient(ellipse at 50% 48%, transparent 25%, rgba(0,5,10,0.54) 105%)'}}/>
 </AbsoluteFill>;
 registerRoot(()=> <Composition id="YunexSennaAfterDark" component={Film}
