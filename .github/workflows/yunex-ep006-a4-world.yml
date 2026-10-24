@@ -1,0 +1,70 @@
+name: YUNEX EP006 Agent 4 Rally Stage Moving Proof
+on:
+  push:
+    branches:
+      - 'agent/ep006-04-rally-stage'
+    paths:
+      - 'src/yunex/ep006/environment/**'
+      - 'src/yunex/studio-projects/ep006-a4-world/**'
+      - 'tests/ep006/environment.test.mjs'
+      - '.github/workflows/yunex-ep006-a4-world.yml'
+  pull_request:
+    paths:
+      - 'src/yunex/ep006/environment/**'
+      - 'src/yunex/studio-projects/ep006-a4-world/**'
+      - 'tests/ep006/environment.test.mjs'
+      - '.github/workflows/yunex-ep006-a4-world.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-moving-world-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install Remotion and native dependencies
+        run: |
+          npm ci --no-audit --no-fund
+          bash scripts/modelling-kit/install-native-media.sh
+      - name: Compile TypeScript and test common physical surface
+        run: |
+          npm run check
+          node --experimental-strip-types --test tests/ep006/environment.test.mjs
+      - name: Render original moving silent 6-second portrait H264 film
+        run: |
+          mkdir -p out/ep006/agent-04
+          npx remotion render src/yunex/studio-projects/ep006-a4-world/entry.tsx Ep006A4World out/ep006/agent-04/ep006-a4-world.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+      - name: Native decode, metadata, source and motion checks
+        run: |
+          set -euo pipefail
+          dir=out/ep006/agent-04
+          ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,width,height,avg_frame_rate,nb_frames -of json "$dir/ep006-a4-world.mp4" > "$dir/ffprobe.json"
+          ffmpeg -v error -xerror -i "$dir/ep006-a4-world.mp4" -f null -
+          sha256sum "$dir/ep006-a4-world.mp4" > "$dir/sha256.txt"
+          git rev-parse HEAD > "$dir/source-commit.txt"
+          ffmpeg -v error -i "$dir/ep006-a4-world.mp4" -vf "fps=1,scale=108:192" -f framemd5 "$dir/motion.framemd5"
+          ffmpeg -v error -i "$dir/ep006-a4-world.mp4" -vf "select='eq(n,0)+eq(n,90)+eq(n,179)',scale=270:480,tile=3x1" -frames:v 1 "$dir/first-middle-last.png"
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=Path('out/ep006/agent-04')
+          s=json.loads((d/'ffprobe.json').read_text())['streams'][0]
+          assert s['codec_name']=='h264',s
+          assert (s['width'],s['height'])==(1080,1920),s
+          assert s['avg_frame_rate']=='30/1',s
+          assert int(s['nb_frames'])==180,s
+          hashes=[line.rsplit(',',1)[-1].strip() for line in (d/'motion.framemd5').read_text().splitlines() if line and not line.startswith('#')]
+          assert len(set(hashes))>=4,'preview does not change over time'
+          (d/'qa.json').write_text(json.dumps({'type':'native moving proof','motion_samples':len(hashes),'unique_frame_hashes':len(set(hashes)),'silent':True,'status':'technical verification; visual review still required'},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-EP006-A4-WORLD-NATIVE-1080x1920
+          path: out/ep006/agent-04/
+          retention-days: 30
