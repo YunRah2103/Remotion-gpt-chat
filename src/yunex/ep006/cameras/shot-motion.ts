@@ -38,7 +38,7 @@ export const EP006_CAMERA_SHOTS:readonly Shot[]=[
  {id:'gravel-side',start:555,end:610,fov:44,position0:[2.4,1.25,-11],position1:[-2.3,1.10,-11.0],target0:[.7,.74,0],target1:[0,.82,0],minClearanceM:.40},
  {id:'exit-chase',start:610,end:675,fov:47,position0:[-8.4,1.1,5.3],position1:[-9.1,1.6,4.2],target0:[2.2,.75,0],target1:[2.9,.85,0],minClearanceM:.50},
  {id:'final-takeoff',start:675,end:725,fov:46,position0:[7.2,.95,6.5],position1:[4.5,1.5,8.4],target0:[.35,.68,0],target1:[0,.8,0],minClearanceM:.42},
- {id:'final-apex',start:725,end:752,fov:43,position0:[-.8,1.8,-12.0],position1:[-3.2,2.2,-10.9],target0:[.2,.87,0],target1:[0,.8,0],minClearanceM:.38},
+ {id:'final-apex',start:725,end:752,fov:44,position0:[-5.9,2.45,1.55],position1:[-5.5,2.2,1.25],target0:[.2,.97,0],target1:[.15,.81,0],minClearanceM:.60},
  {id:'final-touchdown',start:752,end:784,fov:48,position0:[6.4,1.4,.30],position1:[5.8,1.15,1.10],target0:[.4,.65,0],target1:[.1,.56,0],minClearanceM:.55},
  {id:'drive-away',start:784,end:810,fov:43,position0:[-8.2,1.35,4.2],position1:[-11.0,2.1,5.6],target0:[1.4,.7,0],target1:[3.5,.75,0],minClearanceM:.40}
 ] as const;
