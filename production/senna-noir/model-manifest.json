@@ -1,0 +1,23 @@
+{
+  "title": "McLaren Senna",
+  "film": "YUNEX SENNA AFTER DARK",
+  "originalCreator": "Black Snow (@BlackSnow02)",
+  "originalSource": "https://sketchfab.com/3d-models/mclaren-senna-free-ea3e43a6eb004853a87fe9c58422eb96",
+  "originalModelTrianglesApprox": 407900,
+  "originalModelVerticesApprox": 234900,
+  "declaredLicense": "Creative Commons Attribution 4.0 (CC BY 4.0), as declared by Sketchfab uploader",
+  "licenseURL": "https://creativecommons.org/licenses/by/4.0/",
+  "licenseEvidence": "https://sketchfab.com/3d-models/mclaren-senna-free-ea3e43a6eb004853a87fe9c58422eb96",
+  "distributor": "AuraK-7/wild-racing-models",
+  "mirrorURL": "https://github.com/AuraK-7/wild-racing-models/blob/master/models/McLaren/mclaren_senna_free.glb",
+  "mirrorNotes": "Repository describes models as sourced from Sketchfab and says each retains its own license. The exact asset's attribution via mirror is inferred from filename and independently uploader-listed name, and should be reviewed before publication.",
+  "sourceCommit": "6c6a4875004713fe23f3a5ae1bc6c6c075214be3",
+  "sourcePath": "models/McLaren/mclaren_senna_free.glb",
+  "expectedGitBlobSHA1": "119a5ca46c24ff6fda34c98f0e851f22cbdfdc60",
+  "expectedBytes": 26986852,
+  "downloadTo": "public/senna-noir/mclaren_senna_free.glb",
+  "ownershipCaveat": "Sketchfab lists CC BY but mirror linkage and full underlying third-party rights are not independently proven. Owner-only review, not automatic commercial release.",
+  "preservation": "Original geometry and texture maps preserved; runtime named paint/rubber adjustments only. New lighting, architecture and camera authored for YUNEX.",
+  "attribution": "McLaren Senna 3D model by Black Snow (@BlackSnow02), CC BY 4.0, downloaded via a third-party Sketchfab asset mirror.",
+  "publication": "DRAFT visual experiment, never merge/publish without owner approval and rights review."
+}
