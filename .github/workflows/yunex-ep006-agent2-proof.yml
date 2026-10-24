@@ -1,0 +1,68 @@
+name: YUNEX EP006 Agent 2 native jump proof
+on:
+  push:
+    branches: [agent/ep006-02-jump-physics]
+    paths:
+      - 'src/yunex/ep006/dynamics/**'
+      - 'src/yunex/ep006/fx/**'
+      - 'src/yunex/studio-projects/ep006-a2-jump/**'
+      - 'tests/ep006/agent2-physics.test.mjs'
+      - '.github/workflows/yunex-ep006-agent2-proof.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/yunex/ep006/dynamics/**'
+      - 'src/yunex/ep006/fx/**'
+      - 'src/yunex/studio-projects/ep006-a2-jump/**'
+      - 'tests/ep006/agent2-physics.test.mjs'
+  workflow_dispatch:
+concurrency:
+  group: yunex-ep006-agent2-native-proof
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  ballistic-and-native-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: TypeScript and deterministic physics assertions
+        run: |
+          npm run check
+          node --experimental-strip-types --test tests/ep006/agent2-physics.test.mjs
+      - name: Ensure native Remotion media support
+        run: bash scripts/modelling-kit/install-native-media.sh
+      - name: Render two jump and landing windows (silent 225-frame H.264 proof)
+        run: |
+          mkdir -p out/ep006/agent-02
+          npx remotion render src/yunex/studio-projects/ep006-a2-jump/entry.tsx ep006-a2-jump out/ep006/agent-02/ep006-a2-jump.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+      - name: Full decoding, frame metadata, hash and contact sheet evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd out/ep006/agent-02
+          ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,width,height,r_frame_rate,avg_frame_rate,nb_frames,pix_fmt -show_entries format=duration -of json ep006-a2-jump.mp4 | tee ffprobe.json
+          ffmpeg -v error -xerror -i ep006-a2-jump.mp4 -f null -
+          frames="$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=nw=1:nk=1 ep006-a2-jump.mp4)"
+          dimensions="$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 ep006-a2-jump.mp4)"
+          rate="$(ffprobe -v error -select_streams v:0 -show_entries stream=r_frame_rate -of default=nw=1:nk=1 ep006-a2-jump.mp4)"
+          codec="$(ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of default=nw=1:nk=1 ep006-a2-jump.mp4)"
+          test "$frames" = 225 && test "$dimensions" = '1080x1920' && test "$rate" = '30/1' && test "$codec" = h264
+          sha256sum ep006-a2-jump.mp4 | tee sha256.txt
+          ffmpeg -hide_banner -loglevel error -i ep006-a2-jump.mp4 -vf 'fps=4/3,scale=270:480,tile=5x2' -frames:v 1 contact-sheet.jpg
+          ffmpeg -hide_banner -i ep006-a2-jump.mp4 -vf 'freezedetect=n=-55dB:d=0.75' -an -f null - >freeze-detection.txt 2>&1
+          printf 'Project=ep006-a2-jump\nSource=%s\nNative=1080x1920 30/1 H264 225 frames\nTimes=source 0..114 then 680..789\nAudio=none\nVisual signoff=REQUIRES HUMAN WATCH OF MP4\n' "$GITHUB_SHA" | tee evidence.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNEX-EP006-agent2-jump-native
+          path: out/ep006/agent-02/
+          retention-days: 30
+          if-no-files-found: warn
