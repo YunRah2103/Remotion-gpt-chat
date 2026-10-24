@@ -8,23 +8,26 @@ const clamp=(n:number)=>Math.max(0,Math.min(1,n));
 const smooth=(n:number)=>{const a=clamp(n);return a*a*(3-2*a);};
 const lerp=(a:number,b:number,t:number)=>a+(b-a)*t;
 type V3=[number,number,number];
+/**
+ * Portrait camera placement is deliberately OUTSIDE the front left wheel and
+ * coachwork (2.7–5.5m away), not inside a tyre or opaque rocker panel.
+ * +X forward, +Y up, +Z left. Each shot reveals a DIFFERENT fitted load path.
+ */
 const ranges=[
-  {end:.25,focus:'contact' as const, from:[2.38,.40,2.30] as V3,to:[1.72,.48,1.62] as V3,target:[1.23,.38,.67] as V3,fov:48},
-  {end:.50,focus:'spring' as const,from:[1.88,.96,1.65] as V3,to:[1.50,.84,1.30] as V3,target:[1.22,.53,.66] as V3,fov:42},
-  {end:.73,focus:'damper' as const,from:[1.10,.68,1.52] as V3,to:[1.31,.47,1.32] as V3,target:[1.23,.54,.63] as V3,fov:39},
-  {end:1,focus:'chassis' as const,from:[-.92,.23,1.68] as V3,to:[.38,.27,1.68] as V3,target:[0,.40,0] as V3,fov:49},
+  {end:.25,focus:'contact' as const,from:[2.65,1.18,3.18] as V3,to:[2.49,1.10,3.05] as V3,target:[1.31,.36,.80] as V3,fov:53},
+  {end:.50,focus:'spring' as const,from:[2.97,.97,3.62] as V3,to:[2.70,.89,3.43] as V3,target:[1.28,.59,.58] as V3,fov:52},
+  {end:.73,focus:'damper' as const,from:[2.56,.77,3.18] as V3,to:[2.68,.71,3.48] as V3,target:[1.28,.54,.58] as V3,fov:52},
+  {end:1,focus:'chassis' as const,from:[2.63,.33,5.15] as V3,to:[2.28,.38,4.85] as V3,target:[0,.47,0] as V3,fov:55},
 ];
 /**
- * Screen time 192..555 plays source landing 62..125 at ~0.17x speed.
- * Nothing here creates a second landing or guesses camera/voice timestamps.
- * Agent 2 owns sourceFrame => physically canonical sample.
+ * Global screen frames [192,555) replay canonical J1 source frames 62..125
+ * monotonically. There is no new landing simulation or invented narration.
  */
 export function sampleEp006MechanicalTimeline(globalFrame:number,
   canonicalMotion:(absoluteFrame:number)=>Ep006Motion):Ep006MechanicalShot{
   if(!Number.isInteger(globalFrame)||globalFrame<192||globalFrame>=555)
     throw Error('Mechanical timeline requires EP006 absolute frames [192,555)');
   const t=(globalFrame-192)/(555-192-1);
-  // Preserve launch→touchdown→compression→damped rebound in source order.
   const sourceFrame=62+Math.floor(t*63);
   const motion=canonicalMotion(sourceFrame);
   const i=ranges.findIndex(r=>t<=r.end),shot=ranges[Math.max(0,i)];
@@ -32,13 +35,10 @@ export function sampleEp006MechanicalTimeline(globalFrame:number,
   const u=smooth((t-prior)/(shot.end-prior));
   const body=new T.Vector3(...motion.positionM);
   const orientation=new T.Euler(...motion.rotationRad,'XYZ');
-  const transform=(v:V3):V3=>{
-    const p=new T.Vector3(...v).applyEuler(orientation).add(body);return p.toArray() as V3;
-  };
+  const transform=(v:V3):V3=>new T.Vector3(...v).applyEuler(orientation).add(body).toArray() as V3;
   const localPos:V3=[0,1,2].map(k=>lerp(shot.from[k],shot.to[k],u)) as V3;
   const focus=shot.focus;
-  // Contact starts mostly opaque, skin becomes ghosted while metal remains solid.
-  const exposure01=(focus==='contact'?.22:.72)*smooth(Math.min(1,t*9));
+  const exposure01=focus==='contact'?.12:focus==='chassis'?.94:.91;
   return {sourceFrame,motion,focus,exposure01,replay:true,
     camera:{position:transform(localPos),target:transform(shot.target),fov:shot.fov}};
 }
