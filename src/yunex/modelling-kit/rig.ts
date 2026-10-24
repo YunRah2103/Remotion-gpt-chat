@@ -62,7 +62,7 @@ export function createCinematicVehicle(options:CinematicOptions):T.Group{
    enhanceCabin(shell,s,options);
    if(s.family==='formula'||s.family==='bike'||s.id==='box-truck'||s.id==='tractor-truck')installFleetSpecialty(shell,s);else installFleetRoad(shell,s,options);
    if(s.bodyStyle==='rally')rallyDetails(shell,mounts,s,true);
-   root.userData.bodyArchitecture='fleet-v5';root.userData.bodyRevision='fleet-rebuild-20261024';
+   root.userData.bodyArchitecture='fleet-v5';root.userData.bodyRevision='continuous-loft-groundup-20261024';
   }else if(options.bodyDetail==='studio'){
    enhanceCabin(shell,s,options);installStudioCoachwork(shell,s);rallyDetails(shell,mounts,s,true);
    for(const name of ['rally-exhaust-tip','rally-exhaust-route','rally-rear-silencer']){const old=shell.getObjectByName(name);if(old){old.parent?.remove(old);old.traverse(o=>{if(o instanceof T.Mesh)o.geometry.dispose();});}}

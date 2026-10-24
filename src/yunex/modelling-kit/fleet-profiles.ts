@@ -30,21 +30,23 @@ const bodyForms={
 export function fleetProfile(s:VehicleSpec){
  const kind=fleetArchitecture(s),l=interiorLayout(s),sports=s.family==='sports',rally=kind==='rally',utility=kind==='pickup'||kind==='suv',van=kind==='van';
  const form={...(bodyForms[kind as keyof typeof bodyForms]??bodyForms.sedan)};
+ if(sports){form.roofArc=Math.min(form.roofArc,.055);form.roofRoll=Math.min(form.roofRoll,.060);}
  // Body-style derivatives retain their shared structure while changing the actual volumes.
  if(s.id==='boxy-suv'){form.roofArc=.025;form.endWidth=.95;form.nose=.065;}
  if(s.id==='fastback-suv'){form.roofArc=.095;form.roofTaper=.14;form.tail=.12;}
  if(s.id==='city-ev'){form.nose=.23;form.roofArc=.10;}
  if(s.id==='track-coupe'){form.nose=.25;form.shoulder=.17;form.inset=.14;}
  if(s.id==='minivan'){form.roofArc=.075;form.nose=.22;form.roofTaper=.075;}
- const roof=s.id==='supercar'?1.39:sports?Math.max(s.height,1.32):s.height-.025;
- const belt=van?s.height*.57:utility?s.height*.58:sports?.86:Math.max(.88,s.height*.625);
+ const roof=s.id==='supercar'?1.44:sports?Math.max(s.height,1.40):s.height-.025;
+ const belt=van?s.height*.57:utility?s.height*.58:sports?.99:Math.max(.88,s.height*.625);
  let fr=s.length*(van?.29:s.bodyStyle==='muscle'?.015:sports?.035:.085),rr=l.rearRoof,fb=l.frontBase,rb=l.rearBase;
+ if(sports){fr=s.length*.075;fb=Math.min(fb,s.length*.205);}
  if(kind==='mid-engine'){fr=s.length*.095;rr=-s.length*.145;fb=s.length*.245;rb=-s.length*.275;}
  if(kind==='fastback'||s.id==='fastback-suv'){rr=-s.length*.15;rb=-s.length*.405;}
  return {kind,form,roof,belt,frontRoof:fr,rearRoof:rr,frontBase:fb,rearBase:rb,
   baseWidth:s.width*(utility||van?.452:sports?.417:.435),roofWidth:s.width*(van?.414:utility?.386:sports?.326:.365),
   sill:Math.max(.22,s.radius*.69),arch:s.radius*(rally?1.18:utility?1.14:1.105),
-  crown:sports?.023:van?.025:.034,waist:sports?.065:utility?.018:.035,
+  crown:sports?.045:van?.035:.045,waist:sports?.065:utility?.018:.035,
   shoulder:form.shoulder,
   open:s.roof==='open',targa:s.bodyStyle==='targa',sports,rally,utility,van};
 }

@@ -1,4 +1,6 @@
-# YUNEX V5 fleet authoring
+# YUNEX fleet authoring
+
+Current geometry: [continuous curved-body construction](YUNEX_CONTINUOUS_BODY.md). This supersedes earlier body-shape descriptions below.
 
 The current `createFleetVehicle` default rebuilds the main body shapes of all 36 procedural catalogue vehicles, including the supercar, Formula cars, motorcycles and commercials. This replaces the previous shared body volumes. Existing legacy factory defaults remain available. Request `reference:'v4-approved'` explicitly for the earlier approved supercar. See [the complete rebuild guide](YUNEX_FLEET_REBUILD.md) for scope and review limits.
 

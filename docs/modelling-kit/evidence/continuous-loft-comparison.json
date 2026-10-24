@@ -1,0 +1,767 @@
+{
+  "baselineCommit": "74a986855ab87d02090ea7653501368d2b2e1470",
+  "before": [
+    {
+      "variant": "saloon",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 15483,
+          "hash": "4de44f0553e5f77e51944fd847db70a17e9926a493311b13edc13a1d80a0c806"
+        }
+      ]
+    },
+    {
+      "variant": "hatchback",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 14771,
+          "hash": "9d2c5ffb7133af78a62f3a6104426548bbf7282a21157fc22123a3b28d90cc59"
+        }
+      ]
+    },
+    {
+      "variant": "estate",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 14726,
+          "hash": "259528afb028597e1b912c0bf4e91cc53b09aa74cb56b61b39e70c8a9549a5ce"
+        }
+      ]
+    },
+    {
+      "variant": "compact",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 14916,
+          "hash": "0ae0b459e8ff9c8924081815467e6a5cef35a7af90ca3f3e89f10673cae164ba"
+        }
+      ]
+    },
+    {
+      "variant": "coupe",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 15497,
+          "hash": "fd26cda0a2eeeffa1d868110cbfde79dd9a6c23fc3c433ad28d76ae0a2bbf25f"
+        }
+      ]
+    },
+    {
+      "variant": "roadster",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 15623,
+          "hash": "456bdd2d32a59e7ff11bb75fa1a5e0163b8d18af1a80135fc7d865d9fd8e2775"
+        }
+      ]
+    },
+    {
+      "variant": "supercar",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 15794,
+          "hash": "0b6f006f34af95c10ecd38bf5327e8c7926aa9ae16418cebfa90011888599f2c"
+        }
+      ]
+    },
+    {
+      "variant": "grand-tourer",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 15523,
+          "hash": "4dfa4bd8817637e8e2d136edeaa3253968fbdcc3628337d96c169a58a47cacf6"
+        }
+      ]
+    },
+    {
+      "variant": "crossover",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 14765,
+          "hash": "cd7d1231e089b803512d5676a5b89cc709473ca57342c297fd8891579d112b15"
+        }
+      ]
+    },
+    {
+      "variant": "boxy-suv",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 14508,
+          "hash": "4421ae21d84315de9caf6f5f91611181d2b39614da31c3cb0a2518cda86b0cb4"
+        }
+      ]
+    },
+    {
+      "variant": "fastback-suv",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 14711,
+          "hash": "66be71ae2086dc4e7ed89b056d15d59e505dde138b6f8058325a88ff10782917"
+        }
+      ]
+    },
+    {
+      "variant": "formula-modern",
+      "surfaces": [
+        {
+          "name": "fleet-monocoque",
+          "vertices": 37992,
+          "hash": "99c8d635c8f471f283c592568495efb4d4abbb50f0c6e0ec83e84dd124ee921d"
+        }
+      ]
+    },
+    {
+      "variant": "formula-classic",
+      "surfaces": [
+        {
+          "name": "fleet-monocoque",
+          "vertices": 37368,
+          "hash": "9a61651057828eb47b9af6455448062c238c2aaed4780dd1a2652ee422c3582d"
+        }
+      ]
+    },
+    {
+      "variant": "sport-bike",
+      "surfaces": [
+        {
+          "name": "fleet-tank",
+          "vertices": 6210,
+          "hash": "fd33327c2b08efd749fd87b078573ed644b99829ca50f5194ed773136bb10f76"
+        }
+      ]
+    },
+    {
+      "variant": "naked-bike",
+      "surfaces": [
+        {
+          "name": "fleet-tank",
+          "vertices": 6210,
+          "hash": "ce0a745373f392a70801c9db17a58dd1dceb0a0dae4d3e4d27debb3b09c04f37"
+        }
+      ]
+    },
+    {
+      "variant": "touring-bike",
+      "surfaces": [
+        {
+          "name": "fleet-tank",
+          "vertices": 6210,
+          "hash": "0e09da905a6730d3d3007911e7ac2b872a44ff67f8055280a5d851e6b8a6258a"
+        }
+      ]
+    },
+    {
+      "variant": "pickup",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 15611,
+          "hash": "4605b42d38bf6b99653e29cd3a3287bfce50a972cfe3f3fddf3adef7a8452d40"
+        }
+      ]
+    },
+    {
+      "variant": "box-truck",
+      "surfaces": [
+        {
+          "name": "cab",
+          "vertices": 51210,
+          "hash": "906bc34563eb8c040ef729ad48b9c89c23b07971c8e9f83399a9e23f54c97b96"
+        }
+      ]
+    },
+    {
+      "variant": "tractor-truck",
+      "surfaces": [
+        {
+          "name": "cab",
+          "vertices": 51189,
+          "hash": "50d4dadbb6b6f49f31237f42e1adfebd29ee2ba168b5d492b2f1fafa107a1cbd"
+        }
+      ]
+    },
+    {
+      "variant": "fastback",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 14884,
+          "hash": "5114cbf3ac56402fa7ceba296a76e4ebdcb446b5fdd4c1e4aa70d2208cc64fcf"
+        }
+      ]
+    },
+    {
+      "variant": "city-ev",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 15035,
+          "hash": "d77ad293c17ffc98c84c9f01438fc5343e7bc79189cde64e3c39b422d15250f0"
+        }
+      ]
+    },
+    {
+      "variant": "luxury-saloon",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 15444,
+          "hash": "9742bf109399c167ceeb4bed24ca574891c7962abaffefdd032e37ae66e0e321"
+        }
+      ]
+    },
+    {
+      "variant": "retro-saloon",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 15610,
+          "hash": "903c628cfaa4bd0715120835701923c0306f698d8f28bb9e4f54372c4aa85404"
+        }
+      ]
+    },
+    {
+      "variant": "hot-hatch",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 14750,
+          "hash": "dd0f81f6ca92bb1f6b9380f4291b1907193c9304fd86f2d5ab1f37b0987d2916"
+        }
+      ]
+    },
+    {
+      "variant": "muscle-coupe",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 15487,
+          "hash": "2d027042cd69aaea6f5bd020f82cac7817f5c01cb992dfbe42822f41b1d510ea"
+        }
+      ]
+    },
+    {
+      "variant": "retro-coupe",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 15505,
+          "hash": "2801c972e7ee7738236789746ace7e1ffd9d764db01783b05b005f1c5ef687e9"
+        }
+      ]
+    },
+    {
+      "variant": "targa",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 15038,
+          "hash": "da5ad7a2affdb1a4d7f60a9a917b784b0b9b2fd72a95a45da3da96782a79a526"
+        }
+      ]
+    },
+    {
+      "variant": "track-coupe",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 15535,
+          "hash": "376a8cf0b61306a47b0f479adaa71a281aae2d821856b6e656582b56a4a57c46"
+        }
+      ]
+    },
+    {
+      "variant": "compact-suv",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 14737,
+          "hash": "30d6d733c93ad9f1513ead34dcd0c69aaf9e144ea786122a76c1b05a025f4cc4"
+        }
+      ]
+    },
+    {
+      "variant": "long-suv",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 14687,
+          "hash": "40ab3d3e44b57df3f63f22d75f902da9f9094fe64db5a0c509e5552285cd92de"
+        }
+      ]
+    },
+    {
+      "variant": "single-cab-pickup",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 15641,
+          "hash": "3fce75e9c4b52b75c4b5afbe94e3c8215cef798c2f4f13e93358e03d98a29315"
+        }
+      ]
+    },
+    {
+      "variant": "crew-pickup",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 15716,
+          "hash": "b9388f068bc4944a8a022d9d797fc6960258d643c0c89912ee23b0a56597bb44"
+        }
+      ]
+    },
+    {
+      "variant": "panel-van",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 12579,
+          "hash": "b0694d5c2064e445ffdda82657e2478030e58560001359a89d87f46591d4c6e6"
+        }
+      ]
+    },
+    {
+      "variant": "minivan",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 12658,
+          "hash": "3a383edd6ce31eec441565e1aeea826eab3a74bb2a3e4e1839f4b7c1de300cdd"
+        }
+      ]
+    },
+    {
+      "variant": "camper-van",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 12559,
+          "hash": "a6ea4f1c6284e6916938eb7ea7c852a4fcb29816c86c2f878cf3da9f90672310"
+        }
+      ]
+    },
+    {
+      "variant": "rally-hatch",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 15245,
+          "hash": "b2d07526901634506d6874fea7cde77ecd27a30ca809cf76dda8ed20cf27f5f5"
+        }
+      ]
+    }
+  ],
+  "after": [
+    {
+      "variant": "saloon",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 23622,
+          "hash": "ef72dc449764fcc37de029a7958a5eb38ac441fd965ea8e8fcdc8b40a21dd3b0"
+        }
+      ]
+    },
+    {
+      "variant": "hatchback",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 22898,
+          "hash": "112b5d555d031bf50207acb7ee780d6bdf3005550faaac4d6c58e58ecf00f7f6"
+        }
+      ]
+    },
+    {
+      "variant": "estate",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 22917,
+          "hash": "4f21b0ec870180c45bd25799a35dbc55dc1baeaba1f7f3ce158aa99e0dd08c4e"
+        }
+      ]
+    },
+    {
+      "variant": "compact",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 22924,
+          "hash": "28ca8fd4f5018bdbd03a1e28c7ad766e20def78d328681e4941811dbc425ac85"
+        }
+      ]
+    },
+    {
+      "variant": "coupe",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 23763,
+          "hash": "582b7d5a0c7e5816f4713b071794774b460478e191d9b4cd4bb3ccefd953c9bf"
+        }
+      ]
+    },
+    {
+      "variant": "roadster",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 24046,
+          "hash": "4b7a9f37d9c8b8d68946d28974c19210f77970afd04e430657c267926188f747"
+        }
+      ]
+    },
+    {
+      "variant": "supercar",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 23734,
+          "hash": "2697d9ab8021311fa0f9fa4c975daece145072ffe56047a73823af2afdbe0df6"
+        }
+      ]
+    },
+    {
+      "variant": "grand-tourer",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 23870,
+          "hash": "d5f1ca1cb1e132b774a9b0807c0b5484457c320fa139ac0fed0e503e490ac5f8"
+        }
+      ]
+    },
+    {
+      "variant": "crossover",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 20984,
+          "hash": "549672607b620f017ac33bb779081e7c84437be3fe453c0c92ca40d23c02e07c"
+        }
+      ]
+    },
+    {
+      "variant": "boxy-suv",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 20566,
+          "hash": "1405197093aa55082a6881b56cfec97744c9ed86b0fe8975b9118f47b95f3391"
+        }
+      ]
+    },
+    {
+      "variant": "fastback-suv",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 20780,
+          "hash": "c6aeca9128a82797ebb3d392c29310a40b3542312fd4ad3a92426ee609159bd0"
+        }
+      ]
+    },
+    {
+      "variant": "formula-modern",
+      "surfaces": [
+        {
+          "name": "fleet-monocoque",
+          "vertices": 37608,
+          "hash": "bcc64c9fc36e7109779fd7711e004b9a2b173686903125a6092c37c04a636b6c"
+        }
+      ]
+    },
+    {
+      "variant": "formula-classic",
+      "surfaces": [
+        {
+          "name": "fleet-monocoque",
+          "vertices": 37368,
+          "hash": "9a61651057828eb47b9af6455448062c238c2aaed4780dd1a2652ee422c3582d"
+        }
+      ]
+    },
+    {
+      "variant": "sport-bike",
+      "surfaces": [
+        {
+          "name": "fleet-tank",
+          "vertices": 6210,
+          "hash": "f83c926fede07e4a21e8c2276105f5a8b1bcd70d7b0588f8bc28b00830a059cd"
+        }
+      ]
+    },
+    {
+      "variant": "naked-bike",
+      "surfaces": [
+        {
+          "name": "fleet-tank",
+          "vertices": 6210,
+          "hash": "f2ce3fe1cc88edc997e95865b74922b4f68f1c88ef9701f993042773f6f78b04"
+        }
+      ]
+    },
+    {
+      "variant": "touring-bike",
+      "surfaces": [
+        {
+          "name": "fleet-tank",
+          "vertices": 6210,
+          "hash": "9e1d869f576c646da3741e94e62a74c5ac5d1487db7085e4f51274770ec07703"
+        }
+      ]
+    },
+    {
+      "variant": "pickup",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 22234,
+          "hash": "85a47dfa8c9f90eee44f8ba31fc51b8c59ebc49b586b229b4613286962ebee40"
+        }
+      ]
+    },
+    {
+      "variant": "box-truck",
+      "surfaces": [
+        {
+          "name": "cab",
+          "vertices": 48837,
+          "hash": "4edaae3c387f0ff1eb991d9dd1d7f6183968b05ead5057c5136126af1efbdab6"
+        }
+      ]
+    },
+    {
+      "variant": "tractor-truck",
+      "surfaces": [
+        {
+          "name": "cab",
+          "vertices": 48792,
+          "hash": "9d9f985c0ed6253350c32f7bed565d3e32c63e0555d9f5930282f9b910395d3b"
+        }
+      ]
+    },
+    {
+      "variant": "fastback",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 22647,
+          "hash": "41e1f74eb3d738511252be2ab563fcdf62d67b9163ca3ff2738be7b82f6bd158"
+        }
+      ]
+    },
+    {
+      "variant": "city-ev",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 22987,
+          "hash": "82a65ec83f2c4576f1e614015a641613c8d5f0b310570f20e846810f57f9af1d"
+        }
+      ]
+    },
+    {
+      "variant": "luxury-saloon",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 23522,
+          "hash": "f4ff68ab76b91e5da5eb5579bc5d60df3298fac627088a5cd593ea17cafdf73e"
+        }
+      ]
+    },
+    {
+      "variant": "retro-saloon",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 24034,
+          "hash": "76673d6a6a53a160d5971c2c8108e8a5c1923332694e4db0e25b91d2969c1622"
+        }
+      ]
+    },
+    {
+      "variant": "hot-hatch",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 22156,
+          "hash": "604cb63b16c1195eace7b8c4735a2826abbfefa6ebb7c480cffff31a1358e8de"
+        }
+      ]
+    },
+    {
+      "variant": "muscle-coupe",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 23867,
+          "hash": "7bff259bba5322de6b70952894c739d75fb412f617fcbd8e24af4d9148553d10"
+        }
+      ]
+    },
+    {
+      "variant": "retro-coupe",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 24167,
+          "hash": "9a76387f3e898943877ecca40b2c1a34c6830fb8d57b4df6590673a324a9872e"
+        }
+      ]
+    },
+    {
+      "variant": "targa",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 23780,
+          "hash": "144c5765798f45ead17fbebe88900a3aa4053409161834347706ad4c503348c2"
+        }
+      ]
+    },
+    {
+      "variant": "track-coupe",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 23665,
+          "hash": "36de06d39820c657d50af604518821169c2c326e99578bea20ca9580cdd16b48"
+        }
+      ]
+    },
+    {
+      "variant": "compact-suv",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 20861,
+          "hash": "a0a092cf081dfe8cd8bb0c7a4ed810e428296b7f488f0a699176c287e7b806a0"
+        }
+      ]
+    },
+    {
+      "variant": "long-suv",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 21414,
+          "hash": "dd476978c156e69169ff0d98d85b6a4468bed037207e421da26ba2e19de0b7c6"
+        }
+      ]
+    },
+    {
+      "variant": "single-cab-pickup",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 22238,
+          "hash": "79c3b09ec0284d25f664aa0760af0343f6246b4e1358b34a01e96e5ab431609f"
+        }
+      ]
+    },
+    {
+      "variant": "crew-pickup",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 22584,
+          "hash": "78b908de88997ab76db7459380813715f436df1ed477a65d0238b996ea8744d0"
+        }
+      ]
+    },
+    {
+      "variant": "panel-van",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 20298,
+          "hash": "8706bcf0a1a9851e78ae01934eddc5669a2323b2fcc7c5a1d7e35a4dc66ed659"
+        }
+      ]
+    },
+    {
+      "variant": "minivan",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 19869,
+          "hash": "6c1df4b68102e941ea5b326662933d8850ea79c9aa4b755379117b4b816e2f70"
+        }
+      ]
+    },
+    {
+      "variant": "camper-van",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 20581,
+          "hash": "8d1c6770f8ed3db944bab0185806e80f01120eee5c397f2e8da65e97fd21dee7"
+        }
+      ]
+    },
+    {
+      "variant": "rally-hatch",
+      "surfaces": [
+        {
+          "name": "arched-body",
+          "vertices": 21640,
+          "hash": "740c81ba549921b2d426bce722e39b34730d64bda1e2122dec9b124863b0178c"
+        }
+      ]
+    }
+  ],
+  "changedPrimaryMeshes": [
+    "saloon",
+    "hatchback",
+    "estate",
+    "compact",
+    "coupe",
+    "roadster",
+    "supercar",
+    "grand-tourer",
+    "crossover",
+    "boxy-suv",
+    "fastback-suv",
+    "formula-modern",
+    "sport-bike",
+    "naked-bike",
+    "touring-bike",
+    "pickup",
+    "box-truck",
+    "tractor-truck",
+    "fastback",
+    "city-ev",
+    "luxury-saloon",
+    "retro-saloon",
+    "hot-hatch",
+    "muscle-coupe",
+    "retro-coupe",
+    "targa",
+    "track-coupe",
+    "compact-suv",
+    "long-suv",
+    "single-cab-pickup",
+    "crew-pickup",
+    "panel-van",
+    "minivan",
+    "camper-van",
+    "rally-hatch"
+  ],
+  "additionalCoverage": {
+    "formula-classic": "Previously rounded monocoque retained; wings replaced with closed cambered volumes and formed endplates."
+  }
+}
