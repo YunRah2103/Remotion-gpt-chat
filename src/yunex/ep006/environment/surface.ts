@@ -19,7 +19,7 @@ const roadEdge=(x:number)=>EP006_STAGE_LIMITS.halfRoadWidthM+.16*Math.sin(x*.057
 const roadBase=(x:number)=>.26*Math.sin(x*.025)+.16*Math.sin(x*.066)+lift(x,0)+lift(x,610);
 function roadBed(x:number,z:number){
   const crown=.055*(1-Math.min(1,Math.abs(z)/5)**2);
-  const rut=-.034*Math.exp(-((Math.abs(z)-1.18)/.29)**2);
+  const rut=-.034*Math.exp(-(((Math.abs(z)-1.18)/.29)**2));
   const aggregate=.016*Math.sin(x*1.91+z*3.37)*Math.sin(x*3.26-z*2.41)
     +.012*Math.sin(x*.68+z*1.34);
   return roadBase(x)+crown+rut+aggregate;
