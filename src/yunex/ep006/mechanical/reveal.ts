@@ -33,7 +33,7 @@ type CornerRig={corner:MechanicalCorner;mount:T.Object3D;rest:T.Vector3;
   links:T.Object3D; damper:T.Object3D; upper:T.Vector3;lower:T.Vector3;
   overlay:T.Group;coil:T.Mesh;barrel:T.Mesh;shaft:T.Mesh;
   topCollar:T.Mesh;bottomCollar:T.Mesh;tyre:T.Mesh<T.BufferGeometry>;tyreRest:number[];
-  wheelRoll:T.Object3D};
+  wheelRoll:T.Object3D;agent1Assembly:boolean};
 export type MechanicalReveal={root:T.Group;vehicle:T.Group;
   update:(input:RevealInput)=>void; corners:ReadonlyArray<MechanicalCorner>};
 const clamp=(v:number,a=0,b=1)=>Math.max(a,Math.min(b,v));
@@ -100,6 +100,9 @@ export function createEp006MechanicalReveal(vehicle:T.Group):MechanicalReveal{
       throw Error('Missing V4 connected suspension/tyre at '+corner);
     const datum=damper.userData.link as {a:[number,number,number];b:[number,number,number]};
     if(!datum?.a||!datum.b)throw Error('No suspension hardpoint data at '+corner);
+    // Agent 1's upgraded hardware supersedes this self-contained V4 proof fallback.
+    // Do not duplicate pistons/springs or re-enable the V4 links after integration.
+    const agent1Assembly=!!vehicle.getObjectByName('ep006-'+corner+'-suspension');
     const overlay=new T.Group();overlay.name='ep006-coaxial-damper-'+corner;root.add(overlay);
     const barrel=section(dark,.042,'shock-pressure-body-'+corner);
     const shaft=section(chrome,.018,'shock-chrome-piston-'+corner);
@@ -112,7 +115,7 @@ export function createEp006MechanicalReveal(vehicle:T.Group):MechanicalReveal{
     corners.push({corner,mount,rest:new T.Vector3(...(mount.userData.restPosition as [number,number,number])),
       links,damper,upper:new T.Vector3(...datum.a),lower:new T.Vector3(...datum.b),
       overlay,coil:spring,barrel,shaft,topCollar,bottomCollar,
-      tyre:tyre as T.Mesh<T.BufferGeometry>,tyreRest,wheelRoll});
+      tyre:tyre as T.Mesh<T.BufferGeometry>,tyreRest,wheelRoll,agent1Assembly});
   }
   // Fade only exterior coachwork: cabin cage, chassis rails, wheels, shafts and fittings remain opaque.
   const ghosts:Ghost[]=[];
@@ -158,9 +161,10 @@ export function createEp006MechanicalReveal(vehicle:T.Group):MechanicalReveal{
       connect(c.bottomCollar,springTop.clone().lerp(wheelBottom,.92),springTop.clone().lerp(wheelBottom,.985));
       connect(c.coil,springTop.clone().lerp(wheelBottom,.09),springTop.clone().lerp(wheelBottom,.90));
       // Reveal augments existing links. The original load path stays attached to the car.
-      c.overlay.visible=exposure>.08;
+      c.overlay.visible=exposure>.08&&!c.agent1Assembly;
       // Deform the tyre's existing named mesh, never the rim or the wheel-to-body rig.
       // Work in the inverse current wheel-roll frame so the flattened patch stays at the road.
+      if(!c.agent1Assembly){
       const p=c.tyre.geometry.attributes.position;
       const base=c.tyreRest,theta=c.wheelRoll.rotation.z;
       const sx=Math.sin(theta),cy=Math.cos(theta);
@@ -173,12 +177,13 @@ export function createEp006MechanicalReveal(vehicle:T.Group):MechanicalReveal{
         p.setXYZ(i,x+sx*crush*w,y+cy*crush*w,z*(1+crush*w*.35));
       }
       p.needsUpdate=true;c.tyre.geometry.computeVertexNormals();
+      }
       // Compression and rebound both visibly change spring span; the damper controls
       // velocity, not stored energy. We do not portray heat/energy as glowing particles.
       c.coil.material instanceof T.MeshStandardMaterial &&
         c.coil.material.color.set(focus==='spring'?'#ffc05d':'#b98b47');
       // Existing V4 coil belongs to its registered assembly and remains in place.
-      c.links.visible=true;
+      if(!c.agent1Assembly)c.links.visible=true;
     }
     for(const g of ghosts)for(let i=0;i<g.materials.length;i++){
       const mat=g.materials[i];
