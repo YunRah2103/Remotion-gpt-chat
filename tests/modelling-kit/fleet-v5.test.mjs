@@ -82,3 +82,18 @@ test('V5 roof liner stays below crowned roof after driver animation',()=>{
  animateCinematicVehicle(car,{frame:20,fps:30,distance:5,speed:8});
  assert.ok(liner.visible);assert.ok(new T.Box3().setFromObject(liner).max.y<new T.Box3().setFromObject(roof).max.y);disposeObject(car);
 });
+test('existing geometry inspection uses the selected V5 roof envelope',async()=>{
+ const {auditVehicleGeometry}=await import('../../src/yunex/modelling-kit/visual-quality.ts');
+ const car=createCinematicVehicle({variant:'coupe',bodyDetail:'fleet',optimize:false});
+ const issues=auditVehicleGeometry(car).diagnostics.filter(d=>d.code==='roof-height');
+ assert.deepEqual(issues,[]);disposeObject(car);
+});
+test('static fleet cutaway keeps rebuilt glazing and liner hidden during driver animation',()=>{
+ const car=createCinematicVehicle({variant:'saloon',bodyDetail:'fleet',cutaway:true,driver:true,optimize:false});
+ animateCinematicVehicle(car,{frame:30,fps:30,distance:10,speed:10});
+ for(const name of ['roof','windshield','side-glass','roof-liner'])assert.equal(car.getObjectByName(name).visible,false,name);disposeObject(car);
+});
+test('classic family retains round lamp identity instead of sharing the modern LED fascia',()=>{
+ const car=createCinematicVehicle({variant:'retro-coupe',bodyDetail:'fleet',optimize:false});
+ assert.ok(car.getObjectByName('classic-headlamp-lens'));assert.ok(car.getObjectByName('classic-headlamp-reflector'));disposeObject(car);
+});

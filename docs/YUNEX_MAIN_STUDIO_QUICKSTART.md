@@ -1,5 +1,7 @@
 # YUNEX V4 — start on main
 
+For the opt-in V5 fleet (all 36 catalogue IDs), use [V5 fleet guide](YUNEX_V5_FLEET_GUIDE.md) and `createFleetVehicle`. Existing approved V4 projects below are preserved. V5 remains a draft visual upgrade pending moving review; do not describe it as manufacturer CAD or silently migrate approved films.
+
 The automotive studio is installed on **main**. Use this guide before asking an agent to produce a YUNEX film. The previous V4 implementation and reference evidence are retained in [PR #233](https://github.com/YunRah2103/Remotion-gpt-chat/pull/233). This workflow does **not** alter EP003–EP005 source branches.
 
 ## First use

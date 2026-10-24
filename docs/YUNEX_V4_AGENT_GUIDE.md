@@ -1,5 +1,7 @@
 # Automotive Studio V4: source to moving proof
 
+New fleet work can opt into [V5 fleet authoring](YUNEX_V5_FLEET_GUIDE.md), covering the full catalogue via `createFleetVehicle`. This V4 reference workflow and approved teal supercar remain available unchanged.
+
 This guide concerns the modelling studio in this repository, not the Galaxy S25 footage worker. Existing compositions, audio and projects remain independent. New V4 projects are opt-in source recipes; their native output is 1080×1920 at 30 fps.
 
 ## Make a new production

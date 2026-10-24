@@ -19,7 +19,7 @@ const Scene:React.FC<Props>=({variant,before=false,mode='tour',panel=false})=>{
  let a=mode==='orbit'?.45+frame/179*Math.PI*1.05:shot===0?.55+phase*.12:shot===1?Math.PI/2:shot===2?2.55-phase*.13:shot===3?.70+phase*.18:.85+phase*.16;
  const close=mode==='tour'&&shot===3,radius=close?5.3:Math.max(panel?8.5:14,s.length*(panel?1.9:3.05)),target:T.Vector3Tuple=close?[s.wheelbase/2,.55,s.width*.30]:[0,s.height*.49,0];
  return <ThreeCanvas width={width} height={height} shadows camera={{fov:38,near:.03,far:500}}>
-  <CinematicLighting timeOfDay="day"/><primitive object={car}/>
+  <CinematicLighting timeOfDay="day" shadowMapSize={2048}/><primitive object={car}/>
   <mesh rotation={[-Math.PI/2,0,0]} position={[0,-.018,0]} receiveShadow><planeGeometry args={[300,300]}/><meshStandardMaterial color={rally?'#665c4e':'#3b4146'} roughness={.94} metalness={.02}/></mesh>
   {!rally?Array.from({length:31},(_,i)=><mesh key={i} rotation={[-Math.PI/2,0,0]} position={[i*6-90-(t*9)%6,-.015,-3]}><planeGeometry args={[2.4,.10]}/><meshStandardMaterial color="#b8bdba" roughness={1}/></mesh>):Array.from({length:120},(_,i)=>{const x=((i*1.713-t*9)%36+36)%36-18,z=Math.sin(i*2.399)*6;return <mesh key={i} position={[x,-.008+((i%7)*.002),z]} rotation={[0,i*.72,0]}><dodecahedronGeometry args={[.018+(i%4)*.012,0]}/><meshStandardMaterial color={i%2?'#a39a85':'#48463e'} roughness={1}/></mesh>;})}
   <CameraAim position={[target[0]+Math.cos(a)*radius,close?1.45:2.6,target[2]+Math.sin(a)*radius]} target={target} fov={38}/>

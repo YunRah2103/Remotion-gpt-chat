@@ -75,6 +75,8 @@ export function createCinematicVehicle(options:CinematicOptions):T.Group{
   }
  }
 
+ if(options.bodyDetail==='fleet'&&options.cutaway){const hidden=new Set(['roof','side-glass','windshield','rear-glass','roof-liner','cargo-side-panel','windscreen','side-window','roof-deflector']);shell.traverse(o=>{if(hidden.has(o.name)){o.visible=false;o.userData.fleetHidden=true;}});}
+
  // Material clones isolate fades/highlights between components and between vehicles.
  const originals=new Set<T.Material>();
  for(const scope of [shell,...mounts]){const clones=new Map<T.Material,T.Material>();scope.traverse(o=>{if(o instanceof T.Mesh){const clone=(m:T.Material)=>{let c=clones.get(m);if(!c){c=m.clone();clones.set(m,c);originals.add(m);}return c;};o.material=Array.isArray(o.material)?o.material.map(clone):clone(o.material);}});}

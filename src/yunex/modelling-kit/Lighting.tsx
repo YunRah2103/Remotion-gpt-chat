@@ -18,13 +18,13 @@ const StableReflections:React.FC<{timeOfDay:LightingTime}>=({timeOfDay})=>{
   return()=>{scene.environment=previous;scene.environmentIntensity=intensity;env.dispose();};
  },[gl,scene,timeOfDay]);return null;
 };
-export const CinematicLighting:React.FC<{focus?:V3;timeOfDay?:LightingTime}>=({focus=[0,0,0],timeOfDay='day'})=>{
+export const CinematicLighting:React.FC<{focus?:V3;timeOfDay?:LightingTime;shadowMapSize?:number}>=({focus=[0,0,0],timeOfDay='day',shadowMapSize=2048})=>{
  const target=React.useMemo(()=>new T.Object3D(),[]);target.position.set(...focus);
  const p=lightingProfile(timeOfDay),night=timeOfDay==='night';
  return <>
  <color attach="background" args={[p.background]}/><fog attach="fog" args={[p.background,95,260]}/>
  <hemisphereLight args={[p.sky,p.ground,p.hemisphere]}/><primitive object={target}/>
- <directionalLight target={target} position={[focus[0]+4,focus[1]+p.keyHeight,focus[2]+4]} color={p.keyColor} intensity={p.keyIntensity} castShadow shadow-mapSize={[2048,2048]} shadow-camera-left={-10} shadow-camera-right={10} shadow-camera-top={10} shadow-camera-bottom={-10} shadow-camera-far={35} shadow-bias={-.0002} shadow-normalBias={.012} shadow-radius={3}/>
+ <directionalLight target={target} position={[focus[0]+4,focus[1]+p.keyHeight,focus[2]+4]} color={p.keyColor} intensity={p.keyIntensity} castShadow shadow-mapSize={[shadowMapSize,shadowMapSize]} shadow-camera-left={-10} shadow-camera-right={10} shadow-camera-top={10} shadow-camera-bottom={-10} shadow-camera-far={35} shadow-bias={-.0002} shadow-normalBias={.012} shadow-radius={3}/>
  <directionalLight target={target} position={[focus[0]-5,focus[1]+3,focus[2]-4]} color={p.fillColor} intensity={p.fillIntensity}/>
  <directionalLight target={target} position={[focus[0]+1,focus[1]+5,focus[2]-6]} color={p.rimColor} intensity={p.rimIntensity}/>
  {night?<><spotLight target={target} position={[focus[0]-3,focus[1]+6,focus[2]+3]} color="#e0ecff" intensity={95} distance={18} angle={.65} penumbra={.85} decay={2}/><spotLight target={target} position={[focus[0]+4,focus[1]+4,focus[2]-5]} color="#92b7de" intensity={65} distance={16} angle={.65} penumbra={.9} decay={2}/></>:null}

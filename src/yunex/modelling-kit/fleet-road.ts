@@ -117,8 +117,15 @@ export function installFleetRoad(shell:T.Group,s:VehicleSpec,options:Partial<Veh
    const z=side*s.width*.29;
    const old=body.geometry;body.geometry=cutOpening(old,[x-.13,y-lampH,z-lampWidth*.55],[x+.13,y+lampH,z+lampWidth*.55]);old.dispose();
    box(shell,trim,[.11,lampH*1.8,lampWidth*1.08],[x-sign*.045,y,z],.018,front?'headlamp-housing':'tail-lamp-housing');
-   fleetCurve(shell,front?white:red,[-.44,0,.44].map(t=>new T.Vector3(x+sign*.012,y+Math.abs(t)*.018,z+t*lampWidth)),front?.012:.009,front?'led-signature':'rear-light-guide');
-   box(shell,glass,[.018,lampH*1.7,lampWidth],[x+sign*.019,y,z],.009,'lamp-cover');
+   if(c.kind==='classic'&&front){
+    fleetSkin(shell,metal,'classic-headlamp-reflector',(u,v)=>{const a=u*Math.PI*2,r=v*.102;return new T.Vector3(x+sign*(.006-.035*(1-v*v)),y+Math.cos(a)*r,z+Math.sin(a)*r);},true,48,16);
+    mesh(shell,new T.TorusGeometry(.108,.009,10,48),metal,[x+.018,y,z],[0,Math.PI/2,0],'classic-headlamp-bezel');
+    mesh(shell,new T.SphereGeometry(1,32,20).scale(.018,.103,.103),glass,[x+.024,y,z],[0,0,0],'classic-headlamp-lens');
+    mesh(shell,new T.SphereGeometry(.022,16,12),white,[x-.017,y,z],[0,0,0],'classic-headlamp-bulb');
+   }else{
+    fleetCurve(shell,front?white:red,[-.44,0,.44].map(t=>new T.Vector3(x+sign*.012,y+Math.abs(t)*.018,z+t*lampWidth)),front?.012:.009,front?'led-signature':'rear-light-guide');
+    box(shell,glass,[.018,lampH*1.7,lampWidth],[x+sign*.019,y,z],.009,'lamp-cover');
+   }
   }
   const y0=c.sill+.12,w=s.width*(front?.33:.38),h=Math.min(.22,c.belt-c.sill-.23);
   const old=body.geometry;body.geometry=cutOpening(old,[x-.16,y0,-w],[x+.16,y0+h,w]);old.dispose();
