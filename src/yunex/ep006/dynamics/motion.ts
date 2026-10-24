@@ -1,8 +1,9 @@
+import {heightAt} from '../environment/surface.ts';
 /**
  * YUNEX EP006 — authoritative, absolute-frame jump motion.
  * Metres, seconds, radians; +X forward, +Y up, +Z left.
  * Intentionally illustrative 4-corner compliant response, NOT a calibrated car model.
- * Agent 4 must mesh this SAME height function. No simulation history is stored.
+ * Agent 4 heightAt is imported directly. No independent surface copy exists.
  */
 export const EP006_FPS = 30;
 export const EP006_GRAVITY_MPS2 = 9.81;
@@ -29,35 +30,8 @@ const clamp=(x:number,a:number,b:number)=>Math.min(b,Math.max(a,x));
 const smooth=(a:number,b:number,x:number)=>{const u=clamp((x-a)/(b-a),0,1);return u*u*(3-2*u);};
 const vxAt=(t:number)=>25.6+0.10*t;
 export const ep006TravelXM=(tSeconds:number)=>25.6*tSeconds+0.05*tSeconds*tSeconds;
-/**
- * Exact independent-branch mirror of Agent 4's published environment/surface.ts
- * `heightAt` implementation. On integration use their heightAt as the single
- * shared import; mathematical parity here keeps this branch independently
- * buildable and gives the native fixture the same sampled collision heights.
- * Avoid changing either copy without notifying Agents 2 + 4.
- */
-const lift=(x:number,crest:number)=>
-  3.65*smooth(crest-38,crest+2,x)-3.75*smooth(crest+4,crest+32,x);
-const roadEdge=(x:number)=>4.25+.16*Math.sin(x*.057)+.09*Math.sin(x*.159);
-const roadBase=(x:number)=>.26*Math.sin(x*.025)+.16*Math.sin(x*.066)+lift(x,0)+lift(x,610);
-function roadBed(x:number,z:number){
-  const crown=.055*(1-Math.min(1,Math.abs(z)/5)**2);
-  const rut=-.034*Math.exp(-(((Math.abs(z)-1.18)/.29)**2));
-  const aggregate=.016*Math.sin(x*1.91+z*3.37)*Math.sin(x*3.26-z*2.41)
-    +.012*Math.sin(x*.68+z*1.34);
-  return roadBase(x)+crown+rut+aggregate;
-}
-export function ep006SurfaceHeightM(x:number,z=0):number {
-  if(!Number.isFinite(x)||!Number.isFinite(z))throw Error('EP006 ground query must be finite metres');
-  const d=Math.abs(z),edge=roadEdge(x);
-  const blend=smooth(edge,edge+15,d);
-  const rolling=.43*Math.sin(x*.038+z*.024)+.38*Math.sin(z*.056-x*.015)
-    +.20*Math.cos(z*.113+x*.046);
-  const hillside=(1.85+rolling)*blend + Math.pow(Math.max(0,d-edge-16)/22,1.05)
-    *(.48+.18*Math.sin(x*.017+z*.03));
-  const bank=.13*smooth(edge,edge+3,d)*Math.sin(x*.12+z*.17);
-  return roadBed(x,z)+hillside+bank;
-}
+/** Single authoritative Agent 4 mesh/physics surface (legacy API retained). */
+export const ep006SurfaceHeightM=(x:number,z=0):number=>heightAt(x,z);
 export const EP006_JUMPS = [
   {id:'J1' as const,launchFrame:0,landingFrame:72},
   {id:'J2' as const,launchFrame:684,landingFrame:750},
