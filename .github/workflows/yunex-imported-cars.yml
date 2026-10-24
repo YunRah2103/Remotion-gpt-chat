@@ -6,6 +6,8 @@ on:
       - feat/yunex-imported-cars-agent-ready
     paths:
       - 'production/assets/imported-cars/**'
+      - 'production/asset-library/**'
+      - 'tests/asset-library/**'
       - 'src/yunex/imported-cars/**'
       - 'scripts/imported-cars.mjs'
       - 'scripts/yunex-agent-car.mjs'
@@ -15,6 +17,8 @@ on:
   pull_request:
     paths:
       - 'production/assets/imported-cars/**'
+      - 'production/asset-library/**'
+      - 'tests/asset-library/**'
       - 'src/yunex/imported-cars/**'
       - 'scripts/imported-cars.mjs'
       - 'scripts/yunex-agent-car.mjs'
@@ -39,6 +43,7 @@ jobs:
         run: |
           npm run check
           node --experimental-strip-types --test tests/imported-cars/*.test.mjs
+          python3 -m unittest discover -s tests/asset-library -p 'test_*.py'
       - name: Fetch ALL 10 attributed real-geometry GLBs
         run: |
           npm run kit:cars:list
