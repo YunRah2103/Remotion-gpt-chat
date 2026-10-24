@@ -49,6 +49,8 @@ jobs:
           git rev-parse HEAD > "$dir/source-commit.txt"
           ffmpeg -v error -i "$dir/ep006-integrated-proof.mp4" -vf "fps=1,scale=108:192" -f framemd5 "$dir/motion.framemd5"
           ffmpeg -v error -i "$dir/ep006-integrated-proof.mp4" -vf "select='eq(n,0)+eq(n,70)+eq(n,105)+eq(n,150)+eq(n,205)+eq(n,225)+eq(n,270)+eq(n,349)',scale=270:480,tile=4x2" -frames:v 1 "$dir/visual-contact-sheet.png"
+          # Catch the fully black upper half seen in the first mechanical-replay render.
+          ffmpeg -v error -i "$dir/ep006-integrated-proof.mp4" -vf "select='eq(n,130)+eq(n,150)+eq(n,175)',scale=96:160,format=gray" -vsync 0 -f rawvideo "$dir/replay-luma.raw"
           python3 - <<'PY'
           import json
           from pathlib import Path
@@ -64,12 +66,23 @@ jobs:
           assert not [s for s in streams if s['codec_type']=='audio'],'Proof must remain silent'
           hashes=[x.rsplit(',',1)[-1].strip() for x in (d/'motion.framemd5').read_text().splitlines() if x and not x.startswith('#')]
           assert len(set(hashes))>=8,'MP4 looks static at 1fps'
+          lum=(d/'replay-luma.raw').read_bytes()
+          frame_bytes=96*160
+          assert len(lum)==3*frame_bytes,'Missing inspected replay frames'
+          replay_top_luma=[]
+          for i in range(3):
+            frame=lum[i*frame_bytes:(i+1)*frame_bytes]
+            top=frame[:96*100]
+            mean=sum(top)/len(top)
+            replay_top_luma.append(round(mean,2))
+            assert mean>36,f'Replay frame {130+i*0} upper screen is black or terrain-clipped (YAVG={mean:.1f})'
           (d/'qa.json').write_text(json.dumps({
             'composition':'Ep006IntegratedVisualPass01',
             'source_agents':['1 vehicle','2 dynamics and FX','3 cameras','4 stage'],
             'agent5_included':False,
             'fps':30,'frames':350,'width':1080,'height':1920,
             'motion_samples':len(hashes),'unique_motion_hashes':len(set(hashes)),
+            'mechanical_replay_upper_screen_mean_luma':replay_top_luma,
             'status':'technical native evidence; human moving-image approval remains pending'
           },indent=2))
           PY
