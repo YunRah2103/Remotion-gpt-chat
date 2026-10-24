@@ -22,7 +22,7 @@ export function driverPovCamera(model:T.Object3D,lookAhead?:V3){
  let position:V3,target:V3,fov:number;
  if(s.family==='formula'){
   position=[-.62,1.20,0];target=[3.8,.55,0];fov=60;
- }else if((model.userData.bodyArchitecture==='section-loft-v4'||model.userData.bodyArchitecture==='fleet-v5')){
+ }else if((model.userData.bodyArchitecture==='section-loft-v4'||model.userData.bodyArchitecture==='fleet-v5'&&!['box-truck','tractor-truck'].includes(s.id))){
   const c=model.userData.bodyArchitecture==='fleet-v5'&&s.id!=='supercar'?fleetProfile(s):studioBodyProfile(s),head=model.getObjectByName('head'),headLocal=head?shell.worldToLocal(head.getWorldPosition(new T.Vector3())):undefined;
   const y=c.roof-.18,t=(y-c.belt)/(c.roof-c.belt),glassX=T.MathUtils.lerp(c.frontBase,c.frontRoof,t),z=headLocal?.z??-s.width*.235;
   position=[glassX-.025,y,z];target=[glassX+8,y-.20,z];fov=54;

@@ -1,7 +1,13 @@
 name: YUNEX V5 fleet native proofs
 on:
-  push:
-    branches: [feat/yunex-v5-fleet-overhaul]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/yunex/modelling-kit/fleet*.ts'
+      - 'src/yunex/modelling-kit/fleet*.tsx'
+      - 'src/yunex/modelling-kit/rig.ts'
+      - 'scripts/modelling-kit/fleet*.mjs'
+      - '.github/workflows/yunex-v5-fleet.yml'
   workflow_dispatch:
 permissions:
   contents: read

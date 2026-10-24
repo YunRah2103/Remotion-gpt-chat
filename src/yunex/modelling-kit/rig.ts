@@ -60,7 +60,7 @@ export function createCinematicVehicle(options:CinematicOptions):T.Group{
   roadHeroDetails(shell,s);
   if(options.bodyDetail==='fleet'&&options.variant!=='supercar'){
    enhanceCabin(shell,s,options);
-   if(s.family==='formula'||s.family==='bike'||s.id==='box-truck'||s.id==='tractor-truck')installFleetSpecialty(shell,s);else installFleetRoad(shell,s);
+   if(s.family==='formula'||s.family==='bike'||s.id==='box-truck'||s.id==='tractor-truck')installFleetSpecialty(shell,s);else installFleetRoad(shell,s,options);
    if(s.bodyStyle==='rally')rallyDetails(shell,mounts,s,true);
    root.userData.bodyArchitecture='fleet-v5';
   }else if(options.bodyDetail==='studio'||(options.bodyDetail==='fleet'&&options.variant==='supercar')){
@@ -135,7 +135,7 @@ export function animateCinematicVehicle(root:T.Group,state:CinematicState){
  sparks.visible=contact;const dummy=new T.Object3D(),t=state.frame/state.fps;
  for(let i=0;i<sparks.count;i++){const age=(t*3+i*.61803398875)%1,side=Math.sin(i*12.9);dummy.position.set((i%2?.8:-.8)-age*4.5,.014+Math.sin(age*Math.PI)*(.035+(i%7)*.012),side*age*.95);dummy.scale.set(.8+age*3.5,.65,.65);dummy.rotation.z=-.2;dummy.updateMatrix();sparks.setMatrixAt(i,dummy.matrix);}sparks.instanceMatrix.needsUpdate=true;
  if(systems)animateMechanicalSystems(systems,root,shell.position.y,shell.rotation);
- if(driver){const cabin=shell.getObjectByName('interior');if(cabin){fade(cabin,0);for(const name of ['door-panel-left','door-panel-right','roof-liner']){const panel=cabin.getObjectByName(name);if(panel)panel.visible=cutaway<.5;}}animateDriver(driver,steer,state.braking??0,state.impact??0,state.gearChange??0);fade(driver,0);}
+ if(driver){const cabin=shell.getObjectByName('interior');if(cabin){fade(cabin,0);for(const name of ['door-panel-left','door-panel-right','roof-liner']){const panel=cabin.getObjectByName(name);if(panel)panel.visible=cutaway<.5&&!panel.userData.fleetHidden;}}animateDriver(driver,steer,state.braking??0,state.impact??0,state.gearChange??0);fade(driver,0);}
  materials(root,m=>{if(m.userData.shaderTransparent!==m.transparent){m.needsUpdate=true;m.userData.shaderTransparent=m.transparent;}});
  root.updateMatrixWorld(true);groundTornCords(root,mounts);
 }

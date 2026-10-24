@@ -1,11 +1,11 @@
 /** Source-owned V5 road families: connected body sections, wheel apertures and fitted crowned glazing. */
 import * as T from 'three';
-import type {VehicleSpec} from '../world-kit/catalog.ts';
+import type {VehicleOptions,VehicleSpec} from '../world-kit/catalog.ts';
 import {box,mesh,surface} from '../world-kit/geometry.ts';
 import {cutOpening} from '../world-kit/cavity.ts';
 import {angleWeightedNormals} from './studio-normals.ts';
 import {fleetProfile} from './fleet-profiles.ts';
-import {fleetCurve,fleetSkin,fleetPillar,lerp,station} from './fleet-surfaces.ts';
+import {fleetCurve,fleetSkin,fleetPillar,fleetPatch,lerp,station} from './fleet-surfaces.ts';
 export function fleetSection(s:VehicleSpec,x:number){
  const c=fleetProfile(s),u=x/(s.length/2),axle=Math.max(Math.exp(-(((x-s.wheelbase/2)/.45)**2)),Math.exp(-(((x+s.wheelbase/2)/.50)**2)));
  const rear=c.kind==='hatch'||c.kind==='rally'||c.kind==='estate'||c.van;
@@ -40,6 +40,7 @@ function roadShell(s:VehicleSpec){
  let g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setIndex(idx);angleWeightedNormals(g);
  // Remove the actual cabin cavity instead of hiding a solid slab behind glass.
  const old=g;g=cutOpening(g,[c.rearBase+.045,c.sill+.08,-c.baseWidth*.94],[c.frontBase-.035,c.roof+.1,c.baseWidth*.94]);old.dispose();
+ if(c.kind==='pickup')g=cutOpening(g,[-half+.11,c.belt-.18,-s.width*.40],[c.rearBase-.06,c.roof+.1,s.width*.40]);
  return g;
 }
 function canopy(shell:T.Group,s:VehicleSpec,paint:T.Material,glass:T.Material,trim:T.Material){
@@ -65,20 +66,29 @@ function canopy(shell:T.Group,s:VehicleSpec,paint:T.Material,glass:T.Material,tr
   }
   rail('belt-window-seal',t=>new T.Vector3(lerp(c.rearBase,c.frontBase,t),c.belt,side*c.baseWidth),trim,.010);
  }
- const liner=shell.getObjectByName('roof-liner');if(liner)liner.visible=false;
+ const liner=shell.getObjectByName('roof-liner') as T.Mesh|undefined;
+ if(liner){
+  if(c.open||c.targa){liner.visible=false;liner.userData.fleetHidden=true;}
+  else{liner.geometry.dispose();liner.geometry=fleetPatch(32,24,(u,v)=>roof(lerp(c.rearRoof,c.frontRoof,u),-1+2*v).add(new T.Vector3(0,-.035,0)));liner.position.set(0,0,0);liner.rotation.set(0,0,0);}
+ }
  if(c.kind==='pickup'){
   const len=s.length/2+c.rearBase-.08,centre=(c.rearBase-s.length/2)/2;
   box(shell,trim,[len,.045,s.width*.80],[centre,c.belt-.20,0],.015,'bed-floor');
   for(const side of [-1,1])box(shell,paint,[len,.18,.07],[centre,c.belt-.06,side*s.width*.46],.028,'bed-rail');
+  for(const side of [-1,1]){
+   box(shell,trim,[len,.18,.025],[centre,c.belt-.09,side*s.width*.40],.008,'bed-inner-wall');
+   fleetSkin(shell,trim,'bed-wheel-tub',(u,v)=>{const a=u*Math.PI,x=-s.wheelbase/2+Math.cos(a)*(c.arch+.025);return new T.Vector3(x,Math.max(c.belt-.18,s.radius+Math.sin(a)*(c.arch+.025)),side*lerp(s.width*.30,s.width*.40,v));},side<0,48,8);
+  }
+  for(const x of [-s.length/2+.12,c.rearBase-.075])box(shell,trim,[.025,.18,s.width*.80],[x,c.belt-.09,0],.008,'bed-end-liner');
  }
  // Cargo vans retain opaque cargo panels, keeping the cab glass distinct.
  if(c.van&&s.id!=='minivan')for(const side of [-1,1])fleetSkin(shell,paint,'cargo-side-panel',(u,v)=>new T.Vector3(lerp(c.rearBase+.07,-.5,u),lerp(c.belt+.02,c.roof-.06,v),side*lerp(c.baseWidth,c.roofWidth,v)),side<0);
 }
-export function installFleetRoad(shell:T.Group,s:VehicleSpec){
+export function installFleetRoad(shell:T.Group,s:VehicleSpec,options:Partial<VehicleOptions>={}){
  const source=shell.getObjectByName('arched-body') as T.Mesh<T.BufferGeometry,T.MeshStandardMaterial>;
  const paint=new T.MeshPhysicalMaterial({color:source.material.color,metalness:.58,roughness:.25,clearcoat:1,clearcoatRoughness:.09});
  const trim=surface('#13191d',.12,.55),rubber=surface('#111519',.01,.82),metal=surface('#a5afb4',.94,.22);
- const glass=new T.MeshPhysicalMaterial({color:'#617b86',metalness:.12,roughness:.065,clearcoat:1,transparent:true,opacity:.78,depthWrite:false,side:T.DoubleSide});
+ const glass=new T.MeshPhysicalMaterial({color:'#617b86',metalness:.12,roughness:.065,clearcoat:1,transparent:true,opacity:options.glassOpacity??.78,depthWrite:false,side:T.DoubleSide});
  for(const o of [...shell.children])if(!['interior','console-switch-bank'].includes(o.name)){shell.remove(o);o.traverse(n=>{if(n instanceof T.Mesh)n.geometry.dispose();});}
  const c=fleetProfile(s),half=s.length/2;
  const body=mesh(shell,roadShell(s),paint,[0,0,0],[0,0,0],'arched-body');body.userData.sourceSurface='fleet-v5';
@@ -100,7 +110,7 @@ export function installFleetRoad(shell:T.Group,s:VehicleSpec){
   mesh(shell,new T.SphereGeometry(1,28,16).scale(.135,.058,.080),paint,p.toArray(),[0,0,0],'mirror');
   mesh(shell,new T.SphereGeometry(1,24,12).scale(.008,.043,.063),metal,[p.x-.12,p.y,p.z],[0,0,0],'mirror-glass');
  }
- const white=new T.MeshStandardMaterial({color:'#dce9f0',emissive:'#c7e2ff',emissiveIntensity:.65}),red=new T.MeshStandardMaterial({color:'#90121e',emissive:'#f12432',emissiveIntensity:.45});
+ const white=new T.MeshStandardMaterial({color:'#dce9f0',emissive:'#c7e2ff',emissiveIntensity:options.lights===false?0:.65}),red=new T.MeshStandardMaterial({color:'#90121e',emissive:'#f12432',emissiveIntensity:options.lights===false?0:.45});
  for(const front of [true,false]){
   const sign=front?1:-1,x=sign*half,y=c.belt-(front?.24:.15),lampWidth=s.width*(c.kind==='classic'?.13:.20),lampH=c.kind==='classic'?.12:c.utility?.075:.045;
   for(const side of [-1,1]){

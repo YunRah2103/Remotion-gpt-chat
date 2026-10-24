@@ -63,3 +63,22 @@ test('fleet road families pass structural audit and detect a displaced wheel anc
   assert.equal(auditFleetVehicle(car).state,'fail');disposeObject(car);
  }
 });
+test('pickup cargo bed is a real opening above its floor',()=>{
+ const car=createCinematicVehicle({variant:'crew-pickup',bodyDetail:'fleet',optimize:false});car.updateMatrixWorld(true);
+ const cast=new T.Raycaster(new T.Vector3(-2,4,0),new T.Vector3(0,-1,0));
+ const floor=cast.intersectObject(car.getObjectByName('bed-floor'))[0];assert.ok(floor);
+ const cover=cast.intersectObject(car.getObjectByName('arched-body')).find(h=>h.point.y>floor.point.y+.01);
+ assert.equal(cover,undefined);disposeObject(car);
+});
+test('V5 replacement glass and lamp materials honor existing options',()=>{
+ const car=createCinematicVehicle({variant:'saloon',bodyDetail:'fleet',glassOpacity:.2,lights:false,optimize:false});
+ assert.equal(car.getObjectByName('windshield').material.opacity,.2);
+ assert.equal(car.getObjectByName('led-signature').material.emissiveIntensity,0);disposeObject(car);
+});
+test('V5 roof liner stays below crowned roof after driver animation',()=>{
+ const car=createCinematicVehicle({variant:'saloon',bodyDetail:'fleet',driver:true,optimize:false});
+ const liner=car.getObjectByName('roof-liner'),roof=car.getObjectByName('roof');
+ assert.equal(liner.position.y,0);assert.ok(liner.geometry.attributes.position.count>100);
+ animateCinematicVehicle(car,{frame:20,fps:30,distance:5,speed:8});
+ assert.ok(liner.visible);assert.ok(new T.Box3().setFromObject(liner).max.y<new T.Box3().setFromObject(roof).max.y);disposeObject(car);
+});
