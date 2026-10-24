@@ -105,6 +105,8 @@ export function sampleEp006Camera(frame:number,pose:Ep006MotionPose,options:{
  }
  const actualDistance=Math.sqrt(dot(sub(position,target),sub(position,target)));
  if(actualDistance<requiredDistance)position=add(target,mul(back,requiredDistance+.08));
+ // Extending a low tracking ray must never bury the camera in the road.
+ position[1]=Math.max(position[1],surface+shot.minClearanceM);
  // Fit a useful subject without artificially tightening extreme wide shots.
  const projectedWidth=clamp(b.length/(2*Math.max(requiredDistance,actualDistance)*tanH),0,1);
  const clearance=position[1]-surface;
