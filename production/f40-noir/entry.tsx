@@ -118,8 +118,8 @@ const CONCRETE='#171d22',STEEL='#212a32',WHITE='#e1f4ff',CYAN='#79e1e7';
 function LightBar({position,length=5,vertical=false,blue=false}:{position:V3;length?:number;vertical?:boolean;blue?:boolean}){
   const color=blue?CYAN:WHITE;
   return <group position={position}>
-    <mesh rotation={vertical?[0,0,0]:[0,0,Math.PI/2]}>
-      <boxGeometry args={[vertical?.055:length,.055, .08]}/>
+    <mesh>
+      <boxGeometry args={vertical?[.055,length,.08]:[length,.055,.08]}/>
       <meshStandardMaterial color={color} emissive={color} emissiveIntensity={4.5} toneMapped={false}/>
     </mesh>
     <pointLight intensity={blue?11:9} color={color} distance={7} decay={2}/>
