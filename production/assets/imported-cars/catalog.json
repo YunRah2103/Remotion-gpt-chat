@@ -1,0 +1,314 @@
+{
+  "version": 1,
+  "description": "YUNEX reusable imported licensed 3D car and vehicle catalog. GLB binaries acquired on demand and verified, not stored in Git.",
+  "sourceValidationDate": "2026-10-24",
+  "rightsPolicy": "attribution-required entries can be acquired for production if attributions and publication rights are respected. review-only entries are experimental and must not be published or commercially released without further approval. All automaker names and marks remain their owners'.",
+  "assetRoot": "public/yunex/imported-cars",
+  "vehicles": [
+    {
+      "id": "ferrari-f40",
+      "name": "Ferrari F40",
+      "kind": "supercar",
+      "tags": [
+        "hero",
+        "classic",
+        "race"
+      ],
+      "creator": "Black Snow",
+      "originalUrl": "https://sketchfab.com/3d-models/ferrari-f40-52a66c41cfcd4f999fb1b1c49bf24d70",
+      "license": "CC-BY-4.0",
+      "attribution": "Ferrari F40 by Black Snow, licensed CC BY 4.0. Source: https://sketchfab.com/3d-models/ferrari-f40-52a66c41cfcd4f999fb1b1c49bf24d70",
+      "readiness": "attribution-required",
+      "publisherNote": "Creator attribution is mandatory; the uploader's licence does not grant rights to associated automotive trademarks.",
+      "source": {
+        "host": "github",
+        "owner": "sceneview",
+        "repository": "sceneview.github.io",
+        "commit": "fd7e851a96cd144ee5e72e217e2a83a9480bfe2f",
+        "path": "models/platforms/ferrari_f40.glb",
+        "gitBlobSha1": "ba7883f03490b2f3e5820d0c0a2f6b0b489b91e9",
+        "sizeBytes": 8058920
+      },
+      "fileName": "ferrari-f40.glb"
+    },
+    {
+      "id": "fiat-500-classic",
+      "name": "Fiat 500 Classic",
+      "kind": "classic",
+      "tags": [
+        "classic",
+        "city"
+      ],
+      "creator": "Francesco Coldesina",
+      "originalUrl": "https://sketchfab.com/3d-models/fiat-500-4606659ff31142e3b8080f995514452f",
+      "license": "CC-BY-4.0",
+      "attribution": "Fiat 500 Classic by Francesco Coldesina, licensed CC BY 4.0. Source: https://sketchfab.com/3d-models/fiat-500-4606659ff31142e3b8080f995514452f",
+      "readiness": "attribution-required",
+      "publisherNote": "Creator attribution is mandatory; the uploader's licence does not grant rights to associated automotive trademarks.",
+      "source": {
+        "host": "github",
+        "owner": "sceneview",
+        "repository": "sceneview.github.io",
+        "commit": "fd7e851a96cd144ee5e72e217e2a83a9480bfe2f",
+        "path": "models/platforms/fiat_500_classic.glb",
+        "gitBlobSha1": "ba0f2b1fc003ba04a2643e1bccab72d22a0a17de",
+        "sizeBytes": 12045368
+      },
+      "fileName": "fiat-500-classic.glb"
+    },
+    {
+      "id": "citroen-h-van",
+      "name": "Citroën H Van",
+      "kind": "van",
+      "tags": [
+        "commercial",
+        "stylized"
+      ],
+      "creator": "Daniel Zhabotinsky",
+      "originalUrl": "https://sketchfab.com/3d-models/french-delivery-van-low-poly-model-a350a422d200485ea57778dc42139edc",
+      "license": "CC-BY-4.0",
+      "attribution": "Citroën H Van by Daniel Zhabotinsky, licensed CC BY 4.0. Source: https://sketchfab.com/3d-models/french-delivery-van-low-poly-model-a350a422d200485ea57778dc42139edc",
+      "readiness": "attribution-required",
+      "publisherNote": "Creator attribution is mandatory; the uploader's licence does not grant rights to associated automotive trademarks.",
+      "source": {
+        "host": "github",
+        "owner": "sceneview",
+        "repository": "sceneview.github.io",
+        "commit": "fd7e851a96cd144ee5e72e217e2a83a9480bfe2f",
+        "path": "models/platforms/citroen_h_van.glb",
+        "gitBlobSha1": "246225d117e937fb77470037fb00a3b7796d1a6c",
+        "sizeBytes": 3721960
+      },
+      "fileName": "citroen-h-van.glb"
+    },
+    {
+      "id": "mini-cooper-s",
+      "name": "MINI Cooper S",
+      "kind": "hatchback",
+      "tags": [
+        "city",
+        "sport"
+      ],
+      "creator": "cenobyte",
+      "originalUrl": "https://sketchfab.com/3d-models/mini-cooper-s-b262744901a04cda823f17289d1a4847",
+      "license": "CC-BY-4.0",
+      "attribution": "MINI Cooper S by cenobyte, licensed CC BY 4.0. Source: https://sketchfab.com/3d-models/mini-cooper-s-b262744901a04cda823f17289d1a4847",
+      "readiness": "attribution-required",
+      "publisherNote": "Creator attribution is mandatory; the uploader's licence does not grant rights to associated automotive trademarks.",
+      "source": {
+        "host": "github",
+        "owner": "sceneview",
+        "repository": "sceneview.github.io",
+        "commit": "fd7e851a96cd144ee5e72e217e2a83a9480bfe2f",
+        "path": "models/platforms/mini_cooper_s.glb",
+        "gitBlobSha1": "4661e1cd8ffe719f100530686598ae236acb9678",
+        "sizeBytes": 4524592
+      },
+      "fileName": "mini-cooper-s.glb"
+    },
+    {
+      "id": "peugeot-2008",
+      "name": "Peugeot 2008",
+      "kind": "suv",
+      "tags": [
+        "suv",
+        "city"
+      ],
+      "creator": "David_Holiday",
+      "originalUrl": "https://sketchfab.com/3d-models/2020-peugeot-2008-93efd164d3374295a8ac04c36e329429",
+      "license": "CC-BY-4.0",
+      "attribution": "Peugeot 2008 by David_Holiday, licensed CC BY 4.0. Source: https://sketchfab.com/3d-models/2020-peugeot-2008-93efd164d3374295a8ac04c36e329429",
+      "readiness": "attribution-required",
+      "publisherNote": "Creator attribution is mandatory; the uploader's licence does not grant rights to associated automotive trademarks.",
+      "source": {
+        "host": "github",
+        "owner": "sceneview",
+        "repository": "sceneview.github.io",
+        "commit": "fd7e851a96cd144ee5e72e217e2a83a9480bfe2f",
+        "path": "models/platforms/peugeot_2008.glb",
+        "gitBlobSha1": "70d94af991e0ae6d2db9691ab0e1ca1d4201fc3e",
+        "sizeBytes": 10128808
+      },
+      "fileName": "peugeot-2008.glb"
+    },
+    {
+      "id": "tesla-model-3",
+      "name": "Tesla Model 3",
+      "kind": "sedan",
+      "tags": [
+        "electric",
+        "city",
+        "lightweight"
+      ],
+      "creator": "David_Holiday",
+      "originalUrl": "https://sketchfab.com/3d-models/tesla-model-3-123c10f376ec4f18b93c73afc382808b",
+      "license": "CC-BY-4.0",
+      "attribution": "Tesla Model 3 by David_Holiday, licensed CC BY 4.0. Source: https://sketchfab.com/3d-models/tesla-model-3-123c10f376ec4f18b93c73afc382808b",
+      "readiness": "attribution-required",
+      "publisherNote": "Creator attribution is mandatory; the uploader's licence does not grant rights to associated automotive trademarks.",
+      "source": {
+        "host": "github",
+        "owner": "sceneview",
+        "repository": "sceneview.github.io",
+        "commit": "fd7e851a96cd144ee5e72e217e2a83a9480bfe2f",
+        "path": "models/platforms/tesla_model_3.glb",
+        "gitBlobSha1": "8ed569128812413f4f382a137dea0ee313b6086d",
+        "sizeBytes": 549128
+      },
+      "fileName": "tesla-model-3.glb"
+    },
+    {
+      "id": "car-concept",
+      "name": "Khronos Car Concept",
+      "kind": "concept",
+      "tags": [
+        "concept",
+        "showcase"
+      ],
+      "creator": "Darmstadt Graphics Group GmbH (Eric Chadwick)",
+      "originalUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept",
+      "license": "CC-BY-4.0",
+      "attribution": "Khronos Car Concept by Darmstadt Graphics Group GmbH (Eric Chadwick), licensed CC BY 4.0. Source: https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept",
+      "readiness": "attribution-required",
+      "publisherNote": "Creator attribution is mandatory; the uploader's licence does not grant rights to associated automotive trademarks.",
+      "source": {
+        "host": "github",
+        "owner": "sceneview",
+        "repository": "sceneview.github.io",
+        "commit": "fd7e851a96cd144ee5e72e217e2a83a9480bfe2f",
+        "path": "models/platforms/CarConcept.glb",
+        "gitBlobSha1": "c0f38c989a78cc4ba63253b5338705e0afb0142f",
+        "sizeBytes": 11778688
+      },
+      "fileName": "car-concept.glb"
+    },
+    {
+      "id": "toy-car",
+      "name": "Khronos Toy Car",
+      "kind": "stylized",
+      "tags": [
+        "stylized",
+        "cc0"
+      ],
+      "creator": "Guido Odendahl; Eric Chadwick (extensions)",
+      "originalUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/ToyCar",
+      "license": "CC0-1.0",
+      "attribution": "Toy Car by Guido Odendahl, extended by Eric Chadwick; CC0 1.0, via Khronos glTF Sample Assets.",
+      "readiness": "attribution-required",
+      "publisherNote": "Creator attribution is mandatory; the uploader's licence does not grant rights to associated automotive trademarks.",
+      "source": {
+        "host": "github",
+        "owner": "sceneview",
+        "repository": "sceneview.github.io",
+        "commit": "fd7e851a96cd144ee5e72e217e2a83a9480bfe2f",
+        "path": "models/platforms/ToyCar.glb",
+        "gitBlobSha1": "0d1496b4967025cfa023990420e496a845423112",
+        "sizeBytes": 2152460
+      },
+      "fileName": "toy-car.glb"
+    },
+    {
+      "id": "vespa-et3",
+      "name": "Vespa Primavera ET3",
+      "kind": "motorbike",
+      "tags": [
+        "motorbike",
+        "classic"
+      ],
+      "creator": "Nadia Ribitis",
+      "originalUrl": "https://sketchfab.com/3d-models/old-scooter-5e9b5072b2224ba982366490ad5f31d9",
+      "license": "CC-BY-4.0",
+      "attribution": "Vespa Primavera ET3 (Old Scooter) by Nadia Ribitis, CC BY 4.0. Source: https://sketchfab.com/3d-models/old-scooter-5e9b5072b2224ba982366490ad5f31d9",
+      "readiness": "attribution-required",
+      "publisherNote": "Creator attribution is mandatory; the uploader's licence does not grant rights to associated automotive trademarks.",
+      "source": {
+        "host": "github",
+        "owner": "sceneview",
+        "repository": "sceneview.github.io",
+        "commit": "fd7e851a96cd144ee5e72e217e2a83a9480bfe2f",
+        "path": "models/platforms/vespa_et3.glb",
+        "gitBlobSha1": "278efe395487f4134cfa11b6411f4ef70686cfd2",
+        "sizeBytes": 2611440
+      },
+      "fileName": "vespa-et3.glb"
+    },
+    {
+      "id": "cesium-milk-truck",
+      "name": "Cesium Milk Truck",
+      "kind": "truck",
+      "tags": [
+        "commercial",
+        "utility",
+        "example"
+      ],
+      "creator": "Cesium",
+      "originalUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CesiumMilkTruck",
+      "license": "CC-BY-4.0",
+      "attribution": "Cesium Milk Truck by Cesium. CC BY 4.0; distributed by Khronos glTF Sample Assets.",
+      "readiness": "attribution-required",
+      "publisherNote": "Preserve creator attribution.",
+      "source": {
+        "host": "github",
+        "owner": "KhronosGroup",
+        "repository": "glTF-Sample-Assets",
+        "commit": "8f492390ddc7a2ae221a1369ef560589cf8c70fb",
+        "path": "Models/CesiumMilkTruck/glTF-Binary/CesiumMilkTruck.glb",
+        "gitBlobSha1": "d5c7cf5a921c77a3a8d6011b9164c217db105008",
+        "sizeBytes": 369980
+      },
+      "fileName": "cesium-milk-truck.glb"
+    },
+    {
+      "id": "mclaren-senna",
+      "name": "McLaren Senna",
+      "kind": "supercar",
+      "tags": [
+        "hero",
+        "track",
+        "hypercar"
+      ],
+      "creator": "Black Snow",
+      "originalUrl": "https://sketchfab.com/3d-models/mclaren-senna-free-ea3e43a6eb004853a87fe9c58422eb96",
+      "license": "CC-BY-4.0",
+      "attribution": "McLaren Senna Free by Black Snow (@BlackSnow02), Sketchfab listing under CC BY 4.0.",
+      "readiness": "review-only",
+      "publisherNote": "Third-party mirror binary has not been independently proven identical to Black Snow's source download. Use only for drafts and review until provenance/commercial rights assessed.",
+      "source": {
+        "host": "github",
+        "owner": "AuraK-7",
+        "repository": "wild-racing-models",
+        "commit": "6c6a4875004713fe23f3a5ae1bc6c6c075214be3",
+        "path": "models/McLaren/mclaren_senna_free.glb",
+        "gitBlobSha1": "119a5ca46c24ff6fda34c98f0e851f22cbdfdc60",
+        "sizeBytes": 26986852
+      },
+      "fileName": "mclaren-senna.glb"
+    },
+    {
+      "id": "porsche-manthey-gt3rs",
+      "name": "Porsche GT3 RS 992 Manthey",
+      "kind": "supercar",
+      "tags": [
+        "hero",
+        "track",
+        "gt3"
+      ],
+      "creator": "HYPR:IMPS 3D",
+      "originalUrl": "https://sketchfab.com/3d-models/2024-manthey-racing-porsche-911-gt3-rs-09ccead93fb34944bde812d4b4684eff",
+      "license": "CC-BY-4.0",
+      "attribution": "2024 Manthey Racing Porsche 911 GT3 RS by HYPR:IMPS 3D, Sketchfab CC Attribution 4.0.",
+      "readiness": "review-only",
+      "publisherNote": "Third-party mirror source attribution and downstream commercial rights need independent review. Existing PR #279 used this pinned file.",
+      "source": {
+        "host": "github",
+        "owner": "Priyanshh1407",
+        "repository": "porsche-react",
+        "commit": "afc3c19c8a29f28e253e2cee4285bbb4b2c92a1e",
+        "path": "porsche-react-master/public/2024_manthey_racing_porsche_911_gt3_rs.glb",
+        "gitBlobSha1": "4642ff67ba3c0570e0d36ee94bbc843b040e5346",
+        "sizeBytes": 0
+      },
+      "fileName": "porsche-manthey-gt3rs.glb"
+    }
+  ]
+}
