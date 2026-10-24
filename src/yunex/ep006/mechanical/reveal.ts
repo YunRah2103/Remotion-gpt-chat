@@ -111,8 +111,20 @@ export function createEp006MechanicalReveal(vehicle:T.Group):MechanicalReveal{
     const bottomCollar=section(metal,.032,'shock-lower-eye-'+corner);
     const spring=helix(gold,'active-coil-spring-'+corner);
     overlay.add(barrel,shaft,topCollar,bottomCollar,spring);
-    const pos=tyre.geometry.attributes.position.array;
-    const tyreRest=Array.from(((tyre.userData.restVertices as number[]|undefined)??pos) as ArrayLike<number>);
+    const positionAttribute=tyre.geometry.getAttribute('position');
+    if(!(positionAttribute instanceof T.BufferAttribute))throw Error('Missing valid tyre position attribute at '+corner);
+    const rawVertices:unknown=tyre.userData.restVertices;
+    const sourceVertices=Array.isArray(rawVertices)?rawVertices:positionAttribute.array;
+    const tyreRest:number[]=[];
+    // Intentionally validate each sample before accepting it: neither a
+    // typed-array assertion nor an implicit cast may mask corrupt geometry.
+    for(const value of sourceVertices){
+      if(typeof value!=='number'||!Number.isFinite(value))
+        throw Error('Non-finite tyre vertex at '+corner);
+      tyreRest.push(value);
+    }
+    if(tyreRest.length!==positionAttribute.count*3)
+      throw Error('Unexpected tyre vertex count at '+corner);
     corners.push({corner,mount,rest:new T.Vector3(...(mount.userData.restPosition as [number,number,number])),
       links,damper,upper:new T.Vector3(...datum.a),lower:new T.Vector3(...datum.b),
       overlay,coil:spring,barrel,shaft,topCollar,bottomCollar,
