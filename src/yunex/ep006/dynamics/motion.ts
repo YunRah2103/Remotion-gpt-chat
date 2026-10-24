@@ -63,11 +63,11 @@ export const EP006_JUMPS = [
   {id:'J2' as const,launchFrame:684,landingFrame:750},
 ] as const;
 const durationOf=(jump:typeof EP006_JUMPS[number])=>(jump.landingFrame-jump.launchFrame)/EP006_FPS;
-const launchSpeedY=(jump:typeof EP006_JUMPS[number])=>{
+const launchClearanceM=0.13; // initial airborne tyre clearance, including rear axle droop\nconst launchSpeedY=(jump:typeof EP006_JUMPS[number])=>{
  const fromX=ep006TravelXM(jump.launchFrame/EP006_FPS);
  const toX=ep006TravelXM(jump.landingFrame/EP006_FPS);
  const duration=durationOf(jump);
- return (ep006SurfaceHeightM(toX)-ep006SurfaceHeightM(fromX)+.5*EP006_GRAVITY_MPS2*duration*duration)/duration;
+ return (ep006SurfaceHeightM(toX)-ep006SurfaceHeightM(fromX)-launchClearanceM+.5*EP006_GRAVITY_MPS2*duration*duration)/duration;
 };
 export const EP006_JUMP_EVENTS = EP006_JUMPS.map(j=>({
  id:j.id,launchFrame:j.launchFrame,landingFrame:j.landingFrame,
@@ -103,7 +103,7 @@ export function sampleEp006Motion(frame:number):Ep006Motion {
  let phase:Ep006Phase='driving',jumpId:Ep006JumpId|null=null;
  if(airborne){
   const age=(frame-airborne.launchFrame)/EP006_FPS,vy0=launchSpeedY(airborne);
-  y=ep006SurfaceHeightM(ep006TravelXM(airborne.launchFrame/EP006_FPS))+vy0*age-.5*EP006_GRAVITY_MPS2*age*age;
+  y=ep006SurfaceHeightM(ep006TravelXM(airborne.launchFrame/EP006_FPS))+launchClearanceM+vy0*age-.5*EP006_GRAVITY_MPS2*age*age;
   vy=vy0-EP006_GRAVITY_MPS2*age;
   pitch=.075*(1-age/durationOf(airborne));
   phase=frame===airborne.launchFrame?'takeoff':'airborne';jumpId=airborne.id;
