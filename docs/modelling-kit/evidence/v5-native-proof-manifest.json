@@ -90,7 +90,9 @@
       "localSourceCommit": "87766cce8e274fc17ce1f310d17dad2621a450ca",
       "sourceSrcTree": "b429707dd41b5a8c101fb09c8f719b92058bacfa",
       "sourceFile": "V5-classic-tail.mp4",
-      "sha256": "db1c6e270b8791c1bdaf10bde5839c11319453d93a8bde0c56da99a6e8ac2e0d"
+      "sha256": "db1c6e270b8791c1bdaf10bde5839c11319453d93a8bde0c56da99a6e8ac2e0d",
+      "equivalentPublishedSourceCommit": "471b4e50164017ee4f95c8069875ec54f42f858e",
+      "sourceEquivalence": "Identical complete src subtree, identical unchanged package lock and Remotion configuration; later changes are media-gate scripts and documentation."
     }
   ],
   "reviewMethod": "Chronological decoded sequence samples, not real-time playback or all-frame visual signoff",
