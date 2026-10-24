@@ -1,0 +1,67 @@
+name: YUNEX imported-car fleet integrity
+on:
+  push:
+    branches:
+      - feat/yunex-imported-car-fleet-20261024
+    paths:
+      - 'production/assets/imported-cars/**'
+      - 'src/yunex/imported-cars/**'
+      - 'scripts/imported-cars.mjs'
+      - 'tests/imported-cars/**'
+      - '.github/workflows/yunex-imported-cars.yml'
+      - 'package.json'
+  pull_request:
+    paths:
+      - 'production/assets/imported-cars/**'
+      - 'src/yunex/imported-cars/**'
+      - 'scripts/imported-cars.mjs'
+      - 'tests/imported-cars/**'
+      - '.github/workflows/yunex-imported-cars.yml'
+      - 'package.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  imported-cars:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Compile and verify model contract
+        run: |
+          npm run check
+          node --test tests/imported-cars/catalog.test.mjs
+      - name: Fetch ALL 10 attributed real-geometry GLBs
+        run: |
+          npm run kit:cars:list
+          npm run kit:cars:fetch -- all
+          npm run kit:cars:verify -- all
+      - name: Inspect extracted model metadata and gate duplicates
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path('production/assets/imported-cars/catalog.json').read_text())
+          v=json.loads(Path('out/imported-cars/verified-manifest.json').read_text())
+          ready=[x for x in c['vehicles'] if x['readiness']=='attribution-required']
+          assert len(v['records'])==len(ready)
+          assert set(x['id'] for x in v['records'])==set(x['id'] for x in ready)
+          assert all(x['meshes']>0 and x['sha256'] for x in v['records'])
+          assert all(x['readiness']=='attribution-required' for x in v['records'])
+          print('PASS verified ready imported real-geometry models:',len(ready))
+          for x in v['records']:
+              print(x['id'],x['meshes'],'meshes',x['materials'],'materials',x['textures'],'textures')
+          PY
+      - name: Keep verification records (no third-party binary redistribution)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-Imported-Cars-Verification
+          path: out/imported-cars/verified-manifest.json
+          if-no-files-found: warn
+          retention-days: 14
