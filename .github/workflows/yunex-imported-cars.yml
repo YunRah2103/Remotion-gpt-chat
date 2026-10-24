@@ -57,11 +57,18 @@ jobs:
           for x in v['records']:
               print(x['id'],x['meshes'],'meshes',x['materials'],'materials',x['textures'],'textures')
           PY
+      - name: Native Three.js/Remotion real Ferrari model frame
+        run: |
+          mkdir -p out/imported-cars
+          npx remotion still src/yunex/imported-cars/entry.tsx YunexImportedCarPreview out/imported-cars/ferrari-f40-actual-mesh.png --frame=10 --scale=.5 --gl=swangle --timeout=120000
+          test -s out/imported-cars/ferrari-f40-actual-mesh.png
       - name: Keep verification records (no third-party binary redistribution)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: YUNEX-Imported-Cars-Verification
-          path: out/imported-cars/verified-manifest.json
+          path: |
+            out/imported-cars/verified-manifest.json
+            out/imported-cars/ferrari-f40-actual-mesh.png
           if-no-files-found: warn
           retention-days: 14
