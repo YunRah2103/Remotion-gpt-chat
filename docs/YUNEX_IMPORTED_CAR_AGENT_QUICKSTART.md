@@ -57,3 +57,7 @@ For a different display size, pass `--length=5.1`; to replace an existing local 
 ## Current V5 work
 
 The authored procedural fleet rebuild is still [PR #282](https://github.com/YunRah2103/Remotion-gpt-chat/pull/282), and the opt-in V5 scene/environment work is [PR #277](https://github.com/YunRah2103/Remotion-gpt-chat/pull/277). This importer adds a complementary production route without claiming either unfinished visual review is complete. Keep those PRs under their existing review gates.
+
+## Mesh-quality preflight for 96 external candidates
+
+On every private-review download, `production/asset-library/fetch_cars.py` now checks GLB 2.0 structure, non-empty triangle meshes, POSITION/index accessor ranges, pinned Git blob SHA and exact bytes. It writes `out/imported-cars/external-mesh-audit.json` with mesh, primitive, vertex, approximate triangle, material and texture counts. Use that data to **shortlist assets for visual inspection**, not to certify manufacturer fidelity, usable rigs, texture sharpness or publisher rights. Reject weak/clipped models on the six-second camera orbit even if triangle counts are high.
