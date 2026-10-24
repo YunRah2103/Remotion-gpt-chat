@@ -5,6 +5,7 @@
  */
 import verifiedCatalogue from '../../../production/assets/imported-cars/catalog.json';
 import externalCatalogue from '../../../production/asset-library/external-car-catalogue.json';
+import {requirePrivateReview} from './permissions.ts';
 
 export type ImportedAssetDetails = {
   id:string;
@@ -55,7 +56,5 @@ export function importedAssetInfo(id:string):ImportedAssetDetails{
  */
 export function resolveImportedAsset(id:string,options:{privateReview?:boolean}={}):ImportedAssetDetails{
   const item=importedAssetInfo(id);
-  if(item.privateReviewOnly&&!options.privateReview)
-    throw Error('PRIVATE REVIEW ONLY: '+id+' has unverified source or publication rights. Set privateReview={true} solely for a non-public inspection, after acquiring the asset.');
-  return item;
+  return requirePrivateReview(item,options.privateReview);
 }
