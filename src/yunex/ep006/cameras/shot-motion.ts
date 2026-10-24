@@ -29,7 +29,7 @@ type Shot={
 export const EP006_CAMERA_SHOTS:readonly Shot[]=[
  {id:'jump-hook',start:0,end:36,fov:44,position0:[7.5,1.05,-6.1],position1:[6.9,1.2,-7.0],target0:[.30,.72,0],target1:[-.18,.95,0],minClearanceM:.48},
  {id:'flight-profile',start:36,end:74,fov:44,position0:[1.0,1.85,-11.1],position1:[-2.0,1.55,-11.8],target0:[.6,.80,0],target1:[.10,.60,0],minClearanceM:.40},
- {id:'first-touchdown',start:74,end:103,fov:49,position0:[6.5,.45,-6.5],position1:[5.5,.65,-6.6],target0:[.8,.48,0],target1:[.2,.56,0],minClearanceM:.32},
+ {id:'first-touchdown',start:74,end:103,fov:47,position0:[6.5,.62,3.5],position1:[5.5,.70,3.55],target0:[.8,.48,0],target1:[.2,.56,0],minClearanceM:.40},
  {id:'landing-follow',start:103,end:192,fov:45,position0:[-8.3,2.3,5.0],position1:[-7.6,1.4,6.0],target0:[.6,.9,0],target1:[1.1,.7,0],minClearanceM:.45},
  {id:'underbody-glide',start:192,end:277,fov:51,position0:[3.7,.12,-3.8],position1:[-3.5,.22,-4.4],target0:[.6,.36,0],target1:[-.8,.48,0],minClearanceM:.23},
  {id:'wheel-response',start:277,end:375,fov:44,position0:[2.8,.38,-3.4],position1:[1.6,.56,-4.3],target0:[1.25,.38,-.6],target1:[1.25,.54,-.6],minClearanceM:.24},
@@ -39,7 +39,7 @@ export const EP006_CAMERA_SHOTS:readonly Shot[]=[
  {id:'exit-chase',start:610,end:675,fov:47,position0:[-8.4,1.1,5.3],position1:[-9.1,1.6,4.2],target0:[2.2,.75,0],target1:[2.9,.85,0],minClearanceM:.50},
  {id:'final-takeoff',start:675,end:725,fov:46,position0:[7.2,.95,6.5],position1:[4.5,1.5,8.4],target0:[.35,.68,0],target1:[0,.8,0],minClearanceM:.42},
  {id:'final-apex',start:725,end:752,fov:43,position0:[-.8,1.8,-12.0],position1:[-3.2,2.2,-10.9],target0:[.2,.87,0],target1:[0,.8,0],minClearanceM:.38},
- {id:'final-touchdown',start:752,end:784,fov:49,position0:[5.9,.65,-6.5],position1:[4.7,.42,-7.2],target0:[.6,.45,0],target1:[0,.55,0],minClearanceM:.29},
+ {id:'final-touchdown',start:752,end:784,fov:47,position0:[6.8,.80,3.15],position1:[5.4,.68,3.35],target0:[.6,.48,0],target1:[0,.55,0],minClearanceM:.42},
  {id:'drive-away',start:784,end:810,fov:43,position0:[-8.2,1.35,4.2],position1:[-11.0,2.1,5.6],target0:[1.4,.7,0],target1:[3.5,.75,0],minClearanceM:.40}
 ] as const;
 
