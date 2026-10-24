@@ -19,11 +19,11 @@ const clamp=(n:number)=>Math.max(0,Math.min(1,n));
 const ease=(n:number)=>{const x=clamp(n);return x*x*(3-2*x)};
 const shots:{start:V3;end:V3;look:V3;fov:number}[]=[
   // 0-2s: headlights, nose, dramatic low front-three-quarter tracking.
-  {start:[-5.8,1.62,10.8],end:[-4.9,1.38,9.5],look:[0.0,.96,0],fov:43},
+  {start:[-3.45,1.04,6.35],end:[-3.05,1.00,5.95],look:[-.48,.69,0],fov:43},
   // 2-4s: genuine wheels, side-intake and recognisable F40 side profile.
-  {start:[.2,1.48,9.65],end:[-1.8,1.46,8.9],look:[.10,.94,0],fov:42},
+  {start:[-.9,1.03,7.9],end:[.85,1.02,7.4],look:[0,.68,0],fov:45},
   // 4-6s: big wing, broad rear stance and luminous architectural reveal.
-  {start:[6.8,2.05,9.5],end:[5.9,1.65,8.6],look:[.08,1.10,0],fov:44}
+  {start:[3.65,1.22,6.5],end:[3.35,1.00,5.9],look:[.55,.80,0],fov:43}
 ];
 function CameraRig(){
   const frame=useCurrentFrame(),{camera}=useThree();
@@ -49,9 +49,9 @@ function PhysicalPipeline(){
     const envScene=new RoomEnvironment();
     const renderTarget=pmrem.fromScene(envScene,.03);
     scene.environment=renderTarget.texture;
-    scene.environmentIntensity=1.22;
+    scene.environmentIntensity=.92;
     gl.toneMapping=THREE.ACESFilmicToneMapping;
-    gl.toneMappingExposure=1.12;
+    gl.toneMappingExposure=.73;
     gl.outputColorSpace=THREE.SRGBColorSpace;
     return()=>{scene.environment=previous;scene.background=background;
       gl.toneMapping=tone;gl.toneMappingExposure=exposure;
@@ -114,15 +114,15 @@ function FerrariAsset(){
   },[gltf.scene]);
   return <primitive object={pivot}/>;
 }
-const CONCRETE='#171d22',STEEL='#212a32',WHITE='#e1f4ff',CYAN='#79e1e7';
+const CONCRETE='#0d141a',STEEL='#141e26',WHITE='#dae5ed',CYAN='#59bac5';
 function LightBar({position,length=5,vertical=false,blue=false}:{position:V3;length?:number;vertical?:boolean;blue?:boolean}){
   const color=blue?CYAN:WHITE;
   return <group position={position}>
     <mesh>
       <boxGeometry args={vertical?[.055,length,.08]:[length,.055,.08]}/>
-      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={4.5} toneMapped={false}/>
+      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={2.8} toneMapped={false}/>
     </mesh>
-    <pointLight intensity={blue?11:9} color={color} distance={7} decay={2}/>
+    <pointLight intensity={blue?2.9:2.4} color={color} distance={6} decay={2}/>
   </group>;
 }
 function Hangar(){
@@ -136,14 +136,14 @@ function Hangar(){
     {/* Wet floor, flush with real tyre ground contact */}
     <mesh rotation={[-Math.PI/2,0,0]} position={[0,-.027,0]} receiveShadow>
       <planeGeometry args={[90,90]}/>
-      <meshPhysicalMaterial color="#181f25" metalness={.45} roughness={.14}
+      <meshPhysicalMaterial color="#0b1015" metalness={.52} roughness={.12}
         clearcoat={.95} clearcoatRoughness={.08}/>
     </mesh>
     {puddles.map((p,i)=><mesh key={i} rotation={[-Math.PI/2,0,0]}
        position={[p.x,-.017,p.z]} receiveShadow>
        <planeGeometry args={[p.sx,p.sz]}/>
-       <meshPhysicalMaterial color="#233039" metalness={.45} roughness={.065}
-         transparent opacity={.38} depthWrite={false}/>
+       <meshPhysicalMaterial color="#141e25" metalness={.62} roughness={.065}
+         transparent opacity={.31} depthWrite={false}/>
     </mesh>)}
     {/* A deep believable architecture: concrete bays, load-bearing columns,
         wall cladding, suspended ceiling, light coves, drainage grates. */}
@@ -171,7 +171,7 @@ function Hangar(){
       <LightBar position={[x,5.65,-7.25]} length={4.4} vertical blue={i%2===0}/>
     </group>)}
     {[-6,6].map((x,i)=><group key={i}>
-      {[-5,1,7].map((z,j)=><group key={j}>
+      {[-5,1].map((z,j)=><group key={j}>
         <mesh position={[x,3,z]} receiveShadow castShadow>
           <boxGeometry args={[.62,6,.62]}/>
           <meshStandardMaterial color={STEEL} metalness={.24} roughness={.72}/>
@@ -206,19 +206,22 @@ function Scene(){
     camera={{fov:43,near:.06,far:100,position:[-5,1.7,11]}}>
     <PhysicalPipeline/>
     <Hangar/>
-    <hemisphereLight args={['#d9eaf2','#17212d',.78]}/>
-    <ambientLight intensity={.15}/>
-    <directionalLight color="#eef5ff" intensity={3.4} position={[-3.8,7.2,5.3]} castShadow
+    <hemisphereLight args={['#d9eaf2','#111921',.49]}/>
+    <ambientLight intensity={.07}/>
+    <directionalLight color="#eef5ff" intensity={2.8} position={[-3.8,7.2,5.3]} castShadow
       shadow-mapSize={[2048,2048]} shadow-camera-left={-10} shadow-camera-right={10}
       shadow-camera-top={10} shadow-camera-bottom={-10} shadow-camera-near={.1}
       shadow-camera-far={35} shadow-bias={-.00012} shadow-normalBias={.025}/>
-    <directionalLight color="#69a6e1" intensity={2.2} position={[7,4,-4]}/>
-    <spotLight color="#b9f8ff" intensity={80} position={[-3,7,-4]}
+    <directionalLight color="#69a6e1" intensity={1.3} position={[7,4,-4]}/>
+    <spotLight color="#b9f8ff" intensity={26} position={[-3,7,-4]}
       angle={.48} penumbra={.9} distance={22}/>
     <FerrariAsset/>
     <CameraRig/>
   </ThreeCanvas>;
 }
-const Film:React.FC=()=> <AbsoluteFill style={{backgroundColor:'#0c151b'}}><Scene/></AbsoluteFill>;
+const Film:React.FC=()=> <AbsoluteFill style={{backgroundColor:'#070a0c'}}>
+  <AbsoluteFill style={{filter:'contrast(1.14) saturate(1.14)'}}><Scene/></AbsoluteFill>
+  <AbsoluteFill style={{pointerEvents:'none',background:'radial-gradient(ellipse at 50% 48%, transparent 25%, rgba(0,5,10,0.54) 105%)'}}/>
+</AbsoluteFill>;
 registerRoot(()=> <Composition id="YunexRossoAfterDark" component={Film}
   width={1080} height={1920} fps={FPS} durationInFrames={FRAMES}/>);
