@@ -1,0 +1,85 @@
+name: YUNEX EP006 Agent 1 rally vehicle native proof
+on:
+  push:
+    branches:
+      - agent/ep006-01-rally-vehicle
+    paths:
+      - 'src/yunex/ep006/vehicle/**'
+      - 'src/yunex/studio-projects/ep006-a1-vehicle/**'
+      - 'tests/ep006-agent1/**'
+      - '.github/workflows/yunex-ep006-agent1-vehicle.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ep006-agent1-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install pinned modelling and media dependencies
+        run: |
+          npm ci --no-audit --no-fund
+          bash scripts/modelling-kit/install-native-media.sh
+      - name: Validate existing project and agent-specific suspension
+        run: |
+          npm run check
+          node --experimental-strip-types --test tests/ep006-agent1/vehicle.test.mjs
+      - name: Native moving proof, no soundtrack
+        run: |
+          mkdir -p out/ep006/agent-01
+          npx remotion render src/yunex/studio-projects/ep006-a1-vehicle/entry.tsx Ep006Agent1VehicleProof \
+            out/ep006/agent-01/vehicle-proof.mp4 \
+            --gl=swangle --codec=h264 --pixel-format=yuv420p --color-space=bt709 \
+            --crf=18 --concurrency=2
+      - name: Native decode, frame count, silence and SHA256
+        shell: bash
+        run: |
+          set -euo pipefail
+          FILE=out/ep006/agent-01/vehicle-proof.mp4
+          ffprobe -v error -show_entries format=duration:stream=codec_name,codec_type,width,height,avg_frame_rate,nb_frames \
+            -of json "$FILE" | tee out/ep006/agent-01/ffprobe.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('out/ep006/agent-01/ffprobe.json'))
+          streams=d['streams']; video=[s for s in streams if s['codec_type']=='video']
+          assert len(video)==1,streams
+          v=video[0]
+          assert (v['codec_name'],v['width'],v['height'],v['avg_frame_rate'])==('h264',1080,1920,'30/1'),v
+          assert int(v['nb_frames'])==180,v
+          assert not any(s['codec_type']=='audio' for s in streams),streams
+          print('PASS native 180 frames, silent H.264, portrait 30fps')
+          PY
+          ffmpeg -hide_banner -loglevel error -xerror -i "$FILE" -f null -
+          sha256sum "$FILE" | tee out/ep006/agent-01/sha256.txt
+          git rev-parse HEAD > out/ep006/agent-01/source-commit.txt
+          for FRAME in 5 35 65 95 125 155 175; do
+            ffmpeg -hide_banner -loglevel error -y -i "$FILE" \
+              -vf "select=eq(n\\,$FRAME),scale=540:960" -frames:v 1 \
+              "out/ep006/agent-01/frame-$FRAME.png"
+          done
+          # Distinct frame hashes establish non-static temporal samples;
+          # they are not a substitute for watching the moving footage.
+          python3 - <<'PY'
+          import glob,hashlib
+          f=sorted(glob.glob('out/ep006/agent-01/frame-*.png'))
+          assert len(f)==7,f
+          hashes=[hashlib.sha256(open(x,'rb').read()).hexdigest() for x in f]
+          assert len(set(hashes))>=5,'preview appears static'
+          print('Distinct visual sample hashes:',len(set(hashes)))
+          PY
+      - name: Upload native MP4 and QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-EP006-A1-Rally-Vehicle
+          path: out/ep006/agent-01/
+          if-no-files-found: warn
+          retention-days: 30
