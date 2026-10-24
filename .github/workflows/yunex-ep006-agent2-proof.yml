@@ -16,6 +16,9 @@ on:
       - 'src/yunex/studio-projects/ep006-a2-jump/**'
       - 'tests/ep006/agent2-physics.test.mjs'
   workflow_dispatch:
+concurrency:
+  group: yunex-ep006-agent2-native-proof
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
