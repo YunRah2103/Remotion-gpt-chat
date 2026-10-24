@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - feat/yunex-imported-car-fleet-20261024
+      - feat/yunex-imported-cars-agent-ready
     paths:
       - 'production/assets/imported-cars/**'
       - 'src/yunex/imported-cars/**'
@@ -16,6 +17,7 @@ on:
       - 'production/assets/imported-cars/**'
       - 'src/yunex/imported-cars/**'
       - 'scripts/imported-cars.mjs'
+      - 'scripts/yunex-agent-car.mjs'
       - 'tests/imported-cars/**'
       - '.github/workflows/yunex-imported-cars.yml'
       - 'package.json'
