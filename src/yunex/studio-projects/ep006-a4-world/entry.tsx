@@ -30,8 +30,12 @@ const RallyStageProof:React.FC=()=>{
   }),[]);
   useEffect(()=>()=>{disposeObject(stage);disposeObject(car);},[stage,car]);
   const pose=previewPose(f);
+  // Four independently sampled wheel contact points: the render has NO second road function.
+  const wheelY=(axleX:number,sideZ:number)=>pose.air?-.08:heightAt(pose.x+axleX,sideZ)-heightAt(pose.x,0);
   animateCinematicVehicle(car,{frame:f,fps:FPS,distance:pose.x+25,speed:33,curvature:0,
-    compression:Math.max(0,Math.min(.075,pose.impact*.075)),roughness:0});
+    compression:Math.max(0,Math.min(.075,pose.impact*.075)),roughness:0,
+    roadFrontLeft:wheelY(1.31,.82),roadFrontRight:wheelY(1.31,-.82),
+    roadRearLeft:wheelY(-1.31,.82),roadRearRight:wheelY(-1.31,-.82)});
   car.position.set(pose.x,pose.y,0);
   car.rotation.set(0,0,pose.air?-.055:0);
   // Motion, pan and hero scale are real frame-by-frame Three.js updates.
