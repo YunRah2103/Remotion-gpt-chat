@@ -1,0 +1,969 @@
+{
+  "version": 1,
+  "sourceRepository": "AuraK-7/wild-racing-models",
+  "sourceCommit": "6c6a4875004713fe23f3a5ae1bc6c6c075214be3",
+  "licensePolicy": "Every asset is QUARANTINED until its individual creator and license have been verified. Catalogue inclusion is not publication clearance.",
+  "count": 96,
+  "assets": [
+    {
+      "id": "aston-aston-martin-valhalla",
+      "name": "aston martin valhalla",
+      "category": "Aston",
+      "path": "models/Aston/aston_martin_valhalla.glb",
+      "sizeBytes": 4159212,
+      "gitBlobSha": "77bb98a342648da8913ac5e6c251265929bb1260",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "aston-aston-martin-valkyrie-free",
+      "name": "aston martin valkyrie free",
+      "category": "Aston",
+      "path": "models/Aston/aston_martin_valkyrie_free.glb",
+      "sizeBytes": 2146928,
+      "gitBlobSha": "8040c4777d7819a78b86b89659f557956e28030f",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-2013-bugatti-veyron-legend-jean-bugatti",
+      "name": "2013 bugatti veyron legend jean bugatti",
+      "category": "Bugatti",
+      "path": "models/Bugatti/2013_bugatti_veyron_legend_jean_bugatti.glb",
+      "sizeBytes": 14949476,
+      "gitBlobSha": "daef113b86a1488b0da587598d59fb4430ff4586",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-2014-bugatti-veyron-legend-ettore-bugatti",
+      "name": "2014 bugatti veyron legend ettore bugatti",
+      "category": "Bugatti",
+      "path": "models/Bugatti/2014_bugatti_veyron_legend_ettore_bugatti.glb",
+      "sizeBytes": 13426048,
+      "gitBlobSha": "ac9e8c2b5c0cf4862663fd74722068866a7a0dd6",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-2015-bugatti-vision-gran-turismo",
+      "name": "2015  bugatti vision gran turismo",
+      "category": "Bugatti",
+      "path": "models/Bugatti/2015__bugatti_vision_gran_turismo.glb",
+      "sizeBytes": 22669632,
+      "gitBlobSha": "d780cea9c95ebecde0881e4a702374c1d3be8cea",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-2015-bugatti-atlantic-concept-car",
+      "name": "2015 bugatti atlantic - concept car",
+      "category": "Bugatti",
+      "path": "models/Bugatti/2015_bugatti_atlantic_-_concept_car.glb",
+      "sizeBytes": 19233332,
+      "gitBlobSha": "0cf8b233c76cc6709642d9dc40f2e71fe5999e72",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-2019-bugatti-divo",
+      "name": "2019 bugatti divo",
+      "category": "Bugatti",
+      "path": "models/Bugatti/2019_bugatti_divo.glb",
+      "sizeBytes": 13607280,
+      "gitBlobSha": "cec8a31a3ec6edcf981219b7bf3e4281ca927b66",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-2019-bugatti-la-voiture-noire",
+      "name": "2019 bugatti la voiture noire",
+      "category": "Bugatti",
+      "path": "models/Bugatti/2019_bugatti_la_voiture_noire.glb",
+      "sizeBytes": 16247312,
+      "gitBlobSha": "f546c8cab4481196eed44ac74c335ca2210b5766",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-2020-bugatti-bolide-concept",
+      "name": "2020 bugatti bolide concept",
+      "category": "Bugatti",
+      "path": "models/Bugatti/2020_bugatti_bolide_concept.glb",
+      "sizeBytes": 13995400,
+      "gitBlobSha": "de8fdbcdd10e24027d5107ef187ebdf6e3dcff42",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-2020-bugatti-centodieci",
+      "name": "2020 bugatti centodieci",
+      "category": "Bugatti",
+      "path": "models/Bugatti/2020_bugatti_centodieci.glb",
+      "sizeBytes": 14056832,
+      "gitBlobSha": "d3e8a4a67699e764fb93ed1b9e04ccae88bf626b",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-2021-bugatti-chiron-pur-sport",
+      "name": "2021 bugatti chiron pur sport",
+      "category": "Bugatti",
+      "path": "models/Bugatti/2021_bugatti_chiron_pur_sport.glb",
+      "sizeBytes": 16493848,
+      "gitBlobSha": "a5344638cc24cbc4f484f6724bb892e4cfdcdf0c",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-2022-bugatti-centodieci-eb110",
+      "name": "2022  bugatti centodieci eb110",
+      "category": "Bugatti",
+      "path": "models/Bugatti/2022__bugatti_centodieci_eb110.glb",
+      "sizeBytes": 16503652,
+      "gitBlobSha": "58d6820fc107ef7782f5d5e94ed4c43711fb2f7b",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-2022-bugatti-chiron-lebe-edition",
+      "name": "2022  bugatti chiron lebe edition",
+      "category": "Bugatti",
+      "path": "models/Bugatti/2022__bugatti_chiron_lebe_edition.glb",
+      "sizeBytes": 10682324,
+      "gitBlobSha": "57160324e8f7fe50df8e73703586f018cf2d935b",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-2022-bugatti-chiron-profilee",
+      "name": "2022 bugatti chiron profilee",
+      "category": "Bugatti",
+      "path": "models/Bugatti/2022_bugatti_chiron_profilee.glb",
+      "sizeBytes": 14097464,
+      "gitBlobSha": "40804de63104e3aa0bdb9afc162b058840cb9ef0",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-2022-bugatti-chiron-super-sport",
+      "name": "2022 bugatti chiron super sport",
+      "category": "Bugatti",
+      "path": "models/Bugatti/2022_bugatti_chiron_super_sport.glb",
+      "sizeBytes": 12096168,
+      "gitBlobSha": "301c05bfb32b15df34e9189c524f6f9e218825f2",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-2026-bugatti-tourbillon",
+      "name": "2026 bugatti tourbillon",
+      "category": "Bugatti",
+      "path": "models/Bugatti/2026_bugatti_tourbillon.glb",
+      "sizeBytes": 20030360,
+      "gitBlobSha": "8febdb25da8f893b1c0e4df8c50ac151e7b315f3",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-bugatti-la-voiture-noire",
+      "name": "bugatti - la voiture noire",
+      "category": "Bugatti",
+      "path": "models/Bugatti/bugatti_-_la_voiture_noire.glb",
+      "sizeBytes": 9697420,
+      "gitBlobSha": "78149e666754c5e22268b576167b70f24da125e1",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-bugatti-bolide",
+      "name": "bugatti bolide",
+      "category": "Bugatti",
+      "path": "models/Bugatti/bugatti_bolide.glb",
+      "sizeBytes": 8992888,
+      "gitBlobSha": "dbdd27777cf824fe946052f476a253fc523facc0",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-bugatti-bolide-2024",
+      "name": "bugatti bolide 2024",
+      "category": "Bugatti",
+      "path": "models/Bugatti/bugatti_bolide_2024.glb",
+      "sizeBytes": 10797984,
+      "gitBlobSha": "bf010a58451d57c214c54c9bfd34c49d3243f717",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-bugatti-bolide-ii",
+      "name": "bugatti bolide ii",
+      "category": "Bugatti",
+      "path": "models/Bugatti/bugatti_bolide_ii.glb",
+      "sizeBytes": 7294740,
+      "gitBlobSha": "9b52395d4fb5ec41e9a010aa86f4de7b56c94663",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-bugatti-centodieci",
+      "name": "bugatti centodieci",
+      "category": "Bugatti",
+      "path": "models/Bugatti/bugatti_centodieci.glb",
+      "sizeBytes": 10062620,
+      "gitBlobSha": "775feddef02377e777b0928d3d195de6c54e4ced",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-bugatti-chiron",
+      "name": "bugatti chiron",
+      "category": "Bugatti",
+      "path": "models/Bugatti/bugatti_chiron.glb",
+      "sizeBytes": 11555172,
+      "gitBlobSha": "c39395c4172787c2fd57c065f770f90021b0c584",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-bugatti-chiron-ans-110-special-thanks-for-500",
+      "name": "bugatti chiron ans 110  special thanks for 500",
+      "category": "Bugatti",
+      "path": "models/Bugatti/bugatti_chiron_ans_110__special_thanks_for_500.glb",
+      "sizeBytes": 14976268,
+      "gitBlobSha": "ce5c1f90c46f05662a817d07f1ecf7a5e27b52bf",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-bugatti-chiron-last-unit",
+      "name": "bugatti chiron last unit",
+      "category": "Bugatti",
+      "path": "models/Bugatti/bugatti_chiron_last_unit.glb",
+      "sizeBytes": 8320816,
+      "gitBlobSha": "48b877a19a1caea9ec4045be20621a3b2c854300",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-bugatti-chiron-super-sport-300",
+      "name": "bugatti chiron super sport 300",
+      "category": "Bugatti",
+      "path": "models/Bugatti/bugatti_chiron_super_sport_300.glb",
+      "sizeBytes": 7241240,
+      "gitBlobSha": "8d5ef8dc47e4fd8d1f35e752d297ac36a0b6b344",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-bugatti-divo",
+      "name": "bugatti divo",
+      "category": "Bugatti",
+      "path": "models/Bugatti/bugatti_divo.glb",
+      "sizeBytes": 11918168,
+      "gitBlobSha": "df1f8303b3c4a3b00e94aec20c8fe01d53c89554",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-bugatti-eb110-ss-roadcar",
+      "name": "bugatti eb110 ss roadcar",
+      "category": "Bugatti",
+      "path": "models/Bugatti/bugatti_eb110_ss_roadcar.glb",
+      "sizeBytes": 24185376,
+      "gitBlobSha": "0a54ecf02f54cefc4e8769317b8f3ba198064e57",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-bugatti-eb110-super-sport-1992-by-alex-ka",
+      "name": "bugatti eb110 super sport 1992 by alex.ka.",
+      "category": "Bugatti",
+      "path": "models/Bugatti/bugatti_eb110_super_sport_1992_by_alex.ka..glb",
+      "sizeBytes": 11266904,
+      "gitBlobSha": "eb4a9dc61c4c1f9177f1b1cc657ed049909f425c",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-bugatti-la-voiture",
+      "name": "bugatti la voiture",
+      "category": "Bugatti",
+      "path": "models/Bugatti/bugatti_la_voiture.glb",
+      "sizeBytes": 9620164,
+      "gitBlobSha": "3e3a9d751f4f7706350f96e65dba7951407b38d7",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-bugatti-t57-r",
+      "name": "bugatti t57 r",
+      "category": "Bugatti",
+      "path": "models/Bugatti/bugatti_t57_r.glb",
+      "sizeBytes": 609372,
+      "gitBlobSha": "aa980ec44f47e721bfa4444320863b3c98502d41",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-bugatti-tourbillon-2024",
+      "name": "bugatti tourbillon 2024",
+      "category": "Bugatti",
+      "path": "models/Bugatti/bugatti_tourbillon_2024.glb",
+      "sizeBytes": 22476496,
+      "gitBlobSha": "13631bf92a6cf53ae937d7f107df9fbb23115000",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-bugatti-veyron-super-sport-speed-enforcement",
+      "name": "bugatti veyron super sport speed enforcement",
+      "category": "Bugatti",
+      "path": "models/Bugatti/bugatti_veyron_super_sport_speed_enforcement.glb",
+      "sizeBytes": 2152664,
+      "gitBlobSha": "9a3146e52540ec3fa44fba6ce373d99cdbb414c4",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-bugatti-w16-mistral",
+      "name": "bugatti w16 mistral",
+      "category": "Bugatti",
+      "path": "models/Bugatti/bugatti_w16_mistral.glb",
+      "sizeBytes": 15102764,
+      "gitBlobSha": "91858dcac437037a860d50828a00d1b5de2f5c00",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-custom-bugatti-bolide-concept-2020",
+      "name": "custom bugatti bolide concept 2020",
+      "category": "Bugatti",
+      "path": "models/Bugatti/custom_bugatti_bolide_concept_2020.glb",
+      "sizeBytes": 20361336,
+      "gitBlobSha": "7f42d8892617e17890331098ad6ee9640867aa87",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-free-bugatti-chiron",
+      "name": "free bugatti chiron",
+      "category": "Bugatti",
+      "path": "models/Bugatti/free_bugatti_chiron.glb",
+      "sizeBytes": 6008984,
+      "gitBlobSha": "b3131326a8a2a811bade5e5356c4fb4e2774df45",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "bugatti-toon-bugatti-chiron-pur-sport",
+      "name": "toon  bugatti chiron pur sport",
+      "category": "Bugatti",
+      "path": "models/Bugatti/toon__bugatti_chiron_pur_sport.glb",
+      "sizeBytes": 11576128,
+      "gitBlobSha": "ae25182991a1b9c831613ca736d8c518f2ee0732",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "czinger-2021-czinger-21c",
+      "name": "2021 czinger 21c",
+      "category": "Czinger",
+      "path": "models/Czinger/2021_czinger_21c.glb",
+      "sizeBytes": 15856696,
+      "gitBlobSha": "412dd5fd0a3defde00ebd413abefa7d8472e8931",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "czinger-2021-czinger-21c1",
+      "name": "2021 czinger 21c1",
+      "category": "Czinger",
+      "path": "models/Czinger/2021_czinger_21c1.glb",
+      "sizeBytes": 12467804,
+      "gitBlobSha": "791b387d155266024014dccd4d9ab7ea07274160",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "czinger-2023-czinger-21c-v-max",
+      "name": "2023 czinger 21c v max",
+      "category": "Czinger",
+      "path": "models/Czinger/2023_czinger_21c_v_max.glb",
+      "sizeBytes": 16365032,
+      "gitBlobSha": "18967956d7ef3636f6197162996ba700bf0d42ee",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "czinger-czinger-21c-v-max-2023-www-vecarz-com",
+      "name": "czinger 21c v max 2023  www.vecarz.com",
+      "category": "Czinger",
+      "path": "models/Czinger/czinger_21c_v_max_2023__www.vecarz.com.glb",
+      "sizeBytes": 19194684,
+      "gitBlobSha": "2bfc033e481f2680a63b03903404eff8298304bc",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "ferrari-2014-ferrari-laferrari",
+      "name": "2014 ferrari laferrari",
+      "category": "Ferrari",
+      "path": "models/Ferrari/2014_ferrari_laferrari.glb",
+      "sizeBytes": 11314720,
+      "gitBlobSha": "3429b40eb64015e9357ada92f407f98e85785e8e",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "ferrari-2017-ferrari-fxx-k-evo-special-thanks-for-600",
+      "name": "2017  ferrari fxx-k evo special thanks for 600",
+      "category": "Ferrari",
+      "path": "models/Ferrari/2017__ferrari_fxx-k_evo_special_thanks_for_600.glb",
+      "sizeBytes": 14682072,
+      "gitBlobSha": "cab0b7b5ac87c1b15557ea9f0563d0d88e177d6f",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "ferrari-2017-ferrari-laferrari-aperta",
+      "name": "2017 ferrari laferrari aperta",
+      "category": "Ferrari",
+      "path": "models/Ferrari/2017_ferrari_laferrari_aperta.glb",
+      "sizeBytes": 13777572,
+      "gitBlobSha": "23b4c43f56c9f8fddf268413f2f2fdd4e453e37b",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "ferrari-2019-ferrari-monza-sp2",
+      "name": "2019 ferrari monza sp2",
+      "category": "Ferrari",
+      "path": "models/Ferrari/2019_ferrari_monza_sp2.glb",
+      "sizeBytes": 16001724,
+      "gitBlobSha": "394c2d5867e306994706ea9f5cbad692f2527fd6",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "ferrari-2020-ferrari-812-gts",
+      "name": "2020 ferrari 812 gts",
+      "category": "Ferrari",
+      "path": "models/Ferrari/2020_ferrari_812_gts.glb",
+      "sizeBytes": 17414056,
+      "gitBlobSha": "645b0715bdb27283e5f0a22ca37f3a79a3088eed",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "ferrari-ferrari-488-pista-widebody",
+      "name": "ferrari 488 pista widebody",
+      "category": "Ferrari",
+      "path": "models/Ferrari/ferrari_488_pista_widebody.glb",
+      "sizeBytes": 8032568,
+      "gitBlobSha": "65d233c35efcb850e1efc4757d046795eb2d9c42",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "ferrari-ferrari-f80-concept",
+      "name": "ferrari f80 concept",
+      "category": "Ferrari",
+      "path": "models/Ferrari/ferrari_f80_concept.glb",
+      "sizeBytes": 7202632,
+      "gitBlobSha": "5ab1441de494829c5eac1d8c9abfc954f9081431",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "ferrari-ferrari-laferrari-www-vecarz-com",
+      "name": "ferrari laferrari  www.vecarz.com",
+      "category": "Ferrari",
+      "path": "models/Ferrari/ferrari_laferrari__www.vecarz.com.glb",
+      "sizeBytes": 27019920,
+      "gitBlobSha": "e4566abc15795b7a8cfd77f3e8dd10f15e4b50d1",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "ferrari-ferrari-sf90-stradale",
+      "name": "ferrari sf90 stradale",
+      "category": "Ferrari",
+      "path": "models/Ferrari/ferrari_sf90_stradale.glb",
+      "sizeBytes": 31189484,
+      "gitBlobSha": "15fa33e115e895ea6e08da9e30da509358932f64",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "koenigsegg-2015-koenigsegg-regera",
+      "name": "2015 koenigsegg regera",
+      "category": "Koenigsegg",
+      "path": "models/Koenigsegg/2015_koenigsegg_regera.glb",
+      "sizeBytes": 13138888,
+      "gitBlobSha": "ae036b4b4a1c58e6e12544f0e8c43253a3580b9e",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "koenigsegg-2019-koenigsegg-jesko",
+      "name": "2019  koenigsegg jesko",
+      "category": "Koenigsegg",
+      "path": "models/Koenigsegg/2019__koenigsegg_jesko.glb",
+      "sizeBytes": 12742268,
+      "gitBlobSha": "6c99550f48238dab2739e4ff468663e18cafc22a",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "koenigsegg-2020-koenigsegg-jesko",
+      "name": "2020 koenigsegg jesko",
+      "category": "Koenigsegg",
+      "path": "models/Koenigsegg/2020_koenigsegg_jesko.glb",
+      "sizeBytes": 9071100,
+      "gitBlobSha": "dd688a3dbf0cf454162186a0e2dfb0eb9be5bbd5",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "koenigsegg-2023-koenigsegg-cc850",
+      "name": "2023 koenigsegg cc850",
+      "category": "Koenigsegg",
+      "path": "models/Koenigsegg/2023_koenigsegg_cc850.glb",
+      "sizeBytes": 22748172,
+      "gitBlobSha": "25b7ff8eea115b72ce3d478fa1ceeadaa25768ab",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "koenigsegg-free-koenigsegg-gemera",
+      "name": "free koenigsegg gemera",
+      "category": "Koenigsegg",
+      "path": "models/Koenigsegg/free_koenigsegg_gemera.glb",
+      "sizeBytes": 7193068,
+      "gitBlobSha": "3f83dbb4873109749241d56178abb11e5fd44125",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "koenigsegg-koenigsegg-agera",
+      "name": "koenigsegg agera",
+      "category": "Koenigsegg",
+      "path": "models/Koenigsegg/koenigsegg_agera.glb",
+      "sizeBytes": 1697276,
+      "gitBlobSha": "2d363cd18259f26c406d2bf732bb4a9c3d9d99ea",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "koenigsegg-koenigsegg-agera-r",
+      "name": "koenigsegg agera r",
+      "category": "Koenigsegg",
+      "path": "models/Koenigsegg/koenigsegg_agera_r.glb",
+      "sizeBytes": 4015940,
+      "gitBlobSha": "846ba44a1f4f31e9250dfe7cf223e859ae908bf3",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "koenigsegg-koenigsegg-ccx-100-followers-special",
+      "name": "koenigsegg ccx - 100 followers special",
+      "category": "Koenigsegg",
+      "path": "models/Koenigsegg/koenigsegg_ccx_-_100_followers_special.glb",
+      "sizeBytes": 4277060,
+      "gitBlobSha": "09363e75eee6e427e96ba4e50fb4114736ee1905",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "koenigsegg-koenigsegg-jesko-absolut",
+      "name": "koenigsegg jesko absolut",
+      "category": "Koenigsegg",
+      "path": "models/Koenigsegg/koenigsegg_jesko_absolut.glb",
+      "sizeBytes": 11235028,
+      "gitBlobSha": "0a3d94fce089d452b2c078efa4b10f99a3cb97c1",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "koenigsegg-super-koenigsegg",
+      "name": "super koenigsegg",
+      "category": "Koenigsegg",
+      "path": "models/Koenigsegg/super_koenigsegg.glb",
+      "sizeBytes": 14747744,
+      "gitBlobSha": "46bb6cb2f140883aed092d3556037a7e285eb067",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "mclaren-1992-mclaren-f1",
+      "name": "1992 mclaren f1",
+      "category": "McLaren",
+      "path": "models/McLaren/1992_mclaren_f1.glb",
+      "sizeBytes": 15116352,
+      "gitBlobSha": "b1fbbb5251cffa996c29ff4306d5592a22801b5f",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "mclaren-2017-mclaren-720s-lbworks",
+      "name": "2017 mclaren 720s lbworks",
+      "category": "McLaren",
+      "path": "models/McLaren/2017_mclaren_720s_lbworks.glb",
+      "sizeBytes": 11318712,
+      "gitBlobSha": "862babd81857511f68aef9975a059651f20e855a",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "mclaren-2021-mclaren-elva",
+      "name": "2021 mclaren elva",
+      "category": "McLaren",
+      "path": "models/McLaren/2021_mclaren_elva.glb",
+      "sizeBytes": 13494868,
+      "gitBlobSha": "003a5d54384e1eb343f324d6684eedd0f2a634fa",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "mclaren-ac-mclaren-p1-free",
+      "name": "ac - mclaren p1 free",
+      "category": "McLaren",
+      "path": "models/McLaren/ac_-_mclaren_p1_free.glb",
+      "sizeBytes": 12391916,
+      "gitBlobSha": "8e786c392d0f8fc643f78a4c44b5e7ae18016e2e",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "mclaren-mclaren-f1-1993-ruby",
+      "name": "mclaren f1 1993 ruby",
+      "category": "McLaren",
+      "path": "models/McLaren/mclaren_f1_1993_ruby.glb",
+      "sizeBytes": 17461980,
+      "gitBlobSha": "63caa70af7575d28c402d8ac4d7b1670afac4222",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "mclaren-mclaren-senna",
+      "name": "mclaren senna",
+      "category": "McLaren",
+      "path": "models/McLaren/mclaren_senna.glb",
+      "sizeBytes": 12652720,
+      "gitBlobSha": "a6a1a00c3c547e7d42c041639a8a34ef3b2e8105",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "mclaren-mclaren-senna-free",
+      "name": "mclaren senna free",
+      "category": "McLaren",
+      "path": "models/McLaren/mclaren_senna_free.glb",
+      "sizeBytes": 26986852,
+      "gitBlobSha": "119a5ca46c24ff6fda34c98f0e851f22cbdfdc60",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "mclaren-mclaren-ultimate-vision-gran-turismo",
+      "name": "mclaren ultimate vision gran turismo",
+      "category": "McLaren",
+      "path": "models/McLaren/mclaren_ultimate_vision_gran_turismo.glb",
+      "sizeBytes": 9410928,
+      "gitBlobSha": "6b56270da580d2690e73011086f4969667759985",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "gma-t-50",
+      "name": "gma t.50",
+      "category": "Other",
+      "path": "models/gma_t.50.glb",
+      "sizeBytes": 20188356,
+      "gitBlobSha": "7c73c7aacdc4abd67ed24a32bd226b76d9fcc472",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "gma-t50",
+      "name": "gma t50",
+      "category": "Other",
+      "path": "models/gma_t50.glb",
+      "sizeBytes": 20216900,
+      "gitBlobSha": "a8e3516519277016de5ce17f68374d7a377d4642",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-2012-lamborghini-aventador-j-concept",
+      "name": "2012 lamborghini aventador j concept",
+      "category": "lamborghini",
+      "path": "models/lamborghini/2012_lamborghini_aventador_j_concept.glb",
+      "sizeBytes": 5580172,
+      "gitBlobSha": "64326fd650e0140303fea399932b4d019f7058b6",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-2020-lamborghini-sc20",
+      "name": "2020 lamborghini sc20",
+      "category": "lamborghini",
+      "path": "models/lamborghini/2020_lamborghini_sc20.glb",
+      "sizeBytes": 15665308,
+      "gitBlobSha": "80c3114667fa8d97040141a993783c88a226b0e1",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-2021-lamborghini-countach-lpi-800-4",
+      "name": "2021 lamborghini countach lpi 800-4",
+      "category": "lamborghini",
+      "path": "models/lamborghini/2021_lamborghini_countach_lpi_800-4.glb",
+      "sizeBytes": 12949220,
+      "gitBlobSha": "f0a858f02e97a387b7cba909a0d29e927557c3dd",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-2021-lamborghini-sian-roadster",
+      "name": "2021 lamborghini sian roadster",
+      "category": "lamborghini",
+      "path": "models/lamborghini/2021_lamborghini_sian_roadster.glb",
+      "sizeBytes": 15359396,
+      "gitBlobSha": "010bfb38e674dfb545ff7e9d480904e284fa1a36",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-2022-lamborghini-huracan-trofeo-evo2-thx-700",
+      "name": "2022  lamborghini huracan trofeo evo2 thx 700",
+      "category": "lamborghini",
+      "path": "models/lamborghini/2022__lamborghini_huracan_trofeo_evo2_thx_700.glb",
+      "sizeBytes": 12117476,
+      "gitBlobSha": "09b68a6b760257b3936aa8d002d1ef6033792fd6",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-2022-lamborghini-countach-lpi-800-4",
+      "name": "2022 lamborghini countach lpi 800-4",
+      "category": "lamborghini",
+      "path": "models/lamborghini/2022_lamborghini_countach_lpi_800-4.glb",
+      "sizeBytes": 16922232,
+      "gitBlobSha": "5888a3fdfd86047e8fb8a4633c52d42ea25af2a0",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-2024-lamborghini-huracan-sterrato",
+      "name": "2024 lamborghini huracan sterrato",
+      "category": "lamborghini",
+      "path": "models/lamborghini/2024_lamborghini_huracan_sterrato.glb",
+      "sizeBytes": 15678424,
+      "gitBlobSha": "5d164d8f59f88e0db847bddc9ccaf7703bb4c783",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-asphalt-9-lamborghini-terzo-millennio-v2",
+      "name": "asphalt 9 - lamborghini terzo millennio v2",
+      "category": "lamborghini",
+      "path": "models/lamborghini/asphalt_9_-_lamborghini_terzo_millennio_v2.glb",
+      "sizeBytes": 5099800,
+      "gitBlobSha": "439258323ba5e970467822346f5d54dd03793991",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-free-lamborghini-terzo-millennio",
+      "name": "free  lamborghini terzo millennio",
+      "category": "lamborghini",
+      "path": "models/lamborghini/free__lamborghini_terzo_millennio.glb",
+      "sizeBytes": 6062148,
+      "gitBlobSha": "a148c5cf5e9bdad1191ea832651f8e2e92c8539d",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-free-lamborghini-terzo-millennio-wind-tunnel",
+      "name": "free  lamborghini terzo millennio wind tunnel",
+      "category": "lamborghini",
+      "path": "models/lamborghini/free__lamborghini_terzo_millennio_wind_tunnel.glb",
+      "sizeBytes": 11722468,
+      "gitBlobSha": "a36700c952c3458ef88f3ba051fc7a3cde361f04",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-free-lamborghini-aventador",
+      "name": "free lamborghini aventador",
+      "category": "lamborghini",
+      "path": "models/lamborghini/free_lamborghini_aventador.glb",
+      "sizeBytes": 14312560,
+      "gitBlobSha": "543463c1d4a7c73d6fef2dff1854d5ff3219530e",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-free-lamborghini-countach-se",
+      "name": "free lamborghini countach se",
+      "category": "lamborghini",
+      "path": "models/lamborghini/free_lamborghini_countach_se.glb",
+      "sizeBytes": 8326172,
+      "gitBlobSha": "c0453dbbd01d6daf4aa9925b7d06ab6ea98c2174",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-free-lamborghini-revuelto",
+      "name": "free lamborghini revuelto",
+      "category": "lamborghini",
+      "path": "models/lamborghini/free_lamborghini_revuelto.glb",
+      "sizeBytes": 5679708,
+      "gitBlobSha": "4c1fdd2f94f5411d642a1a3002fcd429eaf63f29",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-free-lamborghini-sesto-elemento",
+      "name": "free lamborghini sesto elemento",
+      "category": "lamborghini",
+      "path": "models/lamborghini/free_lamborghini_sesto_elemento.glb",
+      "sizeBytes": 7164520,
+      "gitBlobSha": "9cd91a5b6d8929d79c074fdc824936baf2135f42",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-lamborghini-sian",
+      "name": "lamborghini-sian",
+      "category": "lamborghini",
+      "path": "models/lamborghini/lamborghini-sian.glb",
+      "sizeBytes": 12449348,
+      "gitBlobSha": "f05f62ca6c40e5539e274de3b27aba33a2a414a0",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-lamborghini-ferzor",
+      "name": "lamborghini - ferzor",
+      "category": "lamborghini",
+      "path": "models/lamborghini/lamborghini_-_ferzor.glb",
+      "sizeBytes": 8505064,
+      "gitBlobSha": "bef16627536e66d6b9f0fa69562ba02507ba5666",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-lamborghini-aventador-lp750-4-sv",
+      "name": "lamborghini aventador lp750-4 sv",
+      "category": "lamborghini",
+      "path": "models/lamborghini/lamborghini_aventador_lp750-4_sv.glb",
+      "sizeBytes": 11580424,
+      "gitBlobSha": "bdb7e9066456428de392a64f31afa4206a39f61f",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-lamborghini-centenario-lp-770-baby-blue-sdc",
+      "name": "lamborghini centenario lp-770 baby blue sdc",
+      "category": "lamborghini",
+      "path": "models/lamborghini/lamborghini_centenario_lp-770_baby_blue_sdc.glb",
+      "sizeBytes": 19984316,
+      "gitBlobSha": "512ede4c985ed8061f2d7710c4089ab1aa76df89",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-lamborghini-centenario-lp-770-interior-sdc",
+      "name": "lamborghini centenario lp-770 interior sdc",
+      "category": "lamborghini",
+      "path": "models/lamborghini/lamborghini_centenario_lp-770_interior_sdc.glb",
+      "sizeBytes": 19997868,
+      "gitBlobSha": "2d71c0479883e3b6d0e5f87b907cf10a2d8bcbef",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-lamborghini-centenario-roadster-sdc",
+      "name": "lamborghini centenario roadster sdc",
+      "category": "lamborghini",
+      "path": "models/lamborghini/lamborghini_centenario_roadster_sdc.glb",
+      "sizeBytes": 20174876,
+      "gitBlobSha": "7c0782ebbc223ea18dff2d5f63fb8cf7429b664e",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-lamborghini-countach-concept",
+      "name": "lamborghini countach concept",
+      "category": "lamborghini",
+      "path": "models/lamborghini/lamborghini_countach_concept.glb",
+      "sizeBytes": 10918408,
+      "gitBlobSha": "7f4eae27a7fd6835f1a04d38afc56b6dc8cdc7f7",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-lamborghini-gallardo-2010",
+      "name": "lamborghini gallardo 2010",
+      "category": "lamborghini",
+      "path": "models/lamborghini/lamborghini_gallardo_2010.glb",
+      "sizeBytes": 16327004,
+      "gitBlobSha": "30e00f7193038f2251e7a6e05343f56d2e207e3b",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "lamborghini-lamborghini-venevo",
+      "name": "lamborghini venevo",
+      "category": "lamborghini",
+      "path": "models/lamborghini/lamborghini_venevo.glb",
+      "sizeBytes": 14318604,
+      "gitBlobSha": "934782b43d69056c56df74114ba8ebe83b062704",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "maserati-mc12",
+      "name": "maserati mc12",
+      "category": "Other",
+      "path": "models/maserati_mc12.glb",
+      "sizeBytes": 5589668,
+      "gitBlobSha": "161182f33da72af4eb0db604d64e3f5b53948ed0",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "pagani-huayra-free",
+      "name": "pagani huayra free",
+      "category": "Other",
+      "path": "models/pagani_huayra_free.glb",
+      "sizeBytes": 12498568,
+      "gitBlobSha": "6f986726eec065fcc3b8f7fedf7e889b858476a7",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "pagani-huayra-r",
+      "name": "pagani huayra r",
+      "category": "Other",
+      "path": "models/pagani_huayra_r.glb",
+      "sizeBytes": 13934748,
+      "gitBlobSha": "54df453719d56053effccc499d1049f7f66ab876",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    },
+    {
+      "id": "porsche-918-free",
+      "name": "porsche 918 free",
+      "category": "Other",
+      "path": "models/porsche_918_free.glb",
+      "sizeBytes": 26503744,
+      "gitBlobSha": "876dcdd06dbaaafe73f45ccb14e0c628ba453556",
+      "licenseStatus": "unverified",
+      "commercialUseApproved": false
+    }
+  ]
+}
