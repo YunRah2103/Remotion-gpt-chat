@@ -60,7 +60,7 @@ function helix(material:T.Material,name:string){
 }
 const shellNames=(name:string)=>{
   const n=name.toLowerCase();
-  return n==='arched-body'||n==='roof'||n.includes('studio-panel')||
+  return n==='arched-body'||n==='roof'||n==='sill'||n==='wheel-well-return'||n==='studio-fender-lip'||n.includes('studio-panel')||
     n.includes('studio-door')||n.includes('studio-roof')||
     n.includes('body-panel')||n.includes('studio-bonnet')||
     n.includes('studio-quarter')||n.includes('rally-wide-arch')||
@@ -120,6 +120,7 @@ export function createEp006MechanicalReveal(vehicle:T.Group):MechanicalReveal{
   }
   // Fade only exterior coachwork: cabin cage, chassis rails, wheels, shafts and fittings remain opaque.
   const ghosts:Ghost[]=[];
+  const wheelGhosts:Ghost[]=[];
   shell.traverse(node=>{
     if(!(node instanceof T.Mesh)||!shellNames(node.name))return;
     const materials=(Array.isArray(node.material)?node.material:[node.material]);
@@ -127,6 +128,18 @@ export function createEp006MechanicalReveal(vehicle:T.Group):MechanicalReveal{
     const cloned=materials.map(mat=>mat.clone() as T.MeshStandardMaterial);
     node.material=Array.isArray(node.material)?cloned:cloned[0];
     ghosts.push({mesh:node,materials:cloned,opacity:cloned.map(mat=>mat.opacity)});
+  });
+
+  // Ghost only the nearer wheel during spring/damper cutaways; the exact
+  // fitted V4 wheel stays on its real pivot, rolling and connected.
+  const nearWheel=vehicle.getObjectByName('mount-front-left')?.getObjectByName('wheel-roll');
+  nearWheel?.traverse(node=>{
+    if(!(node instanceof T.Mesh))return;
+    const materials=Array.isArray(node.material)?node.material:[node.material];
+    if(!materials.every(m=>m instanceof T.MeshStandardMaterial))return;
+    const cloned=materials.map(m=>(m as T.MeshStandardMaterial).clone());
+    node.material=Array.isArray(node.material)?cloned:cloned[0];
+    wheelGhosts.push({mesh:node,materials:cloned,opacity:cloned.map(m=>m.opacity)});
   });
   const update=(input:RevealInput)=>{
     const {motion,focus,exposure01,applyV4FallbackPose=false}=input;
@@ -138,13 +151,23 @@ export function createEp006MechanicalReveal(vehicle:T.Group):MechanicalReveal{
       // Existing V4 only accepts global 0..0.12m compression. This is an explicitly
       // temporary compatibility adapter; the final editor uses Agent 1+2's pose.
       animateCinematicVehicle(vehicle,{
-        frame:motion.frame,fps:30,compression:clamp(mean,0,.12),
+        // Body pose is supplied by motion, so do not double-compress V4 shell.
+        frame:motion.frame,fps:30,compression:0,
         distance:motion.positionM[0],speed:Math.hypot(...motion.velocityMps),
         steer:motion.wheels['front-left'].steerRad,roughness:0,
         cutaway:0,braking:0,impact:clamp(motion.impact01),
       });
       vehicle.position.set(...motion.positionM);
       vehicle.rotation.set(...motion.rotationRad);
+      // The V4 rig has only one compression channel. During this temporary
+      // preview, adapt each existing four wheel pivot from the motion fixture.
+      // The final production uses Agent 1's pose adapter instead.
+      for(const c of corners){
+        const w=motion.wheels[c.corner];
+        c.mount.position.y=c.rest.y+clamp(w.compressionM,-.15,.16);
+        c.mount.rotation.y=w.steerRad;
+        c.wheelRoll.rotation.z=w.spinRad;
+      }
     }
     // Compute all reveal coordinates from the actual named attachment points.
     const body=vehicle.getObjectByName('body-shell')!;
@@ -184,11 +207,22 @@ export function createEp006MechanicalReveal(vehicle:T.Group):MechanicalReveal{
       c.coil.material instanceof T.MeshStandardMaterial &&
         c.coil.material.color.set(focus==='spring'?'#ffc05d':'#b98b47');
       // Existing V4 coil belongs to its registered assembly and remains in place.
-      if(!c.agent1Assembly)c.links.visible=true;
+      // Do not overlay original lightweight shock and our detailed shock.
+      if(!c.agent1Assembly)c.links.visible=focus==='contact';
+    }
+    for(const g of wheelGhosts){
+      const revealWheel=focus==='spring'||focus==='damper';
+      for(let i=0;i<g.materials.length;i++){
+        const mat=g.materials[i],opacity=g.opacity[i];
+        mat.opacity=opacity*(revealWheel?.23:1);
+        mat.transparent=revealWheel||opacity<1;
+        mat.depthWrite=!revealWheel;
+        mat.needsUpdate=true;
+      }
     }
     for(const g of ghosts)for(let i=0;i<g.materials.length;i++){
       const mat=g.materials[i];
-      mat.opacity=g.opacity[i]*(1-.83*exposure);
+      mat.opacity=g.opacity[i]*(1-.95*exposure);
       mat.transparent=exposure>.001||g.opacity[i]<1;
       mat.depthWrite=exposure<.001;
       mat.needsUpdate=true;
