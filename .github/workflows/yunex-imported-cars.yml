@@ -35,7 +35,7 @@ jobs:
       - name: Compile and verify model contract
         run: |
           npm run check
-          node --test tests/imported-cars/catalog.test.mjs
+          node --experimental-strip-types --test tests/imported-cars/*.test.mjs
       - name: Fetch ALL 10 attributed real-geometry GLBs
         run: |
           npm run kit:cars:list
@@ -62,6 +62,11 @@ jobs:
           mkdir -p out/imported-cars
           npx remotion still src/yunex/imported-cars/entry.tsx YunexImportedCarPreview out/imported-cars/ferrari-f40-actual-mesh.png --frame=10 --scale=.5 --gl=swangle --timeout=120000
           test -s out/imported-cars/ferrari-f40-actual-mesh.png
+      - name: Moving imported-car studio proof
+        run: |
+          npx remotion render src/yunex/imported-cars/entry.tsx YunexImportedCarPreview out/imported-cars/ferrari-f40-studio-source.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2 --timeout=120000
+          ffmpeg -v error -i out/imported-cars/ferrari-f40-studio-source.mp4 -vf "scale=in_range=pc:out_range=tv:out_color_matrix=bt709" -c:v libx264 -crf 18 -pix_fmt yuv420p -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 -an out/imported-cars/ferrari-f40-studio-review.mp4
+          ffmpeg -v error -i out/imported-cars/ferrari-f40-studio-review.mp4 -f null -
       - name: Keep verification records (no third-party binary redistribution)
         if: always()
         uses: actions/upload-artifact@v4
@@ -70,5 +75,6 @@ jobs:
           path: |
             out/imported-cars/verified-manifest.json
             out/imported-cars/ferrari-f40-actual-mesh.png
+            out/imported-cars/ferrari-f40-studio-review.mp4
           if-no-files-found: warn
           retention-days: 14

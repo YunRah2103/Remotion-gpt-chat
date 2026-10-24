@@ -10,6 +10,7 @@ import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {DRACOLoader} from 'three/examples/jsm/loaders/DRACOLoader.js';
 import {MeshoptDecoder} from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import * as THREE from 'three';
+import {normalizeImportedScene} from './normalize.ts';
 import catalog from '../../../production/assets/imported-cars/catalog.json';
 
 export const IMPORTED_CARS=catalog.vehicles;
@@ -38,19 +39,7 @@ export const ImportedCar:React.FC<ImportedCarProps>=({id,lengthMeters=4.7,yaw=0,
   loader.setDRACOLoader(draco);
  });
  const group=useMemo(()=>{
-  if(!(Number.isFinite(lengthMeters)&&lengthMeters>0&&lengthMeters<30))throw Error('Invalid target length');
-  const cloned=model.scene.clone(true);
-  cloned.updateMatrixWorld(true);
-  const box=new THREE.Box3().setFromObject(cloned,true);
-  if(box.isEmpty())throw Error('Imported '+id+' has no usable geometry');
-  const size=box.getSize(new THREE.Vector3());
-  const center=box.getCenter(new THREE.Vector3());
-  const span=Math.max(size.x,size.z);
-  if(!Number.isFinite(span)||span<=0||!Number.isFinite(size.y)||size.y<=0)
-   throw Error('Imported '+id+' has invalid bounds');
-  const factor=lengthMeters/span;
-  cloned.scale.setScalar(factor);
-  cloned.position.set(-center.x*factor,-box.min.y*factor,-center.z*factor);
+  const {cloned,size}=normalizeImportedScene(model.scene,id,lengthMeters);
   cloned.traverse(node=>{
    if(node instanceof THREE.Mesh){
     node.castShadow=castShadow;
