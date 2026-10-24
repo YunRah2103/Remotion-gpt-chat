@@ -75,7 +75,8 @@ function assertMotion(m:Ep006Motion){
     const w=m.wheels[c];
     if(!w)throw Error('Missing wheel '+c);
     for(const n of [w.compressionM,w.steerRad,w.spinRad,w.surfaceHeightM])if(!Number.isFinite(n))throw Error('Non-finite wheel '+c);
-    if(w.compressionM<-.0001||w.compressionM>.45)throw Error('Unexpected compression metres: '+c);
+    // Negative travel is valid suspension droop during flight. Agent 2 currently allows -0.085m. 
+    if(w.compressionM<-.20||w.compressionM>.45)throw Error('Unexpected bump/droop metres: '+c);
   }
 }
 /** Do not call createCinematicVehicle here: this is an overlay on the exact shared car. */
