@@ -63,7 +63,8 @@ export const EP006_JUMPS = [
   {id:'J2' as const,launchFrame:684,landingFrame:750},
 ] as const;
 const durationOf=(jump:typeof EP006_JUMPS[number])=>(jump.landingFrame-jump.launchFrame)/EP006_FPS;
-const launchClearanceM=0.13; // initial airborne tyre clearance, including rear axle droop\nconst launchSpeedY=(jump:typeof EP006_JUMPS[number])=>{
+const launchClearanceM=0.13; // initial airborne tyre clearance, including rear axle droop
+const launchSpeedY=(jump:typeof EP006_JUMPS[number])=>{
  const fromX=ep006TravelXM(jump.launchFrame/EP006_FPS);
  const toX=ep006TravelXM(jump.landingFrame/EP006_FPS);
  const duration=durationOf(jump);
