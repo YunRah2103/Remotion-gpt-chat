@@ -1,3 +1,5 @@
+import {installFleetRoad} from './fleet-road.ts';
+import {installFleetSpecialty} from './fleet-specialty.ts';
 import {studioWheelFinish} from './studio-wheels.ts';
 import {installStudioExhaust} from './studio-exhaust.ts';
 import {cutOpening} from '../world-kit/cavity.ts';
@@ -29,7 +31,7 @@ import {tyreDetail,floorAssembly,suspensionLinks} from './details.ts';
 import {deformTyre,deformBody,createFragments,animateFragments,createTornCarcass,damageRim,groundTornCords} from './damage.ts';
 
 export const HERO_VEHICLES=['hot-hatch','supercar','formula-modern'] as const satisfies readonly VehicleVariant[];
-export type CinematicOptions=VehicleOptions & {quality?:'lightweight'|'standard'|'hero';paintPreset?:'lacquer'|'satin';bodyDetail?:'legacy'|'coachbuilt'|'studio';tyreType?:'road'|'slick';optimize?:boolean;driver?:boolean;powertrain?:AssemblySpec};
+export type CinematicOptions=VehicleOptions & {quality?:'lightweight'|'standard'|'hero';paintPreset?:'lacquer'|'satin';bodyDetail?:'legacy'|'coachbuilt'|'studio'|'fleet';tyreType?:'road'|'slick';optimize?:boolean;driver?:boolean;powertrain?:AssemblySpec};
 export type WheelCorner='front-left'|'front-right'|'rear-left'|'rear-right'|'rear-aux-left'|'rear-aux-right';
 export type CinematicState={frame:number;fps:number;distance?:number;speed?:number;acceleration?:number;curvature?:number;roughness?:number;roadFrontLeft?:number;roadFrontRight?:number;roadRearLeft?:number;roadRearRight?:number;steer?:number;compression?:number;tyreDamage?:number;damagedWheel?:WheelCorner;bodyDamage?:number;cutaway?:number;exploded?:number;highlight?:'engine'|'underfloor'|'wheels';heat?:number;failureFrame?:number;braking?:number;impact?:number;gearChange?:number};
 type Rig={driver?:T.Group;systems?:T.Group;shell:T.Group;mounts:T.Group[];engine?:T.Group;floor?:T.Group;links:T.Group[];sparks:T.InstancedMesh;fragments:T.Group;body?:T.Mesh;panels:T.Mesh[]};
@@ -38,12 +40,12 @@ function materials(root:T.Object3D,fn:(m:T.MeshStandardMaterial)=>void){root.tra
 function rememberMaterials(root:T.Object3D){materials(root,m=>{m.userData.shaderTransparent=m.transparent;m.userData.baseline={opacity:m.opacity,transparent:m.transparent,depthWrite:m.depthWrite,emissive:m.emissive.getHex(),intensity:m.emissiveIntensity};});}
 function fade(root:T.Object3D,value:number,highlight=false){materials(root,m=>{const b=m.userData.baseline;if(!b)return;m.opacity=b.opacity*(1-value*.94);m.transparent=value>0||b.transparent;m.depthWrite=value>0?false:b.depthWrite;m.emissive.setHex(highlight?0x15c7bd:b.emissive);m.emissiveIntensity=highlight?.65:b.intensity;});}
 export function createCinematicVehicle(options:CinematicOptions):T.Group{
- if(options.bodyDetail!==undefined&&!['legacy','coachbuilt','studio'].includes(options.bodyDetail))throw Error('Unknown body detail');
+ if(options.bodyDetail!==undefined&&!['legacy','coachbuilt','studio','fleet'].includes(options.bodyDetail))throw Error('Unknown body detail');
  if(options.bodyDetail==='studio'&&!STUDIO_BODY_IDS.includes(options.variant as typeof STUDIO_BODY_IDS[number]))throw Error('Studio body supported for supercar, coupe and rally-hatch; choose coachbuilt for other vehicles');
  if(options.bodyDetail==='studio'&&options.quality!==undefined&&options.quality!=='hero')throw Error('Studio body requires quality:hero; use coachbuilt for standard/lightweight');
  const quality=options.quality??'hero';if(!['lightweight','standard','hero'].includes(quality))throw new Error('Unknown quality');
  const root=createVehicle(options),s=vehicleSpec(options.variant);root.userData.quality=quality;root.userData.accuracy='Illustrative kinematic rig; not validated engineering simulation';
- if(quality==='lightweight')return root;
+ if(quality==='lightweight'&&options.bodyDetail!=='fleet')return root;
  const shell=new T.Group();shell.name='body-shell';root.add(shell);
  const mounts:T.Group[]=[],corners=new Set<string>();
  for(const o of [...root.children]){
@@ -51,18 +53,23 @@ export function createCinematicVehicle(options:CinematicOptions):T.Group{
   if(o.name.startsWith('steer-')){const mount=o as T.Group;let corner=`${o.position.x>0?'front':'rear'}-${o.position.z>=0?'left':'right'}`;if(corners.has(corner))corner=`rear-aux-${o.position.z>=0?'left':'right'}`;corners.add(corner);mount.name=`mount-${corner}`;mount.userData.restPosition=mount.position.toArray();mounts.push(mount);
    mount.traverse(n=>{if(n instanceof T.Mesh&&n.name==='tyre'){const original=n.geometry;n.geometry=original.clone();original.dispose();n.userData.restVertices=Array.from(n.geometry.attributes.position.array);}});
    createTornCarcass(mount.getObjectByName('wheel-roll')!,s.radius,s.family==='formula'?.32:s.family==='sports'?.28:.235);
-   if(quality==='hero'){const roll=mount.getObjectByName('wheel-roll')!;tyreDetail(roll,s.radius,s.family==='formula'?.32:s.family==='sports'?.28:.235,options.tyreType==='slick'||s.family==='formula');if(options.bodyDetail==='studio')studioWheelFinish(roll,s);}
+   if(quality==='hero'){const roll=mount.getObjectByName('wheel-roll')!;tyreDetail(roll,s.radius,s.family==='formula'?.32:s.family==='sports'?.28:.235,options.tyreType==='slick'||s.family==='formula');if(options.bodyDetail==='studio'||(options.bodyDetail==='fleet'&&s.family!=='bike'&&s.family!=='formula'&&s.family!=='truck'))studioWheelFinish(roll,s);}
   }else shell.add(o);
  }
- if(quality==='hero'){
+ if(quality==='hero'||options.bodyDetail==='fleet'){
   roadHeroDetails(shell,s);
-  if(options.bodyDetail==='studio'){
+  if(options.bodyDetail==='fleet'&&options.variant!=='supercar'){
+   enhanceCabin(shell,s,options);
+   if(s.family==='formula'||s.family==='bike'||s.id==='box-truck'||s.id==='tractor-truck')installFleetSpecialty(shell,s);else installFleetRoad(shell,s);
+   if(s.bodyStyle==='rally')rallyDetails(shell,mounts,s,true);
+   root.userData.bodyArchitecture='fleet-v5';
+  }else if(options.bodyDetail==='studio'||(options.bodyDetail==='fleet'&&options.variant==='supercar')){
    enhanceCabin(shell,s,options);installStudioCoachwork(shell,s);rallyDetails(shell,mounts,s,true);
    for(const name of ['rally-exhaust-tip','rally-exhaust-route','rally-rear-silencer']){const old=shell.getObjectByName(name);if(old){old.parent?.remove(old);old.traverse(o=>{if(o instanceof T.Mesh)o.geometry.dispose();});}}
    const exhaust=installStudioExhaust(shell,s),diffuser=shell.getObjectByName('rear-diffuser') as T.Mesh;
    for(const outlet of exhaust.outlets){const p=outlet.mount.position,r=outlet.outerDiameter/2+.009,old=diffuser.geometry;diffuser.updateMatrix();const inverse=diffuser.matrix.clone().invert(),a=new T.Vector3(-s.length/2-.1,p.y-r,p.z-r).applyMatrix4(inverse),b=new T.Vector3(-s.length/2+.35,p.y+r,p.z+r).applyMatrix4(inverse);diffuser.geometry=cutOpening(old,a.toArray(),b.toArray());old.dispose();
     const engineX=mechanicalLayout(s).engineX,points=[new T.Vector3(engineX,.38,Math.sign(p.z)*.28),new T.Vector3(engineX-.15,.26,Math.sign(p.z)*.24),new T.Vector3(-s.length*.38,.26,Math.sign(p.z)*.32),new T.Vector3(p.x+.25,p.y,p.z),new T.Vector3(p.x+.05,p.y,p.z)];const pipe=new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(points),48,.028,12,false),new T.MeshStandardMaterial({color:'#8d7a67',metalness:.8,roughness:.43}));pipe.name='connected-exhaust-route';shell.add(pipe);}
-   root.userData.bodyArchitecture='section-loft-v4';
+   root.userData.bodyArchitecture=options.bodyDetail==='fleet'?'fleet-v5':'section-loft-v4';
   }else{
    premiumExterior(shell,s);if(options.bodyDetail!=='legacy'){sculptedFascia(shell,s);coachbuiltPanels(shell,s);}sculptShell(shell,s);formulaHeroDetails(shell,mounts,s);enhanceCabin(shell,s,options);if(options.bodyDetail!=='legacy')coachbuiltFinish(shell,mounts,s);rallyDetails(shell,mounts,s,options.bodyDetail!=='legacy');if(options.bodyDetail!=='legacy')refineGlazing(shell);
   }

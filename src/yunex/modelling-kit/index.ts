@@ -46,3 +46,10 @@ export type {QualityState,QualityStages,GeometryDiagnostic} from './visual-quali
 
 export {auditCameraClearance} from './camera-clearance.ts';
 export type {ClearanceView} from './camera-clearance.ts';
+
+export {createFleetVehicle,createFleetRecipe,fleetCatalogue} from './fleet.ts';
+export type {FleetOptions} from './fleet.ts';
+export {fleetArchitecture,fleetProfile} from './fleet-profiles.ts';
+export type {FleetArchitecture} from './fleet-profiles.ts';
+
+export {auditFleetVehicle} from './fleet-quality.ts';
