@@ -17,6 +17,10 @@ Select `variant` for any of the 36 existing catalogue IDs, or `family` for a str
 
 For an existing StudioEpisode recipe, set `vehicle.bodyDetail:'fleet'`. Mechanical components, named wheel mounts, source-owned assemblies, environment placement, drivingState, camera helpers, deterministic seek animation and all existing shot fields remain available. `powertrain` attaches an editable AssemblySpec via the existing engine envelope; it is not a fit guarantee for arbitrary oversized custom parts. Never resize wheel mounts or change catalogue dimensions to conceal bad body geometry.
 
+## Authored GLBs now on main
+
+During V5 development, main independently added the 12-entry [imported-car fleet](YUNEX_IMPORTED_CAR_FLEET.md). It is preserved alongside V5, including original attribution, review gates and download verification. Use `ImportedCar` for high-detail authored real-car geometry. Use `createFleetVehicle` for these source-owned procedural class rigs and their existing wheel/mechanical/damage animation. Imported GLBs are not automatically converted into driving rigs, and none of the four V5 proof films is claimed to show those authored models. Do not resculpt procedural approximations to claim branded 1:1 accuracy.
+
 ## Architecture and provenance
 
 All surfaces are original editable TypeScript geometry, under the repository's existing terms; no external model/textures were downloaded. `fleet-profiles.ts` assigns class proportions. `fleet-road.ts` replaces exterior surfaces for 28 road vehicles, with connected section shells, real wheel/cabin apertures, crowned closed glazing, formed pillars, fitted seams, rockers, arch returns, inset lamps and rounded fascia returns. Supercar preserves V4. Two Formula cars use separate rounded monocoques, engine covers and cambered wings; modern gets undercut sidepods. Three motorcycles get rounded tanks, tails, fenders and sport fairings. Two heavy trucks retain their perforated cab architecture, with coherent cab/window taper and new arches/swages; cargo boxes remain rectangular because they are cargo boxes. Truck uplift is narrower than the road-body rebuild.

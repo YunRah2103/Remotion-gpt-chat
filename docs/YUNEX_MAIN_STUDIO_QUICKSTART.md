@@ -43,3 +43,15 @@ For the full editable workflow, study [V4 agent guide](YUNEX_V4_AGENT_GUIDE.md) 
 ## Agent handoff
 
 Specify: **agent number and ownership**, project ID/recipe, vehicle reference, source commit, shot/frame assignments, unchanged audio contract, native media URL and SHA256, tested commands, visual limitations, and whether changes are committed to an agent branch. No episode code modifications without an explicit episode assignment.
+
+## High-quality real imported vehicle models
+
+The existing `HERO_VEHICLES`/35 world-kit presets are procedural illustrations. For exact-looking external meshes use [the imported-car fleet](YUNEX_IMPORTED_CAR_FLEET.md):
+
+```sh
+npm run kit:cars:list
+npm run kit:cars:fetch -- ferrari-f40
+npx remotion still src/yunex/imported-cars/entry.tsx YunexImportedCarPreview out/imported-f40.png --frame=10 --scale=.5 --gl=swangle
+```
+
+Ten attributed vehicles can be downloaded/verified from pinned GLB sources with `npm run kit:cars:fetch -- all`. More experimental supercars are marked **review-only**, never silently auto-published. Use `ImportedCar` in new film scenes, with true imported mesh and embedded materials. Do not pass a GLB ID to the procedural variant field without implementing a real importer-specific shot renderer.

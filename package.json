@@ -30,7 +30,10 @@
     "kit:handoff": "node --experimental-strip-types scripts/modelling-kit/studio-v3.mjs handoff",
     "kit:scene": "node --experimental-strip-types scripts/modelling-kit/studio-v3.mjs render",
     "kit:review": "node --experimental-strip-types scripts/modelling-kit/studio-v3.mjs preview",
-    "kit:assemble": "node --experimental-strip-types scripts/modelling-kit/assemble.mjs"
+    "kit:assemble": "node --experimental-strip-types scripts/modelling-kit/assemble.mjs",
+    "kit:cars:list": "node scripts/imported-cars.mjs list",
+    "kit:cars:fetch": "node scripts/imported-cars.mjs fetch",
+    "kit:cars:verify": "node scripts/imported-cars.mjs verify"
   },
   "dependencies": {
     "@remotion/captions": "4.0.533",

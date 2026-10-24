@@ -50,3 +50,7 @@ Review method: chronological decoded sequence samples spanning every shot and co
 - [PR #275 compatibility](modelling-kit/V5_PR275_COMPATIBILITY.md): isolated combined-source TypeScript and four grounding tests pass. One textual recipe-type conflict needs additive resolution if merging both independent branches; neither branch was overwritten or merged here.
 
 Visual target remains pending: the fleet has a real source-wide uplift, but the owner's requested 1:1 Porsche-level realism is not honestly achieved across the entire catalogue. Keep this PR draft and retain legacy/approved paths while the owner reviews the actual films.
+
+## Latest-main integration
+
+Main advanced during this session to `ee2734b41dda449ac69f5b07262503bce88baa83`, adding an independent 12-entry imported GLB fleet. This update was merged into the V5 branch, retaining both additive export blocks and all imported asset manifests, credits, fetch/verification tooling, workflow and tests. No third-party model was copied into the V5 procedural proof films or claimed as V5-authored geometry. Post-integration TypeScript and imported-fleet/media tests pass; a merge-tree check against that latest main is clean. The GLB option is explicitly linked in the V5 guide. Proofs remain the documented earlier source snapshots plus corrected classic segment, not disguised latest-head imported-model footage.
