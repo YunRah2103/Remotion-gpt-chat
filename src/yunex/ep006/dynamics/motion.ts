@@ -126,13 +126,29 @@ export function sampleEp006Motion(frame:number):Ep006Motion {
   return [cx,ep006SurfaceHeightM(cx,cz),cz] as [number,number,number];
  });
  const meanGround=grounds.reduce((n,p)=>n+p[1],0)/4;
- // Translate chassis relative to average tyre contact so independent wheel positions
- // remain on the SAME ground even across the roughness/camber of Agent 4's mesh.
- if(!airborne){y=meanGround-compression-tyreSquish;}
+ // Resolve chassis pitch/bank to the actual four wheel-height samples.
+ // A level car climbing a jump crest would otherwise demand >250mm front travel.
+ const meanFront=(grounds[0][1]+grounds[1][1])/2;
+ const meanRear=(grounds[2][1]+grounds[3][1])/2;
+ const meanLeft=(grounds[0][1]+grounds[2][1])/2;
+ const meanRight=(grounds[1][1]+grounds[3][1])/2;
+ const roll=airborne?.002*Math.sin(t*.8):Math.atan2(meanRight-meanLeft,EP006_TRACK_M);
+ if(!airborne)pitch+=Math.atan2(meanFront-meanRear,EP006_WHEELBASE_M);
+ const targets=EP006_CORNERS.map((c,i)=>{
+  const axle=c.startsWith('front')?EP006_WHEELBASE_M/2:-EP006_WHEELBASE_M/2;
+  const side=c.endsWith('left')?EP006_TRACK_M/2:-EP006_TRACK_M/2;
+  // World-space Y of the rotated hub relative to the chassis root.
+  return compression+grounds[i][1]-meanGround-axle*Math.sin(pitch)+side*Math.sin(roll);
+ });
+ // Adjust the centre-of-mass height so the peak-loaded corner hits its bump
+ // stop without pushing tyre geometry through the actual road surface.
+ const lower=Math.max(...targets)-EP006_SUSPENSION_LIMITS_M.bump;
+ const upper=Math.min(...targets)-EP006_SUSPENSION_LIMITS_M.droop;
+ const shift=!airborne?(lower<=upper?clamp(0,lower,upper):lower):0;
+ if(!airborne)y=meanGround-compression-tyreSquish+shift;
  EP006_CORNERS.forEach((c,i)=>{
-  const point=grounds[i],groundDelta=point[1]-meanGround;
-  const contact=!airborne;
-  const travel=contact?clamp(compression+groundDelta,EP006_SUSPENSION_LIMITS_M.droop,EP006_SUSPENSION_LIMITS_M.bump):EP006_SUSPENSION_LIMITS_M.droop;
+  const point=grounds[i],contact=!airborne&&targets[i]-shift>=EP006_SUSPENSION_LIMITS_M.droop-.0001;
+  const travel=contact?clamp(targets[i]-shift,EP006_SUSPENSION_LIMITS_M.droop,EP006_SUSPENSION_LIMITS_M.bump):EP006_SUSPENSION_LIMITS_M.droop;
   wheels[c]={
    compressionM:travel,
    steerRad:c.startsWith('front')?.012*Math.sin(t*.46):0,
@@ -149,7 +165,7 @@ export function sampleEp006Motion(frame:number):Ep006Motion {
  const hit=EP006_JUMPS.find(j=>j.landingFrame===frame);
  const event=start?`${start.id}_LAUNCH`:hit?`${hit.id}_TOUCHDOWN`:null;
  const out:Ep006Motion={
-  frame,timeSeconds:t,phase,jumpId,positionM:[x,y,z],rotationRad:[.002*Math.sin(t*.8),yaw,pitch],
+  frame,timeSeconds:t,phase,jumpId,positionM:[x,y,z],rotationRad:[roll,yaw,pitch],
   velocityMps:[vx,vy,vz],wheels,impact01,dust01,gravel01,event,
  };
  return out;
