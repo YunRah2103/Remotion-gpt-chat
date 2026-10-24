@@ -7,6 +7,7 @@ on:
       - 'production/assets/imported-cars/**'
       - 'src/yunex/imported-cars/**'
       - 'scripts/imported-cars.mjs'
+      - 'scripts/yunex-agent-car.mjs'
       - 'tests/imported-cars/**'
       - '.github/workflows/yunex-imported-cars.yml'
       - 'package.json'
@@ -35,7 +36,7 @@ jobs:
       - name: Compile and verify model contract
         run: |
           npm run check
-          node --test tests/imported-cars/catalog.test.mjs
+          node --experimental-strip-types --test tests/imported-cars/*.test.mjs
       - name: Fetch ALL 10 attributed real-geometry GLBs
         run: |
           npm run kit:cars:list
