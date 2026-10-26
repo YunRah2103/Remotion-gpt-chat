@@ -14,10 +14,10 @@ W,H,FPS=1080,1920,30
 N=300
 RED=(242,70,68)
 CLIPS=[
- {"id":"5017","slug":"classic-red-sports-car","title":"Classic red sports car","page":"https://mixkit.co/free-stock-video/classic-red-sports-car-5017/","start":0.15,"seconds":2.0,"frames":60,"scene":"ENTRY"},
- {"id":"52427","slug":"a-red-sports-car-traveling-along-a-curvy-asphalt-road","title":"A red sports car traveling along a curvy asphalt road at dawn","page":"https://mixkit.co/free-stock-video/a-red-sports-car-traveling-along-a-curvy-asphalt-road-52427/","start":0.3,"seconds":3.0,"frames":90,"scene":"TRACK"},
- {"id":"63","slug":"close-up-of-red-sports-car","title":"Close up of red sports car","page":"https://mixkit.co/free-stock-video/close-up-of-red-sports-car-63/","start":2.4,"seconds":3.0,"frames":90,"scene":"DETAIL"},
- {"id":"5017","slug":"classic-red-sports-car","title":"Classic red sports car","page":"https://mixkit.co/free-stock-video/classic-red-sports-car-5017/","start":4.65,"seconds":2.0,"frames":60,"scene":"HERO"}
+ {"id":"daytona24","title":"Lamborghini SC63 at 2025 Rolex 24 at Daytona","page":"https://commons.wikimedia.org/wiki/File:Daytona24lamborgini.webm","url":"https://upload.wikimedia.org/wikipedia/commons/d/d5/Daytona24lamborgini.webm","creator":"cyberwolf","license":"CC BY-SA 4.0","start":0.20,"seconds":2.0,"frames":60,"scene":"ENTRY"},
+ {"id":"daytona24","title":"Lamborghini SC63 at 2025 Rolex 24 at Daytona","page":"https://commons.wikimedia.org/wiki/File:Daytona24lamborgini.webm","url":"https://upload.wikimedia.org/wikipedia/commons/d/d5/Daytona24lamborgini.webm","creator":"cyberwolf","license":"CC BY-SA 4.0","start":4.50,"seconds":3.0,"frames":90,"scene":"TRACK"},
+ {"id":"daytona24","title":"Lamborghini SC63 at 2025 Rolex 24 at Daytona","page":"https://commons.wikimedia.org/wiki/File:Daytona24lamborgini.webm","url":"https://upload.wikimedia.org/wikipedia/commons/d/d5/Daytona24lamborgini.webm","creator":"cyberwolf","license":"CC BY-SA 4.0","start":9.20,"seconds":3.0,"frames":90,"scene":"DETAIL"},
+ {"id":"daytona24","title":"Lamborghini SC63 at 2025 Rolex 24 at Daytona","page":"https://commons.wikimedia.org/wiki/File:Daytona24lamborgini.webm","url":"https://upload.wikimedia.org/wikipedia/commons/d/d5/Daytona24lamborgini.webm","creator":"cyberwolf","license":"CC BY-SA 4.0","start":15.70,"seconds":2.0,"frames":60,"scene":"HERO"}
 ]
 def sh(args, **kw):
  print("+", " ".join(map(str,args)), flush=True)
@@ -27,33 +27,27 @@ def probe(path):
 def asset(c):
  return SRC/(c["id"]+".mp4")
 def fetch_footage():
- import urllib.request, urllib.error
+ import urllib.request
  SRC.mkdir(parents=True,exist_ok=True)
  for c in CLIPS:
   p=asset(c)
   if p.exists() and p.stat().st_size>200000: continue
-  # Mixkit's specific item page explicitly labels this clip "Stock Video Free License".
-  # Do not download from unrestricted search results or use any image as a proxy.
-  fetched=False
-  for quality in ("large","medium"):
-   url="https://assets.mixkit.co/videos/preview/mixkit-"+c["slug"]+"-"+c["id"]+"-"+quality+".mp4"
-   print("Downloading licensed source:",url,flush=True)
-   try:
-    req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0 (compatible; YUNEX-licensed-footage-experiment/1.0)"})
-    with urllib.request.urlopen(req,timeout=50) as r,open(str(p)+".partial","wb") as f:
-     shutil.copyfileobj(r,f)
-    os.replace(str(p)+".partial",p)
-    meta=probe(p)
-    v=next(s for s in meta["streams"] if s.get("codec_type")=="video")
-    secs=float(meta["format"]["duration"])
-    if secs<c["start"]+c["seconds"]-.1 or int(v["width"])<1000: raise RuntimeError("Source short or too low-res")
-    print("VERIFIED REAL SOURCE",p.stat().st_size,secs,v["width"],v["height"],flush=True)
-    fetched=True;break
-   except Exception as e:
-    print("Source candidate failed:",e,flush=True)
-    if p.exists():p.unlink()
-    if pathlib.Path(str(p)+".partial").exists(): pathlib.Path(str(p)+".partial").unlink()
-  if not fetched: raise RuntimeError("FOOTAGE_UNAVAILABLE: licensed source "+c["page"]+" cannot be acquired; no substitute images will be used.")
+  print("Downloading author-licensed real footage:",c["url"],flush=True)
+  try:
+   req=urllib.request.Request(c["url"],headers={"User-Agent":"AutomotiveMotionLab/1.0 (educational video production; referer Commons file page)"})
+   with urllib.request.urlopen(req,timeout=90) as r,open(str(p)+".partial","wb") as f:
+    shutil.copyfileobj(r,f)
+   os.replace(str(p)+".partial",p)
+   meta=probe(p)
+   v=next(z for z in meta["streams"] if z["codec_type"]=="video")
+   duration=float(meta["format"]["duration"])
+   if duration<c["start"]+c["seconds"] or int(v["width"])<1000:
+    raise RuntimeError("Source resolution/duration unacceptable")
+   print("VERIFIED REAL VIDEO SOURCE:",p.stat().st_size,"bytes, duration",duration,flush=True)
+  except Exception as e:
+   if p.exists():p.unlink()
+   if pathlib.Path(str(p)+".partial").exists():pathlib.Path(str(p)+".partial").unlink()
+   raise RuntimeError("FOOTAGE_UNAVAILABLE: Commons rights-cleared video not downloadable "+c["page"]+": "+str(e))
 def prepare():
  TMP.mkdir(parents=True,exist_ok=True)
  for i,c in enumerate(CLIPS):
@@ -100,7 +94,13 @@ def draw_frame(src, idx, state):
  m1=cv2.inRange(hsv,(0,75,65),(14,255,255))
  m2=cv2.inRange(hsv,(168,75,65),(179,255,255))
  redmask=cv2.bitwise_or(m1,m2)
+ # For racecar liveries other than red, identify sufficiently saturated foreground detail.
+ if cv2.countNonZero(redmask)<600:
+  sat=cv2.inRange(hsv,(16,88,74),(164,255,255))
+  roi=np.zeros_like(sat);roi[145:745,255:1230]=255
+  redmask=cv2.bitwise_and(sat,roi)
  redmask=cv2.morphologyEx(redmask,cv2.MORPH_OPEN,np.ones((5,5),np.uint8))
+ # Saturation target provides a moving tracking anchor, not measured speed.
  count,lab,stats,centers=cv2.connectedComponentsWithStats(redmask)
  hits=[(stats[j,4],centers[j,0]) for j in range(1,count) if stats[j,4]>350]
  desired=float(max(hits)[1]) if hits else iw/2
@@ -109,7 +109,7 @@ def draw_frame(src, idx, state):
  state["scene"]=scene
  cx=int(state["cx"])
  # Car occupies a large sharp portrait stage, while the full-width surroundings remain alive.
- cropw=995
+ cropw=820 if scene=="DETAIL" else 995
  x0=max(0,min(iw-cropw,cx-cropw//2))
  crop=src[:,x0:x0+cropw]
  fh=879
@@ -260,15 +260,17 @@ def qa():
  for i,im in enumerate(ims):sheet.paste(im,(270*i,0))
  sheet.save(OUT/"contact_sheet.jpg",quality=90)
  credits={"title":"Experiment 02 — Live-action Automotive Motion Graphics",
-          "source_platform":"Mixkit",
-          "license":"Mixkit Stock Video Free License",
-          "license_url":"https://mixkit.co/license/modal/videoFree/",
+          "source_platform":"Wikimedia Commons",
+          "license":"Creative Commons Attribution-ShareAlike 4.0 International",
+          "license_url":"https://creativecommons.org/licenses/by-sa/4.0/",
           "checked":"2026-10-26",
-          "notes":"Commercial use and modification permitted by the cited item pages. Attribution not required. Do not imply brand endorsement. Technical overlays are original motion graphics. Engine response display is illustrative and not a measurement.",
-          "sources":[{"title":c["title"],"page":c["page"],"timestamp":f'{c["start"]:.2f}s for {c["seconds"]:.1f}s',"credit":"Mixkit"} for c in CLIPS],
-          "technical":{"width":1080,"height":1920,"fps":30,"frames":300,"duration":10.0,"audio":"original synthesised score and rhythmic throttle layers"}}
+          "attribution":"Daytona24lamborgini.webm by cyberwolf, licensed CC BY-SA 4.0 via Wikimedia Commons. This video edits, colour-grades, crops and animates the original footage. This derivative is shared under CC BY-SA 4.0. No endorsement is implied.",
+          "source":"https://commons.wikimedia.org/wiki/File:Daytona24lamborgini.webm",
+          "notes":"Real race footage; no still-image replacement. Illustrated telemetry is not measured speed.",
+          "segments":[{"source_start":c["start"],"seconds":c["seconds"],"scene":c["scene"]} for c in CLIPS],
+          "technical":{"width":1080,"height":1920,"fps":30,"frames":300,"duration":10.0,"audio":"original synthesised score"}}
  (OUT/"FOOTAGE_CREDITS.json").write_text(json.dumps(credits,indent=2))
- (OUT/"FOOTAGE_CREDITS.md").write_text("# Footage and licence\n\nMixkit Stock Video Free License: https://mixkit.co/license/modal/videoFree/\n\n"+"\n".join(f'- [{c["title"]}]({c["page"]}) — Mixkit (Free License)' for c in CLIPS)+"\n\nEdited, graded, tracked and composited into an original film. Telemetry is illustrative, not measured.\n")
+ (OUT/"FOOTAGE_CREDITS.md").write_text("# Attribution and derivative licence\n\nFootage: [Daytona24lamborgini.webm](https://commons.wikimedia.org/wiki/File:Daytona24lamborgini.webm), created by **cyberwolf**, [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).\n\nChanges: trimmed, reframed, colour-graded, motion graphic overlays, original audio and editing. The resulting derivative is licensed CC BY-SA 4.0. No brand endorsement is implied.\n\nTelemetry is illustrative, not actual vehicle speed.\n")
  (OUT/"verify.json").write_text(json.dumps({"status":"PASS","format":info["format"],"video":v,"audio":a},indent=2))
  print("QA PASS",json.dumps({"frames":v["nb_frames"],"fps":v["avg_frame_rate"],"duration":info["format"]["duration"],"size":video.stat().st_size}))
 if __name__=="__main__":
