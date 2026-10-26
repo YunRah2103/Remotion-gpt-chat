@@ -1,0 +1,35 @@
+name: YUNEX V5 fleet native proofs
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/yunex/modelling-kit/fleet*.ts'
+      - 'src/yunex/modelling-kit/fleet*.tsx'
+      - 'src/yunex/modelling-kit/rig.ts'
+      - 'scripts/modelling-kit/fleet*.mjs'
+      - '.github/workflows/yunex-v5-fleet.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        composition: [V5Supercar, V5Road, V5Rally, V5Fleet]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - run: node scripts/modelling-kit/fleet-render.mjs ${{ matrix.composition }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yunex-v5-${{ matrix.composition }}
+          path: out/v5/

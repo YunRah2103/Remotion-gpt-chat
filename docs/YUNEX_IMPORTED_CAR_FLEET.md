@@ -54,3 +54,18 @@ The source catalogue is built from the [SceneView attribution manifest](https://
 **Do not commercial-publish any model before checking the actual redistribution terms and manufacturer/trademark context.** A source check verifies the exact binary, *not* the legal rights of third parties or premium photographic quality. Prefer the Ferrari F40 for a licensed imported supercar with a credible third-party attribution trail. Keep the two preview-only supercars as private tests pending source matching. Never use the uncredited bulk mirror as an automatic fleet expansion source.
 
 **Verification:** `npm run kit:cars:verify -- all` produces `out/imported-cars/verified-manifest.json` with SHA-256, asset sizes, mesh/material/texture counts and creator credits. `npm run kit:cars:list` shows source names, classes and whether cached. CI checks the 10 attributed assets and uploads a verification report. A successful GLB integrity check is *not* proof the car looks photoreal.
+
+## Imported-car visual follow-up (PR #282)
+
+Normalization now wraps each cloned source scene in a separate fitting group. Authored root translation, rotation, nonuniform scale and explicit matrices stay intact; the fitting group applies the uniform target size and floor offset. This prevents transformed GLB roots from being distorted or incorrectly grounded. Materials and source geometry remain shared and unmodified.
+
+The preview composition now runs a deterministic four-second camera orbit with neutral procedural softbox reflections, reduced environment intensity, a floor at y=0 and a fog-blended studio background. It is a stationary model inspection, not wheel-rigged driving footage. No external environment texture or new model was added. These presentation changes apply to the imported-car preview, while other scenes continue to choose their own lighting.
+
+```bash
+node --experimental-strip-types --test tests/imported-cars/*.test.mjs
+npx remotion render src/yunex/imported-cars/entry.tsx YunexImportedCarPreview out/imported-cars/f40-studio-source.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --concurrency=2
+```
+
+The imported-car workflow retains an actual moving F40 review alongside its integrity report and still. Transform regressions cover nonuniformly scaled/translated/rotated roots, matrix-authored roots, source immutability and invalid bounds. Render review of the F40 does not certify the other eleven catalogue entries or convert any imported model into a driving rig.
+
+Validation for this follow-up: TypeScript passes; combined modelling/world/parts/imported-car suite **279 passed, zero failed/skipped**. The transformed-root regression was observed failing before the wrapper fix (2.15196 m instead of requested 4.7 m), then passing after it.

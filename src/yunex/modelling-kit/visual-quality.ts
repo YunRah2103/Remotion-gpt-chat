@@ -2,6 +2,7 @@
 import * as T from 'three';
 import {vehicleSpec} from '../world-kit/catalog.ts';
 import {coachbuiltField} from './coachbuilt.ts';
+import {fleetProfile} from './fleet-profiles.ts';
 import {studioBodyProfile} from './studio-coachwork.ts';
 export type QualityState='pass'|'fail'|'pending';
 export type QualityStages={source:QualityState;native:QualityState;geometry:QualityState;visual:QualityState;final:QualityState};
@@ -54,7 +55,7 @@ export function auditVehicleGeometry(root:T.Object3D){
  });
  if(wheels.length){const x=wheels.map(w=>w.center[0]),actual=Math.max(...x)-Math.min(...x);if(Math.abs(actual-s.wheelbase)>.08)issue('wheelbase-fit',s.id,actual,s.wheelbase,'Measured front/rear wheel spacing differs from specification.','Restore canonical axle hardpoints; do not stretch wheelbase with the body.');}
  // End-cap triangle winding is measurable without a GPU or material-side assumptions.
- if(root.userData.bodyArchitecture==='section-loft-v4'){
+ if(['section-loft-v4','fleet-v5'].includes(root.userData.bodyArchitecture)){
   const body=records.find(r=>r.object.name==='arched-body');
   if(body){const index=body.object.geometry.index;for(const sign of [-1,1]){let checked=0,inward=0;for(let i=0;i<(index?.count??body.points.length);i+=3){const a=body.points[index?index.getX(i):i],b=body.points[index?index.getX(i+1):i+1],c=body.points[index?index.getX(i+2):i+2];if(!a||!b||!c)continue;const normal=b.clone().sub(a).cross(c.clone().sub(a)).normalize(),x=(a.x+b.x+c.x)/3;if(x*sign<s.length/2-.20||Math.abs(normal.x)<.85)continue;checked++;if(normal.x*sign<0)inward++;}if(checked&&inward/checked>.35)issue('fascia-winding',`arched-body/${sign>0?'front':'rear'}`,inward/checked,.35,'End-cap triangles predominantly face inward.','Reverse cap index winding and verify exterior ray hits with front-sided material.');}}
  }
@@ -64,7 +65,7 @@ export function auditVehicleGeometry(root:T.Object3D){
  if(roof){
   const top=roof.box.max.y;
   const shell=root.getObjectByName('body-shell'),offset=shell?.position.y??0;
-  const expectedRoof=(root.userData.bodyArchitecture==='section-loft-v4'?studioBodyProfile(s).roof+.012:shell?.userData.coachbuilt?coachbuiltField(new T.Vector3(0,s.height+.02,0),s).y:s.height+.02)+offset;
+  const expectedRoof=(root.userData.bodyArchitecture==='fleet-v5'?(s.id==='supercar'?studioBodyProfile(s).roof+.012:fleetProfile(s).roof+.018):root.userData.bodyArchitecture==='section-loft-v4'?studioBodyProfile(s).roof+.012:shell?.userData.coachbuilt?coachbuiltField(new T.Vector3(0,s.height+.02,0),s).y:s.height+.02)+offset;
   if(Math.abs(top-expectedRoof)>.055)issue('roof-height','roof',top,expectedRoof,'Actual roof apex differs from the selected body architecture.','Inspect roof field/deformation against its architecture profile, not nominal catalogue height.');
   if(liner){
    // Local nearest surface comparison catches a protruding liner even beneath a curved roof apex.

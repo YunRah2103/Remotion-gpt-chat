@@ -8,7 +8,7 @@ import type {DrivingAction,CameraPreset} from './driving.ts';
 import {validateCameraMove} from './camera-move.ts';
 import type {CameraMove} from './camera-move.ts';
 export type StudioShot={cameraMove?:CameraMove;speedScale?:number;context?:'world'|'inspection';energyFlow?:'drive'|'regenerate';id:string;duration:number;camera:CameraPreset;action:DrivingAction;caption:string;orbit?:{azimuth:number;elevation:number;sweep?:number};joints?:Record<string,number>;jointTracks?:Record<string,{time:number;value:number}[]>;part?:PartVariant;assembly?:AssemblySpec;cutaway?:number;exploded?:number;highlight?:'engine'|'underfloor'|'wheels';annotation?:{anchor:'engine'|'front-wheel'|'driver'|'underfloor'|'part';text:string}};
-export type EpisodeRecipe={presentation?:'cinematic';id:string;title:string;vehicle:{bodyDetail?:'legacy'|'coachbuilt'|'studio';variant:VehicleVariant;driver?:boolean;color?:string;powertrain?:AssemblySpec;model?:ModelVariation;components?:ComponentSpec[]};world:{kind:EnvironmentKind;roughness?:number;wetness?:number;timeOfDay?:'day'|'dusk'|'night';model?:ModelVariation;components?:ComponentSpec[]};shots:StudioShot[];words?:{text:string;start:number;end:number}[];captions?:{start:number;end:number;text:string}[];audio?:{narration?:string;music?:string;musicVolume?:number}};
+export type EpisodeRecipe={presentation?:'cinematic';id:string;title:string;vehicle:{bodyDetail?:'legacy'|'coachbuilt'|'studio'|'fleet';variant:VehicleVariant;driver?:boolean;color?:string;powertrain?:AssemblySpec;model?:ModelVariation;components?:ComponentSpec[]};world:{kind:EnvironmentKind;roughness?:number;wetness?:number;timeOfDay?:'day'|'dusk'|'night';model?:ModelVariation;components?:ComponentSpec[]};shots:StudioShot[];words?:{text:string;start:number;end:number}[];captions?:{start:number;end:number;text:string}[];audio?:{narration?:string;music?:string;musicVolume?:number}};
 export type CompiledRecipe=Omit<EpisodeRecipe,'shots'> & {fps:number;durationInFrames:number;shots:(StudioShot & {startFrame:number;endFrame:number;distanceOffset:number})[]};
 const fail=(message:string):never=>{throw new Error(message);};
 export function compileRecipe(input:EpisodeRecipe,fps=30):CompiledRecipe{
@@ -16,7 +16,7 @@ export function compileRecipe(input:EpisodeRecipe,fps=30):CompiledRecipe{
  const r=JSON.parse(JSON.stringify(input)) as EpisodeRecipe;
  if(typeof r.id!=='string'||typeof r.title!=='string'||!r.id||!r.title)fail('Recipe requires id and title');
  const vehicle=VEHICLES.find(v=>v.id===r.vehicle?.variant);if(!vehicle)fail('Unknown vehicle');
- if(r.vehicle.bodyDetail!==undefined&&!['legacy','coachbuilt','studio'].includes(r.vehicle.bodyDetail))fail('Unknown body detail');
+ if(r.vehicle.bodyDetail!==undefined&&!['legacy','coachbuilt','studio','fleet'].includes(r.vehicle.bodyDetail))fail('Unknown body detail');
  if(r.presentation!==undefined&&r.presentation!=='cinematic')fail('Unknown presentation');
  if(r.vehicle.driver&&vehicle!.family==='bike')fail('Motorcycle driver is not supported');
  if(!ENVIRONMENTS.some(v=>v===r.world?.kind))fail('Unknown world');

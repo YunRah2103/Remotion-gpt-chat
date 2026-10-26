@@ -1,0 +1,105 @@
+{
+  "ciRun": 40048433628,
+  "ciSourceCommit": "f2b6e9c3abe6689fa9978e73a5f2b4c729de792a",
+  "ciSourceTree": "477a5581da4ab1b76b23c30260fdb3fa2baa17a0",
+  "videos": [
+    {
+      "file": "V5-A-Supercar.mp4",
+      "sha256": "f7437419f3d0923c8afac9255633e166915a39b525e66d02ad034590fe5e1c04",
+      "sourceMediaSha256": "46cbf95109af95a1e6f0450c9a0eeb6ef953acb22025da27d82be28671c1d216",
+      "deliveryRangeNormalized": true,
+      "codec_name": "h264",
+      "width": 1080,
+      "height": 1920,
+      "pix_fmt": "yuv420p",
+      "color_range": "tv",
+      "color_space": "bt709",
+      "color_transfer": "bt709",
+      "color_primaries": "bt709",
+      "avg_frame_rate": "30/1",
+      "nb_read_frames": "180",
+      "visualApproval": "pending"
+    },
+    {
+      "file": "V5-B-Road.mp4",
+      "sha256": "d2a4450eb1aff3497dbc131d19c86e7fbf5db4b4ad40a90bdda774a76b58a22c",
+      "sourceMediaSha256": "7e84637d6f65ffba697bfaf911560f1b6dd5669fa230a89b94ea5b8dd50d0df8",
+      "deliveryRangeNormalized": true,
+      "codec_name": "h264",
+      "width": 1080,
+      "height": 1920,
+      "pix_fmt": "yuv420p",
+      "color_range": "tv",
+      "color_space": "bt709",
+      "color_transfer": "bt709",
+      "color_primaries": "bt709",
+      "avg_frame_rate": "30/1",
+      "nb_read_frames": "180",
+      "visualApproval": "pending"
+    },
+    {
+      "file": "V5-C-Rally.mp4",
+      "sha256": "acc0b7abdf40dcf7bd5457ad4c302f90f652834712182ce99d5dd27803973d1c",
+      "sourceMediaSha256": "39cd5c8c5b23e323859ca331ac27cef70f89412c35c043660b85d11cdacab72d",
+      "deliveryRangeNormalized": true,
+      "codec_name": "h264",
+      "width": 1080,
+      "height": 1920,
+      "pix_fmt": "yuv420p",
+      "color_range": "tv",
+      "color_space": "bt709",
+      "color_transfer": "bt709",
+      "color_primaries": "bt709",
+      "avg_frame_rate": "30/1",
+      "nb_read_frames": "180",
+      "visualApproval": "pending"
+    },
+    {
+      "file": "V5-D-Fleet-Comparison.mp4",
+      "sha256": "fcccdd277bb646706338ccd6fb17c0327cf4f715b711f9ec73b276c7a16e1951",
+      "sourceMediaSha256": "4869a3a00b2bb99f8f59933b0c2496976e5ad141e8e8967b984756f28f96ce0d",
+      "deliveryRangeNormalized": true,
+      "codec_name": "h264",
+      "width": 1080,
+      "height": 1920,
+      "pix_fmt": "yuv420p",
+      "color_range": "tv",
+      "color_space": "bt709",
+      "color_transfer": "bt709",
+      "color_primaries": "bt709",
+      "avg_frame_rate": "30/1",
+      "nb_read_frames": "360",
+      "visualApproval": "pending"
+    }
+  ],
+  "reviewedComparisonSources": [
+    {
+      "frames": [
+        0,
+        329
+      ],
+      "sourceCommit": "f2b6e9c3abe6689fa9978e73a5f2b4c729de792a",
+      "sourceFile": "V5-D-Fleet-Comparison.mp4",
+      "sha256": "eed12bf8da2d35dd08dd0a957c0b3f1db05d406ad3b204dcbcc5e4ff03ce0489"
+    },
+    {
+      "frames": [
+        330,
+        359
+      ],
+      "localSourceCommit": "87766cce8e274fc17ce1f310d17dad2621a450ca",
+      "sourceSrcTree": "b429707dd41b5a8c101fb09c8f719b92058bacfa",
+      "sourceFile": "V5-classic-tail.mp4",
+      "sha256": "db1c6e270b8791c1bdaf10bde5839c11319453d93a8bde0c56da99a6e8ac2e0d",
+      "equivalentPublishedSourceCommit": "471b4e50164017ee4f95c8069875ec54f42f858e",
+      "sourceEquivalence": "Identical complete src subtree, identical unchanged package lock and Remotion configuration; later changes are media-gate scripts and documentation."
+    }
+  ],
+  "reviewMethod": "Chronological decoded sequence samples, not real-time playback or all-frame visual signoff",
+  "visualLimitations": [
+    "Generic fascias and procedural styling remain.",
+    "Truck and motorcycle uplift is narrower than road replacement.",
+    "Rally ground contact and scenery remain development quality.",
+    "Owner approval remains pending."
+  ]
+}
