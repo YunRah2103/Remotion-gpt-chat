@@ -14,10 +14,10 @@ W,H,FPS=1080,1920,30
 N=300
 RED=(242,70,68)
 CLIPS=[
- {"id":"daytona24","title":"Lamborghini SC63 at 2025 Rolex 24 at Daytona","page":"https://commons.wikimedia.org/wiki/File:Daytona24lamborgini.webm","url":"https://upload.wikimedia.org/wikipedia/commons/d/d5/Daytona24lamborgini.webm","creator":"cyberwolf","license":"CC BY-SA 4.0","start":0.20,"seconds":2.0,"frames":60,"scene":"ENTRY"},
- {"id":"daytona24","title":"Lamborghini SC63 at 2025 Rolex 24 at Daytona","page":"https://commons.wikimedia.org/wiki/File:Daytona24lamborgini.webm","url":"https://upload.wikimedia.org/wikipedia/commons/d/d5/Daytona24lamborgini.webm","creator":"cyberwolf","license":"CC BY-SA 4.0","start":4.50,"seconds":3.0,"frames":90,"scene":"TRACK"},
- {"id":"daytona24","title":"Lamborghini SC63 at 2025 Rolex 24 at Daytona","page":"https://commons.wikimedia.org/wiki/File:Daytona24lamborgini.webm","url":"https://upload.wikimedia.org/wikipedia/commons/d/d5/Daytona24lamborgini.webm","creator":"cyberwolf","license":"CC BY-SA 4.0","start":9.20,"seconds":3.0,"frames":90,"scene":"DETAIL"},
- {"id":"daytona24","title":"Lamborghini SC63 at 2025 Rolex 24 at Daytona","page":"https://commons.wikimedia.org/wiki/File:Daytona24lamborgini.webm","url":"https://upload.wikimedia.org/wikipedia/commons/d/d5/Daytona24lamborgini.webm","creator":"cyberwolf","license":"CC BY-SA 4.0","start":15.70,"seconds":2.0,"frames":60,"scene":"HERO"}
+ {"id":"f430","title":"Ferrari F430 Spider filmed by FPV drone","page":"https://commons.wikimedia.org/wiki/File:Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","url":"https://upload.wikimedia.org/wikipedia/commons/a/aa/Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","creator":"SE FPV","license":"CC BY 3.0","start":1.1,"seconds":2.0,"frames":60,"scene":"ENTRY"},
+ {"id":"f430","title":"Ferrari F430 Spider filmed by FPV drone","page":"https://commons.wikimedia.org/wiki/File:Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","url":"https://upload.wikimedia.org/wikipedia/commons/a/aa/Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","creator":"SE FPV","license":"CC BY 3.0","start":9.1,"seconds":3.0,"frames":90,"scene":"TRACK"},
+ {"id":"f430","title":"Ferrari F430 Spider filmed by FPV drone","page":"https://commons.wikimedia.org/wiki/File:Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","url":"https://upload.wikimedia.org/wikipedia/commons/a/aa/Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","creator":"SE FPV","license":"CC BY 3.0","start":21.0,"seconds":3.0,"frames":90,"scene":"DETAIL"},
+ {"id":"f430","title":"Ferrari F430 Spider filmed by FPV drone","page":"https://commons.wikimedia.org/wiki/File:Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","url":"https://upload.wikimedia.org/wikipedia/commons/a/aa/Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","creator":"SE FPV","license":"CC BY 3.0","start":35.8,"seconds":2.0,"frames":60,"scene":"HERO"}
 ]
 def sh(args, **kw):
  print("+", " ".join(map(str,args)), flush=True)
@@ -261,16 +261,16 @@ def qa():
  sheet.save(OUT/"contact_sheet.jpg",quality=90)
  credits={"title":"Experiment 02 — Live-action Automotive Motion Graphics",
           "source_platform":"Wikimedia Commons",
-          "license":"Creative Commons Attribution-ShareAlike 4.0 International",
-          "license_url":"https://creativecommons.org/licenses/by-sa/4.0/",
+          "license":"Creative Commons Attribution 3.0 Unported",
+          "license_url":"https://creativecommons.org/licenses/by/3.0/",
           "checked":"2026-10-26",
-          "attribution":"Daytona24lamborgini.webm by cyberwolf, licensed CC BY-SA 4.0 via Wikimedia Commons. This video edits, colour-grades, crops and animates the original footage. This derivative is shared under CC BY-SA 4.0. No endorsement is implied.",
-          "source":"https://commons.wikimedia.org/wiki/File:Daytona24lamborgini.webm",
+          "attribution":"Ferrari F430 Spider driving as viewed from FPV drone.webm by SE FPV, CC BY 3.0 via Wikimedia Commons, source originally published on YouTube (ouCi0FfEOx0). Cropped, trimmed, colour graded, overlaid original motion graphics, with original sound design. CC BY 3.0 attribution; no endorsement is implied. Source Commons notes review pending.",
+          "source":"https://commons.wikimedia.org/wiki/File:Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm",
           "notes":"Real race footage; no still-image replacement. Illustrated telemetry is not measured speed.",
           "segments":[{"source_start":c["start"],"seconds":c["seconds"],"scene":c["scene"]} for c in CLIPS],
           "technical":{"width":1080,"height":1920,"fps":30,"frames":300,"duration":10.0,"audio":"original synthesised score"}}
  (OUT/"FOOTAGE_CREDITS.json").write_text(json.dumps(credits,indent=2))
- (OUT/"FOOTAGE_CREDITS.md").write_text("# Attribution and derivative licence\n\nFootage: [Daytona24lamborgini.webm](https://commons.wikimedia.org/wiki/File:Daytona24lamborgini.webm), created by **cyberwolf**, [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).\n\nChanges: trimmed, reframed, colour-graded, motion graphic overlays, original audio and editing. The resulting derivative is licensed CC BY-SA 4.0. No brand endorsement is implied.\n\nTelemetry is illustrative, not actual vehicle speed.\n")
+ (OUT/"FOOTAGE_CREDITS.md").write_text("# Footage attribution and licence\n\n[**Ferrari F430 Spider driving as viewed from FPV drone.webm**](https://commons.wikimedia.org/wiki/File:Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm) by **SE FPV**, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). Original source: [SE FPV on YouTube](https://www.youtube.com/watch?v=ouCi0FfEOx0).\n\nAdaptations: four edited segments, colour grade, portrait reframing, dynamic overlays, original audio. This version credits the author without implying endorsement. Licence review of Wikimedia source is marked pending; verify before unrestricted distribution.\n\nVisual telemetry is illustrative, not measured real-vehicle performance.\n")
  (OUT/"verify.json").write_text(json.dumps({"status":"PASS","format":info["format"],"video":v,"audio":a},indent=2))
  print("QA PASS",json.dumps({"frames":v["nb_frames"],"fps":v["avg_frame_rate"],"duration":info["format"]["duration"],"size":video.stat().st_size}))
 if __name__=="__main__":
