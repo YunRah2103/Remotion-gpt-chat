@@ -1,0 +1,45 @@
+name: YUNEX RS6 C2 details source acquisition QA
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/c2-details-textures
+    paths:
+      - 'production/videos/rs6-no-mercy-001/agent-c2/*.py'
+      - '.github/workflows/rs6-c2-detail-probe.yml'
+  workflow_dispatch:
+jobs:
+  c2-acquire-qa:
+    timeout-minutes: 17
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install --upgrade yt-dlp curl-cffi pillow --break-system-packages
+          ffmpeg -version | head -n 1
+          yt-dlp --version
+      - name: Execute independent C2 source acquisition attempts
+        run: python production/videos/rs6-no-mercy-001/agent-c2/probe_sources.py
+      - name: Fine-grained C8 RS6 details motion QA (32 frames)
+        if: always()
+        run: python production/videos/rs6-no-mercy-001/agent-c2/fine_glenmore.py
+      - name: Upload timed motion contact sheet
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-c2-detail-fine-qa-${{ github.run_id }}
+          path: glen_qa/
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Upload only technical and visual QA (never third-party MP4s)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-c2-detail-source-qa-${{ github.run_id }}
+          path: c2_qa/
+          if-no-files-found: warn
+          retention-days: 7

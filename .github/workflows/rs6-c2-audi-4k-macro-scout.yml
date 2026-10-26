@@ -1,0 +1,36 @@
+name: RS6 C2 UHD close-up 14-window storyboard
+on:
+  push:
+    branches:
+      - automotive-edits/rs6-no-mercy-001/c2-details-textures
+    paths:
+      - 'production/videos/rs6-no-mercy-001/agent-c2/c2_uhd_detail_scan.py'
+      - '.github/workflows/rs6-c2-audi-4k-macro-scout.yml'
+  pull_request:
+    paths:
+      - 'production/videos/rs6-no-mercy-001/agent-c2/c2_uhd_detail_scan.py'
+      - '.github/workflows/rs6-c2-audi-4k-macro-scout.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  macro-original-4k:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up native 4K contact sheet decoding
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install pillow --break-system-packages
+      - name: Execute 14 true original UHD point-seeks, 3 frames each
+        run: python production/videos/rs6-no-mercy-001/agent-c2/c2_uhd_detail_scan.py
+      - name: Provide internal editorial frame review only, not source MP4
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-c2-uhd-macro-storyboard-${{ github.run_id }}
+          path: c2_uhd_detail_scan/
+          retention-days: 7
+          if-no-files-found: warn
