@@ -24,9 +24,8 @@ jobs:
           python-version: '3.12'
       - name: FFmpeg and Python composition tools
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg
-          python -m pip install -q opencv-python-headless==4.10.0.84 pillow numpy
+          ffmpeg -version | head -n 1
+          python -m pip install -q --only-binary=:all: opencv-python-headless==4.10.0.84 pillow numpy
       - name: Download licensed real footage, design, render and decode-QA
         run: |
           python experiments/02-live-action-motion-graphics/build.py
