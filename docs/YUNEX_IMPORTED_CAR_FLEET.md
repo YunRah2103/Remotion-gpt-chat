@@ -54,3 +54,8 @@ The source catalogue is built from the [SceneView attribution manifest](https://
 **Do not commercial-publish any model before checking the actual redistribution terms and manufacturer/trademark context.** A source check verifies the exact binary, *not* the legal rights of third parties or premium photographic quality. Prefer the Ferrari F40 for a licensed imported supercar with a credible third-party attribution trail. Keep the two preview-only supercars as private tests pending source matching. Never use the uncredited bulk mirror as an automatic fleet expansion source.
 
 **Verification:** `npm run kit:cars:verify -- all` produces `out/imported-cars/verified-manifest.json` with SHA-256, asset sizes, mesh/material/texture counts and creator credits. `npm run kit:cars:list` shows source names, classes and whether cached. CI checks the 10 attributed assets and uploads a verification report. A successful GLB integrity check is *not* proof the car looks photoreal.
+
+
+## Unified 108-entry agent view (new)
+
+Use [the unified agent quickstart](YUNEX_IMPORTED_CAR_AGENT_QUICKSTART.md) for discovery across the 12 individually catalogued real vehicles plus 96 additional unverified *private-review-only* candidates. `npm run kit:cars:agent -- list` or `-- preview ferrari-f40` gives a one-command car selection and native six-second moving proof. **Only the specifically attributed 12-model catalogue is available to ordinary production acquisition** (its two review-only entries still require a private gate). The bulk mirror remains prohibited from public publication until independent source/licence verification.

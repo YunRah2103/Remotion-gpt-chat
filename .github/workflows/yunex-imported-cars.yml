@@ -3,18 +3,27 @@ on:
   push:
     branches:
       - feat/yunex-imported-car-fleet-20261024
+      - feat/yunex-imported-cars-agent-ready
     paths:
       - 'production/assets/imported-cars/**'
+      - 'production/asset-library/**'
+      - 'tests/asset-library/**'
       - 'src/yunex/imported-cars/**'
       - 'scripts/imported-cars.mjs'
+      - 'scripts/yunex-agent-car.mjs'
+      - 'scripts/modelling-kit/imported-car-montage.py'
       - 'tests/imported-cars/**'
       - '.github/workflows/yunex-imported-cars.yml'
       - 'package.json'
   pull_request:
     paths:
       - 'production/assets/imported-cars/**'
+      - 'production/asset-library/**'
+      - 'tests/asset-library/**'
       - 'src/yunex/imported-cars/**'
       - 'scripts/imported-cars.mjs'
+      - 'scripts/yunex-agent-car.mjs'
+      - 'scripts/modelling-kit/imported-car-montage.py'
       - 'tests/imported-cars/**'
       - '.github/workflows/yunex-imported-cars.yml'
       - 'package.json'
@@ -35,7 +44,8 @@ jobs:
       - name: Compile and verify model contract
         run: |
           npm run check
-          node --test tests/imported-cars/catalog.test.mjs
+          node --experimental-strip-types --test tests/imported-cars/*.test.mjs
+          python3 -m unittest discover -s tests/asset-library -p 'test_*.py'
       - name: Fetch ALL 10 attributed real-geometry GLBs
         run: |
           npm run kit:cars:list
@@ -62,6 +72,43 @@ jobs:
           mkdir -p out/imported-cars
           npx remotion still src/yunex/imported-cars/entry.tsx YunexImportedCarPreview out/imported-cars/ferrari-f40-actual-mesh.png --frame=10 --scale=.5 --gl=swangle --timeout=120000
           test -s out/imported-cars/ferrari-f40-actual-mesh.png
+      - name: Install FFmpeg for frame verification
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+      - name: Real moving native Ferrari GLB preview (180 frames, 1080x1920)
+        run: |
+          npx remotion render src/yunex/imported-cars/entry.tsx YunexImportedCarPreview out/imported-cars/ferrari-f40-moving-inspection.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --timeout=120000 --concurrency=2
+          ffprobe -v error -count_frames -select_streams v:0 -show_entries stream=width,height,nb_read_frames,avg_frame_rate -of json out/imported-cars/ferrari-f40-moving-inspection.mp4 > out/imported-cars/moving-probe.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          j=json.loads(Path('out/imported-cars/moving-probe.json').read_text())['streams'][0]
+          assert j['width']==1080 and j['height']==1920, j
+          assert j['avg_frame_rate']=='30/1', j
+          assert int(j['nb_read_frames'])==180, j
+          print('PASS true 180-frame imported Ferrari orbit')
+          PY
+          ffmpeg -v error -i out/imported-cars/ferrari-f40-moving-inspection.mp4 -f null -
+      - name: Render imported car catalogue stills and montage
+        if: github.head_ref == 'feat/yunex-imported-cars-agent-ready' || github.ref_name == 'feat/yunex-imported-cars-agent-ready'
+        run: |
+          python3 -m pip install --break-system-packages pillow
+          mkdir -p out/imported-cars/showcase/stills
+          python3 - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+          catalog=json.loads(Path('production/assets/imported-cars/catalog.json').read_text())['vehicles']
+          cars=[x for x in catalog if x['readiness']=='attribution-required']
+          assert len(cars)==10
+          for i,car in enumerate(cars,1):
+              print('RENDER REAL GLB',i,'/',len(cars),car['id'],flush=True)
+              subprocess.run(['npx','remotion','still','src/yunex/imported-cars/entry.tsx',
+                  'YunexImportedCarPreview',f"out/imported-cars/showcase/stills/{car['id']}.png",
+                  '--frame=65','--gl=swangle','--timeout=120000',
+                  '--props='+json.dumps({'carId':car['id'],'privateReview':False,'lengthMeters':4.7})],check=True)
+          PY
+          python3 scripts/modelling-kit/imported-car-montage.py
       - name: Keep verification records (no third-party binary redistribution)
         if: always()
         uses: actions/upload-artifact@v4
@@ -70,5 +117,9 @@ jobs:
           path: |
             out/imported-cars/verified-manifest.json
             out/imported-cars/ferrari-f40-actual-mesh.png
+            out/imported-cars/ferrari-f40-moving-inspection.mp4
+            out/imported-cars/moving-probe.json
+            out/imported-cars/showcase/YUNEX-Real-Imported-Cars-Showcase.mp4
+            out/imported-cars/showcase/showcase-manifest.json
           if-no-files-found: warn
           retention-days: 14
