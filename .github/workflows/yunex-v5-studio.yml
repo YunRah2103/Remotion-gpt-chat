@@ -1,0 +1,57 @@
+name: YUNEX V5 road-led studio native QA
+on:
+  pull_request:
+    paths: ['src/yunex/studio-v5/**', 'tests/studio-v5/**', 'scripts/studio-v5/**', '.github/workflows/yunex-v5-studio.yml', 'public/yunex-v5/**']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: yunex-v5-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '24', cache: npm}
+      - run: npm ci --no-audit --no-fund
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - run: npm run check
+      - run: node --experimental-strip-types --test tests/studio-v5/*.test.mjs tests/modelling-kit/*.test.mjs tests/world-kit/*.test.mjs tests/parts-kit/*.test.mjs
+      - run: python3 -m unittest discover -s tests/modelling-kit -p 'test_*.py'
+  render:
+    needs: regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        preset: [mountain, circuit, city, rally]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '24', cache: npm}
+      - run: npm ci --no-audit --no-fund
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - run: npx remotion render src/yunex/studio-v5/Film.tsx V5-${{ matrix.preset }} out/v5/${{ matrix.preset }}.mp4 --gl=swangle --codec=h264 --pixel-format=yuv420p --color-space=bt709 --crf=18 --concurrency=2
+      - name: Controlled surface comparison (same road, car, lighting and camera)
+        if: matrix.preset == 'mountain'
+        run: |
+          npx remotion render src/yunex/studio-v5/Film.tsx V5-mountain out/v5/before-surfaces.mp4 --frames=0-59 --props='{"config":{"preset":"mountain","quality":"hero"},"scanned":false}' --gl=swangle --codec=h264 --pixel-format=yuv420p --color-space=bt709 --crf=18 --concurrency=2
+          ffmpeg -v error -i out/v5/before-surfaces.mp4 -i out/v5/mountain.mp4 -filter_complex '[0:v]trim=end_frame=60,setpts=PTS-STARTPTS[a];[1:v]trim=end_frame=60,setpts=PTS-STARTPTS[b];[a][b]hstack=inputs=2[v]' -map '[v]' -c:v libx264 -crf 18 -pix_fmt yuv420p out/v5/controlled-surfaces-ab.mp4
+          ffmpeg -v error -xerror -i out/v5/controlled-surfaces-ab.mp4 -f null -
+      - name: Verify native master
+        run: |
+          ffmpeg -v error -xerror -i out/v5/${{ matrix.preset }}.mp4 -f null -
+          ffprobe -v error -count_frames -show_entries stream=width,height,avg_frame_rate,nb_read_frames -of json out/v5/${{ matrix.preset }}.mp4 > out/v5/probe.json
+          python3 -c 'import json; s=json.load(open("out/v5/probe.json"))["streams"][0]; assert (s["width"],s["height"],s["avg_frame_rate"],s["nb_read_frames"])==(1080,1920,"30/1","240")'
+          sha256sum out/v5/*.mp4 > out/v5/sha256.txt
+          ffmpeg -v error -i out/v5/${{ matrix.preset }}.mp4 -f framemd5 out/v5/frame-hashes.txt
+          python3 -c 'from pathlib import Path; h=[s.rsplit(",",1)[-1].strip() for s in Path("out/v5/frame-hashes.txt").read_text().splitlines() if s and not s.startswith("#")]; assert len(h)==240 and len(set(h))>=230, "Frozen/duplicate native frames"'
+          git rev-parse HEAD > out/v5/source-sha.txt
+          git rev-parse 'HEAD^{tree}' > out/v5/source-tree.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-V5-${{ matrix.preset }}-native
+          path: out/v5/

@@ -1,0 +1,17 @@
+{
+  "config": {
+    "preset": "circuit",
+    "timeOfDay": "night",
+    "weather": "wet",
+    "quality": "hero",
+    "vegetation": 0.05,
+    "cameraSafeWidth": 14
+  },
+  "camera": {
+    "side": "right",
+    "distance": 14,
+    "height": 2.6,
+    "angle": 0.75,
+    "orbit": 0.08
+  }
+}

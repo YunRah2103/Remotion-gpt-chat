@@ -1,0 +1,21 @@
+{
+  "config": {
+    "preset": "rally",
+    "timeOfDay": "day",
+    "weather": "clear",
+    "quality": "hero",
+    "vegetation": 1,
+    "road": {
+      "width": 6,
+      "bank": 0.018,
+      "roughness": 0.018
+    }
+  },
+  "camera": {
+    "side": "right",
+    "distance": 14,
+    "height": 2.5,
+    "angle": 0.78,
+    "orbit": 0.1
+  }
+}

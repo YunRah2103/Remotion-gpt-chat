@@ -1,0 +1,17 @@
+{
+  "config": {
+    "preset": "city",
+    "timeOfDay": "night",
+    "weather": "wet",
+    "quality": "hero",
+    "vegetation": 0.1,
+    "seed": 37
+  },
+  "camera": {
+    "side": "right",
+    "distance": 14,
+    "height": 2.8,
+    "angle": 0.78,
+    "orbit": 0.08
+  }
+}
