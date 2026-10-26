@@ -24,7 +24,13 @@ jobs:
           python-version: '3.12'
       - name: FFmpeg and Python composition tools
         run: |
-          ffmpeg -version | head -n 1
+          mkdir -p /tmp/exp02-tools /tmp/exp02-bin
+          npm install --silent --prefix /tmp/exp02-tools --no-save --no-package-lock @ffmpeg-installer/linux-x64 @ffprobe-installer/linux-x64
+          ln -s /tmp/exp02-tools/node_modules/@ffmpeg-installer/linux-x64/ffmpeg /tmp/exp02-bin/ffmpeg
+          ln -s /tmp/exp02-tools/node_modules/@ffprobe-installer/linux-x64/ffprobe /tmp/exp02-bin/ffprobe
+          /tmp/exp02-bin/ffmpeg -version | head -n 1
+          /tmp/exp02-bin/ffprobe -version | head -n 1
+          echo /tmp/exp02-bin >> "$GITHUB_PATH"
           python -m pip install -q --only-binary=:all: opencv-python-headless==4.10.0.84 pillow numpy
       - name: Download licensed real footage, design, render and decode-QA
         run: |
