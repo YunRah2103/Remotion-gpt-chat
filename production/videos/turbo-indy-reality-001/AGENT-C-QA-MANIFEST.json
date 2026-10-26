@@ -1,0 +1,69 @@
+{
+  "project": "YUNEX Turbo → IndyCar 001",
+  "agent": "C",
+  "delivery_status": "PARTIAL_VISUAL_QA_NOT_FULLY_APPROVED",
+  "curated_actions_run_id": 38272030425,
+  "curated_artifact_id": 11757970118,
+  "curated_artifact_name": "yunex-agent-c-curated-indycar-native-1080p",
+  "curated_artifact_url": "https://github.com/YunRah2103/Remotion-gpt-chat/actions/runs/38272030425/artifacts/11757970118",
+  "source_verified_acquisition_run_id": 38270561114,
+  "source_verified_acquisition_commit": "bd4ec8998e65b7d87fdc2caf97731ec730cb8b3d",
+  "release_workflow_commit": "36852c2d9a5b209d701c0e8770285894323ba275",
+  "checks": {
+    "artifact_downloaded_and_nested_zip_test": true,
+    "sha256_match_for_all_clips": true,
+    "full_ffmpeg_decode_for_all_clips": true,
+    "codec": "h264",
+    "native_dimensions": "1920x1080",
+    "clips": 6,
+    "distinct_racing_views": 2,
+    "approved_for_publish": 0
+  },
+  "quality_summary": "C04 2026 dramatic close onboard overtake is sole high-impact shot candidate (Agent D overlap). C01–C03 2025 real race start distant/fan-obstructed; C06–C07 2024 formation pace laps, not race. Black MARCA outro removed. More distinct racing sources needed.",
+  "rights": "2026 Dailymotion racing material broadcast reuse not licensed by public accessibility. 2025 Commons PD-self but licence review pending. 2024 Commons Sarah Stierch CC BY 4.0 requires attribution.",
+  "clips": [
+    {
+      "id": "C01",
+      "source": "2025 500 start",
+      "timecode": "2.55-5.15",
+      "sha256": "b62343af47cc8cd4393690d6d6761c6f9d09f9a1331ee36f2d4a6fc807a7c8f3",
+      "quality": "RACE_VALID_WEAK_CROP"
+    },
+    {
+      "id": "C02",
+      "source": "2025 500 start",
+      "timecode": "7.55-10.15",
+      "sha256": "421ba51aecc97acf168aba991b71fc447b099d04d6da96d8109104dcf25901c2",
+      "quality": "RACE_VALID_WEAK_CROP"
+    },
+    {
+      "id": "C03",
+      "source": "2025 500 start",
+      "timecode": "12.55-15.15",
+      "sha256": "580747e58d4f704e84dd37ef4c069089dbbdfca0869959829222192d70cdebe9",
+      "quality": "RACE_VALID_WEAK_CROP"
+    },
+    {
+      "id": "C04",
+      "source": "2026 500 wheel-to-wheel",
+      "timecode": "54.88-57.48",
+      "sha256": "0b11ddeca3a13360112c2530c2dfd6ccb95586f7eae408356673ea966813960b",
+      "quality": "TOP_REVIEW_CANDIDATE_BROADCAST_RIGHTS_AND_AGENT_D"
+    },
+    {
+      "id": "C06",
+      "source": "2024 500 pace/formation",
+      "timecode": "2.55-5.15",
+      "sha256": "e9c00428f166476a665b3c306036a75dee3bf8c5c59359fd3ed30291642e2bd8",
+      "quality": "NOT_RACE"
+    },
+    {
+      "id": "C07",
+      "source": "2024 500 pace/formation",
+      "timecode": "7.55-10.15",
+      "sha256": "757a1d39f30d18022799582488af905c50c05b3d4698de7f9284fe54ce58f21c",
+      "quality": "NOT_RACE"
+    }
+  ],
+  "note": "Full machine-readable manifest including URLs, metadata, duration, bitrate and contact sheets are in actual Actions ZIP. Not finished by 8–12 distinct action angle requirement."
+}
