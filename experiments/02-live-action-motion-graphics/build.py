@@ -14,10 +14,10 @@ W,H,FPS=1080,1920,30
 N=300
 RED=(242,70,68)
 CLIPS=[
- {"id":"f430","title":"Ferrari F430 Spider filmed by FPV drone","page":"https://commons.wikimedia.org/wiki/File:Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","url":"https://upload.wikimedia.org/wikipedia/commons/a/aa/Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","creator":"SE FPV","license":"CC BY 3.0","start":1.1,"seconds":2.0,"frames":60,"scene":"ENTRY"},
- {"id":"f430","title":"Ferrari F430 Spider filmed by FPV drone","page":"https://commons.wikimedia.org/wiki/File:Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","url":"https://upload.wikimedia.org/wikipedia/commons/a/aa/Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","creator":"SE FPV","license":"CC BY 3.0","start":9.1,"seconds":3.0,"frames":90,"scene":"TRACK"},
- {"id":"f430","title":"Ferrari F430 Spider filmed by FPV drone","page":"https://commons.wikimedia.org/wiki/File:Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","url":"https://upload.wikimedia.org/wikipedia/commons/a/aa/Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","creator":"SE FPV","license":"CC BY 3.0","start":21.0,"seconds":3.0,"frames":90,"scene":"DETAIL"},
- {"id":"f430","title":"Ferrari F430 Spider filmed by FPV drone","page":"https://commons.wikimedia.org/wiki/File:Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","url":"https://upload.wikimedia.org/wikipedia/commons/a/aa/Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","creator":"SE FPV","license":"CC BY 3.0","start":35.8,"seconds":2.0,"frames":60,"scene":"HERO"}
+ {"id":"f430","title":"Ferrari F430 Spider filmed by FPV drone","page":"https://commons.wikimedia.org/wiki/File:Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","url":"https://upload.wikimedia.org/wikipedia/commons/a/aa/Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","creator":"SE FPV","license":"CC BY 3.0","start":34.4,"seconds":2.0,"frames":60,"scene":"ENTRY"},
+ {"id":"f430","title":"Ferrari F430 Spider filmed by FPV drone","page":"https://commons.wikimedia.org/wiki/File:Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","url":"https://upload.wikimedia.org/wikipedia/commons/a/aa/Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","creator":"SE FPV","license":"CC BY 3.0","start":27.0,"seconds":3.0,"frames":90,"scene":"TRACK"},
+ {"id":"f430","title":"Ferrari F430 Spider filmed by FPV drone","page":"https://commons.wikimedia.org/wiki/File:Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","url":"https://upload.wikimedia.org/wikipedia/commons/a/aa/Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","creator":"SE FPV","license":"CC BY 3.0","start":31.0,"seconds":3.0,"frames":90,"scene":"DETAIL"},
+ {"id":"f430","title":"Ferrari F430 Spider filmed by FPV drone","page":"https://commons.wikimedia.org/wiki/File:Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","url":"https://upload.wikimedia.org/wikipedia/commons/a/aa/Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm","creator":"SE FPV","license":"CC BY 3.0","start":38.0,"seconds":2.0,"frames":60,"scene":"HERO"}
 ]
 def sh(args, **kw):
  print("+", " ".join(map(str,args)), flush=True)
@@ -77,122 +77,82 @@ def text(d,xy,s,size,col=(240,244,250),mono=False,bold=False):
  d.text(xy,s,font=font(size,mono,bold),fill=col,stroke_width=0)
 def draw_frame(src, idx, state):
  t=idx/FPS
- which=0 if idx<60 else 1 if idx<150 else 2 if idx<240 else 3
- local=(idx-[0,60,150,240][which])/FPS
- scene=CLIPS[which]["scene"]
+ shot=0 if idx<60 else 1 if idx<150 else 2 if idx<240 else 3
+ scene=CLIPS[shot]["scene"]
  ih,iw=src.shape[:2]
- # Rich atmospheric fill: heavily defocused light from the actual source video.
- ambient=cv2.resize(src,(540,960),interpolation=cv2.INTER_AREA)
- ambient=cv2.GaussianBlur(ambient,(81,81),0)
- ambient=cv2.resize(ambient,(W,H),interpolation=cv2.INTER_LINEAR).astype(np.float32)
- yy,xx=np.mgrid[0:H,0:W]
- shade=(1.0-0.45*np.abs(yy-H*.52)/(H*.52)).clip(.35,1)
- ambient=ambient*.23*shade[:,:,None]+np.array([12,10,10],dtype=np.float32)
- ambient=np.uint8(np.clip(ambient,0,255))
- # Motion-aware horizontal crop: center tracks the red vehicle rather than random scenery.
+ # Full-screen vertical reframing of genuine moving video. No synthetic background
+ # and no paused frames. Camera follows the measured position of the red Ferrari.
  hsv=cv2.cvtColor(src,cv2.COLOR_BGR2HSV)
- m1=cv2.inRange(hsv,(0,75,65),(14,255,255))
- m2=cv2.inRange(hsv,(168,75,65),(179,255,255))
- redmask=cv2.bitwise_or(m1,m2)
- # For racecar liveries other than red, identify sufficiently saturated foreground detail.
- if cv2.countNonZero(redmask)<600:
-  sat=cv2.inRange(hsv,(16,88,74),(164,255,255))
-  roi=np.zeros_like(sat);roi[145:745,255:1230]=255
-  redmask=cv2.bitwise_and(sat,roi)
- redmask=cv2.morphologyEx(redmask,cv2.MORPH_OPEN,np.ones((5,5),np.uint8))
- # Saturation target provides a moving tracking anchor, not measured speed.
- count,lab,stats,centers=cv2.connectedComponentsWithStats(redmask)
- hits=[(stats[j,4],centers[j,0]) for j in range(1,count) if stats[j,4]>350]
- desired=float(max(hits)[1]) if hits else iw/2
- desired=max(505,min(iw-505,desired))
- state["cx"]=0.78*state.get("cx",desired)+0.22*desired if state.get("scene")==scene else desired
- state["scene"]=scene
- cx=int(state["cx"])
- # Car occupies a large sharp portrait stage, while the full-width surroundings remain alive.
- cropw=820 if scene=="DETAIL" else 995
- x0=max(0,min(iw-cropw,cx-cropw//2))
- crop=src[:,x0:x0+cropw]
- fh=879
- crop=cv2.resize(crop,(W,fh),interpolation=cv2.INTER_CUBIC)
- base=cv2.cvtColor(ambient,cv2.COLOR_BGR2RGB)
- y0=472
- base[y0:y0+fh,:,:]=cv2.cvtColor(crop,cv2.COLOR_BGR2RGB)
- img=Image.fromarray(base)
- o=Image.new("RGBA",(W,H),(0,0,0,0))
- d=ImageDraw.Draw(o)
- # Film-edge treatments, sharp graphic design instead of a generic full-screen HUD.
- d.rectangle([0,y0-4,W,y0+1],fill=(229,66,66,255))
- d.line([(0,y0+fh),(W,y0+fh)],fill=(226,72,69,160),width=3)
- # Optical car-body trace (derived each frame from actual changing red pixels).
- if scene in ("TRACK","DETAIL","HERO") and len(hits)>0:
-  hsv2=cv2.cvtColor(crop,cv2.COLOR_BGR2HSV)
-  rm=cv2.bitwise_or(cv2.inRange(hsv2,(0,95,65),(13,255,255)),cv2.inRange(hsv2,(168,95,65),(179,255,255)))
-  rm=cv2.morphologyEx(rm,cv2.MORPH_CLOSE,np.ones((11,11),np.uint8))
-  cs,_=cv2.findContours(rm,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-  candidates=[c for c in cs if cv2.contourArea(c)>700 and cv2.arcLength(c,True)>150]
-  if candidates:
-   contour=max(candidates,key=cv2.contourArea)
-   epsilon=0.005*cv2.arcLength(contour,True)
-   pts=cv2.approxPolyDP(contour,epsilon,True).reshape(-1,2)
-   if 3<len(pts)<180:
-    pix=[(int(p[0]),int(p[1])+y0) for p in pts]
-    glow=Image.new("RGBA",(W,H),(0,0,0,0))
-    gd=ImageDraw.Draw(glow)
-    gd.line(pix+[pix[0]],fill=(*RED,125),width=6,joint="curve")
-    glow=glow.filter(ImageFilter.GaussianBlur(9))
-    o.alpha_composite(glow)
-    d=ImageDraw.Draw(o)
-    d.line(pix+[pix[0]],fill=(*RED,150),width=2,joint="curve")
-    xx0,yy0,ww,hh=cv2.boundingRect(contour)
-    # Reticle explicitly moves with measured chromatic target.
-    px=min(W-98,max(95,xx0+ww))
-    py=min(y0+fh-100,max(y0+90,y0+yy0+hh/2))
-    d.ellipse((px-11,py-11,px+11,py+11),outline=(252,96,88,220),width=2)
-    lines(d,[(px+11,py),(px+44,py-28),(px+125,py-28)],(255,111,105,190),2)
-    text(d,(px+49,py-58),"BODY TRACK",17,(240,198,198),mono=True)
- # Elegant fixed graphic language, large legible clear-space typography.
- d.rectangle((54,71,65,95),fill=(*RED,255))
- text(d,(85,63),"Y U N E X",31,(248,247,250),bold=True)
- text(d,(85,108),"AUTOMOTIVE / MOTION LAB",18,(177,189,201),mono=True)
- text(d,(810,76),"EXPERIMENT 02",19,(211,218,228),mono=True)
- d.line((62,152,W-62,152),fill=(152,168,185,110),width=2)
- text(d,(68,189),"REAL FOOTAGE.",58,(247,244,243),bold=True)
- text(d,(70,267),"REAL MOMENTUM.",58,(247,244,243),bold=True)
- text(d,(71,356),"CAMERA-TRACKED GRAPHICS  /  30 FPS",20,(203,209,217),mono=True)
- # Technical corner ticks frame subject with edge-safe anchors.
- p=40
- for x,sx in ((p,1),(W-p,-1)):
-  for y,sy in ((y0+35,1),(y0+fh-35,-1)):
-   lines(d,[(x,y+sy*38),(x,y),(x+sx*47,y)],(238,239,242,175),3)
- # narrow progress rail above footer
- rail=1405
- d.line((70,rail,W-70,rail),fill=(139,154,170,86),width=2)
- d.line((70,rail,70+int((W-140)*((idx+1)/N)),rail),fill=(*RED,245),width=5)
- for mark in (60,150,240):
-  x=70+(W-140)*(mark/N)
-  d.line((x,rail-7,x,rail+7),fill=(222,230,235,150),width=2)
- text(d,(69,1450),"SEQUENCE / "+scene,22,(247,250,250),mono=True)
- right=f"{t:04.1f}  /  10.0"
- text(d,(815,1450),right,22,(201,208,214),mono=True)
- # Modular clean engine-motion readout; a visualisation, not a claim of measured speed.
- energy=0.29+0.70*ease((t+.25)/9.4)
- for k in range(22):
-  x=72+k*41
-  hh0=21+int((9+16*math.sin((t*13)+k*.68)**2)*energy)
-  d.rounded_rectangle((x,1559-hh0,x+15,1559),radius=2,fill=(235,74,71,220) if k<19*energy else (114,130,150,66))
- text(d,(69,1587),"ENGINE RESPONSE  •  MOTION STUDY",20,(216,224,229),mono=True)
- text(d,(69,1642),"TRACKED IN FRAME",47,(251,246,245),bold=True)
- scene_labels={"ENTRY":"HARD CUT / OPEN","TRACK":"TRAJECTORY / LIVE","DETAIL":"SURFACE / DETAIL","HERO":"VELOCITY / FINALE"}
- text(d,(72,1719),scene_labels[scene],26,(235,112,103),mono=True)
- d.line((70,1805,W-70,1805),fill=(150,164,179,95),width=2)
- text(d,(71,1837),"VISUAL TELEMETRY  /  NOT MEASURED VEHICLE DATA",16,(166,184,197),mono=True)
- # Deliberate 2-frame warm cut glow, not a blackout.
- for boundary in (60,150,240):
-  delta=abs(idx-boundary)
-  if delta<3:
-   d.rectangle((0,y0,W,y0+fh),fill=(250,81,60,int(23*(3-delta)/3)))
- img=Image.alpha_composite(img.convert("RGBA"),o)
- return cv2.cvtColor(np.array(img.convert("RGB")),cv2.COLOR_RGB2BGR)
+ mask=cv2.bitwise_or(cv2.inRange(hsv,(0,76,58),(13,255,255)),
+                    cv2.inRange(hsv,(169,76,58),(179,255,255)))
+ mask=cv2.morphologyEx(mask,cv2.MORPH_OPEN,np.ones((5,5),np.uint8))
+ n,labels,stats,centroids=cv2.connectedComponentsWithStats(mask)
+ target=[(stats[j,cv2.CC_STAT_AREA],centroids[j,0]) for j in range(1,n)
+         if stats[j,cv2.CC_STAT_AREA]>230 and 130<centroids[j,1]<760]
+ # Follow car at a natural camera rate to preserve movement (not pin car motionless).
+ desired=float(max(target)[1]) if target else iw*.54
+ if state.get("shot")!=shot:
+  state["cx"]=desired
+  state["shot"]=shot
+ else:
+  state["cx"]=.93*state["cx"]+.07*desired
+ cropw=456
+ x0=int(max(0,min(iw-cropw,state["cx"]-cropw/2)))
+ region=src[:,x0:x0+cropw]
+ frame=cv2.resize(region,(W,H),interpolation=cv2.INTER_CUBIC)
+ # Cinematic grade with subtle vignette and graphic readability.
+ frame=cv2.convertScaleAbs(frame,alpha=1.07,beta=-9)
+ yy,xx=np.mgrid[0:H,0:W]
+ vig=np.clip(1-0.30*((xx-W/2)/(W/2))**2-0.18*((yy-H/2)/(H/2))**2,.5,1)
+ frame=np.uint8(np.clip(frame.astype(np.float32)*vig[:,:,None],0,255))
+ pic=Image.fromarray(cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)).convert("RGBA")
+ overlay=Image.new("RGBA",(W,H),(0,0,0,0))
+ # Fade overlays, not the source video. Keep moving Ferrari visually dominant.
+ glow=Image.new("RGBA",(W,H),(0,0,0,0))
+ glowArr=np.zeros((H,W,4),dtype=np.uint8)
+ ys=np.arange(H)
+ top=np.clip((610-ys)/610,0,1)**1.1
+ bot=np.clip((ys-1310)/610,0,1)**1.1
+ glowArr[:,:,3]=(np.maximum(top*.85,bot*.80)*210).astype(np.uint8)[:,None]
+ overlay=Image.fromarray(glowArr,"RGBA")
+ d=ImageDraw.Draw(overlay)
+ # Bespoke restrained editorial graphics, no generic fake speed HUD.
+ d.rectangle((52,87,61,119),fill=(*RED,255))
+ text(d,(83,85),"Y U N E X",37,(255,255,255),bold=True)
+ text(d,(86,137),"MOTION LAB   /   02",21,(210,217,224),mono=True)
+ d.line((57,198,1025,198),fill=(240,245,247,100),width=2)
+ text(d,(63,257),"FERRARI  F430",45,(255,251,249),bold=True)
+ text(d,(65,319),"S P I D E R   /   F P V",25,(237,237,238),mono=True)
+ text(d,(65,370),"REAL-WORLD FOOTAGE  /  30 FPS",18,(214,225,228),mono=True)
+ d.line((62,1582,1018,1582),fill=(225,232,235,95),width=2)
+ d.line((62,1582,62+int(956*(idx+1)/N),1582),fill=(*RED,255),width=6)
+ text(d,(67,1626),["01  /  PURSUIT","02  /  ROAD SPEED","03  /  CORNERING","04  /  FINAL CHASE"][shot],
+      29,(250,247,245),mono=True)
+ text(d,(69,1711),"LIVE BODY TRACK",27,(244,110,101),mono=True)
+ text(d,(69,1769),"VISUAL MOTION / NOT VEHICLE TELEMETRY",19,(213,222,227),mono=True)
+ text(d,(68,1850),"00:"+f"{t:04.1f}"+"     /     10.0",20,(220,220,226),mono=True)
+ # Live chromatic outline, only when red vehicle is clearly observed in this frame.
+ rgba=overlay
+ cropMask=mask[:,x0:x0+cropw]
+ contours,_=cv2.findContours(cropMask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+ valid=[c for c in contours if cv2.contourArea(c)>500]
+ if valid:
+  car=max(valid,key=cv2.contourArea)
+  epsilon=cv2.arcLength(car,True)*.013
+  vertices=cv2.approxPolyDP(car,epsilon,True).reshape(-1,2)
+  xy=[(int(pt[0]*W/cropw),int(pt[1]*H/ih)) for pt in vertices]
+  if 4<=len(xy)<150:
+   d.line(xy+[xy[0]],fill=(*RED,135),width=3,joint="curve")
+   bx,by,bw,bh=cv2.boundingRect(car)
+   px=int(min(W-77,max(65,(bx+bw/2)*W/cropw)))
+   py=int(min(1430,max(545,(by+bh/2)*H/ih)))
+   d.ellipse((px-15,py-15,px+15,py+15),outline=(255,110,102,220),width=3)
+   lines(d,[(px+15,py),(px+65,py-45),(min(px+200,W-20),py-45)],(255,120,110,155),2)
+ # 2-frame masked red flash at 4 cut points; no black video gaps.
+ if idx in [0,60,150,240]:
+  d.rectangle((0,0,W,H),fill=(245,76,67,18))
+ return cv2.cvtColor(np.asarray(Image.alpha_composite(pic,rgba).convert("RGB")),
+                      cv2.COLOR_RGB2BGR)
 def synth():
  sr=48000
  n=10*sr
@@ -266,7 +226,7 @@ def qa():
           "checked":"2026-10-26",
           "attribution":"Ferrari F430 Spider driving as viewed from FPV drone.webm by SE FPV, CC BY 3.0 via Wikimedia Commons, source originally published on YouTube (ouCi0FfEOx0). Cropped, trimmed, colour graded, overlaid original motion graphics, with original sound design. CC BY 3.0 attribution; no endorsement is implied. Source Commons notes review pending.",
           "source":"https://commons.wikimedia.org/wiki/File:Ferrari_F430_Spider_driving_as_viewed_from_FPV_drone.webm",
-          "notes":"Real race footage; no still-image replacement. Illustrated telemetry is not measured speed.",
+          "notes":"Real FPV driving footage; no still-image replacement. Illustrated telemetry is not measured speed.",
           "segments":[{"source_start":c["start"],"seconds":c["seconds"],"scene":c["scene"]} for c in CLIPS],
           "technical":{"width":1080,"height":1920,"fps":30,"frames":300,"duration":10.0,"audio":"original synthesised score"}}
  (OUT/"FOOTAGE_CREDITS.json").write_text(json.dumps(credits,indent=2))
