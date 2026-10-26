@@ -1,0 +1,122 @@
+name: RS6 Agent B creator footage acquisition and QA
+on:
+  push:
+    branches: [automotive-edits/rs6-no-mercy-001/b-creator-driving]
+    paths: [.github/workflows/rs6-agent-b-source-check.yml]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      approved_url:
+        description: "Explicitly reuse-cleared direct creator MP4 URL (optional)"
+        required: false
+        type: string
+      permission_reference:
+        description: "Public proof of uploader's reuse and redistribution grant (required for media artifact)"
+        required: false
+        type: string
+jobs:
+  acquire-and-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q --upgrade yt-dlp requests curl_cffi
+          ffprobe -version | head -n 1
+          ffmpeg -version | head -n 1
+      - name: Acquire C8 Dailymotion creator/benchmark clips (technical QA only)
+        shell: bash
+        env:
+          APPROVED_URL: ${{ inputs.approved_url }}
+          PERMISSION_REFERENCE: ${{ inputs.permission_reference }}
+        run: |
+          set -uo pipefail
+          mkdir -p reports staging deliver
+          declare -a entries=(
+            "DMcreatorExoticCarspotters|https://www.dailymotion.com/video/x9zt11g"
+            "DMc8DaytonaDriving|https://www.dailymotion.com/video/x7op6zd"
+            "DMc8GTDriving|https://www.dailymotion.com/video/x95q1ti"
+          )
+          if [[ -n "${APPROVED_URL:-}" ]]; then
+            if [[ ! "${APPROVED_URL}" =~ ^https:// ]]; then echo "Approved URL must be HTTPS" >&2; exit 2; fi
+            entries=("ownerApproved|${APPROVED_URL}" "${entries[@]}")
+          fi
+          for entry in "${entries[@]}"; do
+            name="${entry%%|*}"; url="${entry#*|}"
+            printf 'source=%s\nurl=%s\n' "$name" "$url" > "reports/$name.txt"
+            # Is the delivery capped by the site/extractor, or is genuine 1080p accessible?
+            yt-dlp --ignore-config --list-formats --socket-timeout 12 --retries 1 "$url" >"reports/$name-formats.txt" 2>&1 || :
+            yt-dlp --ignore-config --impersonate chrome --list-formats --socket-timeout 12 --retries 1 "$url" >"reports/$name-chrome-formats.txt" 2>&1 || :
+            for attempt in 1 2; do
+              yt-dlp --ignore-config --no-playlist --skip-download --print '%(title)s | %(uploader)s | %(duration)s | %(license)s' --socket-timeout 15 --retries 1 "$url" >> "reports/$name.txt" 2>&1 && break
+              sleep "$attempt"
+            done
+            # Preferred native high-resolution source, then a permissive format fallback.
+            for fmt in 'bestvideo[height>=1080]+bestaudio/best[height>=1080]' 'bv*+ba/best'; do
+              yt-dlp --ignore-config --impersonate chrome --no-playlist --download-sections '*0-8' --force-keyframes-at-cuts --merge-output-format mp4 --format "$fmt" --socket-timeout 15 --retries 2 --fragment-retries 2 --output "staging/$name.%(ext)s" "$url" >> "reports/$name.txt" 2>&1 && break
+            done
+            # Fallback helper supports public embed/progressive when relevant; not permission to redistribute.
+            # Do not assume that access to video implies permission to redistribute it.
+            if ! find staging -maxdepth 1 -name "$name.*" -type f | grep -q .; then
+              python production/videos/rs6-no-mercy-001/agent_b_direct_media_fallback.py "$name" "$url" "staging/$name.mp4" >>"reports/$name.txt" 2>&1 || :
+            fi
+            file="$(find staging -maxdepth 1 -type f -name "$name.*" ! -name '*.part' | head -n 1)"
+            if [[ -z "$file" ]]; then echo 'DOWNLOAD_FAILED' >>"reports/$name.txt"; continue; fi
+            ffprobe -v error -show_entries format=duration,size:stream=codec_name,codec_type,width,height,r_frame_rate -of json "$file" >"reports/$name-probe.json" 2>>"reports/$name.txt"
+            ffmpeg -hide_banner -nostdin -v error -xerror -i "$file" -f null - >>"reports/$name.txt" 2>&1
+            decoded=$?
+            echo "decode_exit=$decoded" >>"reports/$name.txt"
+            sha256sum "$file" >>"reports/$name.txt"
+            mkdir -p "reports/$name-frames"
+            ffmpeg -hide_banner -nostdin -v error -y -i "$file" -vf "fps=1/2,scale=420:-1" -frames:v 3 "reports/$name-frames/frame_%02d.jpg" || :
+            python - "$file" "$name" "$decoded" "${PERMISSION_REFERENCE:-}" <<'PY'
+          import json,subprocess,sys,pathlib,shutil
+          f,name,decoded,permission=sys.argv[1:]
+          meta=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-of','json',f]))
+          video=next((s for s in meta['streams'] if s['codec_type']=='video'),{})
+          width,height=video.get('width',0),video.get('height',0)
+          authentic_review_needed=True
+          meets_technical=int(decoded)==0 and width>=1920 and height>=1080
+          permitted=name=='ownerApproved' and bool(permission.startswith('https://'))
+          record={'source':name,'width':width,'height':height,'full_decode':int(decoded)==0,'native_hd_candidate':meets_technical,'permission_reference':permission if permitted else None,'visual_C8_verification':'PENDING_HUMAN_REVIEW','uploaded':False}
+          if meets_technical and permitted:
+              shutil.copy2(f,pathlib.Path('deliver')/(name+'.mp4'))
+              record['uploaded']=True
+          pathlib.Path('reports',name+'-status.json').write_text(json.dumps(record,indent=2))
+          PY
+            rm -f "$file"
+          done
+      - name: Summarize acquisition outcomes
+        if: always()
+        shell: bash
+        run: |
+          for f in reports/*-status.json; do
+            [[ -f "$f" ]] || continue
+            echo "RESULT: $f"
+            cat "$f"
+          done
+          for f in reports/*.txt; do
+            echo "SOURCE_LOG_TAIL $f"
+            tail -n 10 "$f"
+          done
+      - name: Publish evidence reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-b-source-ffprobe-decode-reports
+          path: reports/
+          retention-days: 14
+      - name: Deliver only explicitly approved native-HD creator clip
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-b-approved-media-candidate
+          path: deliver/*.mp4
+          if-no-files-found: ignore
+          retention-days: 7

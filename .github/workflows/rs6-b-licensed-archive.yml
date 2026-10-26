@@ -1,0 +1,125 @@
+name: RS6 B - licensed archive video acquisition
+on:
+  push:
+    branches: [automotive-edits/rs6-no-mercy-001/b-creator-driving]
+    paths: [.github/workflows/rs6-b-licensed-archive.yml]
+  workflow_dispatch:
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q requests
+      - name: Search original CC video and verify downloaded media
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib, json, pathlib, re, subprocess, time, requests
+          from urllib.parse import quote, urlparse
+          out=pathlib.Path('rs6_cc_reports'); out.mkdir(exist_ok=True)
+          media=pathlib.Path('rs6_cc_media'); media.mkdir(exist_ok=True)
+          s=requests.Session()
+          s.headers['User-Agent']='YUNEX RS6 Agent B license QA (CC sources only)'
+          results=[]; candidates=[]
+          def get(url,params=None):
+              for attempt in range(3):
+                  try:
+                      x=s.get(url,params=params,timeout=(9,23))
+                      x.raise_for_status()
+                      return x.json()
+                  except Exception as e:
+                      results.append({'api_error':urlparse(url).netloc,'attempt':attempt+1,'details':str(e)[:160]})
+                      time.sleep(attempt+1)
+              return {}
+          def lic(url):
+              u=(url or '').lower().replace('http://','https://')
+              if 'creativecommons.org/publicdomain/zero/' in u:return 'CC0'
+              if re.search(r'creativecommons.org/licenses/by/(2.0|3.0|4.0)',u):return 'CC-BY'
+              return None
+          def rs6_title(x):
+              return bool(re.search(r'rs\s?6',x,re.I)) and not bool(re.search(r'\b(200[0-9]|201[0-8]|c5|c6|c7|rs3|rs4|rs7)\b',x,re.I))
+          for q in ('"Audi RS6"','"Audi RS 6"','"RS6 C8"'):
+              data=get('https://commons.wikimedia.org/w/api.php',{'action':'query','format':'json','generator':'search','gsrsearch':q,'gsrnamespace':6,'gsrlimit':50,'prop':'imageinfo','iiprop':'url|extmetadata|size|mime'})
+              for p in data.get('query',{}).get('pages',{}).values():
+                  if not rs6_title(p.get('title','')):continue
+                  info=(p.get('imageinfo') or [{}])[0]
+                  if not info.get('mime','').startswith('video/'):continue
+                  ex=info.get('extmetadata',{})
+                  rights=ex.get('LicenseUrl',{}).get('value','')
+                  kind=lic(rights)
+                  if kind and info.get('url','').startswith('https://upload.wikimedia.org/'):
+                      candidates.append({'title':p['title'],'url':info['url'],'source':'https://commons.wikimedia.org/wiki/'+quote(p['title'].replace(' ','_')),'licence':kind,'licence_url':rights,'declared_bytes':int(info.get('size',0))})
+          data=get('https://archive.org/advancedsearch.php',{'q':'(title:("Audi RS6") OR title:("Audi RS 6") OR title:("RS6 Avant")) AND mediatype:movies','fl[]':['identifier','title'],'rows':40,'output':'json'})
+          for d in data.get('response',{}).get('docs',[]):
+              title=d.get('title',''); ident=d.get('identifier','')
+              if not rs6_title(title) or not re.fullmatch(r'[\w.-]{3,120}',ident):continue
+              md=get('https://archive.org/metadata/'+ident)
+              licence=(md.get('metadata') or {}).get('licenseurl','')
+              licence=licence[0] if isinstance(licence,list) else licence
+              kind=lic(licence)
+              if not kind:continue
+              for f in md.get('files',[]):
+                  name=f.get('name','')
+                  size=int(f.get('size') or 0)
+                  if name.lower().endswith(('.mp4','.webm')) and size<=180000000:
+                      candidates.append({'title':title,'url':'https://archive.org/download/'+quote(ident)+'/'+quote(name),'source':'https://archive.org/details/'+ident,'licence':kind,'licence_url':licence,'declared_bytes':size})
+          seen=set()
+          for i,c in enumerate(candidates,1):
+              if c['url'] in seen or len(seen)>=10:continue
+              seen.add(c['url'])
+              item=dict(c)
+              ext=pathlib.PurePosixPath(urlparse(c['url']).path).suffix
+              file=media/('candidate_%02d'%i+ext)
+              try:
+                  if c['declared_bytes']>180000000:raise ValueError('Media exceeds 180MB cap')
+                  with s.get(c['url'],stream=True,timeout=(10,45)) as r:
+                      r.raise_for_status()
+                      total=0
+                      with file.open('wb') as handle:
+                          for block in r.iter_content(1048576):
+                              total+=len(block)
+                              if total>180000000:raise ValueError('Download exceeds 180MB cap')
+                              handle.write(block)
+                  p=subprocess.run(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(file)],capture_output=True,text=True,timeout=30,check=True)
+                  probe=json.loads(p.stdout)
+                  video=next(v for v in probe['streams'] if v.get('codec_type')=='video')
+                  w,h=video['width'],video['height']
+                  seconds=float(probe['format']['duration'])
+                  item.update({'width':w,'height':h,'duration_seconds':seconds,'sha256':hashlib.sha256(file.read_bytes()).hexdigest()})
+                  if min(w,h)<1080 or max(w,h)<1920 or seconds<4:
+                      raise ValueError('Not 1080p native video or duration <4 seconds')
+                  subprocess.run(['ffmpeg','-hide_banner','-nostdin','-v','error','-xerror','-i',str(file),'-map','0:v:0','-f','null','-'],capture_output=True,timeout=140,check=True)
+                  folder=out/('frames_%02d'%i);folder.mkdir(exist_ok=True)
+                  for j,sec in enumerate((seconds*.2,seconds*.5,seconds*.8),1):
+                      subprocess.run(['ffmpeg','-hide_banner','-nostdin','-v','error','-y','-ss',str(sec),'-i',str(file),'-frames:v','1','-vf','scale=600:-2',str(folder/f'{j}.jpg')],capture_output=True,timeout=30,check=True)
+                  item['result']='RIGHTS-ELIGIBLE FULL-DECODE PASS; C8 VISUAL QA PENDING'
+              except Exception as exc:
+                  item['result']='FAILED';item['error']=str(exc)[:220]
+                  file.unlink(missing_ok=True)
+              results.append(item)
+          summary={'rights_scoped_video_leads':len(candidates),'fully_decoded_1080p_candidates':sum(x.get('result','').startswith('RIGHTS') for x in results),'not_finally_approved':True,'results':results,'licence_note':'CC-BY requires creator attribution. Visual verification of moving genuine C8 RS6 is mandatory.'}
+          (out/'manifest.json').write_text(json.dumps(summary,indent=2))
+          print(json.dumps({k:v for k,v in summary.items() if k!='results'},indent=2))
+          PY
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-b-cc-archive-evidence
+          path: rs6_cc_reports/
+          retention-days: 14
+      - name: Upload technically verified CC media - not approved for film yet
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rs6-b-cc-media-needs-visual-qa
+          path: rs6_cc_media/
+          if-no-files-found: ignore
+          retention-days: 7
