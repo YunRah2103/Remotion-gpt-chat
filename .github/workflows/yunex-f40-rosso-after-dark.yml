@@ -1,0 +1,95 @@
+name: YUNEX Ferrari F40 Rosso After Dark cinematic
+on:
+  push:
+    branches:
+      - experiment/yunex-f40-noir-cinematic
+    paths:
+      - 'production/f40-noir/**'
+      - '.github/workflows/yunex-f40-rosso-after-dark.yml'
+  pull_request:
+    paths:
+      - 'production/f40-noir/**'
+      - '.github/workflows/yunex-f40-rosso-after-dark.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  film:
+    name: Render full-size real GLB and verify all 180 frames
+    runs-on: ubuntu-24.04
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install dependencies and inspect asset manifest
+        run: |
+          npm ci --no-audit --no-fund
+          python3 -m json.tool production/f40-noir/model-manifest.json > /dev/null
+          npm run check
+      - name: Obtain ORIGINAL pinned high-detail model, no replacements
+        run: bash production/f40-noir/acquire.sh
+      - name: Ensure FFmpeg and Chrome render prerequisites
+        run: bash scripts/modelling-kit/install-native-media.sh
+      - name: Render all 180 native frames at 1080x1920
+        run: |
+          npx remotion render production/f40-noir/entry.tsx \
+            YunexRossoAfterDark out/f40-noir/rosso-after-dark-6s.mp4 \
+            --gl=swangle --codec=h264 --pixel-format=yuv420p \
+            --color-space=bt709 --crf=18 --concurrency=1 --timeout=120000
+      - name: Audit H.264 moving picture and make 9-shot contact sheet
+        run: |
+          set -euo pipefail
+          VIDEO=out/f40-noir/rosso-after-dark-6s.mp4
+          test -s "$VIDEO"
+          ffmpeg -v error -xerror -i "$VIDEO" -f null -
+          ffprobe -v error -count_frames -select_streams v:0 \
+            -show_entries stream=codec_name,width,height,avg_frame_rate,nb_read_frames \
+            -show_entries format=duration -of json "$VIDEO" \
+            > out/f40-noir/probe.json
+          python3 - <<'PY'
+          import json
+          j=json.load(open('out/f40-noir/probe.json'))
+          s=j['streams'][0]
+          assert (s['codec_name'],s['width'],s['height'],s['avg_frame_rate'],s['nb_read_frames'])==('h264',1080,1920,'30/1','180'),s
+          assert abs(float(j['format']['duration'])-6)<.02,j['format']
+          print('PASS real playable 1080x1920 H.264, 30fps, 180 frames, 6.000s')
+          PY
+          ffmpeg -v error -i "$VIDEO" -f framemd5 out/f40-noir/frame-hashes.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          lines=Path('out/f40-noir/frame-hashes.txt').read_text().splitlines()
+          hashes=[s.rsplit(',',1)[-1].strip() for s in lines if s and not s.startswith('#')]
+          assert len(hashes)==180,len(hashes)
+          assert len(set(hashes))>=155,('Film appears static',len(set(hashes)))
+          print('PASS distinct moving frames:',len(set(hashes)))
+          PY
+          ffmpeg -y -v error -i "$VIDEO" \
+            -vf "select='eq(n,0)+eq(n,20)+eq(n,50)+eq(n,65)+eq(n,90)+eq(n,115)+eq(n,125)+eq(n,152)+eq(n,179)',scale=360:-1,tile=3x3" \
+            -frames:v 1 out/f40-noir/contact-sheet.jpg
+          test -s out/f40-noir/contact-sheet.jpg
+          # Decode nine evenly spaced frames; reject accidentally blank/transparent film.
+          ffmpeg -v error -i "$VIDEO" -vf "fps=1,scale=90:160,format=gray" -f rawvideo out/f40-noir/luminance.raw
+          python3 - <<'PY'
+          from pathlib import Path
+          from statistics import fmean
+          b=Path('out/f40-noir/luminance.raw').read_bytes()
+          wh=90*160
+          assert len(b)==6*wh,('Unexpected samples',len(b))
+          means=[fmean(b[i*wh:(i+1)*wh]) for i in range(6)]
+          assert min(means)>4,('Possible black frame in film',means)
+          print('PASS no near-blank sampled frames; means:',means)
+          PY
+          sha256sum "$VIDEO" out/f40-noir/contact-sheet.jpg > out/f40-noir/output-sha256.txt
+          git rev-parse HEAD > out/f40-noir/source-commit.txt
+          cp production/f40-noir/model-manifest.json out/f40-noir/
+      - name: Publish real playable MP4, contact sheet and model credit manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNEX-F40-Rosso-After-Dark-Review
+          path: out/f40-noir/
+          if-no-files-found: warn
+          retention-days: 14
