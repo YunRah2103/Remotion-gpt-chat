@@ -21,7 +21,10 @@ PRESETS={
 def limit(x):
     return max(0.,min(1.,x))
 
-def grade(rgb,setting):
+def grade(rgb,setting,strength=1.0):
+    if not math.isfinite(strength) or not 0.0<=strength<=1.0:
+        raise ValueError('Grade strength must be between zero and one')
+    if strength==0.0:return [limit(v) for v in rgb]
     mid=.5
     after=[limit((v-mid)*setting["contrast"]+mid+setting["lift"]) for v in rgb]
     luma=after[0]*.2126+after[1]*.7152+after[2]*.0722
@@ -30,27 +33,29 @@ def grade(rgb,setting):
     # Shadow-to-highlight smooth split; split itself depends on pixel luminance.
     shw=1-limit(luma)
     high=1-shw
-    return [limit(adjusted[i]*(setting["shadow"][i]*shw+setting["highlight"][i]*high)) for i in range(3)]
+    graded=[limit(adjusted[i]*(setting["shadow"][i]*shw+setting["highlight"][i]*high)) for i in range(3)]
+    return [limit(rgb[i]*(1.0-strength)+graded[i]*strength) for i in range(3)]
 
-def cube(name,setting,size):
+def cube(name,setting,size,strength=1.0):
     lines=[f"TITLE \"Automotive {name}\"","LUT_3D_SIZE "+str(size),"DOMAIN_MIN 0.0 0.0 0.0","DOMAIN_MAX 1.0 1.0 1.0"]
     # .cube order: RED axis fastest.
     for b in range(size):
         for g in range(size):
             for r in range(size):
-                graded=grade([r/(size-1),g/(size-1),b/(size-1)],setting)
+                graded=grade([r/(size-1),g/(size-1),b/(size-1)],setting,strength)
                 lines.append(" ".join(f"{v:.7f}" for v in graded))
     return "\n".join(lines)+"\n"
 
-def generate(directory,size=17):
+def generate(directory,size=17,strength=1.0):
     if size not in (17,33):raise ValueError("LUT size must be 17 or 33")
+    if not math.isfinite(strength) or not 0.0<=strength<=1.0:raise ValueError('Grade strength must be in [0,1]')
     output=Path(directory);output.mkdir(parents=True,exist_ok=True)
     manifest={"schemaVersion":1,"colourSpace":"sRGB approximate/gamma-encoded input (not linear light, HDR, or calibrated camera log)",
               "gammaAssumption":"Standard Rec.709 SDR-oriented source and output, inspect source log/colour metadata before application",
-              "size":size,"presets":[]}
+              "size":size,"strength":strength,"presets":[]}
     for name,values in PRESETS.items():
         path=output/(name+".cube")
-        path.write_text(cube(name,values,size),encoding="ascii")
+        path.write_text(cube(name,values,size,strength),encoding="ascii")
         digest=hashlib.sha256(path.read_bytes()).hexdigest()
         manifest["presets"].append({"name":name,"path":path.name,"sha256":digest,"bytes":path.stat().st_size})
     (output/"lut-manifest.json").write_text(json.dumps(manifest,indent=2)+"\n")
@@ -60,6 +65,7 @@ if __name__=="__main__":
     p=argparse.ArgumentParser()
     p.add_argument("--out",default="out/fx-luts")
     p.add_argument("--size",type=int,default=17,choices=[17,33])
+    p.add_argument("--strength",type=float,default=1.0,help='Mix with source; 1.0 reproduces the original presets')
     x=p.parse_args()
-    result=generate(x.out,x.size)
+    result=generate(x.out,x.size,x.strength)
     print(json.dumps(result,indent=2))

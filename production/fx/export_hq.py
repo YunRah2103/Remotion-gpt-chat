@@ -39,7 +39,7 @@ def make_command(inp,out,lut=None,reencode=False,crf=16):
     if copy:args.extend(["-c:v","copy"])
     else:args.extend(["-c:v","libx264","-preset","slow","-crf",str(crf),"-profile:v","high","-pix_fmt","yuv420p"])
     if a is None:args+=["-an"]
-    elif copy:args+=["-c:a","copy"]
+    elif a["codec_name"]=="aac":args+=["-c:a","copy"]  # Never needlessly recompress an existing soundtrack.
     else:args+=["-c:a","aac","-b:a","256k","-ar","48000"]
     args+=["-movflags","+faststart",str(out)]
     return args
@@ -48,12 +48,19 @@ def run(inp,out,lut=None,reencode=False,crf=16):
     args=make_command(inp,out,lut,reencode,crf)
     Path(out).parent.mkdir(parents=True,exist_ok=True)
     subprocess.run(args,check=True,timeout=1800)
-    info,v,_=inspect(out)
+    info,v,a=inspect(out)
+    src_info,src_v,src_a=inspect(inp)
+    if (v['width'],v['height'],v['r_frame_rate'])!=(src_v['width'],src_v['height'],src_v['r_frame_rate']):
+        raise ValueError('Export changed dimensions or nominal frame rate')
+    if src_v.get('nb_frames') and v.get('nb_frames') and src_v['nb_frames']!=v['nb_frames']:
+        raise ValueError('Export lost or duplicated video frames')
+    if src_a is not None and a is None:raise ValueError('Export unexpectedly lost audio')
     cmd("ffmpeg","-v","error","-xerror","-i",str(out),"-f","null","-",timeout=1800)
     return {"status":"PASS","file":str(out),"source":str(inp),
             "codec":v["codec_name"],"frames":v.get("nb_frames"),
             "dimensions":[v["width"],v["height"]],"fps":v["r_frame_rate"],
             "reencoded":not ("-c:v" in args and args[args.index("-c:v")+1]=="copy"),"lut":str(lut) if lut else None,
+            "audioCopied":bool(a is not None and '-c:a' in args and args[args.index('-c:a')+1]=='copy'),
             "fullDecode":"PASS"}
 if __name__=="__main__":
     p=argparse.ArgumentParser()
