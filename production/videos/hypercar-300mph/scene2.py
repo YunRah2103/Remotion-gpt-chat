@@ -151,6 +151,10 @@ def build():
     dk = nt.nodes.new('ShaderNodeBsdfDiffuse'); dk.inputs[0].default_value = (0.01, 0.012, 0.02, 1)
     mx = nt.nodes.new('ShaderNodeMixShader'); nt.links.new(msk, mx.inputs[0]); nt.links.new(dk.outputs[0], mx.inputs[1]); nt.links.new(em.outputs[0], mx.inputs[2])
     out = nt.nodes.new('ShaderNodeOutputMaterial'); nt.links.new(mx.outputs[0], out.inputs[0])
+    # wide matte ground so the skyline stands on land instead of floating over the void
+    gm2 = bpy.data.materials.new('land'); gm2.use_nodes = True
+    p2 = gm2.node_tree.nodes['Principled BSDF']; p2.inputs['Base Color'].default_value = (0.006, 0.007, 0.009, 1); p2.inputs['Roughness'].default_value = 0.55
+    bpy.ops.mesh.primitive_plane_add(size=1, location=(0, -1200, -0.03)); lg = bpy.context.object; lg.scale = (2400, 6000, 1); lg.data.materials.append(gm2)
     CITY = []
     for sx in (-1, 1):
         for i in range(36):
@@ -341,7 +345,7 @@ def set_frame(t):
     for i, (a, b) in enumerate(GANTS):
         a.location = (0, gb + (i - 5) * G, 7.5); b.location = (0, gb + (i - 5) * G, 7.0)
     CP = 400.0; cb = round(loc.y / CP) * CP
-    for o, sx, i, dx, jy in CITY: o.location = (sx * (dx + 14), cb + (i - 18) * (CP / 9) + jy, o.dimensions.z / 2)
+    for o, sx, i, dx, jy in CITY: o.location = (sx * (dx + 14), cb + (i - 18) * (CP / 9) + jy, 0.0)  # mesh spans 0..h after transform_apply
     PL = 20.0
     for o, x, z, ph in PARTS:
         o.location = (x, round(loc.y / 90) * 90 + (ph - 0.5) * 90, z)
