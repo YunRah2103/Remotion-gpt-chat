@@ -6,6 +6,8 @@ export {createImpactBarrier,animateImpactBarrier} from './barrier.ts';
 export {createCinematicEnvironment} from './environments.ts';
 export {CinematicStage} from './Stage';
 export {CinematicLighting} from './Lighting';
+export {createGroundContactShadows,updateGroundContactShadows} from './ground-contact.ts';
+export type {GroundContactOptions} from './ground-contact.ts';
 
 export {drivingCamera,drivingState} from './driving.ts';
 export type {CameraPreset,DrivingAction} from './driving.ts';

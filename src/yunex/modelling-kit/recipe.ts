@@ -8,7 +8,7 @@ import type {DrivingAction,CameraPreset} from './driving.ts';
 import {validateCameraMove} from './camera-move.ts';
 import type {CameraMove} from './camera-move.ts';
 export type StudioShot={cameraMove?:CameraMove;speedScale?:number;context?:'world'|'inspection';energyFlow?:'drive'|'regenerate';id:string;duration:number;camera:CameraPreset;action:DrivingAction;caption:string;orbit?:{azimuth:number;elevation:number;sweep?:number};joints?:Record<string,number>;jointTracks?:Record<string,{time:number;value:number}[]>;part?:PartVariant;assembly?:AssemblySpec;cutaway?:number;exploded?:number;highlight?:'engine'|'underfloor'|'wheels';annotation?:{anchor:'engine'|'front-wheel'|'driver'|'underfloor'|'part';text:string}};
-export type EpisodeRecipe={presentation?:'cinematic';id:string;title:string;vehicle:{bodyDetail?:'legacy'|'coachbuilt'|'studio';variant:VehicleVariant;driver?:boolean;color?:string;powertrain?:AssemblySpec;model?:ModelVariation;components?:ComponentSpec[]};world:{kind:EnvironmentKind;roughness?:number;wetness?:number;timeOfDay?:'day'|'dusk'|'night';model?:ModelVariation;components?:ComponentSpec[]};shots:StudioShot[];words?:{text:string;start:number;end:number}[];captions?:{start:number;end:number;text:string}[];audio?:{narration?:string;music?:string;musicVolume?:number}};
+export type EpisodeRecipe={presentation?:'cinematic';id:string;title:string;vehicle:{bodyDetail?:'legacy'|'coachbuilt'|'studio';variant:VehicleVariant;driver?:boolean;color?:string;powertrain?:AssemblySpec;model?:ModelVariation;components?:ComponentSpec[]};world:{kind:EnvironmentKind;grounding?:'enhanced';roughness?:number;wetness?:number;timeOfDay?:'day'|'dusk'|'night';model?:ModelVariation;components?:ComponentSpec[]};shots:StudioShot[];words?:{text:string;start:number;end:number}[];captions?:{start:number;end:number;text:string}[];audio?:{narration?:string;music?:string;musicVolume?:number}};
 export type CompiledRecipe=Omit<EpisodeRecipe,'shots'> & {fps:number;durationInFrames:number;shots:(StudioShot & {startFrame:number;endFrame:number;distanceOffset:number})[]};
 const fail=(message:string):never=>{throw new Error(message);};
 export function compileRecipe(input:EpisodeRecipe,fps=30):CompiledRecipe{
@@ -21,6 +21,9 @@ export function compileRecipe(input:EpisodeRecipe,fps=30):CompiledRecipe{
  if(r.vehicle.driver&&vehicle!.family==='bike')fail('Motorcycle driver is not supported');
  if(!ENVIRONMENTS.some(v=>v===r.world?.kind))fail('Unknown world');
  if(r.world.timeOfDay!==undefined&&!['day','dusk','night'].includes(r.world.timeOfDay))fail('Unknown time of day');
+ if(r.world.grounding!==undefined&&r.world.grounding!=='enhanced')fail('Unknown ground contact mode');
+ if(r.world.grounding==='enhanced'&&!['track','showroom','garage','parking'].includes(r.world.kind))fail('Enhanced ground contact currently supports flat track/showroom/garage/parking only');
+ if(r.world.grounding==='enhanced'&&(r.world.roughness??0)>0)fail('Enhanced ground contact cannot be combined with rough rally terrain');
  if(r.world.roughness!==undefined&&(!Number.isFinite(r.world.roughness)||r.world.roughness<0||r.world.roughness>1||r.world.roughness>0&&r.world.kind!=='rally'))fail('Roughness requires a rally world and 0..1');
  if((r.world.roughness??0)>0&&(vehicle!.family==='bike'||vehicle!.axles!==2))fail('Rough rally contact currently requires a four-wheel vehicle; set roughness to 0 for motorcycles or six-wheel vehicles');
  if(!Array.isArray(r.shots)||!r.shots.length)fail('At least one shot required');
