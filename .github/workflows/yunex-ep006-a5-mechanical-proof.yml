@@ -1,0 +1,74 @@
+name: YUNEX EP006 Agent 5 native mechanical proof
+on:
+  push:
+    branches: [agent/ep006-05-mechanical-story]
+    paths:
+      - 'src/yunex/ep006/mechanical/**'
+      - 'src/yunex/studio-projects/ep006-a5-mechanics/**'
+      - '.github/workflows/yunex-ep006-a5-mechanical-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-mechanics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: bash scripts/modelling-kit/install-native-media.sh
+      - name: Type-check the owned source
+        run: npm run check
+      - name: Native moving six-second portrait render (silent)
+        run: |
+          mkdir -p out/ep006/agent-05/stills
+          npx remotion render src/yunex/studio-projects/ep006-a5-mechanics/entry.tsx EP006A5MechanicalProof \
+            out/ep006/agent-05/ep006-a5-mechanics.mp4 \
+            --gl=swangle --codec=h264 --pixel-format=yuv420p \
+            --color-space=bt709 --concurrency=2 --crf=19
+      - name: FFprobe frame budget, full decode, SHA256 and actual motion
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd out/ep006/agent-05
+          ffprobe -v error -show_streams -show_format -of json ep006-a5-mechanics.mp4 > ffprobe.json
+          python3 - <<'PY'
+          import json
+          p=json.load(open('ffprobe.json'))
+          v=next(x for x in p['streams'] if x['codec_type']=='video')
+          assert (v['width'],v['height']) == (1080,1920),v
+          assert v['codec_name']=='h264',v
+          assert v['avg_frame_rate']=='30/1',v
+          assert int(v['nb_frames'])==180,v
+          assert not any(s['codec_type']=='audio' for s in p['streams'])
+          print('PASS: H264 1080x1920 30/1, 180 frames, silent')
+          PY
+          ffmpeg -hide_banner -loglevel error -xerror -i ep006-a5-mechanics.mp4 -f null -
+          sha256sum ep006-a5-mechanics.mp4 > SHA256SUMS
+          for frame in 12 82 166; do
+            ffmpeg -hide_banner -loglevel error -y -i ep006-a5-mechanics.mp4 \
+              -vf "select='eq(n,${frame})'" -vsync 0 -frames:v 1 "stills/frame-${frame}.png"
+          done
+          python3 - <<'PY'
+          import hashlib,pathlib,json
+          files=sorted(pathlib.Path('stills').glob('frame-*.png'))
+          assert len(files)==3,[str(p) for p in files]
+          digests=[hashlib.sha256(p.read_bytes()).hexdigest() for p in files]
+          assert len(set(digests))==3,'Expected visibly different rendered frames'
+          report={'moving_sample_frames':[12,82,166],'sha256_distinct':True,
+                  'motion_fixture_only':True,'agent_2_final_landings_pending':True,
+                  'visual_human_review':'REQUIRED - automation cannot certify cinematic quality'}
+          pathlib.Path('proof-report.json').write_text(json.dumps(report,indent=2))
+          print(report)
+          PY
+          git rev-parse HEAD > source-revision.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EP006-A5-native-mechanics
+          path: out/ep006/agent-05/
+          retention-days: 30
