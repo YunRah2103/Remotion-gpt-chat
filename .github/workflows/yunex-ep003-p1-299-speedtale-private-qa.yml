@@ -1,0 +1,65 @@
+name: YUNEX EP003 Speed Tale original P1 motion scout #299
+on:
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: read
+jobs:
+  verify:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.issue.number == 299 && github.event.comment.user.login == 'YunRah2103' && startsWith(github.event.comment.body, 'YUNEX_PHONE_DONE_V4')) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - id: source
+        uses: ./.github/actions/yunex-v4-import
+        with:
+          issue_number: '299'
+          token: ${{ github.token }}
+          destination: private/speedtale299
+      - name: Independently validate actual video and sample 2fps original/portrait motion
+        shell: bash
+        env:
+          VIDEO: ${{ steps.source.outputs.asset_path }}
+          ORIGINAL_SHA: ${{ steps.source.outputs.sha256 }}
+          RIGHTS: ${{ steps.source.outputs.rights_status }}
+        run: |
+          set -euo pipefail
+          mkdir -p qa
+          ffprobe -v error -show_format -show_streams -of json "$VIDEO" > qa/ffprobe.json
+          printf '%s\n' "$ORIGINAL_SHA" > qa/original_sha256.txt
+          ffmpeg -hide_banner -loglevel error -xerror -i "$VIDEO" -f null -
+          width="$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of csv=p=0 "$VIDEO")"
+          height="$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=p=0 "$VIDEO")"
+          duration="$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$VIDEO")"
+          [[ "$width" -ge 1920 && "$height" -ge 1080 ]] || { echo "::error::Source below 1080p: NO-GO"; exit 3; }
+          crop_width=$((height*9/16))
+          crop_width=$((crop_width/2*2))
+          crop_x=$(((width-crop_width)/2))
+          [[ "$crop_width" -gt 0 && "$crop_x" -ge 0 ]] || exit 3
+          for start in 0 30 60 90; do
+            if awk -v d="$duration" -v s="$start" 'BEGIN {exit !(s<d)}'; then
+              ffmpeg -nostdin -hide_banner -loglevel error -y -ss "$start" -t 30 -i "$VIDEO" -vf "fps=2,scale=480:-2,tile=6x10:padding=2:margin=2" -frames:v 1 -update 1 "qa/wide-relative-$start.jpg"
+              ffmpeg -nostdin -hide_banner -loglevel error -y -ss "$start" -t 30 -i "$VIDEO" -vf "fps=2,crop=${crop_width}:${height}:${crop_x}:0,scale=192:342,tile=6x10:padding=2:margin=2" -frames:v 1 -update 1 "qa/portrait-relative-$start.jpg"
+            fi
+          done
+          {
+            echo "SOURCE: Richard Mille original 2021 Speed Tale, director Guillaume Mille."
+            echo "SOURCE URL: https://www.youtube.com/watch?v=cTRcPh1kl_s"
+            echo "SCOUT REQUEST: ORIGINAL 60-180 seconds; grid relative start 0,30,60,90 maps to original 60,90,120,150 seconds."
+            echo "Independent original press reports describe REAL road-going P1 and Speedtail driving in Spain."
+            echo "CRITICAL: This is a two-model film. Confirm each frame shows the actual road P1, not Speedtail, and do not mistake montage CGI/previsualization for filmed footage."
+            echo "AUTHENTICATED ISSUE: #299 SHA256 $ORIGINAL_SHA"
+            echo "RIGHTS: $RIGHTS. Film is brand-sponsored by Richard Mille/McLaren; NO reuse permission established. Private owner review only, no public publication."
+            echo "Source frames are landscape; 9:16 center crop is NOT native portrait and may exclude the car."
+            echo "This scout is NOT an editor-approved MP4 selects package; require exact in/out, real continuous motion, verified portrait crop, independent decode, hashes and licensed rights before any GO."
+            echo "No documentary picture, sound, final master or existing approved media changed."
+          } > qa/README.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yunex-ep003-speedtale299-owner-only-original-portrait-contact-qa
+          path: qa/
+          retention-days: 2
+          if-no-files-found: error
